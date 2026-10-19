@@ -175,3 +175,17 @@ a:hover { text-decoration-thickness: 2px; }
     .a-rincian dd { margin-bottom: var(--a-ruang-3); }
     .a-header__pengguna { gap: var(--a-ruang-2); }
 }
+
+
+/* K2: formulir referensi, breadcrumb dan tabel penetapan G1 */
+.a-breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: var(--a-ruang-2); margin-bottom: var(--a-ruang-3); color: var(--a-redup); font-size: .9rem; }
+.a-breadcrumb a { font-weight: 650; }
+.a-dua-kolom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--a-ruang-4); align-items: start; }
+.a-dua-kolom > .a-card { min-width: 0; }
+.a-form-penugasan { min-width: 260px; }
+.a-form-penugasan .a-btn { justify-self: start; }
+.a-tbl--luas { min-width: 730px; }
+.a-baca-panel .a-field textarea { resize: vertical; }
+@media (max-width: 899px) {
+    .a-dua-kolom { grid-template-columns: minmax(0, 1fr); }
+}

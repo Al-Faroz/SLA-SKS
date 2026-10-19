@@ -24,4 +24,15 @@ $routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan'])
 $routes->get('admin/pengguna', 'Akun::pengguna', ['filter' => 'auth:admin']);
 $routes->post('admin/pengguna', 'Akun::prosesBuatPengguna', ['filter' => 'auth:admin']);
 
+
+// K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
+$routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);
+$routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'auth:admin']);
+$routes->post('admin/referensi/tahun-ajaran', 'AdminReferensi::buatTahunAjaran', ['filter' => 'auth:admin']);
+$routes->get('admin/mapel-guru', 'AdminReferensi::mapel', ['filter' => 'auth:admin']);
+$routes->post('admin/mapel-guru', 'AdminReferensi::buatMapel', ['filter' => 'auth:admin']);
+$routes->post('admin/mapel-guru/(:num)/guru', 'AdminReferensi::tetapkanGuru/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/identitas', 'AdminIdentitas::index', ['filter' => 'auth:admin']);
+$routes->post('admin/identitas', 'AdminIdentitas::simpan', ['filter' => 'auth:admin']);
+
 $routes->set404Override('\App\Controllers\Publik::tidakDitemukan');

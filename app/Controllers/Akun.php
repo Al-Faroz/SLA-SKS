@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
+use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
@@ -202,14 +203,6 @@ final class Akun extends BaseController
     /** @return list<array{label:string,path:string,aktif:bool}> */
     private function menu(string $peran, string $aktif): array
     {
-        $menu = [
-            ['label' => 'Beranda', 'path' => $peran, 'aktif' => $aktif === $peran],
-        ];
-        if ($peran === 'admin') {
-            $menu[] = ['label' => 'Pengguna', 'path' => 'admin/pengguna', 'aktif' => $aktif === 'pengguna'];
-        }
-        $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
-
-        return $menu;
+        return NavigasiService::untuk($peran, $aktif);
     }
 }

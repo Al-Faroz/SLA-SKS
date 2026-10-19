@@ -38,3 +38,27 @@
     });
     mobile.addEventListener('change', () => setOpen(false));
 })();
+
+
+/* Form identitas: tombol Simpan aktif hanya setelah isi berubah. Tanpa JS tetap bisa submit. */
+(() => {
+    'use strict';
+    const form = document.querySelector('[data-dirty-form]');
+    if (!form) return;
+    const button = form.querySelector('[data-dirty-submit]');
+    const status = form.querySelector('[data-dirty-status]');
+    if (!button || !status) return;
+    const fields = [...form.querySelectorAll('input[name], textarea[name], select[name]')]
+        .filter(field => field.name !== 'csrf_test_name');
+    const awal = fields.map(field => field.value);
+    const perbarui = () => {
+        const berubah = fields.some((field, index) => field.value !== awal[index]);
+        button.disabled = !berubah;
+        status.textContent = berubah
+            ? 'Perubahan belum disimpan. Klik Simpan identitas untuk menyimpan.'
+            : 'Belum ada perubahan untuk disimpan.';
+    };
+    form.addEventListener('input', perbarui);
+    form.addEventListener('change', perbarui);
+    perbarui();
+})();

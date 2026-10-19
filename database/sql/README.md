@@ -1,24 +1,24 @@
-# SQL SLA-SKS v2.2 — Tahap K1
+# SQL SLA-SKS v2.2 — Pembaruan K2
 
-**K1 hanya skema identitas, peran, sesi, pembatasan login, dan audit.** Bukan dump final LMS. Tidak ada data pribadi atau sandi contoh pada repository.
+## Database K1 yang sudah dipakai
+JANGAN instal ulang file install/k1_fondasi_akun.sql. Patch K2 tidak menghapus data K1.
 
-## Instalasi di database KOSONG
-1. Pastikan koneksi database .env lokal telah benar.
-2. Buka phpMyAdmin dan pilih database SLA-SKS yang masih kosong. Jangan menghapus data apa pun.
-3. Impor file database/sql/install/k1_fondasi_akun.sql SATU KALI.
-4. Periksa schema_version = K1-0001 serta tabel pengguna, pengguna_peran, batas_login, log_aktivitas, ci_sessions.
-5. Pada CMD di root proyek jalankan: G:\xampp\php\php.exe spark sla:admin-awal
-6. Ikuti petunjuk nama dan username. Perintah memberikan sandi sementara acak hanya satu kali di terminal. Simpan privat, lalu wajib ganti sandi pada login pertama.
+1. Backup manual database dan folder writable/ ke lokasi privat.
+2. Pada phpMyAdmin pilih database SLA-SKS yang sama.
+3. Jalankan SELECT versi FROM schema_version; pastikan K1-0001 ada dan K2-0002 belum ada.
+4. Impor database/sql/updates/0002_referensi_identitas.sql SATU KALI.
+5. Periksa schema_version sekarang berisi K1-0001 dan K2-0002.
+6. Login kembali dengan akun Admin yang lama; gunakan menu Gen & Tahun Ajaran, Mapel & Guru, Identitas Madrasah.
 
-**Jangan menyimpan sandi, .env, atau data riil pengguna di GitHub.** Skrip admin awal menolak dijalankan bila sudah ada pengguna.
+File SQL menambah 10 tabel tanpa menyentuh data K1, serta referensi tetap MTs Fase D (semester 1–6).
+Data nyata siswa, guru, dan identitas sekolah tidak ada pada dump.
 
-## Ketergantungan dan keamanan
-- K1 berbasis K0 pada branch feature/k0-foundation. Uji dan gabungkan K0 terlebih dahulu.
-- Tidak menggunakan migrations/seeders CI4.
-- Jika database tidak kosong, JANGAN impor skema K1 tanpa audit tabel yang sudah ada.
-- Dump instalasi final sla_sks_v2_2_full.sql belum dibuat. K1 menyiapkan tabel yang dibutuhkan tahap ini saja.
-- SQL berikutnya memakai file tambahan incremental bernomor di database/sql/updates, tanpa reset data.
-- Lakukan backup manual sebelum pembaruan; DDL tidak selalu dapat dibatalkan dengan ROLLBACK.
+PENTING: DDL MySQL/MariaDB dapat melakukan implicit commit. Bila impor terputus,
+JANGAN impor ulang begitu saja. Periksa tabel yang telah dibuat dan lakukan pemulihan
+melalui backup bila perlu. Pengujian MariaDB hosting masih harus dilakukan.
 
-## Uji manual yang dibutuhkan
-Uji MySQL XAMPP dan MariaDB hosting pada database pengujian terpisah, login salah lima kali, ganti sandi pertama, logout POST/CSRF, akses lintas role, URL privat, dan sesi usang. K1 tidak boleh dianggap siap produksi tanpa seluruh pemeriksaan ini.
+## Instalasi baru (database benar-benar kosong)
+Jalankan install/k1_fondasi_akun.sql kemudian updates/0002_referensi_identitas.sql.
+Baru kemudian jalankan CLI inisialisasi Admin awal dari K1.
+
+Tidak memakai CI4 Migration atau Seeder. SQL berikutnya harus incremental dan diberi nomor.
