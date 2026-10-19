@@ -154,3 +154,24 @@ a:hover { text-decoration-thickness: 2px; }
     html { scroll-behavior: auto; }
     .a-side { transition: none; }
 }
+
+
+/* K1 — formulir identitas dan status akun bersama. */
+.a-form { display: grid; gap: var(--a-ruang-3); }
+.a-form .a-field { margin: 0; }
+.a-form .a-btn { justify-self: start; }
+.a-akses .a-form { width: 100%; }
+.a-akses .a-form .a-btn { width: 100%; }
+.a-jarak-atas { margin-top: var(--a-ruang-6); }
+.a-baca-panel { max-width: 730px; }
+.a-rincian { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: var(--a-ruang-3); }
+.a-rincian dt { font-weight: 700; color: var(--a-redup); }
+.a-rincian dd { margin: 0; overflow-wrap: anywhere; }
+.a-fieldset { border: 1px solid var(--a-garis); border-radius: var(--a-radius-kecil); padding: var(--a-ruang-3); }
+.a-fieldset label { display: flex; gap: var(--a-ruang-2); align-items: center; min-height: 40px; }
+.a-form-keluar { margin: 0; }
+@media(max-width: 767px) {
+    .a-rincian { grid-template-columns: minmax(0,1fr); gap: var(--a-ruang-1); }
+    .a-rincian dd { margin-bottom: var(--a-ruang-3); }
+    .a-header__pengguna { gap: var(--a-ruang-2); }
+}

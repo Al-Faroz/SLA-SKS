@@ -18,13 +18,13 @@ final class K0PublikTest extends CIUnitTestCase
         $hasil->assertStatus(302);
     }
 
-    public function testHalamanAksesTidakMenawarkanFormLoginPalsu(): void
+    public function testHalamanMasukMenampilkanFormLoginAsli(): void
     {
         $hasil = $this->get('/masuk');
 
         $hasil->assertStatus(200);
-        $hasil->assertSee('Akses akun belum dibuka');
-        $hasil->assertDontSee('<form');
+        $hasil->assertSee('Masuk SLA-SKS');
+        $hasil->assertSee('<form');
     }
 
     public function testKebijakanPrivasiBelumDisahkanTidakDianggapTerbit(): void

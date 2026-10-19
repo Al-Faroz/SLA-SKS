@@ -47,6 +47,10 @@ $peranAktif = $peranAktif ?? '';
             <div class="a-header__pengguna">
                 <strong><?= esc($namaPengguna) ?></strong>
                 <span class="a-badge"><?= esc($peranAktif) ?></span>
+                <form method="post" action="<?= esc(site_url('keluar'), 'attr') ?>" class="a-form-keluar">
+                    <?= csrf_field() ?>
+                    <button class="a-btn a-btn--sekunder" type="submit">Keluar</button>
+                </form>
             </div>
         </header>
         <main class="a-main__konten" id="konten-utama">
