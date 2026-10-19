@@ -1,0 +1,21 @@
+# Runtime / credentials
+.env
+.env.*
+!.env.example
+/vendor/
+/node_modules/
+/writable/*
+!/writable/.gitkeep
+# Backups and data exports
+*.sql.gz
+*.bak
+*.backup
+*.log
+*.tmp
+*.cache
+/private/
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
