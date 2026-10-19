@@ -28,6 +28,8 @@ final class Akun extends BaseController
             }
         }
 
+        $this->response->setHeader('Cache-Control', 'no-store, private');
+
         return view('akun/masuk', ['judul' => 'Masuk']);
     }
 
