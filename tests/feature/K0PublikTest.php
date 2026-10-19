@@ -24,7 +24,7 @@ final class K0PublikTest extends CIUnitTestCase
 
         $hasil->assertStatus(200);
         $hasil->assertSee('Akses akun belum dibuka');
-        $hasil->assertDontSee('<form', false);
+        $hasil->assertDontSee('<form');
     }
 
     public function testKebijakanPrivasiBelumDisahkanTidakDianggapTerbit(): void

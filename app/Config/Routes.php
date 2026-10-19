@@ -8,4 +8,4 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Publik::beranda');
 $routes->get('masuk', 'Publik::masuk');
 $routes->get('kebijakan-privasi', 'Publik::kebijakanPrivasi');
-$routes->set404Override('Publik::tidakDitemukan');
+$routes->set404Override('\App\Controllers\Publik::tidakDitemukan');
