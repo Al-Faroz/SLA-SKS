@@ -59,9 +59,9 @@
                 </div>
             </div>
             <div class="a-proto-shortcuts">
-                <a href="<?= esc(site_url('admin/pengguna'), 'attr') ?>">
+                <a href="<?= esc(site_url('admin/pengelola'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8.5" cy="8" r="2.5"/><path d="M3 19v-2.2A4.8 4.8 0 0 1 7.8 12h1.4a4.8 4.8 0 0 1 4.8 4.8V19M16 5a3 3 0 0 1 0 6M17 13a4 4 0 0 1 4 4v2"/></svg></span>
-                    <span><strong>Pengguna</strong><small>Akun, peran dan sandi awal</small></span>
+                    <span><strong>Pengelola</strong><small>Akun staf dan reset sandi</small></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/referensi'), 'attr') ?>">

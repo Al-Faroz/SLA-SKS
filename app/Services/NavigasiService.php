@@ -15,7 +15,8 @@ final class NavigasiService
         ];
         if ($peran === 'admin') {
             foreach ([
-                'pengguna' => ['Pengguna', 'admin/pengguna'],
+                'pengelola' => ['Pengelola', 'admin/pengelola'],
+                'siswa' => ['Siswa', 'admin/siswa'],
                 'gen' => ['Gen & Tahun Ajaran', 'admin/referensi'],
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],

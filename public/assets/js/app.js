@@ -62,3 +62,29 @@
     form.addEventListener('change', perbarui);
     perbarui();
 })();
+
+
+/* Reset akun K2B: sandi hanya disalin setelah Admin menekan tombol. */
+(() => {
+    'use strict';
+    const tombol = document.querySelector('[data-salin-sandi]');
+    const input = document.getElementById('sandi-baru-sekali');
+    const status = document.querySelector('[data-status-salin]');
+    if (!tombol || !input || !status) return;
+    tombol.addEventListener('click', async () => {
+        if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            input.focus();
+            input.select();
+            status.textContent = 'Salin teks yang telah dipilih secara manual.';
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(input.value);
+            status.textContent = 'Sandi telah disalin. Sampaikan melalui saluran privat.';
+        } catch {
+            input.focus();
+            input.select();
+            status.textContent = 'Penyalinan otomatis tidak diizinkan. Salin teks terpilih secara manual.';
+        }
+    });
+})();
