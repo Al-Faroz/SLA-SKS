@@ -49,6 +49,8 @@ Koreksi soal/kunci yang sah dapat menghitung ulang TP dari tuntas menjadi belum 
 ## 8. Verifikasi publik
 `GET /verifikasi/{kode}` tanpa login, token acak sulit ditebak, rate limit. Tampilkan **nomor, nama, mapel, semester, nilai akhir tercetak pada versi yang ditanyakan, tanggal terbit, status, dan tautan versi terbaru bila digantikan**. **Jangan tampilkan NISN, HP, tanggal lahir, alasan koreksi atau audit.** QR lama tetap bisa diakses dengan label `Digantikan — bukan versi terbaru`. Kode tidak ada: `Sertifikat tidak ditemukan`. Akses PDF asli hanya untuk pemilik dan peran berwenang; halaman publik bukan endpoint download PDF.
 
+**Laporan dan sertifikat per Gen (v2.3):** setiap sertifikat/rapor mengacu pada snapshot siswa, Gen, mapel, paket semester dan versi konten historis yang benar. Paket antargen terpisah meskipun kode BAB atau CP serupa; filter laporan Guru selalu membatasi Gen–Mapel penugasan aktif. Nomor/QR dan versi sertifikat tetap unik, sertifikat lama tidak berubah ketika Guru atau data Gen lainnya diganti. Pada ekspor akun R9, data Pengelola dan Siswa dapat diunduh terpisah sesuai filter, tanpa sandi/hash/token, disanitasi dari formula injection.
+
 ## 9. Daftar laporan resmi
 | Kode | Laporan | Format/isi |
 |---|---|---|
@@ -62,4 +64,4 @@ Koreksi soal/kunci yang sah dapat menghitung ulang TP dari tuntas menjadi belum 
 | R8 | Aktivitas penilaian guru | Excel; antrean, jumlah/umur item, durasi penilaian |
 | R9 | Daftar akun | Excel; identitas/status/role/login, **tanpa password** |
 
-Rapor siswa dapat dilihat siswa pemilik; Guru hanya mapelnya; Admin seluruhnya; Pimpinan baca-saja. Excel dinetralkan dari formula injection (`=`, `+`, `-`, `@`), nilai sementara **wajib dilabel**, laporan besar dapat dibatasi filter dengan pesan jelas. PDF laporan A4 portrait kecuali sertifikat A4 landscape.
+Rapor siswa dapat dilihat siswa pemilik; Guru hanya siswa dan paket **Gen–Mapel yang aktif ditugaskan**; Admin seluruhnya; Pimpinan baca-saja. Excel dinetralkan dari formula injection (`=`, `+`, `-`, `@`), nilai sementara **wajib dilabel**, laporan besar dapat dibatasi filter dengan pesan jelas. PDF laporan A4 portrait kecuali sertifikat A4 landscape.

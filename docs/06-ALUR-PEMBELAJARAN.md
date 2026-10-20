@@ -1,7 +1,9 @@
 # 06 — Alur Pembelajaran Siswa dan Pencapaian
 
 ## 1. Prasyarat akses
-Siswa hanya dapat membuka paket yang ditugaskan menurut Gen/tahun ajaran/semester mulai efektif. Semester sebelum titik mulai bertanda **Dilewati** tanpa skor/sertifikat. Semester berikutnya dibuka berurutan setelah sebelumnya memenuhi ketuntasan; BAB dan TP juga berurutan. Jika BAB berikutnya draf, siswa melihat **"Menunggu BAB berikutnya disiapkan guru"**, bukan error kosong.
+Siswa hanya dapat membuka paket **milik Gen siswa** yang ditugaskan menurut Gen/tahun ajaran/semester mulai efektif. Semester sebelum titik mulai bertanda **Dilewati** tanpa skor/sertifikat. Semester berikutnya dibuka berurutan setelah sebelumnya memenuhi ketuntasan; BAB dan TP juga berurutan. Jika BAB berikutnya draf, siswa melihat **"Menunggu BAB berikutnya disiapkan guru"**, bukan error kosong.
+
+**Paket independen antar-Gen:** semua langkah pembelajaran siswa mengikat `siswa.angkatan_id`, penugasan paket Gen sendiri, serta versi paket/BAB yang dipin. Siswa Gen A tidak dapat memakai tautan, nomor paket, BAB, soal atau kemajuan Gen B walaupun mata pelajarannya sama. Ketuntasan dan lencana dinilai dari paket sendiri. Guru yang berwenang menilai atau menangani siswa selalu ditentukan dari Gen–Mapel siswa itu; perubahan Guru di Gen lain tidak berdampak.
 
 ## 2. Mesin alur setiap TP
 ```mermaid

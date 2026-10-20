@@ -15,7 +15,7 @@ HTTP → Filter (auth, peran aktif, CSRF, rate-limit) → Controller → Service
                                                         ↓
                                            Audit / Notifikasi / PDF
 ```
-Service sentral minimum: `AuthService`, `PengaturanService`, `GuruMapelService`, `KurikulumService`, `CpService`, `PaketService`, `BabService`, `ImporBabService`, `MateriService`, `ProgresService`, `UjianService`, `PenilaianGuruService`, `KoreksiNilaiService`, `NilaiService`, `SertifikatService`, `NotifikasiService`, `PengumumanService`, `FaqService`, `LaporanService`, `BerkasService`, `LogService`.
+Service sentral minimum: `AuthService`, `PengaturanService`, `GuruMapelService`, `PenggunaImportService`, `PenggunaExportService`, `ProfilService`, `KurikulumService`, `CpService`, `PaketService`, `BabService`, `ImporBabService`, `MateriService`, `ProgresService`, `UjianService`, `PenilaianGuruService`, `KoreksiNilaiService`, `NilaiService`, `SertifikatService`, `NotifikasiService`, `PengumumanService`, `FaqService`, `LaporanService`, `BerkasService`, `LogService`.
 
 Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode (mis. `BAB_TERKUNCI`, `NILAI_BERUBAH`, `UJIAN_FULLSCREEN_WAJIB`, `TTD_SERTIFIKAT_KOSONG`, `SERTIFIKAT_REVISI_GAGAL`). Controller menerjemahkannya ke status HTTP dan pesan Indonesia. View tidak mengarang syarat baru.
 
@@ -24,7 +24,7 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 |---|---|---|
 | GET,POST | `/masuk` | Public; rate limit, password hash |
 | POST | `/keluar`, `/peran/ganti` | Auth + CSRF; sesi diregenerasi |
-| GET,POST | `/ganti-sandi`, `/profil` | Auth; wajib ganti pada login awal |
+| GET,POST | `/ganti-sandi`, `/profil` | Auth; staf hanya edit foto/kontak pribadi/sandi sendiri; data resmi hanya Admin |
 | GET | `/verifikasi/{kode}` | Public; informasi terbatas, rate limit |
 | GET | `/kebijakan-privasi` | Public; teks kebijakan sekolah berversi |
 | GET | `/berkas/{id}` | Auth + owner; mendukung `Range` untuk audio/PDF |
@@ -33,11 +33,17 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET,POST | `/siswa/materi/{id}`, `/siswa/materi/{id}/resume` | Pembuktian materi, draf manual/kirim |
 | GET,POST | `/siswa/tp/{id}/tugas` | Draf manual/kirim |
 | GET | `/siswa/nilai`, `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Hanya miliknya |
-| GET,POST | `/guru/bab/{id}/...`, `/guru/tp/{id}/...` | G1 + hanya draf kecuali koreksi khusus |
+| GET,POST | `/guru/bab/{id}/...`, `/guru/tp/{id}/...` | G1 aktif **Gen–Mapel objek** + hanya draf kecuali koreksi khusus |
 | GET,POST | `/guru/bab/{id}/impor`, `/guru/bab/{id}/impor/konfirmasi` | XLSX validasi lalu transaksi |
-| GET,POST | `/guru/penilaian/...`, `/guru/ujian/{id}/keputusan` | Penilaian/keputusan Guru mapel |
+| GET,POST | `/guru/penilaian/...`, `/guru/ujian/{id}/keputusan` | Guru hanya untuk Gen–Mapel siswa/ujian terkait |
 | GET,POST | `/guru/koreksi-bab/...`, `/guru/koreksi-nilai/...` | Pengajuan akademik berversi |
-| GET,POST | `/admin/akun/...`, `/admin/siswa/{id}/biodata` | Admin; audit |
+| GET,POST | `/admin/pengelola/...`, `/admin/siswa/...` | Dua ruang Admin dengan akun bersama; tambah/ubah/nonaktif/reset per akun, audit |
+| GET,POST | `/admin/pengelola/impor`, `/admin/siswa/impor`, `.../konfirmasi` | Template XLSX terpisah, pratinjau galat, transaksi dan idempotensi |
+| GET | `/admin/pengelola/ekspor`, `/admin/siswa/ekspor` | XLSX sesuai filter; tanpa sandi/hash; sanitasi sel |
+| POST | `/admin/pengelola/{id}/reset-sandi`, `/admin/siswa/{id}/reset-sandi` | CSRF, audit, konfirmasi, sandi sementara acak sekali tampil, cabut sesi lama |
+| GET | `/guru/{id}/profil` | Siswa hanya profil profesional Guru yang ditugaskan pada Gen-nya; tanpa data kontak pribadi |
+| GET,POST | `/admin/mapel-guru/.../gen/{angkatan_id}` | Penugasan/riwayat satu Guru aktif per Gen–Mapel, validasi role Guru |
+
 | GET,POST | `/admin/cp/...`, `/admin/koreksi-bab/...`, `/admin/koreksi-nilai/...` | Admin; larangan approve usulan sendiri |
 | GET,POST | `/admin/pengaturan/identitas`, `/admin/pengaturan/aset` | Branding dengan upload tervalidasi |
 | GET,POST | `/admin/sertifikat/template/...`, `/admin/sertifikat/{id}/revisi-identitas` | Versi background, pratinjau, revisi |
@@ -47,6 +53,10 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET | `/pimpinan/...`, `/pratinjau/...` | Baca saja; pratinjau tidak menyimpan data |
 
 Rute final boleh mengikuti penamaan CI4 yang konsisten, tetapi **aksi, hak, efek data dan statusnya wajib sama**. Semua API mengembalikan hasil dan pesan terstruktur; parameter ID divalidasi kepemilikannya.
+
+### Kontrak izin dan data Gen v2.3
+Semua service Guru, paket, BAB, penilaian, ujian dan laporan menyelesaikan `angkatan_id` melalui objek terikat server (paket/siswa) dan menegaskan `penugasan_guru_gen(angkatan_id,mapel_id,guru_id)` untuk pengguna Guru berperan aktif. **Jangan** menjadikan `created_by`, `ref_mapel.guru_id`, parameter Gen dari form saja, atau kombinasi role staf sebagai bukti kepemilikan. `paket_semester` harus dimiliki Gen yang sama dengan penugasan aktif; perubahan Guru tidak mengubah snapshot/riwayat siswa.
+Impor pengguna harus memisahkan mode pratinjau dan konfirmasi, memakai checksum/kunci idempoten, pemeriksaan server saat commit, dan transaksi pembaruan NISN+username secara atomik. Reset sandi per akun menaikkan versi sesi dan memaksa ganti sandi; hasil sementara tidak boleh masuk log, URL atau ekspor.
 
 ## 4. Penanganan upload
 Validasi MIME hasil inspeksi, ekstensi, ukuran, dimensi, decoder, PDF aktif, dan checksum sebelum memindahkan file ke storage. Aset historis tidak ditimpa. Service membuat metadata setelah berkas lolos validasi. Gagal simpan tidak membiarkan baris file aktif tanpa berkas. Proxy berkas privat dengan cek hak akses dan *Content-Disposition* yang sesuai.
