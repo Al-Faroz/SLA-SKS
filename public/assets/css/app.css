@@ -383,3 +383,57 @@ a:hover { text-decoration-thickness: 2px; }
 @media (prefers-reduced-motion: reduce) {
     .a-proto-shortcuts a { transition: none; }
 }
+
+
+/* K2B — Administrasi Pengelola dan Siswa, memakai design system panel v2.3. */
+.a-admin-akun { display: grid; gap: 18px; }
+.a-admin-akun__jumlah { border: 1px solid #d6e6de; color: #175c45; background: #e8f6ee; border-radius: 50px; padding: 7px 11px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.a-admin-akun__grid { display: grid; grid-template-columns: minmax(285px, 340px) minmax(0, 1fr); align-items: start; gap: 14px; }
+.a-app--prototipe .a-admin-akun__form,
+.a-app--prototipe .a-admin-akun__daftar { padding: 18px; min-width: 0; }
+.a-admin-akun__form h2 { font-size: 17px; margin: 0 0 6px; }
+.a-admin-akun__form > .a-help { margin: 0 0 18px; font-size: 12px; }
+.a-admin-akun__form .a-form { gap: 12px; }
+.a-admin-akun__form .a-form .a-field { gap: 6px; }
+.a-admin-akun__form .a-form .a-btn { justify-self: stretch; }
+.a-admin-akun__form .a-fieldset { display: grid; gap: 5px; }
+.a-admin-akun__form .a-fieldset label { min-height: 32px; font-size: 13px; }
+.a-admin-akun__form .a-fieldset input { width: auto; min-height: 0; }
+.a-admin-akun__filter { margin: 15px 0 13px; gap: 9px; align-items: end; }
+.a-admin-akun__filter .a-field { margin: 0; gap: 5px; }
+.a-admin-akun__filter .a-field:first-child { flex: 1 1 170px; }
+.a-admin-akun__filter .a-field:nth-child(2) { flex: 0 1 130px; }
+.a-admin-akun__filter button,
+.a-admin-akun__filter a { white-space: nowrap; min-height: 42px; }
+.a-admin-akun__tabel { min-width: 600px; }
+.a-app--prototipe .a-admin-akun__tabel th,
+.a-app--prototipe .a-admin-akun__tabel td { padding: 10px; font-size: 12px; line-height: 1.5; vertical-align: middle; }
+.a-app--prototipe .a-admin-akun__tabel th { color: #637782; background: #f2f6f8; white-space: nowrap; }
+.a-admin-akun__tabel td > strong { font-size: 12px; }
+.a-admin-akun__subtitle { display: block; margin-top: 3px; color: #748591; font-size: 11px; }
+.a-admin-akun__tabel .a-btn { white-space: nowrap; }
+.a-admin-akun__penempatan { display: grid; gap: 6px; margin-top: 8px; max-width: 210px; }
+.a-admin-akun__penempatan .a-label { font-size: 11px; }
+.a-admin-akun__penempatan select { width: 100%; min-height: 38px; border: 1px solid #cfdbe1; border-radius: 7px; padding: 6px; background: #fff; }
+.a-admin-akun__penempatan button { justify-self: start; }
+.a-admin-akun__pagination { display: flex; flex-wrap: wrap; gap: 8px; }
+.a-akun-reset { max-width: 730px; }
+.a-app--prototipe .a-akun-reset h1 { margin-top: 0; font-size: 24px; }
+.a-akun-reset .a-rincian { margin-block: 18px; padding: 16px; background: #f6faf8; border-radius: 9px; }
+.a-akun-reset__aksi { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.a-akun-reset__aksi .a-btn { justify-self: auto; }
+.a-akun-reset__rahasia { display: grid; gap: 8px; margin: 20px 0; }
+.a-akun-reset__rahasia input { width: 100%; padding: 12px; border: 1px solid #c8d8cf; border-radius: 8px; font-size: 16px; font-family: ui-monospace, Consolas, monospace; letter-spacing: .06em; }
+@media (max-width: 1150px) {
+    .a-admin-akun__grid { grid-template-columns: minmax(0, 1fr); }
+    .a-admin-akun__form { max-width: 640px; }
+}
+@media (max-width: 767px) {
+    .a-admin-akun { gap: 14px; }
+    .a-admin-akun__filter { align-items: stretch; }
+    .a-admin-akun__filter .a-field { flex: 1 1 100% !important; }
+    .a-admin-akun__filter button,
+    .a-admin-akun__filter a { flex: 1 1 auto; }
+    .a-admin-akun__jumlah { white-space: normal; }
+    .a-akun-reset .a-rincian { grid-template-columns: minmax(0, 1fr); }
+}

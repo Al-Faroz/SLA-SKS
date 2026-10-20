@@ -166,42 +166,10 @@ final class Akun extends BaseController
         return view('akun/beranda', $data);
     }
 
-    public function pengguna(): ResponseInterface|string
+    /** Rute lama tidak digunakan lagi; arahkan Admin ke Pengelola. */
+    public function pengguna(): RedirectResponse
     {
-        if (! $this->servis()->izinkan('admin')) {
-            return $this->ditolak();
-        }
-        $akun = $this->servis()->penggunaSaatIni();
-
-        return view('akun/daftar_pengguna', [
-            'judul' => 'Pengguna',
-            'namaPengguna' => $akun['nama'],
-            'peranAktif' => 'Admin',
-            'tautanNavigasi' => $this->menu('admin', 'pengguna'),
-            'pengguna' => $this->servis()->daftarPengguna(),
-        ]);
-    }
-
-    public function prosesBuatPengguna(): RedirectResponse|ResponseInterface
-    {
-        if (! $this->servis()->izinkan('admin')) {
-            return $this->ditolak();
-        }
-
-        $peran = $this->request->getPost('peran');
-        try {
-            $this->servis()->buatPengguna(
-                (string) $this->request->getPost('username'),
-                (string) $this->request->getPost('nama'),
-                (string) $this->request->getPost('sandi'),
-                is_array($peran) ? array_values(array_map('strval', $peran)) : []
-            );
-        } catch (DomainException $e) {
-            return redirect()->to(site_url('admin/pengguna'))->with('galat', $e->getMessage());
-        }
-
-        return redirect()->to(site_url('admin/pengguna'))->with('sukses',
-            'Akun berhasil dibuat. Sampaikan sandi awal kepada pengguna secara privat.');
+        return redirect()->to(site_url('admin/pengelola'));
     }
 
     private function ditolak(): ResponseInterface
