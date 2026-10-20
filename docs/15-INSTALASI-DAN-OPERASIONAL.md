@@ -32,12 +32,19 @@ sla-sks/
 ## 3. Instalasi awal tanpa migration/seeder
 1. Siapkan hosting dan database MariaDB kosong, domain HTTPS dan PHP extension.
 2. Upload aplikasi (kecuali data dev/test yang tidak diperlukan di produksi), `vendor/` hasil Composer; hak file/folder seminimal mungkin. `writable/` dapat ditulis PHP, directory listing mati.
-3. Import **`database/sql/install/sla_sks_v2_2_full.sql`** melalui phpMyAdmin atau CLI setelah dump benar-benar dibuat/dites developer. Dump berisi skema dan pengaturan default non-pribadi, **tidak** menyisipkan password Admin umum sebagai teks biasa.
+3. Import **`database/sql/install/sla_sks_v2_3_full.sql`** melalui phpMyAdmin atau CLI setelah dump benar-benar dibuat/dites developer. Dump berisi skema dan pengaturan default non-pribadi, **tidak** menyisipkan password Admin umum sebagai teks biasa.
 4. Buat akun Admin awal melalui tahap inisialisasi aman **sekali pakai** (atau data hash unik hasil setup), lalu nonaktifkan endpoint/script setup. Password pertama harus diganti.
 5. Salin `.env.example` menjadi `.env` secara privat; isi koneksi DB, `app.baseURL`, HTTPS, session/CSRF, zona Asia/Jakarta. Jangan push `.env`.
 6. Login Admin dan lengkapi **seluruh data madrasah wajib** (nama, alamat, NPSN, NSM, telepon, email, kota, kepala madrasah dan NIP); situs web boleh kosong. Upload logo, ikon dan **PNG tanda tangan wajib untuk sertifikat**; latar sertifikat optional karena ada template bawaan.
-7. Atur Gen, siswa, Guru, mapel, satu Guru per mapel, kurikulum dan referensi CP. Guru mengisi konten melalui BAB + Excel.
+7. Atur Gen, siswa, Guru, mapel, satu Guru **per pasangan Gen–Mapel**, kurikulum dan referensi CP. Guru mengisi konten melalui BAB + Excel.
 8. Jalankan checklist rute, akses privat, ujian fullscreen dan QR sebelum dipakai siswa.
+
+### Pemutakhiran v2.3 pada instalasi K1/K2 yang sudah berisi data
+- **PR K2 #3 belum digabung** dan memuat model Guru global v2.2; sebagian instalasi lokal **sudah mengimpor** patch SQL K2 dan mengisi data. Jangan mengganti berkas SQL yang pernah diimpor lalu meminta pemilik mengimpornya ulang.
+- Setelah dokumen v2.3 disahkan, revisi kode K2 agar memilih Gen+mapel dan penugasan Guru per Gen. Buat SQL pembaruan **baru bernomor 0003** untuk instalasi yang sudah memakai `K2-0002` (bukan CI4 Migration); pra-syarat versi wajib dicek, backup DB dan `writable/` terlebih dahulu.
+- Kolom `ref_mapel.guru_id` dan riwayat Guru global K2 dipertahankan sebagai data warisan selama transisi; **jangan otomatis menyebarkan penugasan Guru lama ke seluruh Gen**. Admin menetapkan ulang masing-masing pasangan Gen–Mapel.
+- Kode paket baru mengikat setiap paket ke Gen pemilik. Paket/riwayat siswa yang sudah ada tidak dihapus, di-reset atau dipindahkan ke Gen lain; bila penentuan pemilik ambigu hentikan proses dan lakukan verifikasi manual.
+- Perubahan dokumen saja **tidak** menjalankan SQL dan tidak mengubah aplikasi localhost; uji DB MySQL dan MariaDB tetap wajib sebelum produksi.
 
 ## 4. Pembaruan versi tanpa migration
 1. Baca catatan release/versi SQL saat ini dari `schema_version`.

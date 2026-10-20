@@ -14,12 +14,14 @@ TP dibuat Guru pengampu dengan `kode_tp` stabil, rumusan, indikator ketercapaian
 6. Bila akun pengusul adalah akun Admin+Guru yang sama, persetujuan usulan akademiknya tidak dilakukan oleh akun tersebut; sediakan peringatan atas benturan identitas.
 
 ## 3. Paket semester berversi
-`paket_semester` adalah paket konten mapel/kelas/semester/kurikulum/versi. `penugasan_paket` mengaitkan paket dengan angkatan dan tahun ajaran, bukan menetapkan Guru. Untuk `(angkatan, mapel, semester, tahun_ajaran)` hanya ada satu paket aktif. Jika kurikulum berubah, buat revisi paket untuk penugasan baru; siswa yang telah memiliki progres tetap memakai paket lama. Jangan menghapus fisik paket yang pernah memiliki progres.
+Setiap `paket_semester` memiliki satu pemilik `angkatan_id` (Gen) dan konteks mapel/semester/tahun ajaran/kurikulum/versi. `penugasan_paket` menunjuk paket aktif **milik Gen yang sama**, tidak membuat konten bersama dan tidak memberi kewenangan Guru. Untuk `(angkatan, mapel, semester, tahun_ajaran)` hanya ada satu penugasan paket aktif; setiap revisi mempertahankan versi dan progres siswa yang telah menggunakan paket terdahulu. Tidak menghapus paket historis atau memindahkan siswa ke Gen lain otomatis.
+
+Admin menetapkan satu Guru aktif melalui `penugasan_guru_gen` untuk Gen–Mapel, berlaku lintas semester. Guru hanya boleh menyunting draf, menerbitkan dan menilai dalam cakupan Gen–Mapel tersebut. Setelah Guru berganti, kewenangan operasional berpindah, bukan versi konten atau penilai historis. Referensi CP resmi boleh digunakan oleh banyak Gen dengan validasi mapel/fase/kurikulum.
 
 **Semester mulai:** `COALESCE(siswa.semester_mulai, ref_angkatan.semester_mulai)`. Angkatan dapat dimulai pada semester berbeda, contoh konfigurasi awal Gen 2025 semester 4, Gen 2026 semester 1 bila relevan pada instalasi. Tahun/angkatan nyata ditentukan Admin, bukan terikat seed hardcode.
 
 ## 4. Wizard Guru
-`Pilih mapel/semester → rencanakan BAB → buat TP dan kaitkan CP → unduh Excel dari struktur aktual → isi/unggah Excel → lengkapi berkas → checklist → BAB Siap`.
+`Pilih Gen → pilih mapel yang diampu → semester → rencanakan BAB → buat TP dan kaitkan CP → unduh Excel dari struktur aktual → isi/unggah Excel → lengkapi berkas → checklist → BAB Siap`.
 
 Halaman pembelajaran siswa hanya membuka TP dari BAB Siap, sesuai urutan dan paket yang ditugaskan ke siswa. Versi BAB Siap yang digunakan untuk siswa di-*pin* ketika TP pertama kali dibuka.
 
@@ -31,4 +33,4 @@ Halaman pembelajaran siswa hanya membuka TP dari BAB Siap, sesuai urutan dan pak
 - Sistem menolak referensi CP yang sudah diganti apabila tidak valid untuk penautan baru, tetapi tidak menghapus keterkaitan historis.
 
 ## 6. Batas data
-Tidak membuat rombel sebagai sumber kewenangan, tidak ada Guru ganda per mapel, tidak mengubah nilai atau rekam ujian lama akibat pembaruan CP. Detail skema ditulis di `10-DATABASE.md`, izin di `03-PERAN-DAN-HAK-AKSES.md`.
+Tidak membuat rombel sebagai sumber kewenangan, maksimal satu Guru aktif per Gen–Mapel, tidak mengubah nilai atau rekam ujian lama akibat pembaruan CP. Detail skema ditulis di `10-DATABASE.md`, izin di `03-PERAN-DAN-HAK-AKSES.md`.
