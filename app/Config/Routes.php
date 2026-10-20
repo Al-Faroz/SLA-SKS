@@ -34,6 +34,16 @@ $routes->get('admin/siswa/(:num)/reset-sandi', 'AdminPengguna::konfirmasiResetSi
 $routes->post('admin/siswa/(:num)/reset-sandi', 'AdminPengguna::resetSiswa/$1', ['filter' => 'auth:admin']);
 
 
+// K2C — Edit identitas dan konfirmasi aktif/nonaktif (semua POST CSRF + role Admin).
+$routes->get('admin/pengelola/(:num)/edit', 'AdminMutasiPengguna::editPengelola/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pengelola/(:num)/edit', 'AdminMutasiPengguna::simpanPengelola/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/pengelola/(:num)/status', 'AdminMutasiPengguna::statusPengelola/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pengelola/(:num)/status', 'AdminMutasiPengguna::ubahStatusPengelola/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/(:num)/edit', 'AdminMutasiPengguna::editSiswa/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/siswa/(:num)/edit', 'AdminMutasiPengguna::simpanSiswa/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/(:num)/status', 'AdminMutasiPengguna::statusSiswa/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/siswa/(:num)/status', 'AdminMutasiPengguna::ubahStatusSiswa/$1', ['filter' => 'auth:admin']);
+
 // K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
 $routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);
 $routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'auth:admin']);
