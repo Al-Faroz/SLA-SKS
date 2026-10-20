@@ -44,6 +44,12 @@ $routes->post('admin/siswa/(:num)/edit', 'AdminMutasiPengguna::simpanSiswa/$1', 
 $routes->get('admin/siswa/(:num)/status', 'AdminMutasiPengguna::statusSiswa/$1', ['filter' => 'auth:admin']);
 $routes->post('admin/siswa/(:num)/status', 'AdminMutasiPengguna::ubahStatusSiswa/$1', ['filter' => 'auth:admin']);
 
+// K2D: template dan ekspor XLSX, khusus Admin.
+$routes->get('admin/pengelola/template', 'AdminXlsx::templatePengelola', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/template', 'AdminXlsx::templateSiswa', ['filter' => 'auth:admin']);
+$routes->get('admin/pengelola/ekspor', 'AdminXlsx::eksporPengelola', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/ekspor', 'AdminXlsx::eksporSiswa', ['filter' => 'auth:admin']);
+
 // K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
 $routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);
 $routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'auth:admin']);

@@ -121,6 +121,18 @@
                 <a class="a-btn a-btn--sekunder" href="<?= esc($lokasi, 'attr') ?>">Reset filter</a>
             </form>
 
+            <div class="a-admin-akun__xlsx">
+                <div>
+                    <strong>File Excel (.xlsx)</strong>
+                    <span class="a-help">Ekspor sesuai filter yang diterapkan, tanpa sandi dan hash.</span>
+                </div>
+                <div class="a-admin-akun__xlsx-aksi">
+                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/template'), 'attr') ?>">Unduh template</a>
+                    <a class="a-btn a-btn--utama"
+                       href="<?= esc(site_url('admin/' . $jenis . '/ekspor') . '?' . http_build_query(['cari' => $cari, 'status' => $status, 'gen' => $siswa ? $genFilter : null]), 'attr') ?>">Ekspor XLSX</a>
+                </div>
+            </div>
+
             <?php if ($pengguna === []): ?>
                 <div class="a-empty" role="status"><strong>Belum ada hasil.</strong><p>Belum ada akun atau tidak ada yang cocok dengan filter.</p></div>
             <?php else: ?>
@@ -188,6 +200,6 @@
             <?php endif ?>
         </section>
     </div>
-    <p class="a-help">Impor/ekspor XLSX dan penyuntingan Gen/semester bagi siswa yang telah ditempatkan memerlukan modul tersendiri dan belum ditampilkan sebagai aksi sebelum siap.</p>
+    <p class="a-help">Ekspor XLSX dan template tersedia. Pratinjau/konfirmasi impor XLSX serta perubahan Gen siswa yang sudah memiliki progres menyusul pada tahap berikutnya.</p>
 </div>
 <?= $this->endSection() ?>

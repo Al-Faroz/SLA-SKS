@@ -454,3 +454,15 @@ a:hover { text-decoration-thickness: 2px; }
     .a-akun-edit__grid { grid-template-columns: minmax(0,1fr); }
     .a-admin-akun__aksi .a-btn { min-height: 40px; }
 }
+
+
+/* K2D — Unduhan template dan ekspor XLSX dari daftar akun. */
+.a-admin-akun__xlsx { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 12px 13px; margin-bottom: 14px; background: #f3f8f6; border: 1px solid #dbe9e1; border-radius: 10px; }
+.a-admin-akun__xlsx strong { display: block; font-size: 13px; color: #174c3c; }
+.a-admin-akun__xlsx .a-help { display: block; margin-top: 4px; font-size: 11px; }
+.a-admin-akun__xlsx-aksi { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.a-admin-akun__xlsx-aksi .a-btn { white-space: nowrap; min-height: 40px; }
+@media (max-width: 600px) {
+  .a-admin-akun__xlsx-aksi { width: 100%; }
+  .a-admin-akun__xlsx-aksi .a-btn { flex: 1 1 auto; text-align: center; }
+}
