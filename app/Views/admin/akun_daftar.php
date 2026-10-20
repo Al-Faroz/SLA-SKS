@@ -128,6 +128,7 @@
                 </div>
                 <div class="a-admin-akun__xlsx-aksi">
                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/template'), 'attr') ?>">Unduh template</a>
+                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/impor'), 'attr') ?>">Impor XLSX</a>
                     <a class="a-btn a-btn--utama"
                        href="<?= esc(site_url('admin/' . $jenis . '/ekspor') . '?' . http_build_query(['cari' => $cari, 'status' => $status, 'gen' => $siswa ? $genFilter : null]), 'attr') ?>">Ekspor XLSX</a>
                 </div>
@@ -200,6 +201,6 @@
             <?php endif ?>
         </section>
     </div>
-    <p class="a-help">Ekspor XLSX dan template tersedia. Pratinjau/konfirmasi impor XLSX serta perubahan Gen siswa yang sudah memiliki progres menyusul pada tahap berikutnya.</p>
+    <p class="a-help">Impor XLSX tersedia dengan validasi, pratinjau, konfirmasi transaksi, dan audit. Perubahan Gen siswa yang sudah ditempatkan tetap memerlukan pemeriksaan progres pada modul berikutnya.</p>
 </div>
 <?= $this->endSection() ?>

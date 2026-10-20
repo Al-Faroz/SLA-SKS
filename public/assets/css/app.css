@@ -466,3 +466,25 @@ a:hover { text-decoration-thickness: 2px; }
   .a-admin-akun__xlsx-aksi { width: 100%; }
   .a-admin-akun__xlsx-aksi .a-btn { flex: 1 1 auto; text-align: center; }
 }
+
+
+/* K2D-2: pratinjau validasi XLSX dengan ringkasan, galat, dan konfirmasi. */
+.a-impor-akun { max-width: 1080px; display: grid; gap: 14px; }
+.a-impor-akun h1 { margin: 0; }
+.a-impor-akun h2 { font-size: 17px; margin: 0 0 8px; }
+.a-impor-akun__petunjuk { padding: 16px; border: 1px solid #dce9e3; border-radius: 10px; background: #f7faf8; }
+.a-impor-akun__petunjuk ol { margin: 0; padding-left: 22px; display: grid; gap: 8px; font-size: 13px; }
+.a-impor-akun__aksi { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 6px; }
+.a-impor-akun__aksi form { margin: 0; }
+.a-impor-akun__ringkasan { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+.a-impor-akun__ringkasan > div { border-radius: 11px; padding: 13px; border: 1px solid #dae9e2; background: #f5faf7; }
+.a-impor-akun__ringkasan strong { display: block; font-size: 23px; color: #145840; }
+.a-impor-akun__ringkasan span { font-size: 12px; color: #5e7470; }
+.a-impor-akun__tabel { min-width: 690px; }
+.a-impor-akun__tabel th,.a-impor-akun__tabel td { font-size: 12px; vertical-align: top; }
+.a-impor-akun input[type=file] { padding: 10px; max-width: 100%; }
+@media (max-width: 600px) {
+  .a-impor-akun__ringkasan { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .a-impor-akun__aksi > .a-btn, .a-impor-akun__aksi > form { flex: 1 1 100%; }
+  .a-impor-akun__aksi > form .a-btn { width: 100%; }
+}
