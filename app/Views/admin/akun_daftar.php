@@ -163,7 +163,11 @@
                                     <?php endif ?>
                                 </td>
                                 <td><span class="a-badge <?= $akun['status'] === 'aktif' ? 'a-badge--siap' : 'a-badge--tunggu' ?>"><?= esc(ucfirst($akun['status'])) ?></span></td>
-                                <td><a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/reset-sandi'), 'attr') ?>">Reset sandi</a></td>
+                                <td><div class="a-admin-akun__aksi">
+                                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/edit'), 'attr') ?>">Ubah</a>
+                                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/reset-sandi'), 'attr') ?>">Reset sandi</a>
+                                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/status'), 'attr') ?>"><?= $akun['status'] === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' ?></a>
+                                </div></td>
                             </tr>
                             <?php endforeach ?>
                         </tbody>
@@ -184,6 +188,6 @@
             <?php endif ?>
         </section>
     </div>
-    <p class="a-help">Import/export XLSX, edit biodata lengkap dan nonaktif akun menyusul pada modul pengguna berikutnya; belum ditampilkan sebagai tombol sebelum tersedia.</p>
+    <p class="a-help">Impor/ekspor XLSX dan penyuntingan Gen/semester bagi siswa yang telah ditempatkan memerlukan modul tersendiri dan belum ditampilkan sebagai aksi sebelum siap.</p>
 </div>
 <?= $this->endSection() ?>
