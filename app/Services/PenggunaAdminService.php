@@ -108,7 +108,7 @@ final class PenggunaAdminService
         $total = (int) ($hitungan['total'] ?? 0);
         $halaman = min($halaman, max(1, (int) ceil($total / $perHalaman)));
 
-        $builder = $this->basisDaftar($jenis, $cari, $status)
+        $builder = $this->basisDaftar($jenis, $cari, $status, $genFilter)
             ->distinct()->select('p.id,p.nama,p.username,p.status,p.wajib_ganti_sandi');
 
         if ($jenis === 'siswa') {

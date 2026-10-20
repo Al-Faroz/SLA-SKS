@@ -22,6 +22,20 @@ final class K2BAkunTest extends CIUnitTestCase
         $this->assertFalse(PenggunaAdminService::jenisPeranSesuai('admin', ['admin']));
     }
 
+    /**
+     * Regresi ArgumentCountError pada halaman /admin/pengelola dan /admin/siswa.
+     * Kueri jumlah total dan kueri data harus menerima filter Gen yang sama.
+     */
+    public function testKeduaPemanggilanBasisDaftarMenyertakanParameterGen(): void
+    {
+        $kode = file_get_contents(APPPATH . 'Services/PenggunaAdminService.php');
+        $this->assertIsString($kode);
+        $this->assertSame(2, preg_match_all('/\\$this->basisDaftar\\s*\\(/', $kode));
+        $this->assertSame(2, substr_count(
+            $kode, '$this->basisDaftar($jenis, $cari, $status, $genFilter)'
+        ));
+    }
+
     public function testSandiSementaraAcakTidakPernahMenggunakanSandiBawaan(): void
     {
         $awal = PenggunaAdminService::buatSandiSementara();
