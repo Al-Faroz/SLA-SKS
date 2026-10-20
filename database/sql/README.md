@@ -1,24 +1,31 @@
-# SQL SLA-SKS v2.2 — Pembaruan K2
+# SQL SLA-SKS v2.3 — K1, K2 dan penugasan Guru per Gen
 
-## Database K1 yang sudah dipakai
-JANGAN instal ulang file install/k1_fondasi_akun.sql. Patch K2 tidak menghapus data K1.
+## Wajib: instalasi K1/K2 yang SUDAH dipakai pemilik
 
-1. Backup manual database dan folder writable/ ke lokasi privat.
-2. Pada phpMyAdmin pilih database SLA-SKS yang sama.
-3. Jalankan SELECT versi FROM schema_version; pastikan K1-0001 ada dan K2-0002 belum ada.
-4. Impor database/sql/updates/0002_referensi_identitas.sql SATU KALI.
-5. Periksa schema_version sekarang berisi K1-0001 dan K2-0002.
-6. Login kembali dengan akun Admin yang lama; gunakan menu Gen & Tahun Ajaran, Mapel & Guru, Identitas Madrasah.
+**JANGAN impor ulang K1 atau K2-0002.** Berkas `updates/0002_referensi_identitas.sql` dipertahankan persis seperti yang sebelumnya diimpor. **Jangan hapus data** Gen, mapel, Guru, akun, identitas sekolah, riwayat atau sesi.
 
-File SQL menambah 10 tabel tanpa menyentuh data K1, serta referensi tetap MTs Fase D (semester 1–6).
-Data nyata siswa, guru, dan identitas sekolah tidak ada pada dump.
+1. Backup database SLA-SKS **dan** folder `writable/` ke lokasi privat; uji restore backup pada DB pengujian jika memungkinkan.
+2. Tarik branch K2 yang diperbarui (PR #3) di localhost, tetapi **jangan** langsung menguji halaman baru sebelum patch SQL berhasil.
+3. Di phpMyAdmin pilih database SLA-SKS yang sama. Jalankan:
+   `SELECT versi FROM schema_version ORDER BY versi;`
+   Sebelum impor harus ada `K1-0001` dan `K2-0002`, tetapi **belum** `K2-0003`.
+4. Impor **hanya** `database/sql/updates/0003_guru_per_gen.sql`, sekali.
+5. Ulangi query nomor 3; pastikan penanda `K2-0003` serta kedua tabel baru tersedia.
+6. Login Admin lama. Buka `/admin/mapel-guru`, pilih Gen lalu tentukan Guru untuk setiap mapel. **Penugasan `ref_mapel.guru_id` lama TIDAK otomatis disalin ke Gen mana pun.** Gunakan nilai lama sebagai informasi historis bila perlu, lalu tetapkan Guru dengan sengaja.
 
-PENTING: DDL MySQL/MariaDB dapat melakukan implicit commit. Bila impor terputus,
-JANGAN impor ulang begitu saja. Periksa tabel yang telah dibuat dan lakukan pemulihan
-melalui backup bila perlu. Pengujian MariaDB hosting masih harus dilakukan.
+**Penting:** DDL MySQL/MariaDB dapat melakukan *implicit commit*. Jika impor gagal di tengah jalan, **jangan impor ulang** membabi buta. Simpan pesan galat; periksa status dan restore backup sesuai prosedur.
 
-## Instalasi baru (database benar-benar kosong)
-Jalankan install/k1_fondasi_akun.sql kemudian updates/0002_referensi_identitas.sql.
-Baru kemudian jalankan CLI inisialisasi Admin awal dari K1.
+## Instalasi baru (database BENAR-BENAR kosong)
 
-Tidak memakai CI4 Migration atau Seeder. SQL berikutnya harus incremental dan diberi nomor.
+Impor secara berurutan satu kali:
+1. `install/k1_fondasi_akun.sql`
+2. `updates/0002_referensi_identitas.sql`
+3. `updates/0003_guru_per_gen.sql`
+
+Jalankan `php spark sla:admin-awal` satu kali sesuai panduan K1. Tidak menggunakan CI4 Migration atau Seeder.
+
+## Batas tahap K2
+
+K2 sekarang menegakkan satu Guru aktif per pasangan Gen–Mapel, berlaku untuk seluruh semester pada Gen itu. Guru dengan peran Guru+Admin atau Guru+Pimpinan sah; akun tanpa role Guru dan akun nonaktif tidak boleh dipilih, termasuk melalui POST langsung. Riwayat pergantian tidak ditimpa. K2 belum membangun paket/BAB, pengelolaan siswa terpisah, impor akun atau reset akun; fitur tersebut dilaksanakan pada tahap berikutnya sesuai Master Document v2.3.
+
+Pengujian nyata yang diperlukan: MySQL XAMPP lokal, kompatibilitas MariaDB hosting, PHPUnit dan pengujian browser/HP. PR tidak boleh digabung sebelum hasil tersebut diperiksa.

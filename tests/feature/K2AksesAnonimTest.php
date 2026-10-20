@@ -13,7 +13,7 @@ final class K2AksesAnonimTest extends CIUnitTestCase
 
     public function testHalamanAdminBaruMemerlukanSesi(): void
     {
-        foreach (['/admin/referensi', '/admin/mapel-guru', '/admin/identitas'] as $uri) {
+        foreach (['/admin/referensi', '/admin/mapel-guru', '/admin/mapel-guru?gen=1', '/admin/identitas'] as $uri) {
             $this->get($uri)->assertStatus(302);
         }
     }

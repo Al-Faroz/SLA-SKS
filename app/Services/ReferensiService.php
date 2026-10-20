@@ -140,27 +140,67 @@ final class ReferensiService
         });
     }
 
-    /** @return array{mapel:list<array<string,mixed>>,guru:list<array<string,mixed>>,riwayat:list<array<string,mixed>>} */
-    public function daftarMapel(): array
+    /**
+     * Memenuhi syarat saat menyimpan: akun harus aktif DAN benar-benar punya role Guru.
+     * Gabungan Admin+Guru/Guru+Pimpinan tetap sah walau peran aktifnya saat ini berbeda.
+     *
+     * @param list<string> $peran
+     */
+    public static function layakMenjadiGuru(string $status, array $peran): bool
+    {
+        return $status === 'aktif' && in_array('guru', $peran, true);
+    }
+
+    /**
+     * Semua penetapan G1 aktif hanya per pasangan Gen + mapel.
+     * Tidak membaca ref_mapel.guru_id warisan sebagai izin.
+     *
+     * @return array{mapel:list<array<string,mixed>>,guru:list<array<string,mixed>>,angkatan:list<array<string,mixed>>,angkatanAktif:?int,riwayat:list<array<string,mixed>>}
+     */
+    public function daftarMapel(?int $genDipilih = null): array
     {
         $this->adminId();
 
+        $angkatan = $this->db->table('ref_angkatan')
+            ->select('id,kode,nama')->orderBy('id', 'DESC')
+            ->get()->getResultArray();
+        $ids = array_map(static fn (array $r): int => (int) $r['id'], $angkatan);
+        // GET yang tidak dikenal tidak membuka penugasan Gen lain.
+        if ($genDipilih !== null && ! in_array($genDipilih, $ids, true)) {
+            throw new DomainException('Gen tidak ditemukan. Silakan pilih Gen yang tersedia.');
+        }
+        $genAktif = $genDipilih ?? ($ids[0] ?? null);
+
+        $mapel = $this->db->query(
+            'SELECT m.id, m.kode, m.nama, pg.guru_id, p.nama AS guru_nama
+             FROM ref_mapel m
+             LEFT JOIN penugasan_guru_gen pg ON pg.mapel_id = m.id AND pg.angkatan_id = ?
+             LEFT JOIN pengguna p ON p.id = pg.guru_id
+             ORDER BY m.nama ASC',
+            [$genAktif ?? 0]
+        )->getResultArray();
+
+        $guru = $this->db->table('pengguna p')
+            ->distinct()->select('p.id,p.nama')
+            ->join('pengguna_peran pp', 'pp.pengguna_id = p.id')
+            ->where('pp.peran', 'guru')->where('p.status', 'aktif')
+            ->orderBy('p.nama', 'ASC')
+            ->get()->getResultArray();
+
+        $riwayat = $this->db->table('riwayat_penugasan_guru_gen r')
+            ->select('r.id,r.alasan,r.waktu,g.kode AS gen_kode,m.nama AS mapel_nama,p1.nama AS guru_lama,p2.nama AS guru_baru')
+            ->join('ref_angkatan g', 'g.id = r.angkatan_id')
+            ->join('ref_mapel m', 'm.id = r.mapel_id')
+            ->join('pengguna p1', 'p1.id = r.guru_sebelum_id', 'left')
+            ->join('pengguna p2', 'p2.id = r.guru_sesudah_id', 'left')
+            ->orderBy('r.id', 'DESC')->limit(25)->get()->getResultArray();
+
         return [
-            'mapel' => $this->db->table('ref_mapel m')
-                ->select('m.id,m.kode,m.nama,m.guru_id,p.nama AS guru_nama')
-                ->join('pengguna p', 'p.id = m.guru_id', 'left')
-                ->orderBy('m.nama', 'ASC')->get()->getResultArray(),
-            'guru' => $this->db->table('pengguna p')
-                ->select('p.id,p.nama,p.username')
-                ->join('pengguna_peran pp', 'pp.pengguna_id = p.id')
-                ->where('pp.peran', 'guru')->where('p.status', 'aktif')
-                ->orderBy('p.nama', 'ASC')->get()->getResultArray(),
-            'riwayat' => $this->db->table('riwayat_guru_mapel r')
-                ->select('r.id,r.alasan,r.waktu,m.nama AS mapel_nama,p1.nama AS guru_lama,p2.nama AS guru_baru')
-                ->join('ref_mapel m', 'm.id = r.mapel_id')
-                ->join('pengguna p1', 'p1.id = r.guru_sebelum_id', 'left')
-                ->join('pengguna p2', 'p2.id = r.guru_sesudah_id', 'left')
-                ->orderBy('r.id', 'DESC')->limit(25)->get()->getResultArray(),
+            'mapel' => $mapel,
+            'guru' => $guru,
+            'angkatan' => $angkatan,
+            'angkatanAktif' => $genAktif,
+            'riwayat' => $riwayat,
         ];
     }
 
@@ -190,52 +230,85 @@ final class ReferensiService
         });
     }
 
-    public function tetapkanGuru(int $mapelId, ?int $guruId, string $alasan): void
+    /**
+     * Penetapan Guru Gen–Mapel dilakukan dalam transaksi dengan row lock mapel
+     * (menyerialkan operasi pada mapel sama bahkan sebelum baris penugasan ada).
+     */
+    public function tetapkanGuru(int $mapelId, int $angkatanId, ?int $guruId, string $alasan): void
     {
         $adminId = $this->adminId();
         $alasan = trim($alasan);
-        if ($mapelId < 1 || ($guruId !== null && $guruId < 1)
+        if ($mapelId < 1 || $angkatanId < 1 || ($guruId !== null && $guruId < 1)
             || mb_strlen($alasan) < 5 || mb_strlen($alasan) > 255) {
-            throw new DomainException('Pilih mapel dan isi alasan pergantian minimal 5 karakter.');
+            throw new DomainException('Pilih Gen, mapel, Guru, dan isi alasan minimal 5 karakter.');
         }
 
-        $this->transaksi(function () use ($mapelId, $guruId, $adminId, $alasan): void {
-            // Row lock mencegah catatan pergantian guru terlewat oleh permintaan bersamaan.
-            $mapel = $this->db->query(
-                'SELECT id, guru_id FROM ref_mapel WHERE id = ? FOR UPDATE',
-                [$mapelId]
-            )->getRowArray();
-            if ($mapel === null) {
-                throw new DomainException('Mata pelajaran tidak ditemukan.');
+        $this->transaksi(function () use ($mapelId, $angkatanId, $guruId, $adminId, $alasan): void {
+            $mapel = $this->db->query('SELECT id FROM ref_mapel WHERE id = ? FOR UPDATE', [$mapelId])
+                ->getRowArray();
+            $gen = $this->db->table('ref_angkatan')->select('id')->where('id', $angkatanId)
+                ->get()->getRowArray();
+            if ($mapel === null || $gen === null) {
+                throw new DomainException('Gen atau mata pelajaran tidak ditemukan.');
             }
 
-            $lamaId = $mapel['guru_id'] === null ? null : (int) $mapel['guru_id'];
-            if ($guruId === $lamaId) {
-                throw new DomainException('Guru yang dipilih sudah menjadi pengampu aktif.');
+            $lama = $this->db->query(
+                'SELECT id,guru_id FROM penugasan_guru_gen
+                 WHERE angkatan_id = ? AND mapel_id = ? FOR UPDATE',
+                [$angkatanId, $mapelId]
+            )->getRowArray();
+            $guruLamaId = $lama === null || $lama['guru_id'] === null
+                ? null : (int) $lama['guru_id'];
+
+            if ($guruLamaId === $guruId) {
+                throw new DomainException('Tidak ada perubahan Guru pengampu pada Gen ini.');
             }
+
             if ($guruId !== null) {
-                $guru = $this->db->table('pengguna p')
-                    ->select('p.id')
-                    ->join('pengguna_peran pp', 'pp.pengguna_id = p.id')
-                    ->where('p.id', $guruId)->where('p.status', 'aktif')
-                    ->where('pp.peran', 'guru')->get()->getRowArray();
-                if ($guru === null) {
-                    throw new DomainException('Guru tidak aktif atau tidak mempunyai peran Guru.');
+                $calon = $this->db->query(
+                    'SELECT id,status FROM pengguna WHERE id = ? FOR UPDATE',
+                    [$guruId]
+                )->getRowArray();
+                $peran = $this->db->table('pengguna_peran')->select('peran')
+                    ->where('pengguna_id', $guruId)->get()->getResultArray();
+                $namaPeran = array_column($peran, 'peran');
+                if ($calon === null || ! self::layakMenjadiGuru((string) $calon['status'], $namaPeran)) {
+                    throw new DomainException('Guru harus berstatus aktif dan mempunyai peran Guru.');
                 }
             }
 
-            $this->db->table('ref_mapel')->where('id', $mapelId)
-                ->update(['guru_id' => $guruId]);
-            $this->db->table('riwayat_guru_mapel')->insert([
+            $waktu = gmdate('Y-m-d H:i:s');
+            if ($lama === null) {
+                $this->db->table('penugasan_guru_gen')->insert([
+                    'angkatan_id' => $angkatanId,
+                    'mapel_id' => $mapelId,
+                    'guru_id' => $guruId,
+                    'dibuat_oleh' => $adminId,
+                    'diperbarui_oleh' => $adminId,
+                    'dibuat_pada' => $waktu,
+                    'diperbarui_pada' => $waktu,
+                ]);
+            } else {
+                $this->db->table('penugasan_guru_gen')->where('id', (int) $lama['id'])
+                    ->update([
+                        'guru_id' => $guruId,
+                        'diperbarui_oleh' => $adminId,
+                        'diperbarui_pada' => $waktu,
+                    ]);
+            }
+
+            $this->db->table('riwayat_penugasan_guru_gen')->insert([
+                'angkatan_id' => $angkatanId,
                 'mapel_id' => $mapelId,
-                'guru_sebelum_id' => $lamaId,
+                'guru_sebelum_id' => $guruLamaId,
                 'guru_sesudah_id' => $guruId,
                 'admin_id' => $adminId,
                 'alasan' => $alasan,
-                'waktu' => gmdate('Y-m-d H:i:s'),
+                'waktu' => $waktu,
             ]);
-            $this->audit($adminId, 'guru_mapel_diubah', 'Mapel ID ' . $mapelId
-                . ': guru ' . ($lamaId ?? 'kosong') . ' ke ' . ($guruId ?? 'kosong'));
+            $this->audit($adminId, 'guru_gen_mapel_diubah',
+                'Gen ID ' . $angkatanId . '; Mapel ID ' . $mapelId
+                . ': Guru ' . ($guruLamaId ?? 'kosong') . ' ke ' . ($guruId ?? 'kosong'));
         });
     }
 }

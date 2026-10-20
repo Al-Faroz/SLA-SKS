@@ -75,11 +75,20 @@ final class AdminReferensi extends BaseController
         return redirect()->to(site_url('admin/referensi'))->with('sukses', 'Tahun ajaran berhasil disimpan.');
     }
 
-    public function mapel(): string
+    public function mapel(): string|RedirectResponse
     {
+        $pilihan = $this->request->getGet('gen');
+        if ($pilihan !== null && (! is_string($pilihan) || ! ctype_digit($pilihan) || (int) $pilihan < 1)) {
+            return redirect()->to(site_url('admin/mapel-guru'))->with('galat', 'Pilih Gen yang tersedia.');
+        }
+        try {
+            $data = $this->service()->daftarMapel($pilihan === null ? null : (int) $pilihan);
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('admin/mapel-guru'))->with('galat', $e->getMessage());
+        }
         return view('admin/mapel_guru', array_merge(
-            $this->layout('Mapel dan Guru', 'mapel'),
-            $this->service()->daftarMapel()
+            $this->layout('Mapel dan Guru per Gen', 'mapel'),
+            $data
         ));
     }
 
@@ -98,22 +107,19 @@ final class AdminReferensi extends BaseController
         return redirect()->to(site_url('admin/mapel-guru'))->with('sukses', 'Mata pelajaran berhasil ditambahkan.');
     }
 
-    public function tetapkanGuru(int $mapelId): RedirectResponse
+    public function tetapkanGuru(int $mapelId, int $angkatanId): RedirectResponse
     {
         $masukan = $this->masukan('guru_id');
         $guruId = $masukan === '' ? null : (ctype_digit($masukan) ? (int) $masukan : -1);
+        $kembali = site_url('admin/mapel-guru') . '?gen=' . $angkatanId;
 
         try {
-            $this->service()->tetapkanGuru(
-                $mapelId,
-                $guruId,
-                $this->masukan('alasan')
-            );
+            $this->service()->tetapkanGuru($mapelId, $angkatanId, $guruId, $this->masukan('alasan'));
         } catch (DomainException $e) {
-            return redirect()->to(site_url('admin/mapel-guru'))->with('galat', $e->getMessage());
+            return redirect()->to($kembali)->with('galat', $e->getMessage());
         }
 
-        return redirect()->to(site_url('admin/mapel-guru'))
-            ->with('sukses', 'Guru pengampu diperbarui dan riwayat dicatat.');
+        return redirect()->to($kembali)->with('sukses',
+            'Guru pengampu pada Gen terpilih diperbarui dan riwayat dicatat.');
     }
 }

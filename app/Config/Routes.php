@@ -31,7 +31,7 @@ $routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'au
 $routes->post('admin/referensi/tahun-ajaran', 'AdminReferensi::buatTahunAjaran', ['filter' => 'auth:admin']);
 $routes->get('admin/mapel-guru', 'AdminReferensi::mapel', ['filter' => 'auth:admin']);
 $routes->post('admin/mapel-guru', 'AdminReferensi::buatMapel', ['filter' => 'auth:admin']);
-$routes->post('admin/mapel-guru/(:num)/guru', 'AdminReferensi::tetapkanGuru/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/mapel-guru/(:num)/gen/(:num)/guru', 'AdminReferensi::tetapkanGuru/$1/$2', ['filter' => 'auth:admin']);
 $routes->get('admin/identitas', 'AdminIdentitas::index', ['filter' => 'auth:admin']);
 $routes->post('admin/identitas', 'AdminIdentitas::simpan', ['filter' => 'auth:admin']);
 
