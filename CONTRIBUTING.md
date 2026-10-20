@@ -8,6 +8,9 @@
 5. Pastikan `.env`, dump data produksi, kunci API/sesi, PDF siswa asli, TTD PNG asli dan file privat tidak masuk Git.
 6. PR boleh memperbaiki typo/spesifikasi teknis kecil; perubahan kebijakan besar harus mendapat keputusan pemilik yang jelas dan memperbarui dokumen utama, bukan menambahkan addendum di sampingnya.
 
+## PR perubahan acuan besar (khusus dokumentasi)
+Bila pemilik menyetujui perubahan Master, buat PR dokumentasi tersendiri untuk semua dokumen domain terdampak; tidak mencampur perubahan kode/SQL yang belum diuji. Sebelum merge, audit sisa aturan lama dan cross-link, pastikan satu versi resmi. Setelah dokumen disahkan, kode, SQL patch, UI prototipe dan tes dibuat bertahap pada PR implementasi. Untuk transisi v2.3, data K2 yang sudah dipakai harus dijaga dan penugasan Guru tidak boleh digeneralisasikan ke seluruh Gen.
+
 ## Format ringkasan PR
 - Tujuan fitur dan dokumen acuan.
 - UI: layar, state dan galeri komponen yang berubah.

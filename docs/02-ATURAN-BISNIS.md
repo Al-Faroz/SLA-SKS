@@ -5,7 +5,7 @@
 ## 1. Invarian umum
 1. **Jam server** menjadi sumber kebenaran ujian, penugasan waktu, transaksi dan log; zona Asia/Jakarta.
 2. **Tidak ada penghapusan fisik** atas data siswa, nilai, sertifikat, BAB Siap, versi CP/BAB dan artefak historis. Penonaktifan/arsip berbeda dengan delete.
-3. **Satu pemilik G1 per mapel** untuk seluruh semester/Gen; `created_by` bersifat sejarah, bukan pemberi izin. Guru pengganti memperoleh kewenangan operasional mapel, tetapi bukan identitas penilai lama.
+3. **Satu G1 aktif per Gen–Mapel** untuk seluruh semester Gen tersebut, bukan Guru global per mapel. Setiap Gen mengelola paket/BAB/TP/soal/materi sendiri. `created_by` adalah catatan sejarah, bukan sumber izin. Penggantian Guru memindahkan hak operasional hanya untuk Gen–Mapel yang dipilih, tanpa menimpa identitas penilai lama.
 4. **Admin boleh mengelola biodata, referensi CP dan pengaturan**, tetapi tidak langsung mengetik nilai akademik/isi soal/materi milik Guru. Persetujuan koreksi guru dilakukan atas permintaan tersimpan.
 5. **Admin tunggal diizinkan.** Larangan setuju permohonan sendiri berlaku ketika akun yang sama berperan sebagai *pengusul Guru* dan *pemutus Admin* untuk permohonan akademik; jangan memaksakan admin kedua untuk pembetulan biodata yang menjadi tugas Admin langsung.
 6. Semua keputusan penting diaudit (pelaku, peran aktif, objek, sebelum/sesudah, alasan, waktu, versi). Audit tidak berarti menambah persetujuan manual yang tidak diwajibkan.
@@ -19,6 +19,14 @@
 - Pemilik aplikasi menetapkan **satu Admin cukup untuk operasional**. Manajemen biodata oleh Admin tidak memakai formulir pengajuan dan persetujuan dua Admin.
 - Permohonan koreksi BAB Siap atau koreksi nilai yang **diajukan sebagai Guru** memerlukan keputusan Admin; satu `pengguna_id` tidak boleh menyetujui permohonannya sendiri sekalipun berpindah role. Bila benar-benar akun yang sama, sistem menampilkan peringatan keterbatasan persetujuan tanpa mengubah kewenangan administrasi normal.
 - Penelaahan CP dilakukan **langsung oleh Admin** dan tidak memakai reviewer `cp_review` terpisah. Jika usulan CP diajukan Guru yang juga Admin, aturan larangan self-approval akademik tetap diperiksa.
+
+### Administrasi akun dan profil v2.3
+- Dua menu Admin, **Pengelola** dan **Siswa**, menggunakan satu sistem `pengguna` dan peran aktif yang sudah ada. Akun siswa tidak merangkap role staf.
+- Keduanya menyediakan tambah/ubah/nonaktif, **import/export XLSX**, serta tombol reset sandi per akun. Ekspor tidak memuat hash, sandi, token, sesi, atau data rahasia.
+- Impor memerlukan template, pemeriksaan kolom/role/Gen/NISN/duplikasi, pratinjau galat per baris, konfirmasi, transaksi dan idempotensi. Baris yang tak ada di file tidak dianggap permintaan menghapus data.
+- Reset sandi oleh Admin menghasilkan sandi sementara **acak**, ditampilkan satu kali melalui alur aman, wajib ganti pada login berikutnya, sesi lama dibatalkan, dan audit tanpa merekam isi sandi.
+- Staf hanya dapat mengubah foto, kontak pribadi dan sandi sendiri. Nama resmi/NIP/peran/penugasan dan biodata siswa dikelola Admin; siswa boleh melihat profil Guru aktif pada Gen-nya (nama, foto disetujui, mapel), bukan kontak pribadi/NIP.
+- Perbaikan NISN dan username login siswa harus atomik dan menjaga `siswa_id`, progres dan histori.
 
 ## 3. Keputusan final tentang pembelajaran
 - `Semester mulai = COALESCE(siswa.semester_mulai, angkatan.semester_mulai)`; semua semester sebelumnya berstatus Dilewati tanpa nilai/sertifikat.

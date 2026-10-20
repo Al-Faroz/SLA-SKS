@@ -3,7 +3,7 @@
 ## 1. Strategi
 Tiap fitur harus lolos: **uji aturan bisnis di Service, uji integrasi DB, uji endpoint & hak akses, uji browser desktop/HP, uji keamanan URL**, serta verifikasi perilaku sukses dan gagal. PHPUnit untuk kode server; browser testing dapat memakai Playwright bila fasilitas lokal tersedia. **Jangan mewajibkan test runner Node/daemon pada shared hosting**, pengujian dijalankan sebelum deploy.
 
-Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket Master. Nomor UJ historis dari dokumen lama dapat digunakan sebagai referensi internal tetapi **hasil akhir wajib mengikuti keputusan v2.2 dalam paket ini**, bukan ekspektasi usang.
+Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket Master. Nomor UJ historis dari dokumen lama dapat digunakan sebagai referensi internal tetapi **hasil akhir wajib mengikuti keputusan v2.3 dalam paket ini**, bukan ekspektasi usang.
 
 ## 2. Skenario end-to-end wajib
 | ID | Skenario | Hasil wajib |
@@ -13,8 +13,8 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-003 | Staf Admin+Guru mengganti peran | Session ID baru; izin hanya role aktif |
 | E2E-004 | Satu Admin aktif | Administrasi normal dan koreksi biodata berfungsi |
 | E2E-005 | Admin+Guru menyetujui usulan akademik miliknya | Ditolak, tanpa nilai/konten berubah; pesan informatif |
-| E2E-006 | Guru mengakses mapel lain via ID URL | Ditolak server |
-| E2E-007 | Guru mapel diganti | Guru baru berwenang operasional; riwayat penilai lama utuh |
+| E2E-006 | Guru mengakses Gen–Mapel lain via URL ID sekalipun mapel sama | Ditolak server, tanpa bocor konten/siswa |
+| E2E-007 | Guru Gen–Mapel diganti | Guru baru hanya berwenang pada pasangan itu; Gen lain tetap, riwayat penilai lama utuh |
 | E2E-008 | Semester Gen dan override siswa | Semester sebelum mulai Dilewati, tidak menghilangkan progres |
 | E2E-009 | Guru membuat TP dengan CP resmi | Minimal satu CP utama, mapel/fase valid |
 | E2E-010 | Guru usul CP; Admin memutus | Publikasi versi CP baru tanpa reviewer Guru lain |
@@ -83,6 +83,23 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-073 | Dua jawaban resume sangat mirip pada materi sama | Badge Perlu dicek muncul pada Guru, tidak otomatis menahan siswa |
 | E2E-074 | Resume/tugas dengan nilai sementara dan bobot 0 | Tetap menunggu penilaian komponen wajib sebelum sertifikat |
 | E2E-075 | Menghapus BAB draf tanpa progres, lalu mencoba menghapus BAB Siap | Hanya draf aman yang boleh dihapus; data BAB Siap utuh |
+
+### Skenario penerimaan tambahan v2.3
+| ID | Skenario | Lulus bila |
+|---|---|---|
+| E2E-076 | Matematika Gen A dan Gen B punya Guru berbeda | Satu pengampu aktif per Gen–Mapel; keduanya hanya dapat mengakses cakupan Gen sendiri |
+| E2E-077 | Dua Gen memiliki mapel dan semester sama | Paket/BAB/TP/soal/materi berbeda objek, tidak dapat ditautkan atau diubah lintas Gen |
+| E2E-078 | Admin mengganti Guru Matematika hanya pada Gen A | Akses operasional pindah hanya Gen A; Gen B dan histori nilai/ujian/BAB Siap tidak berubah |
+| E2E-079 | Dropdown Guru penugasan per Gen | Hanya akun aktif dengan role Guru; staf Admin+Guru sah; non-Guru/nonaktif tak muncul dan ditolak saat POST |
+| E2E-080 | Impor Pengelola XLSX valid, duplikat, dan file salah | Pratinjau/galat per baris; transaksi idempoten; satu akun staf multirole tidak digandakan |
+| E2E-081 | Impor Siswa XLSX valid dan NISN duplikat | NISN unik 10 digit, Gen valid, baris salah ditolak; tidak menghapus siswa lain |
+| E2E-082 | Export Pengelola dan Siswa sesuai filter | XLSX tepat data berizin; tanpa sandi/hash/token dan formula injection |
+| E2E-083 | Reset sandi satu Pengelola atau Siswa | Sandi acak tampil sekali, sesi lama batal, wajib ganti sandi, target lain tetap |
+| E2E-084 | Staf mengubah profil sendiri | Foto/kontak pribadi tersimpan; upaya mengubah nama resmi/NIP/role via POST ditolak |
+| E2E-085 | Siswa melihat profil Guru Gen-nya | Nama/foto disetujui/mapel terlihat; NIP, nomor pribadi dan profil Guru Gen lain tidak dapat dibaca |
+| E2E-086 | UI prototipe dashboard dan login v2.3 | Pemilik menyetujui sebelum rollout; font, ukuran, gap, layout padat/responsif di 360/390/768/1100px dan fokus/kontras lolos |
+| E2E-087 | Patch SQL transisi 0003 pada database K2 yang telah terisi | K1/K2 dan akun/sandi/Gen/mapel/riwayat tetap utuh, penugasan global tak dianggap berlaku otomatis, rollback melalui backup terbukti |
+| E2E-088 | Admin+Guru mengakses Gen lain setelah berpindah peran | Service menegakkan peran aktif dan izin Gen–Mapel; mode Admin tidak dipakai untuk menyetujui usulan akademik sendiri |
 
 ## 3. Matriks nonfungsional
 - **Keamanan:** CSRF, injection/XSS, file palsu, akses lintas role, force browse direktori root, rahasia `.env`, download TTD, QR throttle.

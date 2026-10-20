@@ -40,5 +40,8 @@ Jika heartbeat tidak diterima ≥20 detik, saat rekonsiliasi server menyatakan j
 - **S06:** tata letak tanpa sidebar, timer server, soal, pilihan, navigator, indikator menyimpan, jumlah insiden terhitung, tampilan jeda penuh; tidak ada notifikasi/pengumuman/perayaan saat ujian. Tombol kembali fullscreen dan tombol kirim berkonfirmasi. Respons saat offline tidak dianggap sudah tersimpan tanpa konfirmasi server.
 - **S07:** tampil skor/ketuntasan hanya `selesai_sah`, atau status `Menunggu keputusan guru` tanpa nilai bila batal. Tidak membuka kunci jawaban sebelum kebijakan perujian mengizinkan.
 
+### Wewenang Guru per Gen–Mapel (v2.3)
+Penanganan ujian batal, izin ulang, pembacaan percobaan/snapshot, dan telaah insiden hanya tersedia bagi Guru yang **saat itu ditugaskan ke pasangan Gen–Mapel siswa/ujian**. Service memeriksa relasi paket ujian ke Gen pemilik, `siswa.angkatan_id`, peran aktif Guru dan penugasan aktif. Guru Gen lain tidak dapat melakukan GET/POST dengan menebak ID ujian. Pergantian Guru dalam Gen yang sama menjaga snapshot, keputusan, dan pencatat historis. Seluruh kebijakan fullscreen, waktu server, jeda dan profil Ketat tidak berubah.
+
 ## 7. Keamanan dan hak
 Throttler per akun dan percobaan, CSRF, session auth, anti replay, cek status setiap request, soal/opsi acak server, ID percobaan sulit ditebak, tanpa skor pada percobaan batal, log insiden tidak terhitung dan terhitung terpisah. Fullscreen hanya mitigasi berbasis browser, **bukan jaminan ujian anticurang**.

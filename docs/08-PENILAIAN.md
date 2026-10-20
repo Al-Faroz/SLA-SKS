@@ -8,12 +8,12 @@
 - Kelulusan TP ditentukan skor diagnostik/sumatif dibanding KKM; bukan nilai gabungan. Pada koreksi hasil ujian selesai, **status ketuntasan dihitung ulang**, termasuk kemungkinan turun dari tuntas ke belum tuntas.
 
 ## 2. Proses penilaian Guru
-Antrean diurut tertua, tampil mapel/siswa/TP/materi, jawaban dan petunjuk. Guru pengampu aktif boleh menilai pengiriman belum dinilai, meski dibuat ketika guru lama mengampu mapel. Penilai asli disimpan di `dinilai_oleh` dan `dinilai_pada`; jangan menimpa identitas penilai historis.
+Antrean diurut tertua, tampil mapel/siswa/TP/materi, jawaban dan petunjuk. Guru aktif yang mengampu **Gen–Mapel siswa terkait** boleh menilai pengiriman belum dinilai, termasuk kiriman saat Guru lama mengampu pasangan Gen–Mapel yang sama. Guru mapel sama di Gen lain tidak berwenang. Penilai asli disimpan di `dinilai_oleh` dan `dinilai_pada`; jangan menimpa identitas penilai historis.
 
 Guru yang menilai sendiri dapat memperbaiki penilaian lewat jalur koreksi AB-33 dengan `riwayat_nilai` dan `nilai_diubah`. Koreksi harus mematuhi konsistensi sertifikat jika paket sudah bersertifikat.
 
 ## 3. Koreksi nilai oleh guru pengganti — AB-33a
-1. Guru pengampu baru mengusulkan perubahan nilai resume/tugas yang telah dinilai guru lama; isi nilai lama, nilai baru 0–100, alasan akademik dan referensi versi asli.
+1. Guru pengampu baru **pada Gen–Mapel yang sama** mengusulkan perubahan nilai resume/tugas yang telah dinilai Guru lama; isi nilai lama, nilai baru 0–100, alasan akademik dan referensi versi asli.
 2. Admin meninjau dan memutus `setujui`/`tolak`/`kembalikan_perbaikan` atas **usulan yang tersimpan**, tidak mengetik nilai langsung. Pemohon dan pemutus tidak boleh `pengguna_id` sama.
 3. Setelah sah, sistem memeriksa pengampu masih aktif, nilai asal dan `row_version` belum berubah, kasus belum dipakai; penerapan idempoten dengan audit sebelum/sesudah.
 4. Hitung ulang agregat; status ketuntasan TP **tidak berubah semata-mata karena koreksi resume/tugas**. Jika nilai sertifikat tercetak berubah, prosedur sertifikat revisi `09-SERTIFIKAT-DAN-LAPORAN.md` dijalankan secara konsisten.
@@ -31,6 +31,8 @@ Guru yang menilai sendiri dapat memperbaiki penilaian lewat jalur koreksi AB-33 
 
 ## 6. Indikator kemiripan tulisan — AB-36
 Kemiripan **bukan penilaian otomatis kecurangan**. Normalisasi jawaban (huruf kecil, tanpa tanda baca, rapatkan spasi), buat himpunan **3-gram kata** (jika kurang dari 3 kata, gunakan kata tunggal), lalu `skor_kemiripan = |A∩B| / |A∪B| × 100`. Resume dibandingkan dengan resume siswa lain **pada materi sama**, HOTS dengan tugas pada **TP sama**. Ambang bawaan `kemiripan_ambang = 60` menampilkan badge **Perlu dicek** pada antrean Guru dan informasi pasangan hanya untuk pihak berwenang. **Tidak memblokir siswa, tidak mengubah nilai atau ketuntasan**, dan tidak memberi label salah tanpa pemeriksaan Guru.
+
+**Batas lintas Gen:** setiap antrean, koreksi nilai/kunci, skor sah, rapor dan penelusuran riwayat menampilkan konteks Gen dan paket/versi yang tepat. Guru hanya memperoleh siswa serta paket dari Gen–Mapel yang aktif ditugaskan kepadanya; Admin tetap melihat seluruh cakupan dan Pimpinan hanya baca. Pergantian Guru di satu Gen tidak membuka data Gen lain. Histori `dinilai_oleh`, peristiwa dan keputusan asli tetap utuh.
 
 ## 7. Nilai, riwayat dan komunikasi siswa
 Siswa melihat angka/status sementara dan perubahan resmi setelah commit, bukan riwayat internal persetujuan sensitif. Guru/Admin dapat menelusuri penilaian dan koreksi menurut hak akses; Pimpinan ringkasan baca-saja. Rapor menunjukkan komponen TP, cara tuntas, hasil sumatif/diagnostik sah, nilai akhir dan status saat ini. Ekspor mengikuti izin dan penanda Sementara.

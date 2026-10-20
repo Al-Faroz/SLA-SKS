@@ -1,15 +1,15 @@
 # 05 — Paket, BAB, TP, Media dan Impor Excel
 
 ## 1. Entitas dan status
-Paket semester memuat BAB urut 1..n sesuai rencana. BAB memiliki `draf` atau `siap`. Pada BAB draf, Guru pengampu dapat membuat TP (kode stabil, rumusan, indikator, CP, urutan ATP) dan materi. **BAB Siap terkunci permanen dari edit biasa** termasuk editor, Excel, berkas, soal, KKM, bobot, durasi, dan urutan. Admin tidak mengisi konten Guru.
+Paket semester milik satu Gen untuk satu mapel/semester/tahun ajaran memuat BAB urut 1..n sesuai rencana. BAB memiliki `draf` atau `siap`. Pada BAB draf, Guru pengampu dapat membuat TP (kode stabil, rumusan, indikator, CP, urutan ATP) dan materi. **BAB Siap terkunci permanen dari edit biasa** termasuk editor, Excel, berkas, soal, KKM, bobot, durasi, dan urutan. Admin tidak mengisi konten Guru.
 
 `Belum dibuat`, `Draf`, `Perlu dilengkapi`, `Siap/Terkunci` tampil jelas di UI; `Perlu dilengkapi` adalah label hasil checklist, bukan perlu status DB baru. BAB sesudahnya boleh tetap draf sambil BAB sebelumnya digunakan siswa.
 
-## 2. Delapan sheet Excel resmi v2.2
+## 2. Delapan sheet Excel resmi v2.3 (struktur 8 sheet tetap)
 | Sheet | Isi dan peraturan |
 |---|---|
 | `PETUNJUK` | Dibuat sistem, baca saja; jenis materi dan contoh penulisan |
-| `IDENTITAS_BAB` | Identitas paket/mapel/semester/kelas/fase/BAB/versi; terkunci |
+| `IDENTITAS_BAB` | Identitas **Gen pemilik**/paket/mapel/semester/kelas/fase/BAB/versi; terkunci dan diverifikasi server |
 | `TP` | Satu baris per TP dari aplikasi, ID/kode/CP terkunci; parameter nilai/keterangan terbatas |
 | `MATERI` | Materi per `kode_tp`: judul, jenis, urutan, petunjuk resume, waktu minimum |
 | `TUGAS_HOTS` | Satu pertanyaan dan petunjuk tugas per TP |
@@ -18,6 +18,8 @@ Paket semester memuat BAB urut 1..n sesuai rencana. BAB memiliki `draf` atau `si
 | `_META` | Sheet sangat tersembunyi, HMAC, `bab_id`, versi template/struktur dan `row_uuid` |
 
 Sumber struktur TP **hanya layar BAB**, bukan Excel. Jangan membuat TP baru, mengganti CP, atau mengubah urutan TP melalui Excel. Jangan memakai template v2.1 yang masih memuat sheet/kolom berbeda.
+
+**Cakupan konten dan akses v2.3:** wizard Guru selalu diawali pemilihan Gen yang benar-benar diampu lalu mapel/semester. Paket/BAB berbeda per Gen; meskipun dua Gen memiliki mapel, materi, atau CP serupa, tidak ada satu objek BAB yang otomatis dipakai bersama. Semua penulisan, impor, berkas, publikasi dan koreksi memverifikasi pasangan Gen–Mapel melalui penugasan aktif, bukan `created_by` atau `ref_mapel.guru_id`. Unggahan Excel dari Gen lain ditolak sebelum commit; ID, versi, checksum/HMAC, dan nama Gen dalam template harus sesuai objek server. Tidak ada fitur salin otomatis antar-Gen.
 
 ## 3. Prosedur impor
 1. Guru memilih BAB **draf** dan mengunduh template untuk struktur/versi terkini.
@@ -61,4 +63,4 @@ Kategori yang boleh diusulkan Guru: **A redaksional**, **B materi/media**, **C s
 - Jika Guru mengganti berkas pada konten yang masih boleh diedit, progres historis siswa tidak dihapus. BAB Siap tidak berubah file melalui editor normal.
 
 ## 9. UI yang wajib disediakan
-Wizard empat ruang: `Semester/BAB`, `Struktur TP/CP`, `Excel/Media`, `Checklist/Publikasi`. Setiap langkah menampilkan status, ringkasan validasi, tombol kembali, simpan, dan aksi utama; jangan membiarkan tombol Siap aktif jika validasi gagal. Pada BAB Siap tampil `Lihat`, `Riwayat Versi`, `Ajukan Koreksi Darurat`, bukan `Tarik ke Draf`.
+Wizard empat ruang: `Pilih Gen–Mapel/Semester/BAB`, `Struktur TP/CP`, `Excel/Media`, `Checklist/Publikasi`. Setiap langkah menampilkan status, ringkasan validasi, tombol kembali, simpan, dan aksi utama; jangan membiarkan tombol Siap aktif jika validasi gagal. Pada BAB Siap tampil `Lihat`, `Riwayat Versi`, `Ajukan Koreksi Darurat`, bukan `Tarik ke Draf`.
