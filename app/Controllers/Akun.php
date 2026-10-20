@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
+use App\Services\DashboardAdminService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -31,7 +32,7 @@ final class Akun extends BaseController
 
         $this->response->setHeader('Cache-Control', 'no-store, private');
 
-        return view('akun/masuk', ['judul' => 'Masuk']);
+        return view('akun/masuk', ['judul' => 'Masuk', 'uiPrototipe' => true]);
     }
 
     public function prosesMasuk(): RedirectResponse
@@ -146,14 +147,23 @@ final class Akun extends BaseController
         }
         $akun = $this->servis()->penggunaSaatIni();
 
-        return view('akun/beranda', [
+        $data = [
             'judul' => 'Beranda ' . ucfirst($peran),
             'namaPengguna' => $akun['nama'],
             'peranAktif' => ucfirst($peran),
             'tautanNavigasi' => $this->menu($peran, $peran),
             'peran' => $peran,
             'daftarPeran' => $akun['daftar_peran'],
-        ]);
+        ];
+
+        if ($peran === 'admin') {
+            $data['uiPrototipe'] = true;
+            $data['ringkasan'] = (new DashboardAdminService())->ringkasan();
+
+            return view('admin/beranda_prototipe', $data);
+        }
+
+        return view('akun/beranda', $data);
     }
 
     public function pengguna(): ResponseInterface|string

@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Galeri Komponen SLA-SKS v2.2</title>
+    <title>Galeri Komponen SLA-SKS v2.3</title>
     <link rel="stylesheet" href="../../public/assets/css/app.css">
 </head>
 <body>
 <main class="a-main__konten">
     <header>
-        <p class="a-kicker">Dokumentasi desain · K0</p>
+        <p class="a-kicker">Dokumentasi desain · Prototipe UI v2.3</p>
         <h1>Galeri Komponen SLA-SKS</h1>
         <p class="a-help">Contoh visual statis, bukan layar aplikasi. Semua kelas menggunakan stylesheet yang sama: <code>public/assets/css/app.css</code>. Tombol contoh tidak disajikan sebagai aksi aplikasi.</p>
     </header>
@@ -60,11 +60,29 @@
         <nav class="a-breadcrumb" aria-label="Contoh breadcrumb">
             <span>Beranda Admin</span><span aria-hidden="true">/</span><span aria-current="page">Mapel &amp; Guru</span>
         </nav>
-        <p class="a-help">Contoh tabel penugasan G1: satu mapel memiliki satu Guru aktif. Form perubahan memiliki alasan dan jejak audit.</p>
+        <p class="a-help">Contoh tabel penugasan G1: satu pasangan Gen–Mapel memiliki satu Guru aktif. Form perubahan memiliki alasan dan jejak audit.</p>
         <div class="a-tabel-gulir">
             <table class="a-tbl"><thead><tr><th>Mapel</th><th>Pengampu</th></tr></thead><tbody>
                 <tr><td>Mapel Contoh</td><td><span class="a-badge a-badge--tunggu">Belum ditugaskan</span></td></tr>
             </tbody></table>
+        </div>
+    </section>
+
+    <section class="a-card" aria-labelledby="judul-proto-v23">
+        <h2 id="judul-proto-v23">Prototipe visual v2.3 — contoh statis</h2>
+        <p class="a-help">Warna, kepadatan kartu, dan hirarki yang diterapkan pada login dan Dashboard Admin.
+            Konten contoh di galeri ini bukan data aplikasi dan tidak memiliki aksi.</p>
+        <div class="a-proto-metrics">
+            <article class="a-proto-metric">
+                <span class="a-proto-metric__symbol a-proto-metric__symbol--mint" aria-hidden="true">G</span>
+                <p>Contoh kartu metrik</p><strong>—</strong>
+                <span class="a-help">Data tidak ditampilkan di galeri.</span>
+            </article>
+            <article class="a-proto-metric">
+                <span class="a-proto-metric__symbol a-proto-metric__symbol--blue" aria-hidden="true">M</span>
+                <p>Contoh kartu kedua</p><strong>—</strong>
+                <span class="a-help">Bentuk komponen saja.</span>
+            </article>
         </div>
     </section>
 </main>
