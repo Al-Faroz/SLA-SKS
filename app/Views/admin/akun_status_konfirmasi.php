@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
+<div class="a-page">
 <?php
     $aktif = $target['status'] === 'aktif';
     $statusBaru = $aktif ? 'nonaktif' : 'aktif';
@@ -39,4 +40,5 @@
         </form>
     <?php endif ?>
 </section>
+</div>
 <?= $this->endSection() ?>

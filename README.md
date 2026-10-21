@@ -50,3 +50,7 @@ Menu `/profil` untuk Admin/Guru/Pimpinan menampilkan identitas resmi baca-saja, 
 ## K3A — Referensi Kurikulum dan CP resmi berversi
 
 Admin mengelola kurikulum, sumber/dasar hukum, CP Fase D per mapel, dan naskah CP resmi beserta riwayat versinya pada `/admin/kurikulum-cp`. Draf dapat diperbaiki dan diterbitkan; versi lama tidak dihapus atau diedit, dan versi aktif lama diarsipkan ketika versi baru terbit. Ini fondasi **sebelum** TP/BAB dan usulan CP Guru. Memerlukan update SQL incremental `database/sql/updates/0008_kurikulum_cp.sql` sekali setelah K2-0007. Master Document tetap acuan, aplikasi tidak mengisi rumusan/sumber resmi fiktif.
+
+
+## Penyeragaman UI seluruh halaman (branch UI terpisah)
+Layout panel/publik menerapkan gaya v2.3 seragam (tanpa `uiPrototipe` kondisional); halaman lama Gen, Mapel, Identitas, akun dan halaman CP menampilkan header/form/tabel konsisten. Kurikulum/CP dilengkapi tautan bagian dan form CP bertahap yang dapat dilipat. **Tidak ada perubahan model, Service, Route, SQL, atau aturan bisnis.** Perubahan visual dibangun sebagai PR bertumpuk di atas K3A (#11), sehingga harus diuji dan digabung setelah K3A disahkan.

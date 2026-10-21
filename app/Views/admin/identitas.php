@@ -1,12 +1,18 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
+<div class="a-page">
 <nav class="a-breadcrumb" aria-label="Breadcrumb"><a href="<?= esc(site_url('admin'), 'attr') ?>">Beranda Admin</a><span aria-hidden="true">/</span><span aria-current="page">Identitas Madrasah</span></nav>
-<h1>Identitas Madrasah</h1>
-<p class="a-help">Lengkapi informasi resmi sekolah untuk administrasi dan sertifikat. Perubahan disimpan bersama catatan sejarah; tidak ada data contoh yang otomatis diterbitkan sebagai identitas sekolah.</p>
+<header class="a-page__heading a-proto-heading">
+    <div>
+        <p class="a-proto-eyebrow">Admin · Pengaturan</p>
+        <h1>Identitas Madrasah</h1>
+        <p class="a-proto-muted">Lengkapi informasi resmi madrasah untuk administrasi dan sertifikat. Setiap perubahan menyimpan riwayat; tidak ada data contoh yang digunakan sebagai identitas resmi.</p>
+    </div>
+</header>
 <?php if ($pesan = session()->getFlashdata('galat')): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div><?php endif ?>
 <?php if ($pesan = session()->getFlashdata('sukses')): ?><div class="a-alert" role="status"><?= esc($pesan) ?></div><?php endif ?>
 <?php if (in_array('', $identitas, true)): ?><p class="a-alert a-alert--info" role="status">Data resmi belum lengkap. Isilah seluruh kolom wajib sebelum menyimpan.</p><?php endif ?>
-<section class="a-card a-baca-panel" aria-labelledby="judul-form-identitas">
+<section class="a-card a-page__editor a-page__editor--luas" aria-labelledby="judul-form-identitas">
 <h2 id="judul-form-identitas">Form identitas resmi</h2>
 <form method="post" action="<?= esc(site_url('admin/identitas'), 'attr') ?>" class="a-form" data-dirty-form>
 <?= csrf_field() ?>
@@ -32,4 +38,5 @@
 <button class="a-btn a-btn--utama" type="submit" data-dirty-submit>Simpan identitas</button>
 </form>
 </section>
+</div>
 <?= $this->endSection() ?>

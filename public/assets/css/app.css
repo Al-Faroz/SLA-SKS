@@ -1,12 +1,12 @@
-/* SLA-SKS v2.2 — satu stylesheet bersama untuk seluruh peran (K0). */
+/* SLA-SKS v2.3 — satu design system untuk seluruh peran dan halaman. */
 :root {
-    --a-primer: #23874f;
-    --a-primer-gelap: #165b36;
+    --a-primer: #168458;
+    --a-primer-gelap: #146b4a;
     --a-latar: #f6f8f6;
     --a-permukaan: #ffffff;
-    --a-teks: #1d2a23;
-    --a-redup: #55675c;
-    --a-garis: #d8e2d9;
+    --a-teks: #172433;
+    --a-redup: #596c79;
+    --a-garis: #e1e8eb;
     --a-bahaya: #a93232;
     --a-info: #1f5f99;
     --a-sorot: #f7bf1b;
@@ -14,15 +14,22 @@
     --a-peran-guru: var(--a-info);
     --a-peran-admin: #4f6157;
     --a-peran-pimpinan: #6b3fa0;
-    --a-radius-kecil: 6px;
-    --a-radius: 12px;
+    --a-radius-kecil: 8px;
+    --a-radius: 13px;
     --a-ruang-1: 4px;
     --a-ruang-2: 8px;
     --a-ruang-3: 12px;
     --a-ruang-4: 16px;
     --a-ruang-6: 24px;
-    --a-lebar-konten: 1200px;
-    --a-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --a-lebar-konten: 1270px;
+    --a-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --a-font-isi: 14px;
+    --a-font-label: 13px;
+    --a-font-judul: 25px;
+    --a-font-judul-kartu: 17px;
+    --a-tinggi-input: 42px;
+    --a-padding-kartu: 18px;
+    --a-gap-kartu: 14px;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -112,7 +119,7 @@ a:hover { text-decoration-thickness: 2px; }
 .a-kaki-publik { min-height: 62px; display: flex; flex-wrap: wrap; gap: var(--a-ruang-3); align-items: center; justify-content: space-between; border-top: 1px solid var(--a-garis); padding: var(--a-ruang-3) max(20px, calc((100vw - var(--a-lebar-konten)) / 2)); color: var(--a-redup); font-size: .88rem; }
 
 /* Shell panel: menu hanya berisi rute yang sudah diotorisasi oleh server. */
-.a-app { min-height: 100vh; display: grid; grid-template-columns: 260px minmax(0, 1fr); }
+.a-app { min-height: 100vh; display: grid; grid-template-columns: 236px minmax(0, 1fr); }
 .a-side { min-height: 100vh; padding: var(--a-ruang-6) var(--a-ruang-3); background: var(--a-primer-gelap); color: #fff; }
 .a-side__atas { display: flex; gap: var(--a-ruang-3); align-items: center; padding: var(--a-ruang-2) var(--a-ruang-3) var(--a-ruang-6); font-size: 1.1rem; }
 .a-side__atas .a-identitas__mark { background: #fff; color: var(--a-primer-gelap); }
@@ -120,7 +127,7 @@ a:hover { text-decoration-thickness: 2px; }
 .a-side__tautan { display: block; min-height: 44px; padding: 10px 13px; border-radius: var(--a-radius-kecil); color: #fff; text-decoration: none; }
 .a-side__tautan:hover, .a-side__tautan.is-aktif { background: rgb(255 255 255 / .17); }
 .a-main { min-width: 0; }
-.a-header { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: var(--a-ruang-3); padding: var(--a-ruang-3) var(--a-ruang-6); background: var(--a-permukaan); border-block-end: 1px solid var(--a-garis); }
+.a-header { min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: var(--a-ruang-3); padding: var(--a-ruang-3) var(--a-ruang-6); background: var(--a-permukaan); border-block-end: 1px solid var(--a-garis); }
 .a-header__pengguna { display: flex; align-items: center; flex-wrap: wrap; gap: var(--a-ruang-3); margin-inline-start: auto; }
 .a-main__konten { max-width: var(--a-lebar-konten); margin-inline: auto; padding: var(--a-ruang-6); }
 .a-menu-toggle { display: none; }
@@ -192,8 +199,8 @@ a:hover { text-decoration-thickness: 2px; }
 
 
 /* ===========================================================
-   SLA-SKS v2.3 — PROTOTIPE VISUAL (login + dashboard Admin).
-   Scoped: halaman lain memakai desain K2 sampai disetujui.
+   SLA-SKS v2.3 — Desain panel dan publik disetujui.
+   Aktif secara konsisten pada seluruh halaman; tidak ada tema K2 lama.
    Inspirasi hirarki: TailDash (panel), UIdeck Appwind (publik).
    Tidak memuat Tailwind, CDN, font atau image eksternal.
    =========================================================== */
@@ -209,7 +216,7 @@ a:hover { text-decoration-thickness: 2px; }
     --a-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
     font-family: var(--a-font);
     color: var(--a-teks);
-    font-size: 14px;
+    font-size: var(--a-font-isi);
     line-height: 1.5;
 }
 .a-publik--prototipe .a-btn,
@@ -547,4 +554,149 @@ a:hover { text-decoration-thickness: 2px; }
   .a-cp__lebar { grid-column:auto; }
   .a-cp .a-card { padding:var(--a-ruang-4); }
   .a-cp__aksi .a-btn { flex:1 1 auto; justify-content:center; text-align:center; }
+}
+
+
+/* ===========================================================
+   U01 — Penyelarasan seluruh halaman yang telah dibangun.
+   Semua panel memakai .a-app--prototipe dari shared layout.
+   Struktur a-page dapat dipakai ulang di setiap modul berikutnya.
+   =========================================================== */
+.a-app--prototipe .a-main__konten {
+    width:100%;
+    max-width:1320px;
+    margin-inline:auto;
+    padding:clamp(15px,2.1vw,26px);
+}
+.a-page { display:grid; gap:var(--a-gap-kartu); min-width:0; align-content:start; }
+.a-page > * { min-width:0; }
+.a-page__heading {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin:0 0 3px;
+}
+.a-page__heading > div { min-width:0; max-width:900px; }
+.a-page__heading h1,
+.a-app--prototipe .a-page__heading h1 {
+    font-size:clamp(23px,2.4vw,var(--a-font-judul));
+    line-height:1.25;
+    letter-spacing:-.035em;
+    margin:4px 0 7px;
+    overflow-wrap:anywhere;
+}
+.a-page__heading .a-proto-eyebrow { margin:0; font-size:11px; letter-spacing:.07em; }
+.a-page__heading .a-proto-muted,
+.a-app--prototipe .a-page__heading .a-proto-muted {
+    color:var(--a-redup); font-size:13px; line-height:1.6; margin:0;
+}
+.a-page h2,
+.a-app--prototipe .a-page .a-card > h2,
+.a-app--prototipe .a-page .a-card > section > h2 {
+    font-size:var(--a-font-judul-kartu);
+    line-height:1.38;
+    letter-spacing:-.018em;
+    margin:0 0 10px;
+}
+.a-page h3 { line-height:1.4; }
+.a-page > .a-card,
+.a-page .a-card { min-width:0; }
+.a-app--prototipe .a-page .a-card { padding:var(--a-padding-kartu); box-shadow:0 3px 15px rgb(22 40 54 / 4%); }
+.a-app--prototipe .a-page .a-card > .a-help { margin-top:0; }
+.a-page__editor { width:min(100%,760px); }
+.a-page__editor--luas { width:min(100%,920px); }
+.a-page .a-form { gap:13px; }
+.a-page .a-form .a-field { display:grid; gap:5px; min-width:0; margin:0; }
+.a-page .a-form .a-field > .a-help { line-height:1.5; font-size:12px; margin-top:0; }
+.a-page .a-label { font-size:var(--a-font-label); line-height:1.4; }
+.a-page .a-field :is(input:not([type=checkbox]):not([type=radio]), select, textarea) {
+    width:100%; min-width:0; max-width:100%; min-height:var(--a-tinggi-input);
+    font-size:13px; padding:9px 12px; border:1px solid #cbd9df;
+    border-radius:var(--a-radius-kecil); background:var(--a-permukaan);
+}
+.a-page .a-field :is(input:not([type=checkbox]):not([type=radio]), select, textarea):focus-visible {
+    outline:3px solid rgb(22 132 88 / 16%); outline-offset:1px; border-color:var(--a-primer-gelap);
+}
+.a-page .a-field textarea { resize:vertical; min-height:110px; line-height:1.6; }
+.a-page .a-fieldset { min-width:0; }
+.a-page .a-btn { min-height:40px; }
+.a-page .a-tabel-gulir {
+    min-width:0; max-width:100%; overscroll-behavior-x:contain; border:1px solid var(--a-garis);
+    border-radius:10px;
+}
+.a-app--prototipe .a-page .a-tbl { font-size:12px; }
+.a-app--prototipe .a-page .a-tbl th {
+    color:var(--a-redup); font-size:12px; font-weight:700;
+    white-space:normal; background:#f4f7f8;
+}
+.a-app--prototipe .a-page .a-tbl :is(th,td) { padding:11px 12px; line-height:1.55; vertical-align:middle; }
+.a-page .a-tbl tbody tr:hover { background:#f8fbf9; }
+.a-page .a-tbl td { overflow-wrap:anywhere; }
+.a-page .a-breadcrumb {
+    color:var(--a-redup); font-size:12px; line-height:1.5;
+    margin:0; padding:0 0 2px;
+}
+.a-page .a-breadcrumb a { color:var(--a-primer-gelap); text-underline-offset:3px; }
+.a-page .a-alert { border-radius:8px; padding:12px 14px; }
+.a-page .a-empty { padding:20px; }
+.a-page .a-rincian { column-gap:18px; row-gap:12px; }
+.a-page__daftar .a-card { min-width:0; }
+.a-page .a-pager { padding-bottom:0; }
+.a-page__jumps {
+    display:flex; flex-wrap:wrap; gap:7px;
+    padding:10px; border:1px solid var(--a-garis);
+    border-radius:10px; background:var(--a-permukaan);
+}
+.a-page__jumps a {
+    display:inline-flex; align-items:center; min-height:38px;
+    padding:8px 12px; text-decoration:none; border-radius:8px;
+    font-size:12px; font-weight:650;
+}
+.a-page__jumps a:hover, .a-page__jumps a:focus-visible { background:#e9f6ee; }
+.a-cp [id^="cp-"], .a-cp [id^="kurikulum-"] { scroll-margin-top:20px; }
+.a-cp__kurikulum-form { max-width:none; }
+.a-cp__details {
+    min-width:0; border:1px solid var(--a-garis);
+    border-radius:11px; background:#f9fcfa;
+}
+.a-cp__details > summary {
+    cursor:pointer; display:list-item; padding:12px 14px;
+    font-size:13px; font-weight:700; color:var(--a-primer-gelap);
+}
+.a-cp__details[open] > summary { border-bottom:1px solid var(--a-garis); }
+.a-cp__details > .a-cp__form { padding:16px; }
+.a-cp__group-title {
+    grid-column:1/-1; margin:6px 0 0; padding:0 0 8px;
+    border-bottom:1px solid var(--a-garis); font-size:14px; font-weight:750;
+}
+.a-cp__form > .a-cp__aksi { margin:0; padding-top:14px; border-top:1px solid var(--a-garis); }
+.a-cp__form .a-field textarea { min-height:142px; }
+.a-cp__tabel { min-width:710px; }
+.a-cp__versi { background:#fbfdfc; border-color:var(--a-garis); }
+.a-cp__versi + .a-cp__versi { margin-top:10px; }
+.a-page :is(input,select,textarea,button,a) { scroll-margin-top:28px; }
+@media(max-width:1099px) {
+    .a-page__jumps { gap:4px; }
+    .a-cp__dua { grid-template-columns:1fr; }
+}
+@media(max-width:767px) {
+    .a-app--prototipe .a-main__konten { padding:14px; }
+    .a-page { gap:12px; }
+    .a-app--prototipe .a-page .a-card { padding:15px; }
+    .a-page__heading { align-items:flex-start; }
+    .a-page__editor, .a-page__editor--luas { width:100%; }
+    .a-page__jumps a { flex:1 1 auto; justify-content:center; }
+    .a-page__heading h1 { font-size:23px; }
+    .a-page .a-rincian { grid-template-columns:1fr; row-gap:5px; }
+    .a-page .a-rincian dd { margin-bottom:8px; }
+    .a-admin-akun__grid { grid-template-columns:1fr; }
+    .a-admin-akun__form { max-width:none; }
+}
+@media(max-width:390px) {
+    .a-page__jumps { padding:7px; }
+    .a-page__jumps a { flex:1 1 100%; }
+    .a-cp__details > .a-cp__form { padding:12px; }
+    .a-app--prototipe .a-page .a-card { padding:13px; }
 }

@@ -1,14 +1,20 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<h1>Pengguna</h1>
-<p class="a-help">Admin menambahkan akun secara tertutup. Siswa menggunakan NISN 10 angka sebagai username; staf boleh memiliki satu atau dua peran yang sesuai.</p>
+<div class="a-page">
+<header class="a-page__heading a-proto-heading">
+    <div>
+        <p class="a-proto-eyebrow">Admin · Administrasi Akun</p>
+        <h1>Pengguna</h1>
+        <p class="a-proto-muted">Admin membuat akun secara tertutup. Siswa memakai NISN 10 angka, sedangkan Pengelola dapat memiliki dua peran yang sah.</p>
+    </div>
+</header>
 <?php if (session()->getFlashdata('galat')): ?>
     <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
 <?php endif ?>
 <?php if (session()->getFlashdata('sukses')): ?>
     <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
 <?php endif ?>
-<section class="a-card a-baca-panel" aria-labelledby="judul-buat">
+<section class="a-card a-page__editor" aria-labelledby="judul-buat">
     <h2 id="judul-buat">Buat akun</h2>
     <form method="post" action="<?= esc(site_url('admin/pengguna'), 'attr') ?>" class="a-form">
         <?= csrf_field() ?>
@@ -55,4 +61,5 @@
     </table></div>
     <?php endif ?>
 </section>
+</div>
 <?= $this->endSection() ?>

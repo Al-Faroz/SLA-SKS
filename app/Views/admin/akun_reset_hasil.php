@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
+<div class="a-page">
 <section class="a-card a-baca-panel a-akun-reset" aria-labelledby="judul-hasil">
     <h1 id="judul-hasil">Reset sandi berhasil</h1>
     <div class="a-alert" role="status">Sandi lama dinonaktifkan, semua sesi sebelumnya dibatalkan, dan pengguna wajib mengganti sandi pada login berikutnya.</div>
@@ -13,4 +14,5 @@
     <p class="a-help">Jangan membagikan sandi melalui grup publik, URL, atau screenshot. Halaman ini tidak disimpan pada flash session.</p>
     <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/' . $jenis), 'attr') ?>">Kembali ke daftar <?= esc(ucfirst($jenis)) ?></a>
 </section>
+</div>
 <?= $this->endSection() ?>

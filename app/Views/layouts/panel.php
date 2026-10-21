@@ -20,7 +20,7 @@ $peranAktif = $peranAktif ?? '';
 </head>
 <body>
 <a class="a-lewati" href="#konten-utama">Lewati ke konten</a>
-<div class="a-app<?= ! empty($uiPrototipe) ? ' a-app--prototipe' : '' ?>" data-shell="panel">
+<div class="a-app a-app--prototipe" data-shell="panel">
     <aside id="navigasi-panel" class="a-side" aria-label="Navigasi panel">
         <div class="a-side__atas">
             <span class="a-identitas__mark" aria-hidden="true">S</span>

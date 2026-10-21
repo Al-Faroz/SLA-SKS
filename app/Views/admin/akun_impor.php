@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
 <?php $link = site_url('admin/' . $jenis); ?>
-<div class="a-admin-akun">
+<div class="a-admin-akun a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc($link, 'attr') ?>"><?= esc(ucfirst($jenis)) ?></a>
         <span aria-hidden="true">/</span><span aria-current="page">Impor XLSX</span>

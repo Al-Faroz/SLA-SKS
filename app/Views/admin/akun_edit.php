@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
+<div class="a-page">
 <?php $siswa = $jenis === 'siswa'; $kembali = site_url('admin/' . $jenis); ?>
 <nav class="a-breadcrumb" aria-label="Breadcrumb">
     <a href="<?= esc($kembali, 'attr') ?>"><?= esc(ucfirst($jenis)) ?></a>
@@ -62,4 +63,5 @@
         </div>
     </form>
 </section>
+</div>
 <?= $this->endSection() ?>

@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
+<div class="a-page">
 <nav class="a-breadcrumb" aria-label="Breadcrumb"><a href="<?= esc(site_url('admin/' . $jenis), 'attr') ?>"><?= esc(ucfirst($jenis)) ?></a><span aria-hidden="true">/</span><span aria-current="page">Reset sandi</span></nav>
 <section class="a-card a-baca-panel a-akun-reset" aria-labelledby="judul-reset">
     <h1 id="judul-reset">Konfirmasi reset sandi</h1>
@@ -21,4 +22,5 @@
         </form>
     <?php endif ?>
 </section>
+</div>
 <?= $this->endSection() ?>

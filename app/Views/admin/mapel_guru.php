@@ -1,11 +1,17 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
+<div class="a-page">
 <nav class="a-breadcrumb" aria-label="Breadcrumb">
     <a href="<?= esc(site_url('admin'), 'attr') ?>">Beranda Admin</a>
     <span aria-hidden="true">/</span><span aria-current="page">Mapel &amp; Guru per Gen</span>
 </nav>
-<h1>Mata Pelajaran &amp; Guru Pengampu (G1)</h1>
-<p class="a-help">Satu Guru aktif untuk setiap pasangan <strong>Gen + Mata Pelajaran</strong>, berlaku sepanjang semester pada Gen tersebut. Guru di Gen lain tidak terpengaruh.</p>
+<header class="a-page__heading a-proto-heading">
+    <div>
+        <p class="a-proto-eyebrow">Admin · Data Akademik</p>
+        <h1>Mata Pelajaran &amp; Guru per Gen</h1>
+        <p class="a-proto-muted">Satu Guru aktif setiap pasangan Gen–Mapel; penetapan Guru pada satu Gen tidak mengubah penugasan Gen lain.</p>
+    </div>
+</header>
 <p class="a-alert a-alert--info" role="status">Penugasan Guru dari K2 lama tidak disalin otomatis. Pilih Guru pada setiap Gen dan mapel sesuai keputusan madrasah. Data penugasan lama tetap tersimpan sebagai riwayat.</p>
 <?php if ($pesan = session()->getFlashdata('galat')): ?>
     <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
@@ -14,7 +20,7 @@
     <div class="a-alert" role="status"><?= esc($pesan) ?></div>
 <?php endif ?>
 
-<section class="a-card a-baca-panel" aria-labelledby="judul-buat-mapel">
+<section class="a-card a-page__editor" aria-labelledby="judul-buat-mapel">
     <h2 id="judul-buat-mapel">Tambahkan mata pelajaran</h2>
     <form class="a-form" method="post" action="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">
         <?= csrf_field() ?>
@@ -124,4 +130,5 @@
         </table></div>
     <?php endif ?>
 </section>
+</div>
 <?= $this->endSection() ?>
