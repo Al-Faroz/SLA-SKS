@@ -20,11 +20,17 @@ final class NavigasiService
                 'gen' => ['Gen & Tahun Ajaran', 'admin/referensi'],
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
+                'usulan_cp' => ['Keputusan Usulan CP', 'admin/usulan-cp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],
             ] as $kode => [$label, $path]) {
                 $menu[] = ['label' => $label, 'path' => $path, 'aktif' => $aktif === $kode];
             }
+        }
+
+        if ($peran === 'guru') {
+            $menu[] = ['label' => 'Paket dan BAB', 'path' => 'guru/paket', 'aktif' => $aktif === 'paket'];
+            $menu[] = ['label' => 'Usulan CP', 'path' => 'guru/usulan-cp', 'aktif' => $aktif === 'usulan_cp'];
         }
 
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];

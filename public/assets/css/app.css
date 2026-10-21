@@ -700,3 +700,50 @@ a:hover { text-decoration-thickness: 2px; }
     .a-cp__details > .a-cp__form { padding:12px; }
     .a-app--prototipe .a-page .a-card { padding:13px; }
 }
+
+
+/* K3B–K4B: wizard akademik Guru — komponen v2.3 dalam satu app.css. */
+.a-belajar-guru { display:grid; gap:var(--a-gap-kartu); min-width:0; }
+.a-belajar-guru .a-card { min-width:0; }
+.a-belajar-guru__list { display:grid; gap:10px; }
+.a-belajar-guru__item { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:13px; background:#f8fbfa; border:1px solid var(--a-garis); border-radius:10px; }
+.a-belajar-guru__item strong { font-size:14px; }
+.a-belajar-guru__item p { margin:6px 0 0; font-size:12px; }
+.a-belajar-guru__inner { display:grid; gap:14px; padding:15px; }
+.a-belajar-guru__inner > section { min-width:0; }
+.a-belajar-guru__inner h3 { margin:0 0 10px; font-size:15px; }
+.a-belajar-guru__list > details, .a-belajar-guru__tp-card { min-width:0; }
+.a-belajar-guru__list > details > summary { padding:13px; }
+.a-guru-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.a-guru-form-grid > * { min-width:0; }
+.a-guru-form-grid__wide { grid-column:1/-1; }
+.a-belajar-guru__subitem { padding:12px; border:1px solid var(--a-garis); background:#fbfdfc; border-radius:9px; margin-bottom:10px; overflow-wrap:anywhere; }
+.a-belajar-guru__subitem .a-form { margin-top:12px; }
+.a-belajar-guru__subitem strong { font-size:13px; }
+.a-belajar-guru__teks { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.65; border:1px solid var(--a-garis); padding:12px; border-radius:8px; }
+.a-belajar-guru__aksi { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+.a-belajar-guru__summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.a-belajar-guru__summary > div { background:#f2f8f5; border:1px solid #d7e7dd; border-radius:10px; padding:12px; }
+.a-belajar-guru__summary strong { display:block; font-size:20px; overflow-wrap:anywhere; color:var(--a-primer-gelap); }
+.a-belajar-guru__summary span { display:block; font-size:12px; margin-top:4px; color:var(--a-redup); }
+.a-belajar-guru__stat { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:12px; border-radius:9px; background:#f3f7f5; }
+.a-belajar-guru__masalah { margin:10px 0 0; padding-left:20px; color:#8d3434; display:grid; gap:6px; font-size:13px; }
+.a-belajar-guru .a-cp__details { margin-top:10px; }
+.a-belajar-guru .a-cp__details > summary { color:var(--a-primer-gelap); }
+.a-belajar-guru :is(input,select,textarea) { max-width:100%; }
+.a-belajar-guru .a-guru-form-grid .a-field { min-width:0; }
+.a-belajar-guru .a-field input[type=file] { padding:9px; max-width:100%; }
+.a-belajar-guru .a-alert ul { margin:8px 0; }
+@media(max-width:767px) {
+    .a-guru-form-grid { grid-template-columns:minmax(0,1fr); }
+    .a-guru-form-grid__wide { grid-column:auto; }
+    .a-belajar-guru__summary { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .a-belajar-guru__inner { padding:12px; }
+    .a-belajar-guru__aksi > form { flex:1 1 100%; }
+    .a-belajar-guru__aksi > form > .a-btn { width:100%; }
+}
+@media(max-width:390px) {
+    .a-belajar-guru .a-card { padding:12px; }
+    .a-belajar-guru__summary strong { font-size:16px; }
+    .a-belajar-guru__item > .a-btn { width:100%; justify-content:center; }
+}
