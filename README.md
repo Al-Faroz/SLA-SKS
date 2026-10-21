@@ -38,3 +38,10 @@ Tersedia pada menu Admin Pengelola/Siswa: **Unduh template** dan **Ekspor XLSX**
 
 ## K2D-2: Impor XLSX akun
 Alur Admin Pengelola/Siswa: unduh template AKUN-V1 → unggah XLSX → pratinjau jumlah baru/ubah/tetap/tolak, diff serta galat per baris → unduh laporan galat bila perlu → konfirmasi transaksi dan audit. Wajib backup database serta impor patch `database/sql/updates/0006_impor_akun.sql` sekali setelah K2-0005. Tidak menghapus akun atau otomatis mengubah sandi akun lama. PR harus diuji di XAMPP sebelum merge.
+
+
+## K2E — Profil mandiri dan Guru pengampu Gen
+
+Menu `/profil` untuk Admin/Guru/Pimpinan menampilkan identitas resmi baca-saja, ubah kontak pribadi, unggah foto sendiri untuk persetujuan Admin, ganti sandi dan pergantian peran. Admin meninjau foto di `/admin/foto-profil`. Siswa melihat identitas/Gen miliknya serta Guru aktif pengampu Gen tersebut (nama, foto disetujui dan daftar mapel, tanpa NIP/telepon). Foto disimpan di direktori `writable/`, tidak dipublikasikan sebagai file statis dan hanya disajikan dari endpoint yang memeriksa hak pemilik/Admin/Gen.
+
+**SQL wajib:** sesudah K2-0006, backup database dan `writable/`, impor sekali `database/sql/updates/0007_profil_pengelola.sql`. Tidak ada perubahan `.env`, index.php atau instalasi framework.

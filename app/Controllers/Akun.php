@@ -95,6 +95,8 @@ final class Akun extends BaseController
     {
         $akun = $this->servis()->penggunaSaatIni();
 
+        $data = (new \App\Services\ProfilService())->profilSendiri();
+
         return view('akun/profil', [
             'judul' => 'Profil',
             'namaPengguna' => $akun['nama'],
@@ -102,7 +104,9 @@ final class Akun extends BaseController
             'peranAktifKode' => $akun['peran_aktif'],
             'daftarPeran' => $akun['daftar_peran'],
             'username' => $akun['username'],
+            'dataProfil' => $data,
             'tautanNavigasi' => $this->menu($akun['peran_aktif'], 'profil'),
+            'uiPrototipe' => true,
         ]);
     }
 

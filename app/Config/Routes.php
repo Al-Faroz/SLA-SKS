@@ -15,6 +15,11 @@ $routes->get('ganti-sandi', 'Akun::gantiSandi', ['filter' => 'auth']);
 $routes->post('ganti-sandi', 'Akun::prosesGantiSandi', ['filter' => 'auth']);
 $routes->post('keluar', 'Akun::keluar', ['filter' => 'auth']);
 $routes->get('profil', 'Akun::profil', ['filter' => 'auth']);
+$routes->post('profil/kontak', 'Profil::simpanKontak', ['filter' => 'auth']);
+$routes->post('profil/foto', 'Profil::unggahFoto', ['filter' => 'auth']);
+$routes->get('profil/foto/(:num)', 'Profil::mediaFoto/$1', ['filter' => 'auth']);
+$routes->get('admin/foto-profil', 'Profil::tinjauFoto', ['filter' => 'auth:admin']);
+$routes->post('admin/foto-profil/(:num)/setujui', 'Profil::setujuiFoto/$1', ['filter' => 'auth:admin']);
 $routes->post('peran/ganti', 'Akun::prosesGantiPeran', ['filter' => 'auth']);
 
 $routes->get('siswa', 'Akun::berandaSiswa', ['filter' => 'auth:siswa']);
