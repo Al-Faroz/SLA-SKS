@@ -45,3 +45,8 @@ Alur Admin Pengelola/Siswa: unduh template AKUN-V1 → unggah XLSX → pratinjau
 Menu `/profil` untuk Admin/Guru/Pimpinan menampilkan identitas resmi baca-saja, ubah kontak pribadi, unggah foto sendiri untuk persetujuan Admin, ganti sandi dan pergantian peran. Admin meninjau foto di `/admin/foto-profil`. Siswa melihat identitas/Gen miliknya serta Guru aktif pengampu Gen tersebut (nama, foto disetujui dan daftar mapel, tanpa NIP/telepon). Foto disimpan di direktori `writable/`, tidak dipublikasikan sebagai file statis dan hanya disajikan dari endpoint yang memeriksa hak pemilik/Admin/Gen.
 
 **SQL wajib:** sesudah K2-0006, backup database dan `writable/`, impor sekali `database/sql/updates/0007_profil_pengelola.sql`. Tidak ada perubahan `.env`, index.php atau instalasi framework.
+
+
+## K3A — Referensi Kurikulum dan CP resmi berversi
+
+Admin mengelola kurikulum, sumber/dasar hukum, CP Fase D per mapel, dan naskah CP resmi beserta riwayat versinya pada `/admin/kurikulum-cp`. Draf dapat diperbaiki dan diterbitkan; versi lama tidak dihapus atau diedit, dan versi aktif lama diarsipkan ketika versi baru terbit. Ini fondasi **sebelum** TP/BAB dan usulan CP Guru. Memerlukan update SQL incremental `database/sql/updates/0008_kurikulum_cp.sql` sekali setelah K2-0007. Master Document tetap acuan, aplikasi tidak mengisi rumusan/sumber resmi fiktif.

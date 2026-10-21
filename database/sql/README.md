@@ -49,3 +49,24 @@ Patch additive ini menambah `foto_profil` (metadata foto privat dan status perse
 Pengelola (Admin/Guru/Pimpinan) dapat mengubah kontak dan mengunggah foto sendiri; foto JPG/PNG maksimal 2 MB, setiap sisi 100–1600 piksel, didekode lalu dienkode ulang dan memerlukan persetujuan Admin. Foto lama tetap tersedia hingga foto baru disetujui. Siswa hanya melihat foto profesional Guru yang sudah disetujui dan ditugaskan untuk Gen-nya, tanpa telepon pribadi atau NIP. Server memeriksa akses pada setiap unduhan foto.
 
 Jika impor SQL terhenti, jangan langsung ulangi; periksa tabel dan pulihkan backup terlebih dahulu. Tidak memakai migrations/seeders.
+
+
+## Update K3-0008 — Kurikulum dan CP resmi berversi
+
+**Sebelum impor:** backup database MySQL dan `writable/`. Periksa:
+`SELECT versi FROM schema_version ORDER BY versi;`
+Prasyarat `K2-0007` sudah terpasang dan `K3-0008` belum ada. Impor **hanya** `updates/0008_kurikulum_cp.sql` **satu kali** melalui phpMyAdmin.
+Jangan mengimpor ulang dump atau patch 0001–0007; jangan menggunakan migration/seeder.
+
+Patch additive membuat:
+- `ref_kurikulum`: nama, versi, sumber, dasar hukum dan pembuat.
+- `ref_cp`: kode CP stabil pada kombinasi kurikulum–mapel–Fase D; CP tidak dimiliki Gen tertentu.
+- `ref_cp_versi`: teks rumusan, elemen, otoritas, nomor dokumen, URL sumber, tanggal berlaku, dan siklus draf/aktif/diarsipkan.
+
+Admin mengelola `/admin/kurikulum-cp` untuk menambahkan kurikulum dan CP, memperbaiki draf,
+menerbitkan versi serta membuat draf versi berikutnya. Hanya teks **draf** yang dapat diubah.
+Ketika versi baru diterbitkan, status versi aktif lama menjadi diarsipkan; teks versi historis **tidak berubah**. Penerbitan menulis audit; seluruh mutasi memakai transaksi. Tidak ada CP/kurikulum dummy atau ketetapan hukum yang ditebak/dimasukkan otomatis.
+
+**Batas tahap K3A:** proposal CP dari Guru dan keputusan Admin atas usulan (`usulan_cp`) serta penautan TP–CP belum tersedia, harus dibangun pada PR akademik berikutnya sebelum BAB/TP aktif. Setelah modul siap, penautan TP baru hanya memilih versi CP `aktif` dengan kurikulum/mapel/fase yang cocok; tautan historis tetap.
+
+Jika impor gagal setelah sebagian DDL, periksa database dan pulihkan backup sebelum mencoba kembali.

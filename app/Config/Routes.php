@@ -67,6 +67,18 @@ $routes->get('admin/siswa/impor/(:segment)', 'AdminImporAkun::lihatSiswa/$1', ['
 $routes->post('admin/siswa/impor/(:segment)/konfirmasi', 'AdminImporAkun::konfirmasiSiswa/$1', ['filter' => 'auth:admin']);
 $routes->get('admin/siswa/impor/(:segment)/galat', 'AdminImporAkun::galatSiswa/$1', ['filter' => 'auth:admin']);
 
+// K3A — Kurikulum dan CP resmi berversi. Hanya Admin aktif; semua POST global CSRF.
+$routes->get('admin/kurikulum-cp', 'AdminKurikulumCp::index', ['filter' => 'auth:admin']);
+$routes->post('admin/kurikulum-cp/kurikulum', 'AdminKurikulumCp::simpanKurikulum', ['filter' => 'auth:admin']);
+$routes->post('admin/kurikulum-cp', 'AdminKurikulumCp::simpanCp', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/(:num)', 'AdminKurikulumCp::detail/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/(:num)/versi-baru', 'AdminKurikulumCp::versiBaru/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/kurikulum-cp/(:num)/versi-baru', 'AdminKurikulumCp::simpanVersiBaru/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/versi/(:num)/edit', 'AdminKurikulumCp::editDraf/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/kurikulum-cp/versi/(:num)/edit', 'AdminKurikulumCp::simpanDraf/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/versi/(:num)/terbit', 'AdminKurikulumCp::konfirmasiTerbit/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/kurikulum-cp/versi/(:num)/terbit', 'AdminKurikulumCp::terbitkan/$1', ['filter' => 'auth:admin']);
+
 // K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
 $routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);
 $routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'auth:admin']);
