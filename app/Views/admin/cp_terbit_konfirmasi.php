@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-cp">
+<div class="a-cp a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb"><a href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $cp['id']), 'attr') ?>">CP <?= esc($cp['kode']) ?></a><span aria-hidden="true">/</span><span aria-current="page">Terbitkan</span></nav>
     <section class="a-card a-cp__editor">
         <h1>Konfirmasi penerbitan CP</h1>

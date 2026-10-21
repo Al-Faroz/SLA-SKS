@@ -1,11 +1,11 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-profil">
+<div class="a-profil a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('admin/pengelola'), 'attr') ?>">Pengelola</a>
         <span aria-hidden="true">/</span><span aria-current="page">Persetujuan foto</span>
     </nav>
-    <header class="a-proto-heading">
+    <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Admin · Foto profil</p>
             <h1>Persetujuan foto profil</h1>

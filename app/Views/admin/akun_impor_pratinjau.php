@@ -7,7 +7,7 @@
         && (int) $batch['jumlah_tolak'] === 0
         && ((int) $batch['jumlah_baru'] + (int) $batch['jumlah_ubah'] > 0);
 ?>
-<div class="a-admin-akun">
+<div class="a-admin-akun a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc($base, 'attr') ?>"><?= esc(ucfirst($jenis)) ?></a>
         <span aria-hidden="true">/</span><a href="<?= esc($base . '/impor', 'attr') ?>">Impor XLSX</a>

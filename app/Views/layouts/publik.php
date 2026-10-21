@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="<?= esc(base_url('public/assets/css/app.css'), 'attr') ?>">
     <script defer src="<?= esc(base_url('public/assets/js/app.js'), 'attr') ?>"></script>
 </head>
-<body class="a-publik<?= ! empty($uiPrototipe) ? ' a-publik--prototipe' : '' ?>">
+<body class="a-publik a-publik--prototipe">
 <a class="a-lewati" href="#konten-utama">Lewati ke konten</a>
 <div class="a-shell-publik">
     <header class="a-kepala-publik">

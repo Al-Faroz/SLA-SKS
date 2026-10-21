@@ -121,6 +121,17 @@ Hanya lebar **bilah progres** dan **segmen** yang boleh memakai style inline yan
 ## 6. Animasi dan media
 Boleh animasi ringan **hanya** pada bilah segmen, lencana baru, dan perayaan siswa; matikan pada `prefers-reduced-motion`. Tidak ada animasi pada S06. PDF.js dan pustaka efek balik halaman diaktifkan hanya saat materi PDF; jangan membebani semua dashboard dengan library itu. Ikon SVG inline dari kumpulan ikon yang diizinkan, dengan label aksesibel pada tombol tanpa teks.
 
+## 6A. Sistem halaman tunggal v2.3 — standar implementasi semua modul
+
+Mulai tahap UI konsistensi, `layouts/panel.php` dan `layouts/publik.php` **selalu memakai desain v2.3 yang disetujui**. Tidak ada percabangan tema lama berdasarkan `uiPrototipe`. Satu stylesheet tetap `public/assets/css/app.css`.
+
+- Konten panel dalam `.a-page`; gunakan `header.a-page__heading.a-proto-heading` untuk kelompok judul, `.a-proto-eyebrow` untuk konteks, dan `.a-proto-muted` untuk deskripsi ringkas.
+- Gunakan `.a-page__editor` untuk form sederhana, `.a-page__editor--luas` untuk form banyak atribut. Daftar data tetap full width dengan `.a-tabel-gulir`, tidak memotong tabel pada 360px.
+- Halaman panjang seperti Kurikulum/CP memakai `nav.a-page__jumps` yang mengarah ke `id` bagian nyata. Form CP boleh memakai `details/summary` native dan tetap **terbuka secara default**, termasuk setelah server mengembalikan error validasi.
+- Field harus memakai label eksplisit; `.a-field` mengatur tinggi input 42px, ritme label-help, dan fokus keyboard. Satu CTA utama per formulir; tindakan bahaya punya konfirmasi server.
+- Badge, status kosong, galat/sukses, tabel, breadcrumb dan font menggunakan token yang sama. Gunakan satu header H1 per halaman, H2 untuk kartu, H3 untuk subbagian.
+- Jangan menaruh autentikasi atau perubahan hak akses pada komponen visual. Penataan UI tidak menambah aksi/backend/SQL baru. Lakukan pengecekan 360, 390, 768, 1100px dan desktop; lint PHP serta PHPUnit pada perubahan view.
+
 ## 7. Halaman katalog/galeri
 `docs/assets/galeri-komponen.html` menyediakan contoh statis tombol, status, kartu, form, tabel, step, modal, dan contoh responsive. Sebelum rollout massal, prototipe dashboard dan login mendapat persetujuan pemilik. Ketika komponen baru ditambahkan: ubah dokumen ini → ubah galeri → ubah `app.css` → uji pada 360/390/768/1100px → commit bersama. Jangan mengimplementasikan CSS komponen baru tanpa memperbarui galeri.
 

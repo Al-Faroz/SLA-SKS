@@ -4,8 +4,8 @@
     $siswa = $peranAktifKode === 'siswa';
     $profil = $dataProfil;
 ?>
-<div class="a-profil">
-    <header class="a-proto-heading">
+<div class="a-profil a-page">
+    <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Akun · Profil</p>
             <h1>Profil saya</h1>

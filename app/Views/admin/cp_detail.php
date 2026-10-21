@@ -1,8 +1,8 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-cp">
+<div class="a-cp a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb"><a href="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>">Referensi CP</a><span aria-hidden="true">/</span><span aria-current="page"><?= esc($cp['kode']) ?></span></nav>
-    <header class="a-proto-heading">
+    <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Admin · Riwayat Referensi</p>
             <h1>CP <?= esc($cp['kode']) ?></h1>

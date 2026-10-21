@@ -1,14 +1,14 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-proto-dashboard">
-    <div class="a-proto-heading">
+<div class="a-proto-dashboard a-page">
+    <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Ruang kerja / Administrasi</p>
             <h1>Dashboard Admin</h1>
             <p class="a-proto-muted">Selamat datang, <strong><?= esc($namaPengguna) ?></strong>. Berikut ringkasan data induk akademik yang tersedia saat ini.</p>
         </div>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/referensi'), 'attr') ?>">Kelola Gen <span aria-hidden="true">↗</span></a>
-    </div>
+    </header>
 
     <?php if ($pesan = session()->getFlashdata('sukses')): ?>
         <div class="a-alert" role="status"><?= esc($pesan) ?></div>

@@ -1,11 +1,11 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-cp">
+<div class="a-cp a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('admin'), 'attr') ?>">Beranda Admin</a>
         <span aria-hidden="true">/</span><span aria-current="page">Kurikulum &amp; CP</span>
     </nav>
-    <header class="a-proto-heading">
+    <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Admin · Referensi Akademik</p>
             <h1>Referensi Kurikulum &amp; CP</h1>
@@ -19,8 +19,14 @@
         <div class="a-alert" role="status"><?= esc($sukses) ?></div>
     <?php endif ?>
 
+    <nav class="a-page__jumps" aria-label="Bagian referensi akademik">
+        <a href="#kurikulum-tambah">Tambah kurikulum</a>
+        <a href="#kurikulum-daftar">Kurikulum tersimpan</a>
+        <a href="#cp-tambah">Buat CP</a>
+        <a href="#cp-daftar">Daftar CP</a>
+    </nav>
     <div class="a-cp__dua">
-        <section class="a-card" aria-labelledby="judul-kurikulum">
+        <section class="a-card a-cp__kurikulum-form" id="kurikulum-tambah" aria-labelledby="judul-kurikulum">
             <h2 id="judul-kurikulum">Tambah referensi kurikulum</h2>
             <p class="a-help">Masukkan nama, edisi, sumber dan dasar hukum sesuai dokumen resmi. Data bawaan tidak ditebak oleh aplikasi.</p>
             <form method="post" action="<?= esc(site_url('admin/kurikulum-cp/kurikulum'), 'attr') ?>" class="a-form">
@@ -36,7 +42,7 @@
                 <button class="a-btn a-btn--utama" type="submit">Simpan kurikulum</button>
             </form>
         </section>
-        <section class="a-card" aria-labelledby="judul-daftar-kurikulum">
+        <section class="a-card" id="kurikulum-daftar" aria-labelledby="judul-daftar-kurikulum">
             <h2 id="judul-daftar-kurikulum">Kurikulum tersimpan</h2>
             <?php if ($kurikulum === []): ?>
                 <div class="a-empty" role="status"><strong>Belum ada kurikulum.</strong><p>Tambahkan kurikulum resmi sebelum membuat CP.</p></div>
@@ -55,15 +61,18 @@
             <?php endif ?>
         </section>
     </div>
-    <section class="a-card" aria-labelledby="judul-cp-baru">
+    <section class="a-card" id="cp-tambah" aria-labelledby="judul-cp-baru">
         <h2 id="judul-cp-baru">Buat CP Fase D (draf pertama)</h2>
         <p class="a-help">Pilih kurikulum dan mapel yang tepat. Draf belum dapat digunakan dalam TP sampai diterbitkan Admin.</p>
         <?php if ($kurikulum === [] || $mapel === []): ?>
             <div class="a-alert a-alert--info" role="status">Tambahkan kurikulum serta mapel pada menu terkait terlebih dahulu.</div>
         <?php else: ?>
+            <details class="a-cp__details" open>
+                <summary>Formulir draf CP resmi · isi identitas dan sumber</summary>
             <form method="post" action="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>" class="a-form a-cp__form">
                 <?= csrf_field() ?>
                 <div class="a-cp__grid">
+                    <h3 class="a-cp__group-title">1 · Identitas dan cakupan CP</h3>
                     <div class="a-field"><label class="a-label" for="cp-kurikulum">Kurikulum</label>
                         <select id="cp-kurikulum" name="kurikulum_id" required>
                             <option value="">Pilih kurikulum</option>
@@ -83,6 +92,7 @@
                         <span class="a-help">Kode stabil dan unik untuk kombinasi kurikulum, mapel, Fase D.</span></div>
                     <div class="a-field"><label class="a-label" for="cp-elemen">Elemen CP</label>
                         <input id="cp-elemen" name="elemen" type="text" minlength="3" maxlength="150" required value="<?= esc(old('elemen', ''), 'attr') ?>"></div>
+                    <h3 class="a-cp__group-title">2 · Rumusan dan dokumen resmi</h3>
                     <div class="a-field a-cp__lebar"><label class="a-label" for="cp-rumusan">Rumusan CP resmi</label>
                         <textarea id="cp-rumusan" name="rumusan" rows="5" minlength="20" maxlength="15000" required><?= esc(old('rumusan', '')) ?></textarea></div>
                     <div class="a-field"><label class="a-label" for="cp-otoritas">Otoritas penerbit</label>
@@ -94,11 +104,12 @@
                     <div class="a-field"><label class="a-label" for="cp-tanggal">Tanggal berlaku dokumen</label>
                         <input id="cp-tanggal" name="tanggal_berlaku" type="date" required value="<?= esc(old('tanggal_berlaku', ''), 'attr') ?>"></div>
                 </div>
-                <button class="a-btn a-btn--utama" type="submit">Simpan draf CP</button>
+                <div class="a-cp__aksi"><button class="a-btn a-btn--utama" type="submit">Simpan draf CP</button></div>
             </form>
+            </details>
         <?php endif ?>
     </section>
-    <section class="a-card" aria-labelledby="judul-cp-daftar">
+    <section class="a-card" id="cp-daftar" aria-labelledby="judul-cp-daftar">
         <h2 id="judul-cp-daftar">Daftar CP dan status versinya</h2>
         <?php if ($cp === []): ?>
             <div class="a-empty" role="status"><strong>Belum ada referensi CP.</strong><p>Gunakan formulir di atas untuk menyiapkan draf CP resmi.</p></div>

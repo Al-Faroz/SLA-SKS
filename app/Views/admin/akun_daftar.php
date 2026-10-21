@@ -6,8 +6,8 @@
     $lokasi = site_url('admin/' . $jenis);
     $jumlahHalaman = (int) max(1, ceil($total / $perHalaman));
 ?>
-<div class="a-admin-akun">
-    <div class="a-proto-heading">
+<div class="a-admin-akun a-page">
+    <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Administrasi / Akun</p>
             <h1><?= esc($judulDaftar) ?></h1>
@@ -16,7 +16,7 @@
                 : 'Akun Admin, Guru dan Pimpinan dalam satu daftar.' ?></p>
         </div>
         <span class="a-admin-akun__jumlah"><?= (int) $total ?> akun sesuai filter</span>
-    </div>
+    </header>
 
     <?php if ($galat = session()->getFlashdata('galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>

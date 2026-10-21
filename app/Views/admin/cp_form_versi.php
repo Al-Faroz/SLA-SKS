@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-cp">
+<div class="a-cp a-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>">Referensi CP</a><span aria-hidden="true">/</span>
         <a href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $cp['id']), 'attr') ?>"><?= esc($cp['kode']) ?></a>
@@ -13,6 +13,7 @@
         <form method="post" action="<?= esc($aksi, 'attr') ?>" class="a-form">
             <?= csrf_field() ?>
             <div class="a-cp__grid">
+                <h2 class="a-cp__group-title">Naskah dan rujukan versi</h2>
                 <div class="a-field"><label class="a-label" for="v-elemen">Elemen CP</label>
                     <input id="v-elemen" name="elemen" type="text" minlength="3" maxlength="150" required value="<?= esc(old('elemen', $dataVersi['elemen'] ?? ''), 'attr') ?>"></div>
                 <div class="a-field"><label class="a-label" for="v-otoritas">Otoritas penerbit</label>
