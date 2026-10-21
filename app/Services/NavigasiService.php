@@ -20,6 +20,7 @@ final class NavigasiService
                 'gen' => ['Gen & Tahun Ajaran', 'admin/referensi'],
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
+                'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],
             ] as $kode => [$label, $path]) {
                 $menu[] = ['label' => $label, 'path' => $path, 'aktif' => $aktif === $kode];
             }
