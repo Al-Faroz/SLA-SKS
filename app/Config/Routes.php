@@ -79,6 +79,31 @@ $routes->post('admin/kurikulum-cp/versi/(:num)/edit', 'AdminKurikulumCp::simpanD
 $routes->get('admin/kurikulum-cp/versi/(:num)/terbit', 'AdminKurikulumCp::konfirmasiTerbit/$1', ['filter' => 'auth:admin']);
 $routes->post('admin/kurikulum-cp/versi/(:num)/terbit', 'AdminKurikulumCp::terbitkan/$1', ['filter' => 'auth:admin']);
 
+// K3B+K3C+K4A+K4B — alur akademik Guru dan keputusan Admin.
+$routes->get('guru/usulan-cp', 'CpUsulan::guru', ['filter' => 'auth:guru']);
+$routes->post('guru/usulan-cp', 'CpUsulan::ajukan', ['filter' => 'auth:guru']);
+$routes->get('admin/usulan-cp', 'CpUsulan::admin', ['filter' => 'auth:admin']);
+$routes->get('admin/usulan-cp/(:num)', 'CpUsulan::detail/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/usulan-cp/(:num)', 'CpUsulan::putuskan/$1', ['filter' => 'auth:admin']);
+$routes->get('guru/paket', 'GuruPaket::index', ['filter' => 'auth:guru']);
+$routes->post('guru/paket', 'GuruPaket::buat', ['filter' => 'auth:guru']);
+$routes->get('guru/paket/(:num)', 'GuruPaket::detail/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/paket/(:num)/bab', 'GuruPaket::buatBab/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/bab/(:num)', 'GuruBab::editor/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/bab/(:num)/tp', 'GuruBab::tambahTp/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/parameter', 'GuruBab::parameter/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi', 'GuruBab::materi/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/hots', 'GuruBab::hots/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/soal/(:segment)', 'GuruBab::soal/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/bab/(:num)/checklist', 'GuruBab::checklist/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/bab/(:num)/siap', 'GuruBab::siap/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/materi/(:num)/berkas', 'GuruBabFile::unggah/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/berkas/(:num)', 'GuruBabFile::berkas/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/bab/(:num)/template', 'GuruBabFile::template/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/bab/(:num)/impor', 'GuruBabFile::impor/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/bab/(:num)/impor/(:segment)', 'GuruBabFile::pratinjau/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/bab/(:num)/impor/(:segment)/konfirmasi', 'GuruBabFile::konfirmasi/$1/$2', ['filter' => 'auth:guru']);
+
 // K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
 $routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);
 $routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'auth:admin']);

@@ -70,3 +70,14 @@ Ketika versi baru diterbitkan, status versi aktif lama menjadi diarsipkan; teks 
 **Batas tahap K3A:** proposal CP dari Guru dan keputusan Admin atas usulan (`usulan_cp`) serta penautan TP–CP belum tersedia, harus dibangun pada PR akademik berikutnya sebelum BAB/TP aktif. Setelah modul siap, penautan TP baru hanya memilih versi CP `aktif` dengan kurikulum/mapel/fase yang cocok; tautan historis tetap.
 
 Jika impor gagal setelah sebagian DDL, periksa database dan pulihkan backup sebelum mencoba kembali.
+
+
+## Pembaruan K4-0009 — Paket terpadu K3B+K3C+K4A+K4B
+
+**Wajib backup MySQL dan folder `writable/` terlebih dahulu.** Pastikan `K3-0008` sudah tercatat, sementara `K4-0009` belum ada melalui `SELECT versi FROM schema_version ORDER BY versi;`. Impor **hanya** `database/sql/updates/0009_cp_tp_paket_bab_excel.sql` **satu kali** via phpMyAdmin; jangan impor ulang 0001–0008. Bila terjadi kegagalan DDL, periksa tabel dan pulihkan backup, bukan menjalankan ulang SQL secara buta.
+
+Patch additive membuat usulan CP berkeputusan Admin, paket/penugasan paket khusus Gen, BAB+TP dengan referensi CP berversi, materi/berkas privat, HOTS, soal dan opsi, snapshot BAB Siap, serta staging pratinjau impor dan rahasia HMAC per instalasi. Tidak menggunakan CI4 Migration atau Seeder. Tidak menghapus data riil.
+
+**Penting:** file materi disimpan privat dalam `writable/berkas`. Backup/pemulihan membutuhkan SQL **dan** isi direktori tersebut. Setiap template XLSX 8 sheet khusus BAB menggunakan HMAC dari kunci acak di tabel `rahasia_template_bab` yang dibuat aplikasi, tidak disimpan dalam kode/repo. Implikasi restore: tabel rahasia dan data BAB harus dipulihkan sebagai satu kesatuan. File yang diimpor maksimal 5 MB, 2.000 baris per sheet; tidak otomatis menghapus baris lama. Pratinjau 30 menit dan konfirmasi memakai transaksi; jika struktur TP berubah, unduh ulang template.
+
+Alur teruji secara manual masih diperlukan: Guru role aktif → pilih Gen–Mapel yang diampu → paket → BAB → TP/CP resmi → konten dari form atau 8 sheet XLSX → unggah berkas non-YouTube → checklist → BAB Siap. Admin role aktif memutus usulan CP Guru, kecuali milik ID dirinya sendiri. Versi BAB Siap tidak boleh dibuka dalam editor tulis.

@@ -54,3 +54,8 @@ Admin mengelola kurikulum, sumber/dasar hukum, CP Fase D per mapel, dan naskah C
 
 ## Penyeragaman UI seluruh halaman (branch UI terpisah)
 Layout panel/publik menerapkan gaya v2.3 seragam (tanpa `uiPrototipe` kondisional); halaman lama Gen, Mapel, Identitas, akun dan halaman CP menampilkan header/form/tabel konsisten. Kurikulum/CP dilengkapi tautan bagian dan form CP bertahap yang dapat dilipat. **Tidak ada perubahan model, Service, Route, SQL, atau aturan bisnis.** Perubahan visual dibangun sebagai PR bertumpuk di atas K3A (#11), sehingga harus diuji dan digabung setelah K3A disahkan.
+
+
+## Paket terpadu K3B + K3C + K4A + K4B
+
+Alur Guru dapat disusun dari `guru/usulan-cp` (Guru ajukan CP; Admin memutus di `admin/usulan-cp`) dan `guru/paket` (Gen–Mapel yang diampu → Paket semester → BAB → TP dan tautan CP → Materi/HOTS/Soal/parameter → Template 8 sheet/Impor XLSX → Checklist → BAB Siap). Hak Server harus selalu didasarkan pada G1 aktif dan status BAB. Upload berkas materi privat melalui `writable/berkas`. Patch skema baru `database/sql/updates/0009_cp_tp_paket_bab_excel.sql` setelah K3-0008; backup DB+writable lebih dahulu dan impor sekali. Tidak ada mekanisme Migration/Seeder. PR menunggu pengujian lint/SQL/browser oleh pemilik sebelum merge.
