@@ -519,3 +519,32 @@ a:hover { text-decoration-thickness: 2px; }
     .a-profil__guru-grid { grid-template-columns:minmax(0,1fr); }
     .a-profil__tinjau-card img { width:128px; height:128px; }
 }
+
+
+/* K3A: referensi kurikulum dan CP. Selaras dengan kartu/form/tabel Admin v2.3. */
+.a-cp { display:grid; gap:16px; }
+.a-cp__dua { display:grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:14px; align-items:start; }
+.a-cp .a-card { min-width:0; padding:var(--a-padding-kartu); }
+.a-cp h2 { margin:0 0 10px; font-size:var(--a-font-judul-kartu); }
+.a-cp__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.a-cp__lebar { grid-column:1/-1; }
+.a-cp__form, .a-cp__editor .a-form { display:grid; gap:14px; }
+.a-cp__detail { display:block; margin-top:5px; color:var(--a-redup); font-size:12px; }
+.a-cp__tabel { min-width:760px; }
+.a-cp__tabel th,.a-cp__tabel td { vertical-align:top; }
+.a-cp__editor { max-width:980px; }
+.a-cp__versi { margin-top:14px; padding:15px; border:1px solid var(--a-garis); border-radius:var(--a-radius); }
+.a-cp__versi-atas { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.a-cp__versi-atas h3 { margin:0; font-size:16px; }
+.a-cp__rumusan { white-space:normal; overflow-wrap:anywhere; line-height:1.6; }
+.a-cp__url { overflow-wrap:anywhere; }
+.a-cp__aksi { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:16px; }
+@media (max-width:800px) {
+  .a-cp__dua { grid-template-columns:minmax(0,1fr); }
+}
+@media (max-width:600px) {
+  .a-cp__grid { grid-template-columns:minmax(0,1fr); }
+  .a-cp__lebar { grid-column:auto; }
+  .a-cp .a-card { padding:var(--a-ruang-4); }
+  .a-cp__aksi .a-btn { flex:1 1 auto; justify-content:center; text-align:center; }
+}

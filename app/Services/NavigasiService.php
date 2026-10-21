@@ -19,6 +19,7 @@ final class NavigasiService
                 'siswa' => ['Siswa', 'admin/siswa'],
                 'gen' => ['Gen & Tahun Ajaran', 'admin/referensi'],
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
+                'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],
             ] as $kode => [$label, $path]) {
