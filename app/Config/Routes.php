@@ -50,6 +50,18 @@ $routes->get('admin/siswa/template', 'AdminXlsx::templateSiswa', ['filter' => 'a
 $routes->get('admin/pengelola/ekspor', 'AdminXlsx::eksporPengelola', ['filter' => 'auth:admin']);
 $routes->get('admin/siswa/ekspor', 'AdminXlsx::eksporSiswa', ['filter' => 'auth:admin']);
 
+// K2D-2: impor XLSX dengan pratinjau privat dan konfirmasi POST.
+$routes->get('admin/pengelola/impor', 'AdminImporAkun::halamanPengelola', ['filter' => 'auth:admin']);
+$routes->post('admin/pengelola/impor', 'AdminImporAkun::unggahPengelola', ['filter' => 'auth:admin']);
+$routes->get('admin/pengelola/impor/(:segment)', 'AdminImporAkun::lihatPengelola/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pengelola/impor/(:segment)/konfirmasi', 'AdminImporAkun::konfirmasiPengelola/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/pengelola/impor/(:segment)/galat', 'AdminImporAkun::galatPengelola/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/impor', 'AdminImporAkun::halamanSiswa', ['filter' => 'auth:admin']);
+$routes->post('admin/siswa/impor', 'AdminImporAkun::unggahSiswa', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/impor/(:segment)', 'AdminImporAkun::lihatSiswa/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/siswa/impor/(:segment)/konfirmasi', 'AdminImporAkun::konfirmasiSiswa/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/siswa/impor/(:segment)/galat', 'AdminImporAkun::galatSiswa/$1', ['filter' => 'auth:admin']);
+
 // K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
 $routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);
 $routes->post('admin/referensi/gen', 'AdminReferensi::buatGen', ['filter' => 'auth:admin']);

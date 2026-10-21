@@ -34,3 +34,7 @@ Dokumen lama v2.0/v2.1 dan addendum tidak diperlukan dalam repo acuan utama; ars
 Tersedia pada menu Admin Pengelola/Siswa: **Unduh template** dan **Ekspor XLSX** sesuai filter (pencarian/status/Gen). Menggunakan `phpoffice/phpspreadsheet` yang sudah ditetapkan di `composer.json`/`composer.lock`, bukan dependensi baru. Data XLSX diekspor dalam tipe sel teks untuk menjaga NISN dengan nol di depan, sekaligus menetralkan formula injection. Ekspor tidak membawa hash/sandi/sesi. Setiap unduhan diaudit tanpa data sensitif.
 
 **Penting:** Ini tahap pertama K2D (ekspor + template). Fitur **unggah/pratinjau/konfirmasi impor XLSX belum tersedia** dan akan dikerjakan dalam PR berikutnya agar tidak ada tombol impor yang tampak berfungsi tetapi belum aman. Tidak ada SQL baru untuk tahap ini. Jangan mengimpor ulang SQL 0001–0005.
+
+
+## K2D-2: Impor XLSX akun
+Alur Admin Pengelola/Siswa: unduh template AKUN-V1 → unggah XLSX → pratinjau jumlah baru/ubah/tetap/tolak, diff serta galat per baris → unduh laporan galat bila perlu → konfirmasi transaksi dan audit. Wajib backup database serta impor patch `database/sql/updates/0006_impor_akun.sql` sekali setelah K2-0005. Tidak menghapus akun atau otomatis mengubah sandi akun lama. PR harus diuji di XAMPP sebelum merge.
