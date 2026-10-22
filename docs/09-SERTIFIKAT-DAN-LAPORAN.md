@@ -1,7 +1,7 @@
 # 09 — Sertifikat, Revisi, Verifikasi dan Laporan
 
 ## 1. Syarat penerbitan sertifikat pertama
-`SertifikatService::periksaPenerbitan()` menerbitkan satu sertifikat per **siswa + paket semester** apabila semua BAB yang direncanakan telah Siap/tuntas, semua TP tuntas dan seluruh resume/tugas **yang wajib di jalur belajar** telah dinilai, tanpa nilai sementara. TP diagnostik tuntas tidak mewajibkan kiriman dari jalur yang dilewati. Semester `Dilewati` tidak mendapat sertifikat. Nilai akhir = rata-rata nilai TP, pembulatan tampilan konsisten sesuai template. Penerbitan terkoordinasi transaksi dan idempoten.
+`SertifikatService::periksaPenerbitan()` menerbitkan satu sertifikat per **siswa + paket semester** apabila semua TP yang direncanakan telah Siap dan tuntas dan seluruh resume/tugas **yang wajib di jalur belajar** telah dinilai, tanpa nilai sementara. TP diagnostik tuntas tidak mewajibkan kiriman dari jalur yang dilewati. Semester `Dilewati` tidak mendapat sertifikat. Nilai akhir = rata-rata nilai TP, pembulatan tampilan konsisten sesuai template. Penerbitan terkoordinasi transaksi dan idempoten.
 
 ## 2. Isi PDF dan template
 | Komponen | Aturan |
@@ -49,19 +49,22 @@ Koreksi soal/kunci yang sah dapat menghitung ulang TP dari tuntas menjadi belum 
 ## 8. Verifikasi publik
 `GET /verifikasi/{kode}` tanpa login, token acak sulit ditebak, rate limit. Tampilkan **nomor, nama, mapel, semester, nilai akhir tercetak pada versi yang ditanyakan, tanggal terbit, status, dan tautan versi terbaru bila digantikan**. **Jangan tampilkan NISN, HP, tanggal lahir, alasan koreksi atau audit.** QR lama tetap bisa diakses dengan label `Digantikan — bukan versi terbaru`. Kode tidak ada: `Sertifikat tidak ditemukan`. Akses PDF asli hanya untuk pemilik dan peran berwenang; halaman publik bukan endpoint download PDF.
 
-**Laporan dan sertifikat per Gen (v2.3):** setiap sertifikat/rapor mengacu pada snapshot siswa, Gen, mapel, paket semester dan versi konten historis yang benar. Paket antargen terpisah meskipun kode BAB atau CP serupa; filter laporan Guru selalu membatasi Gen–Mapel penugasan aktif. Nomor/QR dan versi sertifikat tetap unik, sertifikat lama tidak berubah ketika Guru atau data Gen lainnya diganti. Pada ekspor akun R9, data Pengelola dan Siswa dapat diunduh terpisah sesuai filter, tanpa sandi/hash/token, disanitasi dari formula injection.
+**Laporan dan sertifikat per Gen (v2.4):** setiap sertifikat/rapor mengacu pada snapshot siswa, Gen, mapel, paket semester dan versi konten historis yang benar. Paket antargen terpisah meskipun kode TP atau CP serupa; filter laporan Guru selalu membatasi Gen–Mapel penugasan aktif. Nomor/QR dan versi sertifikat tetap unik, sertifikat lama tidak berubah ketika Guru atau data Gen lainnya diganti. Pada ekspor akun R9, data Pengelola dan Siswa dapat diunduh terpisah sesuai filter, tanpa sandi/hash/token, disanitasi dari formula injection.
 
 ## 9. Daftar laporan resmi
 | Kode | Laporan | Format/isi |
 |---|---|---|
 | R1 | Rapor satu siswa/mapel/semester | PDF + Excel; TP, cara tuntas, resume, HOTS, sumatif, nilai TP dan nilai akhir |
 | R2 | Rekap nilai mapel | Excel; siswa × TP, rata-rata, status sementara |
-| R3 | Progres siswa | Excel; status TP, jalur tuntas, tanggal, BAB menunggu |
+| R3 | Progres siswa | Excel; status TP, jalur tuntas, tanggal, TP menunggu |
 | R4 | Log ujian | Excel; status dan insiden, tanpa skor pada percobaan batal |
 | R5 | Sertifikat | Excel; nomor/versi/status, siswa, mapel, nilai, tanggal |
-| R6 | Kesiapan BAB | Excel/PDF; BAB siap/rencana, kekurangan materi, target dan kebutuhan Gen |
+| R6 | Kesiapan TP | Excel/PDF; TP siap/rencana, kekurangan materi, target dan kebutuhan Gen |
 | R7 | Ringkasan progres program | Excel/PDF sesuai dasbor |
 | R8 | Aktivitas penilaian guru | Excel; antrean, jumlah/umur item, durasi penilaian |
 | R9 | Daftar akun | Excel; identitas/status/role/login, **tanpa password** |
 
 Rapor siswa dapat dilihat siswa pemilik; Guru hanya siswa dan paket **Gen–Mapel yang aktif ditugaskan**; Admin seluruhnya; Pimpinan baca-saja. Excel dinetralkan dari formula injection (`=`, `+`, `-`, `@`), nilai sementara **wajib dilabel**, laporan besar dapat dibatasi filter dengan pesan jelas. PDF laporan A4 portrait kecuali sertifikat A4 landscape.
+
+### Kontrak agregasi v2.4
+Progres/nilai/laporan/sertifikat menggunakan **TP** sebagai unit akademik; tidak menyimpan hasil atau prasyarat kelompok BAB. Resume dan HOTS per Materi dinilai seluruhnya bagi siswa jalur belajar sebelum sertifikat. Jalur lulus Diagnostik tetap bernilai Diagnostik sebagaimana kebijakan madrasah. Laporan kesiapan menggunakan status **TP Siap**, bukan kesiapan BAB. Histori sertifikat dan perlindungan revisi tidak berubah.
