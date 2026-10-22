@@ -77,9 +77,9 @@ Semua kelas komponen memakai awalan `a-`. Modifier dapat berbentuk `a-btn--utama
 
 ## 4. Pola HTML standar
 ```html
-<section class="a-card" aria-labelledby="bab-judul">
+<section class="a-card" aria-labelledby="tp-judul">
   <div class="a-card__atas">
-    <h2 id="bab-judul">TP 1 · Bilangan</h2>
+    <h2 id="tp-judul">TP 1 · Bilangan</h2>
     <span class="a-badge a-badge--siap">Siap</span>
   </div>
   <p class="a-help">3 TP · 2 TP tuntas</p>
