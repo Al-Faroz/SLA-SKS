@@ -13,13 +13,13 @@ Nama di bawah adalah **kontrak desain**. Saat menulis dump SQL, cocokan dengan `
 | Akun | `pengguna`, `pengguna_peran`, `siswa`, `profil_pengelola`, `ci_sessions` | akun bersama; siswa NISN dan Gen, staf profil kontak/foto, sandi hash, status & audit |
 | Referensi | `ref_angkatan`, `ref_semester`, `ref_mapel`, `penugasan_guru_gen`, `riwayat_penugasan_guru_gen`, `ref_jenjang`, `ref_fase`, `ref_kelas`, `ref_kurikulum`, `ref_tahun_ajaran` | Guru aktif unik per Gen–Mapel; mapel tidak lagi mempunyai Guru global; semester 1–6 |
 | CP | `ref_cp`, `ref_cp_versi`, `usulan_cp`, `tp_cp` | CP versi immutable, usulan diputus Admin, tepat satu CP utama per TP |
-| Konten | `paket_semester`, `penugasan_paket`, `bab`, `versi_konten_tp`, `tp`, `materi`, `berkas` | `paket_semester.angkatan_id` wajib; objek TP/soal/materi khusus satu Gen, historis terjaga |
+| Konten | `paket_semester`, `penugasan_paket`, `tp`, `tp_cp`, `versi_konten_tp`, `materi`, `berkas` | `paket_semester.angkatan_id` wajib; objek TP/soal/materi khusus satu Gen, historis terjaga |
 | Impor | `impor_atp`, `impor_atp_baris`, `impor_soal_docx`, `impor_soal_baris`, `impor_akun`, `impor_akun_baris` | Impor ATP Excel, bank soal DOCX dan impor akun adalah alur terpisah; checksum/versi/UUID/idempoten serta jejak Admin |
 | Asesmen | `soal`, `pilihan`, `percobaan_ujian`, `jawaban_percobaan`, `riwayat_status_ujian`, `segmen_jeda_ujian`, `pelanggaran_ujian`, `tambahan_percobaan` | snapshot soal/kunci/opsi server, server timer, attempt sah/batal terpisah |
 | Belajar | `progres_tp`, `progres_materi`, `resume_materi`, `tugas_hots_materi` | progres/versi TP terpin, draf DB manual, nilai dan siapa menilai |
 | Koreksi | `koreksi_tp`, `usulan_koreksi_nilai`, `riwayat_nilai`, `koreksi_ujian`, `riwayat_identitas` | pengusul, pemutus, versi asal, alasan, nilai sebelum/sesudah |
 | Hasil | `sertifikat`, `sertifikat_aktif`, `pekerjaan_revisi_sertifikat`, `log_sertifikat`, `lencana_siswa` | nomor/QR unik, satu berlaku per pasangan, histori immutable |
-| Branding | `pengaturan`, `aset_identitas`, `template_sertifikat`, `template_sertifikat_versi` | data madrasah, ikon/logo/TTD PNG terpisah, template historis |
+| Branding | `pengaturan`, `aset_identitas`, `template_sertifikat`, `template_sertifikat_versi` | data madrasah, logo aplikasi sebagai favicon, TTD PNG privat dan template historis, template historis |
 | LMS | `notifikasi`, `pengumuman`, `faq`, `log_aktivitas` | notifikasi internal, pengumuman global, FAQ login-only, audit |
 
 ### Relasi inti
@@ -32,8 +32,7 @@ flowchart TD
  U --> G
  A --> P[paket_semester khusus Gen]
  M --> P
- P --> B[bab]
- B --> TP[tp]
+ P --> TP[tp]
  TP --> MT[materi]
  TP --> CP[tp_cp dan ref_cp_versi]
  TP --> PR[progres_tp siswa]
