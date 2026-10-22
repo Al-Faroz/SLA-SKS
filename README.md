@@ -24,3 +24,5 @@ Dokumen resmi proyek terdiri atas **16 Master Document** di [docs/README.md](doc
 - PR kode terdahulu **#13** (K3B/K3C/K4A/K4B) masih memakai hierarki dan impor lama sehingga harus **dirombak di PR implementasi terpisah**, tidak boleh otomatis digabung.
 - Perubahan Master v2.4 hanya dokumentasi dan referensi; pelaksanaan SQL, generator Excel, parser DOCX serta revisi UI/UX **menunggu tahap implementasi serta pengujian XAMPP**.
 - Template kerja acuan: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` dan `docs/TEMPLATE_SOAL_SLA-SKS.docx`; aplikasi akan menghasilkan unduhan yang terkait identitas/TP aktual.
+
+> **Status template biner:** Excel dan Word referensi telah dibuat tetapi belum terunggah di branch ini; **jangan merge** sebelum keduanya benar-benar ada di `docs/` dan lolos QA. Lihat [status template](docs/STATUS-TEMPLATE-V2.4.md).
