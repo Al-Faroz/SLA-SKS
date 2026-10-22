@@ -1,16 +1,15 @@
-# Instruksi untuk Coding Assistant — SLA-SKS
+# Instruksi Coding Assistant — SLA-SKS Master v2.4
 
-1. **WAJIB baca** `docs/README.md`, `docs/02-ATURAN-BISNIS.md`, `docs/03-PERAN-DAN-HAK-AKSES.md`, dan dokumen domain fitur sebelum membuat/mengubah kode.
-2. Keputusan terakhir yang tertulis pada Master v2.3 ini merupakan sumber tunggal. Jangan memakai aturan lama dari addendum/v2.1 bila bertentangan dengan dokumen ini.
-3. **Tidak boleh membuat CI4 migrations/seeders** sebagai alur instalasi. Buat *dump install* dan *SQL update bernomor* yang aman untuk MySQL lokal serta MariaDB shared hosting; jangan lakukan update destruktif.
-4. **`index.php` dan `.htaccess` di root**; wajib uji deny untuk `.env`, `app/`, `writable/`, `vendor/`, `database/sql/` serta informasi privat lain.
-5. **UI/CSS mengikuti** `12-UI-UX-DAN-HALAMAN.md` dan `13-DESIGN-SYSTEM-CSS.md`. Jangan membuat file stylesheet terpisah per role, tidak pakai framework CSS baru, semua tombol punya fungsi, galeri komponen harus ikut diperbarui.
-6. **G1 v2.3:** satu Guru aktif per kombinasi Gen–Mapel; paket/BAB/TP/soal/materi per Gen, tanpa kewenangan Guru global dari `ref_mapel.guru_id`. Service wajib memeriksa Gen–Mapel objek, termasuk saat impor dan penilaian. Jangan merge PR K2 model lama apa adanya.
-7. **Akun v2.3:** menu Admin Pengelola/Siswa terpisah (tetap satu autentikasi), impor/ekspor XLSX, reset sandi per akun, profil staf milik sendiri, profil Guru untuk siswa berizin Gen; semua sesuai 03/10/12/14.
-8. Hak akses dicek di **Service**, bukan hanya route/controller/client. Hanya empat role. Admin tunggal cukup untuk administrasi; jangan menambahkan keharusan dua Admin bagi koreksi biodata.
-9. Fitur ujian memakai satu **profil Ketat**, fullscreen wajib sebelum attempt, sumatif desktop/laptop dari rumah boleh, diagnostik HP hanya jika mendukung fullscreen. Gunakan waktu server. Shared hosting tidak boleh dipaksa daemon wajib.
-10. Penilaian/koreksi harus audit dan idempoten. Jangan menghapus snapshot ujian, skor asal, atau sertifikat historis. **Tidak ada pencabutan sertifikat**.
-11. Sertifikat: A4 landscape, NISN hanya dalam PDF privat, QR publik tanpa NISN, TTD PNG wajib; background fallback jika belum diunggah; saat revisi gunakan background lama dan TTD penandatangan aktif terbaru.
-12. Draf siswa **disimpan manual**. Pengumuman global oleh Admin/Guru; notifikasi internal saja; FAQ login-only. Jangan membangun autosave/email/WA/forum secara sepihak.
-13. Setiap fitur memiliki happy path, empty/loading/error/locked/read-only dan pengujian. Jalankan tes sesuai `docs/16-PENGUJIAN-DAN-PENERIMAAN.md` sebelum menyatakan selesai.
-14. Bila ada ambiguitas teknis kecil, ambil solusi yang paling sederhana dan kompatibel lalu dokumentasikan. Jangan menambah alur approval, fitur atau pertanyaan pemilik baru tanpa konflik produk yang sungguh-sungguh.
+1. Baca `README.md`, `docs/README.md`, dokumen domain 01–16 terkait dan `docs/PENDING-DECISIONS.md` sebelum mengubah kode.
+2. **Kontrak akademik:** CP → ATP (urutan TP) → TP → Materi/Submateri, **tanpa BAB**. TP adalah unit status Siap, snapshot, Diagnostik, Sumatif dan koreksi.
+3. Fase D dan integrasi KBC/Panca Cinta relevan. **Jangan mengubah kebijakan SKS percepatan 2 tahun**: Diagnostik ≥ KKM langsung menuntaskan TP dengan nilai Diagnostik; jika gagal wajib Materi/Resume/HOTS **per Materi** lalu Sumatif. Bobot, KKM, nilai, aturan ujian dan sertifikat tetap.
+4. **G1 per Gen–Mapel**; paket/TP/materi/soal Gen A tidak dipakai otomatis untuk Gen B. Cek hak di Controller DAN Service; satu Admin cukup, usulan akademik tidak self-approved.
+5. Excel resmi: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx`, enam semester, CP terfilter mapel/fase/kurikulum, identitas otomatis server dan impor untuk mencipta TP/Materi; **bukan konten Excel delapan sheet lama**. Seluruh materi/media/Resume/HOTS di aplikasi.
+6. Word resmi: `docs/TEMPLATE_SOAL_SLA-SKS.docx`, satu parser PG lima opsi A–E untuk Diagnostik/Sumatif per TP; pertanyaan dan semua pilihan dapat teks/Equation Word, gambar, tabel bersarang, Unicode, audio/video Google Drive. Upload → validate → preview → confirm; no kunci bocor.
+7. Enam revisi UI wajib menurut `docs/12-UI-UX-DAN-HALAMAN.md`: Pengelola/Siswa form atas & tabel pagination bawah; Mapel/Guru input 3 kolom + pagination; CP daftar export+pagination; identitas logo/favicon; profil foto full-width lalu Identitas/Kontak. Design system `docs/13-DESIGN-SYSTEM-CSS.md`.
+8. Tetap CI4 MVC + Service Layer, `index.php` dan `.htaccess` di ROOT, `.env` dan URL tidak diubah. CSS kustom `app.css` serta JS native; tanpa Bootstrap/React/Vue tambahan.
+9. **Tidak menggunakan Migration/Seeder**. Database MySQL lokal/MariaDB hosting melalui dump SQL/patch bernomor. Pemilik akan mengirim dump lokal; lakukan analisis dan pemetaan data terpilih sebelum menyusun SQL final. **Pemilik sendiri yang backup, menghapus tabel lokal tertentu, lalu impor**; jangan reset hosting/produksi.
+10. Privat: tidak ada credential, data siswa nyata, dump/backup privat dalam GitHub. Semua SQL, unggahan XLSX/DOCX, preview dan aset lulus pemeriksaan izin, sanitasi, audit, concurrency dan anti-duplikasi.
+11. Jangan hapus/timpa data nilai, attempt, file, sertifikat, CP/TP Siap dan riwayat versi produksi. Koreksi konten akademik lewat permohonan Guru dan keputusan Admin tanpa menyetujui usulan diri sendiri; sertifikat tidak dicabut.
+12. Semua UI memiliki normal/kosong/loading/sukses/gagal/locked, keyboard, kontras, mobile. Semua tombol berfungsi; komponen baru wajib masuk galeri saat implementasi kode. E2E sesuai `docs/16-PENGUJIAN-DAN-PENERIMAAN.md`.
+13. Bekerja di branch terpisah, PR untuk review, **jangan merge `main` tanpa PASS**. PR #13 masih memakai model lama; revisi implementasi lewat branch baru setelah Master ini direview. Lakukan tes nyata bila mampu dan jujur tentang yang belum diuji.
