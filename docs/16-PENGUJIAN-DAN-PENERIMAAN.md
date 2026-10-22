@@ -73,7 +73,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-063 | Laporan XLSX dengan sel `=FORMULA` | Diamankan dari formula injection |
 | E2E-064 | Login di instalasi shared hosting | Semua rute dan rewrite root bekerja |
 | E2E-065 | Mengakses `/.env`, `/app/...`, `/vendor/...`, `/writable/...`, `/database/sql/...` | 403/404, tidak bocor konten |
-| E2E-066 | Menjalankan import SQL full di DB bersih MySQL & MariaDB | Keduanya sukses, struktur/relasi sesuai |
+| E2E-066 | Menjalankan impor SQL final ke DB uji bersih MySQL & MariaDB | Keduanya sukses; struktur TP langsung di bawah paket; dump lokal berdata disiapkan terpisah setelah analisis |
 | E2E-067 | Menjalankan SQL update pada DB berisi progres | Tidak menghapus siswa/sertifikat/riwayat |
 | E2E-068 | Website kehilangan cron 5 menit | Request ujian tetap rekonsiliasi dengan waktu server |
 | E2E-069 | Backup manual dan restore di lingkungan uji | Siswa, aset historis dan sertifikat dapat dibaca |
@@ -98,7 +98,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-084 | Staf mengubah profil sendiri | Foto/kontak pribadi tersimpan; upaya mengubah nama resmi/NIP/role via POST ditolak |
 | E2E-085 | Siswa melihat profil Guru Gen-nya | Nama/foto disetujui/mapel terlihat; NIP, nomor pribadi dan profil Guru Gen lain tidak dapat dibaca |
 | E2E-086 | UI prototipe dashboard dan login v2.4 | Pemilik menyetujui sebelum rollout; font, ukuran, gap, layout padat/responsif di 360/390/768/1100px dan fokus/kontras lolos |
-| E2E-087 | Patch SQL transisi 0003 pada database K2 yang telah terisi | K1/K2 dan akun/sandi/Gen/mapel/riwayat tetap utuh, penugasan global tak dianggap berlaku otomatis, rollback melalui backup terbukti |
+| E2E-087 | Konversi database lama dalam simulasi terpisah | Skema dan data yang harus dipertahankan terpetakan, tanpa berbagi TP lintas Gen, backup dan restore terbukti |
 | E2E-088 | Admin+Guru mengakses Gen lain setelah berpindah peran | Service menegakkan peran aktif dan izin Gen–Mapel; mode Admin tidak dipakai untuk menyetujui usulan akademik sendiri |
 
 ## 3. Matriks nonfungsional
