@@ -28,13 +28,13 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET | `/verifikasi/{kode}` | Public; informasi terbatas, rate limit |
 | GET | `/kebijakan-privasi` | Public; teks kebijakan sekolah berversi |
 | GET | `/berkas/{id}` | Auth + owner; mendukung `Range` untuk audio/PDF |
-| GET | `/siswa`, `/siswa/mapel/{id}/semester/{n}`, `/siswa/tp/{id}`, `/siswa/tp/{id}` | Peran siswa, prasyarat berurutan |
+| GET | `/siswa`, `/siswa/mapel/{id}/semester/{n}`, `/siswa/tp/{id}` | Peran siswa, prasyarat berurutan |
 | GET,POST | `/siswa/ujian/{tp}/{jenis}/...` | Preflight, ujian server-auth, snapshot dan state |
 | GET,POST | `/siswa/materi/{id}`, `/siswa/materi/{id}/resume` | Pembuktian materi, draf manual/kirim |
-| GET,POST | `/siswa/tp/{id}/tugas` | Draf manual/kirim |
+| GET,POST | `/siswa/materi/{id}/hots` | Draf manual/kirim |
 | GET | `/siswa/nilai`, `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Hanya miliknya |
-| GET,POST | `/guru/tp/{id}/...`, `/guru/tp/{id}/...` | G1 aktif **Gen–Mapel objek** + hanya draf kecuali koreksi khusus |
-| GET,POST | `/guru/peta-atp/unduh`, `/guru/peta-atp/impor`, `/guru/peta-atp/impor/konfirmasi` | Workbook enam semester terikat Gen–Mapel/Kurikulum, pratinjau, transaksi |
+| GET,POST | `/guru/tp/{id}/...` | G1 aktif **Gen–Mapel objek** + hanya draf kecuali koreksi khusus |
+| GET,POST | `/guru/peta-atp/unduh`, `/guru/peta-atp/impor`, `/guru/peta-atp/impor/{id}/konfirmasi` | Workbook enam semester terikat Gen–Mapel/Kurikulum, pratinjau, transaksi |
 | GET,POST | `/guru/penilaian/...`, `/guru/ujian/{id}/keputusan` | Guru hanya untuk Gen–Mapel siswa/ujian terkait |
 | GET,POST | `/guru/koreksi-tp/...`, `/guru/koreksi-nilai/...` | Pengajuan akademik berversi |
 | GET,POST | `/admin/pengelola/...`, `/admin/siswa/...` | Dua ruang Admin dengan akun bersama; tambah/ubah/nonaktif/reset per akun, audit |
