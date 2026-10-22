@@ -5,7 +5,7 @@
 ## 1. Produk dan pengguna
 SLA-SKS adalah LMS tertutup untuk program pembelajaran mandiri berurutan. Siswa mempelajari mata pelajaran menurut paket semester 1–6, TP, TP dan materi. Fokusnya ketuntasan akademik, bukan kompetisi. Empat peran: **Siswa**, **Guru**, **Admin**, **Pimpinan**. Setiap siswa hanya memiliki peran siswa; akun staf boleh merangkap maksimal dua peran yang diizinkan. Perkiraan kapasitas kecil: satu kelas khusus maksimum tiap angkatan, bukan platform publik ratusan pengguna serentak. Akses utama siswa melalui HP/laptop; sumatif dari **desktop/laptop** saja.
 
-Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru merancang paket TP, TP dan CP → Guru melengkapi dan menerbitkan TP Siap → Siswa menjalani diagnostik → jika belum tuntas: materi/resume/tugas/sumatif → Guru memberi penilaian → siswa melihat kemajuan/sertifikat → Pimpinan memantau**.
+Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru menyusun ATP/TP dan Materi berdasarkan CP resmi → Guru melengkapi dan menerbitkan TP Siap → Siswa menjalani diagnostik → jika belum tuntas: materi/resume/tugas/sumatif → Guru memberi penilaian → siswa melihat kemajuan/sertifikat → Pimpinan memantau**.
 
 ## 2. Struktur belajar resmi
 `Madrasah → Gen → Mata pelajaran → Paket semester khusus Gen (1–6) → ATP (urutan TP) → TP berurutan → Materi/Submateri berurutan`. Setiap TP memetakan satu atau lebih CP resmi yang dipublikasikan, tepat satu CP utama. MTs Fase D mencakup VII–IX; label semester SLA 1–6 **bukan periode tahun kalender**. Penugasan paket berlaku menurut kombinasi angkatan, tahun ajaran, mapel dan semester; siswa yang sudah memiliki progres dipertahankan pada paket dan versi konten asal.
