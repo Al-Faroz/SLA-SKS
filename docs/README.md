@@ -41,3 +41,5 @@
 | Penilaian dan sertifikat | 08, 09 | 10–14 | 16 |
 | Akun, G1, layout Admin dan profil | 03, 12, 13 | 10, 11, 14 | 16 |
 | SQL/hosting/backup | 10, 15 | AGENTS.md dan README | 16 |
+
+> **Status template biner:** Excel dan Word referensi telah dibuat tetapi belum terunggah di branch ini; **jangan merge** sebelum keduanya benar-benar ada di `docs/` dan lolos QA. Lihat [status template](STATUS-TEMPLATE-V2.4.md).
