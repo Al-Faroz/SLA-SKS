@@ -13,11 +13,11 @@ Nama di bawah adalah **kontrak desain**. Saat menulis dump SQL, cocokan dengan `
 | Akun | `pengguna`, `pengguna_peran`, `siswa`, `profil_pengelola`, `ci_sessions` | akun bersama; siswa NISN dan Gen, staf profil kontak/foto, sandi hash, status & audit |
 | Referensi | `ref_angkatan`, `ref_semester`, `ref_mapel`, `penugasan_guru_gen`, `riwayat_penugasan_guru_gen`, `ref_jenjang`, `ref_fase`, `ref_kelas`, `ref_kurikulum`, `ref_tahun_ajaran` | Guru aktif unik per Gen–Mapel; mapel tidak lagi mempunyai Guru global; semester 1–6 |
 | CP | `ref_cp`, `ref_cp_versi`, `usulan_cp`, `tp_cp` | CP versi immutable, usulan diputus Admin, tepat satu CP utama per TP |
-| Konten | `paket_semester`, `penugasan_paket`, `bab`, `versi_konten_bab`, `tp`, `materi`, `berkas` | `paket_semester.angkatan_id` wajib; objek BAB/TP/soal/materi khusus satu Gen, historis terjaga |
-| Impor | `impor_bab`, `impor_baris`, `impor_akun`, `impor_akun_baris` | Impor BAB dan impor akun adalah alur terpisah; checksum/versi/UUID/idempoten serta jejak Admin |
+| Konten | `paket_semester`, `penugasan_paket`, `bab`, `versi_konten_tp`, `tp`, `materi`, `berkas` | `paket_semester.angkatan_id` wajib; objek TP/soal/materi khusus satu Gen, historis terjaga |
+| Impor | `impor_atp`, `impor_atp_baris`, `impor_soal_docx`, `impor_soal_baris`, `impor_akun`, `impor_akun_baris` | Impor ATP Excel, bank soal DOCX dan impor akun adalah alur terpisah; checksum/versi/UUID/idempoten serta jejak Admin |
 | Asesmen | `soal`, `pilihan`, `percobaan_ujian`, `jawaban_percobaan`, `riwayat_status_ujian`, `segmen_jeda_ujian`, `pelanggaran_ujian`, `tambahan_percobaan` | snapshot soal/kunci/opsi server, server timer, attempt sah/batal terpisah |
-| Belajar | `progres_tp`, `progres_materi`, `resume_materi`, `tugas_tp` | progres/versi TP terpin, draf DB manual, nilai dan siapa menilai |
-| Koreksi | `koreksi_bab`, `usulan_koreksi_nilai`, `riwayat_nilai`, `koreksi_ujian`, `riwayat_identitas` | pengusul, pemutus, versi asal, alasan, nilai sebelum/sesudah |
+| Belajar | `progres_tp`, `progres_materi`, `resume_materi`, `tugas_hots_materi` | progres/versi TP terpin, draf DB manual, nilai dan siapa menilai |
+| Koreksi | `koreksi_tp`, `usulan_koreksi_nilai`, `riwayat_nilai`, `koreksi_ujian`, `riwayat_identitas` | pengusul, pemutus, versi asal, alasan, nilai sebelum/sesudah |
 | Hasil | `sertifikat`, `sertifikat_aktif`, `pekerjaan_revisi_sertifikat`, `log_sertifikat`, `lencana_siswa` | nomor/QR unik, satu berlaku per pasangan, histori immutable |
 | Branding | `pengaturan`, `aset_identitas`, `template_sertifikat`, `template_sertifikat_versi` | data madrasah, ikon/logo/TTD PNG terpisah, template historis |
 | LMS | `notifikasi`, `pengumuman`, `faq`, `log_aktivitas` | notifikasi internal, pengumuman global, FAQ login-only, audit |
@@ -47,21 +47,21 @@ flowchart TD
 
 ## 3. Invarian SQL dan transaksi
 1. `pengguna.username` unik; `siswa.nisn` unik; username diubah bersama NISN di **satu transaksi** dengan log.
-2. `penugasan_guru_gen` mempunyai **UNIQUE(angkatan_id,mapel_id)** dan `guru_id` nullable, FK ke Guru aktif yang juga tervalidasi peran melalui Service. Admin dapat menugaskan seorang Guru ke beberapa Gen/mapel. `ref_mapel.guru_id` (kolom warisan K2) bukan penentu hak v2.3; migrasi non-destruktif mempertahankan data sampai transisi teruji.
+2. `penugasan_guru_gen` mempunyai **UNIQUE(angkatan_id,mapel_id)** dan `guru_id` nullable, FK ke Guru aktif yang juga tervalidasi peran melalui Service. Admin dapat menugaskan seorang Guru ke beberapa Gen/mapel. `ref_mapel.guru_id` (kolom warisan K2) bukan penentu hak v2.4; migrasi non-destruktif mempertahankan data sampai transisi teruji.
 3. `paket_semester.angkatan_id` wajib dan paket tidak dapat ditugaskan ke Gen yang berbeda dari pemiliknya; `penugasan_paket` unik **untuk penugasan yang aktif** per (angkatan,mapel,semester,tahun ajaran); implementasi MariaDB/MySQL bisa memakai pointer/constraint service atau kolom materialisasi untuk indeks unik, jangan mengandalkan partial index yang tak tersedia.
-4. `UNIQUE(bab_id,kode_tp)`; `UNIQUE(tp_id,cp_versi_id)`; tepat satu CP utama per TP divalidasi Service dan diuji.
+4. `UNIQUE(paket_semester_id,kode_tp)`; `UNIQUE(tp_id,cp_versi_id)`; tepat satu CP utama per TP divalidasi Service dan diuji.
 5. `UNIQUE(siswa_id,tp_id,versi_paket_yang_ditugaskan)` untuk progres TP dalam satu konteks; `UNIQUE(percobaan_id,soal_snapshot_id)` untuk jawaban. Tidak ada dua percobaan **berjalan atau jeda** bersamaan untuk siswa+TP+jenis.
 6. `sertifikat.nomor` unik dan `kode_verifikasi` unik; **tidak** memakai UNIQUE sederhana `(siswa_id,paket_semester_id)` di tabel versi historis; `sertifikat_aktif` memiliki satu pointer unik `(siswa_id,paket_semester_id)` yang diarahkan ke versi `berlaku`.
 7. `usulan_koreksi_nilai` memiliki versi asal dan status; setelah diterapkan, tidak dapat diterapkan ulang. `riwayat_nilai` append-only secara fungsional.
-8. Berkas yang dipakai sertifikat/BAB historis tidak di-overwrite dan tidak dihapus otomatis.
+8. Berkas yang dipakai sertifikat/TP historis tidak di-overwrite dan tidak dihapus otomatis.
 9. Waktu simpan UTC atau timezone konsisten yang kemudian ditampilkan Asia/Jakarta; pilih satu standar secara eksplisit pada implementasi dan pakai di semua service/database.
 10. Pengecekan referensial dilakukan ulang sebelum commit, bukan hanya lewat JavaScript.
 
-### Struktur data v2.3 yang mengikat implementasi
+### Struktur data yang dipertahankan dari v2.4
 - `ref_mapel` menyimpan identitas kode/nama mapel saja untuk kewenangan baru. Sumber G1 adalah `penugasan_guru_gen(id,angkatan_id,mapel_id,guru_id,diubah_oleh,diubah_pada)`, pasangan Gen–Mapel unik. FK pengguna membatasi ID valid; Service menegakkan status aktif + peran Guru. Baris boleh ada tanpa Guru; dropdown Guru hanya akun aktif dengan role `guru`. `riwayat_penugasan_guru_gen` menyimpan Guru sebelum/sesudah, alasan, Admin dan waktu, append-only.
 - `siswa(id,pengguna_id,nisn,angkatan_id,semester_mulai,...)`: `pengguna_id` unik dan FK, `nisn` unik 10 angka, `angkatan_id` wajib sebelum siswa dapat belajar. Koreksi NISN = update `pengguna.username` dan `siswa.nisn` satu transaksi+audit; tidak mengganti `siswa_id`.
 - `profil_pengelola(pengguna_id,foto_aset_id,telepon_pribadi,...)`: staf mengubah hanya atribut profil sendiri yang diizinkan; nama resmi/NIP/peran/penugasan ditangani Admin. Foto berada di storage privat dengan pemeriksaan upload. Data publik Guru dibuat melalui proyeksi terbatas tanpa telepon pribadi/NIP.
-- `paket_semester.angkatan_id` merupakan FK wajib. `penugasan_paket` hanya menunjuk paket dari Gen yang sama; Service memeriksa Gen/Mapel/semester/tahun ajaran saat menetapkan, memulai progres, menilai, dan merevisi. BAB/TP/soal/materi mengikuti Gen paket induk, tanpa objek pembelajaran bersama lintas Gen. CP resmi tetap bisa dipakai lintas Gen.
+- `paket_semester.angkatan_id` merupakan FK wajib. `penugasan_paket` hanya menunjuk paket dari Gen yang sama; Service memeriksa Gen/Mapel/semester/tahun ajaran saat menetapkan, memulai progres, menilai, dan merevisi. TP/soal/materi mengikuti Gen paket induk, tanpa objek pembelajaran bersama lintas Gen. CP resmi tetap bisa dipakai lintas Gen.
 - `impor_akun` dan `impor_akun_baris` menyimpan metadata file versi template/checksum, jenis Pengelola/Siswa, Admin, status, ringkasan galat dan kunci idempoten; **tidak menyimpan sandi plaintext**. Simpan perubahan akun dan peran secara transaksional; file tanpa baris tertentu bukan perintah penghapusan.
 - Reset sandi menaikkan `pengguna.versi_sesi`, mengaktifkan `wajib_ganti_sandi`, mencatat peristiwa tanpa menyimpan sandi sementara. Export XLSX dibuat server dari daftar yang difilter, menetralkan sel formula, tidak menyertakan sandi/hash/token/sesi.
 - Penguncian transaksi berlaku pada pergantian G1, perubahan profil resmi, impor akun, NISN, pengikatan paket dan penilaian. Selalu cek FK, status dan otorisasi kembali sebelum commit.
@@ -71,7 +71,7 @@ flowchart TD
 |---|---|
 | `nama_madrasah`, `alamat_madrasah`, `npsn`, `nsm`, `telepon`, `email` | Diisi Admin; wajib sesuai pilihan K20 B; situs web opsional |
 | `kota_penerbitan`, `kepala_madrasah_nama`, `kepala_madrasah_nip` | Diisi Admin |
-| `logo_madrasah_aset_id`, `ikon_aplikasi_aset_id`, `ttd_png_versi_id` | Referensi berkas, jangan simpan binary dalam kunci nilai |
+| `logo_aplikasi_aset_id`, `ttd_png_versi_id` | Referensi berkas, jangan simpan binary dalam kunci nilai |
 | `template_sertifikat_aktif_id` | Pointer global; fallback bawaan jika kosong |
 | `kkm_bawaan`, `bobot_resume_bawaan`, `bobot_tugas_bawaan`, `bobot_sumatif_bawaan` | 75; 20/30/50 |
 | `resume_min_karakter`, `tugas_min_karakter` | 50; 200 |
@@ -88,15 +88,15 @@ flowchart TD
 | `pdf_maks_mb`, `pdf_maks_halaman`, `audio_maks_mb`, `gambar_sisi_maks_px` | 15; 40; 10; 1600 (hanya berkas materi) |
 
 ## 5. Paket SQL instalasi dan update
-**Struktur file yang wajib dibuat programmer ketika membangun DB:**
+**Struktur file yang wajib dibuat programmer ketika membangun DB final (nama/urutan SQL nyata ditentukan setelah dump lokal dianalisis):**
 ```text
 database/sql/
 ├── README.md
 ├── install/
-│   └── sla_sks_v2_3_full.sql           # DDL + data bawaan non-pribadi
+│   └── sla_sks_v2_4_full.sql           # DDL + data bawaan non-pribadi
 └── updates/
     ├── 0002_*.sql                     # patch K2 bila sudah diimpor
-    └── 0003_*.sql                     # transisi v2.3 non-destruktif (dibuat saat implementasi)
+    └── 0003_*.sql                     # transisi v2.4 non-destruktif (dibuat saat implementasi)
 ```
 
 - Semua SQL UTF-8/`utf8mb4`; gunakan sintaks kompatibel **MySQL lokal dan MariaDB hosting**. Uji impor bersih di keduanya.
@@ -105,12 +105,20 @@ database/sql/
 - Admin awal tidak dibuat oleh CI4 Seeder: instalasi membuat akun lewat **skrip inisialisasi sekali pakai yang aman** atau data import terenkripsi/hash yang diberikan ketika instalasi. **Jangan hardcode password plaintext/default yang diketahui publik dalam dump yang dipush ke repo.** Setelah login pertama, wajib ganti sandi.
 - Jangan pernah menyimpan dump data siswa nyata pada repo. Ekspor data produksi dan backup hanya berada di lokasi privat.
 
-### Transisi database K1/K2 → v2.3 tanpa reset
-K2 sudah diuji pemilik pada localhost dan `0002_referensi_identitas.sql` mungkin sudah diimpor **meskipun PR #3 belum digabung ke main**. Oleh karena itu, **jangan edit atau minta impor ulang SQL 0002 yang telah diterapkan**. Setelah dokumentasi disahkan, buat **patch SQL 0003 terpisah** untuk instalasi dengan K2 yang sudah dipakai; cek `schema_version`, backup DB/storage dan catat pra-syarat secara eksplisit. 
-1. Pertahankan `ref_mapel.guru_id` dan `riwayat_guru_mapel` warisan sebagai data transisi, tidak menjadi sumber otorisasi baru. Jangan menganggap Guru lama otomatis berwenang atas seluruh Gen. Admin harus menetapkan Guru setiap pasangan Gen–Mapel.
-2. Buat tabel/indeks/FK v2.3 secara additive. Untuk paket historis yang kelak ada, petakan kepemilikan ke Gen dari relasi penugasan yang sah; bila ambigu **hentikan dan minta pemeriksaan Admin**, bukan menebak atau menimpa progres.
-3. Setelah aplikasi dan seluruh referensi beralih ke penugasan per Gen, pertahankan jejak lama sesuai kebijakan histori. Jangan menjalankan migrasi/seeder CI4; semua pembaruan melalui SQL berurutan dan pengujian MySQL/MariaDB.
-4. Revisi dokumentasi saja **tidak menjalankan patch apa pun**, tidak membuat tabel atau mengubah akun yang telah ada.
+### Transisi basis data ke kontrak v2.4
+**Pola yang diminta pemilik khusus localhost:** ketika implementasi dimulai, pemilik akan mengirim dump SQL lokal terkini. Developer wajib **menganalisis skema, versi dan isi dump**, memilih data lama yang perlu dipertahankan, membuat **dump instalasi final baru yang telah mencakup data terpilih**, dan memberikan petunjuk import. **Pemilik secara eksplisit akan mengosongkan seluruh tabel DB lokal yang dipilih setelah backup**, kemudian mengimpor dump baru di XAMPP. Jangan menjatuhkan tabel dari aplikasi atau menjalankan operasi tersebut sebelum dump ditinjau dan persetujuan tetap jelas. **Reset ini hanya untuk database lokal pengembangan, tidak berlaku untuk hosting/produksi**; produksi memakai patch additive bernomor yang aman.
+
+- Jika masih ada tabel `bab`, `versi_konten_bab`, `tugas_tp` pada dump lama, analisis relasi/isinya terlebih dulu; transformasi data terpilih ke **`tp` sebagai unit langsung di bawah `paket_semester`**, `versi_konten_tp`, dan **`tugas_hots_materi`**. Konflik banyak TP per BAB tidak boleh otomatis dipaksa jadi satu atau dihapus: petakan TP dan materi berdasarkan identitas/urutan, catat ambiguitas untuk diperiksa.
+- Tidak mengasumsikan dump lama bersih atau tabel `0009` sudah lengkap. Periksa `schema_version`, FK, jumlah/unik identitas, kemiripan data, hash pengguna, referensi Gen/CP, histori ujian dan file privat. Tidak memasukkan data siswa nyata/credential/backup privat ke GitHub.
+- Perbaikan kontrak SQL, generator XLSX/Word, Service dan UI dilakukan di **branch implementasi terpisah** dari PR dokumentasi ini dan diuji MySQL/MariaDB. Dump final bukan sekadar skema kosong bila pengguna meminta data lama penting ikut dipertahankan.
+
+## 5A. Kontrak tambahan model v2.4
+1. **Relasi inti:** `paket_semester.id → tp.paket_semester_id → materi.tp_id → tugas_hots_materi.materi_id`. **Tidak ada entitas BAB operasional**. Tepat satu kunci unik per TP pada paket, dan urutan ATP berdasarkan semester/urut TP. `tp_cp` mengikat CP versi aktif dan tepat satu CP utama per TP.
+2. Setiap Materi mempunyai satu instruksi Resume dan satu tugas HOTS; `resume_materi` serta pengiriman/penilaian HOTS mengacu pada Materi, siswa, versi konten terpin, penilai dan histori, bukan hanya TP. Bank `soal` Diagnostik/Sumatif mengacu pada `tp_id` dan versi TP; satu soal PG **lima opsi A–E** dengan satu kunci.
+3. Konten campuran Word tidak boleh diflatten menjadi teks; simpan representasi aman yang mencatat paragraf/Equation/gambar/tabel bersarang, pilihan terkait dan aset privat. Metadata impor menautkan Guru/Gen/Mapel/TP/jenis/versi/checksum/idempoten; tidak bocor kunci ke siswa.
+4. Excel ATP enam semester diunduh per **Gen–Mapel + Kurikulum**. Generator menanam identitas/snapshot versi/kode CP aktif yang dapat diverifikasi saat impor, tanpa berisi data Gen lain. `impor_atp` dan `impor_soal_docx` punya pratinjau dan konfirmasi transaksional terpisah. Hapus by omission dilarang.
+5. **Logo aplikasi** menggunakan aset unggahan tervalidasi yang juga menjadi favicon (bisa menghasilkan varian favicon dari satu sumber); aset ber-versi serta cache/riwayat dikelola. Berkas TTD/sertifikat tetap dilindungi sesuai dokumen 09.
+
 
 ## 6. Pemeriksaan lintas DB dan target
 Karena MySQL lokal dan MariaDB hosting **berbeda mesin**, semua enum, CHECK constraint, generated column, index, JSON, collation dan DDL alter harus diuji pada **versi spesifik keduanya**, bukan dianggap identik. Catat versi yang lulus tes pada `15-INSTALASI-DAN-OPERASIONAL.md`. Ukuran data kecil tidak menghapus kebutuhan FK, transaksi, indeks, atau audit.
