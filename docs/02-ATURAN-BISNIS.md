@@ -4,23 +4,23 @@
 
 ## 1. Invarian umum
 1. **Jam server** menjadi sumber kebenaran ujian, penugasan waktu, transaksi dan log; zona Asia/Jakarta.
-2. **Tidak ada penghapusan fisik** atas data siswa, nilai, sertifikat, BAB Siap, versi CP/BAB dan artefak historis. Penonaktifan/arsip berbeda dengan delete.
-3. **Satu G1 aktif per Gen–Mapel** untuk seluruh semester Gen tersebut, bukan Guru global per mapel. Setiap Gen mengelola paket/BAB/TP/soal/materi sendiri. `created_by` adalah catatan sejarah, bukan sumber izin. Penggantian Guru memindahkan hak operasional hanya untuk Gen–Mapel yang dipilih, tanpa menimpa identitas penilai lama.
+2. **Tidak ada penghapusan fisik** atas data siswa, nilai, sertifikat, TP Siap, versi CP/TP dan artefak historis. Penonaktifan/arsip berbeda dengan delete.
+3. **Satu G1 aktif per Gen–Mapel** untuk seluruh semester Gen tersebut, bukan Guru global per mapel. Setiap Gen mengelola paket/TP/soal/materi sendiri. `created_by` adalah catatan sejarah, bukan sumber izin. Penggantian Guru memindahkan hak operasional hanya untuk Gen–Mapel yang dipilih, tanpa menimpa identitas penilai lama.
 4. **Admin boleh mengelola biodata, referensi CP dan pengaturan**, tetapi tidak langsung mengetik nilai akademik/isi soal/materi milik Guru. Persetujuan koreksi guru dilakukan atas permintaan tersimpan.
 5. **Admin tunggal diizinkan.** Larangan setuju permohonan sendiri berlaku ketika akun yang sama berperan sebagai *pengusul Guru* dan *pemutus Admin* untuk permohonan akademik; jangan memaksakan admin kedua untuk pembetulan biodata yang menjadi tugas Admin langsung.
 6. Semua keputusan penting diaudit (pelaku, peran aktif, objek, sebelum/sesudah, alasan, waktu, versi). Audit tidak berarti menambah persetujuan manual yang tidak diwajibkan.
 7. Tidak ada penghapusan nilai/sertifikat atau perubahan PDF sertifikat terdahulu. Koreksi menghasilkan riwayat atau pengganti, bukan menimpa sejarah.
-8. BAB Siap tidak berubah dari jalur edit biasa, tidak ditarik kembali ke draf, dan tidak mengubah progres siswa yang sudah dimulai.
+8. TP Siap tidak berubah dari jalur edit biasa, tidak ditarik kembali ke draf, dan tidak mengubah progres siswa yang sudah dimulai.
 9. Setiap perubahan yang menyentuh banyak tabel memakai transaksi database dan pemeriksaan ID/otorisasi di service. Penerbitan sertifikat mengunci satu sertifikat berlaku per siswa/paket.
 10. Teks input akademik disimpan sebagai teks biasa; tampilkan dengan escaping. Tidak membiarkan editor HTML bebas.
 
 ## 2. Batas peran dan persetujuan
 - Staf dapat berperan Admin+Guru, Admin+Pimpinan, Guru+Pimpinan; hak akses hanya peran aktif.
 - Pemilik aplikasi menetapkan **satu Admin cukup untuk operasional**. Manajemen biodata oleh Admin tidak memakai formulir pengajuan dan persetujuan dua Admin.
-- Permohonan koreksi BAB Siap atau koreksi nilai yang **diajukan sebagai Guru** memerlukan keputusan Admin; satu `pengguna_id` tidak boleh menyetujui permohonannya sendiri sekalipun berpindah role. Bila benar-benar akun yang sama, sistem menampilkan peringatan keterbatasan persetujuan tanpa mengubah kewenangan administrasi normal.
+- Permohonan koreksi TP Siap atau koreksi nilai yang **diajukan sebagai Guru** memerlukan keputusan Admin; satu `pengguna_id` tidak boleh menyetujui permohonannya sendiri sekalipun berpindah role. Bila benar-benar akun yang sama, sistem menampilkan peringatan keterbatasan persetujuan tanpa mengubah kewenangan administrasi normal.
 - Penelaahan CP dilakukan **langsung oleh Admin** dan tidak memakai reviewer `cp_review` terpisah. Jika usulan CP diajukan Guru yang juga Admin, aturan larangan self-approval akademik tetap diperiksa.
 
-### Administrasi akun dan profil v2.3
+### Administrasi akun dan profil v2.4
 - Dua menu Admin, **Pengelola** dan **Siswa**, menggunakan satu sistem `pengguna` dan peran aktif yang sudah ada. Akun siswa tidak merangkap role staf.
 - Keduanya menyediakan tambah/ubah/nonaktif, **import/export XLSX**, serta tombol reset sandi per akun. Ekspor tidak memuat hash, sandi, token, sesi, atau data rahasia.
 - Impor memerlukan template, pemeriksaan kolom/role/Gen/NISN/duplikasi, pratinjau galat per baris, konfirmasi, transaksi dan idempotensi. Baris yang tak ada di file tidak dianggap permintaan menghapus data.
@@ -30,9 +30,9 @@
 
 ## 3. Keputusan final tentang pembelajaran
 - `Semester mulai = COALESCE(siswa.semester_mulai, angkatan.semester_mulai)`; semua semester sebelumnya berstatus Dilewati tanpa nilai/sertifikat.
-- Semua BAB/TP berjalan berurutan. Hanya BAB `siap` tersedia; BAB draf selanjutnya tidak menghalangi siswa menyelesaikan BAB `siap` sebelumnya.
+- TP dalam ATP berjalan berurutan. Hanya TP `siap` tersedia; TP draf selanjutnya tidak menghalangi siswa menyelesaikan TP `siap` sebelumnya.
 - Diagnostik wajib; skor ≥ KKM menuntaskan TP dengan nilai diagnostik. Siswa dapat membuka materi secara sukarela tetapi **tidak mengirim resume/tugas resmi**; tidak berdampak pada nilai.
-- Skor diagnostik di bawah KKM: siswa wajib materi, resume setiap materi, tugas HOTS, dan sumatif. Komponen resume/tugas dinilai Guru; pengerjaan siswa tidak ditahan menunggu penilaian, tetapi sertifikat menunggu nilai lengkap.
+- Skor diagnostik di bawah KKM: siswa wajib materi berurutan, **Resume dan HOTS pada setiap Materi**, lalu Sumatif TP. Komponen resume/tugas dinilai Guru; pengerjaan siswa tidak ditahan menunggu penilaian, tetapi sertifikat menunggu nilai lengkap.
 - Kelulusan TP hanya ditentukan diagnostik atau sumatif; nilai gabungan resume/tugas/sumatif dipakai rapor dan sertifikat. Koreksi soal/kunci setelah ujian sah dapat menyebabkan hitung ulang **status ketuntasan** sesuai skor yang sudah dikoreksi.
 - Resume/tugas memakai **tombol Simpan draf manual**, data disimpan di database, kemudian tombol kirim final mengunci hasil. Tidak ada autosave wajib.
 - Nilai rapor/sertifikat ditampilkan **angka saja**, tanpa kategori huruf A/B/C/D sebagai predikat.
@@ -55,7 +55,7 @@
 | Domain | Nilai status | Makna |
 |---|---|---|
 | Pengguna | aktif/nonaktif/terkunci | Bisa login, tidak bisa login, ditolak sementara karena kegagalan login |
-| BAB | draf/siap | Bisa diedit atau immutable lewat jalur biasa |
+| TP | draf/siap | Bisa diedit atau immutable lewat jalur biasa |
 | Progres TP | belum_mulai/diagnostik/belajar/sumatif/perlu_bantuan/tuntas | Proses siswa; transisi harus sesuai prasyarat |
 | Ujian | berjalan/jeda_fullscreen/jeda_koneksi/selesai_sah/dibatalkan_menunggu_guru | Skor hanya pada selesai_sah |
 | Penilaian | belum_dinilai/dinilai/koreksi_diajukan/koreksi_diterapkan | Riwayat menyimpan perubahan |
@@ -65,3 +65,10 @@
 
 ## 7. Prinsip pembacaan dokumen
 Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya karena contoh sebelumnya pernah menyebutnya. Persyaratan verifikasi harus **cukup aman, sederhana, dan sesuai keputusan akhir**. Rincian operasional hosting dan data pengaturan sekolah diisi melalui UI saat pemasangan.
+
+## 8. Keputusan lintas modul v2.4
+1. Struktur tunggal **CP → ATP (urutan TP) → TP → Materi/Submateri**; tidak menyimpan status/progres kelompok BAB tersendiri.
+2. Setiap Materi dalam jalur belajar memiliki Resume dan HOTS sendiri. Tugas wajib dikirim final sebelum membuka Materi berikutnya tanpa menunggu nilai Guru; seluruh tugas wajib tetap dinilai untuk sertifikat. Kelulusan Diagnostik/Sumatif, KKM dan bobot tetap kebijakan akademik madrasah untuk SKS percepatan dua tahun.
+3. **Semua soal Diagnostik/Sumatif adalah PG tepat 5 opsi A–E dan satu kunci.** Template Word bersama mendukung konten kaya serta Google Drive; tidak menambah tipe soal CBT lain.
+4. Guru menggunakan Excel pemetaan TP/Materi enam semester terikat Gen–Mapel; tidak memakai delapan sheet konten lama. TP Siap terkunci, snapshot dan koreksi versi berlaku per TP.
+5. Admin CP tidak wajib mengulang metadata sumber resmi pada setiap rumusan; sumber tetap terlacak. Logo aplikasi yang diunggah pada admin/identitas digunakan pula sebagai favicon. UI halaman Admin/Profil mengikuti 12 dan 13.
