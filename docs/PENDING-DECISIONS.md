@@ -1,23 +1,20 @@
-# Status Keputusan Produk SLA-SKS v2.3
+# Status keputusan SLA-SKS Master v2.4 — 22 Oktober 2026
 
-**Keputusan v2.3 telah disetujui pemilik.** G1 per Gen–Mapel, paket/BAB sendiri tiap Gen, menu Pengelola/Siswa, impor/ekspor XLSX, reset per akun, profil staf dan Guru terbatas, serta perombakan visual dashboard/publik merupakan aturan final dalam 16 dokumen resmi. Keputusan bisnis v2.2 lain tetap berlaku sepanjang tidak bertentangan. Tidak ada kuesioner terbuka untuk hal yang sudah diputuskan.
+**Keputusan arsitektur dan ruang lingkup telah final menurut pemilik.** Tidak perlu menanyakan ulang alur Diagnostik/Resume/HOTS/Sumatif, perubahan istilah BAB, lima opsi PG, media Google Drive, atau enam revisi UI. Tidak memaksa prosedur approval/dokumen administratif yang tak diminta.
 
-## Data instalasi yang diisi saat setup, bukan pertanyaan kebijakan
-- Domain HTTPS aktual, versi PHP/CI4 dan MariaDB pada hosting, versi MySQL lokal, kapasitas hosting, direktori aplikasi, jadwal cron yang diizinkan.
-- Nama sekolah, alamat, NPSN, NSM, telepon, email, kota penerbitan, nama/NIP kepala madrasah; situs web opsional.
-- Berkas logo, ikon, PNG tanda tangan, dan template background opsional (fallback bawaan tersedia).
-- Akun Admin awal privat, Gen nyata, Guru per Gen–Mapel, tahun ajaran, rujukan CP resmi per mata pelajaran.
+## Keputusan terkunci
+1. **CP → ATP (urutan TP) → TP → Materi/Submateri**, satu TP banyak Materi, tanpa BAB operasional.
+2. Guru G1 per Gen–Mapel menyusun Excel peta ATP 6 semester; data identitas/CP relevan otomatis unduhan. Sumber media serta Resume/HOTS pada setiap Materi dikelola di aplikasi.
+3. Satu template Word PG lima pilihan A–E satu kunci untuk Diagnostik/Sumatif, dengan OOXML kaya (gambar, tabel bersarang, OMML) dan Drive untuk audio/video; generator mengatur jumlah soal sesuai bank.
+4. Diagnostik SKS percepatan dua tahun/ketuntasan dan nilai madrasah dipertahankan persis; skor HOTS beberapa Materi menjadi komponen rata-rata HOTS TP, bobot 20/30/50 tetap.
+5. Admin CP tanpa kewajiban metadata resmi berulang; versi/sumber tetap dapat ditelusuri. KBC terintegrasi sesuai relevansi.
+6. UI enam halaman dan pagination/export/logo/favicon/profil mengikuti dokumen 12/13.
+7. Database **lokal pengembangan** nanti diganti melalui prosedur dump lama→analisis→pilih data perlu→buat dump final→backup→pemilik hapus tabel lokal→pemilik impor. Jangan menjalankan operasi destruktif di produksi.
 
-## Pemeriksaan teknis saat coding (bukan syarat membuat keputusan produk baru)
-- Uji nyata perlindungan direktori pada front controller ROOT dan ketergantungan Apache/LiteSpeed shared hosting.
-- Selesaikan patch SQL transisi v2.3 (versi 0003 bagi database K2 yang sudah berisi akun/data), SQL instalasi penuh, dan uji MySQL/MariaDB; K1 sudah mempunyai SQL awal dan PR K2 mempunyai SQL 0002, **belum ada dump SQL v2.3 penuh**.
-- Detail algoritme laporan status sertifikat ketika koreksi kunci soal menyebabkan status TP/semester turun; jangan membuat pencabutan/penghapusan sertifikat.
-- Uji batas ukuran/rasio background sertifikat dan penempatan QR/tanda tangan pada PDF A4 sesuai mutu berkas nyata.
-- Uji kompatibilitas fullscreen nyata di browser yang dipakai siswa, dan kesiapan shared hosting untuk rekonsiliasi jam server.
+## Data instalasi yang belum diberikan (bukan keputusan produk)
+- Dump SQL lokal terkini, versi PHP/MySQL/MariaDB nyata, data identitas sekolah/Guru/Gen/CP yang resmi.
+- Aset logo dan TTD final, host/domain hosting, akun privat; jangan memasukkan kredensial atau data siswa nyata ke repo.
 
-## Ketergantungan implementasi setelah dokumentasi disahkan
-1. Jangan gabungkan PR K2 #3 sebelum model `ref_mapel.guru_id` diubah menjadi penugasan per Gen–Mapel dan kode/data K2 yang sudah dipakai pemilik dipertahankan.
-2. Siapkan patch 0003 baru bagi database yang telah menerapkan `K2-0002`, serta jalur instalasi segar yang konsisten; impor/ekspor akun dan profil menyusul di PR kode khusus.
-3. Buat prototipe dashboard Admin dan publik/login sesuai dokumen 12–13 untuk persetujuan pemilik sebelum mengubah seluruh CSS. Implementasi tidak boleh mengubah root CI4 atau `.env`.
-
-**Instruksi:** selesaikan sebagai implementasi yang konsisten dan uji sampai lulus. Jangan mengulang kuesioner ke pemilik atas hal yang sudah diputuskan.
+## Implementasi belum selesai
+- PR #13 menggunakan skema lama; jangan merge. Setelah dokumen v2.4 disetujui, kerjakan parser/importer Excel dan Word, pengalihan skema database, layanan TP/Materi, dan UI secara bertahap via PR kode.
+- Validasi akhir harus benar-benar dilaksanakan di XAMPP pengguna. Persyaratan yang belum terimplementasi bukan fitur selesai hanya karena dokumen telah diperbarui.
