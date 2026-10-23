@@ -21,10 +21,7 @@ final class GuruPetaTp extends BaseController
         try {
             $pilihan = $service->genMapelDiampu();
             $nomorPilihan = $this->angkaGet('pilihan');
-            if ($nomorPilihan !== null && ! array_key_exists($nomorPilihan, $pilihan)) {
-                throw new DomainException('Penugasan Guru tidak ditemukan.');
-            }
-            $dipilih = $pilihan[$nomorPilihan ?? 0] ?? null;
+            $dipilih = PetaTpService::pilihPenugasan($pilihan, $nomorPilihan);
 
             $semester = [];
             if ($dipilih !== null) {
