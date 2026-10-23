@@ -29,3 +29,9 @@
 8. Periksa tampilan desktop dan HP 360px, pesan status, keyboard dan tautan kembali.
 
 **PR tetap Draft sampai uji localhost dan review.**
+
+## Pengujian localhost oleh pemilik — 23 Oktober 2026
+
+Pemilik menguji PR #17 pada XAMPP dengan database `sla_sks_v3` dan melaporkan **8 dari 8 LULUS**: (1) form tambah Materi, (2) tambah Materi, (3) sunting Materi, (4) pengurutan Naik/Turun, (5) validasi input, (6) hak akses Guru, (7) perlindungan TP Siap, dan (8) tampilan/navigasi. Ini merupakan konfirmasi pengujian manual dari pemilik, bukan hasil inspeksi browser oleh CI.
+
+Pemilik secara eksplisit menyetujui PR #17 digabung ke `main` setelah laporan 8/8. Tidak ada pembaruan SQL aplikasi, `.env`, atau perubahan struktur root.
