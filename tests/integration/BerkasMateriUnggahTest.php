@@ -47,7 +47,8 @@ final class BerkasMateriUnggahTest extends TestCase
 
     protected function tearDown(): void
     {
-        self::$db->table('materi')->where('id', 1)->update(['jenis' => 'pdf', 'berkas_id' => null]);
+        self::$db->table('materi')->where('tp_id', 1)->where('id !=', 1)->delete();
+        self::$db->table('materi')->where('id', 1)->update(['jenis' => 'pdf', 'berkas_id' => null, 'judul' => 'Materi Uji A']);
         self::$db->table('berkas')->where('tp_id', 1)->delete();
         self::$db->table('tp')->where('id', 1)->update(['struktur_versi' => $this->versiAwal]);
         if (is_dir($this->folder)) {
@@ -91,6 +92,55 @@ final class BerkasMateriUnggahTest extends TestCase
         self::assertFileExists($path);
         self::assertSame(hash_file('sha256', $path), $meta['checksum']);
         self::assertSame($this->versiAwal + 1, (int) self::$db->table('tp')->where('id', 1)->get()->getRow('struktur_versi'));
+    }
+
+    private function inputMedia(): array
+    {
+        return [
+            'judul' => 'Gambar Materi Terbaru',
+            'jenis' => 'gambar',
+            'petunjuk_resume' => 'Tuliskan ringkasan gambar.',
+            'petunjuk_hots' => 'Analisis gambar ini.',
+            'min_waktu_menit' => '2',
+            'url_youtube' => '',
+        ];
+    }
+
+    public function testTambahMateriSekaligusUpload(): void
+    {
+        $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $this->inputMedia(), $this->uploaded());
+        $baris = self::$db->table('materi')->where('tp_id', 1)
+            ->where('judul', 'Gambar Materi Terbaru')->get()->getRowArray();
+        self::assertNotNull($baris);
+        self::assertSame(0, (int) $baris['aktif']);
+        self::assertSame(120, (int) $baris['min_waktu_detik']);
+        self::assertNotNull($baris['berkas_id']);
+        self::assertSame(1, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+    }
+
+    public function testSuntingMateriSekaligusUpload(): void
+    {
+        $input = $this->inputMedia();
+        $input['judul'] = 'Materi Uji A Diperbarui';
+        $this->service(1)->simpanDenganMedia(1, 1, $this->versiAwal, $input, $this->uploaded());
+        $baris = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+        self::assertSame('Materi Uji A Diperbarui', $baris['judul']);
+        self::assertNotNull($baris['berkas_id']);
+        self::assertSame(120, (int) $baris['min_waktu_detik']);
+        self::assertSame($this->versiAwal + 1, (int) self::$db->table('tp')->where('id', 1)
+            ->get()->getRow('struktur_versi'));
+    }
+
+    public function testTambahMateriVersiLamaTidakMembuatBaris(): void
+    {
+        try {
+            $this->service(1)->tambahDenganMedia(1, 9999, $this->inputMedia(), $this->uploaded());
+            self::fail('Versi lama harus ditolak.');
+        } catch (DomainException $e) {
+            self::assertSame(0, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+            self::assertSame(1, self::$db->table('materi')->where('tp_id', 1)->countAllResults());
+            self::assertSame([], glob($this->folder . '/*') ?: []);
+        }
     }
 
     public function testVersiLamaTidakMenyisakanBerkasAtauMetadata(): void
