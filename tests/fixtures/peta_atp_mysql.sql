@@ -68,7 +68,8 @@ CREATE TABLE materi (
  url_youtube VARCHAR(255) NULL,
  berkas_id BIGINT UNSIGNED NULL,
  aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
- UNIQUE KEY uq_materi_row_uuid (row_uuid),
+ UNIQUE KEY uq_materi_row_uuid (tp_id,row_uuid),
+ UNIQUE KEY uq_materi_urutan (tp_id,urutan),
  FOREIGN KEY (tp_id) REFERENCES tp(id)
 ) ENGINE=InnoDB;
 
