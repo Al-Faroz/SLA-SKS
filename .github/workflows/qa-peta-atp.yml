@@ -1,0 +1,99 @@
+name: QA Peta ATP v2.4
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/PetaTpService.php'
+      - 'app/Controllers/GuruPetaTp.php'
+      - 'app/Views/guru/peta_tp.php'
+      - 'app/Views/akun/beranda.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Config/Routes.php'
+      - 'tests/unit/PetaTpServiceTest.php'
+      - 'tests/integration/peta_atp_mysql_smoke.php'
+      - 'tests/integration/PetaTpDatabaseTest.php'
+      - 'tests/feature/GuruPetaAtpHttpTest.php'
+      - 'tests/feature/GuruPetaAtpLoginHttpTest.php'
+      - 'tests/fixtures/peta_atp_mysql.sql'
+      - '.github/workflows/qa-peta-atp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-qa:
+    name: PHP lint dan unit (tanpa database)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siapkan PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, mysqli, gd, zip, dom, xml
+          tools: composer:v2
+          coverage: none
+      - name: Validasi composer
+        run: composer validate --no-check-publish
+      - name: Instal dependensi dari composer.lock
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Sintaks PHP modul Peta ATP
+        run: |
+          php -l app/Services/PetaTpService.php
+          php -l app/Controllers/GuruPetaTp.php
+          php -l app/Views/guru/peta_tp.php
+          php -l app/Views/akun/beranda.php
+          php -l app/Services/NavigasiService.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/PetaTpServiceTest.php
+          php -l tests/integration/PetaTpDatabaseTest.php
+          php -l tests/feature/GuruPetaAtpHttpTest.php
+          php -l tests/feature/GuruPetaAtpLoginHttpTest.php
+      - name: PHPUnit khusus pemilihan penugasan G1
+        run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
+      - name: Siapkan writable untuk CI4 feature tests
+        run: mkdir -p writable/cache writable/logs writable/session writable/uploads
+      - name: HTTP route dan filter tamu
+        run: vendor/bin/phpunit --no-coverage tests/feature/GuruPetaAtpHttpTest.php
+
+  mysql-integration:
+    name: Isolasi Gen–Mapel pada MySQL sementara
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siapkan PHP dengan mysqli
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli
+          coverage: none
+      - name: Muat SQL sintetis ke database sementara
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
+      - name: Uji query dan pemisahan akses G1
+        run: php tests/integration/peta_atp_mysql_smoke.php
+      - name: Instal dependensi CI4 dan PHPUnit
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Uji Service CI4 asli dengan database anonim
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/PetaTpDatabaseTest.php
+      - name: Siapkan writable untuk HTTP CI4
+        run: mkdir -p writable/cache writable/logs writable/session writable/uploads
+      - name: Uji HTTP login Guru hingga tampilan enam semester
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/feature/GuruPetaAtpLoginHttpTest.php
