@@ -131,6 +131,12 @@ final class MateriDrafService
             if ($lama['jenis'] !== $data['jenis'] && $lama['berkas_id'] !== null) {
                 throw new DomainException('Jenis media tidak boleh diubah ketika berkas sudah terhubung.');
             }
+            if ($data['jenis'] === 'pdf' && $lama['jenis'] !== 'pdf') {
+                throw new DomainException('Jenis PDF belum dapat dipilih sebelum unggah PDF didukung.');
+            }
+            if (in_array($data['jenis'], ['gambar', 'audio'], true) && $lama['berkas_id'] === null) {
+                throw new DomainException('Pilih file gambar atau audio sebelum menyimpan perubahan Materi.');
+            }
             $this->db->table('materi')->where('id', $materiId)->where('tp_id', $tpId)
                 ->update($data);
         });
