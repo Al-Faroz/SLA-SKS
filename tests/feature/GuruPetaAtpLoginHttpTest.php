@@ -84,7 +84,7 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
     public function testAdminTidakBolehMasukHalamanGuru(): void
     {
         $hasil = $this->withSession($this->sesi(3, 'admin'))->get('guru/peta-atp');
-        self::assertSame(403, $hasil->getStatusCode());
+        $hasil->assertStatus(403);
     }
 
     public function testGuruWajibGantiSandiDialihkan(): void
