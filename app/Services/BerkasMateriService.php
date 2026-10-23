@@ -229,7 +229,7 @@ final class BerkasMateriService
             throw new DomainException('Unggahan tidak valid.');
         }
         $data = (new MateriDrafService($this->db))->bersihkan($input);
-        if (! in_array($data['jenis'], ['gambar', 'audio'], true)) {
+        if (! in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
             throw new DomainException('Berkas harus berupa PDF, Gambar atau Audio.');
         }
         $rincian = $this->detail->lihat($tpId);
