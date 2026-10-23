@@ -210,6 +210,77 @@ final class BerkasMateriService
         }
     }
 
+    /**
+     * Simpan perubahan Materi dan file pengganti dalam satu transaksi.
+     * Jenis media pada Materi dengan berkas terpasang tidak boleh diganti.
+     */
+    public function simpanDenganMedia(int $tpId, int $materiId, int $versi, array $input, UploadedFile $file): void
+    {
+        if ($tpId < 1 || $materiId < 1 || $versi < 1 || ! $file->isValid() || $file->hasMoved()) {
+            throw new DomainException('Unggahan tidak valid.');
+        }
+        $data = (new MateriDrafService($this->db))->bersihkan($input);
+        if (! in_array($data['jenis'], ['gambar', 'audio'], true)) {
+            throw new DomainException('Berkas harus berupa Gambar atau Audio.');
+        }
+        $rincian = $this->detail->lihat($tpId);
+        if ($rincian['tp']['status'] !== 'draf') {
+            throw new DomainException('TP Siap tidak boleh diubah.');
+        }
+        $materi = null;
+        foreach ($rincian['materi'] as $item) {
+            if ((int) $item['id'] === $materiId) {
+                $materi = $item;
+                break;
+            }
+        }
+        if ($materi === null || ($materi['berkas_id'] !== null && $materi['jenis'] !== $data['jenis'])) {
+            throw new DomainException('Materi tidak tersedia atau jenis file terpasang tidak dapat diganti.');
+        }
+        $v = self::validasi($file->getTempName(), $data['jenis'], $file->getClientName());
+        $baru = $this->tulisPrivat($file->getTempName(), $data['jenis'], $v);
+
+        $this->db->transBegin();
+        try {
+            $tp = $this->db->query(
+                'SELECT id,status,struktur_versi FROM tp WHERE id=? FOR UPDATE', [$tpId]
+            )->getRowArray();
+            if ($tp === null || $tp['status'] !== 'draf'
+                || (int) $tp['struktur_versi'] !== $versi
+                || (int) $rincian['tp']['struktur_versi'] !== $versi) {
+                throw new DomainException('Struktur TP berubah. Muat ulang editor sebelum menyimpan.');
+            }
+            $lama = $this->db->table('materi')->where('id', $materiId)
+                ->where('tp_id', $tpId)->get()->getRowArray();
+            if ($lama === null || ($lama['berkas_id'] !== null && $lama['jenis'] !== $data['jenis'])) {
+                throw new DomainException('Materi berubah saat diproses.');
+            }
+            $this->db->table('berkas')->insert([
+                'tp_id' => $tpId,
+                'nama_acak' => basename($baru['path']),
+                'mime' => $baru['mime'],
+                'ukuran_byte' => $baru['bytes'],
+                'checksum' => hash_file('sha256', $baru['path']),
+                'halaman' => null,
+                'durasi_detik' => null,
+                'dibuat_pada' => gmdate('Y-m-d H:i:s'),
+            ]);
+            $id = (int) $this->db->insertID();
+            $this->db->table('materi')->where('id', $materiId)->where('tp_id', $tpId)
+                ->update(array_merge($data, ['berkas_id' => $id]));
+            $this->db->table('tp')->where('id', $tpId)->where('status', 'draf')
+                ->where('struktur_versi', $versi)->update(['struktur_versi' => $versi + 1]);
+            if ($this->db->affectedRows() !== 1 || $this->db->transStatus() === false) {
+                throw new DomainException('Penyimpanan perubahan dan file gagal.');
+            }
+            $this->db->transCommit();
+        } catch (Throwable $e) {
+            $this->db->transRollback();
+            @unlink($baru['path']);
+            throw $e;
+        }
+    }
+
     public function unggah(int $tpId, int $materiId, int $versi, UploadedFile $file): void
     {
         if ($tpId < 1 || $materiId < 1 || $versi < 1 || ! $file->isValid() || $file->hasMoved()) {
