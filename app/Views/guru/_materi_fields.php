@@ -29,7 +29,7 @@ $berkasAda = ! empty($nilai['berkas_id']);
         <?= ! $berkasAda && in_array($jenisMateri, ['pdf','gambar','audio'], true) ? 'required' : '' ?>>
     <p class="a-help" data-materi-file-info>Gambar JPG/PNG/WebP dan audio MP3/M4A maksimal 10 MB.</p>
 </div>
-<p class="a-help" data-materi-pdf-info <?= $jenisMateri === 'pdf' ? '' : 'hidden' ?>>Anda dapat memilih file PDF, tetapi penyimpanan PDF belum tersedia sampai pemeriksaan keamanan dan batas 40 halaman selesai. Formulir tidak dapat dikirim untuk jenis PDF.</p>
+<p class="a-help" data-materi-pdf-info <?= $jenisMateri === 'pdf' ? '' : 'hidden' ?>>PDF maksimal 15 MB dan 40 halaman. File terenkripsi, mengandung skrip/formulir, atau struktur PDF yang tidak dapat diverifikasi akan ditolak.</p>
 <div class="a-field">
     <label class="a-label" for="materi-waktu">Minimal waktu belajar (menit)</label>
     <input class="a-input" id="materi-waktu" name="min_waktu_menit" type="number" min="0" max="1092.25" step="0.01" required value="<?= esc(number_format(((int) ($nilai['min_waktu_detik'] ?? 0)) / 60, 2, '.', ''), 'attr') ?>">
