@@ -122,12 +122,26 @@ final class GuruMateri extends BaseController
                     break;
                 }
             }
-            if ($materi === null || $materi['jenis'] !== 'youtube'
-                || ! is_string($materi['url_youtube']) || $materi['url_youtube'] === '') {
-                throw new DomainException('Video Materi tidak tersedia.');
+            if ($materi === null) {
+                throw new DomainException('Materi tidak ditemukan.');
             }
-            $urlEmbed = VideoMateriService::urlEmbed($materi['url_youtube']);
-            $urlAsli = VideoMateriService::urlStandar($materi['url_youtube']);
+            $urlEmbed = null;
+            $urlAsli = null;
+            $urlMedia = null;
+            if ($materi['jenis'] === 'youtube') {
+                if (! is_string($materi['url_youtube']) || $materi['url_youtube'] === '') {
+                    throw new DomainException('Video Materi belum tersedia.');
+                }
+                $urlEmbed = VideoMateriService::urlEmbed($materi['url_youtube']);
+                $urlAsli = VideoMateriService::urlStandar($materi['url_youtube']);
+            } elseif (in_array($materi['jenis'], ['pdf', 'audio', 'gambar'], true)) {
+                // Cek ulang metadata, kepemilikan TP, berkas fisik dan hak G1
+                // sebelum mengeluarkan tautan proxy privat.
+                (new BerkasMateriService())->media($tpId, $materiId);
+                $urlMedia = site_url('guru/tp/' . $tpId . '/materi/' . $materiId . '/media');
+            } else {
+                throw new DomainException('Jenis media tidak dikenali.');
+            }
         } catch (DomainException $e) {
             return $this->response->setStatusCode(403)
                 ->setHeader('Cache-Control', 'no-store, private')
@@ -144,6 +158,7 @@ final class GuruMateri extends BaseController
             'materi' => $materi,
             'urlEmbed' => $urlEmbed,
             'urlAsli' => $urlAsli,
+            'urlMedia' => $urlMedia,
         ]);
     }
 
