@@ -11,6 +11,7 @@ on:
       - 'app/Config/Routes.php'
       - 'tests/unit/PetaTpServiceTest.php'
       - 'tests/integration/peta_atp_mysql_smoke.php'
+      - 'tests/integration/PetaTpDatabaseTest.php'
       - 'tests/fixtures/peta_atp_mysql.sql'
       - '.github/workflows/qa-peta-atp.yml'
   workflow_dispatch:
@@ -44,6 +45,7 @@ jobs:
           php -l app/Services/NavigasiService.php
           php -l app/Config/Routes.php
           php -l tests/unit/PetaTpServiceTest.php
+          php -l tests/integration/PetaTpDatabaseTest.php
       - name: PHPUnit khusus pemilihan penugasan G1
         run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
 
@@ -75,3 +77,9 @@ jobs:
         run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
       - name: Uji query dan pemisahan akses G1
         run: php tests/integration/peta_atp_mysql_smoke.php
+      - name: Instal dependensi CI4 dan PHPUnit
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Uji Service CI4 asli dengan database anonim
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/PetaTpDatabaseTest.php
