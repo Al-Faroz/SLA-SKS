@@ -55,10 +55,24 @@ final class GuruMateri extends BaseController
             return $this->kembali($tpId, 'Data formulir Materi tidak valid.');
         }
         try {
-            (new MateriDrafService())->tambah($tpId, $versi, $data);
-            return $this->kembali($tpId, 'Materi draf berhasil ditambahkan dan belum diaktifkan.', true);
+            if ($data['jenis'] === 'pdf') {
+                throw new DomainException('Upload PDF belum diaktifkan: pemeriksaan keamanan PDF belum tersedia.');
+            }
+            if (in_array($data['jenis'], ['gambar', 'audio'], true)) {
+                $file = $this->request->getFile('media');
+                if ($file === null) {
+                    throw new DomainException('Pilih file media sebelum menyimpan.');
+                }
+                (new BerkasMateriService())->tambahDenganMedia($tpId, $versi, $data, $file);
+            } else {
+                (new MateriDrafService())->tambah($tpId, $versi, $data);
+            }
+            return $this->kembali($tpId, 'Materi draf dan sumber belajar berhasil disimpan. Materi masih nonaktif.', true);
         } catch (DomainException $e) {
             return $this->kembali($tpId, $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Tambah Materi beserta media gagal: ' . get_class($e));
+            return $this->kembali($tpId, 'Gagal menyimpan Materi/media. Periksa file, izin writable dan konfigurasi upload PHP.');
         }
     }
 
