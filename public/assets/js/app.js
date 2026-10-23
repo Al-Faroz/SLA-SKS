@@ -88,3 +88,41 @@
         }
     });
 })();
+
+/* Materi: satu kontrol sumber menurut jenis; validasi tetap dilakukan server. */
+(() => {
+    'use strict';
+    document.querySelectorAll('[data-materi-form]').forEach((form) => {
+        const jenis = form.querySelector('[data-materi-jenis]');
+        const youtube = form.querySelector('[data-materi-youtube]');
+        const berkas = form.querySelector('[data-materi-berkas]');
+        const pdfInfo = form.querySelector('[data-materi-pdf-info]');
+        const url = youtube?.querySelector('input');
+        const file = berkas?.querySelector('input');
+        const info = berkas?.querySelector('[data-materi-file-info]');
+        const submit = form.querySelector('[data-materi-submit]');
+        if (!jenis || !youtube || !berkas || !url || !file || !submit) return;
+        const adaBerkas = form.dataset.materiSudahUpload === '1';
+        function update() {
+            const youtubeDipilih = jenis.value === 'youtube';
+            const pdfDipilih = jenis.value === 'pdf';
+            const gambarDipilih = jenis.value === 'gambar';
+            youtube.hidden = !youtubeDipilih;
+            berkas.hidden = youtubeDipilih;
+            pdfInfo.hidden = !pdfDipilih;
+            url.disabled = !youtubeDipilih;
+            url.required = youtubeDipilih;
+            file.disabled = youtubeDipilih || pdfDipilih;
+            file.required = !youtubeDipilih && !pdfDipilih && !adaBerkas;
+            file.accept = pdfDipilih ? '.pdf' : gambarDipilih ? '.jpg,.jpeg,.png,.webp' : '.mp3,.m4a';
+            if (info) info.textContent = pdfDipilih
+                ? 'PDF maksimal 15 MB / 40 halaman; unggah belum diaktifkan.'
+                : gambarDipilih ? 'JPG, PNG, WebP maksimal 10 MB.'
+                : 'MP3 atau M4A maksimal 10 MB.';
+            submit.disabled = pdfDipilih;
+            submit.title = pdfDipilih ? 'Upload PDF belum diaktifkan.' : '';
+        }
+        jenis.addEventListener('change', () => { file.value = ''; update(); });
+        update();
+    });
+})();
