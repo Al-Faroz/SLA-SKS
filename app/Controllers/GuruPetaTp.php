@@ -20,25 +20,11 @@ final class GuruPetaTp extends BaseController
         $service = new PetaTpService();
         try {
             $pilihan = $service->genMapelDiampu();
-            $gen = $this->angkaGet('gen');
-            $mapel = $this->angkaGet('mapel');
-            if (($gen === null) !== ($mapel === null)) {
-                throw new DomainException('Pilih Gen dan mata pelajaran yang tersedia.');
+            $nomorPilihan = $this->angkaGet('pilihan');
+            if ($nomorPilihan !== null && ! array_key_exists($nomorPilihan, $pilihan)) {
+                throw new DomainException('Penugasan Guru tidak ditemukan.');
             }
-            $dipilih = null;
-            if ($gen !== null && $mapel !== null) {
-                foreach ($pilihan as $item) {
-                    if ((int) $item['angkatan_id'] === $gen && (int) $item['mapel_id'] === $mapel) {
-                        $dipilih = $item;
-                        break;
-                    }
-                }
-                if ($dipilih === null) {
-                    throw new DomainException('Anda tidak ditugaskan pada Gen dan mata pelajaran tersebut.');
-                }
-            } else {
-                $dipilih = $pilihan[0] ?? null;
-            }
+            $dipilih = $pilihan[$nomorPilihan ?? 0] ?? null;
 
             $semester = [];
             if ($dipilih !== null) {
@@ -72,7 +58,7 @@ final class GuruPetaTp extends BaseController
         if ($nilai === null) {
             return null;
         }
-        if (! is_string($nilai) || ! ctype_digit($nilai) || (int) $nilai < 1) {
+        if (! is_string($nilai) || ! ctype_digit($nilai) || strlen($nilai) > 8) {
             throw new DomainException('Parameter pilihan tidak valid.');
         }
 
