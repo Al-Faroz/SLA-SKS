@@ -55,6 +55,16 @@ CREATE TABLE tp (
  struktur_versi INT UNSIGNED NOT NULL,
  FOREIGN KEY (paket_semester_id) REFERENCES paket_semester(id)
 ) ENGINE=InnoDB;
+CREATE TABLE materi (
+ id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+ tp_id BIGINT UNSIGNED NOT NULL,
+ urutan SMALLINT UNSIGNED NOT NULL,
+ judul VARCHAR(180) NOT NULL,
+ jenis ENUM('pdf','audio','gambar','youtube') NOT NULL,
+ aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
+ FOREIGN KEY (tp_id) REFERENCES tp(id)
+) ENGINE=InnoDB;
+
 INSERT INTO pengguna (id,nama,status,wajib_ganti_sandi,versi_sesi) VALUES
 (1,'Guru Penguji A','aktif',0,1),(2,'Guru Penguji B','aktif',0,1),(3,'Admin Penguji','aktif',0,1),(4,'Guru Wajib Ganti Sandi','aktif',1,1),
 (5,'Guru Tanpa G1','aktif',0,1),(6,'Guru Nonaktif','nonaktif',0,1);
@@ -66,3 +76,5 @@ INSERT INTO paket_semester VALUES (1,1,1,4,1,1,1,'draf'),(2,2,1,4,1,1,1,'draf');
 INSERT INTO tp VALUES
 (1,1,'TP-01','TP untuk Guru A','Rumusan uji','Indikator uji',1,'draf',1),
 (2,2,'TP-02','TP untuk Guru B','Rumusan uji','Indikator uji',1,'draf',1);
+
+INSERT INTO materi (id,tp_id,urutan,judul,jenis,aktif) VALUES (1,1,1,'Materi Uji A','pdf',1),(2,2,1,'Materi Uji B','youtube',1);
