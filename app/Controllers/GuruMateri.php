@@ -153,10 +153,21 @@ final class GuruMateri extends BaseController
             return $this->kembali($tpId, 'Data formulir Materi tidak valid.');
         }
         try {
-            (new MateriDrafService())->simpan($tpId, $materiId, $versi, $data);
+            if ($data['jenis'] === 'pdf') {
+                throw new DomainException('Upload PDF belum diaktifkan. Pemeriksaan keamanan PDF belum tersedia.');
+            }
+            $file = $this->request->getFile('media');
+            if ($file !== null && $file->getError() !== UPLOAD_ERR_NO_FILE) {
+                (new BerkasMateriService())->simpanDenganMedia($tpId, $materiId, $versi, $data, $file);
+            } else {
+                (new MateriDrafService())->simpan($tpId, $materiId, $versi, $data);
+            }
             return $this->kembali($tpId, 'Materi draf berhasil diperbarui.', true);
         } catch (DomainException $e) {
             return $this->kembali($tpId, $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Edit Materi/media gagal: ' . get_class($e));
+            return $this->kembali($tpId, 'Gagal mengubah Materi atau file. Periksa berkas dan izin writable.');
         }
     }
 
