@@ -726,3 +726,20 @@ a:hover { text-decoration-thickness: 2px; }
 [data-materi-pdf-info][hidden] {
     display: none !important;
 }
+
+/* G04 — aksi Materi terpisah, tetap mudah dipindai pada layar sempit. */
+.a-materi-aksi {
+    vertical-align: middle;
+    white-space: nowrap;
+    min-width: 98px;
+}
+.a-materi-urutan {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+.a-materi-urutan form { margin: 0; }
+.a-materi-aksi form { margin-block: 0; }
+.a-materi-aksi .a-btn { min-height: 36px; }
+.a-materi-aksi .a-btn[disabled] { opacity: .45; cursor: not-allowed; }
