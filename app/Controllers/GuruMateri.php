@@ -26,6 +26,11 @@ final class GuruMateri extends BaseController
         $hasil = [];
         foreach ($nama as $kunci) {
             $nilai = $this->request->getPost($kunci);
+            // Saat dropdown memilih file, kolom YouTube dinonaktifkan sehingga
+            // field itu memang tidak dikirim browser.
+            if ($kunci === 'url_youtube' && $nilai === null) {
+                $nilai = '';
+            }
             if (! is_string($nilai)) {
                 return null;
             }
