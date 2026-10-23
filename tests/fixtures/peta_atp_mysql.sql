@@ -58,7 +58,10 @@ CREATE TABLE tp (
 CREATE TABLE materi (
  id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
  tp_id BIGINT UNSIGNED NOT NULL,
+ urutan SMALLINT UNSIGNED NOT NULL,
  judul VARCHAR(180) NOT NULL,
+ jenis ENUM('pdf','audio','gambar','youtube') NOT NULL,
+ aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
  FOREIGN KEY (tp_id) REFERENCES tp(id)
 ) ENGINE=InnoDB;
 
@@ -74,4 +77,4 @@ INSERT INTO tp VALUES
 (1,1,'TP-01','TP untuk Guru A','Rumusan uji','Indikator uji',1,'draf',1),
 (2,2,'TP-02','TP untuk Guru B','Rumusan uji','Indikator uji',1,'draf',1);
 
-INSERT INTO materi (id,tp_id,judul) VALUES (1,1,'Materi Uji A'),(2,2,'Materi Uji B');
+INSERT INTO materi (id,tp_id,urutan,judul,jenis,aktif) VALUES (1,1,1,'Materi Uji A','pdf',1),(2,2,1,'Materi Uji B','youtube',1);
