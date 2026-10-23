@@ -8,6 +8,7 @@ on:
       - 'app/Views/guru/**'
       - 'app/Config/Routes.php'
       - 'tests/unit/BerkasMateriValidatorTest.php'
+      - 'tests/integration/BerkasMateriAksesTest.php'
       - 'tests/fixtures/peta_atp_mysql.sql'
       - '.github/workflows/qa-berkas-materi.yml'
   workflow_dispatch:
@@ -47,6 +48,7 @@ jobs:
           php -l app/Views/guru/materi_edit.php
           php -l app/Views/guru/detail_tp.php
           php -l tests/unit/BerkasMateriValidatorTest.php
+          php -l tests/integration/BerkasMateriAksesTest.php
       - name: Validasi file
         run: vendor/bin/phpunit --no-coverage tests/unit/BerkasMateriValidatorTest.php
       - name: Database fixture
@@ -55,3 +57,7 @@ jobs:
         env:
           SLA_QA_DB: sla_sks_qa
         run: vendor/bin/phpunit --no-coverage tests/integration/MateriDrafDatabaseTest.php
+      - name: Uji akses media G1 pada MySQL
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/BerkasMateriAksesTest.php
