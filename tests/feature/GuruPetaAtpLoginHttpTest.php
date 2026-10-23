@@ -40,7 +40,6 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
             'DBDebug' => true,
             'port' => 3306,
         ]);
-        Database::purge();
     }
 
     /** @return array<string,int|string> */
