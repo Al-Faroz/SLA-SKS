@@ -117,12 +117,12 @@
     <?php if ($tp['status'] === 'draf'): ?>
         <section class="a-card a-jarak-atas" aria-labelledby="tambah-materi">
             <h2 id="tambah-materi">Tambah Materi/Submateri</h2>
-            <p class="a-help">Materi baru ditambahkan pada urutan terakhir dan tetap nonaktif. Konten media berkas akan dikelola melalui tahap upload tersendiri.</p>
-            <form method="post" class="a-form" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
+            <p class="a-help">Pilih YouTube untuk mengisi URL, atau Gambar/Audio untuk langsung mengunggah file. Materi tetap nonaktif. PDF menyusul setelah validasi aman tersedia.</p>
+            <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-sudah-upload="0" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                 <?= view('guru/_materi_fields', ['nilai' => []]) ?>
-                <button class="a-btn a-btn--utama" type="submit">Tambah Materi draf</button>
+                <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Tambah Materi draf</button>
             </form>
         </section>
     <?php endif ?>
