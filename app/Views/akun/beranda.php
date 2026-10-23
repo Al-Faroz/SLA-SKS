@@ -15,7 +15,11 @@
     <h2 id="judul-status">Akun Anda sudah aktif</h2>
     <p>Anda sedang menggunakan peran <strong><?= esc($peranAktif) ?></strong>. Sistem memeriksa peran aktif Anda pada server setiap kali membuka halaman yang dilindungi.</p>
     <p class="a-help">Modul pembelajaran, penilaian, dan laporan akan ditambahkan setelah fondasi data masing-masing selesai. Menu yang belum tersedia tidak ditampilkan.</p>
-    <a class="a-btn a-btn--utama" href="<?= esc(site_url('profil'), 'attr') ?>">Lihat profil dan peran</a>
+    <?php if ($peran === 'guru'): ?>
+        <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Lihat peta ATP</a>
+    <?php else: ?>
+        <a class="a-btn a-btn--utama" href="<?= esc(site_url('profil'), 'attr') ?>">Lihat profil dan peran</a>
+    <?php endif ?>
 </section>
 </div>
 <?= $this->endSection() ?>
