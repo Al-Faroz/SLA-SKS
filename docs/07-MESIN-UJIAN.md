@@ -7,7 +7,7 @@ Instruksi petunjuk S05 menyampaikan bahwa membuka ujian memerlukan koneksi stabi
 
 ## 2. Percobaan sah
 - Diagnostik wajib satu percobaan normal. Sumatif memiliki kuota bawaan **3 percobaan sah normal**. Percobaan yang dibatalkan karena pelanggaran/koneksi **tanpa skor**, tidak menghabiskan kuota normal; Guru menentukan tindak lanjut.
-- Soal PG 2–5 opsi, tepat satu jawaban benar; ambil acak soal aktif dari snapshot BAB/TP yang terikat; acak urutan opsi. Kunci tidak pernah dikirim ke browser sebelum ujian sah berakhir.
+- Soal **hanya pilihan ganda (PG) dengan tepat lima opsi A–E terisi dan satu jawaban benar**; ambil acak soal aktif dari snapshot TP yang terikat; acak urutan opsi. Kunci tidak pernah dikirim ke browser sebelum ujian sah berakhir.
 - Server menyimpan snapshot soal/opsi/kunci per percobaan yang tidak bisa diubah secara historis. `jawaban_percobaan` upsert per soal, idempoten, tak menciptakan ganda akibat refresh.
 - Skor sah hanya diterbitkan setelah submit sah/waktu habis sah. Skor sumatif tertinggi dari percobaan sah normal dipakai pada komponen sumatif; perubahan karena peninjauan soal/kunci mengikuti `08-PENILAIAN.md`.
 
@@ -40,8 +40,14 @@ Jika heartbeat tidak diterima ≥20 detik, saat rekonsiliasi server menyatakan j
 - **S06:** tata letak tanpa sidebar, timer server, soal, pilihan, navigator, indikator menyimpan, jumlah insiden terhitung, tampilan jeda penuh; tidak ada notifikasi/pengumuman/perayaan saat ujian. Tombol kembali fullscreen dan tombol kirim berkonfirmasi. Respons saat offline tidak dianggap sudah tersimpan tanpa konfirmasi server.
 - **S07:** tampil skor/ketuntasan hanya `selesai_sah`, atau status `Menunggu keputusan guru` tanpa nilai bila batal. Tidak membuka kunci jawaban sebelum kebijakan perujian mengizinkan.
 
-### Wewenang Guru per Gen–Mapel (v2.3)
+### Wewenang Guru per Gen–Mapel (v2.4)
 Penanganan ujian batal, izin ulang, pembacaan percobaan/snapshot, dan telaah insiden hanya tersedia bagi Guru yang **saat itu ditugaskan ke pasangan Gen–Mapel siswa/ujian**. Service memeriksa relasi paket ujian ke Gen pemilik, `siswa.angkatan_id`, peran aktif Guru dan penugasan aktif. Guru Gen lain tidak dapat melakukan GET/POST dengan menebak ID ujian. Pergantian Guru dalam Gen yang sama menjaga snapshot, keputusan, dan pencatat historis. Seluruh kebijakan fullscreen, waktu server, jeda dan profil Ketat tidak berubah.
 
 ## 7. Keamanan dan hak
 Throttler per akun dan percobaan, CSRF, session auth, anti replay, cek status setiap request, soal/opsi acak server, ID percobaan sulit ditebak, tanpa skor pada percobaan batal, log insiden tidak terhitung dan terhitung terpisah. Fullscreen hanya mitigasi berbasis browser, **bukan jaminan ujian anticurang**.
+
+## 8. Kontrak soal Word dan multimedia v2.4
+- Diagnostik dan Sumatif memakai **satu tipe soal PG lima opsi A–E**. Tidak menerapkan PG kompleks, menjodohkan, isian, uraian, atau tipe CBT lain. Soal dapat diacak dari bank soal TP versi aktif dan urutan opsi diacak; kunci disimpan di server.
+- Impor dari dua template Word beridentitas `SLA-SKS-WORD-V1` mengikuti [05](05-PAKET-TP-DAN-IMPOR.md). Teks, Equation Word/OMML, gambar, tabel termasuk tabel bersarang dipertahankan **pada pertanyaan maupun pilihan** dalam rendering ujian.
+- Audio/video soal via Google Drive boleh hanya jika URL sah, izin akses dan pemutaran telah lolos pratinjau; kegagalan media penting harus mencegah bank dinyatakan Siap. Ini tidak mengubah kebijakan YouTube untuk media pembelajaran.
+- Sanitasi konten DOCX, kontrol kunci dan cache aset historis wajib; sampel ujian tidak mengirim kunci ke klien sebelum sesuai kebijakan hasil.

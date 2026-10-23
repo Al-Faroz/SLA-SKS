@@ -5,12 +5,12 @@ Hanya Admin membuat akun; tidak ada daftar mandiri/Google. Username siswa = NISN
 
 Pemberlakuan roles harus server-side sesuai `03-PERAN-DAN-HAK-AKSES.md`. Tiap request dengan ID dari URL tidak boleh melihat data siswa/mapel lain hanya karena ID valid. Pratinjau Guru/Pimpinan *read-only* dan tidak menulis progres, ujian, nilai atau audit pencapaian siswa.
 
-### Akun, reset sandi dan profil v2.3
+### Akun, reset sandi dan profil v2.4
 - Pengelola dan Siswa **tetap satu sistem login**; dua menu hanya memisahkan administrasi. Admin boleh reset per akun pada kedua daftar. Reset membuat sandi sementara CSPRNG yang hanya tampil satu kali kepada Admin; simpan hanya hash, naikkan versi sesi/batalkan seluruh sesi lama, set wajib ganti sandi, audit Admin+objek+waktu tanpa sandi, jangan pernah kirim sandi lewat URL, GET, email/WA otomatis, log atau file ekspor.
 - Impor XLSX: periksa jenis berkas, MIME, batas ukuran/baris, nama sheet/header/versi, peran/Gen/NISN, duplikasi intra-file dan database, persetujuan perubahan, idempotensi, CSRF, permission saat pratinjau **dan** commit; dokumen disimpan privat sementara dan dibersihkan terkontrol. Penolakan dan hasil operasi dicatat tanpa kredensial.
 - Ekspor XLSX hanya oleh Admin, membatasi filter/jenis Pengelola atau Siswa dan menghilangkan sandi/hash, token, sesi serta kontak pribadi yang tidak diperlukan. Netralisasi formula injection (`=`, `+`, `-`, `@`) untuk semua nilai teks dari pengguna.
 - Upload foto profil staf wajib validasi MIME, ekstensi/ukuran, decode gambar dan otorisasi pemilik. Aset foto disimpan secara aman; endpoint profil profesional Guru yang dapat dilihat siswa **hanya** untuk Guru aktif yang ditugaskan pada Gen siswa, tampilkan nama, foto disetujui dan mapel; NIP, telepon pribadi, username jika sensitif, log/audit dan hash tidak tersedia.
-- Kewenangan Guru untuk membuka, menilai, mengoreksi BAB/TP atau ujian memerlukan pemeriksaan **penugasan aktif Gen–Mapel** atas objek di server, bukan `ref_mapel.guru_id`, `created_by`, atau pilihan Gen dari browser. ID guessing lintas Gen ditolak dan diaudit. Validasi Guru kandidat dilakukan saat tampil dropdown dan saat transaksi commit: status aktif + role `guru`, termasuk akun staf yang memiliki role Guru dalam kombinasi yang diizinkan.
+- Kewenangan Guru untuk membuka, menilai, mengoreksi TP atau ujian memerlukan pemeriksaan **penugasan aktif Gen–Mapel** atas objek di server, bukan `ref_mapel.guru_id`, `created_by`, atau pilihan Gen dari browser. ID guessing lintas Gen ditolak dan diaudit. Validasi Guru kandidat dilakukan saat tampil dropdown dan saat transaksi commit: status aktif + role `guru`, termasuk akun staf yang memiliki role Guru dalam kombinasi yang diizinkan.
 
 ## 2. Keputusan root `index.php` + `.htaccess`
 **Final:** front controller `index.php` dan file rewrite `.htaccess` berada di root proyek pada hosting shared Apache/LiteSpeed yang sesuai. Tidak menyatakan bahwa memindahkan file saja otomatis aman. Karena root proyek sekaligus diakses web, pengujian **deny** untuk folder rahasia wajib lulus. `public/assets/` tetap sumber aset publik; koneksi aset boleh menggunakan rewrite URL `/assets/...` ke `/public/assets/...` yang terbatas. Jalur ini berbeda dari rekomendasi instalasi CI4 standar yang menaruh web-root di `public/`, sehingga di repo perlu menyimpan dokumentasi penyesuaian `index.php` path untuk `app/Config/Paths.php`.
@@ -58,7 +58,7 @@ Server mengontrol state/jam/attempt, tidak menerima jawaban saat jeda; soal dan 
 |---|---|
 | Login/gagal/peran/reset sandi | actor, IP, waktu, tipe; tanpa sandi |
 | Guru ditetapkan/diganti | mapel, guru asal/baru, Admin, waktu |
-| BAB Siap/koreksi | BAB, versi lama/baru, guru, Admin pemutus, alasan |
+| TP Siap/koreksi | TP, versi lama/baru, guru, Admin pemutus, alasan |
 | CP diterbitkan | CP, sumber, versi, pengusul, Admin |
 | Ujian insiden/keputusan | percobaan, insiden, waktu server, alasan, Guru keputusan |
 | Nilai ditetapkan/dikoreksi | nilai sebelum/sesudah, TP, pengusul, Admin jika diperlukan |
@@ -66,7 +66,7 @@ Server mengontrol state/jam/attempt, tidak menerima jawaban saat jeda; soal dan 
 | Sertifikat revisi | nomor/QR ID lama/baru, template, TTD aktif, alasan, checksum |
 | Pengumuman/FAQ/identitas/aset | actor, versi, status lama/baru |
 
-### Audit v2.3 yang wajib ada
+### Audit v2.4 yang wajib ada
 | Peristiwa | Bukti minimal |
 |---|---|
 | Tetapkan/ganti/kosongkan Guru per Gen–Mapel | Gen, mapel, Guru lama/baru, alasan, Admin, waktu |
@@ -78,3 +78,10 @@ Server mengontrol state/jam/attempt, tidak menerima jawaban saat jeda; soal dan 
 
 ## 9. Backup dan data lama
 Keputusan: **backup manual melalui SOP sekolah**, bukan janji backup otomatis. Tidak ada fitur penghapusan data siswa/sertifikat. Backup yang berisi data siswa ditempatkan privat/terenkripsi dan perlu uji restore berkala. Kebijakan lama penyimpanan **media backup** berbeda dari larangan menghapus catatan siswa/sertifikat utama; jangan mengimplementasikan aksi hapus permanen tanpa kebijakan baru yang sah.
+
+## 10. Perlindungan format dan aset baru v2.4
+- Generator template Excel per Gen–Mapel/Kurikulum dan Word per TP memakai identitas **dari sesi/penugasan terotorisasi**, checksum dan token/signature berbasis secret server, bukan kepercayaan pada file yang dapat diedit. Impor ulang wajib cek role, Gen–Mapel, status TP, versi, anti replay/idempotensi, batas ukuran/ZIP bomb dan anti formula injection.
+- DOCX diurai dengan parser OOXML terkendali: **no macro**, no XXE, no external remote fetch otomatis, no `altChunk` HTML tak tepercaya, batas nesting tabel/media, sanitasi render agar XSS/SSRF tertolak. Formula OMML dan tabel bersarang disimpan sebagai konten kaya yang aman, bukan dipaksakan teks biasa.
+- Google Drive hanya URL domain terpercaya hasil parsing ketat, lalu memerlukan pratinjau pemutaran yang nyata; tidak menyalin atau mengeksekusi remote HTML. Jangan menganggap status tautan publik Google selalu tersedia atau membuka kredensial Guru.
+- Bank soal/kunci/snapshot ujian hanya dapat diakses Guru/Admin berhak; siswa tidak menerima kunci sebelum kebijakan ujian mengizinkan. File unggahan/hasil parser/gambar disimpan privat dan melalui controller cek izin. Aset lama dipertahankan untuk percobaan historis.
+- Logo aplikasi diunggah dengan validasi MIME sungguhan, dimensi dan batas ukuran serta pemeriksaan decode; buat varian favicon aman dan ganti pointer aktif atomik, jangan izinkan SVG/script atau unggahan berbahaya disajikan dari origin aplikasi.

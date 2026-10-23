@@ -6,7 +6,7 @@
 Gaya LMS/kelas daring modern dengan **hijau muda** sebagai identitas, sidebar hijau lebih gelap, bidang putih/abu netral, kartu ringkas berjarak terukur, navigasi jelas, dan sedikit ornamen. Siswa mendapat bilah progres/lencana yang hangat, Guru dashboard aksi, Admin dashboard kontrol, Pimpinan dashboard analitik. **Satu sistem token dan satu library komponen** digunakan semua role. Tidak mengikat desain ke merek antarmuka pihak ketiga.
 
 ## 2. Token CSS resmi awal
-Nilai berikut adalah token dasar K0 yang harus diselaraskan dengan **target tipografi dan kepadatan v2.3** melalui prototipe; setiap perubahan diverifikasi kontras sebelum diterapkan luas; komponen wajib menggunakan token, bukan nilai heksadesimal berulang.
+Nilai berikut adalah token dasar K0 yang harus diselaraskan dengan **target tipografi dan kepadatan v2.4** melalui prototipe; setiap perubahan diverifikasi kontras sebelum diterapkan luas; komponen wajib menggunakan token, bukan nilai heksadesimal berulang.
 
 ```css
 :root {
@@ -77,17 +77,17 @@ Semua kelas komponen memakai awalan `a-`. Modifier dapat berbentuk `a-btn--utama
 
 ## 4. Pola HTML standar
 ```html
-<section class="a-card" aria-labelledby="bab-judul">
+<section class="a-card" aria-labelledby="tp-judul">
   <div class="a-card__atas">
-    <h2 id="bab-judul">BAB 1 · Bilangan</h2>
+    <h2 id="tp-judul">TP 1 · Bilangan</h2>
     <span class="a-badge a-badge--siap">Siap</span>
   </div>
   <p class="a-help">3 TP · 2 TP tuntas</p>
-  <div class="a-bar" role="progressbar" aria-label="Progres BAB" 
+  <div class="a-bar" role="progressbar" aria-label="Progres TP" 
        aria-valuemin="0" aria-valuemax="100" aria-valuenow="67">
     <span class="a-bar__isi" style="width:67%"></span>
   </div>
-  <a class="a-btn a-btn--utama" href="/siswa/bab/123">Buka BAB</a>
+  <a class="a-btn a-btn--utama" href="/siswa/tp/123">Buka TP</a>
 </section>
 ```
 Hanya lebar **bilah progres** dan **segmen** yang boleh memakai style inline yang dihitung dan telah divalidasi. Bukan untuk warna/posisi umum.
@@ -121,9 +121,9 @@ Hanya lebar **bilah progres** dan **segmen** yang boleh memakai style inline yan
 ## 6. Animasi dan media
 Boleh animasi ringan **hanya** pada bilah segmen, lencana baru, dan perayaan siswa; matikan pada `prefers-reduced-motion`. Tidak ada animasi pada S06. PDF.js dan pustaka efek balik halaman diaktifkan hanya saat materi PDF; jangan membebani semua dashboard dengan library itu. Ikon SVG inline dari kumpulan ikon yang diizinkan, dengan label aksesibel pada tombol tanpa teks.
 
-## 6A. Sistem halaman tunggal v2.3 — standar implementasi semua modul
+## 6A. Sistem halaman tunggal v2.4 — standar implementasi semua modul
 
-Mulai tahap UI konsistensi, `layouts/panel.php` dan `layouts/publik.php` **selalu memakai desain v2.3 yang disetujui**. Tidak ada percabangan tema lama berdasarkan `uiPrototipe`. Satu stylesheet tetap `public/assets/css/app.css`.
+Mulai tahap UI konsistensi, `layouts/panel.php` dan `layouts/publik.php` **selalu memakai desain v2.4 yang disetujui**. Tidak ada percabangan tema lama berdasarkan `uiPrototipe`. Satu stylesheet tetap `public/assets/css/app.css`.
 
 - Konten panel dalam `.a-page`; gunakan `header.a-page__heading.a-proto-heading` untuk kelompok judul, `.a-proto-eyebrow` untuk konteks, dan `.a-proto-muted` untuk deskripsi ringkas.
 - Gunakan `.a-page__editor` untuk form sederhana, `.a-page__editor--luas` untuk form banyak atribut. Daftar data tetap full width dengan `.a-tabel-gulir`, tidak memotong tabel pada 360px.
@@ -136,4 +136,13 @@ Mulai tahap UI konsistensi, `layouts/panel.php` dan `layouts/publik.php` **selal
 `docs/assets/galeri-komponen.html` menyediakan contoh statis tombol, status, kartu, form, tabel, step, modal, dan contoh responsive. Sebelum rollout massal, prototipe dashboard dan login mendapat persetujuan pemilik. Ketika komponen baru ditambahkan: ubah dokumen ini → ubah galeri → ubah `app.css` → uji pada 360/390/768/1100px → commit bersama. Jangan mengimplementasikan CSS komponen baru tanpa memperbarui galeri.
 
 ## 8. Checklist UI sebelum diterima
-Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty state; loading; tampilan 360/390/768/1100; teks panjang; nama sekolah panjang; opsi soal 2–5; draf manual; peringatan browser tanpa fullscreen; layar ujian tanpa gangguan; logo dan TTD terlihat jelas di sertifikat preview; QR/teks tidak menabrak background; printer A4 landscape tidak memotong area aman.
+Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty state; loading; tampilan 360/390/768/1100; teks panjang; nama sekolah panjang; opsi soal tepat lima A–E dengan satu kunci; draf manual; peringatan browser tanpa fullscreen; layar ujian tanpa gangguan; logo dan TTD terlihat jelas di sertifikat preview; QR/teks tidak menabrak background; printer A4 landscape tidak memotong area aman.
+
+## 9. Tata letak operasional v2.4 yang wajib dicakup CSS dan galeri
+- `admin-akun_form` **full-width baris atas**, formulir field `a-grid` landscape; `admin-akun_daftar` baris bawah full-width. Tidak memakai grid dua kolom yang meletakkan daftar di samping form pada desktop.
+- Tabel penetapan Guru: lebar dan align input diperhitungkan untuk **kolom Guru, Alasan, Simpan terpisah**; tidak memaksa select/input/button menjadi satu kolom vertikal kecuali mode mobile sempit yang memang diperlukan. Tabel panjang bisa scroll horizontal dengan label yang jelas.
+- `a-pager` sebagai kelas kanonis (alias `a-pagination` hanya untuk transisi kode lama) konsisten di Pengelola, Siswa, Mapel–Guru dan tabel Daftar CP: info total, halaman saat ini, navigasi Pertama/Sebelumnya/Berikutnya/Terakhir, disabled beralasan, link berparameter filter. Fokus keyboard dan aria label wajib.
+- `/profil`: card foto full-width lalu grid dua kolom Identitas Akun/Kontak Pribadi; satu kolom di HP. Foto, tanggal status review dan aksi tidak menutupi isi.
+- Logo aplikasi tersentralisasi sebagai favicon dan identitas visual; ukuran varian dihasilkan tanpa mengganti sumber/versi secara liar, nama merek konsisten di header/login.
+- Pratinjau soal Word: tabel akademik di dalam sel pertanyaan/opsi harus tetap terbaca/responsif, gambar tidak overflow, equation dapat di-scroll apabila lebar melebihi mobile, pemutar Drive aman. Warna status/fokus mengikuti token existing `a-`.
+- Pembaruan CSS visual wajib diikuti perubahan `docs/assets/galeri-komponen.html` ketika kode implementasi UI dikerjakan; dokumen ini **tidak** mengklaim galeri runtime sudah berubah.

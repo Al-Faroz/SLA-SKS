@@ -9,20 +9,20 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 - **Ujian:** layar fokus tanpa sidebar dan pop-up non-ujian, hanya timer server, soal, navigator, status simpan, insiden serta kendali fullscreen. Pada gangguan koneksi tampil overlay status otoritatif.
 - **Pimpinan:** indikator `Hanya baca`, filter dan grafik dengan alternatif data tabel.
 
-### Alur tampilan v2.3 sebelum katalog layar
+### Alur tampilan v2.4 sebelum katalog layar
 1. **Admin – Pengelola dan Siswa:** dua menu sidebar terpisah. Tiap daftar mempunyai header ringkas (judul + jumlah), area pencarian/filter, toolbar **Tambah / Import / Export**, tabel yang mudah dipindai, aksi per baris **Lihat/Ubah/Reset Sandi/Nonaktif**, loading/kosong/galat dan konfirmasi aksi. Tombol hanya muncul jika endpoint siap.
 2. **Impor XLSX:** pilih jenis pengguna → unduh template → unggah → validasi dan pratinjau (jumlah baris baru/diubah/ditolak, sumber kesalahan per baris/kolom) → konfirmasi → hasil akhir. Tidak mengubah data saat pratinjau; tidak otomatis menghapus akun yang tak muncul di file.
 3. **Reset sandi:** tombol berada pada baris **Pengelola atau Siswa**, bukan reset massal. Konfirmasi menampilkan akun tujuan; sesudah server berhasil, sandi sementara acak ditampilkan sekali dengan kontrol salin dan anjuran penyampaian privat; sesi lama dicabut, login berikutnya wajib ubah sandi. Jangan menaruhnya pada query string atau unduhan.
-4. **Guru:** sebelum BAB/soal/penilaian, pilih **Gen–Mapel yang benar-benar diampu**. Judul, breadcrumb, filter dan daftar selalu menampilkan konteks Gen sehingga tidak tertukar. Gen yang tidak ditugaskan tidak ditampilkan dan akses URL langsung ditolak.
+4. **Guru:** sebelum TP/soal/penilaian, pilih **Gen–Mapel yang benar-benar diampu**. Judul, breadcrumb, filter dan daftar selalu menampilkan konteks Gen sehingga tidak tertukar. Gen yang tidak ditugaskan tidak ditampilkan dan akses URL langsung ditolak.
 5. **Profil:** akun staf mengedit foto/kontak pribadi/sandi sendiri; bukan nama resmi, peran, NIP atau Gen. Siswa hanya melihat profil profesional Guru pengampunya; kontak dan data autentikasi Guru disembunyikan.
 6. **Konsistensi visual:** panel terinspirasi referensi TailDash dan publik/login terinspirasi UIdeck Appwind dengan komposisi lebih kompak. Desain disesuaikan warna SLA-SKS, tidak menyalin template atau memakai Tailwind sebagai dependency.
 
 ## 3. Katalog layar siswa
 | ID | Layar | Konten dan aksi utama | Kondisi khusus |
 |---|---|---|---|
-| S01 | Beranda | Lanjutkan belajar, semester berjalan, progres bersegmen, rak lencana | Tidak ada paket, semua tuntas, menunggu BAB |
-| S02 | Semester | Daftar BAB urut, status siap/terkunci/tuntas | BAB pertama belum Siap |
-| S03 | BAB | TP dan indikator progres | Tidak mengungkap BAB draf |
+| S01 | Beranda | Lanjutkan belajar, semester berjalan, progres bersegmen, rak lencana | Tidak ada paket, semua tuntas, menunggu TP |
+| S02 | Semester | Daftar TP urut sesuai ATP, status siap/terkunci/tuntas | TP pertama belum Siap |
+| S03 | Detail TP | Ringkasan TP, CP terkait, daftar Materi dan alur Diagnostik/Resume/HOTS/Sumatif | Tidak mengungkap TP draf |
 | S04 | TP | Daftar langkah, indikator akses, materi, diagnostik/sumatif | Diagnostik sudah lulus, pembelajaran sukarela |
 | S05 | Petunjuk ujian | Durasi, percobaan, syarat perangkat/fullscreen, tombol Mulai | Fullscreen tidak didukung ⇒ pesan gunakan desktop/laptop; jangan buat percobaan |
 | S06 | Pengerjaan ujian | PG, timer, navigator, simpan, kirim final, fullscreen | Jeda fullscreen, jeda koneksi, batal, expired, reload |
@@ -37,44 +37,44 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 ## 4. Katalog layar Guru
 | ID | Layar | Isi dan tombol utama |
 |---|---|---|
-| G01 | Beranda | Antrean penilaian, siswa perlu bantuan, BAB yang perlu media, kesiapan mapel, ujian berjalan |
+| G01 | Beranda | Antrean penilaian, siswa perlu bantuan, TP yang perlu media, kesiapan mapel, ujian berjalan |
 | G02 | Semester saya | **Pilih Gen–Mapel yang diampu aktif**, lalu semester 1–6 dan paket khusus Gen |
-| G03 | Paket/BAB | Rencana BAB, target Siap, daftar urut, tombol Buka/Tambah BAB |
-| G04 | Struktur BAB/TP/CP | Draf BAB, TP/kode/indikator/ATP, pemilih CP versi resmi, aturan urutan |
-| G05 | Impor Excel | Unduh 8 sheet, unggah, tabel galat/peringatan, diff, konfirmasi; draf saja |
+| G03 | Paket/ATP enam semester | Unduh/unggah Excel pemetaan TP/Materi, pratinjau diff, daftar TP urut dan status |
+| G04 | Editor TP/CP | TP draf, rumusan/indikator/kode/urutan ATP dan CP utama/resmi, daftar Materi |
+| G05 | Impor Peta ATP | Unduh Excel 6 semester terpersonalisasi, unggah, pratinjau/galat/diff, konfirmasi draf |
 | G06 | Pengaturan TP | KKM/bobot, jumlah/durasi soal, syarat karakter, pengaturan bawaan |
 | G07 | Materi/berkas | PDF/YouTube/audio/gambar, upload, pratinjau dan status tersedia |
 | G08 | Bank soal | Jumlah soal aktif vs diperlukan, diagnostik/sumatif |
-| G09 | Editor soal | Pertanyaan PG 2–5 opsi, kunci, status aktif, validasi |
+| G09 | Bank Word soal | Unduh Word Diagnostik/Sumatif per TP, impor PG lima opsi, pratinjau Equation/gambar/tabel bersarang/Drive, validasi |
 | G10 | Antrean penilaian | Resume/HOTS belum dinilai, filter **Gen–Mapel** dan urutan tertua |
 | G11 | Penilaian | Lihat jawaban, isi skor 0–100 dan umpan balik, simpan & berikutnya |
 | G12 | Monitoring | Matriks siswa × TP **khusus Gen–Mapel yang diampu**, ringkasan tindakan |
 | G13 | Detail siswa/ujian | Nilai, histori attempt/insiden, keputusan pembatalan, izin ulang |
 | G14 | Pratinjau siswa | Berkas/TP dalam mode baca tanpa progres, banner pratinjau |
 | G15 | Laporan | Pilih laporan mapelnya dan PDF/Excel |
-| G16 | Koreksi BAB | Ajukan kategori A/B/C, diff/versi, status keputusan, riwayat |
+| G16 | Koreksi TP | Ajukan kategori A/B/C, diff/versi, status keputusan, riwayat |
 | G17 | Koreksi nilai/kunci ujian | Usulan nilai guru sebelumnya, peninjauan soal/kunci dan dampak akademik |
 | G18 | Pengumuman | Buat/ubah/arsip pengumuman global secara sederhana |
 
 ## 5. Katalog layar Admin
 | ID | Layar | Isi dan tombol utama |
 |---|---|---|
-| A01 | Beranda | Kesehatan sistem, akun, BAB siap, antrean persetujuan, TTD belum ada, disk dan cron |
+| A01 | Beranda | Kesehatan sistem, akun, TP siap, antrean persetujuan, TTD belum ada, disk dan cron |
 | A02 | Pengelola | Daftar staf Admin/Guru/Pimpinan, pencarian/role/status, tambah/edit/nonaktif, reset sandi **per akun**, impor/ekspor XLSX |
 | A02S | Siswa | Daftar siswa, filter Gen/semester/status, NISN dan biodata, tambah/edit/nonaktif, reset sandi **per akun**, impor/ekspor XLSX |
 | A03 | Form Pengelola/Siswa | Identitas dan validasi berbeda: staf nama/NIP/role; siswa NISN/Gen/semester mulai; koreksi NISN juga mengubah username dengan audit |
 | A04 | Impor dan ekspor pengguna | Template XLSX terpisah, validasi/pratinjau galat, konfirmasi dan idempotensi; ekspor sesuai filter dan bebas hash/sandi |
 | A05 | Mapel/Guru per Gen | Matriks Gen × Mapel, satu Guru aktif per pasangan, dropdown hanya akun aktif ber-role Guru, riwayat dan alasan pergantian |
 | A06 | Gen/Semester mulai | Kelola angkatan dan penimpaan siswa dengan cek progres |
-| A07 | Kesiapan BAB | Matriks mapel × semester, siap/rencana, kekurangan |
+| A07 | Kesiapan TP | Matriks mapel × semester, siap/rencana, kekurangan |
 | A08 | Pengaturan | Nilai bawaan, ujian profil Ketat tetap, akun, berkas, identitas madrasah |
 | A09 | Audit | Filter peristiwa, aktor dan waktu, detail sebelum/sesudah aman |
 | A10 | Laporan | Unduh laporan seluruh cakupan |
 | A11 | Pemeliharaan | Kapasitas disk, status cron, akun terkunci, backup manual/SOP |
 | A12 | Referensi CP | Daftar sumber/versi, usulan Guru, setujui/tolak/perbaikan langsung Admin |
-| A13 | Permohonan akademik | Koreksi BAB, nilai pengganti/kunci ujian; bandingkan diff/dampak dan putuskan |
+| A13 | Permohonan akademik | Koreksi TP, nilai pengganti/kunci ujian; bandingkan diff/dampak dan putuskan |
 | A14 | Identitas sekolah | Nama, alamat, NPSN, NSM, telepon, email wajib, web opsional, kepala madrasah |
-| A15 | Logo/ikon/TTD | Tiga aset terpisah, upload, preview, aktifkan, versi sejarah |
+| A15 | Logo Aplikasi/Favicon/TTD | Satu upload logo aplikasi digunakan sebagai logo dan favicon; TTD dan template sertifikat tetap aset terlindung terpisah |
 | A16 | Template sertifikat | JPG/PNG A4 landscape, cek upload, preset posisi, pratinjau, aktivasi global/fallback |
 | A17 | Sertifikat dan koreksi biodata | Lihat versi, revisi satu per satu, nomor/QR baru, tanpa cabut/hapus |
 | A18 | Pengumuman dan FAQ | Kelola pengumuman global dan FAQ login-only |
@@ -86,7 +86,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | M01 | Beranda | KPI total siswa, TP selesai, guru/anggaran penilaian, sertifikat, peringatan |
 | M02 | Progres | Grafik status mapel/semester/Gen, tabel alternatif |
 | M03 | Siswa | Matriks progres siswa × mapel, rapor baca-saja |
-| M04 | Guru dan Kesiapan | BAB Siap, penilaian tertunda, kegiatan mapel |
+| M04 | Guru dan Kesiapan | TP Siap, penilaian tertunda, kegiatan mapel |
 | M05 | Ujian | Distribusi skor, TP sulit, pelanggaran/ujian batal |
 | M06 | Laporan | Seluruh ekspor baca-saja sesuai AB-41 |
 
@@ -105,7 +105,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | P04 | Kebijakan Privasi publik | Teks kebijakan resmi sekolah, versi dan kontak sekolah; tanpa login |
 
 ## 8. Notifikasi internal yang ditampilkan
-Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, keputusan Guru tentang ujian batal/ulang, BAB Siap tersedia atau koreksinya terbit, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik kepada Guru. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
+Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, keputusan Guru tentang ujian batal/ulang, TP Siap tersedia atau koreksinya terbit, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik kepada Guru. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
 
 ## 9. Detail interaksi wajib semua layar
 **Setiap layar wajib memiliki:** tujuan, siapa dapat membuka, data sumber, komponen yang digunakan, form validation, aksi sukses, aksi gagal, akses browser back, loading, kosong, readonly, locked, responsive, uji minimal. Jangan merender tombol Simpan jika tidak ada perubahan kecuali desain memerlukan. Gunakan pesan error yang spesifik: bukan `Terjadi kesalahan` tanpa instruksi. Untuk aksi berisiko tampilkan modal konfirmasi dengan nama objek.
@@ -117,11 +117,25 @@ Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, keputu
 - **Sertifikat:** preview desain Admin dengan data *dummy* (bukan data siswa nyata), zona aman untuk QR/TTD, indikator upload valid, link lihat PDF sebelumnya bila digantikan.
 - **Pembetulan biodata:** Admin melihat data lama/baru dan jumlah sertifikat yang perlu diperbaiki **satu per satu**, bukan memaksa semua sertifikat diganti otomatis.
 
-### Kriteria khusus UX v2.3
+### Kriteria khusus UX v2.4
 - **Desktop Admin/Guru:** sidebar sekitar 228–240px, header sekitar 60px, tipografi isi 14–15px, judul halaman 24–26px, kartu 16–20px padding, gap antarkartu 12–16px; tabel/toolbar padat tetapi tetap jelas. Gunakan grid dua kolom bila form atau ringkasan menguntungkan; hindari satu kolom sangat panjang tanpa alasan.
 - **Publik:** komposisi hero dan login seimbang, tidak seperti marketing site; tidak ada CTA daftar publik, harga, atau landing page promosi. Teks penting dan tombol utama langsung terlihat.
 - **Mobile 360/390px:** ukuran sentuh tetap minimal 40px, bidang formulir tidak menyempit/terpotong, sidebar terkendali, scroll tabel hanya bila perlu, judul serta input tidak melebihi viewport.
-- Sebelum merefaktor seluruh halaman, siapkan **satu prototipe dashboard Admin dan satu tampilan publik/login** dengan token v2.3 untuk persetujuan pemilik. Setelah disetujui, terapkan komponen bersama secara berurutan tanpa merombak aturan bisnis.
+- Sebelum merefaktor seluruh halaman, siapkan **satu prototipe dashboard Admin dan satu tampilan publik/login** dengan token v2.4 untuk persetujuan pemilik. Setelah disetujui, terapkan komponen bersama secara berurutan tanpa merombak aturan bisnis.
 
 ## 10. Aksesibilitas dan lebar responsif
 Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyboard terlihat, pesan status tidak hanya warna, semua field berlabel, error terhubung dengan input, grafik mempunyai ringkasan/tabel; mendukung `prefers-reduced-motion`. Ujian desktop mengutamakan keyboard angka/panah dan tampilan tanpa distraksi. Di layar sempit, tabel panjang boleh scroll horizontal dengan label header tetap terlihat.
+
+## 11. Revisi layout halaman yang WAJIB pada v2.4 (22 Oktober 2026)
+1. **`/admin/pengelola`**: card `admin-akun_form` **baris pertama full-width/landscape**, field membentuk grid horizontal responsif; card `admin-akun_daftar` **di bawah** dan berisi pencarian/filter/tabel serta **pagination server-side** dengan nomor halaman, jumlah total, empty state dan filter yang bertahan antarhalaman.
+2. **`/admin/siswa`**: susunan sama; `admin-akun_form` atas full-width, `admin-akun_daftar` di bawah dengan pagination server-side. Pertahankan menu impor/ekspor, reset, CSRF dan validasi yang sudah ada.
+3. **`/admin/mapel-guru`**: tabel **Penetapan Guru per Gen** mengatur kontrol pada kolom terpisah: **Guru Pengampu (select)** | **Alasan Penetapan/Pergantian (input)** | **Aksi Simpan (button)**, satu baris konteks Gen–Mapel. Tidak bertumpuk vertikal pada desktop, responsif/scroll aman di HP; **pagination server-side** dan filter kontekstual.
+4. **`/admin/kurikulum-cp`**: **hanya tabel Daftar CP dan Status Versinya** yang diubah: pagination server-side serta **Ekspor Excel XLSX** sesuai filter/status, mencakup kode/mapel/kurikulum/fase/elemen/versi/status/identitas tanggal yang sah dan aman dari formula injection. Formulir dan panel lain **tidak ikut dirombak**, kecuali penyederhanaan form CP yang sudah diputuskan dalam dokumen 04.
+5. **`/admin/identitas`**: tambahkan card unggah **Logo Aplikasi**, pratinjau, validasi file gambar asli/dimensi/ukuran, aktifkan setelah sukses; gunakan sebagai **logo antarmuka/login dan favicon** (varian ukuran dari satu sumber diperbolehkan). Fallback ketika belum ada logo; TTD dan background sertifikat tetap diproses menurut dokumen 09.
+6. **`/profil` untuk SELURUH ROLE**: card **Foto Profil** paling atas **lebar penuh**; di bawahnya **dua card berdampingan** pada desktop, **Identitas Akun** dan **Kontak Pribadi**. Di mobile keduanya bertumpuk sesuai urutan dan tanpa memotong input. Hak edit mengikuti role (siswa hanya hak yang sah); fitur foto yang membutuhkan moderasi tetap memakai proses persetujuan yang sudah berlaku.
+7. Prinsip desain: tetap HTML, CSS kustom `app.css`, JS native, komponen `a-`, keadaan normal/kosong/loading/sukses/galat, akses keyboard/kontras dan responsivitas 360/390/768/1100px. Pagination **bukan memuat seluruh tabel lalu menyembunyikan baris dengan JS**.
+
+## 12. UI penyusunan Guru v2.4
+- Kartu konteks Gen–Mapel/Kurikulum, tombol **Unduh Excel ATP enam semester** dan Unggah Peta, pratinjau dengan validasi daftar CP resmi sesuai mapel saja.
+- Setiap TP mempunyai status draf/perlu dilengkapi/Siap, Materi berurutan dan tugas Resume/HOTS **per Materi**, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
+- Preview soal menampilkan konten kaya Word **pada pertanyaan dan A–E**, tabel di dalam tabel, Equation, gambar, pemutar audio/video Google Drive bila valid; soal/catatan yang gagal tidak dapat dikonfirmasi.

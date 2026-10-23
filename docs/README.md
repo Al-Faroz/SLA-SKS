@@ -1,45 +1,45 @@
-# Indeks Master Document SLA-SKS v2.3
+# Indeks Master Document SLA-SKS v2.4
 
-**Satu sumber kebenaran: 16 berkas ini.** Gunakan menu isi berikut, bukan dokumen revisi historis. Nomor dokumen menetapkan wilayah tanggung jawabnya.
+**Satu sumber kebenaran: 16 berkas domain berikut**. Keputusan 22 Oktober 2026 di Master v2.4 mengatasi konflik dengan teks v2.3/PR #13 lama. Tidak ada entitas BAB dalam kontrak data baru.
 
-| No. | Dokumen | Ketika sedang mengerjakan... |
+| No. | Dokumen | Cakupan |
 |---:|---|---|
-| 01 | [Ruang lingkup](01-RUANG-LINGKUP.md) | Definisi produk, istilah, fitur dan batas lingkup |
-| 02 | [Aturan bisnis](02-ATURAN-BISNIS.md) | Aturan lintas modul, status dan ketentuan keras |
-| 03 | [Peran dan akses](03-PERAN-DAN-HAK-AKSES.md) | Menu role, kepemilikan dan otorisasi |
-| 04 | [Kurikulum dan CP](04-KURIKULUM-DAN-CP.md) | MTs Fase D, CP, TP, penugasan versi paket |
-| 05 | [BAB dan Excel](05-PAKET-BAB-DAN-IMPOR.md) | Editor BAB, media dan 8 sheet Excel |
-| 06 | [Belajar siswa](06-ALUR-PEMBELAJARAN.md) | Diagnostik, media, resume, tugas, lencana |
-| 07 | [Mesin ujian](07-MESIN-UJIAN.md) | Fullscreen, batas waktu, koneksi, ujian batal |
-| 08 | [Penilaian](08-PENILAIAN.md) | Rumus nilai, Guru, koreksi skor dan kunci soal |
-| 09 | [Sertifikat dan laporan](09-SERTIFIKAT-DAN-LAPORAN.md) | PDF, QR, TTD PNG, versi/revisi, ekspor |
-| 10 | [Database dan SQL](10-DATABASE.md) | Entitas, FK, indeks, instalasi/update via dump SQL |
-| 11 | [CI4 dan API](11-ARSITEKTUR-DAN-API.md) | Service, Controller, root routing dan endpoint |
-| 12 | [UI/UX dan layar](12-UI-UX-DAN-HALAMAN.md) | Semua layar P/S/G/A/M/U dan state interaksi |
-| 13 | [Design system CSS](13-DESIGN-SYSTEM-CSS.md) | Token, class `a-`, pemakaian dan galeri |
-| 14 | [Keamanan](14-KEAMANAN-DAN-AUDIT.md) | Hak, privasi, root `.htaccess`, audit |
-| 15 | [Instalasi](15-INSTALASI-DAN-OPERASIONAL.md) | Shared hosting, setup, backup manual, update SQL |
-| 16 | [Pengujian](16-PENGUJIAN-DAN-PENERIMAAN.md) | 88 skenario E2E dan kriteria selesai |
+| 01 | [Ruang lingkup](01-RUANG-LINGKUP.md) | Produk, istilah, SKS, batas fitur |
+| 02 | [Aturan bisnis](02-ATURAN-BISNIS.md) | Ketentuan lintas role, pembelajaran, ketuntasan |
+| 03 | [Peran dan hak akses](03-PERAN-DAN-HAK-AKSES.md) | Admin/Guru/Siswa/Pimpinan, G1 per Gen–Mapel |
+| 04 | [Kurikulum, CP dan ATP](04-KURIKULUM-DAN-CP.md) | CP resmi, TP/ATP enam semester, KBC |
+| 05 | [Paket TP dan impor](05-PAKET-TP-DAN-IMPOR.md) | Excel ATP, Word Diagnostik/Sumatif, TP Siap, media |
+| 06 | [Alur siswa](06-ALUR-PEMBELAJARAN.md) | Diagnostik adaptif SKS, Materi, Resume/HOTS, Sumatif |
+| 07 | [Ujian](07-MESIN-UJIAN.md) | PG lima opsi, fullscreen dan percobaan |
+| 08 | [Penilaian](08-PENILAIAN.md) | Agregasi Resume/HOTS tiap Materi, koreksi |
+| 09 | [Sertifikat dan laporan](09-SERTIFIKAT-DAN-LAPORAN.md) | PDF/QR/riwayat/versi |
+| 10 | [Database SQL](10-DATABASE.md) | Model tanpa BAB, impor ulang lokal terkontrol |
+| 11 | [Arsitektur/API](11-ARSITEKTUR-DAN-API.md) | MVC/Service, endpoint, generator dan parser |
+| 12 | [UI/UX](12-UI-UX-DAN-HALAMAN.md) | Seluruh layar, enam revisi layout wajib |
+| 13 | [Design system](13-DESIGN-SYSTEM-CSS.md) | CSS `a-`, pagination, responsif, galeri |
+| 14 | [Keamanan/audit](14-KEAMANAN-DAN-AUDIT.md) | File DOCX/XLSX aman, histori, kontrol server |
+| 15 | [Instalasi/operasional](15-INSTALASI-DAN-OPERASIONAL.md) | MySQL/MariaDB, dump/backup/root CI4 |
+| 16 | [Pengujian](16-PENGUJIAN-DAN-PENERIMAAN.md) | Skenario E2E-001–112, acceptance |
 
-**Berkas tambahan:** [galeri komponen](assets/galeri-komponen.html), [status keputusan](PENDING-DECISIONS.md), [panduan SQL](../database/sql/README.md), [panduan kontribusi](../CONTRIBUTING.md).
+## Template kerja resmi (dokumen non-Master)
+- `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` — master workbook enam semester setelah **pembersihan semua istilah BAB**. Identitas/CP pada hasil unduhan berasal dari database login Guru/Gen–Mapel/Kurikulum.
+- `docs/TEMPLATE_SOAL_SLA-SKS.docx` — struktur Word Soal Global yang diselaraskan ke **SLA-SKS-WORD-V1**, satu tipe PG lima opsi A–E. Generator per TP/jenis ujian mengikuti ukuran bank aktual; **berkas `docs/` berisi contoh, sedangkan unduhan Guru harus menghasilkan semua slot pertanyaan/opsi/kunci kosong sesuai jumlah bank yang diatur di aplikasi**.
+- `docs/assets/galeri-komponen.html` — galeri visual CSS yang diperbarui bersama perubahan kode UI.
+- [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
 
-## Aturan mengubah acuan
-Setiap aturan ditempatkan pada berkas domain utamanya; berkas lain merujuk, **tidak mengulang sebagai versi alternatif**. Usulan perubahan melalui PR harus memperbarui kode dan pengujian terkait. Perbaikan teknis kecil tidak membutuhkan kuesioner pemilik apabila tidak mengubah kebijakan produk.
+## Ketentuan perubahan
+- Aturan hidup pada dokumen domain masing-masing, tanpa membuat versi alternatif. Dokumen lain merujuk domain utama.
+- **PR dokumentasi ini tidak otomatis mengubah kode atau SQL**. Branch implementasi terpisah mengacu v2.4; tiap langkah diikuti tes dan persetujuan pemilik sebelum merge.
+- **PR #13** masih implementasi berdasarkan hierarki lama; **jangan merge** sebelum selaras.
+- Dump SQL lokal dikirim pemilik nanti; developer menganalisis, memilih data aman yang perlu dipertahankan, menyusun dump final. Pemilik backup, mengosongkan database lokal sendiri, lalu mengimpor. **Bukan prosedur reset produksi**.
 
-## Aturan resmi v2.3 dan transisi
-- G1: satu Guru aktif **setiap Gen–Mapel**. Paket/BAB/TP/soal/materi **milik satu Gen**. CP resmi tetap dapat dirujuk banyak Gen (02–05, 08, 10–11).
-- Menu Admin **Pengelola** dan **Siswa** terpisah tetapi memakai sistem akun yang sama, dengan impor/ekspor XLSX dan reset sandi per akun; hak profil diatur 03, 12, 14.
-- Desain v2.3 mengikuti inspirasi visual TailDash (panel) dan UIdeck Appwind (publik), tetap CSS kustom/JS native, dengan prototipe yang diperiksa sebelum penerapan luas (12–13).
-- PR K2 lama **belum digabung** dan masih berlandaskan model Guru global. Perubahan dokumentasi ini **bukan perubahan kode atau SQL**; instalasi K2 yang sudah digunakan harus diperbarui dengan patch versi baru, tanpa penghapusan data.
-
-## Peta lintas modul
-| Proses | Aturan utama | UI/API | Data/tes |
+## Peta dependensi
+| Pekerjaan | Aturan domain | Implementasi | Verifikasi |
 |---|---|---|---|
-| Buat BAB Siap | 04 + 05 | 11 + 12 + 13 | 10 + 16 |
-| Siswa belajar | 06 + 07 | 11 + 12 | 10 + 16 |
-| Koreksi nilai/kunci | 08 | 03 + 11 + 12 | 09 + 10 + 16 |
-| Sertifikat | 09 | 11 + 12 + 13 | 10 + 14 + 16 |
-| Pengaturan sekolah | 03 + 09 | 11 + 12 | 10 + 14 |
-| Setup hosting | 15 | 11 + 14 | 10 + 16 |
-| G1 per Gen dan paket independen | 02 + 03 + 04 + 05 | 11 + 12 | 10 + 14 + 16 |
-| Akun Pengelola/Siswa, impor/ekspor/reset, profil | 02 + 03 + 12 | 11 + 13 | 10 + 14 + 16 |
+| CP resmi, peta ATP, TP Siap dan bank Word | 02, 04, 05, 07 | 10, 11, 12, 14 | 16 |
+| Pembelajaran jalur Diagnostik dan Materi | 02, 06, 08 | 10, 11, 12 | 16 |
+| Penilaian dan sertifikat | 08, 09 | 10–14 | 16 |
+| Akun, G1, layout Admin dan profil | 03, 12, 13 | 10, 11, 14 | 16 |
+| SQL/hosting/backup | 10, 15 | AGENTS.md dan README | 16 |
+
+> **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](STATUS-TEMPLATE-V2.4.md).

@@ -1,62 +1,57 @@
-# 06 — Alur Pembelajaran Siswa dan Pencapaian
+# 06 — Alur Pembelajaran Mandiri Percepatan SKS
 
-## 1. Prasyarat akses
-Siswa hanya dapat membuka paket **milik Gen siswa** yang ditugaskan menurut Gen/tahun ajaran/semester mulai efektif. Semester sebelum titik mulai bertanda **Dilewati** tanpa skor/sertifikat. Semester berikutnya dibuka berurutan setelah sebelumnya memenuhi ketuntasan; BAB dan TP juga berurutan. Jika BAB berikutnya draf, siswa melihat **"Menunggu BAB berikutnya disiapkan guru"**, bukan error kosong.
+## 1. Akses dan urutan
+Siswa belajar melalui paket semester **khusus Gen siswa**. Urutan: `Semester → TP → Materi`; tidak ada BAB sebagai langkah atau layar tersendiri. Semester sebelum `COALESCE(siswa.semester_mulai, angkatan.semester_mulai)` berstatus **Dilewati** tanpa nilai/sertifikat. Semester dan TP dibuka berurutan; TP draf berikutnya tidak menghalangi penyelesaian TP Siap sebelumnya, tetapi tampil **"Menunggu TP berikutnya disiapkan Guru"**. Jangan menampilkan semester selesai 100% sebelum **semua TP yang direncanakan** benar-benar disiapkan dan tuntas.
 
-**Paket independen antar-Gen:** semua langkah pembelajaran siswa mengikat `siswa.angkatan_id`, penugasan paket Gen sendiri, serta versi paket/BAB yang dipin. Siswa Gen A tidak dapat memakai tautan, nomor paket, BAB, soal atau kemajuan Gen B walaupun mata pelajarannya sama. Ketuntasan dan lencana dinilai dari paket sendiri. Guru yang berwenang menilai atau menangani siswa selalu ditentukan dari Gen–Mapel siswa itu; perubahan Guru di Gen lain tidak berdampak.
+Paket/TP/materi/soal hanya milik Gen yang terkait; siswa Gen A tidak dapat mengakses Gen B dengan URL. Guru penilai adalah G1 aktif Gen–Mapel siswa. Versi TP dipin ketika siswa pertama kali memulai; perubahan Guru/versi konten tidak menghapus progres.
 
-## 2. Mesin alur setiap TP
+## 2. Mesin alur TP
 ```mermaid
 flowchart TD
- A[TP dibuka; pin versi konten] --> B[Diagnostik wajib]
- B --> C{Skor >= KKM?}
- C -->|Ya| D[TP tuntas diagnostik]
- D --> E[Materi boleh dibaca sukarela]
- D --> F[TP berikutnya ketika tersedia]
- C -->|Tidak| G[Materi berurutan]
- G --> H[Resume tiap materi]
- H --> I[Tugas HOTS per TP]
- I --> J[Sumatif]
- J --> K{Lulus?}
- K -->|Ya| L[TP tuntas]
- K -->|Tidak| M[Ulang sesuai kuota atau perlu bantuan]
+ A[TP dibuka dan versi dipin] --> B[Diagnostik wajib]
+ B --> C{Nilai >= KKM?}
+ C -->|Ya| D[TP tuntas; nilai diagnostik]
+ D --> E[Materi boleh dilihat sukarela tanpa kirim Resume atau HOTS]
+ D --> F[TP berikutnya saat tersedia]
+ C -->|Tidak| G[Materi 1: media]
+ G --> H[Resume 1 kirim final]
+ H --> I[HOTS 1 kirim final]
+ I --> J{Masih ada Materi?}
+ J -->|Ya| K[Materi berikutnya berurutan]
+ K --> H2[Resume dan HOTS Materi tersebut final]
+ H2 --> J
+ J -->|Tidak| L[Sumatif TP]
+ L --> M{Nilai >= KKM?}
+ M -->|Ya| N[TP tuntas]
+ M -->|Tidak| O[Percobaan sah berikutnya atau perlu bantuan Guru]
 ```
 
-Pilihan siswa setelah lulus diagnostik: **lanjut ke TP berikutnya** atau membaca/menonton materi sukarela; siswa **tidak mengirim resume/tugas resmi** pada jalur sukarela, dan nilai TP tetap nilai diagnostik.
+Alur ini merupakan **kebijakan akademik internal madrasah untuk SKS percepatan dua tahun**. Diagnostik wajib; jika lulus, siswa tidak wajib menuntaskan media/Resume/HOTS dan nilainya dari Diagnostik. Jika tidak lulus, **setiap Materi memiliki Resume dan HOTS sendiri** dan setelah semua Materi final siswa mengikuti Sumatif. Guru tidak boleh memaksakan siswa jalur lulus Diagnostik mengirim tugas resmi; belajar sukarela tidak mempengaruhi nilai.
 
-## 3. Pembuktian akses materi
-- Bacaan PDF: pembaca PDF.js lokal dengan hitung halaman terlihat dan waktu aktif; default 15 detik/halaman, penyelesaian mensyaratkan kunjungan seluruh halaman sesuai aturan lama. Pratinjau akses tidak menulis progres.
-- YouTube: IFrame API bila tersedia dan durasi video/putar minimum; default persentase putar minimum 90%, bukan sekadar membiarkan tab terbuka.
-- Audio: hitung durasi putar nyata dengan heartbeat; gambar: waktu terlihat pada tab aktif; default waktu gambar 30 detik.
-- Pengukuran server menangani jeda tab/background, loncatan, refresh dan gangguan jaringan secara wajar. Semua detak divalidasi, tidak mempercayai durasi mentah yang dikirim klien.
+## 3. Syarat materi dan media
+- PDF melalui PDF.js lokal: seluruh halaman pernah dilihat, waktu aktif default 15 detik/halaman. YouTube dan audio dihitung waktu putar nyata default ≥90% durasi; gambar default terlihat ≥30 detik. Guru dapat mengatur `min_waktu_detik` untuk draf.
+- Heartbeat server kira-kira tiap **10 detik**; satu detak menambah maksimum 20 detik dan interval minimal 5 detik. Tab/background/jeda/refresh tidak boleh dihitung sebagai waktu belajar aktif palsu. Validasi jam server; jangan mempercayai durasi dari klien.
+- Satu Materi berikutnya dibuka setelah media wajib selesai serta **Resume dan HOTS Materi sebelumnya terkirim final**; tidak perlu menunggu skor Guru. Simpan draf tidak dianggap final. Jika ada lebih dari satu jenis media, syarat materi memeriksa seluruh yang diwajibkan.
+- Progres TP berdasarkan langkah jalur aktif; TP lulus Diagnostik langsung 100%. Semester tidak 100% hingga semua TP terencana Siap dan tuntas.
 
-## 4. Perhitungan ketuntasan media yang konsisten
-- Server menerima detak media kira-kira **tiap 10 detik**. Untuk mencegah manipulasi durasi, satu detak menambah maksimum **20 detik** dan interval antardetak sedikitnya **5 detik**. Ini parameter implementasi dan tidak menggantikan syarat waktu materi.
-- PDF `bacaan`: syarat **semua halaman pernah terlihat** (bitmask terisi) dan `detik_aktif` ≥ jumlah halaman × 15 detik bawaan; Guru dapat mengatur `min_waktu_detik` yang sah untuk materi yang belum Siap.
-- Video YouTube/audio: default **≥90% durasi putar**; waktu hanya saat diputar, bukan tab dibiarkan terbuka. Gambar: **≥30 detik** terlihat pada tab aktif. Semua jenis dapat memakai `min_waktu_detik` Guru sesuai pengaturan materi.
-- **Satu materi berikutnya** baru boleh dibuka setelah resume materi sebelumnya **terkirim secara final**, bukan baru disimpan sebagai draf. `syarat_terpenuhi_pada` diisi sekali; progres yang sudah benar tidak dihapus karena refresh atau perubahan berkas di masa depan.
-- Rumus progres TP = langkah selesai / jumlah langkah jalur aktif; TP lulus diagnostik langsung 100%. Progres BAB = TP tuntas / seluruh TP BAB. Progres semester **tidak boleh 100%** sebelum seluruh BAB yang direncanakan benar-benar dibuat, Siap dan selesai, walau TP dari BAB yang sudah tersedia semuanya tuntas.
+## 4. Resume dan HOTS setiap Materi
+Masing-masing mempunyai editor teks, tombol **Simpan draf** manual ke database, status perubahan belum disimpan/berhasil/gagal, serta **Kirim final** yang mengunci hasil dan membuat antrean penilaian. Tidak ada autosave wajib. Pengiriman ganda harus idempoten; browser meminta konfirmasi jika keluar dengan perubahan belum disimpan. Browser boleh mencegah paste biasa, tanpa mengklaim tidak mungkin curang.
 
-## 5. Resume/tugas dan penilaian
-Resume tersedia per materi dan tugas HOTS per TP. Teks disimpan **hanya jika siswa memilih `Simpan draf`**, dan disimpan di database (tidak tergantung localStorage). UI menampilkan `Perubahan belum disimpan`, `Draf tersimpan`, atau kesalahan simpan. Setelah `Kirim final`, jawaban dikunci dan antrean penilaian Guru terbentuk. Form tidak boleh mengirim akibat klik ganda; server menggunakan kunci idempoten/syarat status. Batas karakter mengikuti konfigurasi TP. Browser mencegah paste biasa pada editor jawaban, tetapi tidak mengklaim sebagai jaminan pencegahan kecurangan sempurna.
+Guru memberi nilai 0–100 dan komentar menurut dokumen 08. Siswa boleh melanjutkan setelah kirim final tanpa menunggu Guru, tetapi rapor/sertifikat final menunggu semua skor wajib dinilai. Koreksi skor mengikuti jalur resmi dan audit.
 
-Penilaian resume/tugas oleh Guru **tidak menghambat siswa mengerjakan langkah belajar berikutnya**. Namun nilai akhir/sertifikat belum resmi sampai semua komponen wajib dinilai. Koreksi penilaian menggunakan `08-PENILAIAN.md`.
+## 5. Pencapaian dan teks status
+Lencana per siswa/paket satu kali: `langkah_pertama`, `lolos_diagnostik`, `tp_tuntas`, `setengah_jalan`, `sekali_lulus`, `semester_tuntas`. Lencana lama `bab_tuntas` jika sudah ada di data historis dipetakan saat penataan dump tanpa menghilangkan catatan pemberian lama. Perayaan ringan boleh sesudah TP/semester tuntas, **tidak pernah saat ujian**, dan tidak memberi nilai/poin/ranking.
 
-## 6. Pencapaian
-Lencana diraih otomatis per siswa/paket semester, satu kali tiap kode: `langkah_pertama`, `lolos_diagnostik`, `bab_tuntas`, `setengah_jalan`, `sekali_lulus`, `semester_tuntas`. Lencana tidak menambah nilai. Perayaan singkat dapat muncul satu kali setelah TP/BAB/semester tuntas; **tidak pernah di ruang ujian**. Tidak ada peringkat/streak/poin.
-
-## 7. Status dan teks siswa
-| Kondisi | Pesan/tindakan utama |
+| Kondisi | Teks siswa |
 |---|---|
-| Semester sebelum mulai | `Dilewati` dan sebab akses |
-| BAB draf | `Belum siap`; tidak menampilkan konten tertutup |
-| TP terikat tetapi belum boleh dibuka | `Terkunci — selesaikan TP sebelumnya` |
-| Diagnostik belum dimulai | `Mulai diagnostik` |
-| Lolos diagnostik | `TP tuntas — lanjut atau pelajari materi sukarela` |
-| Jalur belajar menunggu resume/tugas | `Baca materi`, `Simpan draf`, `Kirim final` |
-| Menunggu penilaian guru | `Menunggu penilaian guru: n item` |
-| Ujian dibatalkan | `Menunggu keputusan guru`; tidak tampil nilai palsu |
-| Seluruh paket tuntas | `Selesai`; lihat nilai dan sertifikat bila tersedia |
+| TP belum Siap | Menunggu TP disiapkan Guru |
+| TP berikutnya terkunci | Selesaikan TP sebelumnya |
+| Diagnostik belum dikerjakan | Mulai Diagnostik |
+| Lolos Diagnostik | TP tuntas — lanjut atau pelajari materi sukarela |
+| Jalur Materi | Baca/tonton, Simpan draf, Kirim final Resume, Kirim final HOTS |
+| Penilaian belum lengkap | Menunggu penilaian Guru: n item |
+| Ujian dibatalkan | Menunggu keputusan Guru; tidak ada nilai |
+| Semester tuntas | Lihat nilai dan sertifikat jika syarat terbit lengkap |
 
-## 8. Tampilan siswa
-S01 Beranda (peta semester/lencana/lanjutkan), S02 Semester (BAB), S03 BAB (TP), S04 TP (langkah), S05 petunjuk ujian, S06 ujian, S07 hasil, S08 materi, S09 resume, S10 HOTS, S11 lencana, S12 nilai, S13 sertifikat. Pengumuman, notifikasi, FAQ dan profil merupakan halaman umum. Navigasi harus dapat digunakan keyboard dan layar HP; sumatif sendiri dibatasi desktop/laptop.
+## 6. Halaman Siswa
+S01 Beranda, S02 Semester (**daftar TP**), S03 **Detail TP dan daftar Materi** (menggantikan layar BAB), S04 langkah TP/diagnostik, S05 petunjuk ujian, S06 ujian, S07 hasil, S08 materi, S09 Resume per Materi, S10 HOTS per Materi, S11 lencana, S12 nilai, S13 sertifikat. Pengumuman/notifikasi/FAQ/profil merupakan halaman umum. Semuanya ramah HP kecuali Sumatif yang memerlukan desktop/laptop fullscreen sebagaimana dokumen 07.
