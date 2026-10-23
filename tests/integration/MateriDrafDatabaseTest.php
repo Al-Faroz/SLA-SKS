@@ -61,9 +61,9 @@ final class MateriDrafDatabaseTest extends TestCase
             $ubah = $this->data();
             $ubah['judul'] = 'Materi QA disunting';
             $this->svc()->simpan(1, (int) $baru['id'], $versi, $ubah);
-            self::assertSame('Materi QA disunting', self::$db->table('materi')->where('id', $baru['id'])->get()->getRow('judul'));
+            self::assertSame('Materi QA disunting', self::$db->table('materi')->where('id', $baru['id'])->get()->getRowArray()['judul']);
             $this->svc()->geser(1, (int) $baru['id'], $versi + 1, 'naik');
-            self::assertSame(1, (int) self::$db->table('materi')->where('id', $baru['id'])->get()->getRow('urutan'));
+            self::assertSame(1, (int) self::$db->table('materi')->where('id', $baru['id'])->get()->getRowArray()['urutan']);
             self::assertSame(2, (int) self::$db->table('materi')->where('id', 1)->get()->getRow('urutan'));
         } finally {
             self::$db->table('materi')->where('tp_id', 1)->where('id !=', 1)->delete();
