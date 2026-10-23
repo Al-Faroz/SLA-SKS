@@ -8,6 +8,9 @@
         <p class="a-proto-muted">Ruang kerja akun Anda untuk mengakses layanan akademik sesuai peran aktif.</p>
     </div>
 </header>
+<?php if ($pesan = session()->getFlashdata('galat')): ?>
+    <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+<?php endif ?>
 <?php if (session()->getFlashdata('sukses')): ?>
     <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
 <?php endif ?>
