@@ -87,6 +87,32 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
         $hasil->assertStatus(403);
     }
 
+    public function testGuruTanpaPenugasanMelihatPetunjukKosong(): void
+    {
+        $hasil = $this->withSession($this->sesi(5))->get('guru/peta-atp');
+        $hasil->assertOK();
+        self::assertStringContainsString('Belum ada penugasan Guru', $hasil->getBody());
+        self::assertStringNotContainsString('TP untuk Guru A', $hasil->getBody());
+    }
+
+    public function testParameterPilihanBukanAngkaDitolak(): void
+    {
+        $hasil = $this->withSession($this->sesi(1))->get('guru/peta-atp?pilihan=abc');
+        $hasil->assertRedirectTo('guru');
+    }
+
+    public function testParameterPilihanNegatifDitolak(): void
+    {
+        $hasil = $this->withSession($this->sesi(1))->get('guru/peta-atp?pilihan=-1');
+        $hasil->assertRedirectTo('guru');
+    }
+
+    public function testGuruNonaktifTidakBisaMembukaPeta(): void
+    {
+        $hasil = $this->withSession($this->sesi(6))->get('guru/peta-atp');
+        $hasil->assertRedirectTo('masuk');
+    }
+
     public function testGuruWajibGantiSandiDialihkan(): void
     {
         $hasil = $this->withSession($this->sesi(4))->get('guru/peta-atp');
