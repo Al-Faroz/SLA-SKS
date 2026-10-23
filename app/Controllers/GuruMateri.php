@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
+use App\Services\BerkasMateriService;
 use App\Services\DetailTpService;
 use App\Services\MateriDrafService;
 use App\Services\NavigasiService;
@@ -12,6 +13,7 @@ use App\Services\VideoMateriService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
+use Throwable;
 
 final class GuruMateri extends BaseController
 {
@@ -141,6 +143,99 @@ final class GuruMateri extends BaseController
             return $this->kembali($tpId, 'Materi draf berhasil diperbarui.', true);
         } catch (DomainException $e) {
             return $this->kembali($tpId, $e->getMessage());
+        }
+    }
+
+    public function unggahMedia(int $tpId, int $materiId): RedirectResponse
+    {
+        $versi = $this->versi();
+        $file = $this->request->getFile('media');
+        if ($versi === null || $file === null) {
+            return $this->kembali($tpId, 'Pilih berkas media dan muat ulang halaman jika versi berubah.');
+        }
+        try {
+            (new BerkasMateriService())->unggah($tpId, $materiId, $versi, $file);
+            return $this->kembali($tpId, 'Media privat berhasil diunggah. Materi tidak otomatis aktif.', true);
+        } catch (DomainException $e) {
+            return $this->kembali($tpId, $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Media Materi gagal disimpan: ' . get_class($e));
+            return $this->kembali($tpId, 'Media gagal diproses. Periksa ukuran, jenis file dan izin folder writable.');
+        }
+    }
+
+    public function bukaMedia(int $tpId, int $materiId): ResponseInterface
+    {
+        try {
+            $berkas = (new BerkasMateriService())->media($tpId, $materiId);
+            $panjang = $berkas['bytes'];
+            $awal = 0;
+            $akhir = $panjang - 1;
+            $range = $this->request->getHeaderLine('Range');
+            if ($range !== '') {
+                if ($berkas['jenis'] !== 'audio'
+                    || preg_match('/^bytes=(\\d*)-(\\d*)$/D', $range, $m) !== 1
+                    || ($m[1] === '' && $m[2] === '')) {
+                    return $this->response->setStatusCode(416)
+                        ->setHeader('Content-Range', 'bytes */' . $panjang)
+                        ->setHeader('Cache-Control', 'private, no-store');
+                }
+                if ($m[1] === '') {
+                    $akhir = $panjang - 1;
+                    $awal = max(0, $panjang - (int) $m[2]);
+                } else {
+                    $awal = (int) $m[1];
+                    $akhir = $m[2] === '' ? $akhir : min($akhir, (int) $m[2]);
+                }
+                if ($awal > $akhir || $awal >= $panjang) {
+                    return $this->response->setStatusCode(416)
+                        ->setHeader('Content-Range', 'bytes */' . $panjang)
+                        ->setHeader('Cache-Control', 'private, no-store');
+                }
+            }
+
+            $length = $akhir - $awal + 1;
+            $fp = @fopen($berkas['path'], 'rb');
+            if ($fp === false) {
+                throw new DomainException('Media tidak dapat dibaca.');
+            }
+            try {
+                if (fseek($fp, $awal) !== 0) {
+                    throw new DomainException('Media tidak dapat dibaca.');
+                }
+                $isi = '';
+                while (strlen($isi) < $length && ! feof($fp)) {
+                    $part = fread($fp, min(65536, $length - strlen($isi)));
+                    if ($part === false || $part === '') {
+                        break;
+                    }
+                    $isi .= $part;
+                }
+            } finally {
+                fclose($fp);
+            }
+            if (strlen($isi) !== $length) {
+                throw new DomainException('Media tidak lengkap.');
+            }
+
+            $res = $this->response
+                ->setStatusCode($range === '' ? 200 : 206)
+                ->setHeader('Content-Type', $berkas['mime'])
+                ->setHeader('Content-Length', (string) $length)
+                ->setHeader('Content-Disposition', 'inline')
+                ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Security-Policy', "default-src 'none'; sandbox")
+                ->setHeader('Accept-Ranges', $berkas['jenis'] === 'audio' ? 'bytes' : 'none')
+                ->setBody($isi);
+            if ($range !== '') {
+                $res->setHeader('Content-Range', 'bytes ' . $awal . '-' . $akhir . '/' . $panjang);
+            }
+            return $res;
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(404)
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody('Media tidak tersedia.');
         }
     }
 
