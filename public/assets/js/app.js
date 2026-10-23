@@ -116,12 +116,11 @@
             file.required = !youtubeDipilih && !adaBerkas;
             file.accept = pdfDipilih ? '.pdf' : gambarDipilih ? '.jpg,.jpeg,.png,.webp' : '.mp3,.m4a';
             if (info) info.textContent = pdfDipilih
-                ? 'PDF maksimal 15 MB / 40 halaman; unggah belum diaktifkan.'
+                ? 'PDF maksimal 15 MB dan 40 halaman. Dokumen dengan skrip, formulir, atau struktur tidak didukung akan ditolak server.'
                 : gambarDipilih ? 'JPG, PNG, WebP maksimal 10 MB.'
                 : 'MP3 atau M4A maksimal 10 MB.';
-            const editPdfLama = form.dataset.materiJenisAwal === 'pdf';
-            submit.disabled = pdfDipilih && !editPdfLama;
-            submit.title = pdfDipilih && !editPdfLama ? 'Upload PDF belum diaktifkan.' : '';
+            submit.disabled = false;
+            submit.title = '';
         }
         jenis.addEventListener('change', () => { file.value = ''; update(); });
         update();
