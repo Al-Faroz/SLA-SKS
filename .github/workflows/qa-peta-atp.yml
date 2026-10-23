@@ -12,6 +12,7 @@ on:
       - 'tests/unit/PetaTpServiceTest.php'
       - 'tests/integration/peta_atp_mysql_smoke.php'
       - 'tests/integration/PetaTpDatabaseTest.php'
+      - 'tests/feature/GuruPetaAtpHttpTest.php'
       - 'tests/fixtures/peta_atp_mysql.sql'
       - '.github/workflows/qa-peta-atp.yml'
   workflow_dispatch:
@@ -46,8 +47,11 @@ jobs:
           php -l app/Config/Routes.php
           php -l tests/unit/PetaTpServiceTest.php
           php -l tests/integration/PetaTpDatabaseTest.php
+          php -l tests/feature/GuruPetaAtpHttpTest.php
       - name: PHPUnit khusus pemilihan penugasan G1
         run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
+      - name: HTTP route dan filter tamu
+        run: vendor/bin/phpunit --no-coverage tests/feature/GuruPetaAtpHttpTest.php
 
   mysql-integration:
     name: Isolasi Gen–Mapel pada MySQL sementara
