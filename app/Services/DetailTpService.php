@@ -24,7 +24,7 @@ final class DetailTpService
     }
 
     /**
-     * @return array{tp:array<string,mixed>,paket:array<string,mixed>,jumlah_materi:int}
+     * @return array{tp:array<string,mixed>,paket:array<string,mixed>,jumlah_materi:int,materi:list<array<string,mixed>>}
      */
     public function lihat(int $tpId): array
     {
@@ -70,8 +70,13 @@ final class DetailTpService
             throw new DomainException('TP tidak tersedia untuk penugasan Anda.');
         }
 
-        $jumlahMateri = $this->db->table('materi')->where('tp_id', $tpId)->countAllResults();
+        $materi = $this->db->table('materi')
+            ->select('id,urutan,judul,jenis,aktif')
+            ->where('tp_id', $tpId)
+            ->orderBy('urutan', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->get()->getResultArray();
 
-        return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => $jumlahMateri];
+        return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => count($materi), 'materi' => $materi];
     }
 }
