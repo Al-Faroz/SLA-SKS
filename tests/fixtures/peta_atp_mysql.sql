@@ -56,12 +56,19 @@ CREATE TABLE tp (
  FOREIGN KEY (paket_semester_id) REFERENCES paket_semester(id)
 ) ENGINE=InnoDB;
 CREATE TABLE materi (
- id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
  tp_id BIGINT UNSIGNED NOT NULL,
+ row_uuid CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
  urutan SMALLINT UNSIGNED NOT NULL,
  judul VARCHAR(180) NOT NULL,
  jenis ENUM('pdf','audio','gambar','youtube') NOT NULL,
+ petunjuk_resume TEXT NOT NULL,
+ petunjuk_hots TEXT NULL,
+ min_waktu_detik SMALLINT UNSIGNED NOT NULL,
+ url_youtube VARCHAR(255) NULL,
+ berkas_id BIGINT UNSIGNED NULL,
  aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
+ UNIQUE KEY uq_materi_row_uuid (row_uuid),
  FOREIGN KEY (tp_id) REFERENCES tp(id)
 ) ENGINE=InnoDB;
 
@@ -77,4 +84,6 @@ INSERT INTO tp VALUES
 (1,1,'TP-01','TP untuk Guru A','Rumusan uji','Indikator uji',1,'draf',1),
 (2,2,'TP-02','TP untuk Guru B','Rumusan uji','Indikator uji',1,'draf',1);
 
-INSERT INTO materi (id,tp_id,urutan,judul,jenis,aktif) VALUES (1,1,1,'Materi Uji A','pdf',1),(2,2,1,'Materi Uji B','youtube',1);
+INSERT INTO materi (id,tp_id,row_uuid,urutan,judul,jenis,petunjuk_resume,petunjuk_hots,min_waktu_detik,url_youtube,berkas_id,aktif) VALUES
+(1,1,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',1,'Materi Uji A','pdf','Resume Uji A','HOTS Uji A',0,NULL,NULL,1),
+(2,2,'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',1,'Materi Uji B','youtube','Resume Uji B','HOTS Uji B',0,'https://youtu.be/abcdefghijk',NULL,1);
