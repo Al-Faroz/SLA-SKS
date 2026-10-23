@@ -71,3 +71,24 @@ Penghapusan Materi draf kini memiliki form POST+CSRF dan pemeriksaan versi, konf
 QA tambahan: tests/integration/MateriHapusDatabaseTest.php memeriksa hapus di tengah, penolakan versi lama, TP Siap, Guru Gen lain dan ID Materi dari TP lain. Pengujian lokal: periksa konfirmasi Hapus/Batal, urutan setelah Hapus, file PDF chooser, empat kolom tindakan pada desktop, dan scroll pada HP.
 
 CI: QA Berkas Materi #39933983805, QA Materi Draf #39933983584, QA Peta ATP #39933983544, QA Pratinjau YouTube #39933983587 dan QA Rincian TP #39933983578 — semuanya PASS.
+
+## Revisi final PDF dan pratinjau seluruh media — 23 Oktober 2026
+
+**Bagian ini menggantikan catatan sebelumnya yang menyatakan penyimpanan PDF belum aktif.** Form PDF kini bisa dikirim; Service memvalidasi PDF terlebih dahulu, lalu menyimpan Materi dan berkas dalam satu transaksi privat.
+
+- Validasi PDF: maksimal 15 MiB dan 40 halaman; MIME asli, ekstensi .pdf, header, footer, tabel referensi xref klasik, katalog, halaman, serta daftar halaman konsisten. Dokumen dengan JavaScript, OpenAction, formulir, lampiran, revisi inkremental, berkas terenkripsi, nama PDF tersamarkan atau struktur yang tidak didukung **ditolak (fail closed)**.
+- **Batas kompatibilitas:** Validasi ini konservatif untuk PDF dengan xref klasik dan objek terbuka. PDF modern dengan object stream/xref stream, fitur lanjutan, atau format rumit bisa ditolak walaupun di bawah 15 MB/40 halaman. Pesan penolakan tidak berarti ukuran selalu melebihi batas. Jangan melonggarkan validasi menggunakan hitungan regex halaman saja.
+- Metadata: `berkas.halaman` diisi jumlah halaman sesungguhnya pada PDF yang diterima, checksum SHA-256 tersimpan, berkas fisik di `writable/uploads/materi`. Tidak ada perubahan SQL.
+- Pratinjau Guru: halaman `guru/tp/{tpId}/materi/{materiId}/pratinjau` sekarang mencakup **YouTube, PDF, Audio dan Gambar** dengan breadcrumb, judul, status Nonaktif, pemutar/pembaca, serta tombol kembali seperti halaman YouTube. File PDF/audio/gambar dimuat melalui endpoint GET media privat (bukan path file fisik atau aset publik). PDF memakai pembaca bawaan browser dan fallback buka tab baru. HTTP Range kini didukung untuk PDF dan audio.
+- QA unit `tests/unit/PdfMateriValidatorTest.php` menguji PDF 1 halaman, 40 halaman, 41 halaman, aksi JavaScript, escaped-name, ekstensi salah dan file palsu. QA integrasi `tests/integration/BerkasMateriUnggahTest.php` juga menguji simpan PDF beserta metadata halaman dan penolakan PDF berisi skrip tanpa baris/file tersisa.
+- Formulir file PDF sekarang tidak menonaktifkan submit. Validasi ukuran/jumlah halaman tetap berada di server; jenis media berbeda tidak dapat mengirim file yang salah. Modalitas kontrol tampilan tidak menggantikan keamanan server.
+
+**Checklist XAMPP tambahan:**
+1. Tambah Materi PDF menggunakan PDF klasik yang berisi 1–40 halaman, ukuran tidak lebih dari 15 MB; tombol Simpan harus aktif, penyimpanan berhasil dan Materi muncul sebagai Nonaktif.
+2. Pratinjau PDF dari daftar membuka halaman Guru, menampilkan pembaca PDF atau fallback tab baru dengan autentikasi Guru. Gunakan PDF sendiri, bukan dokumen siswa.
+3. Pratinjau Audio dengan kontrol play/pause/seek dan Gambar dengan skala responsif. Periksa banner Nonaktif, breadcrumb dan tombol kembali pada semua media.
+4. Uji PDF lebih dari 40 halaman, PDF palsu/terpotong/berisi JavaScript, dan PDF dengan struktur modern yang tidak didukung: server harus menolak tanpa membuat Materi atau metadata yatim.
+5. Guru Gen lain tidak boleh mengakses pratinjau/media PDF/audio/gambar milik Gen yang bukan tugasnya; TP Siap tidak dapat diubah.
+6. Pastikan URL privat `/writable/uploads/materi/` tidak dapat diakses langsung. Jangan merger sampai semua hasil uji browser didokumentasikan.
+
+**Catatan:** tes otomatis tidak mensimulasikan viewer PDF nyata di Chrome/Firefox atau konfigurasi CSP Apache XAMPP. Ini wajib diperiksa manual.
