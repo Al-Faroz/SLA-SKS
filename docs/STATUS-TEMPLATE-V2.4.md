@@ -1,20 +1,30 @@
 # Status dua template referensi v2.4
 
-**PENTING: PR Master v2.4 belum boleh digabung sebelum dua file biner berikut benar-benar ada di `docs/` pada branch PR.**
+**Disetujui pemilik pada 23 Oktober 2026 setelah membuka kedua berkas hasil regenerasi.** Persetujuan isi/template **tidak berarti** kedua berkas sudah terunggah ke GitHub. Jangan merge sampai keduanya ada di `docs/` pada branch PR dan hash cocok.
 
-File telah dibuat dari artefak hasil diskusi dan diverifikasi di lingkungan pembuatan. Pengunggahan biner ke GitHub **belum diselesaikan** oleh konektor penulisan file teks yang tersedia pada sesi pembuatan Master Document; tautan lokal ChatGPT bukan pengganti file GitHub.
-
-| Lokasi final di repository | SHA-256 hasil lokal | Ukuran |
+| Lokasi final di repository | SHA-256 file yang disetujui | Ukuran |
 |---|---|---:|
-| `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` | `ed8ecb3d3200fbe43709a1e7a4ef0d8044ea38b10f546505558b5657667af2e1` | 58.229 byte |
-| `docs/TEMPLATE_SOAL_SLA-SKS.docx` | `c71b68793cde4530b92024932509e828b5639de21d0ca80e981bddd9eaf417b3` | 36.338 byte |
+| `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` | `5eaac8698d3ddb3819055720a498002c1a83776114aec6ca3a7d3104dfa27d00` | 58.063 byte |
+| `docs/TEMPLATE_SOAL_SLA-SKS.docx` | `e476f6a524202d8a06f72d6c23d7a0dc6dd70243f3c1b18e53ffcc6f637687a3` | 36.241 byte |
 
-## Pemeriksaan yang dilakukan
-- Excel: 10 worksheet seperti desain Guru (MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII); 97 label/kalimat lama dibersihkan dari konsep BAB. Setelah ekspor masih ada 1.050 formula dan 26 aturan data validation, sama seperti referensi sebelumnya. String Subbab tetap benar karena merupakan istilah Materi/Submateri.
-- Word: 10 contoh soal PG pada master dengan opsi A–E, tepat satu ✓ dari sumber contoh, satu Equation Word/OMML, satu gambar, dan tabel tertanam; metadata marker sudah `SLA-SKS-WORD-V1` tersembunyi; dirender sebagai 6 halaman dan ditinjau pratinjau halaman.
-- Dua file **bukan hasil unduhan Guru nyata**. Generator CI4 belum dibuat dan harus mengisi Gen/Guru/Mapel/Kurikulum/CP pada Excel, serta jenis ujian/TP/jumlah slot soal pada Word. Bank Word Master berisi contoh dan tidak boleh diimpor sebagai data akademik sungguhan.
+Hash ini **menggantikan hash lama** dari regenerasi sebelumnya; hash setiap hasil unduhan dinamis dari aplikasi kelak tentu berbeda.
 
-## Gate PR
-1. Unggah dua file dengan nama persis sesuai tabel di atas **ke branch dokumentasi** (bukan data siswa/CP nyata) sebelum merge, dan cek hash jika bytes tetap.
-2. Buka kedua berkas di Excel/Word; periksa sheet/formula/dropdown serta isi Equation/gambar/tabel Word.
-3. Setelah Master dokumen dinyatakan PASS, kerjakan implementasi database dan kode pada PR terpisah; template dinamis belum dinyatakan selesai.
+## Pemeriksaan berkas yang disetujui
+- Excel: 10 sheet (MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII), **1.050 formula** dan **26 validasi** terdeteksi; struktur contoh dan dropdown tetap.
+- Word: dokumen contoh berisi 10 soal PG lima opsi A–E, satu kunci per contoh, satu Equation Word/OMML dan satu berkas media gambar. Pemilik menyetujui isi sebagai **contoh referensi saja**.
+- Kedua file dibuka dan dinyatakan FIX oleh pemilik. Uji generator serta parser di aplikasi CI4 **belum** dilakukan.
+
+## Ketentuan generator Word yang tidak boleh dilanggar
+1. `docs/TEMPLATE_SOAL_SLA-SKS.docx` adalah **referensi dengan contoh soal dan jawabannya**, bukan file unduhan Guru apa adanya.
+2. Guru memilih TP terotorisasi serta jenis **Diagnostik** atau **Sumatif**. Jumlah slot mengikuti **jumlah bank soal yang diisi di aplikasi** untuk TP dan jenis tersebut; jangan menyalin 10 soal contoh atau menganggap angka contoh sebagai batas bank.
+3. File DOCX unduhan Guru harus berisi **semua slot soal kosong**, termasuk stem, pilihan A–E dan tanda jawaban benar; tidak boleh memuat teks/kunci contoh.
+4. Pertahankan struktur `Bagian | Isi | Benar`, identitas otomatis Guru/Gen/Mapel/Kurikulum/Semester/TP/jenis ujian, dan marker `SLA-SKS-WORD-V1` yang divalidasi di server.
+5. Dua tombol unduh berbeda; satu parser aman dan satu kontrak yang sama saat impor. Konten Word kaya OMML/gambar/tabel bersarang/Unicode/Drive dari isian Guru wajib didukung.
+6. Generator dan parser Word tetap **target implementasi**, bukan fitur runtime yang sudah jadi.
+
+## Gate sebelum merge
+- [x] Pemilik membuka dan menyetujui kedua file regenerasi.
+- [x] Pemeriksaan struktur formula, dropdown dan arsip Office pada berkas lokal.
+- [ ] Unggah file biner tersebut ke **branch** `docs/master-v2-4-atp-tp-materi`, masing-masing di `docs/`.
+- [ ] Unduh dari GitHub dan cocokkan SHA-256, ukuran, serta buka lagi dokumen hasil unduh.
+- [ ] Tinjau PR; **jangan merge** jika kedua file masih tidak ada.
