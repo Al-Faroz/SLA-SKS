@@ -42,7 +42,7 @@ final class MateriDrafDatabaseTest extends TestCase
             'jenis' => 'youtube',
             'petunjuk_resume' => 'Tuliskan resume singkat dari media.',
             'petunjuk_hots' => 'Analisis dan jelaskan alasan pilihanmu.',
-            'min_waktu_detik' => '60',
+            'min_waktu_menit' => '1.5',
             'url_youtube' => 'https://www.youtube.com/watch?v=abcdefghijk',
         ];
     }
@@ -56,6 +56,7 @@ final class MateriDrafDatabaseTest extends TestCase
             self::assertNotNull($baru);
             self::assertSame(2, (int) $baru['urutan']);
             self::assertSame(0, (int) $baru['aktif']);
+            self::assertSame(90, (int) $baru['min_waktu_detik']);
             self::assertSame(32, strlen($baru['row_uuid']));
             $versi = (int) $awal['struktur_versi'] + 1;
             $ubah = $this->data();
@@ -70,6 +71,22 @@ final class MateriDrafDatabaseTest extends TestCase
             self::$db->table('materi')->where('id', 1)->update(['urutan' => 1]);
             self::$db->table('tp')->where('id', 1)->update(['struktur_versi' => $awal['struktur_versi']]);
         }
+    }
+
+    public function testMenitDesimalMelebihiKapasitasDitolak(): void
+    {
+        $data = $this->data();
+        $data['min_waktu_menit'] = '1092.26';
+        $this->expectException(DomainException::class);
+        $this->svc()->tambah(1, 1, $data);
+    }
+
+    public function testNilaiMenitTidakValidDitolak(): void
+    {
+        $data = $this->data();
+        $data['min_waktu_menit'] = '-1';
+        $this->expectException(DomainException::class);
+        $this->svc()->tambah(1, 1, $data);
     }
 
     public function testVersiLamaDitolakTanpaMenyisipkanMateri(): void
