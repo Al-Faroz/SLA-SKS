@@ -43,4 +43,4 @@ jobs:
           php -l app/Config/Routes.php
           php -l tests/unit/PetaTpServiceTest.php
       - name: PHPUnit khusus pemilihan penugasan G1
-        run: vendor/bin/phpunit tests/unit/PetaTpServiceTest.php
+        run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
