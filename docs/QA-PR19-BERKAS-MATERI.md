@@ -31,3 +31,11 @@ Skema diverifikasi secara statis dari **dump bersih v2.4 privat** yang tersedia 
 10. Uji responsif desktop/HP dan akses langsung `http://localhost/sla-sks/writable/uploads/materi/` (harus 403/404).
 
 **PR Draft, tidak merge sebelum hasil CI dan uji XAMPP diperiksa.**
+
+## QA lanjutan — unggah aktual di Service (CI)
+
+Ditambahkan `tests/integration/BerkasMateriUnggahTest.php` dengan file PNG anonim hasil GD dan fixture MySQL sementara: unggah menghasilkan metadata berkas, checksum, nama acak dan versi TP berikutnya; unggah versi kadaluarsa tidak menyisakan file/metadata; Guru Gen lain dan TP Siap ditolak. Untuk file CLI, PHPUnit memakai subclass `UploadedFile` **hanya pada fixture** karena `is_uploaded_file()` memang tidak berlaku untuk file yang dibuat CLI; perlindungan produksi tidak diubah.
+
+GitHub Actions [QA Berkas #39927697636](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39927697636) **PASS**: validasi 8 tes/10 assertions, regresi Materi 11 tes/18 assertions, akses baca 4 tes/6 assertions, integrasi unggah 4 tes/12 assertions. Pengujian ini tidak menggantikan uji POST browser/Apache/PHP XAMPP maupun pemeriksaan streaming HTTP Range secara nyata.
+
+Dukungan unggah PDF masih **belum dikerjakan** karena parser PDF yang menghitung halaman dan memeriksa tindakan aktif secara aman belum tersedia sebagai dependensi yang teruji pada shared hosting. Jangan menganggap berkas PDF telah diterima oleh Service.
