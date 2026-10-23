@@ -36,6 +36,24 @@ final class PetaTpService
         return (int) $akun['id'];
     }
 
+
+    /**
+     * Memilih hanya dari daftar G1 terotorisasi, tanpa menganggap indeks GET
+     * sebagai identitas Gen atau mapel. Pengecekan Service tetap dilakukan ulang.
+     *
+     * @param list<array<string,mixed>> $penugasan
+     * @return array<string,mixed>|null
+     */
+    public static function pilihPenugasan(array $penugasan, ?int $nomor): ?array
+    {
+        $nomor ??= 0;
+        if ($nomor < 0 || ($nomor !== 0 && ! array_key_exists($nomor, $penugasan))) {
+            throw new DomainException('Penugasan Guru tidak ditemukan.');
+        }
+
+        return $penugasan[$nomor] ?? null;
+    }
+
     /**
      * @return list<array<string,mixed>>
      */
