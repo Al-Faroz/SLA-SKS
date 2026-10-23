@@ -1,0 +1,62 @@
+name: QA Materi Draf v2.4
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/MateriDrafService.php'
+      - 'app/Controllers/GuruMateri.php'
+      - 'app/Services/DetailTpService.php'
+      - 'app/Views/guru/**'
+      - 'app/Config/Routes.php'
+      - 'tests/integration/MateriDrafDatabaseTest.php'
+      - 'tests/fixtures/peta_atp_mysql.sql'
+      - '.github/workflows/qa-materi-draf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  materi-draf:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom
+          coverage: none
+      - name: Instal dependensi terkunci
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP Materi
+        run: |
+          php -l app/Services/MateriDrafService.php
+          php -l app/Controllers/GuruMateri.php
+          php -l app/Services/DetailTpService.php
+          php -l app/Views/guru/_materi_fields.php
+          php -l app/Views/guru/materi_edit.php
+          php -l app/Views/guru/detail_tp.php
+          php -l tests/integration/MateriDrafDatabaseTest.php
+      - name: Siapkan database anonim
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
+      - name: Integrasi Service Materi dan kontrol versi
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/MateriDrafDatabaseTest.php
+      - name: Regresi Detail TP
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/DetailTpDatabaseTest.php

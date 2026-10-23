@@ -27,6 +27,10 @@ $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)', 'GuruDetailTp::simpan/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi', 'GuruMateri::tambah/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/materi/(:num)/edit', 'GuruMateri::edit/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi/(:num)', 'GuruMateri::simpan/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi/(:num)/urut', 'GuruMateri::urut/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
 $routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan']);
 // K2B v2.3 — satu autentikasi, dua ruang administrasi akun.
