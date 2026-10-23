@@ -7,7 +7,7 @@ File telah dibuat dari artefak hasil diskusi dan diverifikasi di lingkungan pemb
 | Lokasi final di repository | SHA-256 hasil lokal | Ukuran |
 |---|---|---:|
 | `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` | `ed8ecb3d3200fbe43709a1e7a4ef0d8044ea38b10f546505558b5657667af2e1` | 58.229 byte |
-| `docs/TEMPLATE_SOAL_SLA-SKS.docx` | `8298069447fdcd30e0efc2255684a33ce00f9945b24001d823502866f1379af5` | 36.147 byte |
+| `docs/TEMPLATE_SOAL_SLA-SKS.docx` | `c71b68793cde4530b92024932509e828b5639de21d0ca80e981bddd9eaf417b3` | 36.338 byte |
 
 ## Pemeriksaan yang dilakukan
 - Excel: 10 worksheet seperti desain Guru (MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII); 97 label/kalimat lama dibersihkan dari konsep BAB. Setelah ekspor masih ada 1.050 formula dan 26 aturan data validation, sama seperti referensi sebelumnya. String Subbab tetap benar karena merupakan istilah Materi/Submateri.
