@@ -1,6 +1,6 @@
 # Status dua template referensi v2.4
 
-**Disetujui pemilik pada 23 Oktober 2026 setelah membuka kedua berkas hasil regenerasi.** Persetujuan isi/template **tidak berarti** kedua berkas sudah terunggah ke GitHub. Jangan merge sampai keduanya ada di `docs/` pada branch PR dan hash cocok.
+**Disetujui pemilik pada 23 Oktober 2026 setelah membuka kedua berkas hasil regenerasi.** Kedua berkas **sudah ada** di `docs/` pada branch PR sejak commit `0ea34fbaa18aae27b789f26a524820d72c4fb3e9`. Konten biner pada `main` dan branch v2.4 memiliki blob Git identik. Pemeriksaan hash SHA-256 dilakukan atas artefak lokal final yang disetujui; pemeriksaan ulang unduhan biner dari GitHub tetap dicatat terpisah.
 
 | Lokasi final di repository | SHA-256 file yang disetujui | Ukuran |
 |---|---|---:|
@@ -25,6 +25,6 @@ Hash ini **menggantikan hash lama** dari regenerasi sebelumnya; hash setiap hasi
 ## Gate sebelum merge
 - [x] Pemilik membuka dan menyetujui kedua file regenerasi.
 - [x] Pemeriksaan struktur formula, dropdown dan arsip Office pada berkas lokal.
-- [ ] Unggah file biner tersebut ke **branch** `docs/master-v2-4-atp-tp-materi`, masing-masing di `docs/`.
-- [ ] Unduh dari GitHub dan cocokkan SHA-256, ukuran, serta buka lagi dokumen hasil unduh.
-- [ ] Tinjau PR; **jangan merge** jika kedua file masih tidak ada.
+- [x] Dua berkas biner berada di **branch** `docs/master-v2-4-atp-tp-materi`, masing-masing di `docs/` (Git blob identik dengan `main`).
+- [ ] Unduh kembali dari GitHub dan cocokkan SHA-256/ukuran serta buka dokumen hasil unduh (verifikasi Git blob antarbranch telah PASS, tetapi verifikasi SHA-256 hasil download GitHub belum dilaksanakan).
+- [ ] Tinjau perubahan PR dan verifikasi unduhan GitHub; **jangan merge** sebelum seluruh pemeriksaan wajib selesai.
