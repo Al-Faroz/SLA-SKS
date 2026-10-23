@@ -28,17 +28,16 @@ final class BerkasMateriValidatorTest extends TestCase
         return $path;
     }
 
-    public function testValidasiGambarJpg(): void
+    public function testValidasiGambarPng(): void
     {
-        $raw = base64_decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////2wBDAf//////////////////////////////////////////////////////////////////////////////////////wAARCAAIAAgDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAABAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCfAAD/2Q==');
-        $path = $this->file($raw);
-        $info = @getimagesize($path);
-        if ($info === false) {
-            self::markTestSkipped('Fixture JPEG tidak dikenali oleh pustaka GD/Exif lingkungan ini.');
-        }
-        $v = BerkasMateriService::validasi($path, 'gambar', 'foto.jpg');
-        self::assertSame('image/jpeg', $v['mime']);
-        self::assertSame('jpg', $v['ext']);
+        $img = imagecreatetruecolor(20, 20);
+        $path = tempnam(sys_get_temp_dir(), 'qa-gambar-');
+        $this->temp[] = $path;
+        imagepng($img, $path);
+        imagedestroy($img);
+        $v = BerkasMateriService::validasi($path, 'gambar', 'foto.png');
+        self::assertSame('image/png', $v['mime']);
+        self::assertSame('png', $v['ext']);
     }
 
     public function testValidasiMp3HeaderId3(): void
