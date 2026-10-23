@@ -1,0 +1,57 @@
+name: QA Berkas Materi Privat v2.4
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/BerkasMateriService.php'
+      - 'app/Controllers/GuruMateri.php'
+      - 'app/Views/guru/**'
+      - 'app/Config/Routes.php'
+      - 'tests/unit/BerkasMateriValidatorTest.php'
+      - 'tests/fixtures/peta_atp_mysql.sql'
+      - '.github/workflows/qa-berkas-materi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  berkas-materi:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports: 
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/BerkasMateriService.php
+          php -l app/Controllers/GuruMateri.php
+          php -l app/Views/guru/materi_edit.php
+          php -l app/Views/guru/detail_tp.php
+          php -l tests/unit/BerkasMateriValidatorTest.php
+      - name: Validasi file
+        run: vendor/bin/phpunit --no-coverage tests/unit/BerkasMateriValidatorTest.php
+      - name: Database fixture
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
+      - name: Regresi Materi draf
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/MateriDrafDatabaseTest.php
