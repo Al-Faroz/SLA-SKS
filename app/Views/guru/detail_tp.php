@@ -87,6 +87,9 @@
                                 <td><?= esc($item['jenis']) ?></td>
                                 <td><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
                                 <td>
+                                    <?php if ($item['jenis'] === 'youtube' && ! empty($item['url_youtube'])): ?>
+                                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>">Pratinjau</a>
+                                    <?php endif ?>
                                     <?php if ($tp['status'] === 'draf'): ?>
                                         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
                                         <?php foreach (['naik' => 'Naik', 'turun' => 'Turun'] as $arah => $label): ?>
