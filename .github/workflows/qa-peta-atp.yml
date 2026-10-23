@@ -10,6 +10,8 @@ on:
       - 'app/Services/NavigasiService.php'
       - 'app/Config/Routes.php'
       - 'tests/unit/PetaTpServiceTest.php'
+      - 'tests/integration/peta_atp_mysql_smoke.php'
+      - 'tests/fixtures/peta_atp_mysql.sql'
       - '.github/workflows/qa-peta-atp.yml'
   workflow_dispatch:
 
@@ -44,3 +46,32 @@ jobs:
           php -l tests/unit/PetaTpServiceTest.php
       - name: PHPUnit khusus pemilihan penugasan G1
         run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
+
+  mysql-integration:
+    name: Isolasi Gen–Mapel pada MySQL sementara
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siapkan PHP dengan mysqli
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli
+          coverage: none
+      - name: Muat SQL sintetis ke database sementara
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
+      - name: Uji query dan pemisahan akses G1
+        run: php tests/integration/peta_atp_mysql_smoke.php
