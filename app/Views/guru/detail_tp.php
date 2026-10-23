@@ -31,18 +31,67 @@
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="rumusan-tp">
         <h2 id="rumusan-tp">Rumusan dan indikator</h2>
-        <h3>Rumusan TP</h3>
-        <p><?= nl2br(esc($tp['rumusan'] ?? '')) ?></p>
-        <h3>Indikator</h3>
-        <p><?= nl2br(esc($tp['indikator'] ?? '')) ?></p>
+        <?php if (session()->getFlashdata('sukses')): ?>
+            <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
+        <?php endif ?>
+        <?php if (session()->getFlashdata('galat')): ?>
+            <div class="a-alert" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
+        <?php endif ?>
+        <?php if ($tp['status'] === 'draf'): ?>
+            <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>" class="a-form">
+                <?= csrf_field() ?>
+                <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
+                <div class="a-field">
+                    <label for="tp-judul" class="a-label">Judul TP</label>
+                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="180" required value="<?= esc($tp['judul'], 'attr') ?>">
+                </div>
+                <div class="a-field">
+                    <label for="tp-rumusan" class="a-label">Rumusan TP</label>
+                    <textarea id="tp-rumusan" name="rumusan" rows="5" maxlength="20000" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
+                </div>
+                <div class="a-field">
+                    <label for="tp-indikator" class="a-label">Indikator ketercapaian</label>
+                    <textarea id="tp-indikator" name="indikator" rows="5" maxlength="20000" required><?= esc($tp['indikator'] ?? '') ?></textarea>
+                </div>
+                <button class="a-btn a-btn--utama" type="submit">Simpan draf TP</button>
+            </form>
+        <?php else: ?>
+            <div class="a-alert" role="status">TP sudah Siap. Perubahan melalui editor draf tidak diizinkan.</div>
+            <h3>Rumusan TP</h3>
+            <p><?= nl2br(esc($tp['rumusan'] ?? '')) ?></p>
+            <h3>Indikator</h3>
+            <p><?= nl2br(esc($tp['indikator'] ?? '')) ?></p>
+        <?php endif ?>
         <?php if ($jumlah_materi === 0): ?>
             <div class="a-empty" role="status">
                 <strong>Belum ada Materi/Submateri.</strong>
                 <p>Struktur TP sudah terdaftar, tetapi belum memiliki materi. Penyusunan materi akan tersedia dalam tahap berikutnya.</p>
             </div>
         <?php endif ?>
-        <p class="a-help">Halaman ini hanya menampilkan data. Tidak ada perubahan pada TP atau Materi.</p>
+        <p class="a-help">Penyuntingan ini hanya untuk redaksi TP draf. Perubahan urutan ATP, tautan CP, struktur Materi dan publikasi menggunakan alur tersendiri.</p>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Kembali ke Peta ATP</a>
+    </section>
+    <section class="a-card a-jarak-atas" aria-labelledby="daftar-materi">
+        <h2 id="daftar-materi">Daftar Materi/Submateri</h2>
+        <?php if ($materi === []): ?>
+            <div class="a-empty" role="status"><p>Belum ada Materi/Submateri untuk TP ini.</p></div>
+        <?php else: ?>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl">
+                    <thead><tr><th scope="col">Urutan</th><th scope="col">Judul</th><th scope="col">Jenis</th><th scope="col">Status</th></tr></thead>
+                    <tbody>
+                        <?php foreach ($materi as $item): ?>
+                            <tr>
+                                <td><?= (int) $item['urutan'] ?></td>
+                                <td><?= esc($item['judul']) ?></td>
+                                <td><?= esc($item['jenis']) ?></td>
+                                <td><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif ?>
     </section>
 </div>
 <?= $this->endSection() ?>
