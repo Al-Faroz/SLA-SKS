@@ -68,7 +68,14 @@ final class BerkasMateriUnggahTest extends TestCase
 
     private function uploaded(): UploadedFile
     {
-        return new UploadedFile($this->tmp, 'gambar.png', 'image/png', filesize($this->tmp), UPLOAD_ERR_OK);
+        // Pada CLI file uji bukan hasil HTTP POST; hanya simulasi status isValid.
+        // Jalur produksi tetap memakai UploadedFile asli dan is_uploaded_file().
+        return new class ($this->tmp, 'gambar.png', 'image/png', filesize($this->tmp), UPLOAD_ERR_OK) extends UploadedFile {
+            public function isValid(): bool
+            {
+                return true;
+            }
+        };
     }
 
     public function testUnggahMembuatMetadataDanSimpanPrivat(): void
