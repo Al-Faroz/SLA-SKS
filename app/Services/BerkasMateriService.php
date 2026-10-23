@@ -46,6 +46,15 @@ final class BerkasMateriService
             throw new DomainException('Format berkas tidak dapat dikenali.');
         }
 
+        if ($jenis === 'pdf') {
+            if ($ext !== 'pdf' || $mime !== 'application/pdf') {
+                throw new DomainException('Hanya berkas PDF asli yang diperbolehkan.');
+            }
+            $halaman = PdfMateriValidator::periksa($path);
+            return ['mime' => 'application/pdf', 'ext' => 'pdf',
+                'bytes' => $size, 'halaman' => $halaman, 'durasi_detik' => null];
+        }
+
         if ($jenis === 'gambar') {
             if ($size > 10 * 1024 * 1024 || ! in_array($ext, ['jpg', 'jpeg', 'png', 'webp'], true)
                 || ! in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) {
@@ -82,7 +91,7 @@ final class BerkasMateriService
                 'bytes' => $size, 'halaman' => null, 'durasi_detik' => null];
         }
 
-        throw new DomainException('Unggah PDF memerlukan pemeriksaan halaman khusus dan belum diaktifkan.');
+        throw new DomainException('Jenis media pembelajaran tidak didukung.');
     }
 
     /** @return array{path:string,mime:string,bytes:int} */
@@ -151,8 +160,8 @@ final class BerkasMateriService
             throw new DomainException('Berkas unggahan tidak sah.');
         }
         $data = (new MateriDrafService($this->db))->bersihkan($input);
-        if (! in_array($data['jenis'], ['gambar', 'audio'], true)) {
-            throw new DomainException('Unggah langsung hanya untuk gambar dan audio.');
+        if (! in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
+            throw new DomainException('Unggah langsung hanya untuk PDF, Gambar dan Audio.');
         }
         // Penugasan diperiksa sebelum penyimpanan fisik dan di bawah lock TP.
         $rincian = $this->detail->lihat($tpId);
@@ -184,7 +193,7 @@ final class BerkasMateriService
                 'mime' => $baru['mime'],
                 'ukuran_byte' => $baru['bytes'],
                 'checksum' => hash_file('sha256', $baru['path']),
-                'halaman' => null,
+                'halaman' => $valid['halaman'],
                 'durasi_detik' => null,
                 'dibuat_pada' => gmdate('Y-m-d H:i:s'),
             ]);
@@ -221,7 +230,7 @@ final class BerkasMateriService
         }
         $data = (new MateriDrafService($this->db))->bersihkan($input);
         if (! in_array($data['jenis'], ['gambar', 'audio'], true)) {
-            throw new DomainException('Berkas harus berupa Gambar atau Audio.');
+            throw new DomainException('Berkas harus berupa PDF, Gambar atau Audio.');
         }
         $rincian = $this->detail->lihat($tpId);
         if ($rincian['tp']['status'] !== 'draf') {
@@ -261,7 +270,7 @@ final class BerkasMateriService
                 'mime' => $baru['mime'],
                 'ukuran_byte' => $baru['bytes'],
                 'checksum' => hash_file('sha256', $baru['path']),
-                'halaman' => null,
+                'halaman' => $v['halaman'],
                 'durasi_detik' => null,
                 'dibuat_pada' => gmdate('Y-m-d H:i:s'),
             ]);
@@ -298,8 +307,8 @@ final class BerkasMateriService
                 break;
             }
         }
-        if ($materi === null || ! in_array($materi['jenis'], ['gambar', 'audio'], true)) {
-            throw new DomainException('Hanya Materi gambar/audio pada TP ini yang dapat diunggah.');
+        if ($materi === null || ! in_array($materi['jenis'], ['pdf', 'gambar', 'audio'], true)) {
+            throw new DomainException('Hanya Materi PDF/gambar/audio pada TP ini yang dapat diunggah.');
         }
         $v = self::validasi($file->getTempName(), $materi['jenis'], $file->getClientName());
         $baru = $this->tulisPrivat($file->getTempName(), $materi['jenis'], $v);
@@ -323,7 +332,7 @@ final class BerkasMateriService
                 'mime' => $baru['mime'],
                 'ukuran_byte' => $baru['bytes'],
                 'checksum' => hash_file('sha256', $baru['path']),
-                'halaman' => null,
+                'halaman' => $v['halaman'],
                 'durasi_detik' => null,
                 'dibuat_pada' => gmdate('Y-m-d H:i:s'),
             ]);
@@ -357,21 +366,24 @@ final class BerkasMateriService
                 break;
             }
         }
-        if ($materi === null || ! in_array($materi['jenis'], ['gambar', 'audio'], true)
+        if ($materi === null || ! in_array($materi['jenis'], ['pdf', 'gambar', 'audio'], true)
             || ! isset($materi['berkas_id']) || $materi['berkas_id'] === null) {
             throw new DomainException('Media Materi tidak tersedia.');
         }
         $berkas = $this->db->table('berkas')->where('id', (int) $materi['berkas_id'])
             ->where('tp_id', $tpId)->get()->getRowArray();
-        if ($berkas === null || ! preg_match('/^[0-9a-f]{48}\.(?:jpg|png|webp|mp3|m4a)$/D', $berkas['nama_acak'])) {
+        if ($berkas === null || ! preg_match('/^[0-9a-f]{48}\.(?:pdf|jpg|png|webp|mp3|m4a)$/D', $berkas['nama_acak'])) {
             throw new DomainException('Metadata media tidak tersedia.');
         }
         $path = $this->folder . DIRECTORY_SEPARATOR . $berkas['nama_acak'];
         if (! is_file($path) || ! is_readable($path) || (int) filesize($path) !== (int) $berkas['ukuran_byte']) {
             throw new DomainException('Berkas fisik media tidak ditemukan.');
         }
-        if (! in_array($berkas['mime'], $materi['jenis'] === 'gambar'
-            ? ['image/jpeg', 'image/png', 'image/webp'] : ['audio/mpeg', 'audio/mp4'], true)) {
+        if (! in_array($berkas['mime'], match ($materi['jenis']) {
+            'pdf' => ['application/pdf'],
+            'gambar' => ['image/jpeg', 'image/png', 'image/webp'],
+            'audio' => ['audio/mpeg', 'audio/mp4'],
+        }, true)) {
             throw new DomainException('MIME media tidak sesuai dengan Materi.');
         }
         return ['path' => $path, 'mime' => $berkas['mime'],
