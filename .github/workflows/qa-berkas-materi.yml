@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'app/Services/BerkasMateriService.php'
+      - 'app/Services/PdfMateriValidator.php'
       - 'app/Controllers/GuruMateri.php'
       - 'app/Views/guru/**'
       - 'app/Config/Routes.php'
       - 'tests/unit/BerkasMateriValidatorTest.php'
+      - 'tests/unit/PdfMateriValidatorTest.php'
       - 'tests/integration/BerkasMateriAksesTest.php'
       - 'tests/integration/BerkasMateriUnggahTest.php'
       - 'tests/integration/MateriHapusDatabaseTest.php'
@@ -46,15 +48,19 @@ jobs:
       - name: PHP lint
         run: |
           php -l app/Services/BerkasMateriService.php
+          php -l app/Services/PdfMateriValidator.php
           php -l app/Controllers/GuruMateri.php
           php -l app/Views/guru/materi_edit.php
           php -l app/Views/guru/detail_tp.php
           php -l tests/unit/BerkasMateriValidatorTest.php
+          php -l tests/unit/PdfMateriValidatorTest.php
           php -l tests/integration/BerkasMateriAksesTest.php
           php -l tests/integration/BerkasMateriUnggahTest.php
           php -l tests/integration/MateriHapusDatabaseTest.php
       - name: Validasi file
         run: vendor/bin/phpunit --no-coverage tests/unit/BerkasMateriValidatorTest.php
+      - name: PDF valid dan bermasalah
+        run: vendor/bin/phpunit --no-coverage tests/unit/PdfMateriValidatorTest.php
       - name: Database fixture
         run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
       - name: Regresi Materi draf
