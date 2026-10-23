@@ -23,3 +23,9 @@
 6. Periksa desktop dan HP serta pesan sukses/gagal; jangan menguji penghapusan atau publikasi karena tidak tersedia.
 
 **Belum diuji** HTTP POST sesungguhnya di XAMPP, kompatibilitas MariaDB skema lengkap, dan interaksi browser dengan CSRF, sehingga PR ini tetap Draft.
+
+## Pengujian browser XAMPP oleh pemilik — 23 Oktober 2026
+
+Pemilik mengonfirmasi pengujian pada localhost dengan database `sla_sks_v3` sebagai berikut: **1. Rincian TP LULUS; 2. Daftar Materi LULUS; 3. Form TP draf LULUS; 4. Simpan perubahan LULUS; 5. Validasi form LULUS; 6. Hak akses LULUS; 7. Tampilan LULUS**.
+
+Ini merupakan laporan uji manual pemilik, bukan pengamatan browser langsung oleh CI. Keberhasilan menyimpan redaksi pada TP draf telah dikonfirmasi pengguna. Tidak ada perubahan struktur SQL atau `.env` melalui PR #16. Setelah pemeriksaan CI terakhir, PR dapat ditandai Ready for review tetapi **tidak boleh digabung sebelum izin merge eksplisit**.
