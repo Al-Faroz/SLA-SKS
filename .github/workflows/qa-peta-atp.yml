@@ -1,0 +1,46 @@
+name: QA Peta ATP v2.4
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/PetaTpService.php'
+      - 'app/Controllers/GuruPetaTp.php'
+      - 'app/Views/guru/peta_tp.php'
+      - 'app/Views/akun/beranda.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Config/Routes.php'
+      - 'tests/unit/PetaTpServiceTest.php'
+      - '.github/workflows/qa-peta-atp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-qa:
+    name: PHP lint dan unit (tanpa database)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Siapkan PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, mysqli, gd, zip, dom, xml
+          tools: composer:v2
+          coverage: none
+      - name: Validasi composer
+        run: composer validate --no-check-publish
+      - name: Instal dependensi dari composer.lock
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Sintaks PHP modul Peta ATP
+        run: |
+          php -l app/Services/PetaTpService.php
+          php -l app/Controllers/GuruPetaTp.php
+          php -l app/Views/guru/peta_tp.php
+          php -l app/Views/akun/beranda.php
+          php -l app/Services/NavigasiService.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/PetaTpServiceTest.php
+      - name: PHPUnit khusus pemilihan penugasan G1
+        run: vendor/bin/phpunit tests/unit/PetaTpServiceTest.php
