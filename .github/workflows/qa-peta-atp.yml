@@ -30,7 +30,7 @@ jobs:
       - name: Siapkan PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.2'
           extensions: mbstring, intl, mysqli, gd, zip, dom, xml
           tools: composer:v2
           coverage: none
@@ -78,7 +78,7 @@ jobs:
       - name: Siapkan PHP dengan mysqli
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.2'
           extensions: mysqli
           coverage: none
       - name: Muat SQL sintetis ke database sementara
