@@ -25,4 +25,4 @@ Dokumen resmi proyek terdiri atas **16 Master Document** di [docs/README.md](doc
 - Perubahan Master v2.4 hanya dokumentasi dan referensi; pelaksanaan SQL, generator Excel, parser DOCX serta revisi UI/UX **menunggu tahap implementasi serta pengujian XAMPP**.
 - Template kerja acuan: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` dan `docs/TEMPLATE_SOAL_SLA-SKS.docx`; aplikasi akan menghasilkan unduhan yang terkait identitas/TP aktual.
 
-> **Status template biner:** Excel dan Word referensi telah dibuat tetapi belum terunggah di branch ini; **jangan merge** sebelum keduanya benar-benar ada di `docs/` dan lolos QA. Lihat [status template](docs/STATUS-TEMPLATE-V2.4.md).
+> **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](docs/STATUS-TEMPLATE-V2.4.md).
