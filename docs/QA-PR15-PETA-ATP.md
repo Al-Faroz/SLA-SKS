@@ -45,3 +45,25 @@ Pada **MariaDB lokal `sla_sks_v3`**: 37 pengguna, 17 siswa, 20 Mapel, 3 CP, 1 pa
 Pada [GitHub Actions #39910913002](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39910913002) diuji `tests/feature/GuruPetaAtpLoginHttpTest.php` dengan **5 tests / 18 assertions PASS** terhadap MySQL sementara dan sesi pengguna sintetis. Skenario: Guru A melihat semua semester dan hanya TP sendiri, Guru B hanya TP sendiri, pilihan G1 tidak valid diarahkan kembali, peran Admin menerima HTTP 403, dan akun wajib ganti sandi dialihkan. Unit test dan Service CI4 tetap PASS (masing-masing 5 dan 7 tes).
 
 Fixture ditambah kolom akun dan tabel `pengguna_peran` sintetis, tidak berisi kredensial/data peserta didik. Belum ada pengujian visual browser maupun pengujian terhadap dump lengkap MariaDB `sla_sks_v3` dari localhost; keduanya memerlukan pengujian di lingkungan pengguna setelah perubahan disetujui. Tidak ada perubahan database pengguna atau `.env`.
+
+
+## Review akhir QA PHP 8.2 dan skenario negatif
+
+[GitHub Actions run 39911382786](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39911382786) **PASS** pada PHP **8.2** (menyesuaikan XAMPP lokal): 5 unit tests, 2 HTTP tamu tests, 7 integrasi Service CI4 tests (10 assertions), dan **9 HTTP Guru tests (27 assertions)**. Smoke MySQL sintetik juga PASS.
+
+Empat kasus negatif tambahan: Guru tanpa G1 menampilkan halaman kosong; parameter `pilihan=abc` atau `pilihan=-1` ditolak; akun Guru nonaktif tidak boleh masuk. Fixture hanya menggunakan identitas anonim.
+
+**Batas hasil:** QA dijalankan pada MySQL 8.0 dengan subset tabel sintetik, **bukan** MariaDB 10.4.32 skema lengkap. Kolom query Peta TP telah dibandingkan secara statis dengan berkas konversi skema v2.4 yang terpisah, tetapi pengujian visual dan XAMPP nyata tetap diperlukan.
+
+### Checklist uji manual setelah PR lolos review dan digabung
+
+- Pastikan backup tersedia. Jangan ubah `sla_sks_v2` dan jangan reset `sla_sks_v3`.
+- Pastikan kode yang terpasang sudah mengandung PR #15; uji di lingkungan lokal yang aman dan hanya arahkan DB aplikasi ke `sla_sks_v3` bila pemilik secara sadar memilihnya serta konfigurasi telah dibackup. Jangan otomatis ubah `.env`.
+- Login sebagai Guru dengan penugasan G1 dan akses `/guru/peta-atp`. Verifikasi selector dan enam semester, TP pada semester yang memang mempunyai paket.
+- Ganti penugasan yang tersedia, periksa tidak terlihat data Gen–Mapel lain.
+- Login Guru tanpa penugasan, lalu uji query `?pilihan=999`, `?pilihan=abc`, dan `?pilihan=-1`. Verifikasi status kosong/redirect dan pesan.
+- Login menggunakan peran Admin atau Siswa untuk memastikan akses ditolak. Uji pula sesi login berakhir dan Guru yang wajib ganti sandi.
+- Periksa tampilan desktop 1366px dan HP 360px, keyboard, gulir tabel, alert, fokus, dan seluruh tautan.
+- Laporkan error tanpa membagikan NISN, hash sandi, cookie sesi, atau informasi pribadi.
+
+Jika hasil manual belum PASS, jangan gabungkan tahap selanjutnya yang tergantung halaman ini.
