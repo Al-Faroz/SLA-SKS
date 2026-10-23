@@ -52,11 +52,15 @@ jobs:
           php -l app/Controllers/GuruMateri.php
           php -l app/Views/guru/materi_edit.php
           php -l app/Views/guru/detail_tp.php
+          php -l app/Views/guru/materi_pratinjau.php
+          php -l app/Views/guru/_materi_fields.php
           php -l tests/unit/BerkasMateriValidatorTest.php
           php -l tests/unit/PdfMateriValidatorTest.php
           php -l tests/integration/BerkasMateriAksesTest.php
           php -l tests/integration/BerkasMateriUnggahTest.php
           php -l tests/integration/MateriHapusDatabaseTest.php
+      - name: JavaScript syntax
+        run: node --check public/assets/js/app.js
       - name: Validasi file
         run: vendor/bin/phpunit --no-coverage tests/unit/BerkasMateriValidatorTest.php
       - name: PDF valid dan bermasalah
