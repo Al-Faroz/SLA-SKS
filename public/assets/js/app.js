@@ -112,8 +112,8 @@
             pdfInfo.hidden = !pdfDipilih;
             url.disabled = !youtubeDipilih;
             url.required = youtubeDipilih;
-            file.disabled = youtubeDipilih || pdfDipilih;
-            file.required = !youtubeDipilih && !pdfDipilih && !adaBerkas;
+            file.disabled = youtubeDipilih;
+            file.required = !youtubeDipilih && !adaBerkas;
             file.accept = pdfDipilih ? '.pdf' : gambarDipilih ? '.jpg,.jpeg,.png,.webp' : '.mp3,.m4a';
             if (info) info.textContent = pdfDipilih
                 ? 'PDF maksimal 15 MB / 40 halaman; unggah belum diaktifkan.'
@@ -125,5 +125,18 @@
         }
         jenis.addEventListener('change', () => { file.value = ''; update(); });
         update();
+    });
+})();
+
+/* Konfirmasi eksplisit sebelum menghapus Materi draf; server tetap validasi. */
+(() => {
+    'use strict';
+    document.querySelectorAll('[data-materi-hapus-form]').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            const judul = form.querySelector('[data-materi-hapus]')?.dataset.judul || 'Materi ini';
+            if (!window.confirm('Hapus Materi "' + judul + '" dari TP draf? Tindakan ini tidak bisa dibatalkan. Berkas historis tidak dihapus.')) {
+                event.preventDefault();
+            }
+        });
     });
 })();
