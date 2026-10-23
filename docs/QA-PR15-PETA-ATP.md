@@ -31,4 +31,4 @@ Jalankan `G:\xampp\php\php.exe spark routes` lalu pastikan **GET guru/peta-atp**
 ## Hasil terverifikasi dari laporan pengguna
 Pada **MariaDB lokal `sla_sks_v3`**: 37 pengguna, 17 siswa, 20 Mapel, 3 CP, 1 paket, 1 TP; semua lima cek relasi bernilai 0; jumlah FK 81; kolom `tp.paket_semester_id` dan `tugas_hots_materi.materi_id` ada; tabel BAB tidak ada.
 
-**Belum lulus:** PHP lint, PHPUnit, runtime CI4 terhadap database uji, dan browser. Data pribadi tidak dicommit.
+**PASS di GitHub Actions:** lint PHP, PHPUnit 5 tes (6 assertions), dan smoke MySQL sintetis yang membuktikan isolasi data Gen–Mapel, TP, serta semester kosong. Lihat run [39909166387](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39909166387).\n\n**Belum lulus:** eksekusi Service melalui sesi CI4 penuh terhadap database uji `sla_sks_v3`, serta pengujian browser desktop/mobile. Smoke MySQL memakai subset skema sintetik; ini bukan pengganti uji seluruh dump atau autentikasi nyata. Data pribadi tidak dicommit.
