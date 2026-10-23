@@ -15,26 +15,55 @@
             <p class="a-proto-muted"><?= esc($tp['kode_tp'] . ' — ' . $tp['judul']) ?></p>
         </div>
     </header>
-    <section class="a-card" aria-labelledby="video-materi">
-        <h2 id="video-materi">Video pembelajaran YouTube</h2>
-        <p class="a-help">Pratinjau ini hanya untuk Guru yang ditugaskan pada Gen–Mapel ini. Membuka pemutar menghubungi layanan YouTube; tidak menyimpan progres siswa.</p>
+    <section class="a-card" aria-labelledby="materi-pratinjau-heading">
+        <h2 id="materi-pratinjau-heading">
+            <?= esc(match ($materi['jenis']) {
+                'youtube' => 'Video pembelajaran YouTube',
+                'pdf' => 'Dokumen pembelajaran PDF',
+                'audio' => 'Audio pembelajaran',
+                'gambar' => 'Gambar pembelajaran',
+                default => 'Media pembelajaran',
+            }) ?>
+        </h2>
+        <p class="a-help">Pratinjau hanya untuk Guru yang ditugaskan pada Gen–Mapel ini. Halaman ini tidak mengubah progres siswa.</p>
         <?php if ((int) $materi['aktif'] !== 1): ?>
-            <div class="a-alert" role="status">Materi masih Nonaktif dan tidak ditayangkan kepada siswa.</div>
+            <div class="a-alert" role="status">Materi masih Nonaktif dan belum ditayangkan kepada siswa.</div>
         <?php endif ?>
-        <details class="a-media-details">
-            <summary class="a-btn a-btn--utama">Tampilkan video</summary>
-            <div class="a-media-video">
-                <iframe
-                    src="<?= esc($urlEmbed, 'attr') ?>"
-                    title="Pratinjau video: <?= esc($materi['judul'], 'attr') ?>"
-                    loading="lazy"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allow="encrypted-media; picture-in-picture; fullscreen"
-                    allowfullscreen></iframe>
+        <?php if ($materi['jenis'] === 'youtube'): ?>
+            <details class="a-media-details">
+                <summary class="a-btn a-btn--utama">Tampilkan video</summary>
+                <div class="a-media-video">
+                    <iframe src="<?= esc($urlEmbed, 'attr') ?>"
+                        title="Pratinjau video: <?= esc($materi['judul'], 'attr') ?>"
+                        loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+                        allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+                </div>
+            </details>
+            <p class="a-help">Jika video tidak dapat diputar di sini, buka melalui YouTube.</p>
+            <p><a href="<?= esc($urlAsli, 'attr') ?>" target="_blank" rel="noopener noreferrer">Buka video di YouTube ↗</a></p>
+        <?php elseif ($materi['jenis'] === 'pdf'): ?>
+            <details class="a-media-details">
+                <summary class="a-btn a-btn--utama">Tampilkan PDF</summary>
+                <div class="a-materi-pdf">
+                    <iframe src="<?= esc($urlMedia, 'attr') ?>#toolbar=1"
+                        title="Pratinjau PDF: <?= esc($materi['judul'], 'attr') ?>" loading="lazy"></iframe>
+                </div>
+            </details>
+            <p class="a-help">Pembaca PDF mengikuti kemampuan browser. Apabila tidak tersedia, gunakan tautan buka dokumen.</p>
+            <p><a href="<?= esc($urlMedia, 'attr') ?>" target="_blank" rel="noopener noreferrer">Buka PDF di tab baru ↗</a></p>
+        <?php elseif ($materi['jenis'] === 'audio'): ?>
+            <div class="a-materi-audio">
+                <audio controls preload="metadata" aria-label="Pemutar audio Materi">
+                    <source src="<?= esc($urlMedia, 'attr') ?>" type="<?= esc('audio/' . (str_ends_with((string) $urlMedia, '.m4a') ? 'mp4' : 'mpeg'), 'attr') ?>">
+                    Browser Anda tidak mendukung pemutar audio.
+                </audio>
             </div>
-        </details>
-        <p class="a-help">Jika YouTube membatasi pemutar tertanam atau koneksi sedang bermasalah, gunakan tautan Buka video di YouTube di bawah.</p>
-        <p><a href="<?= esc($urlAsli, 'attr') ?>" target="_blank" rel="noopener noreferrer">Buka video di YouTube <span aria-hidden="true">↗</span></a></p>
+            <p class="a-help">Audio diputar dari penyimpanan privat melalui layanan Guru, dengan dukungan pemindahan posisi pemutaran.</p>
+        <?php elseif ($materi['jenis'] === 'gambar'): ?>
+            <div class="a-materi-gambar">
+                <img src="<?= esc($urlMedia, 'attr') ?>" alt="Gambar materi <?= esc($materi['judul'], 'attr') ?>" loading="lazy">
+            </div>
+        <?php endif ?>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke rincian TP</a>
     </section>
 </div>
