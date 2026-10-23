@@ -15,6 +15,14 @@ final class GuruPetaAtpHttpTest extends CIUnitTestCase
 {
     use FeatureTestTrait;
 
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        if (! defined('WRITEPATH')) {
+            define('WRITEPATH', dirname(__DIR__, 2) . '/writable/');
+        }
+    }
+
     public function testPengunjungTanpaSesiDialihkanDariHalamanPeta(): void
     {
         $hasil = $this->get('guru/peta-atp');
