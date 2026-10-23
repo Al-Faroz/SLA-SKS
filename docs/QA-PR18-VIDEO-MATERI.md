@@ -27,3 +27,7 @@ Pemilik melaporkan **halaman Pratinjau mengalami error saat menampilkan video**,
 3. Periksa lagi pada XAMPP: simpan 2 menit dan pastikan saat membuka ulang muncul 2.00; video dapat dipratinjau; URL yang tidak mendukung embed tetap mempunyai tautan alternatif.
 
 Jangan merge sebelum kedua temuan diperiksa ulang pemilik.
+
+## Konfirmasi perbaikan oleh pemilik — 23 Oktober 2026
+
+Setelah mencoba perubahan pada branch pengujian XAMPP, pemilik menyatakan **"Oke sudah fix"** untuk dua temuan: error ketika menampilkan pratinjau video YouTube dan perubahan satuan minimal waktu belajar menjadi **menit**. Konfirmasi ini berlaku untuk kedua perbaikan yang diminta, bukan klaim bahwa keseluruhan integrasi media PDF/gambar/audio telah diuji atau selesai. PR dapat disiapkan untuk review, tetapi penggabungan ke `main` tetap memerlukan persetujuan eksplisit.
