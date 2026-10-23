@@ -66,7 +66,7 @@ Validasi MIME hasil inspeksi, ekstensi, ukuran, dimensi, decoder, PDF aktif, dan
 - `Persetujuan koreksi TP`: admin putus, baru publish versi konten baru; student TP sudah mulai pin versi lama.
 - `Penilaian/koreksi`: hitung agregat, update nilai dan audit idempoten; bila sertifikat perlu revisi, siapkan PDF sebelumnya dan commit perpindahan secara terkoordinasi.
 - `Koreksi NISN`: periksa keunikan, ubah biodata dan username dalam transaksi tanpa membuat siswa baru.
-- `Impor Excel`: satu TP, satu transaksi dengan idempoten UUID/checksum.
+- `Impor Excel ATP`: satu peta Gen–Mapel, pratinjau dan konfirmasi transaksional dengan idempoten UUID/checksum serta larangan mengubah TP Siap.
 - `Ujian`: transisi status setelah pemeriksaan jam server, row lock/optimistic concurrency, nol skor untuk batal.
 
 ## 6. Server timer di shared hosting
