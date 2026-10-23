@@ -700,3 +700,22 @@ a:hover { text-decoration-thickness: 2px; }
     .a-cp__details > .a-cp__form { padding:12px; }
     .a-app--prototipe .a-page .a-card { padding:13px; }
 }
+
+/* Pratinjau video Materi: ukuran responsif, tanpa CSS inline. */
+.a-media-video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-width: 880px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--a-ruang-3);
+    background: var(--a-latar);
+    border: 1px solid var(--a-garis);
+    border-radius: var(--a-radius);
+    overflow: hidden;
+    padding: var(--a-ruang-4);
+}
+.a-media-video iframe { width: 100%; height: 100%; border: 0; }
+.a-media-video:has(iframe) { padding: 0; }
