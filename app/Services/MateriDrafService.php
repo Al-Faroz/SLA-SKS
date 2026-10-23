@@ -25,7 +25,7 @@ final class MateriDrafService
     }
 
     /** @return array{judul:string,jenis:string,petunjuk_resume:string,petunjuk_hots:string,min_waktu_detik:int,url_youtube:?string} */
-    private function bersihkan(array $input): array
+    public function bersihkan(array $input): array
     {
         $judul = trim((string) ($input['judul'] ?? ''));
         $jenis = (string) ($input['jenis'] ?? '');
