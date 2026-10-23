@@ -2,7 +2,16 @@
 -- Tidak memuat data siswa, nama nyata, hash sandi, atau kredensial.
 CREATE TABLE pengguna (
  id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
- nama VARCHAR(150) NOT NULL
+ nama VARCHAR(150) NOT NULL,
+ status VARCHAR(12) NOT NULL DEFAULT 'aktif',
+ wajib_ganti_sandi TINYINT NOT NULL DEFAULT 0,
+ versi_sesi INT NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+CREATE TABLE pengguna_peran (
+ pengguna_id BIGINT UNSIGNED NOT NULL,
+ peran VARCHAR(20) NOT NULL,
+ PRIMARY KEY (pengguna_id, peran),
+ FOREIGN KEY (pengguna_id) REFERENCES pengguna(id)
 ) ENGINE=InnoDB;
 CREATE TABLE ref_angkatan (
  id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
@@ -46,7 +55,9 @@ CREATE TABLE tp (
  struktur_versi INT UNSIGNED NOT NULL,
  FOREIGN KEY (paket_semester_id) REFERENCES paket_semester(id)
 ) ENGINE=InnoDB;
-INSERT INTO pengguna VALUES (1,'Guru Penguji A'),(2,'Guru Penguji B');
+INSERT INTO pengguna (id,nama,status,wajib_ganti_sandi,versi_sesi) VALUES
+(1,'Guru Penguji A','aktif',0,1),(2,'Guru Penguji B','aktif',0,1),(3,'Admin Penguji','aktif',0,1),(4,'Guru Wajib Ganti Sandi','aktif',1,1);
+INSERT INTO pengguna_peran (pengguna_id,peran) VALUES (1,'guru'),(2,'guru'),(3,'admin'),(4,'guru');
 INSERT INTO ref_angkatan VALUES (1,'GEN-UJI-A','Gen Uji A'),(2,'GEN-UJI-B','Gen Uji B');
 INSERT INTO ref_mapel VALUES (1,'MAP-UJI','Mapel Uji');
 INSERT INTO penugasan_guru_gen VALUES (1,1,1,1),(2,2,1,2);
