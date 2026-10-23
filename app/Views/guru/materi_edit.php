@@ -20,7 +20,7 @@
         <?php if ($materi['berkas_id'] !== null): ?>
             <div class="a-alert" role="status">Materi sudah memiliki berkas. Jenis media tidak dapat diganti dari formulir ini.</div>
         <?php endif ?>
-        <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-sudah-upload="<?= $materi['berkas_id'] !== null ? '1' : '0' ?>" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi['id']), 'attr') ?>">
+        <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-jenis-awal="<?= esc($materi['jenis'], 'attr') ?>" data-materi-sudah-upload="<?= $materi['berkas_id'] !== null ? '1' : '0' ?>" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi['id']), 'attr') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
             <?= view('guru/_materi_fields', ['nilai' => $materi]) ?>
