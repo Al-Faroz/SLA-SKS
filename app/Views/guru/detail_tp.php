@@ -78,7 +78,7 @@
         <?php else: ?>
             <div class="a-tabel-gulir">
                 <table class="a-tbl">
-                    <thead><tr><th scope="col">Urutan</th><th scope="col">Judul</th><th scope="col">Jenis</th><th scope="col">Status</th></tr></thead>
+                    <thead><tr><th scope="col">Urutan</th><th scope="col">Judul</th><th scope="col">Jenis</th><th scope="col">Status</th><th scope="col">Tindakan</th></tr></thead>
                     <tbody>
                         <?php foreach ($materi as $item): ?>
                             <tr>
@@ -86,6 +86,21 @@
                                 <td><?= esc($item['judul']) ?></td>
                                 <td><?= esc($item['jenis']) ?></td>
                                 <td><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
+                                <td>
+                                    <?php if ($tp['status'] === 'draf'): ?>
+                                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
+                                        <?php foreach (['naik' => 'Naik', 'turun' => 'Turun'] as $arah => $label): ?>
+                                            <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/urut'), 'attr') ?>">
+                                                <?= csrf_field() ?>
+                                                <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
+                                                <input type="hidden" name="arah" value="<?= esc($arah, 'attr') ?>">
+                                                <button type="submit" class="a-btn a-btn--sekunder"><?= esc($label) ?></button>
+                                            </form>
+                                        <?php endforeach ?>
+                                    <?php else: ?>
+                                        <span class="a-help">TP Siap</span>
+                                    <?php endif ?>
+                                </td>
                             </tr>
                         <?php endforeach ?>
                     </tbody>
@@ -93,5 +108,17 @@
             </div>
         <?php endif ?>
     </section>
+    <?php if ($tp['status'] === 'draf'): ?>
+        <section class="a-card a-jarak-atas" aria-labelledby="tambah-materi">
+            <h2 id="tambah-materi">Tambah Materi/Submateri</h2>
+            <p class="a-help">Materi baru ditambahkan pada urutan terakhir dan tetap nonaktif. Konten media berkas akan dikelola melalui tahap upload tersendiri.</p>
+            <form method="post" class="a-form" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
+                <?= csrf_field() ?>
+                <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
+                <?= view('guru/_materi_fields', ['nilai' => []]) ?>
+                <button class="a-btn a-btn--utama" type="submit">Tambah Materi draf</button>
+            </form>
+        </section>
+    <?php endif ?>
 </div>
 <?= $this->endSection() ?>
