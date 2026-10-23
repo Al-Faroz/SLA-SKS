@@ -59,3 +59,15 @@ Checklist tambahan XAMPP:
 5. Ganti dari YouTube menjadi Gambar tanpa memilih file: browser/server menolak, tidak meninggalkan Materi tanpa sumber.
 6. Pilih PDF: field upload terlihat tetapi **dinonaktifkan secara eksplisit**, tidak mengirim/menerima file sampai validasi PDF benar-benar selesai. Jangan dinyatakan lulus sebagai *upload PDF*.
 7. Pastikan Materi sudah Siap tetap tidak dapat diubah lewat editor draf.
+
+## Revisi antarmuka berdasarkan screenshot pengguna — 23 Oktober 2026
+
+Tabel Daftar Materi/Submateri kini mempunyai empat kolom aksi terpisah: **Pratinjau**, **Urutan** (Naik/Turun), **Edit** (Sunting), dan **Hapus**. Di layar sempit tabel dapat digulir horizontal, dan tombol mutasi TP Siap tidak tampil.
+
+Input **Upload file** untuk PDF kini tidak disabled sehingga pengguna dapat memilih file PDF dari komputer. Namun ini **belum berarti penyimpanan PDF aktif**: tombol Simpan tetap dibatasi untuk PDF baru dan endpoint server menolak hingga pemeriksaan jumlah halaman serta skrip aktif selesai. Materi PDF lama masih dapat disunting metadata; tidak ada klaim upload PDF sukses.
+
+Penghapusan Materi draf kini memiliki form POST+CSRF dan pemeriksaan versi, konfirmasi browser dan server, hak Guru G1, TP draf, serta perlindungan referensi progres/resume/HOTS. Materi yang dapat dihapus diikuti perapian nomor urut dalam transaksi. Berkas historis tidak dihapus secara fisik.
+
+QA tambahan: tests/integration/MateriHapusDatabaseTest.php memeriksa hapus di tengah, penolakan versi lama, TP Siap, Guru Gen lain dan ID Materi dari TP lain. Pengujian lokal: periksa konfirmasi Hapus/Batal, urutan setelah Hapus, file PDF chooser, empat kolom tindakan pada desktop, dan scroll pada HP.
+
+CI: QA Berkas Materi #39933983805, QA Materi Draf #39933983584, QA Peta ATP #39933983544, QA Pratinjau YouTube #39933983587 dan QA Rincian TP #39933983578 — semuanya PASS.
