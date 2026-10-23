@@ -212,7 +212,7 @@ final class GuruMateri extends BaseController
             $akhir = $panjang - 1;
             $range = $this->request->getHeaderLine('Range');
             if ($range !== '') {
-                if ($berkas['jenis'] !== 'audio'
+                if (! in_array($berkas['jenis'], ['audio', 'pdf'], true)
                     || preg_match('/^bytes=(\\d*)-(\\d*)$/D', $range, $m) !== 1
                     || ($m[1] === '' && $m[2] === '')) {
                     return $this->response->setStatusCode(416)
@@ -265,7 +265,7 @@ final class GuruMateri extends BaseController
                 ->setHeader('Cache-Control', 'private, no-store, max-age=0')
                 ->setHeader('X-Content-Type-Options', 'nosniff')
                 ->setHeader('Content-Security-Policy', "default-src 'none'; sandbox")
-                ->setHeader('Accept-Ranges', $berkas['jenis'] === 'audio' ? 'bytes' : 'none')
+                ->setHeader('Accept-Ranges', in_array($berkas['jenis'], ['audio', 'pdf'], true) ? 'bytes' : 'none')
                 ->setBody($isi);
             if ($range !== '') {
                 $res->setHeader('Content-Range', 'bytes ' . $awal . '-' . $akhir . '/' . $panjang);
