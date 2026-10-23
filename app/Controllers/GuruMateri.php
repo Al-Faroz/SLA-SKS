@@ -266,6 +266,24 @@ final class GuruMateri extends BaseController
         }
     }
 
+    public function hapus(int $tpId, int $materiId): RedirectResponse
+    {
+        $versi = $this->versi();
+        $konfirmasi = $this->request->getPost('konfirmasi');
+        if ($versi === null || $konfirmasi !== 'HAPUS') {
+            return $this->kembali($tpId, 'Konfirmasi penghapusan tidak sah.');
+        }
+        try {
+            (new MateriDrafService())->hapus($tpId, $materiId, $versi);
+            return $this->kembali($tpId, 'Materi draf dihapus. Urutan materi lainnya sudah diperbarui.', true);
+        } catch (DomainException $e) {
+            return $this->kembali($tpId, $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Hapus Materi draf ditolak: ' . get_class($e));
+            return $this->kembali($tpId, 'Materi tidak dapat dihapus karena masih memiliki referensi atau sedang digunakan.');
+        }
+    }
+
     public function urut(int $tpId, int $materiId): RedirectResponse
     {
         $versi = $this->versi();
