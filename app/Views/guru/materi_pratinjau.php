@@ -53,8 +53,7 @@
             <p><a href="<?= esc($urlMedia, 'attr') ?>" target="_blank" rel="noopener noreferrer">Buka PDF di tab baru ↗</a></p>
         <?php elseif ($materi['jenis'] === 'audio'): ?>
             <div class="a-materi-audio">
-                <audio controls preload="metadata" aria-label="Pemutar audio Materi">
-                    <source src="<?= esc($urlMedia, 'attr') ?>" type="<?= esc('audio/' . (str_ends_with((string) $urlMedia, '.m4a') ? 'mp4' : 'mpeg'), 'attr') ?>">
+                <audio controls preload="metadata" src="<?= esc($urlMedia, 'attr') ?>" aria-label="Pemutar audio Materi">
                     Browser Anda tidak mendukung pemutar audio.
                 </audio>
             </div>
