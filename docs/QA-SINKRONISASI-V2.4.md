@@ -15,18 +15,20 @@ Dokumen kontrol QA pendamping; **bukan Master Document ke-17** dan tidak menguba
 ## 2. Gate template Excel ATP
 **Path wajib:** `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx`.
 
-- [ ] Berkas biner terunggah nyata pada branch; checksum dicek terhadap `STATUS-TEMPLATE-V2.4.md`.
-- [ ] Buka di Excel/LibreOffice: 10 sheet terdiri atas panduan, RINGKASAN, REFERENSI CP, SEMESTER 1–6, dan CONTOH MAT VII.
-- [ ] Pastikan formula dan dropdown tidak rusak, tidak ada label BAB operasional, Subbab tetap sah sebagai bagian Materi/Submateri.
+- [x] Berkas biner tersedia di branch, Git blob identik dengan `main`; SHA-256 artefak lokal cocok `STATUS-TEMPLATE-V2.4.md`.
+- [ ] Verifikasi independen SHA-256 hasil unduh GitHub.
+- [x] Pemilik sudah membuka dan menyetujui Excel; 10 sheet terdiri atas panduan, RINGKASAN, REFERENSI CP, SEMESTER 1–6, dan CONTOH MAT VII.
+- [x] Pemeriksaan lokal: 1.050 formula dan 26 data validation tetap ada; label BAB operasional telah dibersihkan, Subbab tetap istilah Materi/Submateri.
 - [ ] Jangan mengisi data siswa/Guru nyata atau CP palsu ke file referensi. Identitas dan CP akan diisi generator server setelah implementasi.
 - [ ] Uji impor terikat Gen–Mapel, idempoten, parsial semester dan menolak TP Siap dilakukan pada PR kode terpisah.
 
 ## 3. Gate template Word
 **Path wajib:** `docs/TEMPLATE_SOAL_SLA-SKS.docx`.
 
-- [ ] Berkas biner terunggah nyata pada branch; checksum dicek terhadap `STATUS-TEMPLATE-V2.4.md`.
-- [ ] Struktur `SLA-SKS-WORD-V1`, opsi A–E, tepat satu ✓ per soal, seluruh 10 contoh dapat dibaca Word.
-- [ ] Equation/OMML, gambar dan tabel tertanam dapat ditinjau; contoh tidak boleh dianggap bank akademik produksi.
+- [x] Berkas biner tersedia di branch, Git blob identik dengan `main`; SHA-256 artefak lokal cocok `STATUS-TEMPLATE-V2.4.md`.
+- [ ] Verifikasi independen SHA-256 hasil unduh GitHub.
+- [x] Pemeriksaan lokal dan persetujuan pemilik: `SLA-SKS-WORD-V1`, opsi A–E, tepat satu ✓ per soal dan 10 contoh; **unduhan Guru kelak harus kosong seluruh isian dan mengikuti jumlah bank soal aplikasi**.
+- [x] Equation/OMML, gambar dan tabel tertanam pada contoh telah ditinjau; contoh tidak boleh dianggap bank akademik produksi.
 - [ ] Uji nyata parser di stem **dan semua pilihan**, tabel bersarang, Unicode/RTL, tautan Drive, serta file rusak saat implementasi.
 - [ ] Dua output Dinamis Diagnostik/Sumatif per TP **belum** tersedia sebagai kode.
 
@@ -43,7 +45,7 @@ Dokumen kontrol QA pendamping; **bukan Master Document ke-17** dan tidak menguba
 Verifikasi UX wajib 360, 390, 768, 1100px, keyboard, CSRF, kosong/loading/error/sukses dan izin Service. **Tidak ada implementasi UI dalam PR dokumentasi ini**.
 
 ## 5. Gate merge dan kelanjutan
-1. **Jangan merge PR Master v2.4** sampai dua biner ada pada `docs/` dan pemeriksaan template PASS.
+1. Kedua berkas telah masuk `docs/`; **jangan merge PR Master v2.4** sebelum verifikasi ulang unduhan GitHub dan review PR selesai.
 2. Pastikan link di README/docs/README tidak rusak setelah file tersedia.
 3. PR implementasi berbeda: SQL dari dump lokal (setelah diserahkan dan dianalisis), generator ATP, parser Word, Service dan UI.
 4. Jangan menggabungkan PR #13 berkontrak BAB lama apa adanya.
