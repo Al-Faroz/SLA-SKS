@@ -163,11 +163,18 @@ final class MateriDrafService
             if (! isset($daftar[$tujuan])) {
                 throw new DomainException('Materi sudah berada pada urutan paling ujung.');
             }
-            // Swap dua nomor urut dalam transaksi; tidak mengubah ID/media/progres.
+            // UNIQUE(tp_id,urutan) berlaku pada skema v2.4: gunakan nomor 0
+            // sementara di dalam transaksi untuk menghindari benturan saat swap.
+            if ((int) $daftar[$posisi]['urutan'] < 1 || (int) $daftar[$tujuan]['urutan'] < 1
+                || $this->db->table('materi')->where('tp_id', $tpId)->where('urutan', 0)->countAllResults() !== 0) {
+                throw new DomainException('Urutan Materi tidak konsisten. Periksa data terlebih dahulu.');
+            }
             $this->db->table('materi')->where('id', $materiId)->where('tp_id', $tpId)
-                ->update(['urutan' => $daftar[$tujuan]['urutan']]);
+                ->update(['urutan' => 0]);
             $this->db->table('materi')->where('id', $daftar[$tujuan]['id'])->where('tp_id', $tpId)
                 ->update(['urutan' => $daftar[$posisi]['urutan']]);
+            $this->db->table('materi')->where('id', $materiId)->where('tp_id', $tpId)
+                ->update(['urutan' => $daftar[$tujuan]['urutan']]);
         });
     }
 }
