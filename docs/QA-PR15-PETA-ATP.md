@@ -39,3 +39,9 @@ Pada **MariaDB lokal `sla_sks_v3`**: 37 pengguna, 17 siswa, 20 Mapel, 3 CP, 1 pa
 - Pada [Actions run 39910267261](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39910267261), kelompok **HTTP: 2 tests / 3 assertions PASS**, bersama unit 5 tests / 6 assertions PASS.
 - Lingkungan CI4 membutuhkan folder `writable/cache`, `writable/logs`, `writable/session`, dan `writable/uploads`. Persiapan folder hanya dilakukan di GitHub Actions, tidak mengubah konfigurasi `.env` pengguna.
 - **Belum mencakup** sesi login Guru yang sah, hasil halaman untuk Guru aktif pada skema lengkap `sla_sks_v3`, maupun pemeriksaan visual browser.
+
+## Pengujian HTTP Guru terautentikasi — PASS
+
+Pada [GitHub Actions #39910913002](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39910913002) diuji `tests/feature/GuruPetaAtpLoginHttpTest.php` dengan **5 tests / 18 assertions PASS** terhadap MySQL sementara dan sesi pengguna sintetis. Skenario: Guru A melihat semua semester dan hanya TP sendiri, Guru B hanya TP sendiri, pilihan G1 tidak valid diarahkan kembali, peran Admin menerima HTTP 403, dan akun wajib ganti sandi dialihkan. Unit test dan Service CI4 tetap PASS (masing-masing 5 dan 7 tes).
+
+Fixture ditambah kolom akun dan tabel `pengguna_peran` sintetis, tidak berisi kredensial/data peserta didik. Belum ada pengujian visual browser maupun pengujian terhadap dump lengkap MariaDB `sla_sks_v3` dari localhost; keduanya memerlukan pengujian di lingkungan pengguna setelah perubahan disetujui. Tidak ada perubahan database pengguna atau `.env`.
