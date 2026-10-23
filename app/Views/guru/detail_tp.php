@@ -87,6 +87,9 @@
                                 <td><?= esc($item['jenis']) ?></td>
                                 <td><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
                                 <td>
+                                    <?php if (in_array($item['jenis'], ['gambar', 'audio'], true) && $item['berkas_id'] !== null): ?>
+                                        <a class="a-btn a-btn--sekunder" target="_blank" rel="noopener" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/media'), 'attr') ?>">Lihat media</a>
+                                    <?php endif ?>
                                     <?php if ($item['jenis'] === 'youtube' && ! empty($item['url_youtube'])): ?>
                                         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>">Pratinjau</a>
                                     <?php endif ?>
