@@ -16,7 +16,7 @@ Dokumen kontrol QA pendamping; **bukan Master Document ke-17** dan tidak menguba
 **Path wajib:** `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx`.
 
 - [x] Berkas biner tersedia di branch, Git blob identik dengan `main`; SHA-256 artefak lokal cocok `STATUS-TEMPLATE-V2.4.md`.
-- [ ] Verifikasi independen SHA-256 hasil unduh GitHub.
+- [x] SHA-256 file lokal final cocok tabel status dan `git hash-object` lokal identik dengan blob SHA di GitHub (verifikasi byte yang sama).
 - [x] Pemilik sudah membuka dan menyetujui Excel; 10 sheet terdiri atas panduan, RINGKASAN, REFERENSI CP, SEMESTER 1–6, dan CONTOH MAT VII.
 - [x] Pemeriksaan lokal: 1.050 formula dan 26 data validation tetap ada; label BAB operasional telah dibersihkan, Subbab tetap istilah Materi/Submateri.
 - [ ] Jangan mengisi data siswa/Guru nyata atau CP palsu ke file referensi. Identitas dan CP akan diisi generator server setelah implementasi.
@@ -45,7 +45,7 @@ Dokumen kontrol QA pendamping; **bukan Master Document ke-17** dan tidak menguba
 Verifikasi UX wajib 360, 390, 768, 1100px, keyboard, CSRF, kosong/loading/error/sukses dan izin Service. **Tidak ada implementasi UI dalam PR dokumentasi ini**.
 
 ## 5. Gate merge dan kelanjutan
-1. Kedua berkas telah masuk `docs/`; **jangan merge PR Master v2.4** sebelum verifikasi ulang unduhan GitHub dan review PR selesai.
+1. Kedua berkas telah masuk `docs/` dengan hash Git terverifikasi; **jangan merge PR Master v2.4** sebelum review dan persetujuan pemilik.
 2. Pastikan link di README/docs/README tidak rusak setelah file tersedia.
 3. PR implementasi berbeda: SQL dari dump lokal (setelah diserahkan dan dianalisis), generator ATP, parser Word, Service dan UI.
 4. Jangan menggabungkan PR #13 berkontrak BAB lama apa adanya.
