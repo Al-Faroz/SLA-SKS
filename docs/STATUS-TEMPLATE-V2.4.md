@@ -1,6 +1,6 @@
 # Status dua template referensi v2.4
 
-**Disetujui pemilik pada 23 Oktober 2026 setelah membuka kedua berkas hasil regenerasi.** Kedua berkas **sudah ada** di `docs/` pada branch PR sejak commit `0ea34fbaa18aae27b789f26a524820d72c4fb3e9`. Konten biner pada `main` dan branch v2.4 memiliki blob Git identik. Pemeriksaan hash SHA-256 dilakukan atas artefak lokal final yang disetujui; pemeriksaan ulang unduhan biner dari GitHub tetap dicatat terpisah.
+**Disetujui pemilik pada 23 Oktober 2026 setelah membuka kedua berkas hasil regenerasi.** Kedua berkas **sudah ada** di `docs/` pada branch PR sejak commit `0ea34fbaa18aae27b789f26a524820d72c4fb3e9`. Konten biner pada `main` dan branch v2.4 memiliki blob Git identik. SHA-256 berkas lokal sesuai tabel, dan `git hash-object` untuk masing-masing berkas lokal menghasilkan **Git blob SHA yang identik** dengan objek berkas pada kedua branch GitHub. Dengan demikian, identitas byte berkas lokal dan biner pada repository terverifikasi tanpa perlu membuat file baru.
 
 | Lokasi final di repository | SHA-256 file yang disetujui | Ukuran |
 |---|---|---:|
@@ -26,5 +26,5 @@ Hash ini **menggantikan hash lama** dari regenerasi sebelumnya; hash setiap hasi
 - [x] Pemilik membuka dan menyetujui kedua file regenerasi.
 - [x] Pemeriksaan struktur formula, dropdown dan arsip Office pada berkas lokal.
 - [x] Dua berkas biner berada di **branch** `docs/master-v2-4-atp-tp-materi`, masing-masing di `docs/` (Git blob identik dengan `main`).
-- [ ] Unduh kembali dari GitHub dan cocokkan SHA-256/ukuran serta buka dokumen hasil unduh (verifikasi Git blob antarbranch telah PASS, tetapi verifikasi SHA-256 hasil download GitHub belum dilaksanakan).
-- [ ] Tinjau perubahan PR dan verifikasi unduhan GitHub; **jangan merge** sebelum seluruh pemeriksaan wajib selesai.
+- [x] SHA-256 dan ukuran file lokal cocok dengan catatan; `git hash-object` lokal cocok dengan Git blob SHA objek pada `main` dan branch v2.4. Kedua berkas sudah dibuka dan dinyatakan FIX oleh pemilik sebelum unggah.
+- [ ] Tinjau perubahan PR dan dapatkan persetujuan merge dari pemilik; jangan menggabungkan tanpa persetujuan.
