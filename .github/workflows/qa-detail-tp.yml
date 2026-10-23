@@ -1,0 +1,56 @@
+name: QA Rincian TP v2.4
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/DetailTpService.php'
+      - 'app/Controllers/GuruDetailTp.php'
+      - 'app/Views/guru/detail_tp.php'
+      - 'app/Views/guru/peta_tp.php'
+      - 'app/Config/Routes.php'
+      - 'tests/fixtures/peta_atp_mysql.sql'
+      - 'tests/integration/DetailTpDatabaseTest.php'
+      - '.github/workflows/qa-detail-tp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  detail-tp:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom
+          coverage: none
+      - name: Composer install
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP
+        run: |
+          php -l app/Services/DetailTpService.php
+          php -l app/Controllers/GuruDetailTp.php
+          php -l app/Views/guru/detail_tp.php
+          php -l app/Views/guru/peta_tp.php
+          php -l tests/integration/DetailTpDatabaseTest.php
+      - name: Siapkan database uji sintetis
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/peta_atp_mysql.sql
+      - name: Uji Service pada CI4 + MySQL
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/DetailTpDatabaseTest.php
