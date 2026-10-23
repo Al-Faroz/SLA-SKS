@@ -106,6 +106,67 @@ final class BerkasMateriUnggahTest extends TestCase
         ];
     }
 
+    /** @return UploadedFile PDF sintetis dengan xref valid untuk QA CI. */
+    private function uploadedPdf(bool $skrip = false): UploadedFile
+    {
+        $objects = [
+            '<< /Type /Catalog /Pages 2 0 R ' . ($skrip ? '/OpenAction << /S /JavaScript /JS (uji) >>' : '') . ' >>',
+            '<< /Type /Pages /Count 1 /Kids [3 0 R] >>',
+            '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>',
+        ];
+        $pdf = "%PDF-1.4\n";
+        $offsets = [];
+        foreach ($objects as $i => $obj) {
+            $offsets[] = strlen($pdf);
+            $pdf .= ($i + 1) . " 0 obj\n" . $obj . "\nendobj\n";
+        }
+        $xref = strlen($pdf);
+        $pdf .= "xref\n0 4\n0000000000 65535 f \n";
+        foreach ($offsets as $off) {
+            $pdf .= sprintf("%010d 00000 n \n", $off);
+        }
+        $pdf .= "trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n" . $xref . "\n%%EOF\n";
+        file_put_contents($this->tmp, $pdf);
+        return new class ($this->tmp, 'materi.pdf', 'application/pdf', filesize($this->tmp), UPLOAD_ERR_OK) extends UploadedFile {
+            public function isValid(): bool
+            {
+                return true;
+            }
+        };
+    }
+
+    public function testTambahPdfMenyimpanJumlahHalamanDanBerkasPrivat(): void
+    {
+        $input = $this->inputMedia();
+        $input['jenis'] = 'pdf';
+        $input['judul'] = 'PDF Materi QA';
+        $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $input, $this->uploadedPdf());
+        $materi = self::$db->table('materi')->where('judul', 'PDF Materi QA')
+            ->where('tp_id', 1)->get()->getRowArray();
+        self::assertNotNull($materi);
+        self::assertSame('pdf', $materi['jenis']);
+        $meta = self::$db->table('berkas')->where('id', (int) $materi['berkas_id'])
+            ->get()->getRowArray();
+        self::assertSame(1, (int) $meta['halaman']);
+        self::assertSame('application/pdf', $meta['mime']);
+        self::assertFileExists($this->folder . '/' . $meta['nama_acak']);
+        $media = $this->service(1)->media(1, (int) $materi['id']);
+        self::assertSame('pdf', $media['jenis']);
+    }
+
+    public function testTolakPdfDenganJavascriptTidakMenyisakanMateri(): void
+    {
+        $input = $this->inputMedia();
+        $input['jenis'] = 'pdf';
+        try {
+            $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $input, $this->uploadedPdf(true));
+            self::fail('PDF dengan skrip harus ditolak.');
+        } catch (DomainException $e) {
+            self::assertSame(0, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+            self::assertSame(1, self::$db->table('materi')->where('tp_id', 1)->countAllResults());
+        }
+    }
+
     public function testTambahMateriSekaligusUpload(): void
     {
         $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $this->inputMedia(), $this->uploaded());
