@@ -34,6 +34,7 @@ $routes->post('guru/tp/(:num)/materi/(:num)', 'GuruMateri::simpan/$1/$2', ['filt
 $routes->post('guru/tp/(:num)/materi/(:num)/media', 'GuruMateri::unggahMedia/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/materi/(:num)/media', 'GuruMateri::bukaMedia/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi/(:num)/urut', 'GuruMateri::urut/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi/(:num)/hapus', 'GuruMateri::hapus/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
 $routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan']);
 // K2B v2.3 — satu autentikasi, dua ruang administrasi akun.
