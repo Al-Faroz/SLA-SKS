@@ -13,6 +13,7 @@ on:
       - 'tests/integration/peta_atp_mysql_smoke.php'
       - 'tests/integration/PetaTpDatabaseTest.php'
       - 'tests/feature/GuruPetaAtpHttpTest.php'
+      - 'tests/feature/GuruPetaAtpLoginHttpTest.php'
       - 'tests/fixtures/peta_atp_mysql.sql'
       - '.github/workflows/qa-peta-atp.yml'
   workflow_dispatch:
@@ -48,6 +49,7 @@ jobs:
           php -l tests/unit/PetaTpServiceTest.php
           php -l tests/integration/PetaTpDatabaseTest.php
           php -l tests/feature/GuruPetaAtpHttpTest.php
+          php -l tests/feature/GuruPetaAtpLoginHttpTest.php
       - name: PHPUnit khusus pemilihan penugasan G1
         run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
       - name: Siapkan writable untuk CI4 feature tests
@@ -89,3 +91,9 @@ jobs:
         env:
           SLA_QA_DB: sla_sks_qa
         run: vendor/bin/phpunit --no-coverage tests/integration/PetaTpDatabaseTest.php
+      - name: Siapkan writable untuk HTTP CI4
+        run: mkdir -p writable/cache writable/logs writable/session writable/uploads
+      - name: Uji HTTP login Guru hingga tampilan enam semester
+        env:
+          SLA_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/feature/GuruPetaAtpLoginHttpTest.php
