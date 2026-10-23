@@ -142,6 +142,57 @@ final class MateriDrafService
         });
     }
 
+    /**
+     * Hapus hanya Materi pada TP draf milik Guru G1.
+     * FK database mencegah penghapusan Materi yang sudah direferensikan progres,
+     * tugas, snapshot, atau data historis. Berkas privat tidak ikut dihapus.
+     */
+    public function hapus(int $tpId, int $materiId, int $versi): void
+    {
+        if ($materiId < 1) {
+            throw new DomainException('Materi tidak ditemukan.');
+        }
+        $this->ubah($tpId, $versi, function () use ($tpId, $materiId): void {
+            $lama = $this->db->table('materi')->select('id,urutan')
+                ->where('id', $materiId)->where('tp_id', $tpId)
+                ->get()->getRowArray();
+            if ($lama === null) {
+                throw new DomainException('Materi tidak ditemukan dalam TP.');
+            }
+
+            // Lindungi semua referensi historis; jangan mengandalkan
+            // cascading delete pada database yang dipasang pengguna.
+            $tabelRujukan = [
+                'progres_materi', 'resume_materi', 'tugas_hots_materi',
+            ];
+            foreach ($tabelRujukan as $tabel) {
+                if ($this->db->tableExists($tabel)
+                    && $this->db->fieldExists('materi_id', $tabel)
+                    && $this->db->table($tabel)->where('materi_id', $materiId)->countAllResults() > 0) {
+                    throw new DomainException('Materi sudah memiliki aktivitas siswa sehingga tidak dapat dihapus.');
+                }
+            }
+
+            $this->db->table('materi')->where('id', $materiId)
+                ->where('tp_id', $tpId)->delete();
+            if ($this->db->affectedRows() !== 1) {
+                throw new DomainException('Materi tidak berhasil dihapus.');
+            }
+
+            // Setelah nomor yang dihapus kosong, geser baris sesudahnya
+            // secara menaik agar UNIQUE(tp_id, urutan) tetap terjaga.
+            $sesudah = $this->db->table('materi')->select('id,urutan')
+                ->where('tp_id', $tpId)
+                ->where('urutan >', (int) $lama['urutan'])
+                ->orderBy('urutan', 'ASC')->get()->getResultArray();
+            foreach ($sesudah as $baris) {
+                $this->db->table('materi')
+                    ->where('id', $baris['id'])->where('tp_id', $tpId)
+                    ->update(['urutan' => (int) $baris['urutan'] - 1]);
+            }
+        });
+    }
+
     public function geser(int $tpId, int $materiId, int $versi, string $arah): void
     {
         if (! in_array($arah, ['naik', 'turun'], true)) {
