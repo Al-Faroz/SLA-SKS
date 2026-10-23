@@ -17,14 +17,25 @@ final class PetaTpService
 {
     private BaseConnection $db;
 
-    public function __construct(?BaseConnection $db = null)
+    /** @var callable():?array */
+    private $penggunaSaatIni;
+
+    /**
+     * Penyedia akun dapat diinjeksi untuk menguji Service terhadap DB sementara;
+     * aplikasi tetap memakai AuthService dan sesi CI4.
+     *
+     * @param (callable():?array)|null $penggunaSaatIni
+     */
+    public function __construct(?BaseConnection $db = null, ?callable $penggunaSaatIni = null)
     {
         $this->db = $db ?? db_connect();
+        $this->penggunaSaatIni = $penggunaSaatIni
+            ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
     }
 
     private function guruId(): int
     {
-        $akun = (new AuthService())->penggunaSaatIni();
+        $akun = ($this->penggunaSaatIni)();
 
         if ($akun === null
             || ($akun['peran_aktif'] ?? '') !== 'guru'
