@@ -39,12 +39,11 @@ sla-sks/
 7. Atur Gen, siswa, Guru, mapel, satu Guru **per pasangan Gen–Mapel**, kurikulum dan referensi CP. Guru menyusun ATP enam semester melalui Excel lalu melengkapi konten Materi/HOTS langsung di aplikasi serta mengimpor Word Diagnostik/Sumatif per TP.
 8. Jalankan checklist rute, akses privat, ujian fullscreen dan QR sebelum dipakai siswa.
 
-### Pemutakhiran v2.4 pada instalasi K1/K2 yang sudah berisi data
-- **PR K2 #3 belum digabung** dan memuat model Guru global v2.2; sebagian instalasi lokal **sudah mengimpor** patch SQL K2 dan mengisi data. Jangan mengganti berkas SQL yang pernah diimpor lalu meminta pemilik mengimpornya ulang.
-- Setelah dokumen v2.4 disahkan, revisi kode K2 agar memilih Gen+mapel dan penugasan Guru per Gen. Buat SQL pembaruan **baru bernomor 0003** untuk instalasi yang sudah memakai `K2-0002` (bukan CI4 Migration); pra-syarat versi wajib dicek, backup DB dan `writable/` terlebih dahulu.
-- Kolom `ref_mapel.guru_id` dan riwayat Guru global K2 dipertahankan sebagai data warisan selama transisi; **jangan otomatis menyebarkan penugasan Guru lama ke seluruh Gen**. Admin menetapkan ulang masing-masing pasangan Gen–Mapel.
-- Kode paket baru mengikat setiap paket ke Gen pemilik. Paket/riwayat siswa yang sudah ada tidak dihapus, di-reset atau dipindahkan ke Gen lain; bila penentuan pemilik ambigu hentikan proses dan lakukan verifikasi manual.
-- Perubahan dokumen saja **tidak** menjalankan SQL dan tidak mengubah aplikasi localhost; uji DB MySQL dan MariaDB tetap wajib sebelum produksi.
+### Pemutakhiran skema lama ke v2.4
+- Repository sudah melewati K1/K2/K3A, sedangkan PR #13 masih memakai struktur BAB lama. **Jangan mengasumsikan nomor patch SQL terakhir**; periksa dump lokal dan `schema_version` aktual. Patch yang pernah diterapkan tidak boleh ditimpa/diedit dan diminta impor ulang.
+- Untuk **lokal pengembangan**, gunakan prosedur dump SQL lama → analisis/pemetaan data yang diperlukan → dump final baru → backup → **pemilik secara manual menghapus tabel pada database lokal yang ditentukan** → impor baru (§8).
+- Untuk hosting/produksi, perubahan harus memakai **SQL pembaruan bernomor lebih tinggi dari yang telah diterapkan**, menjaga data dan audit, serta diuji sebagai patch non-destruktif di database salinan, **bukan reset tabel**.
+- Guru mengikuti Gen–Mapel dan paket/TP khusus Gen, histori progres/sertifikat dipertahankan. Pemetaan ambigu wajib diperiksa sebelum konversi.
 
 ## 4. Pembaruan versi tanpa migration
 1. Baca catatan release/versi SQL saat ini dari `schema_version`.
