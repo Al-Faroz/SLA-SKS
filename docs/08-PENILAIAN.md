@@ -2,7 +2,7 @@
 
 ## 1. Komponen penilaian
 - Guru menilai setiap resume dan tugas HOTS wajib dengan integer **0–100**, disertai umpan balik opsional maksimal 1000 karakter.
-- Nilai TP dari jalur belajar = `rata_rata_resume × bobot_resume/100 + **rata_rata_hots_materi** × bobot_tugas/100 + nilai_sumatif × bobot_sumatif/100`, bobot default **20/30/50** dan total harus 100. Setiap materi wajib selesai dan resume dinilai; komponen wajib bernilai bobot nol **tetap harus dinilai** jika memang diwajibkan pada jalur belajar.
+- Nilai TP dari jalur belajar = `rata_rata_resume × bobot_resume/100 + rata_rata_hots_materi × bobot_tugas/100 + nilai_sumatif × bobot_sumatif/100`, bobot default **20/30/50** dan total harus 100. Setiap materi wajib selesai dan resume dinilai; komponen wajib bernilai bobot nol **tetap harus dinilai** jika memang diwajibkan pada jalur belajar.
 - Nilai TP jalur diagnostik = skor diagnostik, tidak ditambah aktivitas sukarela. Nilai akhir mapel/semester = rata-rata `nilai_tp` pada seluruh TP paket sesuai aturan historis. Simpan presisi 2 desimal; tampilkan pembulatan sesuai jenis laporan/sertifikat.
 - Nilai dengan penilaian wajib belum lengkap ditampilkan **Sementara**; sertifikat tidak diterbitkan jika satu pun komponen jalur wajib belum diberi nilai.
 - Kelulusan TP ditentukan skor diagnostik/sumatif dibanding KKM; bukan nilai gabungan. Pada koreksi hasil ujian selesai, **status ketuntasan dihitung ulang**, termasuk kemungkinan turun dari tuntas ke belum tuntas.
