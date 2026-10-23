@@ -71,7 +71,7 @@ final class DetailTpService
         }
 
         $materi = $this->db->table('materi')
-            ->select('id,urutan,judul,jenis,aktif')
+            ->select('id,urutan,judul,jenis,aktif,petunjuk_resume,petunjuk_hots,min_waktu_detik,url_youtube,berkas_id')
             ->where('tp_id', $tpId)
             ->orderBy('urutan', 'ASC')
             ->orderBy('id', 'ASC')
