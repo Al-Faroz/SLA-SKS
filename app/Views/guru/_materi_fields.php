@@ -25,11 +25,11 @@ $berkasAda = ! empty($nilai['berkas_id']);
     <label class="a-label" for="materi-berkas">Upload file</label>
     <input class="a-input" id="materi-berkas" name="media" type="file"
         accept="<?= $jenisMateri === 'gambar' ? '.jpg,.jpeg,.png,.webp' : ($jenisMateri === 'audio' ? '.mp3,.m4a' : '.pdf') ?>"
-        <?= $jenisMateri === 'youtube' || $jenisMateri === 'pdf' ? 'disabled' : '' ?>
-        <?= ! $berkasAda && in_array($jenisMateri, ['gambar','audio'], true) ? 'required' : '' ?>>
+        <?= $jenisMateri === 'youtube' ? 'disabled' : '' ?>
+        <?= ! $berkasAda && in_array($jenisMateri, ['pdf','gambar','audio'], true) ? 'required' : '' ?>>
     <p class="a-help" data-materi-file-info>Gambar JPG/PNG/WebP dan audio MP3/M4A maksimal 10 MB.</p>
 </div>
-<p class="a-help" data-materi-pdf-info <?= $jenisMateri === 'pdf' ? '' : 'hidden' ?>>Form upload PDF disiapkan, tetapi pengunggahan belum aktif sampai pemeriksaan keamanan dan batas 40 halaman tersedia.</p>
+<p class="a-help" data-materi-pdf-info <?= $jenisMateri === 'pdf' ? '' : 'hidden' ?>>Anda dapat memilih file PDF, tetapi penyimpanan PDF belum tersedia sampai pemeriksaan keamanan dan batas 40 halaman selesai. Formulir tidak dapat dikirim untuk jenis PDF.</p>
 <div class="a-field">
     <label class="a-label" for="materi-waktu">Minimal waktu belajar (menit)</label>
     <input class="a-input" id="materi-waktu" name="min_waktu_menit" type="number" min="0" max="1092.25" step="0.01" required value="<?= esc(number_format(((int) ($nilai['min_waktu_detik'] ?? 0)) / 60, 2, '.', ''), 'attr') ?>">
