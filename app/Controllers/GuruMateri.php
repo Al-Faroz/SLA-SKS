@@ -20,7 +20,7 @@ final class GuruMateri extends BaseController
     /** @return array<string,mixed>|null */
     private function formulir(): ?array
     {
-        $nama = ['judul', 'jenis', 'petunjuk_resume', 'petunjuk_hots', 'min_waktu_detik', 'url_youtube'];
+        $nama = ['judul', 'jenis', 'petunjuk_resume', 'petunjuk_hots', 'min_waktu_menit', 'url_youtube'];
         $hasil = [];
         foreach ($nama as $kunci) {
             $nilai = $this->request->getPost($kunci);
