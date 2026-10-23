@@ -42,7 +42,8 @@ final class BerkasMateriValidatorTest extends TestCase
 
     public function testValidasiMp3HeaderId3(): void
     {
-        $path = $this->file('ID3' . str_repeat("\0", 50));
+        // Audio uji anonim 0,1 detik disintesis tanpa data orang (MP3 valid).
+        $path = $this->file(base64_decode('SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYxLjcuMTAzAAAAAAAAAAAAAAD/83DAAAAAAAAAAAAASW5mbwAAAA8AAAAGAAABUgCdnZ2dnZ2dnZ2dnZ2dnZ2dsbGxsbGxsbGxsbGxsbHExMTExMTExMTExMTExMTE2NjY2NjY2NjY2NjY2NjY2Njs7Ozs7Ozs7Ozs7Ozs7P////////////////////8AAAAATGF2YzYxLjE5AAAAAAAAAAAAAAAAJAKjAAAAAAAAAVK2L0YaAAAAAAAAAAAAAAAAAP/zEMQAAAADSAAAAABMQU1FMy4xMDBVVVVV//MQxA0AAANIAAAAAFVVVVVVVVVVVVVVVVX/8xDEGgAAA0gAAAAAVVVVVVVVVVVVVVVVVf/zEMQnAAADSAAAAABVVVVVVVVVVVVVVVVV//MQxDQAAANIAAAAAFVVVVVVVVVVVVVVVVX/8xDEQQAAA0gAAAAAVVVVVVVVVVVVVVVVVQ=='));
         $v = BerkasMateriService::validasi($path, 'audio', 'materi.mp3');
         self::assertSame('audio/mpeg', $v['mime']);
         self::assertSame('mp3', $v['ext']);
