@@ -119,8 +119,9 @@
                 ? 'PDF maksimal 15 MB / 40 halaman; unggah belum diaktifkan.'
                 : gambarDipilih ? 'JPG, PNG, WebP maksimal 10 MB.'
                 : 'MP3 atau M4A maksimal 10 MB.';
-            submit.disabled = pdfDipilih && !adaBerkas;
-            submit.title = pdfDipilih && !adaBerkas ? 'Upload PDF belum diaktifkan.' : '';
+            const editPdfLama = form.dataset.materiJenisAwal === 'pdf';
+            submit.disabled = pdfDipilih && !editPdfLama;
+            submit.title = pdfDipilih && !editPdfLama ? 'Upload PDF belum diaktifkan.' : '';
         }
         jenis.addEventListener('change', () => { file.value = ''; update(); });
         update();
