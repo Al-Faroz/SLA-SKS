@@ -19,6 +19,8 @@ Semua mutasi draf/konten/publikasi mengecek penugasan Guru aktif pada Gen–Mape
 ## 3. Dua unduhan Word bank soal per TP, satu struktur
 Berkas referensi resmi `docs/TEMPLATE_SOAL_SLA-SKS.docx`. Sistem menyediakan tombol **Unduh Word Diagnostik** dan **Unduh Word Sumatif**, masing-masing untuk **satu TP**. Generator mengisi identitas Gen, Guru, Mapel, Kurikulum, semester, TP, jenis ujian dan jumlah slot soal sesuai setelan bank yang sah. **Satu mesin parser untuk dua jenis**, format `SLA-SKS-WORD-V1`; identitas CBT lain tidak boleh dipakai.
 
+**Pembedaan master dan unduhan Guru (disetujui pemilik 23 Oktober 2026):** DOCX pada `docs/` tetap berisi 10 contoh soal dan kunci sebagai referensi visual serta pengujian. **Unduhan Guru bukan salinan isi contoh:** generator wajib menghasilkan jumlah blok soal **sesuai jumlah bank yang diisi Guru di aplikasi untuk TP dan jenis ujian tersebut**, seluruh pertanyaan, opsi A–E dan kolom kuncinya kosong. Dua jenis Diagnostik/Sumatif memakai format sama, dengan identitas server otomatis. Jangan menyertakan jawaban contoh dalam unduhan ataupun menetapkan 10 soal contoh sebagai batas jumlah bank.
+
 Struktur tabel Word: **Bagian | Isi | Benar**, satu blok `Soal n` dengan pertanyaan, tepat **lima pilihan A–E yang terisi**, dan **tepat satu kunci ✓** pada opsi benar. Hanya pilihan ganda satu kunci; bukan CBT lima tipe. Jumlah slot dapat dibuat dinamis menurut kebutuhan bank; nilai bawaan tayang diagnostik 10, sumatif 20, dengan checklist bank memadai. Guru boleh memperbanyak soal sesuai pengaturan; jumlah slot contoh dokumen tidak menetapkan batas.
 
 **Persyaratan fidelitas DOCX (wajib dan harus diuji):**
