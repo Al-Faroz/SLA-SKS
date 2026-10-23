@@ -50,6 +50,8 @@ jobs:
           php -l tests/feature/GuruPetaAtpHttpTest.php
       - name: PHPUnit khusus pemilihan penugasan G1
         run: vendor/bin/phpunit --no-coverage tests/unit/PetaTpServiceTest.php
+      - name: Siapkan writable untuk CI4 feature tests
+        run: mkdir -p writable/cache writable/logs writable/session writable/uploads
       - name: HTTP route dan filter tamu
         run: vendor/bin/phpunit --no-coverage tests/feature/GuruPetaAtpHttpTest.php
 
