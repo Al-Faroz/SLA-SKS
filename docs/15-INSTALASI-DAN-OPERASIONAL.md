@@ -65,7 +65,7 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 
 ## 8. Checklist go-live
 - [ ] PHP dan ekstensi sesuai paket `composer.lock`.
-- [ ] Database MySQL lokal dan MariaDB hosting lolos impor SQL dari nol.
+- [ ] Dump final MySQL lokal dan skema instalasi MariaDB hosting lolos pengujian pada database uji kosong; patch produksi diuji non-destruktif.
 - [ ] Patch update dari versi sebelumnya dapat diterapkan tanpa kehilangan data.
 - [ ] HTTPS dan domain final.
 - [ ] `index.php`/`.htaccess` root, semua URL privat ditolak dari browser.
