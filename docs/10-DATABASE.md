@@ -56,7 +56,7 @@ flowchart TD
 9. Waktu simpan UTC atau timezone konsisten yang kemudian ditampilkan Asia/Jakarta; pilih satu standar secara eksplisit pada implementasi dan pakai di semua service/database.
 10. Pengecekan referensial dilakukan ulang sebelum commit, bukan hanya lewat JavaScript.
 
-### Struktur data yang dipertahankan dari v2.4
+### Struktur data lama yang tetap relevan pada v2.4
 - `ref_mapel` menyimpan identitas kode/nama mapel saja untuk kewenangan baru. Sumber G1 adalah `penugasan_guru_gen(id,angkatan_id,mapel_id,guru_id,diubah_oleh,diubah_pada)`, pasangan Gen–Mapel unik. FK pengguna membatasi ID valid; Service menegakkan status aktif + peran Guru. Baris boleh ada tanpa Guru; dropdown Guru hanya akun aktif dengan role `guru`. `riwayat_penugasan_guru_gen` menyimpan Guru sebelum/sesudah, alasan, Admin dan waktu, append-only.
 - `siswa(id,pengguna_id,nisn,angkatan_id,semester_mulai,...)`: `pengguna_id` unik dan FK, `nisn` unik 10 angka, `angkatan_id` wajib sebelum siswa dapat belajar. Koreksi NISN = update `pengguna.username` dan `siswa.nisn` satu transaksi+audit; tidak mengganti `siswa_id`.
 - `profil_pengelola(pengguna_id,foto_aset_id,telepon_pribadi,...)`: staf mengubah hanya atribut profil sendiri yang diizinkan; nama resmi/NIP/peran/penugasan ditangani Admin. Foto berada di storage privat dengan pemeriksaan upload. Data publik Guru dibuat melalui proyeksi terbatas tanpa telepon pribadi/NIP.
@@ -94,8 +94,7 @@ database/sql/
 ├── install/
 │   └── sla_sks_v2_4_full.sql           # DDL + data bawaan non-pribadi
 └── updates/
-    ├── 0002_*.sql                     # patch K2 bila sudah diimpor
-    └── 0003_*.sql                     # transisi v2.4 non-destruktif (dibuat saat implementasi)
+    └── NNNN_*.sql                     # pembaruan bernomor sesuai versi skema nyata setelah dump dianalisis
 ```
 
 - Semua SQL UTF-8/`utf8mb4`; gunakan sintaks kompatibel **MySQL lokal dan MariaDB hosting**. Uji impor bersih di keduanya.
