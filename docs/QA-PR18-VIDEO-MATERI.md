@@ -17,3 +17,13 @@
 - Coba Materi Nonaktif (seharusnya tetap bisa dipratinjau Guru tetapi diberi penanda); coba URL video palsu saat simpan draf (harus ditolak).
 - Guru yang tidak ditugaskan pada TP lain harus menerima akses ditolak (tidak memperoleh URL embed).
 - Uji navigasi HP 360px, pesan koneksi offline, dan buka link di YouTube. Jangan memakai data siswa sungguhan.
+
+## Perbaikan hasil pengujian pemilik — 23 Oktober 2026
+
+Pemilik melaporkan **halaman Pratinjau mengalami error saat menampilkan video**, dan meminta label serta input **Minimal waktu belajar dalam menit**, bukan detik. Perubahan tindak lanjut:
+
+1. Pemutar video tidak lagi menggunakan skrip JavaScript inline atau pembuatan iframe dengan `document.createElement`. Antarmuka memakai `<details>` bawaan browser dan `<iframe>` HTML dengan sumber hasil validasi server; tautan langsung YouTube tetap tersedia untuk masalah pembatasan embed. Penyebab pasti error pertama belum dapat dibuktikan tanpa pesan galat/screenshot pengguna, sehingga diperlukan uji XAMPP ulang.
+2. Input formulir bernama `min_waktu_menit` (angka menit, hingga dua desimal). Service memeriksa rentang dan mengonversi ke kolom `materi.min_waktu_detik`, tanpa SQL update. Nilai lama ditampilkan sebagai menit sampai dua desimal, dengan konversi `round(menit * 60)` saat disimpan. Pengujian otomatis membuktikan 1.5 menit menjadi 90 detik dan nilai di luar rentang ditolak.
+3. Periksa lagi pada XAMPP: simpan 2 menit dan pastikan saat membuka ulang muncul 2.00; video dapat dipratinjau; URL yang tidak mendukung embed tetap mempunyai tautan alternatif.
+
+Jangan merge sebelum kedua temuan diperiksa ulang pemilik.
