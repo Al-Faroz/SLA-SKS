@@ -56,7 +56,7 @@
                                 <tr>
                                     <td><?= (int) $tp['urutan_atp'] ?></td>
                                     <td><?= esc($tp['kode_tp']) ?></td>
-                                    <td><?= esc($tp['judul']) ?></td>
+                                    <td><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc($tp['judul']) ?></a></td>
                                     <td><?= $paketTp === null ? '—' : (int) $paketTp['nomor_versi'] ?></td>
                                     <td><span class="a-badge"><?= esc($tp['status']) ?></span></td>
                                 </tr>
