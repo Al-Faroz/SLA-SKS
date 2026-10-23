@@ -44,14 +44,8 @@ final class MateriDrafService
         }
 
         if ($jenis === 'youtube') {
-            $host = strtolower((string) parse_url($url, PHP_URL_HOST));
-            $path = (string) parse_url($url, PHP_URL_PATH);
-            $validHost = in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtube-nocookie.com'], true);
-            if (strlen($url) > 255 || ! $validHost
-                || parse_url($url, PHP_URL_SCHEME) !== 'https'
-                || $path === '' || $path === '/') {
-                throw new DomainException('URL YouTube harus berupa tautan HTTPS YouTube yang valid.');
-            }
+            // URL tervalidasi dinormalisasi agar ID video tidak membawa parameter/tracker.
+            $url = VideoMateriService::urlStandar($url);
         } elseif ($url !== '') {
             throw new DomainException('Tautan YouTube hanya boleh untuk materi berjenis YouTube.');
         }
