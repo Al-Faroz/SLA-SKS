@@ -32,3 +32,10 @@ Jalankan `G:\xampp\php\php.exe spark routes` lalu pastikan **GET guru/peta-atp**
 Pada **MariaDB lokal `sla_sks_v3`**: 37 pengguna, 17 siswa, 20 Mapel, 3 CP, 1 paket, 1 TP; semua lima cek relasi bernilai 0; jumlah FK 81; kolom `tp.paket_semester_id` dan `tugas_hots_materi.materi_id` ada; tabel BAB tidak ada.
 
 **PASS di GitHub Actions:** lint PHP, PHPUnit 5 tes (6 assertions), dan smoke MySQL sintetis yang membuktikan isolasi data Gen–Mapel, TP, serta semester kosong. Lihat run [39909166387](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39909166387).\n\n**PASS tambahan:** [GitHub Actions run 39909576322](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39909576322) menjalankan kelas `PetaTpDatabaseTest` yang memanggil **Service CI4 sesungguhnya** menggunakan koneksi MySQL fixture anonim: **7 tes / 10 assertions**, termasuk penolakan akses Gen milik Guru lain, penolakan peran Admin, kewajiban ganti sandi, dan semester 1–6. PHP lint dan tes unit juga PASS.\n\n**Belum diuji:** HTTP/controller dengan sesi CI4 autentik nyata; seluruh database `sla_sks_v3` dan rendering browser desktop/mobile. Fixture hanya subset skema sintetis, bukan dump lengkap. Data pribadi tidak dicommit.
+
+## Pengujian HTTP anonim otomatis
+
+- `tests/feature/GuruPetaAtpHttpTest.php` memverifikasi GET `/guru/peta-atp` dari pengunjung tanpa sesi diarahkan ke login dan POST tidak diproses sebagai halaman baca-saja.
+- Pada [Actions run 39910267261](https://github.com/Al-Faroz/SLA-SKS/actions/runs/39910267261), kelompok **HTTP: 2 tests / 3 assertions PASS**, bersama unit 5 tests / 6 assertions PASS.
+- Lingkungan CI4 membutuhkan folder `writable/cache`, `writable/logs`, `writable/session`, dan `writable/uploads`. Persiapan folder hanya dilakukan di GitHub Actions, tidak mengubah konfigurasi `.env` pengguna.
+- **Belum mencakup** sesi login Guru yang sah, hasil halaman untuk Guru aktif pada skema lengkap `sla_sks_v3`, maupun pemeriksaan visual browser.
