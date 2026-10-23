@@ -158,9 +158,6 @@ final class GuruMateri extends BaseController
             return $this->kembali($tpId, 'Data formulir Materi tidak valid.');
         }
         try {
-            if ($data['jenis'] === 'pdf') {
-                throw new DomainException('Upload PDF belum diaktifkan. Pemeriksaan keamanan PDF belum tersedia.');
-            }
             $file = $this->request->getFile('media');
             if ($file !== null && $file->getError() !== UPLOAD_ERR_NO_FILE) {
                 (new BerkasMateriService())->simpanDenganMedia($tpId, $materiId, $versi, $data, $file);
