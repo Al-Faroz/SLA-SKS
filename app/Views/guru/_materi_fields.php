@@ -22,8 +22,9 @@ $jenisMateri = (string) ($nilai['jenis'] ?? 'youtube');
     <input class="a-input" id="materi-url" name="url_youtube" type="url" maxlength="255" placeholder="https://www.youtube.com/watch?v=..." value="<?= esc((string) ($nilai['url_youtube'] ?? ''), 'attr') ?>">
 </div>
 <div class="a-field">
-    <label class="a-label" for="materi-waktu">Minimal waktu belajar (detik)</label>
-    <input class="a-input" id="materi-waktu" name="min_waktu_detik" type="number" min="0" max="65535" step="1" required value="<?= (int) ($nilai['min_waktu_detik'] ?? 0) ?>">
+    <label class="a-label" for="materi-waktu">Minimal waktu belajar (menit)</label>
+    <input class="a-input" id="materi-waktu" name="min_waktu_menit" type="number" min="0" max="1092.25" step="0.01" required value="<?= esc(number_format(((int) ($nilai['min_waktu_detik'] ?? 0)) / 60, 2, '.', ''), 'attr') ?>">
+    <p class="a-help">Isi dalam menit, misalnya 1.5 untuk satu setengah menit. Nilai disimpan sebagai detik agar kompatibel dengan database.</p>
 </div>
 <div class="a-field">
     <label class="a-label" for="materi-resume">Petunjuk Resume</label>
