@@ -31,27 +31,22 @@ final class MateriDrafService
         $jenis = (string) ($input['jenis'] ?? '');
         $resume = trim((string) ($input['petunjuk_resume'] ?? ''));
         $hots = trim((string) ($input['petunjuk_hots'] ?? ''));
-        $waktu = $input['min_waktu_detik'] ?? 0;
+        $menit = $input['min_waktu_menit'] ?? null;
+        $formatMenit = is_string($menit) && preg_match('/^(?:[0-9]{1,4})(?:\\.[0-9]{1,2})?$/D', $menit) === 1;
+        $waktu = $formatMenit ? (int) round((float) $menit * 60) : -1;
         $url = trim((string) ($input['url_youtube'] ?? ''));
 
         if ($judul === '' || mb_strlen($judul) > 180
             || ! in_array($jenis, ['pdf', 'gambar', 'audio', 'youtube'], true)
             || $resume === '' || mb_strlen($resume) > 20000
             || $hots === '' || mb_strlen($hots) > 20000
-            || ! is_scalar($waktu) || ! ctype_digit((string) $waktu)
-            || strlen((string) $waktu) > 5 || (int) $waktu > 65535) {
+            || ! $formatMenit || $waktu < 0 || $waktu > 65535) {
             throw new DomainException('Lengkapi judul, jenis media, petunjuk Resume/HOTS dan waktu yang valid.');
         }
 
         if ($jenis === 'youtube') {
-            $host = strtolower((string) parse_url($url, PHP_URL_HOST));
-            $path = (string) parse_url($url, PHP_URL_PATH);
-            $validHost = in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtube-nocookie.com'], true);
-            if (strlen($url) > 255 || ! $validHost
-                || parse_url($url, PHP_URL_SCHEME) !== 'https'
-                || $path === '' || $path === '/') {
-                throw new DomainException('URL YouTube harus berupa tautan HTTPS YouTube yang valid.');
-            }
+            // URL tervalidasi dinormalisasi agar ID video tidak membawa parameter/tracker.
+            $url = VideoMateriService::urlStandar($url);
         } elseif ($url !== '') {
             throw new DomainException('Tautan YouTube hanya boleh untuk materi berjenis YouTube.');
         }

@@ -8,6 +8,7 @@ use App\Services\AuthService;
 use App\Services\DetailTpService;
 use App\Services\MateriDrafService;
 use App\Services\NavigasiService;
+use App\Services\VideoMateriService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
@@ -19,7 +20,7 @@ final class GuruMateri extends BaseController
     /** @return array<string,mixed>|null */
     private function formulir(): ?array
     {
-        $nama = ['judul', 'jenis', 'petunjuk_resume', 'petunjuk_hots', 'min_waktu_detik', 'url_youtube'];
+        $nama = ['judul', 'jenis', 'petunjuk_resume', 'petunjuk_hots', 'min_waktu_menit', 'url_youtube'];
         $hasil = [];
         foreach ($nama as $kunci) {
             $nilai = $this->request->getPost($kunci);
@@ -89,6 +90,42 @@ final class GuruMateri extends BaseController
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'tp' => $rincian['tp'],
             'materi' => $materi,
+        ]);
+    }
+
+    public function pratinjau(int $tpId, int $materiId): ResponseInterface|string
+    {
+        try {
+            $rincian = (new DetailTpService())->lihat($tpId);
+            $materi = null;
+            foreach ($rincian['materi'] as $baris) {
+                if ((int) $baris['id'] === $materiId) {
+                    $materi = $baris;
+                    break;
+                }
+            }
+            if ($materi === null || $materi['jenis'] !== 'youtube'
+                || ! is_string($materi['url_youtube']) || $materi['url_youtube'] === '') {
+                throw new DomainException('Video Materi tidak tersedia.');
+            }
+            $urlEmbed = VideoMateriService::urlEmbed($materi['url_youtube']);
+            $urlAsli = VideoMateriService::urlStandar($materi['url_youtube']);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(403)
+                ->setHeader('Cache-Control', 'no-store, private')
+                ->setBody(view('publik/ditolak', ['judul' => 'Pratinjau tidak tersedia']));
+        }
+
+        $akun = (new AuthService())->penggunaSaatIni();
+        return view('guru/materi_pratinjau', [
+            'judul' => 'Pratinjau Media Materi',
+            'namaPengguna' => $akun['nama'],
+            'peranAktif' => 'Guru',
+            'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
+            'tp' => $rincian['tp'],
+            'materi' => $materi,
+            'urlEmbed' => $urlEmbed,
+            'urlAsli' => $urlAsli,
         ]);
     }
 
