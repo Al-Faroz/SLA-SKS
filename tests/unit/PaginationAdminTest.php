@@ -16,7 +16,7 @@ final class PaginationAdminTest extends TestCase
     public function testKomponenPaginasiMempertahankanGenDanDuaHalaman(): void
     {
         helper('url');
-        $html = view('components/pager', [
+        $html = html_entity_decode(view('components/pager', [
             'urlPath' => 'admin/mapel-guru',
             'pageParam' => 'halaman_mapel',
             'halaman' => 3,
@@ -25,10 +25,10 @@ final class PaginationAdminTest extends TestCase
             'filter' => ['gen' => 7, 'halaman_riwayat' => 2],
             'label' => 'penetapan Guru',
             'anchor' => 'judul-pengampu',
-        ]);
+        ], ['saveData' => false]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         self::assertStringContainsString('51–75 dari 160 data', $html);
         self::assertStringContainsString('Halaman 3 dari 7', $html);
-        self::assertStringContainsString('gen=7&amp;halaman_riwayat=2&amp;halaman_mapel=4', $html);
+        self::assertStringContainsString('gen=7&halaman_riwayat=2&halaman_mapel=4', $html);
         self::assertStringContainsString('#judul-pengampu', $html);
         self::assertStringContainsString('Pertama', $html);
         self::assertStringContainsString('Terakhir', $html);
@@ -45,10 +45,12 @@ final class PaginationAdminTest extends TestCase
             'perHalaman' => 25,
             'total' => 27,
             'filter' => ['cari' => 'uji ruang', 'status' => 'aktif'],
-        ]);
+            'label' => 'akun Pengelola',
+            'anchor' => 'judul-daftar',
+        ], ['saveData' => false]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         self::assertStringContainsString('Halaman 2 dari 2', $html);
         self::assertStringContainsString('26–27 dari 27 data', $html);
-        self::assertStringContainsString('cari=uji+ruang&amp;status=aktif&amp;halaman=1', $html);
+        self::assertStringContainsString('cari=uji+ruang&status=aktif&halaman=1', $html);
         self::assertStringContainsString('aria-disabled="true">Terakhir', $html);
     }
 
