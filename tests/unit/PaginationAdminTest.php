@@ -38,7 +38,7 @@ final class PaginationAdminTest extends TestCase
     public function testHalamanDiLuarRentangDibatasiDanTombolNonaktif(): void
     {
         helper('url');
-        $html = view('components/pager', [
+        $html = html_entity_decode(view('components/pager', [
             'urlPath' => 'admin/pengelola',
             'pageParam' => 'halaman',
             'halaman' => 999,
