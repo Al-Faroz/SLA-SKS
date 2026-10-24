@@ -13,6 +13,7 @@ use App\Services\KunciTemplateWordService;
 use App\Services\PratinjauWordSoalService;
 use App\Services\RenderWordSoalService;
 use App\Services\ImporBankSoalService;
+use App\Services\KelolaSoalGuruService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -31,6 +32,11 @@ final class GuruBankSoal extends BaseController
 
         $akun = (new AuthService())->penggunaSaatIni();
         $ringkasan = (new RingkasanBankSoalService())->lihat($tpId);
+        $jenisDipilih = (string) ($this->request->getGet('jenis') ?: 'diagnostik');
+        if (!in_array($jenisDipilih, ['diagnostik', 'sumatif'], true)) {
+            $jenisDipilih = 'diagnostik';
+        }
+        $daftarSoal = (new KelolaSoalGuruService())->daftar($tpId, $jenisDipilih);
 
         $riwayat = db_connect()->table('impor_soal_docx')
             ->select('id,jenis,status,dibuat_pada,diterapkan_pada')
@@ -44,6 +50,8 @@ final class GuruBankSoal extends BaseController
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'ringkasan_bank' => $ringkasan,
             'word_riwayat' => $riwayat,
+            'jenis_dipilih' => $jenisDipilih,
+            'daftar_soal' => $daftarSoal,
         ]));
     }
     public function unduh(int $tpId, string $jenis): ResponseInterface
