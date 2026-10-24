@@ -146,3 +146,12 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - Logo aplikasi tersentralisasi sebagai favicon dan identitas visual; ukuran varian dihasilkan tanpa mengganti sumber/versi secara liar, nama merek konsisten di header/login.
 - Pratinjau soal Word: tabel akademik di dalam sel pertanyaan/opsi harus tetap terbaca/responsif, gambar tidak overflow, equation dapat di-scroll apabila lebar melebihi mobile, pemutar Drive aman. Warna status/fokus mengikuti token existing `a-`.
 - Pembaruan CSS visual wajib diikuti perubahan `docs/assets/galeri-komponen.html` ketika kode implementasi UI dikerjakan; dokumen ini **tidak** mengklaim galeri runtime sudah berubah.
+
+## Audit tabel responsif tahap A — Admin Pengelola/Siswa dan Guru per Gen (24 Oktober 2026)
+
+- Pola `a-tbl--cards` diterapkan **secara opt-in** pada tabel yang setiap barisnya berdiri sendiri. Pada desktop tetap memakai header kolom/tabel semantik; pada lebar ≤980px, setiap baris menjadi kartu yang memiliki `data-label` di tiap sel. Jangan memasang pola ini pada tabel matriks yang perlu hubungan baris–kolom atau data komparatif kompleks; matriks tetap gunakan scroll dengan label tetap.
+- Tahap pertama: tabel daftar Pengelola dan Siswa (satu template `app/Views/admin/akun_daftar.php`), tabel penetapan Guru per Gen, dan tabel riwayat penetapan (`app/Views/admin/mapel_guru.php`). Pertahankan pemilihan Gen, label form, tindakan per baris, perlindungan CSRF, filter dan pagination server-side.
+- Tabel penetapan harus tetap memberi ruang sejajar untuk input **Guru / Alasan / Simpan** di desktop; pada layar sempit, masing-masing kontrol disusun vertikal dengan label, tanpa input/tombol terpotong.
+- Periksa ukuran 360, 390, 768, 980 dan 1100px, keyboard focus/tab, opsi dropdown panjang, aksi reset sandi, penempatan Gen dan pagination. Tidak mengubah format ataupun endpoint data.
+- Komponen demo responsif telah ditambahkan di `docs/assets/galeri-komponen.html`. Implementasi tahap berikutnya melakukan audit tabel CP/ATP dan referensi yang membutuhkan struktur berbeda, tanpa override CSS global secara sembrono.
+

@@ -904,3 +904,42 @@ a:hover { text-decoration-thickness: 2px; }
   .a-tbl--cards tbody :is(th[scope="row"], td) { grid-template-columns: 1fr; gap: 4px; }
   .a-soal-tindakan .a-btn { flex: 0 1 auto; }
 }
+
+/* Audit responsif tahap A: daftar akun Admin dan penugasan Guru.
+   Menggunakan komponen .a-tbl--cards yang sama dengan Bank Soal;
+   form POST, filter, dan pagination tetap tidak berubah. */
+.a-admin-akun__tabel.a-tbl--cards { width:100%; table-layout:fixed; }
+.a-admin-akun__tabel.a-tbl--cards thead th:nth-child(1) { width:23%; }
+.a-admin-akun__tabel.a-tbl--cards thead th:nth-child(2) { width:17%; }
+.a-admin-akun__tabel.a-tbl--cards thead th:nth-child(3) { width:18%; }
+.a-admin-akun__tabel.a-tbl--cards thead th:nth-child(4) { width:12%; }
+.a-admin-akun__tabel.a-tbl--cards thead th:nth-child(5) { width:30%; }
+.a-admin-akun__tabel.a-tbl--cards :is(th,td) { overflow-wrap:anywhere; }
+.a-admin-akun__tabel.a-tbl--cards .a-admin-akun__aksi { gap:6px; }
+.a-tbl--penugasan { min-width:0; table-layout:fixed; }
+.a-tbl--penugasan thead th:nth-child(1) { width:20%; }
+.a-tbl--penugasan thead th:nth-child(2) { width:20%; }
+.a-tbl--penugasan thead th:nth-child(3) { width:60%; }
+.a-tbl--penugasan .a-form-penugasan { display:grid; grid-template-columns:minmax(130px,1fr) minmax(175px,1.45fr) auto;
+  align-items:end; gap:10px; min-width:0; max-width:100%; }
+.a-tbl--penugasan .a-form-penugasan .a-field { min-width:0; margin:0; }
+.a-tbl--penugasan .a-form-penugasan :is(select,input) { width:100%; min-width:0; }
+.a-tbl--penugasan .a-form-penugasan .a-btn { white-space:normal; line-height:1.35; min-height:42px; }
+.a-tbl--riwayat-guru { overflow-wrap:anywhere; }
+@media (max-width: 980px) {
+  .a-admin-akun__tabel.a-tbl--cards, .a-tbl--penugasan.a-tbl--cards,
+  .a-tbl--riwayat-guru.a-tbl--cards { min-width:0; }
+  .a-app--prototipe .a-admin-akun__tabel.a-tbl--cards tbody :is(th,td) { font-size:14px; line-height:1.5; }
+  .a-admin-akun__tabel.a-tbl--cards tbody th[scope="row"] { font-weight:700; }
+  .a-admin-akun__tabel.a-tbl--cards .a-admin-akun__penempatan { max-width:100%; min-width:0; }
+  .a-admin-akun__tabel.a-tbl--cards .a-admin-akun__aksi { display:flex; flex-wrap:wrap; }
+  .a-admin-akun__tabel.a-tbl--cards .a-admin-akun__aksi .a-btn { min-height:40px; white-space:normal; }
+  .a-tbl--penugasan.a-tbl--cards .a-form-penugasan { grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto; }
+  .a-tbl--penugasan.a-tbl--cards .a-form-penugasan .a-btn { grid-column:auto; }
+  .a-admin-akun__pagination { justify-content:flex-start; }
+}
+@media (max-width: 680px) {
+  .a-tbl--penugasan.a-tbl--cards .a-form-penugasan { grid-template-columns:minmax(0,1fr); }
+  .a-tbl--penugasan.a-tbl--cards .a-form-penugasan .a-btn { width:100%; justify-content:center; }
+  .a-admin-akun__tabel.a-tbl--cards .a-admin-akun__aksi .a-btn { flex:1 1 auto; text-align:center; }
+}
