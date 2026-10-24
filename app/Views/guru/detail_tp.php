@@ -47,6 +47,21 @@
             </table>
         </div>
     </section>
+    <section class="a-card a-jarak-atas" id="kesiapan-tp" aria-labelledby="kesiapan-tp-judul">
+        <h2 id="kesiapan-tp-judul">Kesiapan TP Siap</h2>
+        <p class="a-help">Periksa CP aktif dan utama, seluruh Materi/Resume/HOTS,
+            bank Diagnostik dan Sumatif, media, parameter ujian, serta
+            versi konten sebelum mengunci TP.</p>
+        <?php if ($tp['status'] === 'siap'): ?>
+            <div class="a-alert" role="status">TP sudah Siap dan terkunci.
+                Pemeriksaan dan versi konten tetap dapat dilihat.</div>
+            <a class="a-btn a-btn--sekunder"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">Lihat status dan versi TP</a>
+        <?php else: ?>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">Periksa kesiapan TP Siap</a>
+        <?php endif ?>
+    </section>
     <section class="a-card a-jarak-atas" aria-labelledby="bank-soal-tautan">
         <h2 id="bank-soal-tautan">Bank soal Diagnostik dan Sumatif</h2>
         <p class="a-help">Lihat jumlah soal aktif untuk TP ini. Kelola soal aktif, sunting soal draf, atau impor Word untuk TP ini.</p>

@@ -1137,3 +1137,33 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-pratinjau-navigasi .a-btn { flex-basis:100%; }
     .a-pratinjau-info__item { flex:1 1 auto; }
 }
+
+/* Pemeriksaan akhir TP Siap: ringkas dan responsif, tanpa mengubah editor Materi. */
+.a-kesiapan-ringkasan { display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px; margin:16px 0; }
+.a-kesiapan-ringkasan > div { display:flex; flex-direction:column; gap:4px;
+    border:1px solid #d4e5db; background:#f2f8f5; border-radius:10px; padding:13px 15px;
+    min-width:0; overflow-wrap:anywhere; }
+.a-kesiapan-ringkasan strong { color:#15583f; font-size:19px; line-height:1.3; }
+.a-kesiapan-ringkasan span { color:#546e60; font-size:12px; line-height:1.4; }
+.a-kesiapan-tabel { width:100%; table-layout:fixed; min-width:0; }
+.a-kesiapan-tabel thead th:nth-child(1) { width:31%; }
+.a-kesiapan-tabel thead th:nth-child(2) { width:18%; }
+.a-kesiapan-tabel thead th:nth-child(3) { width:51%; }
+.a-kesiapan-tabel :is(th,td) { overflow-wrap:anywhere; vertical-align:top; }
+.a-kesiapan-tabel td a { display:inline-flex; margin-top:7px; color:#155a41;
+    font-weight:650; text-underline-offset:3px; }
+.a-kesiapan-tabel td a:focus-visible { outline:3px solid #168458; outline-offset:2px; }
+.a-kesiapan-konfirmasi { display:flex; align-items:flex-start; gap:10px; line-height:1.6;
+    cursor:pointer; max-width:850px; }
+.a-kesiapan-konfirmasi input { margin-top:6px; flex-shrink:0; }
+.a-kesiapan-kembali { margin-top:16px; }
+@media(max-width:980px) {
+    .a-kesiapan-ringkasan { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .a-kesiapan-tabel.a-tbl--cards { min-width:0; }
+}
+@media(max-width:430px) {
+    .a-kesiapan-ringkasan { gap:8px; }
+    .a-kesiapan-ringkasan > div { padding:10px; }
+    .a-kesiapan-ringkasan strong { font-size:16px; }
+}
