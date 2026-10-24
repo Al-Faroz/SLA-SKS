@@ -164,3 +164,12 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - Uji penerimaan pada 360, 390, 768, 1100px dan desktop; filter yang menghasilkan 0/1/lebih dari 25 data, halaman terakhir, ID halaman di luar rentang, perubahan Gen, penetapan dan redirect setelah POST. Pagination adalah query SQL (`LIMIT/OFFSET`), bukan JS yang menyembunyikan baris di browser.
 - Struktur akses Admin dan mekanisme MySQL/MariaDB yang sudah berlaku tidak berubah. Contoh tampilan ada di `docs/assets/galeri-komponen.html`.
 
+
+## Audit tabel responsif tahap B — Daftar CP dan Peta ATP (24 Oktober 2026)
+
+- **Admin / Kurikulum & CP:** hanya tabel Daftar CP dan Status Versinya mendapat filter kode/mapel/kurikulum/status, jumlah total, pager SQL 25 data/halaman, dan ekspor XLSX sesuai filter tanpa memaksa seluruh CP dimuat. Ekspor mencakup seluruh hasil filter, dibatasi 5.000 CP demi memori shared hosting, dan menulis setiap sel sebagai teks agar awalan `=`, `+`, `-` atau `@` tidak menjadi formula.
+- Tabel CP yang tiap barisnya independen memakai `a-tbl--cards` di layar ≤980px dengan `data-label` Kode, Kurikulum, Mapel/Fase, Versi resmi, Draf dan Aksi. Tabel kurikulum dan formulir CP tidak dirombak pada tahap ini.
+- **Guru / Peta ATP enam semester:** setiap TP menjadi kartu berlabel pada ≤980px; nomor urut ATP, kode, judul (link Detail TP), versi paket dan status tetap tampil. Urutan serta relasi Gen–Mapel–Semester tidak diubah; enam semester dan penanganan data kosong tetap sama.
+- Gunakan `a-cp__filter`, `a-cp__tabel.a-tbl--cards`, `a-tbl--peta-atp` sesuai CSS; hindari global override untuk tabel matriks akademik. Periksa 360/390/768/1100px, dropdown panjang, keyboard, status kosong dan filter >25 CP, link ke detail, serta worksheet Excel pada LibreOffice/Excel.
+- QA: uji dengan 0/1/26/60 CP; pagination/filter/export konsisten dan tidak menyebabkan CP milik mapel lain ikut; status versi CP tetap immutable.
+

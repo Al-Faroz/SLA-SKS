@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Services\AuthService;
 use App\Services\CpReferensiService;
+use App\Services\CpDaftarService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
@@ -55,10 +56,41 @@ final class AdminKurikulumCp extends BaseController
 
     public function index(): string
     {
+        $filterGalat = null;
+        try {
+            $filter = CpDaftarService::filter((array) $this->request->getGet());
+            $page = CpDaftarService::halamanGet($this->request->getGet('halaman'));
+        } catch (DomainException $e) {
+            $filter = CpDaftarService::filter([]);
+            $page = 1;
+            $filterGalat = $e->getMessage();
+        }
         return view('admin/kurikulum_cp', array_merge(
             $this->layout('Referensi Kurikulum dan CP'),
-            (new CpReferensiService())->daftar()
+            $this->service()->daftar(false),
+            (new CpDaftarService())->halaman($filter, $page),
+            ['cpFilterGalat' => $filterGalat]
         ));
+    }
+
+    public function eksporCp(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        try {
+            $filter = CpDaftarService::filter((array) $this->request->getGet());
+            $bytes = (new CpDaftarService())->eksporXlsx($filter);
+            return $this->response
+                ->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                ->setHeader('Content-Disposition', 'attachment; filename="sla-sks-daftar-cp.xlsx"')
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody($bytes);
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('admin/kurikulum-cp'))
+                ->with('galat', $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Ekspor daftar CP gagal: {error}', ['error' => $e->getMessage()]);
+            return redirect()->to(site_url('admin/kurikulum-cp'))
+                ->with('galat', 'Ekspor CP belum dapat dibuat. Periksa ruang penyimpanan server.');
+        }
     }
 
     public function simpanKurikulum(): RedirectResponse
