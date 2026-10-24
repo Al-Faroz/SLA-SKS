@@ -9,7 +9,7 @@ use DomainException;
 use Throwable;
 
 /**
- * CRUD terbatas Materi TP draf; tanpa penghapusan, publikasi atau unggahan berkas.
+ * CRUD Materi TP draf (tanpa publikasi/unggah berkas langsung).
  * Seluruh operasi mengunci TP induk, menguji hak G1 dan versi struktur.
  */
 final class MateriDrafService
@@ -36,12 +36,20 @@ final class MateriDrafService
         $waktu = $formatMenit ? (int) round((float) $menit * 60) : -1;
         $url = trim((string) ($input['url_youtube'] ?? ''));
 
-        if ($judul === '' || mb_strlen($judul) > 180
-            || ! in_array($jenis, ['pdf', 'gambar', 'audio', 'youtube'], true)
-            || $resume === '' || mb_strlen($resume) > 20000
-            || $hots === '' || mb_strlen($hots) > 20000
-            || ! $formatMenit || $waktu < 0 || $waktu > 65535) {
-            throw new DomainException('Lengkapi judul, jenis media, petunjuk Resume/HOTS dan waktu yang valid.');
+        if ($judul === '' || mb_strlen($judul) > 180) {
+            throw new DomainException('Judul Materi wajib diisi (maksimal 180 karakter).');
+        }
+        if (! in_array($jenis, ['pdf', 'gambar', 'audio', 'youtube'], true)) {
+            throw new DomainException('Pilih jenis media yang tersedia: YouTube, PDF, Gambar atau Audio.');
+        }
+        if ($resume === '' || mb_strlen($resume) > 20000) {
+            throw new DomainException('Petunjuk Resume wajib diisi (maksimal 20.000 karakter).');
+        }
+        if ($hots === '' || mb_strlen($hots) > 20000) {
+            throw new DomainException('Petunjuk tugas HOTS wajib diisi (maksimal 20.000 karakter).');
+        }
+        if (! $formatMenit || $waktu < 0 || $waktu > 65535) {
+            throw new DomainException('Minimal waktu belajar harus 0–1092,25 menit; gunakan paling banyak 2 angka desimal.');
         }
 
         if ($jenis === 'youtube') {
@@ -131,11 +139,8 @@ final class MateriDrafService
             if ($lama['jenis'] !== $data['jenis'] && $lama['berkas_id'] !== null) {
                 throw new DomainException('Jenis media tidak boleh diubah ketika berkas sudah terhubung.');
             }
-            if ($data['jenis'] === 'pdf' && $lama['jenis'] !== 'pdf') {
-                throw new DomainException('Jenis PDF belum dapat dipilih sebelum unggah PDF didukung.');
-            }
-            if (in_array($data['jenis'], ['gambar', 'audio'], true) && $lama['berkas_id'] === null) {
-                throw new DomainException('Pilih file gambar atau audio sebelum menyimpan perubahan Materi.');
+                        if (in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true) && $lama['berkas_id'] === null) {
+                throw new DomainException('Pilih file PDF, gambar atau audio sebelum menyimpan perubahan Materi.');
             }
             $this->db->table('materi')->where('id', $materiId)->where('tp_id', $tpId)
                 ->update($data);
