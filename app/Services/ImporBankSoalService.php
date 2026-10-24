@@ -119,7 +119,7 @@ final class ImporBankSoalService
             || strtotime((string) $row['kedaluwarsa_pada']) < time())) {
             throw new DomainException('Pratinjau sudah kedaluwarsa atau telah diterapkan.');
         }
-        if ($rincian['tp']['status'] !== 'draf') {
+        if ($rincian['tp']['status'] !== 'draf' && $row['status'] !== 'diterapkan') {
             throw new DomainException('TP sudah terkunci.');
         }
         $path = self::lokasi($id);
@@ -127,12 +127,13 @@ final class ImporBankSoalService
             throw new DomainException('Berkas sumber Word tidak ditemukan atau berubah.');
         }
         $meta = json_decode((string) $row['data_json'], true, 8, JSON_THROW_ON_ERROR);
-        if ((int) ($meta['struktur_versi'] ?? 0) !== (int) $rincian['tp']['struktur_versi']) {
+        if ($row['status'] === 'pratinjau'
+            && (int) ($meta['struktur_versi'] ?? 0) !== (int) $rincian['tp']['struktur_versi']) {
             throw new DomainException('TP telah berubah. Unggah ulang Word terbaru.');
         }
         $hasil = PratinjauWordSoalService::periksa(
             $path, $tpId, $guruId, (int) $rincian['paket']['id'],
-            (int) $rincian['tp']['struktur_versi'], (string) $row['jenis'],
+            (int) ($meta['struktur_versi'] ?? 0), (string) $row['jenis'],
             KunciTemplateWordService::ambil()
         );
         return ['row' => $row, 'hasil' => $hasil, 'path' => $path];
