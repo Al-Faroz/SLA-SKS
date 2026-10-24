@@ -122,7 +122,18 @@
             submit.disabled = false;
             submit.title = '';
         }
-        jenis.addEventListener('change', () => { file.value = ''; update(); });
+        file.addEventListener('change', () => {
+            if (!file.files || !file.files.length) return;
+            const dipilih = file.files[0];
+            const maks = jenis.value === 'pdf' ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
+            if (dipilih.size > maks) {
+                file.setCustomValidity('Berkas melebihi batas ' + (jenis.value === 'pdf' ? '15' : '10') + ' MB.');
+                file.reportValidity();
+            } else {
+                file.setCustomValidity('');
+            }
+        });
+        jenis.addEventListener('change', () => { file.value = ''; file.setCustomValidity(''); update(); });
         update();
     });
 })();
