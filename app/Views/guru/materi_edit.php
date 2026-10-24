@@ -30,7 +30,7 @@ if ($materi['berkas_id'] !== null) {
     <section class="a-card" aria-labelledby="sunting-materi">
         <h2 id="sunting-materi"><?= esc($materi['judul']) ?></h2>
         <?php if (is_string($pesanSuntingGalat) && $pesanSuntingGalat !== ''): ?>
-            <div class="a-alert" role="alert"><strong>Perubahan belum disimpan:</strong> <?= esc($pesanSuntingGalat) ?></div>
+            <div class="a-alert a-alert--bahaya" role="alert"><strong>Perubahan belum disimpan:</strong> <?= esc($pesanSuntingGalat) ?></div>
         <?php endif ?>
         <?php if (is_string($pesanSuntingSukses) && $pesanSuntingSukses !== ''): ?>
             <div class="a-alert" role="status"><?= esc($pesanSuntingSukses) ?></div>
