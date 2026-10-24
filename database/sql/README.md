@@ -164,3 +164,43 @@ FROM jawaban_percobaan
 GROUP BY percobaan_ujian_id;
 ```
 
+
+## S08B — Pencatatan aktivitas media (24 Oktober 2026)
+
+**Patch baru:** `database/sql/updates/0016_progres_aktivitas_materi.sql`.
+Sesudah `0014_progres_tp_pin.sql` dan `0015_mesin_ujian_fondasi.sql` yang
+sudah diimpor. **Backup database XAMPP** lebih dahulu. Impor hanya sekali
+dengan phpMyAdmin pada database SLA-SKS yang sedang digunakan. Jangan
+mengimpor ulang dump instalasi, menghapus hasil percobaan ujian, atau
+menerapkan Migration/Seeder.
+
+Dua tabel ditambahkan: `progres_materi` (unik per progres TP × Materi ×
+versi snapshot terpin) dan `halaman_progres_materi` (satu baris per halaman
+per progres untuk pembaca PDF.js lokal pada tahap berikutnya).
+
+Verifikasi baca-saja:
+```sql
+SHOW CREATE TABLE progres_materi;
+SHOW CREATE TABLE halaman_progres_materi;
+SELECT COUNT(*) AS jumlah_progres_media FROM progres_materi;
+SELECT progres_tp_id,materi_id,jenis,status,waktu_aktif_detik,waktu_putar_detik
+FROM progres_materi ORDER BY id DESC;
+```
+
+Saat pertama diimpor, jumlah progres media seharusnya **0**. Setelah
+Siswa pengujian jalur `belajar` menonton audio/YouTube atau melihat gambar
+di halaman aktif, POST heartbeat menciptakan progres bila diperlukan, dan
+kredit detik berikutnya hanya berasal dari request berjarak 5–20 detik,
+dihitung dengan jam server. Progres `media_selesai` hanya untuk durasi
+yang lolos aturan; **bukan** tanda tugas Resume/HOTS selesai. Jalur
+`tuntas` belajar sukarela tidak menciptakan baris progres resmi.
+
+**Batas tahap:** pembaca PDF yang ada di S08A masih iframe browser.
+Iframe tidak membuktikan halaman yang dibaca. S08B tidak mengarang
+kredit PDF: pencatatan PDF sampai `media_selesai` menunggu PDF.js lokal
+dan pengujian aktivitas setiap halaman; tabel halaman sengaja masih kosong.
+Peristiwa browser (fokus/pemutar) adalah mitigasi best-effort, bukan bukti
+antikecurangan absolut.
+
+**QA:** MariaDB sementara di GitHub Actions (DDL/FK/UNIQUE) dan unit test
+aturan durasi. Uji browser dan impor pada MySQL XAMPP tetap diperlukan.
