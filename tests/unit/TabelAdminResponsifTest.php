@@ -25,7 +25,7 @@ final class TabelAdminResponsifTest extends TestCase
         self::assertStringContainsString('class="a-admin-akun__penempatan"', $view);
         self::assertStringContainsString("csrf_field()", $view);
         self::assertStringContainsString("a-pager", $view);
-        self::assertStringContainsString("'halaman' => $tujuan", $view);
+        self::assertStringContainsString("'halaman' => " . '$tujuan', $view);
         self::assertStringContainsString('reset-sandi', $view);
     }
 
