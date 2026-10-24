@@ -28,6 +28,7 @@ $routes->get('siswa/mapel/(:num)', 'SiswaPembelajaran::semester/$1', ['filter' =
 $routes->get('siswa/semester/(:num)', 'SiswaPembelajaran::paket/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)', 'SiswaPembelajaran::tp/$1', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/mulai', 'SiswaPembelajaran::mulaiTp/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/diagnostik/petunjuk', 'SiswaDiagnostik::petunjuk/$1', ['filter' => 'auth:siswa']);
 $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
