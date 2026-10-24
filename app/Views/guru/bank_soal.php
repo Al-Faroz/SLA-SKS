@@ -70,6 +70,29 @@
                     <?php foreach ($rincianWord as $item): ?><tr><td><?= esc($item) ?></td></tr><?php endforeach ?>
                 </tbody></table></div>
             <?php endif ?>
+            <?php $soalWord = session()->getFlashdata('word_soal'); ?>
+            <?php if (is_array($soalWord)): ?>
+                <h3 class="a-jarak-atas">Pratinjau teks soal dan pilihan jawaban</h3>
+                <p class="a-help">Hanya untuk Guru. Pratinjau ini menampilkan teks dan kunci; gambar, rumus Word, serta tabel bersarang belum dirender secara visual dan belum disimpan. Periksa dokumen Word asli untuk membandingkan tata letaknya.</p>
+                <?php foreach ($soalWord as $soalItem): ?>
+                    <section class="a-jarak-atas" aria-label="Soal <?= (int) $soalItem['nomor'] ?>">
+                        <h4>Soal <?= (int) $soalItem['nomor'] ?></h4>
+                        <p><?= nl2br(esc($soalItem['pertanyaan'])) ?></p>
+                        <div class="a-tabel-gulir"><table class="a-tbl">
+                            <thead><tr><th scope="col">Pilihan</th><th scope="col">Isi teks</th><th scope="col">Kunci</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($soalItem['opsi'] as $huruf => $isiOpsi): ?>
+                                <tr><th scope="row"><?= esc($huruf) ?></th><td><?= nl2br(esc($isiOpsi)) ?></td><td><?= $soalItem['kunci'] === $huruf ? 'Benar' : '—' ?></td></tr>
+                            <?php endforeach ?>
+                            </tbody>
+                        </table></div>
+                        <p class="a-help">Konten terdeteksi: gambar <?= (int) $soalItem['konten']['gambar'] ?>,
+                            rumus <?= (int) $soalItem['konten']['rumus'] ?>,
+                            tabel <?= (int) $soalItem['konten']['tabel'] ?>,
+                            Arab <?= (int) $soalItem['konten']['arab'] ?>.</p>
+                    </section>
+                <?php endforeach ?>
+            <?php endif ?>
         <?php endif ?>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke Rincian TP</a>
     </section>
