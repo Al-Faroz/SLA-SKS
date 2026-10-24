@@ -23,6 +23,10 @@ $routes->post('admin/foto-profil/(:num)/setujui', 'Profil::setujuiFoto/$1', ['fi
 $routes->post('peran/ganti', 'Akun::prosesGantiPeran', ['filter' => 'auth']);
 
 $routes->get('siswa', 'Akun::berandaSiswa', ['filter' => 'auth:siswa']);
+$routes->get('siswa/pembelajaran', 'SiswaPembelajaran::mapel', ['filter' => 'auth:siswa']);
+$routes->get('siswa/mapel/(:num)', 'SiswaPembelajaran::semester/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/semester/(:num)', 'SiswaPembelajaran::paket/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)', 'SiswaPembelajaran::tp/$1', ['filter' => 'auth:siswa']);
 $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
