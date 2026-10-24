@@ -89,52 +89,120 @@
     });
 })();
 
-/* Materi: satu kontrol sumber menurut jenis; validasi tetap dilakukan server. */
+/* Form Materi bersama Tambah/Sunting. Server selalu memvalidasi ulang. */
 (() => {
     'use strict';
     document.querySelectorAll('[data-materi-form]').forEach((form) => {
         const jenis = form.querySelector('[data-materi-jenis]');
         const youtube = form.querySelector('[data-materi-youtube]');
         const berkas = form.querySelector('[data-materi-berkas]');
-        const pdfInfo = form.querySelector('[data-materi-pdf-info]');
         const url = youtube?.querySelector('input');
         const file = berkas?.querySelector('input');
-        const info = berkas?.querySelector('[data-materi-file-info]');
+        const info = form.querySelector('[data-materi-file-info]');
+        const fileError = form.querySelector('[data-materi-file-error]');
         const submit = form.querySelector('[data-materi-submit]');
+        const status = form.querySelector('[data-materi-status]');
         if (!jenis || !youtube || !berkas || !url || !file || !submit) return;
-        const adaBerkas = form.dataset.materiSudahUpload === '1';
-        function update() {
-            const youtubeDipilih = jenis.value === 'youtube';
-            const pdfDipilih = jenis.value === 'pdf';
-            const gambarDipilih = jenis.value === 'gambar';
-            youtube.hidden = !youtubeDipilih;
-            berkas.hidden = youtubeDipilih;
-            pdfInfo.hidden = !pdfDipilih;
-            url.disabled = !youtubeDipilih;
-            url.required = youtubeDipilih;
-            file.disabled = youtubeDipilih;
-            file.required = !youtubeDipilih && !adaBerkas;
-            file.accept = pdfDipilih ? '.pdf' : gambarDipilih ? '.jpg,.jpeg,.png,.webp' : '.mp3,.m4a';
-            if (info) info.textContent = pdfDipilih
-                ? 'PDF maksimal 15 MB dan 40 halaman. Dokumen dengan skrip, formulir, atau struktur tidak didukung akan ditolak server.'
-                : gambarDipilih ? 'JPG, PNG, WebP maksimal 10 MB.'
-                : 'MP3 atau M4A maksimal 10 MB.';
-            submit.disabled = false;
-            submit.title = '';
+
+        const sudahAdaBerkas = form.dataset.materiSudahUpload === '1';
+        const awal = form.dataset.materiJenisAwal || '';
+        const batasServer = Number(file.dataset.materiBatasServer || 0);
+        const labelSubmit = submit.textContent;
+        let sedangMengirim = false;
+
+        function pesanJenis() {
+            switch (jenis.value) {
+                case 'pdf':
+                    return 'PDF maksimal 15 MB dan 40 halaman. PDF dengan fitur aktif atau struktur yang belum didukung akan ditolak.';
+                case 'gambar':
+                    return 'JPG, PNG atau WebP maksimal 10 MB.';
+                case 'audio':
+                    return 'MP3 atau M4A maksimal 10 MB.';
+                default:
+                    return '';
+            }
         }
+
+        function batasJenis() {
+            return jenis.value === 'pdf' ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
+        }
+
+        function periksaFile() {
+            file.setCustomValidity('');
+            if (fileError) fileError.textContent = '';
+            if (!file.files || !file.files.length || jenis.value === 'youtube') {
+                return true;
+            }
+
+            const terpilih = file.files[0];
+            let kesalahan = '';
+            const batasAplikasi = batasJenis();
+            if (terpilih.size > batasAplikasi) {
+                kesalahan = 'File melebihi batas aplikasi ' + (jenis.value === 'pdf' ? '15 MB.' : '10 MB.');
+            } else if (batasServer > 0 && terpilih.size > batasServer) {
+                kesalahan = 'File melebihi batas PHP server saat ini. Periksa upload_max_filesize dan post_max_size yang ditampilkan di bawah kolom file.';
+            }
+            if (kesalahan) {
+                file.setCustomValidity(kesalahan);
+                if (fileError) fileError.textContent = kesalahan;
+                return false;
+            }
+            return true;
+        }
+
+        function ubahJenis() {
+            const pilihYoutube = jenis.value === 'youtube';
+            const pilihPdf = jenis.value === 'pdf';
+            youtube.hidden = !pilihYoutube;
+            berkas.hidden = pilihYoutube;
+            url.disabled = !pilihYoutube;
+            url.required = pilihYoutube;
+            file.disabled = pilihYoutube;
+            file.required = !pilihYoutube && !sudahAdaBerkas;
+            file.accept = pilihPdf ? '.pdf' : jenis.value === 'gambar'
+                ? '.jpg,.jpeg,.png,.webp' : '.mp3,.m4a';
+            if (info) info.textContent = pesanJenis();
+            if (awal && sudahAdaBerkas && jenis.value !== awal) {
+                jenis.value = awal;
+                ubahJenis();
+                return;
+            }
+            periksaFile();
+        }
+
+        jenis.addEventListener('change', () => {
+            file.value = '';
+            ubahJenis();
+        });
         file.addEventListener('change', () => {
-            if (!file.files || !file.files.length) return;
-            const dipilih = file.files[0];
-            const maks = jenis.value === 'pdf' ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
-            if (dipilih.size > maks) {
-                file.setCustomValidity('Berkas melebihi batas ' + (jenis.value === 'pdf' ? '15' : '10') + ' MB.');
+            if (!periksaFile()) file.reportValidity();
+        });
+        form.addEventListener('submit', (event) => {
+            if (sedangMengirim) {
+                event.preventDefault();
+                return;
+            }
+            if (!periksaFile()) {
+                event.preventDefault();
                 file.reportValidity();
-            } else {
-                file.setCustomValidity('');
+                return;
+            }
+            sedangMengirim = true;
+            submit.disabled = true;
+            submit.textContent = jenis.value === 'youtube'
+                ? 'Menyimpan Materi...' : 'Mengunggah dan menyimpan...';
+            if (status) {
+                status.textContent = 'Permintaan sedang diproses. File dan data Materi baru akan tersimpan setelah validasi server berhasil.';
             }
         });
-        jenis.addEventListener('change', () => { file.value = ''; file.setCustomValidity(''); update(); });
-        update();
+        window.addEventListener('pageshow', () => {
+            if (sedangMengirim) {
+                sedangMengirim = false;
+                submit.disabled = false;
+                submit.textContent = labelSubmit;
+            }
+        });
+        ubahJenis();
     });
 })();
 
