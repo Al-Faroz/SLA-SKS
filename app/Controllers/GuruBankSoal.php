@@ -32,12 +32,18 @@ final class GuruBankSoal extends BaseController
         $akun = (new AuthService())->penggunaSaatIni();
         $ringkasan = (new RingkasanBankSoalService())->lihat($tpId);
 
+        $riwayat = db_connect()->table('impor_soal_docx')
+            ->select('id,jenis,status,dibuat_pada,diterapkan_pada')
+            ->where('tp_id', $tpId)->where('guru_id', (int) $akun['id'])
+            ->orderBy('dibuat_pada', 'DESC')->limit(10)->get()->getResultArray();
+
         return view('guru/bank_soal', array_merge($rincian, [
             'judul' => 'Bank Soal TP',
             'namaPengguna' => $akun['nama'],
             'peranAktif' => 'Guru',
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'ringkasan_bank' => $ringkasan,
+            'word_riwayat' => $riwayat,
         ]));
     }
     public function unduh(int $tpId, string $jenis): ResponseInterface
@@ -166,6 +172,9 @@ final class GuruBankSoal extends BaseController
     public function konfirmasiWord(int $tpId, string $id): ResponseInterface
     {
         try {
+            if ($this->request->getPost('tinjau') !== 'ya') {
+                throw new DomainException('Konfirmasi peninjauan seluruh soal wajib dicentang.');
+            }
             $akun = (new AuthService())->penggunaSaatIni();
             $hasil = (new ImporBankSoalService())->konfirmasi($tpId, (int) $akun['id'], $id);
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
