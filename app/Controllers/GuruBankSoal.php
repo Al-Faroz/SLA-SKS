@@ -10,6 +10,7 @@ use App\Services\NavigasiService;
 use App\Services\RingkasanBankSoalService;
 use App\Services\TemplateWordSoalService;
 use App\Services\KunciTemplateWordService;
+use App\Services\PratinjauWordSoalService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -102,6 +103,47 @@ final class GuruBankSoal extends BaseController
             ->setHeader('Content-Disposition', 'attachment; filename="' . $nama . '"')
             ->setHeader('Cache-Control', 'private, no-store')
             ->setBody($data);
+    }
+
+    public function pratinjauWord(int $tpId, string $jenis): ResponseInterface|string
+    {
+        try {
+            $rincian = (new DetailTpService())->lihat($tpId);
+            if ($rincian['tp']['status'] !== 'draf' || ! in_array($jenis, ['diagnostik', 'sumatif'], true)) {
+                throw new DomainException('Impor hanya diperbolehkan pada TP draf dan jenis ujian yang sah.');
+            }
+            $berkas = $this->request->getFile('word_soal');
+            if ($berkas === null || ! $berkas->isValid()
+                || strtolower($berkas->getClientExtension()) !== 'docx'
+                || $berkas->getSize() > 15 * 1024 * 1024) {
+                throw new DomainException('Pilih berkas .docx maksimal 15 MB.');
+            }
+            $akun = (new AuthService())->penggunaSaatIni();
+            $hasil = PratinjauWordSoalService::periksa(
+                $berkas->getTempName(), $tpId, (int) $akun['id'],
+                (int) $rincian['paket']['id'], (int) $rincian['tp']['struktur_versi'],
+                $jenis, KunciTemplateWordService::ambil()
+            );
+            $pesan = 'Validasi ' . ucfirst($jenis) . ' berhasil: ' . $hasil['jumlah']
+                . ' soal terstruktur. Pratinjau ini belum menyimpan soal ke database.';
+            $ringkas = array_map(static function (array $row): string {
+                return 'Soal ' . $row['nomor'] . ': gambar ' . $row['konten']['gambar']
+                    . ', rumus ' . $row['konten']['rumus'] . ', tabel ' . $row['konten']['tabel']
+                    . ', teks Arab ' . $row['konten']['arab'];
+            }, $hasil['soal']);
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('word_sukses', $pesan)
+                ->with('word_rincian', $ringkas);
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('word_galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Validasi Word gagal TP {id}: {message}', [
+                'id' => $tpId, 'message' => $e->getMessage(),
+            ]);
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('word_galat', 'Dokumen belum dapat diperiksa. Periksa format DOCX.');
+        }
     }
 
 }
