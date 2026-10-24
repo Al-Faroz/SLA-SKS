@@ -99,6 +99,36 @@ final class PdfMateriValidatorTest extends TestCase
         PdfMateriValidator::periksa($this->pdf(1, '/OpenAction [3 0 R /FitH null] /JS (alert)'));
     }
 
+    public function testMarkerEofDalamMetadataBukanRevisiInkremental(): void
+    {
+        // Token ini boleh muncul pada data dokumen, bukan blok xref/penutup.
+        $file = $this->pdf(1, '/Keywords (materi %%EOF startxref gambar)');
+        self::assertSame(1, PdfMateriValidator::periksa($file));
+    }
+
+    public function testPdfJsPdfTanpaNewlineSetelahEofDiterima(): void
+    {
+        $file = $this->pdf(1, '/OpenAction [3 0 R /FitH null]');
+        file_put_contents($file, rtrim((string) file_get_contents($file), "\r\n"));
+        self::assertSame(1, PdfMateriValidator::periksa($file));
+    }
+
+    public function testRevisiKeduaDenganPenutupStrukturalDitolak(): void
+    {
+        $file = $this->pdf(1);
+        file_put_contents($file, "\nstartxref\n0\n%%EOF\n", FILE_APPEND);
+        $this->expectException(DomainException::class);
+        PdfMateriValidator::periksa($file);
+    }
+
+    public function testPdfTanpaPenutupAkhirDitolak(): void
+    {
+        $file = $this->pdf(1);
+        file_put_contents($file, (string) file_get_contents($file) . "tambahan tidak sah");
+        $this->expectException(DomainException::class);
+        PdfMateriValidator::periksa($file);
+    }
+
     public function testPdfSatuHalamanValid(): void
     {
         $file = $this->pdf(1);
