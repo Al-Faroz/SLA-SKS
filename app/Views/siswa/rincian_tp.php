@@ -32,8 +32,23 @@
         <?php else: ?>
             <ol class="a-siswa-materi-ringkas">
                 <?php foreach ($materi as $item): ?>
-                    <li><strong><?= esc((string) $item['judul']) ?></strong>
-                        <span class="a-siswa-status terkunci">Belum dibuka</span>
+                    <li>
+                        <strong><?= esc((string) $item['judul']) ?></strong>
+                        <?php if ($item['buka'] ?? false): ?>
+                            <span class="a-siswa-status pratinjau">
+                                <?= esc((string) $item['status']) ?>
+                            </span>
+                            <a class="a-btn a-btn--sekunder a-siswa-materi-buka"
+                                href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                                    . '/materi/' . (int) $item['id']), 'attr') ?>">
+                                <?= $item['sukarela'] ? 'Pelajari sukarela' : 'Buka Materi' ?>
+                                <?= (int) $item['urutan'] ?>
+                            </a>
+                        <?php else: ?>
+                            <span class="a-siswa-status terkunci">
+                                <?= esc((string) ($item['status'] ?? 'Belum dibuka')) ?>
+                            </span>
+                        <?php endif ?>
                     </li>
                 <?php endforeach ?>
             </ol>
@@ -80,11 +95,11 @@
             <?php endif ?>
             <p class="a-help">
                 <strong>Diagnostik wajib adalah langkah ujian pertama.</strong>
-                Halaman petunjuk dan uji kemampuan fullscreen kini tersedia bagi
-                siswa dengan progres Diagnostik. Mesin percobaan, pengacakan soal,
-                timer server dan penyimpanan jawaban masih dalam tahap berikutnya.
-                <strong>Belum ada tombol menjalankan ujian.</strong> Materi tetap terkunci
-                sampai alur ujian menghasilkan keputusan sah.
+                Tes Diagnostik berjalan melalui ruang ujian khusus. Jika skor di bawah KKM,
+                Materi pertama terbuka untuk dibaca; Materi selanjutnya membutuhkan
+                penyelesaian media serta pengiriman final Resume dan HOTS sebelumnya.
+                Jika skor memenuhi KKM, Materi boleh dipelajari secara sukarela tanpa
+                penugasan atau nilai tambahan.
             </p>
         </div>
     </section>
