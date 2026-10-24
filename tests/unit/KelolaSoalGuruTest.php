@@ -64,4 +64,27 @@ final class KelolaSoalGuruTest extends TestCase
         $soal['pertanyaan'] = 'Pertanyaan baru';
         self::assertNotSame($versi, KelolaSoalGuruService::versi($soal));
     }
+    public function testToolbarSunEditorMemakaiUnggahGambarLangsung(): void
+    {
+        $js = file_get_contents(__DIR__ . '/../../public/assets/js/soal-editor.js');
+        self::assertIsString($js);
+        self::assertStringContainsString("'table', 'image', 'link'", $js);
+        self::assertStringContainsString('onImageUploadBefore', $js);
+        self::assertStringContainsString('plugins.image.submitURL', $js);
+        self::assertStringNotContainsString('unggah-gambar-soal', $js);
+        $view = file_get_contents(__DIR__ . '/../../app/Views/guru/soal_form.php');
+        self::assertIsString($view);
+        self::assertStringNotContainsString('id="gambar-editor"', $view);
+    }
+
+    public function testTabelBankMemakaiKomponenResponsif(): void
+    {
+        $view = file_get_contents(__DIR__ . '/../../app/Views/guru/bank_soal.php');
+        self::assertIsString($view);
+        self::assertStringContainsString('a-tbl--cards a-tbl--bank', $view);
+        foreach (['Nomor', 'Pertanyaan', 'Status', 'Asal', 'Tindakan'] as $label) {
+            self::assertStringContainsString('data-label="' . $label . '"', $view);
+        }
+    }
+
 }
