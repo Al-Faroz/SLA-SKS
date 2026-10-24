@@ -5,12 +5,10 @@
     if (!form) return;
     const fields = Array.from(form.querySelectorAll('.a-rich-field'));
     const status = document.getElementById('status-gambar-soal');
-    const uploadBtn = document.getElementById('unggah-gambar-soal');
-    const fileInput = document.getElementById('gambar-editor');
     const script = document.currentScript;
     const uploadUrl = script?.dataset.uploadUrl || '';
     const editors = new Map();
-    let active = fields[0]?.id;
+    let uploadsActive = 0;
 
     if (!window.SUNEDITOR || !window.SUNEDITOR.create) {
         const message = document.createElement('p');
@@ -29,7 +27,7 @@
                         ['undo', 'redo'], '|',
                         ['bold', 'italic', 'underline', 'strike'], '|',
                         ['subscript', 'superscript'], '|',
-                        ['align', 'list'], '|', ['table', 'link'], '|',
+                        ['align', 'list'], '|', ['table', 'image', 'link'], '|',
                         ['removeFormat']
                     ],
                     events: {
@@ -51,46 +49,4 @@
         });
     });
 
-    uploadBtn?.addEventListener('click', async () => {
-        const gambar = fileInput?.files?.[0];
-        if (!gambar) {
-            status.textContent = 'Pilih gambar terlebih dahulu.';
-            return;
-        }
-        const editor = editors.get(active);
-        if (!editor) {
-            status.textContent = 'Aktifkan SunEditor dan klik area soal/pilihan sebelum menyisipkan gambar.';
-            return;
-        }
-        const csrf = form.querySelector('input[type="hidden"][name]:not([name="versi"])');
-        const data = new FormData();
-        data.append('gambar', gambar);
-        if (csrf) data.append(csrf.name, csrf.value);
-        uploadBtn.disabled = true;
-        status.textContent = 'Mengunggah gambar...';
-        try {
-            const response = await fetch(uploadUrl, {
-                method: 'POST',
-                body: data,
-                credentials: 'same-origin',
-                headers: {'X-Requested-With': 'XMLHttpRequest'}
-            });
-            const result = await response.json();
-            if (csrf && result.csrfHash) {
-                csrf.value = result.csrfHash;
-                if (result.csrfName) csrf.name = result.csrfName;
-            }
-            if (!response.ok || !result.result?.[0]?.url) {
-                throw new Error(result.errorMessage || 'Unggahan gagal.');
-            }
-            const src = result.result[0].url.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
-            editor.$.html.insert('<img src="' + src + '" alt="Ilustrasi soal">');
-            status.textContent = 'Gambar berhasil disisipkan. Simpan soal setelah selesai.';
-            fileInput.value = '';
-        } catch (error) {
-            status.textContent = error.message || 'Gambar belum berhasil disisipkan.';
-        } finally {
-            uploadBtn.disabled = false;
-        }
-    });
 })();
