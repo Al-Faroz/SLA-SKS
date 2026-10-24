@@ -36,6 +36,7 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
             'CREATE TABLE berkas(id INTEGER PRIMARY KEY,tp_id INTEGER,nama_acak TEXT,mime TEXT,ukuran_byte INTEGER)',
+            'CREATE TABLE progres_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,jenis TEXT,status TEXT,waktu_aktif_detik INTEGER DEFAULT 0,waktu_putar_detik INTEGER DEFAULT 0,posisi_terakhir_detik INTEGER,posisi_terjauh_detik INTEGER DEFAULT 0,durasi_media_detik INTEGER,halaman_total INTEGER,halaman_selesai INTEGER DEFAULT 0,heartbeat_terakhir_pada TEXT,dibuat_pada TEXT,diubah_pada TEXT,media_selesai_pada TEXT)',
         ] as $query) $this->db->query($query);
         $this->db->table('ref_angkatan')->insertBatch([
             ['id'=>1,'kode'=>'GENA','nama'=>'Gen A','semester_mulai'=>4],
@@ -189,4 +190,68 @@ final class MateriSiswaDatabaseTest extends TestCase
         $this->svc()->media(1,31);
         self::assertSame(2,$this->db->table('progres_tp')->countAllResults());
     }
+    private function progresMediaService(int $userId, callable $clock): \App\\Services\\ProgresMediaMateriSiswaService
+    {
+        return new \App\\Services\\ProgresMediaMateriSiswaService(
+            $this->db, static fn (): array => [
+                'id'=>$userId,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ], $clock
+        );
+    }
+
+    private function jadikanMediaPertamaGambar(): void
+    {
+        $row=$this->db->table('versi_konten_tp')->where('id',3)->get()->getRowArray();
+        $snap=json_decode($row['snapshot_json'], true);
+        $snap['materi'][0]['jenis']='gambar';
+        $snap['materi'][0]['min_waktu_detik']=30;
+        $json=json_encode($snap,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        $this->db->table('versi_konten_tp')->where('id',3)
+            ->update(['snapshot_json'=>$json,'checksum'=>hash('sha256',$json)]);
+    }
+
+    public function testDetakGambarMembuatSatuProgresLaluSelesaiDenganJamServer(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $now=1000;
+        $service=$this->progresMediaService(101,static function () use (&$now): int {return $now;});
+        self::assertSame('belum_dimulai',$service->status(1,31)['status']);
+        self::assertSame('berjalan',$service->detak(1,31,true,null,null)['status']);
+        foreach ([1010,1020,1030] as $now) {
+            $hasil=$service->detak(1,31,true,null,null);
+        }
+        self::assertSame('media_selesai',$hasil['status']);
+        self::assertTrue($hasil['media_selesai']);
+        self::assertSame(30,$hasil['waktu_aktif_detik']);
+        self::assertSame(1,$this->db->table('progres_materi')->countAllResults());
+        $now=1040;
+        self::assertSame(30,$service->detak(1,31,true,null,null)['waktu_aktif_detik']);
+    }
+
+    public function testSukarelaTidakDapatMengirimDetakResmi(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $service=$this->progresMediaService(102,static fn (): int => 1000);
+        self::assertSame('sukarela',$service->status(1,31)['status']);
+        try {
+            $service->detak(1,31,true,null,null);
+            self::fail('Jalur tuntas tidak boleh membuat progres media.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('sukarela',$e->getMessage());
+        }
+        self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
+    }
+
+    public function testMediaPdfTidakBolehDinyatakanSelesaiMelaluiDetak(): void
+    {
+        $service=$this->progresMediaService(101,static fn (): int => 1000);
+        try {
+            $service->detak(1,31,true,null,null);
+            self::fail('Iframe PDF tidak menyediakan bukti per halaman.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('PDF.js',$e->getMessage());
+        }
+        self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
+    }
+
 }
