@@ -59,7 +59,8 @@ final class KatalogPembelajaranSiswaTest extends TestCase
             'siswa/tp/(:num)'] as $path) {
             self::assertStringContainsString($path, $file);
         }
-        self::assertSame(4, substr_count($file, "'SiswaPembelajaran::"));
+        self::assertSame(5, substr_count($file, "'SiswaPembelajaran::"));
+        self::assertStringContainsString("SiswaPembelajaran::mulaiTp", $file);
         self::assertStringContainsString("'auth:siswa'", $file);
     }
 
@@ -86,9 +87,11 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         self::assertStringContainsString("->select('id,urutan,judul,jenis')", $service);
         self::assertStringNotContainsString("->table('soal')", $service);
         self::assertStringNotContainsString("->table('berkas')", $service);
-        self::assertStringContainsString('Diagnostik wajib adalah langkah pertama', $view);
+        self::assertStringContainsString('Diagnostik wajib adalah langkah ujian pertama', $view);
         self::assertStringNotContainsString('Mulai Diagnostik</a>', $view);
-        self::assertStringNotContainsString('<form', $view);
+        self::assertStringContainsString('method="post"', $view);
+        self::assertStringContainsString('Aktifkan TP &amp; simpan versi', $view);
+        self::assertStringContainsString('csrf_field()', $view);
         foreach (['rumusan', 'indikator', 'materi'] as $key) {
             self::assertStringContainsString($key, $view);
         }

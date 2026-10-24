@@ -15,7 +15,7 @@
             <p class="a-proto-eyebrow">Siswa · Semester <?= (int) $paket['semester'] ?> · <?= esc((string) $tp['kode_tp']) ?></p>
             <h1><?= esc((string) $tp['judul']) ?></h1>
             <p class="a-proto-muted">TP Siap untuk Gen <?= esc((string) $siswa['gen_nama']) ?>.
-                Ini halaman pengenalan; proses belajar dimulai setelah Diagnostik wajib tersedia.</p>
+                Rincian TP dan status aktivasi versi konten Anda.</p>
         </div>
     </header>
     <section class="a-card" aria-labelledby="rincian-tp-siswa">
@@ -38,11 +38,41 @@
                 <?php endforeach ?>
             </ol>
         <?php endif ?>
-        <div class="a-alert" role="status">
-            <strong>Diagnostik wajib adalah langkah pertama.</strong>
-            Mesin ujian dan pencatatan progres belum diaktifkan pada tahap ini,
-            sehingga belum ada tombol mulai ujian atau akses media. Tidak ada nilai
-            atau progres belajar yang diubah saat Anda melihat rincian TP.
+        <div class="a-siswa-aktivasi" aria-labelledby="status-aktivasi-tp">
+            <h3 id="status-aktivasi-tp">Status pembelajaran TP</h3>
+            <?php if ($pesan = session()->getFlashdata('sukses_mulai_tp')): ?>
+                <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+            <?php endif ?>
+            <?php if ($pesan = session()->getFlashdata('galat_mulai_tp')): ?>
+                <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+            <?php endif ?>
+            <?php if ($progres === null): ?>
+                <p class="a-help">TP ini belum diaktifkan untuk akun Anda. Aktivasi menyimpan
+                    satu progres TP dan mengikat versi konten yang akan digunakan kelak.
+                    Tidak ada jawaban, nilai, atau percobaan ujian yang dibuat.</p>
+                <form action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/mulai'), 'attr') ?>"
+                    method="post"
+                    onsubmit="return confirm('Aktifkan TP dan kunci versi konten untuk akun ini? Aktivasi tidak memulai ujian.');">
+                    <?= csrf_field() ?>
+                    <button class="a-btn a-btn--utama" type="submit">Aktifkan TP &amp; simpan versi</button>
+                </form>
+            <?php else: ?>
+                <div class="a-alert" role="status">
+                    <strong>TP telah diaktifkan.</strong>
+                    Status: <?= esc((string) $progres['status']) ?>.
+                    Snapshot konten #<?= (int) $progres['versi_konten_tp_id'] ?>
+                    dipakai tetap untuk progres ini sejak
+                    <?= esc((string) $progres['dimulai_pada']) ?> (UTC).
+                    Memuat ulang halaman tidak membuat progres baru.
+                </div>
+            <?php endif ?>
+            <p class="a-help">
+                <strong>Diagnostik wajib adalah langkah ujian pertama.</strong>
+                Mesin Diagnostik dengan pemeriksaan fullscreen, pengacakan soal,
+                durasi server, dan penyimpanan jawaban sedang menjadi tahap implementasi berikutnya.
+                <strong>Belum ada tombol menjalankan ujian.</strong> Materi tetap terkunci
+                sampai alur ujian menghasilkan keputusan sah.
+            </p>
         </div>
     </section>
     <p class="a-kesiapan-kembali">

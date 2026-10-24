@@ -220,3 +220,12 @@ Tautan rekomendasi perbaikan CP pada checklist final diarahkan ke Peta ATP, buka
 - UI memakai `a-siswa-kartu-grid`, `a-siswa-kartu`, `a-siswa-status` dan `a-siswa-materi-ringkas` pada 360/390/768/1100px, tanpa mengganti shell/CSS global.
 - **QA penerimaan:** Siswa Gen yang punya TP Siap dapat membuka rincian pertama sesuai semester mulai; Guru/Admin/Pimpinan tidak dapat mengakses. Coba akses paket/TP Gen lain dengan ID URL, semester dilewati, semester berikutnya, TP Draf dan TP kedua; semuanya tetap terkunci. Cek kondisi tanpa Gen/paket/snapshot, semua screen mobile. Tidak ada perubahan SQL, .env, upload PDF/Word atau data TP Siap.
 
+
+## Fondasi S04a — Aktivasi TP dan pengikatan snapshot versi siswa (24 Oktober 2026)
+
+- **Aksi nyata:** ketika siswa pertama kali memilih `Aktifkan TP & simpan versi` pada S03, POST `/siswa/tp/{id}/mulai` secara transaksional mencatat satu baris `progres_tp` untuk siswa login, TP, versi paket yang ditugaskan, serta `versi_konten_tp_id`. Halaman GET tetap baca-saja; refresh dan POST berulang tidak menciptakan progres atau audit duplikat. Status awal baris `diagnostik` **bukan berarti** percobaan ujian telah dimulai.
+- **Gate di Service:** Siswa aktif dari Gen pemilik, paket aktif, hanya TP pertama semester mulai yang Siap, versi snapshot bertanda checksum SHA-256 serta memiliki struktur TP/Materi/Soal yang benar. Service mengunci baris siswa dan TP dalam transaksi InnoDB, cek hak dan versi ulang, mengembalikan pin yang ada jika sudah pernah dimulai.
+- **UI:** `a-siswa-aktivasi` memberi penjelasan dampak permanen dan meminta konfirmasi sebelum POST. Setelah berhasil, status dan ID versi konten terpin terlihat; tidak ada pertanyaan/kunci ujian, akses media atau tombol `Mulai Diagnostik` palsu.
+- **SQL:** `database/sql/updates/0014_progres_tp_pin.sql`, manual impor satu kali sesuai `database/sql/README.md`, **tanpa migration/seeder**, tidak menghapus data. Progres siswa yang dimulai tetap bersejarah walaupun versi TP selanjutnya diterbitkan.
+- **Batas tahap:** mesin ujian Ketat, preflight fullscreen, heartbeat dan skor Diagnostik belum diaktifkan. Implementasikan terpisah dan jalankan pengujian XAMPP sebelum membuka tombol ujian. Gunakan akun uji, bukan data siswa nyata, untuk pengetesan aktivasi irreversibel.
+
