@@ -29,6 +29,17 @@ final class GuruSoal extends BaseController
         return $rincian;
     }
 
+    public function lihatSoal(int $tpId, int $soalId): ResponseInterface|string
+    {
+        try {
+            $data = $this->data($tpId, $soalId);
+            return view('guru/soal_lihat', $data);
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('soal_galat', $e->getMessage());
+        }
+    }
+
     public function baru(int $tpId, string $jenis): ResponseInterface|string
     {
         try {
