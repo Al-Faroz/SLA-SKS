@@ -40,15 +40,17 @@ final class GuruKesiapanTp extends BaseController
     public function siapkan(int $tpId): RedirectResponse
     {
         $versi = $this->request->getPost('struktur_versi');
+        $fingerprint = $this->request->getPost('sidik_jari');
         if (!is_string($versi) || !ctype_digit($versi)
             || strlen($versi) > 10 || (float) $versi > PHP_INT_MAX
+            || !is_string($fingerprint) || !preg_match('/^[a-f0-9]{64}$/D', $fingerprint)
             || $this->request->getPost('tinjau_akademik') !== 'ya') {
             return redirect()->to(site_url('guru/tp/' . $tpId . '/kesiapan'))
                 ->with('galat_siapan', 'Periksa seluruh komponen dan centang konfirmasi akademik.');
         }
         try {
             $akun = (new AuthService())->penggunaSaatIni();
-            (new KesiapanTpService())->terbitkan($tpId, (int) $akun['id'], (int) $versi, true);
+            (new KesiapanTpService())->terbitkan($tpId, (int) $akun['id'], (int) $versi, true, $fingerprint);
             return redirect()->to(site_url('guru/tp/' . $tpId . '/kesiapan'))
                 ->with('sukses_siapan', 'TP berhasil disiapkan dan dikunci. Versi konten telah disimpan.');
         } catch (DomainException $e) {
