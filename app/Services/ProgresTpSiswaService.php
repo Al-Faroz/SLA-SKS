@@ -82,17 +82,20 @@ final class ProgresTpSiswaService
         $this->katalog->rincianTp($tpId);
         $this->db->transBegin();
         try {
+            // MySQL/MariaDB memakai FOR UPDATE; SQLite hanya dipakai pada unit test
+            // (SQL patch produksi tetap InnoDB).
+            $lock = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
             // Satu siswa, satu urutan lock konsisten. Dua klik paralel menunggu
             // lock siswa ini; baris UNIQUE menjadi pengaman tambahan.
             $siswa = $this->db->query(
-                'SELECT id,angkatan_id FROM siswa WHERE pengguna_id=? FOR UPDATE',
+                'SELECT id,angkatan_id FROM siswa WHERE pengguna_id=?' . $lock,
                 [(int) $akun['id']]
             )->getRowArray();
             if ($siswa === null) {
                 throw new DomainException('Data siswa tidak tersedia.');
             }
             $tp = $this->db->query(
-                'SELECT id,paket_semester_id,status FROM tp WHERE id=? FOR UPDATE', [$tpId]
+                'SELECT id,paket_semester_id,status FROM tp WHERE id=?' . $lock, [$tpId]
             )->getRowArray();
             if ($tp === null || $tp['status'] !== 'siap') {
                 throw new DomainException('TP belum Siap atau telah berubah. Muat ulang halaman.');
