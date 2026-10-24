@@ -144,3 +144,13 @@ Perbaikan:
 CI terbaru [QA Berkas Materi #40053134703](https://github.com/Al-Faroz/SLA-SKS/actions/runs/40053134703) PASS: 16 tes PDF/21 assertions; 11 tes integrasi unggah/45 assertions.
 
 Uji manual XAMPP: tarik branch terbaru, Sunting Materi PDF yang sudah ada, pilih PDF pengganti, simpan dan buka Pratinjau. Jika masih muncul error penutup baru, cari [MATERI-PDF] dalam log privat, bandingkan SHA-256 dengan perintah Windows certutil -hashfile "file.pdf" SHA256. Jangan mengganti SQL, .env atau menghapus file lama.
+
+## Serah terima setelah konfirmasi pengguna FIX — 24 Oktober 2026
+
+Pemilik proyek menegaskan **“Oke sudah fix”** setelah memperbarui kode validator dan menguji kasus upload PDF berulang di XAMPP. **Keputusan ini FINAL untuk kasus yang telah diuji**; pekerjaan selanjutnya harus beralih ke modul berikutnya sesuai urutan Master. **Jangan membuka kembali diskusi panjang tentang format internal PDF** tanpa laporan error baru yang spesifik.
+
+Catatan baku dan tes anti-regresi yang wajib dibaca: **[Keputusan Final Validasi PDF Materi](KEPUTUSAN-VALIDASI-PDF-MATERI.md)**. Master 05 §5: PDF maksimal **15 MB dan 40 halaman**, terutama untuk menghemat storage shared hosting dan membatasi panjang dokumen. Master 14 tetap menuntut pengecekan MIME, halaman, dan skrip aktif, serta penyimpanan privat. Revisi inkremental, C2PA, navigasi halaman dan anotasi normal bukan dasar penolakan otomatis.
+
+**Batas klaim:** Konfirmasi FIX berasal dari uji lokal pemilik pada kasus yang dibahas, bukan sertifikat bahwa seluruh PDF dari semua generator, seluruh browser, atau semua pengamanan telah diuji. Parser `ObjStm` tertentu masih menjadi batas yang tercatat, bukan larangan bisnis. Pertahankan test unit/integrasi untuk PDF valid, PDF >40 halaman, PDF beraksi aktif, penggantian file dan rollback; jangan memperluas fitur/aturan tanpa permintaan.
+
+**PR #19 tetap Draft dan belum di-merge** sampai ada instruksi persetujuan eksplisit. Tidak ada SQL baru; jangan reset database/ubah `.env`/menggeser root CodeIgniter.
