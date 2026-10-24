@@ -56,6 +56,20 @@ final class PdfMateriValidatorTest extends TestCase
         return $file;
     }
 
+    public function testPdfDariDompdfAsliDapatDiunggah(): void
+    {
+        $pdf = new \\Dompdf\\Dompdf();
+        $pdf->loadHtml('<html><body><h1>Contoh Materi Belajar</h1><p>Dokumen QA tanpa data siswa.</p></body></html>');
+        $pdf->setPaper('A4');
+        $pdf->render();
+        $path = tempnam(sys_get_temp_dir(), 'sla-pdf-dompdf-');
+        file_put_contents($path, $pdf->output());
+        $this->files[] = $path;
+        $hasil = BerkasMateriService::validasi($path, 'pdf', 'materi.pdf');
+        self::assertSame(1, $hasil['halaman']);
+        self::assertSame('application/pdf', $hasil['mime']);
+    }
+
     public function testPdfSatuHalamanValid(): void
     {
         $file = $this->pdf(1);
