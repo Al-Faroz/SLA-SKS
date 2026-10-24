@@ -14,7 +14,7 @@ use ZipArchive;
  */
 final class RenderWordSoalService
 {
-    public static function hasil(string $path, array $hasil): array
+    public static function hasil(string $path, array $hasil, ?callable $imageSrc = null): array
     {
         $zip = new ZipArchive();
         if ($zip->open($path) !== true) {
@@ -39,7 +39,7 @@ final class RenderWordSoalService
                 $soal['html_opsi'] = [];
                 for ($j = 0; $j < 6; $j++) {
                     $cells = $xp->query('./w:tc', $rows->item(1 + $i * 6 + $j));
-                    $html = self::children($xp, $zip, $relations, $cells->item(1), $totalBytes);
+                    $html = self::children($xp, $zip, $relations, $cells->item(1), $totalBytes, $imageSrc);
                     if ($j === 0) {
                         $soal['html_pertanyaan'] = $html;
                     } else {
@@ -77,7 +77,7 @@ final class RenderWordSoalService
         return $result;
     }
 
-    private static function children(DOMXPath $xp, ZipArchive $zip, array $relations, DOMNode $node, int &$bytes): string
+    private static function children(DOMXPath $xp, ZipArchive $zip, array $relations, DOMNode $node, int &$bytes, ?callable $imageSrc = null): string
     {
         $html = '';
         foreach ($node->childNodes as $child) {
@@ -86,14 +86,14 @@ final class RenderWordSoalService
             }
             switch ($child->localName) {
                 case 'p':
-                    $html .= '<p>' . self::inline($xp, $zip, $relations, $child, $bytes) . '</p>';
+                    $html .= '<p>' . self::inline($xp, $zip, $relations, $child, $bytes, $imageSrc) . '</p>';
                     break;
                 case 'tbl':
                     $html .= '<div class="a-tabel-gulir"><table class="a-tbl a-word-table"><tbody>';
                     foreach ($xp->query('./w:tr', $child) as $row) {
                         $html .= '<tr>';
                         foreach ($xp->query('./w:tc', $row) as $cell) {
-                            $html .= '<td>' . self::children($xp, $zip, $relations, $cell, $bytes) . '</td>';
+                            $html .= '<td>' . self::children($xp, $zip, $relations, $cell, $bytes, $imageSrc) . '</td>';
                         }
                         $html .= '</tr>';
                     }
@@ -104,7 +104,7 @@ final class RenderWordSoalService
         return $html;
     }
 
-    private static function inline(DOMXPath $xp, ZipArchive $zip, array $relations, DOMNode $node, int &$bytes): string
+    private static function inline(DOMXPath $xp, ZipArchive $zip, array $relations, DOMNode $node, int &$bytes, ?callable $imageSrc = null): string
     {
         $html = '';
         foreach ($node->childNodes as $part) {
@@ -118,8 +118,7 @@ final class RenderWordSoalService
                     $rid = $blip->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed');
                     $path = $relations[$rid] ?? null;
                     if ($path === null) {
-                        $html .= '<span>[Gambar tidak tersedia]</span>';
-                        continue;
+                        throw new DomainException('Referensi gambar Word tidak ditemukan. Periksa gambar pada dokumen.');
                     }
                     $info = $zip->statName($path);
                     $size = (int) ($info['size'] ?? 0);
@@ -132,15 +131,51 @@ final class RenderWordSoalService
                     }
                     $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($raw);
                     $bytes += strlen($raw);
-                    $html .= '<img class="a-word-image" alt="Ilustrasi soal" src="data:' . $mime . ';base64,' . base64_encode($raw) . '">';
+                    $src = $imageSrc !== null ? $imageSrc($rid) : ('data:' . $mime . ';base64,' . base64_encode($raw));
+                    $html .= '<img class="a-word-image" alt="Ilustrasi soal" src="' .
+                        htmlspecialchars((string) $src, ENT_QUOTES, 'UTF-8') . '">';
                 }
             } elseif ($part->localName === 'oMath') {
                 $html .= '<span class="a-word-math" title="Equation Word">' .
                     htmlspecialchars(trim($xp->evaluate('string(.//*[local-name()="t"])', $part)), ENT_QUOTES, 'UTF-8') . '</span>';
             } else {
-                $html .= self::inline($xp, $zip, $relations, $part, $bytes);
+                $html .= self::inline($xp, $zip, $relations, $part, $bytes, $imageSrc);
             }
         }
         return $html;
     }
+    /** @return array{data:string,mime:string} */
+    public static function gambar(string $path, string $rid): array
+    {
+        if (!preg_match('/^rId[0-9]+$/D', $rid)) {
+            throw new DomainException('ID gambar tidak valid.');
+        }
+        $zip = new ZipArchive();
+        if ($zip->open($path) !== true) {
+            throw new DomainException('Berkas Word tidak tersedia.');
+        }
+        try {
+            $relasi = self::relations($zip);
+            $lokasi = $relasi[$rid] ?? null;
+            if ($lokasi === null) {
+                throw new DomainException('Gambar tidak ditemukan.');
+            }
+            $stat = $zip->statName($lokasi);
+            if ((int) ($stat['size'] ?? 0) > 2 * 1024 * 1024) {
+                throw new DomainException('Gambar melebihi 2 MB.');
+            }
+            $bin = $zip->getFromName($lokasi);
+            if (!is_string($bin) || $bin === '') {
+                throw new DomainException('Gambar tidak dapat dibaca.');
+            }
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($bin);
+            if (!in_array($mime, ['image/png', 'image/jpeg'], true)) {
+                throw new DomainException('Format gambar tidak didukung.');
+            }
+            return ['data' => $bin, 'mime' => $mime];
+        } finally {
+            $zip->close();
+        }
+    }
+
 }

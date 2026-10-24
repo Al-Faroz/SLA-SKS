@@ -14,7 +14,7 @@ use ZipArchive;
  */
 final class PratinjauWordSoalService
 {
-    public static function periksa(string $path, int $tpId, int $guruId, int $paketId, int $versi, string $jenis, string $kunci): array
+    public static function periksa(string $path, int $tpId, int $guruId, int $paketId, int $versi, string $jenis, string $kunci, ?string $kodeTp = null): array
     {
         if (!is_file($path) || filesize($path) > 15 * 1024 * 1024) {
             throw new DomainException('Word tidak tersedia atau melebihi 15 MB.');
@@ -29,31 +29,67 @@ final class PratinjauWordSoalService
             }
             $meta = $zip->getFromName('customXml/sla-sks.xml');
             $document = $zip->getFromName('word/document.xml');
-            if (!is_string($meta) || !is_string($document) || strlen($document) > 8 * 1024 * 1024) {
-                throw new DomainException('Metadata atau dokumen Word tidak lengkap.');
-            }
-            $xml = self::xml($meta);
-            $xp = new DOMXPath($xml);
-            $payload = trim($xp->evaluate('string(//*[local-name()="payload"])'));
-            $signature = trim($xp->evaluate('string(//*[local-name()="signature"])'));
-            if ($payload === '' || !hash_equals(hash_hmac('sha256', $payload, $kunci), $signature)) {
-                throw new DomainException('Identitas template tidak sah. Unduh ulang dari aplikasi.');
-            }
-            $id = json_decode($payload, true, 16, JSON_THROW_ON_ERROR);
-            if (!is_array($id) || ($id['format'] ?? '') !== 'SLA-SKS-WORD-V1'
-                || (int) ($id['tp_id'] ?? 0) !== $tpId || (int) ($id['guru_id'] ?? 0) !== $guruId
-                || (int) ($id['paket_id'] ?? 0) !== $paketId
-                || (int) ($id['struktur_versi'] ?? 0) !== $versi
-                || ($id['jenis'] ?? '') !== $jenis) {
-                throw new DomainException('Identitas atau versi TP pada Word tidak cocok. Unduh ulang.');
+            if (!is_string($document) || strlen($document) > 8 * 1024 * 1024) {
+                throw new DomainException('Isi dokumen Word tidak terbaca atau terlalu besar.');
             }
             $doc = self::xml($document);
             $xp = new DOMXPath($doc);
             $xp->registerNamespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main');
             $rows = $xp->query('//w:body/w:tbl[1]/w:tr');
-            $n = (int) ($id['jumlah'] ?? 0);
-            if ($n < 1 || $n > 200 || $rows === false || $rows->length !== 1 + 6 * $n) {
-                throw new DomainException('Jumlah baris soal tidak sesuai identitas template.');
+            if ($rows === false || $rows->length < 7 || ($rows->length - 1) % 6 !== 0) {
+                throw new DomainException('Struktur tabel soal berubah. Pastikan setiap soal memiliki pilihan A–E.');
+            }
+            $n = (int) (($rows->length - 1) / 6);
+            if ($n > 200) {
+                throw new DomainException('Jumlah soal pada dokumen terlalu banyak.');
+            }
+
+            if (is_string($meta)) {
+                // Jika tanda tangan masih ada, periksa dengan ketat agar tak menerima identitas yang diubah.
+                $xml = self::xml($meta);
+                $metaXp = new DOMXPath($xml);
+                $payload = trim($metaXp->evaluate('string(//*[local-name()="payload"])'));
+                $signature = trim($metaXp->evaluate('string(//*[local-name()="signature"])'));
+                if ($payload === '' || !hash_equals(hash_hmac('sha256', $payload, $kunci), $signature)) {
+                    throw new DomainException('Identitas dokumen tidak cocok. Gunakan template dari TP ini.');
+                }
+                $id = json_decode($payload, true, 16, JSON_THROW_ON_ERROR);
+                if (!is_array($id) || ($id['format'] ?? '') !== 'SLA-SKS-WORD-V1'
+                    || (int) ($id['tp_id'] ?? 0) !== $tpId || (int) ($id['guru_id'] ?? 0) !== $guruId
+                    || (int) ($id['paket_id'] ?? 0) !== $paketId
+                    || (int) ($id['struktur_versi'] ?? 0) !== $versi
+                    || ($id['jenis'] ?? '') !== $jenis || (int) ($id['jumlah'] ?? 0) !== $n) {
+                    throw new DomainException('Identitas TP atau jumlah soal pada Word tidak cocok.');
+                }
+                $identitasDiperiksa = 'tanda_tangan';
+            } else {
+                // Microsoft Word dapat membuang customXml yang tak diregistrasikan oleh generator lama.
+                // Jangan menghukum Guru atas Save biasa: otorisasi TP/Guru sudah dicek dari server,
+                // dan kita pastikan judul + kode TP dalam bagian identitas dokumen sesuai halaman.
+                if ($kodeTp === null || trim($kodeTp) === '') {
+                    throw new DomainException('Identitas TP belum dapat diperiksa oleh server.');
+                }
+                $namaUjianBenar = false;
+                $kodeTpBenar = false;
+                $paragraf = $xp->query('//w:body/w:p');
+                if ($paragraf !== false) {
+                    foreach ($paragraf as $p) {
+                        $teks = preg_replace('/\\s+/u', ' ', trim(self::teks($xp, $p)));
+                        if ($teks === null) {
+                            continue;
+                        }
+                        if (str_contains(mb_strtoupper($teks), 'BANK SOAL ' . strtoupper($jenis))) {
+                            $namaUjianBenar = true;
+                        }
+                        if (preg_match('/^TP\\s*:\\s*' . preg_quote($kodeTp, '/') . '(?:\\s|—|-|$)/iu', $teks)) {
+                            $kodeTpBenar = true;
+                        }
+                    }
+                }
+                if (!$namaUjianBenar || !$kodeTpBenar) {
+                    throw new DomainException('Jenis ujian atau kode TP dalam dokumen tidak sesuai. Pilih Word dari TP ini.');
+                }
+                $identitasDiperiksa = 'identitas_terlihat';
             }
             $hasil = [];
             for ($i = 0; $i < $n; ++$i) {
@@ -101,6 +137,7 @@ final class PratinjauWordSoalService
                     'opsi' => $opsi, 'kunci' => $benar[0], 'konten' => $media];
             }
             return ['jenis' => $jenis, 'jumlah' => $n, 'soal' => $hasil,
+                'pemeriksaan_identitas' => $identitasDiperiksa,
                 'catatan' => 'Validasi struktur berhasil. Konten kaya belum diimpor/disimpan ke database.'];
         } finally {
             $zip->close();
