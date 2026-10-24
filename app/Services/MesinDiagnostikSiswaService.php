@@ -48,9 +48,13 @@ final class MesinDiagnostikSiswaService
     public function ruang(int $tpId): array
     {
         $ctx = $this->konteks($tpId);
+        $existing = $this->db->table('percobaan_ujian')
+            ->select('token_publik,status')
+            ->where('progres_tp_id', (int) $ctx['progres']['id'])
+            ->where('jenis', 'diagnostik')->orderBy('id','DESC')->get(1)->getRowArray();
         return [
-            'tp' => $ctx['ctx']['tp'],
-            'progres' => $ctx['progres'],
+            'tp' => $ctx['ctx']['tp'], 'progres' => $ctx['progres'],
+            'percobaan' => $existing,
             'status_akhir' => in_array($ctx['progres']['status'], ['tuntas', 'belajar', 'perlu_bantuan'], true),
         ];
     }
