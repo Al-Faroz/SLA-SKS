@@ -118,8 +118,7 @@ final class RenderWordSoalService
                     $rid = $blip->getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed');
                     $path = $relations[$rid] ?? null;
                     if ($path === null) {
-                        $html .= '<span>[Gambar tidak tersedia]</span>';
-                        continue;
+                        throw new DomainException('Referensi gambar Word tidak ditemukan. Periksa gambar pada dokumen.');
                     }
                     $info = $zip->statName($path);
                     $size = (int) ($info['size'] ?? 0);
