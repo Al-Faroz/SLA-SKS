@@ -138,7 +138,7 @@
                 <div class="a-empty" role="status"><strong>Belum ada hasil.</strong><p>Belum ada akun atau tidak ada yang cocok dengan filter.</p></div>
             <?php else: ?>
                 <div class="a-tabel-gulir">
-                    <table class="a-tbl a-admin-akun__tabel">
+                    <table class="a-tbl a-tbl--cards a-admin-akun__tabel">
                         <thead><tr>
                             <th scope="col">Nama</th><th scope="col"><?= $siswa ? 'NISN' : 'Username' ?></th>
                             <th scope="col"><?= $siswa ? 'Gen' : 'Peran' ?></th>
@@ -147,9 +147,9 @@
                         <tbody>
                             <?php foreach ($pengguna as $akun): ?>
                             <tr>
-                                <td><strong><?= esc($akun['nama']) ?></strong><small class="a-admin-akun__subtitle"><?= (int) $akun['wajib_ganti_sandi'] ? 'Wajib ganti sandi' : 'Sandi aktif' ?></small></td>
-                                <td><?= esc($akun['username']) ?></td>
-                                <td>
+                                <th scope="row" data-label="Nama"><strong><?= esc($akun['nama']) ?></strong><small class="a-admin-akun__subtitle"><?= (int) $akun['wajib_ganti_sandi'] ? 'Wajib ganti sandi' : 'Sandi aktif' ?></small></th>
+                                <td data-label="<?= $siswa ? 'NISN' : 'Username' ?>"><?= esc($akun['username']) ?></td>
+                                <td data-label="<?= $siswa ? 'Gen' : 'Peran' ?>">
                                     <?php if ($siswa): ?>
                                         <?php if ($akun['angkatan_id'] === null): ?>
                                             <span class="a-badge a-badge--tunggu">Belum ditempatkan</span>
@@ -175,8 +175,8 @@
                                         <?= esc(implode(', ', $akun['daftar_peran'])) ?>
                                     <?php endif ?>
                                 </td>
-                                <td><span class="a-badge <?= $akun['status'] === 'aktif' ? 'a-badge--siap' : 'a-badge--tunggu' ?>"><?= esc(ucfirst($akun['status'])) ?></span></td>
-                                <td><div class="a-admin-akun__aksi">
+                                <td data-label="Status"><span class="a-badge <?= $akun['status'] === 'aktif' ? 'a-badge--siap' : 'a-badge--tunggu' ?>"><?= esc(ucfirst($akun['status'])) ?></span></td>
+                                <td data-label="Aksi"><div class="a-admin-akun__aksi">
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/edit'), 'attr') ?>">Ubah</a>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/reset-sandi'), 'attr') ?>">Reset sandi</a>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/status'), 'attr') ?>"><?= $akun['status'] === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' ?></a>
