@@ -89,7 +89,8 @@ final class SiswaUjian extends BaseController
             ['heartbeat','keluar_fullscreen','pulih','kirim'], true)) {
             return $this->response(['ok'=>false,'pesan'=>'Tindakan tidak tersedia.'],422);
         }
-        return $this->proses(fn () => $this->engine()->tindakan($tpId, $token, $aksi));
+        return $this->proses(fn () => $this->engine()->tindakan($tpId, $token, $aksi,
+            $this->request->getPost('fullscreen') === 'ya'));
     }
 
     public function media(int $tpId, string $token, string $jenis, string $id): ResponseInterface
