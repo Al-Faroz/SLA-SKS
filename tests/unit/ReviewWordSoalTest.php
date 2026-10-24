@@ -77,4 +77,70 @@ final class ReviewWordSoalTest extends TestCase
             @unlink($file);
         }
     }
+    public function testSaveWordTanpaMetadataTetapDiterimaJikaTpDanStrukturBenar(): void
+    {
+        $data = TemplateWordSoalService::buat([
+            'tp_id' => 11, 'paket_id' => 22, 'guru_id' => 33,
+            'struktur_versi' => 1, 'gen' => 'Gen QA', 'guru' => 'Guru QA',
+            'mapel' => 'SKI', 'kurikulum' => 'KBC', 'semester' => '4',
+            'kode_tp' => 'TP-QA-01', 'judul_tp' => 'Periksa tabel',
+        ], 'sumatif', 1, str_repeat('x', 32));
+        $file = tempnam(sys_get_temp_dir(), 'qa-save-word-');
+        self::assertNotFalse($file);
+        file_put_contents($file, $data);
+        try {
+            $zip = new ZipArchive();
+            self::assertTrue($zip->open($file) === true);
+            $doc = new DOMDocument();
+            self::assertTrue($doc->loadXML($zip->getFromName('word/document.xml'), LIBXML_NONET));
+            $xp = new DOMXPath($doc);
+            $xp->registerNamespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main');
+            $rows = $xp->query('//w:body/w:tbl[1]/w:tr');
+            $isi = ['Soal dengan tabel garis baru', 'A benar', 'B salah', 'C salah', 'D salah', 'E salah'];
+            foreach ($isi as $i => $text) {
+                $cells = $xp->query('./w:tc', $rows->item($i + 1));
+                $xp->query('.//w:t', $cells->item(1))->item(0)->nodeValue = $text;
+                if ($i === 1) {
+                    $xp->query('.//w:t', $cells->item(2))->item(0)->nodeValue = '✓';
+                }
+            }
+            self::assertTrue($zip->addFromString('word/document.xml', $doc->saveXML()));
+            // Mensimulasikan Microsoft Word menyimpan ulang dokumen dan
+            // membuang part customXml yang tidak diregistrasikan generator lama.
+            self::assertTrue($zip->deleteName('customXml/sla-sks.xml'));
+            self::assertTrue($zip->close());
+
+            $parsed = PratinjauWordSoalService::periksa(
+                $file, 11, 33, 22, 1, 'sumatif', str_repeat('x', 32), 'TP-QA-01'
+            );
+            self::assertSame(1, $parsed['jumlah']);
+            self::assertSame('A', $parsed['soal'][0]['kunci']);
+            self::assertSame('identitas_terlihat', $parsed['pemeriksaan_identitas']);
+        } finally {
+            @unlink($file);
+        }
+    }
+    public function testWordTanpaMetadataDariTpLainDitolak(): void
+    {
+        $data = TemplateWordSoalService::buat([
+            'tp_id' => 11, 'paket_id' => 22, 'guru_id' => 33,
+            'struktur_versi' => 1, 'kode_tp' => 'TP-QA-01',
+        ], 'diagnostik', 1, str_repeat('x', 32));
+        $file = tempnam(sys_get_temp_dir(), 'qa-beda-tp-');
+        self::assertNotFalse($file);
+        file_put_contents($file, $data);
+        try {
+            $zip = new ZipArchive();
+            self::assertTrue($zip->open($file) === true);
+            self::assertTrue($zip->deleteName('customXml/sla-sks.xml'));
+            self::assertTrue($zip->close());
+            $this->expectException(\DomainException::class);
+            PratinjauWordSoalService::periksa(
+                $file, 11, 33, 22, 1, 'diagnostik', str_repeat('x', 32), 'TP-LAIN'
+            );
+        } finally {
+            @unlink($file);
+        }
+    }
+
 }
