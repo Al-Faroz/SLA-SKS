@@ -154,6 +154,12 @@
     <?php if ($tp['status'] === 'draf'): ?>
         <section class="a-card a-jarak-atas" aria-labelledby="tambah-materi">
             <h2 id="tambah-materi">Tambah Materi/Submateri</h2>
+            <?php if (session()->getFlashdata('galat')): ?>
+                <div class="a-alert" role="alert"><strong>Materi belum disimpan:</strong> <?= esc(session()->getFlashdata('galat')) ?></div>
+            <?php endif ?>
+            <?php if (session()->getFlashdata('sukses')): ?>
+                <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
+            <?php endif ?>
             <p class="a-help">Pilih YouTube untuk mengisi URL, atau Gambar/Audio untuk langsung mengunggah file. Materi tetap nonaktif. PDF menyusul setelah validasi aman tersedia.</p>
             <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-sudah-upload="0" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
                 <?= csrf_field() ?>
