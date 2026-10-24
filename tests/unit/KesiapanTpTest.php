@@ -132,4 +132,13 @@ final class KesiapanTpTest extends TestCase
         self::assertNotSame($awal, KesiapanTpService::sidikJari($tp, $paket, $cp, $materi, $soal));
     }
 
+    public function testPaketArsipTidakDapatMenerbitkanTpBaru(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $paket['status'] = 'arsip';
+        self::assertFalse(self::hasil(
+            KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'paket'
+        )['terpenuhi']);
+    }
+
 }
