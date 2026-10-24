@@ -19,11 +19,17 @@
     <p>Anda sedang menggunakan peran <strong><?= esc($peranAktif) ?></strong>. Sistem memeriksa peran aktif Anda pada server setiap kali membuka halaman yang dilindungi.</p>
     <?php if ($peran === 'guru'): ?>
         <p class="a-help">Peta ATP enam semester sudah tersedia sebagai tampilan baca-saja. Impor ATP, editor Materi, bank soal dan penilaian masih dalam pengembangan.</p>
+    <?php elseif ($peran === 'siswa'): ?>
+        <p class="a-help">Mata pelajaran, semester, dan rincian TP Siap sudah dapat ditinjau.
+            Ujian Diagnostik, progres belajar, dan pengiriman Resume/HOTS masih dalam pengembangan;
+            tidak ada penilaian atau progres yang dibuat melalui halaman ini.</p>
     <?php else: ?>
         <p class="a-help">Modul pembelajaran, penilaian, dan laporan akan ditambahkan setelah fondasi data masing-masing selesai. Menu yang belum tersedia tidak ditampilkan.</p>
     <?php endif ?>
     <?php if ($peran === 'guru'): ?>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Lihat peta ATP</a>
+    <?php elseif ($peran === 'siswa'): ?>
+        <a class="a-btn a-btn--utama" href="<?= esc(site_url('siswa/pembelajaran'), 'attr') ?>">Lihat mata pelajaran</a>
     <?php else: ?>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('profil'), 'attr') ?>">Lihat profil dan peran</a>
     <?php endif ?>
