@@ -52,7 +52,7 @@ final class PdfMateriValidator
                 throw new DomainException('PDF menggunakan aksi saat dibuka yang tidak didukung.');
             }
             $mode = $destinasi[3][0];
-            $memakaiNull = isset($destinasi[5]) && $destinasi[5][1] >= 0;
+            $memakaiNull = isset($destinasi[4]) && $destinasi[4][1] >= 0;
             if ($memakaiNull !== in_array($mode, ['FitH', 'FitV', 'FitBH', 'FitBV'], true)) {
                 throw new DomainException('Tujuan tampilan awal PDF tidak valid.');
             }
