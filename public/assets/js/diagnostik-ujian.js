@@ -216,7 +216,7 @@
     async function pulih() {
         try {
             await gestureFullscreen();
-            const result = await req('POST','/' + token + '/tindakan',{aksi:'pulih'});
+            const result = await req('POST','/' + token + '/tindakan',{aksi:'pulih',fullscreen:'ya'});
             statusLayar(result);
             if (result.status === 'berjalan') await muatStatus();
         } catch (err) {
@@ -252,7 +252,7 @@
         if (!window.confirm('Kirim semua jawaban tersimpan dan akhiri Diagnostik?')) return;
         memintaFinal = true;
         try {
-            const result=await req('POST','/'+token+'/tindakan',{aksi:'kirim'});
+            const result=await req('POST','/'+token+'/tindakan',{aksi:'kirim',fullscreen:'ya'});
             statusLayar(result);
         } catch(err) { setText('[data-ujian-simpan]',err.message); }
         finally { memintaFinal=false; }
@@ -279,7 +279,7 @@
     },1000);
     setInterval(()=>{
         if (!token || !aktif || selesai || !full() || document.visibilityState!=='visible') return;
-        req('POST','/'+token+'/tindakan',{aksi:'heartbeat'})
+        req('POST','/'+token+'/tindakan',{aksi:'heartbeat',fullscreen:'ya'})
             .then(statusLayar).catch(err => tampilJedaLokal('Koneksi server terputus: '+err.message));
     },10000);
 })();
