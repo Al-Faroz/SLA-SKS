@@ -177,7 +177,7 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 ## Audit tabel responsif tahap C — Detail TP dan Materi Guru (24 Oktober 2026)
 
 - Halaman `guru/tp/{id}`: tabel **Identitas TP** tetap bentuk key/value agar tidak memboroskan layar HP; lebar kolom label dibatasi, judul/kode dapat membungkus tanpa scroll horizontal.
-- **Pemeriksaan awal kelengkapan konten** memakai `a-tbl--cards a-tp-checklist`; label Komponen, Status, Keterangan tetap terbaca saat berubah menjadi kartu pada ≤980px. Teks status memakai warna + teks, tidak hanya warna.
+- **Pemeriksaan TP:** halaman Rincian TP tidak lagi menampilkan tabel pemeriksaan awal yang menduplikasi checklist final. Satu-satunya daftar pemeriksaan untuk Guru ada pada `/guru/tp/{id}/kesiapan` menggunakan `a-tbl--cards a-kesiapan-tabel`, dengan status berteks, alasan, dan tautan perbaikan.
 - **Daftar Materi/Submateri** delapan kolom memakai `a-tbl--cards a-tp-materi-tabel`; desktop mempertahankan kolom terpisah No., Judul, Jenis, Status, Pratinjau, Urutan, Edit, Hapus. Layar ≤980px mengubah baris menjadi kartu berlabel untuk mengurangi scroll. Aksi Naik/Turun menjadi tombol berdampingan bila muat, dan tombol Pratinjau, Sunting, Hapus tetap memiliki endpoint/form semula, CSRF dan konfirmasi hapus.
 - **Form tambah dan edit Materi** memakai satu wrapper `a-materi-form-fields` pada partial field yang telah ada: satu kolom mobile, dua kolom pada desktop ≥1100px; input media dan URL YouTube mengambil lebar penuh agar informasi PDF 15 MB/40 halaman dan pesan kesalahan tetap terbaca. Input file pada browser tetap tidak dapat diisi ulang otomatis setelah gagal.
 - **Tidak ada perubahan** `PdfMateriValidator.php`, `MateriService`, endpoint upload/pratinjau, otorisasi G1, .env, SQL, metadata media maupun batas PDF final. Catatan `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md` tetap berlaku.
@@ -203,3 +203,9 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - **Tidak ada SQL update**, `.env`, migration/seeder atau revisi upload. Sudah memakai tabel `versi_konten_tp`, `soal`, `materi`, `tp`, `paket_semester` dan `log_aktivitas` yang ada dalam dump. Tabel student/attempt yang belum diimplementasikan bukan target tahap ini; tampilan siswa/ujian belum diklaim siap sebelum tahap lanjutan.
 - **QA** wajib: TP belum lengkap tetap draf, CP berbeda Mapel/Fase, bank 0/di bawah target, kunci/opsi tidak lengkap, media hilang, urutan Materi loncat, versi berubah antara GET dan POST, Guru beda Gen, idempotensi dua klik, setelah sukses snapshot v1 dan status siap, refresh serta penolakan edit konten biasa; uji di XAMPP MySQL dan MariaDB sebelum merge.
 
+
+## Perbaikan duplikasi checklist Rincian TP (24 Oktober 2026)
+
+Setelah publikasi TP Siap terbukti berjalan di localhost, tampilan **Pemeriksaan awal kelengkapan konten** pada Rincian TP dihapus. Bagian yang tersisa hanya kartu navigasi **Pemeriksaan kesiapan TP** (untuk Draf) atau **Status publikasi TP** (untuk Siap). Daftar pemeriksaan akademik berada tunggal di halaman `/guru/tp/{id}/kesiapan`; ketika sudah Siap, halaman tersebut tetap bisa dibaca tanpa menyediakan aksi penerbitan ulang.
+
+Tautan rekomendasi perbaikan CP pada checklist final diarahkan ke Peta ATP, bukan anchor checklist awal yang sudah dihapus. Penghilangan tabel awal bersifat antarmuka saja: tidak ada rollback, pembatalan publikasi, perubahan status TP, penghapusan snapshot, perubahan database, ataupun modifikasi aturan pemeriksaan akhir. Unit test mencegah tabel ganda muncul kembali.
