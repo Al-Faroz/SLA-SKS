@@ -66,6 +66,12 @@
                     Memuat ulang halaman tidak membuat progres baru.
                 </div>
             <?php endif ?>
+            <?php if ($progres !== null && in_array($progres['status'], ['belajar','tuntas','perlu_bantuan'], true)): ?>
+                <p><a class="a-btn a-btn--sekunder"
+                    href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/diagnostik/ujian'), 'attr') ?>">
+                    Lihat hasil/status Diagnostik
+                </a></p>
+            <?php endif ?>
             <?php if ($progres !== null && $progres['status'] === 'diagnostik'): ?>
                 <p><a class="a-btn a-btn--sekunder"
                     href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/diagnostik/petunjuk'), 'attr') ?>">
