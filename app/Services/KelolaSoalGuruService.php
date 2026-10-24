@@ -40,7 +40,6 @@ final class KelolaSoalGuruService
     {
         $this->konteks($tpId);
         return $this->db->table('soal')
-            ->select('id,row_uuid,urutan,pertanyaan,kunci,aktif,konten_terstruktur_json')
             ->where('tp_id', $tpId)->where('jenis', self::jenis($jenis))
             ->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')->get()->getResultArray();
     }
