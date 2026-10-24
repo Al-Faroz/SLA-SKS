@@ -11,6 +11,7 @@ use App\Services\RingkasanBankSoalService;
 use App\Services\TemplateWordSoalService;
 use App\Services\KunciTemplateWordService;
 use App\Services\PratinjauWordSoalService;
+use App\Services\RenderWordSoalService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -131,10 +132,18 @@ final class GuruBankSoal extends BaseController
                     . ', rumus ' . $row['konten']['rumus'] . ', tabel ' . $row['konten']['tabel']
                     . ', teks Arab ' . $row['konten']['arab'];
             }, $hasil['soal']);
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
-                ->with('word_sukses', $pesan)
-                ->with('word_rincian', $ringkas)
-                ->with('word_soal', $hasil['soal']);
+            // Render dalam request unggah; gambar tidak diletakkan dalam sesi/flashdata.
+            $hasil = RenderWordSoalService::hasil($berkas->getTempName(), $hasil);
+            return view('guru/bank_soal', array_merge($rincian, [
+                'judul' => 'Pratinjau Word Bank Soal',
+                'namaPengguna' => $akun['nama'],
+                'peranAktif' => 'Guru',
+                'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
+                'ringkasan_bank' => (new RingkasanBankSoalService())->lihat($tpId),
+                'word_pratinjau' => $hasil['soal'],
+                'word_pesan' => $pesan,
+                'word_rincian_hasil' => $ringkas,
+            ]));
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
                 ->with('word_galat', $e->getMessage());

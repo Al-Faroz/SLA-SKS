@@ -59,6 +59,26 @@
                 </form>
             <?php endforeach ?>
         <?php endif ?>
+        <?php if (! empty($word_pratinjau) && is_array($word_pratinjau)): ?>
+            <div class="a-alert" role="status"><?= esc($word_pesan ?? 'Pratinjau tersedia') ?></div>
+            <h3>Pratinjau soal dengan tabel dan gambar</h3>
+            <p class="a-help">Gambar dan tabel ditampilkan dari DOCX pada permintaan ini. Equation Word masih ditampilkan dalam bentuk teks sederhana. Belum ada soal yang disimpan ke database.</p>
+            <?php foreach ($word_pratinjau as $soalItem): ?>
+                <section class="a-jarak-atas" aria-label="Soal <?= (int) $soalItem['nomor'] ?>">
+                    <h4>Soal <?= (int) $soalItem['nomor'] ?></h4>
+                    <div class="a-word-preview"><?= $soalItem['html_pertanyaan'] ?></div>
+                    <div class="a-tabel-gulir"><table class="a-tbl">
+                        <thead><tr><th>Opsi</th><th>Isi jawaban</th><th>Kunci</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($soalItem['html_opsi'] as $huruf => $html): ?>
+                            <tr><th><?= esc($huruf) ?></th><td><div class="a-word-preview"><?= $html ?></div></td>
+                                <td><?= $soalItem['kunci'] === $huruf ? 'Benar' : '—' ?></td></tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table></div>
+                </section>
+            <?php endforeach ?>
+        <?php endif ?>
         <?php if ($pesan = session()->getFlashdata('word_galat')): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
         <?php endif ?>
