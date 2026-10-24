@@ -61,6 +61,24 @@ final class ImporBankSoalService
         }
     }
 
+    /**
+     * Posisi Word hanya boleh memperbarui slot asal Word.
+     * Soal yang pernah disentuh melalui editor manual dilindungi.
+     */
+    public static function cocokUntukImpor(?array $existing, int $nomor): void
+    {
+        if ($existing === null) {
+            return;
+        }
+        $rich = json_decode((string) ($existing['konten_terstruktur_json'] ?? ''), true);
+        if (!is_array($rich) || ($rich['format'] ?? '') !== 'SLA-SKS-RICH-V1'
+            || empty($rich['word_source_id']) || !empty($rich['manual_edited'])
+            || ($rich['origin'] ?? 'word') === 'manual') {
+            throw new DomainException('Soal ' . $nomor . ' pernah dibuat/disunting manual. ' .
+                'Impor Word dibatalkan agar edit Guru tidak tertimpa. Sunting melalui daftar soal atau rapikan konflik terlebih dahulu.');
+        }
+    }
+
     /** @return array{id:string,jumlah:int} */
     public function unggah(string $file, int $tpId, int $guruId, string $jenis): array
     {
@@ -75,6 +93,13 @@ final class ImporBankSoalService
             $versi, $jenis, KunciTemplateWordService::ambil(),
             (string) $rincian['tp']['kode_tp']
         );
+        // Tangkap konflik sebelum staging, sekaligus ulangi di transaksi saat konfirmasi.
+        foreach ($parsed['soal'] as $baris) {
+            $nomor = (int) $baris['nomor'];
+            $current = $this->db->table('soal')->where('tp_id', $tpId)->where('jenis', $jenis)
+                ->where('urutan', $nomor)->get()->getRowArray();
+            self::cocokUntukImpor($current, $nomor);
+        }
         $id = bin2hex(random_bytes(16));
         $loc = self::lokasi($id);
         if (!copy($file, $loc)) {
@@ -195,6 +220,7 @@ final class ImporBankSoalService
                 $existing = $this->db->table('soal')
                     ->where('tp_id', $tpId)->where('jenis', $jenis)
                     ->where('urutan', $nomor)->get()->getRowArray();
+                self::cocokUntukImpor($existing, $nomor);
                 $opsi = $soal['opsi'];
                 $record = [
                     'pertanyaan' => $soal['pertanyaan'] !== '' ? $soal['pertanyaan'] : '[Konten kaya dalam dokumen Word]',
@@ -206,6 +232,7 @@ final class ImporBankSoalService
                     'kunci' => $soal['kunci'], 'aktif' => 1,
                     'konten_terstruktur_json' => json_encode([
                         'format' => 'SLA-SKS-RICH-V1', 'word_source_id' => $id,
+                        'origin' => 'word', 'word_slot' => $nomor, 'manual_edited' => false,
                         'html_pertanyaan' => $soal['html_pertanyaan'], 'html_opsi' => $soal['html_opsi'],
                         'konten' => $soal['konten'],
                     ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),

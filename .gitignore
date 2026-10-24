@@ -19,3 +19,6 @@
 Thumbs.db
 .idea/
 .vscode/
+
+# Editor vendor diinstal sekali dari paket MIT terpin (bukan kode sumber aplikasi)
+/public/assets/vendor/suneditor/

@@ -839,3 +839,28 @@ a:hover { text-decoration-thickness: 2px; }
   .a-word-review-item > .a-word-preview { padding: 12px; }
   .a-word-review-item > .a-tabel-gulir { margin: 8px 10px 12px; }
 }
+
+/* Guru bank soal: daftar, WYSIWYG dan input jawaban lima opsi. */
+.a-soal-daftar { margin: 26px 0 30px; padding-top: 14px; border-top: 1px solid #dce8e2; }
+.a-soal-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.a-soal-tabs .is-aktif { background: #17533f; color: #fff; }
+.a-soal-status-form { display: inline-block; margin: 4px 2px; }
+.a-soal-editor-field { margin-bottom: 20px; }
+.a-soal-editor-field .a-rich-field { width: 100%; min-height: 120px; }
+.a-soal-kunci { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 20px; }
+.a-soal-kunci label { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid #c4d9ce; border-radius: 8px; cursor: pointer; }
+.a-soal-kunci label:has(input:checked) { color: #14503b; background: #e6f2e9; border-color: #178459; }
+.a-soal-aset { border: 1px solid #ccdcd3; border-radius: 12px; padding: 18px; margin: 14px 0; }
+.a-soal-aset input[type=file] { max-width: 100%; display: block; margin: 8px 0; }
+.a-soal-aksi { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding-top: 16px; }
+.a-soal-editor-field .sun-editor { max-width: 100%; border-radius: 8px; }
+.a-soal-editor-field .sun-editor-editable table td,
+.a-soal-editor-field .sun-editor-editable table th { border: 1px solid #9fb9a9; padding: 6px; }
+@media(max-width:640px) {
+ .a-soal-kunci label { flex: 1; justify-content: center; }
+ .a-soal-aksi .a-btn { flex: 1; text-align: center; }
+}
+
+/* Semua tabel soal manual tampil bergaris termasuk sel bersarang. */
+.a-word-preview table { border-collapse: collapse; border: 1px solid #afc7bb; max-width: 100%; }
+.a-word-preview table th, .a-word-preview table td { border: 1px solid #afc7bb; padding: 8px 10px; vertical-align: top; }

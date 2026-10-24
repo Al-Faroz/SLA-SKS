@@ -44,3 +44,5 @@
 | SQL/hosting/backup | 10, 15 | AGENTS.md dan README | 16 |
 
 > **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](STATUS-TEMPLATE-V2.4.md).
+
+- [KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md](KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md) — keputusan teknis CRUD soal Guru, SunEditor lokal dan perlindungan edit manual dari impor ulang Word.
