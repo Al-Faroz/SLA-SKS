@@ -72,7 +72,8 @@ final class ImporBankSoalService
         $versi = (int) $rincian['tp']['struktur_versi'];
         $parsed = PratinjauWordSoalService::periksa(
             $file, $tpId, $guruId, (int) $rincian['paket']['id'],
-            $versi, $jenis, KunciTemplateWordService::ambil()
+            $versi, $jenis, KunciTemplateWordService::ambil(),
+            (string) $rincian['tp']['kode_tp']
         );
         $id = bin2hex(random_bytes(16));
         $loc = self::lokasi($id);
@@ -134,7 +135,8 @@ final class ImporBankSoalService
         $hasil = PratinjauWordSoalService::periksa(
             $path, $tpId, $guruId, (int) $rincian['paket']['id'],
             (int) ($meta['struktur_versi'] ?? 0), (string) $row['jenis'],
-            KunciTemplateWordService::ambil()
+            KunciTemplateWordService::ambil(),
+            (string) $rincian['tp']['kode_tp']
         );
         return ['row' => $row, 'hasil' => $hasil, 'path' => $path];
     }
