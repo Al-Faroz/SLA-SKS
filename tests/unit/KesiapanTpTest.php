@@ -159,8 +159,8 @@ final class KesiapanTpTest extends TestCase
 
         self::assertSame(1, substr_count($kesiapan, 'id="judul-checklist-akhir"'));
         self::assertStringContainsString('Daftar pemeriksaan final', $kesiapan);
-        self::assertStringContainsString("if ($tp['status'] === 'siap')", $detail);
-        self::assertStringContainsString("if ($tp['status'] === 'draf')", $kesiapan);
+        self::assertStringContainsString("if (\$tp['status'] === 'siap')", $detail);
+        self::assertStringContainsString("if (\$tp['status'] === 'draf')", $kesiapan);
         self::assertStringNotContainsString("'#checklist-konten-tp'", $service);
         self::assertStringContainsString("'guru/peta-atp'", $service);
     }
