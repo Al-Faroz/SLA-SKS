@@ -1119,7 +1119,7 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-pratinjau-media .a-materi-kegiatan > :is(h2,p) { grid-column:1/-1; }
 .a-pratinjau-media .a-materi-kegiatan > section { min-width:0; overflow-wrap:anywhere; }
 .a-pratinjau-media .a-materi-kegiatan .a-teks-pratinjau {
-    white-space:pre-wrap; overflow-wrap:anywhere; word-break:normal;
+    white-space:normal; overflow-wrap:anywhere; word-break:normal;
 }
 .a-pratinjau-aksi-bawah { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
 .a-pratinjau-aksi-bawah .a-btn { white-space:normal; }
