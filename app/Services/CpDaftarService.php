@@ -182,7 +182,12 @@ final class CpDaftarService
             foreach (range('A', 'J') as $letter) {
                 $sheet->getColumnDimension($letter)->setWidth($letter === 'F' ? 44 : 22);
             }
-            $tmp = tempnam(WRITEPATH . 'cache/', 'cp-');
+            $tempDir = is_dir(WRITEPATH . 'cache/') && is_writable(WRITEPATH . 'cache/')
+                ? WRITEPATH . 'cache/' : sys_get_temp_dir();
+            if (!is_dir($tempDir) || !is_writable($tempDir)) {
+                throw new DomainException('Direktori sementara untuk ekspor CP tidak dapat ditulis.');
+            }
+            $tmp = tempnam($tempDir, 'cp-');
             if (!is_string($tmp)) {
                 throw new DomainException('Tempat penyimpanan ekspor sementara tidak tersedia.');
             }
