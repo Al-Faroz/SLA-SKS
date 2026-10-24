@@ -154,6 +154,61 @@ final class BerkasMateriUnggahTest extends TestCase
         self::assertSame('pdf', $media['jenis']);
     }
 
+    public function testSuntingPdfMenggantiFileTanpaMenghapusBerkasLama(): void
+    {
+        // Simulasi kasus Guru: Materi sudah memiliki PDF, lalu file PDF diganti.
+        self::$db->table('materi')->where('id', 1)->update(['jenis' => 'pdf']);
+        $this->service(1)->unggah(1, 1, $this->versiAwal, $this->uploadedPdf());
+        $sebelum = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+        $idLama = (int) $sebelum['berkas_id'];
+        $metaLama = self::$db->table('berkas')->where('id', $idLama)->get()->getRowArray();
+        self::assertFileExists($this->folder . '/' . $metaLama['nama_acak']);
+
+        $input = $this->inputMedia();
+        $input['jenis'] = 'pdf';
+        $input['judul'] = 'Materi PDF Pengganti';
+        $this->service(1)->simpanDenganMedia(
+            1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf()
+        );
+        $sesudah = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+        self::assertSame('Materi PDF Pengganti', $sesudah['judul']);
+        self::assertNotSame($idLama, (int) $sesudah['berkas_id']);
+        self::assertSame(2, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+        self::assertFileExists($this->folder . '/' . $metaLama['nama_acak']);
+        $baru = self::$db->table('berkas')->where('id', (int) $sesudah['berkas_id'])
+            ->get()->getRowArray();
+        self::assertSame(1, (int) $baru['halaman']);
+        self::assertFileExists($this->folder . '/' . $baru['nama_acak']);
+        self::assertSame($this->versiAwal + 2,
+            (int) self::$db->table('tp')->where('id', 1)->get()->getRow('struktur_versi'));
+    }
+
+    public function testSuntingPdfGagalTidakMenggantiBerkasLama(): void
+    {
+        self::$db->table('materi')->where('id', 1)->update(['jenis' => 'pdf']);
+        $this->service(1)->unggah(1, 1, $this->versiAwal, $this->uploadedPdf());
+        $lama = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+        $idLama = (int) $lama['berkas_id'];
+        $meta = self::$db->table('berkas')->where('id', $idLama)->get()->getRowArray();
+        $input = $this->inputMedia();
+        $input['jenis'] = 'pdf';
+        $input['judul'] = 'Seharusnya Tidak Tersimpan';
+        try {
+            $this->service(1)->simpanDenganMedia(
+                1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf(true)
+            );
+            self::fail('PDF dengan JavaScript harus ditolak pada penggantian.');
+        } catch (DomainException $e) {
+            $terkini = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+            self::assertSame($idLama, (int) $terkini['berkas_id']);
+            self::assertSame($lama['judul'], $terkini['judul']);
+            self::assertSame(1, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+            self::assertSame($this->versiAwal + 1,
+                (int) self::$db->table('tp')->where('id', 1)->get()->getRow('struktur_versi'));
+            self::assertFileExists($this->folder . '/' . $meta['nama_acak']);
+        }
+    }
+
     public function testTolakPdfDenganJavascriptTidakMenyisakanMateri(): void
     {
         $input = $this->inputMedia();
