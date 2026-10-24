@@ -10,6 +10,7 @@ use App\Services\NavigasiService;
 use App\Services\RingkasanBankSoalService;
 use App\Services\TemplateWordSoalService;
 use App\Services\KunciTemplateWordService;
+use App\Services\PratinjauUnggahWordService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -102,6 +103,53 @@ final class GuruBankSoal extends BaseController
             ->setHeader('Content-Disposition', 'attachment; filename="' . $nama . '"')
             ->setHeader('Cache-Control', 'private, no-store')
             ->setBody($data);
+    }
+
+    public function unggah(int $tpId, string $jenis): ResponseInterface|string
+    {
+        try {
+            $rincian = (new DetailTpService())->lihat($tpId);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(403)->setBody(
+                view('publik/ditolak', ['judul' => 'Akses bank soal ditolak'])
+            );
+        }
+        $pesan = null;
+        $pratinjau = null;
+        if ($rincian['tp']['status'] !== 'draf' || ! in_array($jenis, ['diagnostik', 'sumatif'], true)) {
+            $pesan = 'Jenis ujian tidak valid atau TP sudah terkunci.';
+        } else {
+            $berkas = $this->request->getFile('word');
+            if ($berkas === null || ! $berkas->isValid()
+                || strtolower((string) $berkas->getClientExtension()) !== 'docx'
+                || $berkas->getSize() > 15 * 1024 * 1024) {
+                $pesan = 'Pilih file Word .docx yang valid (maksimal 15 MB).';
+            } else {
+                try {
+                    $akun = (new AuthService())->penggunaSaatIni();
+                    $pratinjau = PratinjauUnggahWordService::baca(
+                        $berkas->getTempName(), $jenis,
+                        ['tp_id'=>$tpId, 'paket_id'=>(int) $rincian['paket']['id'],
+                            'struktur_versi'=>(int) $rincian['tp']['struktur_versi'],
+                            'guru_id'=>(int) $akun['id']],
+                        KunciTemplateWordService::ambil()
+                    );
+                } catch (\Throwable $e) {
+                    $pesan = $e instanceof DomainException ? $e->getMessage()
+                        : 'File Word belum dapat dibaca. Periksa log aplikasi.';
+                    log_message('error', 'Pratinjau Word gagal untuk TP {id}: {error}',
+                        ['id'=>$tpId, 'error'=>$e->getMessage()]);
+                }
+            }
+        }
+        $akun = (new AuthService())->penggunaSaatIni();
+        return view('guru/unggah_word_soal', array_merge($rincian, [
+            'judul' => 'Pratinjau Word Bank Soal',
+            'namaPengguna' => $akun['nama'],
+            'peranAktif' => 'Guru',
+            'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
+            'jenis' => $jenis, 'pesan' => $pesan, 'pratinjau' => $pratinjau,
+        ]));
     }
 
 }
