@@ -52,7 +52,7 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
                     </label>
                     <textarea class="a-input a-rich-field" name="<?= esc($name, 'attr') ?>"
                         id="isi-<?= esc($name, 'attr') ?>" rows="<?= $name === 'pertanyaan' ? 6 : 3 ?>"
-                        maxlength="100000" required><?= esc(old($name, (string) $default)) ?></textarea>
+                        maxlength="100000" required><?= esc(old($name, (string) $default, false)) ?></textarea>
                 </div>
             <?php endforeach ?>
             <div class="a-field">
@@ -61,7 +61,7 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
                     <?php foreach (['A','B','C','D','E'] as $huruf): ?>
                         <label>
                             <input id="kunci-<?= strtolower($huruf) ?>" type="radio" name="kunci" value="<?= $huruf ?>"
-                                <?= old('kunci', $soal['kunci'] ?? '') === $huruf ? 'checked' : '' ?> required>
+                                <?= old('kunci', $soal['kunci'] ?? '', false) === $huruf ? 'checked' : '' ?> required>
                             <?= $huruf ?>
                         </label>
                     <?php endforeach ?>
