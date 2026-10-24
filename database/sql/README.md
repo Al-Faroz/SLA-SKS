@@ -70,3 +70,41 @@ Ketika versi baru diterbitkan, status versi aktif lama menjadi diarsipkan; teks 
 **Batas tahap K3A:** proposal CP dari Guru dan keputusan Admin atas usulan (`usulan_cp`) serta penautan TP–CP belum tersedia, harus dibangun pada PR akademik berikutnya sebelum BAB/TP aktif. Setelah modul siap, penautan TP baru hanya memilih versi CP `aktif` dengan kurikulum/mapel/fase yang cocok; tautan historis tetap.
 
 Jika impor gagal setelah sebagian DDL, periksa database dan pulihkan backup sebelum mencoba kembali.
+
+## S01-0014 — Progres TP dan version pinning Siswa (v2.4, 24 Oktober 2026)
+
+**Prasyarat:** database XAMPP telah berisi skema v2.4 terkini dan memiliki tabel
+`siswa`, `tp`, `paket_semester`, `versi_konten_tp`, `penugasan_paket`.
+Berkas SQL: `database/sql/updates/0014_progres_tp_pin.sql`.
+
+1. **Backup** database aktif menggunakan phpMyAdmin sebelum perubahan, serta
+   simpan backup `writable/` sebagai bagian prosedur proyek. Gunakan database
+   pengujian lokal dahulu, bukan database produksi.
+2. Pastikan tabel belum ada: `SHOW TABLES LIKE 'progres_tp';`. Jika sudah ada,
+   **hentikan** dan periksa struktur/data; jangan mengimpor ulang atau mereset.
+3. Impor **sekali** `0014_progres_tp_pin.sql` melalui phpMyAdmin pada database
+   SLA-SKS v2.4. Patch ini **hanya CREATE TABLE**, tanpa DROP/DELETE/TRUNCATE
+   dan tanpa Migration/Seeder. Karena DDL MySQL memiliki implicit commit,
+   rollback otomatis terhadap CREATE TABLE **tidak tersedia**; gunakan backup
+   bila impor gagal dan pemeriksaan sebelum mencoba ulang.
+4. Verifikasi `SHOW CREATE TABLE progres_tp;` dan
+   `SELECT COUNT(*) AS total FROM progres_tp;` (awal 0).
+5. Pada TP **Siap**, login **Siswa pengujian** dari Gen/paket yang benar.
+   Buka `/siswa/tp/{id}`, klik `Aktifkan TP & simpan versi`, lalu cek ulang
+   halaman dan `SELECT id,siswa_id,tp_id,versi_konten_tp_id,status FROM progres_tp;`.
+   Semestinya **satu** record per siswa–TP–versi paket; status `diagnostik`,
+   dengan versi snapshot yang tetap ketika reload/POST berulang.
+6. Coba siswa dari Gen lain dan TP selanjutnya; harus ditolak. **Jangan**
+   memakai akun siswa nyata untuk uji aktivasi sebelum disepakati karena
+   pengikatan historis bersifat permanen dan tidak memiliki tombol reset.
+7. Belum membuat `percobaan_ujian`, jawaban, skor, ataupun progres Materi.
+   Diagnostik wajib dipasang pada tahap selanjutnya; **tidak ada tombol
+   Mulai Diagnostik** sebelum keamanan fullscreen/timer/acak soal tersedia.
+
+**Kompatibilitas:** kolom/progres berkaitan langsung dengan `siswa`, `tp`,
+`paket_semester`, dan `versi_konten_tp`; nama tabel dan tipe FK memerlukan
+verifikasi terhadap skema nyata sebelum impor hosting MariaDB. Tidak ada data
+siswa di GitHub. Jika skema yang terpasang ternyata memiliki tabel setara
+`progres_tp`, lakukan review dan penyelarasan patch, bukan menjalankan DDL
+yang berpotensi konflik.
+
