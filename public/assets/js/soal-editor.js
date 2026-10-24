@@ -75,9 +75,31 @@
                         ['align', 'list'], '|', ['table', 'image', 'link'], '|',
                         ['removeFormat']
                     ],
+                    image: {
+                        createFileInput: true,
+                        createUrlInput: false,
+                        acceptedFormats: 'image/png,image/jpeg',
+                        uploadSingleSizeLimit: 2 * 1024 * 1024,
+                        allowMultiple: false,
+                        canResize: true
+                    },
                     events: {
-                        onFocus: () => { active = el.id; },
-                        onChange: ({ data }) => { el.value = data; }
+                        onChange: ({ data }) => { el.value = data; },
+                        onImageUploadBefore: ({ $, info }) => {
+                            if (info.url) {
+                                if (!trusted(info.url)) {
+                                    status.textContent = 'Gunakan gambar yang diunggah ke SLA-SKS.';
+                                    return false;
+                                }
+                                return true;
+                            }
+                            if (uploadsActive > 0) {
+                                status.textContent = 'Selesaikan unggahan sebelumnya terlebih dahulu.';
+                                return false;
+                            }
+                            void uploadNative($, info.files);
+                            return false;
+                        }
                     }
                 });
                 editors.set(el.id, editor);
@@ -87,7 +109,12 @@
         });
     }
 
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', (event) => {
+        if (uploadsActive > 0) {
+            event.preventDefault();
+            status.textContent = 'Gambar masih diunggah. Simpan setelah gambar selesai disisipkan.';
+            return;
+        }
         editors.forEach((instance, id) => {
             const textarea = document.getElementById(id);
             if (textarea) textarea.value = instance.$.html.get();
