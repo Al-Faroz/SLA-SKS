@@ -17,7 +17,7 @@
     </header>
     <nav class="a-pratinjau-navigasi" aria-label="Navigasi pratinjau Materi">
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']) . '#daftar-materi', 'attr') ?>">← Daftar Materi</a>
-        <a class="a-btn a-btn--sekunder" href="#materi-pratinjau-heading">Lihat media</a>
+        <a class="a-btn a-btn--sekunder" href="#materi-pratinjau-heading">Ke bagian media</a>
         <a class="a-btn a-btn--sekunder" href="#petunjuk-materi">Petunjuk Resume &amp; HOTS</a>
         <?php if ($tp['status'] === 'draf'): ?>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi['id'] . '/edit'), 'attr') ?>">Sunting Materi</a>
