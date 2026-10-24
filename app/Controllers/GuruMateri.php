@@ -79,8 +79,10 @@ final class GuruMateri extends BaseController
 
     private function kembaliTambah(int $tpId, string $pesan, bool $sukses = false): RedirectResponse
     {
+        // Notifikasi Materi harus terpisah dari notifikasi penyuntingan TP.
+        // Dengan demikian error upload tidak muncul jauh di kartu Rumusan TP.
         return redirect()->to(site_url('guru/tp/' . $tpId) . '#tambah-materi')
-            ->with($sukses ? 'sukses' : 'galat', $pesan);
+            ->with($sukses ? 'materi_sukses' : 'materi_galat', $pesan);
     }
 
     public function tambah(int $tpId): RedirectResponse
