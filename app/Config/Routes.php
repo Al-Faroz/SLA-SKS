@@ -94,6 +94,7 @@ $routes->get('admin/siswa/impor/(:segment)/galat', 'AdminImporAkun::galatSiswa/$
 
 // K3A — Kurikulum dan CP resmi berversi. Hanya Admin aktif; semua POST global CSRF.
 $routes->get('admin/kurikulum-cp', 'AdminKurikulumCp::index', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/ekspor', 'AdminKurikulumCp::eksporCp', ['filter' => 'auth:admin']);
 $routes->post('admin/kurikulum-cp/kurikulum', 'AdminKurikulumCp::simpanKurikulum', ['filter' => 'auth:admin']);
 $routes->post('admin/kurikulum-cp', 'AdminKurikulumCp::simpanCp', ['filter' => 'auth:admin']);
 $routes->get('admin/kurikulum-cp/(:num)', 'AdminKurikulumCp::detail/$1', ['filter' => 'auth:admin']);
