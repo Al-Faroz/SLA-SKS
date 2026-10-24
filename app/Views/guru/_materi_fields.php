@@ -75,7 +75,7 @@ $batasServer = min(
         aria-describedby="materi-file-info materi-file-server materi-file-error">
     <p class="a-help" id="materi-file-info" data-materi-file-info>
         <?= esc(match ($jenisMateri) {
-            'pdf' => 'PDF maksimal 15 MB, 40 halaman; dokumen berisi fitur aktif/struktur tak didukung ditolak.',
+            'pdf' => 'PDF maksimal 15 MB dan 40 halaman. Pilih dokumen PDF yang dapat dibuka.',
             'gambar' => 'Gambar JPG, PNG atau WebP maksimal 10 MB.',
             'audio' => 'Audio MP3 atau M4A maksimal 10 MB.',
             default => 'Pilih media untuk menampilkan batas berkas.',
