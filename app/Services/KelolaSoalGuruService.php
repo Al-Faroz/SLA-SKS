@@ -76,9 +76,15 @@ final class KelolaSoalGuruService
         if (!in_array($input['kunci'] ?? null, ['A', 'B', 'C', 'D', 'E'], true)) {
             throw new DomainException('Pilih tepat satu kunci jawaban A–E.');
         }
+        $sebelumnya = $soalId !== null ? $this->lihat($tpId, $soalId) : null;
+        $richLama = $sebelumnya !== null
+            ? json_decode((string) ($sebelumnya['konten_terstruktur_json'] ?? ''), true) : null;
+        $wordSource = is_array($richLama) ? ($richLama['word_source_id'] ?? null) : null;
         $semua = [];
         foreach (['pertanyaan','opsi_a','opsi_b','opsi_c','opsi_d','opsi_e'] as $name) {
-            $semua[$name] = HtmlSoalGuruService::bersihkan((string) ($input[$name] ?? ''));
+            $semua[$name] = HtmlSoalGuruService::bersihkan(
+                (string) ($input[$name] ?? ''), $tpId, is_string($wordSource) ? $wordSource : null
+            );
         }
 
         $this->db->transBegin();
@@ -93,6 +99,9 @@ final class KelolaSoalGuruService
             $rich = ['format' => 'SLA-SKS-RICH-V1', 'origin' => 'manual',
                 'manual_edited' => true, 'html_pertanyaan' => $semua['pertanyaan']['html'],
                 'html_opsi' => []];
+            if (is_string($wordSource) && preg_match('/^[0-9a-f]{32}$/D', $wordSource)) {
+                $rich['word_source_id'] = $wordSource;
+            }
             foreach ($semua as $name => $data) {
                 $record[$name] = $data['teks'];
                 if ($name !== 'pertanyaan') {
@@ -159,8 +168,14 @@ final class KelolaSoalGuruService
             if (!hash_equals(self::versi($row), $versi)) {
                 throw new DomainException('Soal telah berubah. Muat ulang daftar.');
             }
+            $rich = json_decode((string) ($row['konten_terstruktur_json'] ?? ''), true);
+            if (!is_array($rich)) {
+                $rich = ['format' => 'SLA-SKS-RICH-V1'];
+            }
+            $rich['manual_edited'] = true;
             $this->db->table('soal')->where('id', $soalId)->where('tp_id', $tpId)
-                ->update(['aktif' => $aktif ? 1 : 0]);
+                ->update(['aktif' => $aktif ? 1 : 0,
+                    'konten_terstruktur_json' => json_encode($rich, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)]);
             if ($this->db->transStatus() === false) {
                 throw new RuntimeException('Perubahan status soal gagal.');
             }
