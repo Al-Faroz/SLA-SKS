@@ -35,7 +35,7 @@
             <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
         <?php endif ?>
         <?php if (session()->getFlashdata('galat')): ?>
-            <div class="a-alert" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
         <?php endif ?>
         <?php if ($tp['status'] === 'draf'): ?>
             <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>" class="a-form">
@@ -160,7 +160,7 @@
             <?php $kolomMateriGalat = (string) (session()->getFlashdata('materi_field_galat') ?? ''); ?>
             <?php $nilaiMateriTambah = is_array($nilaiMateriLama) ? $nilaiMateriLama : []; ?>
             <?php if (is_string($pesanMateriGagal) && $pesanMateriGagal !== ''): ?>
-                <div class="a-alert" role="alert">
+                <div class="a-alert a-alert--bahaya" role="alert">
                     <strong>Materi belum disimpan:</strong> <?= esc($pesanMateriGagal) ?>
                 </div>
             <?php endif ?>
