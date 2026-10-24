@@ -58,7 +58,7 @@ final class PdfMateriValidatorTest extends TestCase
 
     public function testPdfDariDompdfAsliDapatDiunggah(): void
     {
-        $pdf = new \\Dompdf\\Dompdf();
+        $pdf = new \Dompdf\Dompdf();
         $pdf->loadHtml('<html><body><h1>Contoh Materi Belajar</h1><p>Dokumen QA tanpa data siswa.</p></body></html>');
         $pdf->setPaper('A4');
         $pdf->render();
