@@ -25,7 +25,7 @@ final class GuruBankSoal extends BaseController
         }
 
         $akun = (new AuthService())->penggunaSaatIni();
-        $ringkasan = (new RingkasanBankSoalService())->lihat($tpId, $rincian['tp']);
+        $ringkasan = (new RingkasanBankSoalService())->lihat($tpId);
 
         return view('guru/bank_soal', array_merge($rincian, [
             'judul' => 'Bank Soal TP',
