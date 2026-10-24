@@ -144,9 +144,11 @@
             }
             if (kesalahan) {
                 file.setCustomValidity(kesalahan);
+                file.setAttribute('aria-invalid', 'true');
                 if (fileError) fileError.textContent = kesalahan;
                 return false;
             }
+            file.removeAttribute('aria-invalid');
             return true;
         }
 
@@ -170,6 +172,11 @@
             periksaFile();
         }
 
+        form.querySelectorAll('[aria-invalid="true"]').forEach((field) => {
+            field.addEventListener('input', () => {
+                if (field !== file) field.removeAttribute('aria-invalid');
+            });
+        });
         jenis.addEventListener('change', () => {
             file.value = '';
             ubahJenis();
