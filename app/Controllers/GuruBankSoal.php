@@ -9,6 +9,7 @@ use App\Services\DetailTpService;
 use App\Services\NavigasiService;
 use App\Services\RingkasanBankSoalService;
 use App\Services\TemplateWordSoalService;
+use App\Services\KunciTemplateWordService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -76,14 +77,22 @@ final class GuruBankSoal extends BaseController
                 'judul_tp' => (string) $rincian['tp']['judul'],
                 'struktur_versi' => (int) $rincian['tp']['struktur_versi'],
             ]);
-            $key = (string) config('Encryption')->key;
+            $key = KunciTemplateWordService::ambil();
             $data = TemplateWordSoalService::buat($identitas, $jenis, $jumlah, $key);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(400)->setBody(
+                '<!doctype html><html lang="id"><meta charset="utf-8"><title>Unduhan tidak tersedia</title><body>' .
+                '<h1>Unduhan tidak dapat diproses</h1><p>' . esc($e->getMessage()) . '</p>' .
+                '<p><a href="' . esc(site_url('guru/tp/' . $tpId . '/bank-soal'), 'attr') . '">Kembali ke bank soal</a></p></body></html>'
+            );
         } catch (\Throwable $e) {
             log_message('error', 'Gagal unduh Word TP {tpId}: {reason}', [
                 'tpId' => $tpId, 'reason' => $e->getMessage(),
             ]);
-            return $this->response->setStatusCode(400)->setBody(
-                view('publik/ditolak', ['judul' => 'Unduhan template belum dapat diproses'])
+            return $this->response->setStatusCode(500)->setBody(
+                '<!doctype html><html lang="id"><meta charset="utf-8"><title>Gagal membuat Word</title><body>' .
+                '<h1>File Word belum berhasil dibuat</h1><p>Periksa log aplikasi atau hubungi pengelola.</p>' .
+                '<p><a href="' . esc(site_url('guru/tp/' . $tpId . '/bank-soal'), 'attr') . '">Kembali ke bank soal</a></p></body></html>'
             );
         }
 
