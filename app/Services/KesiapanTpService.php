@@ -94,13 +94,18 @@ final class KesiapanTpService
                 break;
             }
             $word = $rich['word_source_id'] ?? null;
-            if (is_string($word) && preg_match('/^[0-9a-f]{32}$/D', $word)
-                && !is_file(WRITEPATH . 'private/word_soal/' . $word . '.docx')) {
+            if ($word !== null && (!is_string($word)
+                || !preg_match('/^[0-9a-f]{32}$/D', $word)
+                || !is_file(WRITEPATH . 'private/word_soal/' . $word . '.docx'))) {
                 $mediaSoalBaik = false;
                 break;
             }
             $html = (string) ($rich['html_pertanyaan'] ?? '')
                 . implode('', is_array($rich['html_opsi'] ?? null) ? $rich['html_opsi'] : []);
+            if (str_contains($html, 'word-image:') && $word === null) {
+                $mediaSoalBaik = false;
+                break;
+            }
             if (preg_match_all('/soal-image:([0-9a-f]{32})/', $html, $matches)) {
                 foreach ($matches[1] as $token) {
                     $folder = WRITEPATH . 'private/soal_media/' . $tpId . '/' . $token;
@@ -159,6 +164,10 @@ final class KesiapanTpService
                 $validCp = false;
             }
         }
+        self::tambahCek($hasil, 'paket', 'Paket semester berlaku',
+            in_array($paket['status'] ?? '', ['draf', 'aktif'], true),
+            'Paket semester arsip tidak boleh menerbitkan TP baru.',
+            $detail . '#identitas-tp');
         self::tambahCek($hasil, 'cp', 'CP resmi aktif dan cocok', $validCp && $utama === 1,
             'Setiap CP harus aktif, Fase D, sesuai Mapel/Kurikulum, dengan tepat satu CP utama.',
             $detail . '#checklist-konten-tp');
