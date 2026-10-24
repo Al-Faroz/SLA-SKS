@@ -18,7 +18,7 @@
     <section class="a-card" aria-labelledby="identitas-tp">
         <h2 id="identitas-tp">Identitas TP</h2>
         <div class="a-tabel-gulir">
-            <table class="a-tbl">
+            <table class="a-tbl a-tp-identitas">
                 <tbody>
                     <tr><th scope="row">Kode TP</th><td><?= esc($tp['kode_tp']) ?></td></tr>
                     <tr><th scope="row">Urutan ATP</th><td><?= (int) $tp['urutan_atp'] ?></td></tr>
@@ -33,14 +33,14 @@
         <h2 id="checklist-konten-tp">Pemeriksaan awal kelengkapan konten</h2>
         <p class="a-help">Daftar ini membantu Guru melengkapi TP dan Materi. Ini belum pemeriksaan akhir TP Siap: CP, bank soal Diagnostik/Sumatif, pengaturan ujian, keamanan dan publikasi masih harus diperiksa.</p>
         <div class="a-tabel-gulir">
-            <table class="a-tbl">
+            <table class="a-tbl a-tbl--cards a-tp-checklist">
                 <thead><tr><th scope="col">Komponen</th><th scope="col">Status</th><th scope="col">Keterangan</th></tr></thead>
                 <tbody>
                     <?php foreach ($checklist_konten as $cek): ?>
                         <tr>
-                            <th scope="row"><?= esc($cek['label']) ?></th>
-                            <td><?= $cek['terpenuhi'] ? 'Terisi' : 'Perlu dilengkapi' ?></td>
-                            <td><?= esc($cek['keterangan']) ?></td>
+                            <th scope="row" data-label="Komponen"><?= esc($cek['label']) ?></th>
+                            <td data-label="Status"><span class="a-tp-status <?= $cek['terpenuhi'] ? 'is-lengkap' : 'is-kurang' ?>"><?= $cek['terpenuhi'] ? 'Terisi' : 'Perlu dilengkapi' ?></span></td>
+                            <td data-label="Keterangan"><?= esc($cek['keterangan']) ?></td>
                         </tr>
                     <?php endforeach ?>
                 </tbody>
@@ -49,7 +49,7 @@
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="bank-soal-tautan">
         <h2 id="bank-soal-tautan">Bank soal Diagnostik dan Sumatif</h2>
-        <p class="a-help">Lihat jumlah soal aktif untuk TP ini. Pengelolaan dan impor Word bank soal akan tersedia pada tahap berikutnya.</p>
+        <p class="a-help">Lihat jumlah soal aktif untuk TP ini. Kelola soal aktif, sunting soal draf, atau impor Word untuk TP ini.</p>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal'), 'attr') ?>">Lihat bank soal</a>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="rumusan-tp">
@@ -100,7 +100,7 @@
             <div class="a-empty" role="status"><p>Belum ada Materi/Submateri untuk TP ini.</p></div>
         <?php else: ?>
             <div class="a-tabel-gulir">
-                <table class="a-tbl">
+                <table class="a-tbl a-tbl--cards a-tp-materi-tabel">
                     <thead>
                         <tr>
                             <th scope="col">No.</th>
@@ -116,11 +116,11 @@
                     <tbody>
                         <?php foreach ($materi as $item): ?>
                             <tr>
-                                <td><?= (int) $item['urutan'] ?></td>
-                                <td><?= esc($item['judul']) ?></td>
-                                <td><?= esc(strtoupper((string) $item['jenis'])) ?></td>
-                                <td><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
-                                <td class="a-materi-aksi">
+                                <th scope="row" data-label="No."><?= (int) $item['urutan'] ?></th>
+                                <td data-label="Judul" class="a-tp-materi-judul"><?= esc($item['judul']) ?></td>
+                                <td data-label="Jenis"><?= esc(strtoupper((string) $item['jenis'])) ?></td>
+                                <td data-label="Status"><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
+                                <td class="a-materi-aksi" data-label="Pratinjau">
                                     <?php if (in_array($item['jenis'], ['pdf', 'gambar', 'audio'], true) && $item['berkas_id'] !== null): ?>
                                         <a class="a-btn a-btn--sekunder" target="_blank" rel="noopener noreferrer" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>">Pratinjau</a>
                                     <?php elseif ($item['jenis'] === 'youtube' && ! empty($item['url_youtube'])): ?>
@@ -129,7 +129,7 @@
                                         <span class="a-help">Belum ada file</span>
                                     <?php endif ?>
                                 </td>
-                                <td class="a-materi-aksi">
+                                <td class="a-materi-aksi" data-label="Urutan">
                                     <?php if ($tp['status'] === 'draf'): ?>
                                         <div class="a-materi-urutan">
                                             <?php foreach (['naik' => 'Naik', 'turun' => 'Turun'] as $arah => $label): ?>
@@ -146,14 +146,14 @@
                                         <span class="a-help">Terkunci</span>
                                     <?php endif ?>
                                 </td>
-                                <td class="a-materi-aksi">
+                                <td class="a-materi-aksi" data-label="Edit">
                                     <?php if ($tp['status'] === 'draf'): ?>
                                         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
                                     <?php else: ?>
                                         <span class="a-help">Terkunci</span>
                                     <?php endif ?>
                                 </td>
-                                <td class="a-materi-aksi">
+                                <td class="a-materi-aksi" data-label="Hapus">
                                     <?php if ($tp['status'] === 'draf'): ?>
                                         <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/hapus'), 'attr') ?>"
                                             data-materi-hapus-form>
@@ -197,7 +197,9 @@
             <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-sudah-upload="0" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
-                <?= view('guru/_materi_fields', ['nilai' => $nilaiMateriTambah, 'galatKolom' => $kolomMateriGalat]) ?>
+                <div class="a-materi-form-fields">
+                    <?= view('guru/_materi_fields', ['nilai' => $nilaiMateriTambah, 'galatKolom' => $kolomMateriGalat]) ?>
+                </div>
                 <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Tambah Materi draf</button>
                 <p class="a-help" data-materi-status aria-live="polite">Belum disimpan.</p>
             </form>
