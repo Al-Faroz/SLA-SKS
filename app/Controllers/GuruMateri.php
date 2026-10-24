@@ -77,12 +77,88 @@ final class GuruMateri extends BaseController
             ->with($sukses ? 'sukses' : 'galat', $pesan);
     }
 
+    /**
+     * Data teks saja untuk mengisi ulang form setelah ditolak. Berkas tidak boleh
+     * disimpan di session dan harus dipilih ulang oleh pengguna.
+     *
+     * @return array<string,string>
+     */
+    private function isianUntukUlang(): array
+    {
+        $nilai = [];
+        foreach (['judul' => 180, 'jenis' => 20, 'url_youtube' => 255,
+                  'min_waktu_menit' => 24, 'petunjuk_resume' => 20000,
+                  'petunjuk_hots' => 20000] as $kunci => $maks) {
+            $raw = $this->request->getPost($kunci);
+            if (is_string($raw)) {
+                $nilai[$kunci] = mb_substr($raw, 0, $maks);
+            }
+        }
+        return $nilai;
+    }
+
+    private function kolomKeliru(string $pesan): string
+    {
+        $teks = strtolower($pesan);
+        if (str_contains($teks, 'judul materi')) {
+            return 'judul';
+        }
+        if (str_contains($teks, 'resume')) {
+            return 'petunjuk_resume';
+        }
+        if (str_contains($teks, 'hots')) {
+            return 'petunjuk_hots';
+        }
+        if (str_contains($teks, 'waktu') || str_contains($teks, 'menit')) {
+            return 'min_waktu_menit';
+        }
+        if (str_contains($teks, 'youtube') || str_contains($teks, 'tautan')) {
+            return 'url_youtube';
+        }
+        if (str_contains($teks, 'jenis media')) {
+            return 'jenis';
+        }
+        if (str_contains($teks, 'pdf') || str_contains($teks, 'gambar')
+            || str_contains($teks, 'audio') || str_contains($teks, 'unggah')
+            || str_contains($teks, 'berkas') || str_contains($teks, 'file')
+            || str_contains($teks, 'struktur dokumen')) {
+            return 'media';
+        }
+        return '';
+    }
+
+    private function galatTeknis(string $proses, Throwable $e): string
+    {
+        $kode = strtoupper(bin2hex(random_bytes(4)));
+        // Detail hanya di log privat. Jangan tampilkan SQL/path/server pada browser.
+        log_message('error', '[GURU-MATERI ' . $kode . '] ' . $proses . ': '
+            . get_class($e) . ' - ' . $e->getMessage()
+            . ' (' . $e->getFile() . ':' . $e->getLine() . ')');
+        return 'Penyimpanan gagal karena gangguan server. Kode pemeriksaan: ' . $kode
+            . '. Sampaikan kode ini kepada pengelola.';
+    }
+
     private function kembaliTambah(int $tpId, string $pesan, bool $sukses = false): RedirectResponse
     {
-        // Notifikasi Materi harus terpisah dari notifikasi penyuntingan TP.
-        // Dengan demikian error upload tidak muncul jauh di kartu Rumusan TP.
-        return redirect()->to(site_url('guru/tp/' . $tpId) . '#tambah-materi')
+        $res = redirect()->to(site_url('guru/tp/' . $tpId) . '#tambah-materi')
             ->with($sukses ? 'materi_sukses' : 'materi_galat', $pesan);
+        if (! $sukses) {
+            $res->with('materi_input_lama', $this->isianUntukUlang());
+            $res->with('materi_field_galat', $this->kolomKeliru($pesan));
+        }
+        return $res;
+    }
+
+    private function kembaliSunting(int $tpId, int $materiId, string $pesan, bool $sukses = false): RedirectResponse
+    {
+        $res = redirect()->to(site_url('guru/tp/' . $tpId . '/materi/' . $materiId . '/edit')
+            . '#sunting-materi')
+            ->with($sukses ? 'materi_edit_sukses' : 'materi_edit_galat', $pesan);
+        if (! $sukses) {
+            $res->with('materi_edit_input_lama', $this->isianUntukUlang());
+            $res->with('materi_edit_field_galat', $this->kolomKeliru($pesan));
+        }
+        return $res;
     }
 
     public function tambah(int $tpId): RedirectResponse
@@ -116,8 +192,7 @@ final class GuruMateri extends BaseController
         } catch (DomainException $e) {
             return $this->kembaliTambah($tpId, $e->getMessage());
         } catch (Throwable $e) {
-            log_message('error', 'Tambah Materi beserta media gagal: ' . get_class($e));
-            return $this->kembaliTambah($tpId, 'Gagal menyimpan Materi/media. Periksa file, izin writable dan konfigurasi upload PHP.');
+            return $this->kembaliTambah($tpId, $this->galatTeknis('Tambah Materi', $e));
         }
     }
 
@@ -210,21 +285,24 @@ final class GuruMateri extends BaseController
         $data = $this->formulir();
         $versi = $this->versi();
         if ($data === null || $versi === null) {
-            return $this->kembali($tpId, 'Data formulir Materi tidak valid.');
+            return $this->kembaliSunting($tpId, $materiId,
+                'Data formulir tidak lengkap atau versi TP berubah. Periksa isian dan muat ulang jika perlu.');
         }
         try {
             $file = $this->request->getFile('media');
             if ($file !== null && $file->getError() !== UPLOAD_ERR_NO_FILE) {
+                if (! $file->isValid()) {
+                    throw new DomainException($this->pesanUpload($file->getError()));
+                }
                 (new BerkasMateriService())->simpanDenganMedia($tpId, $materiId, $versi, $data, $file);
             } else {
                 (new MateriDrafService())->simpan($tpId, $materiId, $versi, $data);
             }
-            return $this->kembali($tpId, 'Materi draf berhasil diperbarui.', true);
+            return $this->kembaliSunting($tpId, $materiId, 'Materi draf berhasil diperbarui.', true);
         } catch (DomainException $e) {
-            return $this->kembali($tpId, $e->getMessage());
+            return $this->kembaliSunting($tpId, $materiId, $e->getMessage());
         } catch (Throwable $e) {
-            log_message('error', 'Edit Materi/media gagal: ' . get_class($e));
-            return $this->kembali($tpId, 'Gagal mengubah Materi atau file. Periksa berkas dan izin writable.');
+            return $this->kembaliSunting($tpId, $materiId, $this->galatTeknis('Sunting Materi', $e));
         }
     }
 
