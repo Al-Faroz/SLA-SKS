@@ -104,7 +104,7 @@ final class RenderWordSoalService
         return $html;
     }
 
-    private static function inline(DOMXPath $xp, ZipArchive $zip, array $relations, DOMNode $node, int &$bytes): string
+    private static function inline(DOMXPath $xp, ZipArchive $zip, array $relations, DOMNode $node, int &$bytes, ?callable $imageSrc = null): string
     {
         $html = '';
         foreach ($node->childNodes as $part) {
