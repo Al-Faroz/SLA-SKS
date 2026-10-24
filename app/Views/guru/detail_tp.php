@@ -156,6 +156,9 @@
             <h2 id="tambah-materi">Tambah Materi/Submateri</h2>
             <?php $pesanMateriGagal = session()->getFlashdata('materi_galat'); ?>
             <?php $pesanMateriSukses = session()->getFlashdata('materi_sukses'); ?>
+            <?php $nilaiMateriLama = session()->getFlashdata('materi_input_lama'); ?>
+            <?php $kolomMateriGalat = (string) (session()->getFlashdata('materi_field_galat') ?? ''); ?>
+            <?php $nilaiMateriTambah = is_array($nilaiMateriLama) ? $nilaiMateriLama : []; ?>
             <?php if (is_string($pesanMateriGagal) && $pesanMateriGagal !== ''): ?>
                 <div class="a-alert" role="alert">
                     <strong>Materi belum disimpan:</strong> <?= esc($pesanMateriGagal) ?>
@@ -164,12 +167,16 @@
             <?php if (is_string($pesanMateriSukses) && $pesanMateriSukses !== ''): ?>
                 <div class="a-alert" role="status"><?= esc($pesanMateriSukses) ?></div>
             <?php endif ?>
-            <p class="a-help">Pilih YouTube untuk URL, atau PDF/Gambar/Audio untuk mengunggah berkas. Materi yang berhasil disimpan tetap Nonaktif.</p>
+            <p class="a-help">Pilih YouTube untuk mengisi URL, atau PDF/Gambar/Audio untuk memilih file. Simpan menghasilkan Materi Nonaktif; file dan data Materi hanya disimpan bila semua pemeriksaan berhasil.</p>
+            <?php if (is_string($pesanMateriGagal) && $pesanMateriGagal !== '' && in_array(($nilaiMateriTambah['jenis'] ?? ''), ['pdf', 'gambar', 'audio'], true)): ?>
+                <p class="a-help"><strong>Perlu pilih ulang file:</strong> Demi keamanan, browser tidak dapat mempertahankan pilihan file setelah pengiriman gagal. Judul, waktu, petunjuk Resume dan HOTS tetap dipulihkan.</p>
+            <?php endif ?>
             <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-sudah-upload="0" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
-                <?= view('guru/_materi_fields', ['nilai' => []]) ?>
+                <?= view('guru/_materi_fields', ['nilai' => $nilaiMateriTambah, 'galatKolom' => $kolomMateriGalat]) ?>
                 <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Tambah Materi draf</button>
+                <p class="a-help" data-materi-status aria-live="polite">Belum disimpan.</p>
             </form>
         </section>
     <?php endif ?>
