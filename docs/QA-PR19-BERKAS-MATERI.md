@@ -130,3 +130,17 @@ Perbaikan dalam `app/Services/PdfMateriValidator.php`: hanya `/OpenAction` array
 QA regresi `tests/unit/PdfMateriValidatorTest.php`: contoh jsPDF 1 halaman dengan OpenAction FitH valid; OpenAction Launch, target bukan Page dan campuran instruksi JS ditolak. Inspeksi lokal file unggahan menunjukkan satu-satunya pola larangan lama yang cocok adalah `/OpenAction` dengan `/FitH null`; objek target `3 0` adalah `/Page` dan seluruh pemeriksaan xref, katalog, jumlah halaman lainnya cocok. **Belum diuji pada browser XAMPP pemilik** setelah patch.
 
 Jika kelak ditemukan contoh PDF modern/berstruktur lain, identifikasi terpisah dan jangan menonaktifkan pemeriksaan action secara umum. Jangan commit dokumen nyata atau URL berisi identitas sekolah jika tidak relevan dengan QA.
+
+## Temuan 24 Oktober 2026 — PDF pengganti satu halaman ditolak oleh pemeriksaan EOF
+
+Pemilik berhasil menambah Materi PDF baru pada XAMPP, lalu mencoba mengganti PDF pada Materi sama dan mendapat pesan "PDF dengan revisi inkremental atau penutup tidak jelas ditolak". Contoh pengganti hanya diperiksa lokal, **tidak ditambahkan ke repository**. Byte contoh menunjukkan PDF 1.3 jsPDF, ukuran ~199 KB, satu halaman, tepat satu %%EOF, satu startxref, offset xref valid, tanpa /Prev, tanpa JS dan enkripsi; pemeriksaan PHP atas footer file asli berhasil. Jadi pesan lama **tidak sesuai dengan file yang dilampirkan**. Belum terbukti bahwa byte yang diterima PHP/XAMPP identik dengan file asli.
+
+Perbaikan:
+1. PdfMateriValidator.php tidak lagi menghitung token EOF/startxref mentah di seluruh konten biner; pemeriksaan mencari **blok akhir PDF struktural** dan memastikan hanya satu blok. Dokumen multi-revisi masih ditolak; validasi xref, aksi aktif, MIME, 15 MiB dan 40 halaman tetap.
+2. Jika penutup yang diterima PHP masih salah, log privat writable/logs mencatat label [MATERI-PDF], ukuran byte, SHA-256, jumlah token mentah dan klasifikasi error, tanpa menyimpan isi/nama dokumen. Data ini dapat dibandingkan dengan hash file lokal, tanpa membagikan dokumen ke GitHub.
+3. Tes unit mencakup token EOF/startxref di metadata (bukan revisi), EOF tanpa newline ala jsPDF, revisi berulang, penutup tidak sah.
+4. Tes integrasi mencakup **Sunting Materi PDF dengan file pengganti**, mempertahankan metadata/file historis, menaikkan versi TP hanya bila berhasil, dan mempertahankan file lama saat PDF pengganti ditolak.
+
+CI terbaru [QA Berkas Materi #40053134703](https://github.com/Al-Faroz/SLA-SKS/actions/runs/40053134703) PASS: 16 tes PDF/21 assertions; 11 tes integrasi unggah/45 assertions.
+
+Uji manual XAMPP: tarik branch terbaru, Sunting Materi PDF yang sudah ada, pilih PDF pengganti, simpan dan buka Pratinjau. Jika masih muncul error penutup baru, cari [MATERI-PDF] dalam log privat, bandingkan SHA-256 dengan perintah Windows certutil -hashfile "file.pdf" SHA256. Jangan mengganti SQL, .env atau menghapus file lama.
