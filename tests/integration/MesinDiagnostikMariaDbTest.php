@@ -133,7 +133,13 @@ final class MesinDiagnostikMariaDbTest extends TestCase
                 ->where('id',$id)->get()->getRowArray()['kunci_acak'];
             $engine->jawab(1,$token,$id,$kunci);
         }
-        $end=$engine->tindakan(1,$token,'kirim');
+        try {
+            $engine->tindakan(1,$token,'kirim');
+            self::fail('Kirim tanpa sinyal fullscreen harus ditolak.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('fullscreen', $e->getMessage());
+        }
+        $end=$engine->tindakan(1,$token,'kirim',true);
         self::assertSame('selesai_sah',$end['status']);
         self::assertSame(100.0,$end['skor']);
         self::assertSame('tuntas',$this->db->table('progres_tp')
@@ -148,7 +154,7 @@ final class MesinDiagnostikMariaDbTest extends TestCase
         self::assertSame('berjalan',$other->status(1,$token2)['status']);
         for ($i=0;$i<3;$i++) {
             $pause=$other->tindakan(1,$token2,'keluar_fullscreen');
-            if ($i<2) $other->tindakan(1,$token2,'pulih');
+            if ($i<2) $other->tindakan(1,$token2,'pulih',true);
         }
         self::assertSame('dibatalkan_menunggu_guru',$pause['status']);
         self::assertNull($pause['skor']);
@@ -171,7 +177,7 @@ final class MesinDiagnostikMariaDbTest extends TestCase
         self::assertFalse($pause['tersimpan']);
         self::assertSame(0,$this->db->table('jawaban_percobaan')
             ->where('percobaan_ujian_id',3)->countAllResults());
-        $pulih=$third->tindakan(1,$thirdToken,'pulih');
+        $pulih=$third->tindakan(1,$thirdToken,'pulih',true);
         self::assertSame('berjalan',$pulih['status']);
         self::assertGreaterThanOrEqual(15,$pulih['jeda_koneksi_detik']);
 
