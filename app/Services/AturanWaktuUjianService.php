@@ -67,9 +67,10 @@ final class AturanWaktuUjianService
             $state['sisa_detik'] = max(0, (int) $state['sisa_detik'] - $dt);
             $state['waktu_aktif_terakhir'] = $akhirAktif;
             if ($state['sisa_detik'] === 0) {
-                $state['status'] = 'selesai_sah';
-                $state['waktu_selesai'] = $akhirAktif;
-                // Belum ada nilai sampai mesin S06B menghitung semua jawaban.
+                // Jangan mengeluarkan status selesai_sah tanpa nilai! Adapter
+                // S06B wajib menghitung jawaban dan menyimpan status+skor dalam
+                // satu transaksi sebelum mengembalikan respons selesai.
+                $state['harus_finalisasi'] = true;
                 return $state;
             }
             if ($sekarang > $cutoff) {
@@ -100,7 +101,7 @@ final class AturanWaktuUjianService
     public static function heartbeat(array $state, int $sekarang): array
     {
         $state = self::rekonsiliasi($state, $sekarang);
-        if ($state['status'] === 'berjalan') {
+        if ($state['status'] === 'berjalan' && (int) $state['sisa_detik'] > 0) {
             $state['last_seen_server_at'] = $sekarang;
         }
         return $state;
