@@ -4,9 +4,13 @@
     $siswa = $jenis === 'siswa';
     $judulDaftar = $siswa ? 'Siswa' : 'Pengelola';
     $lokasi = site_url('admin/' . $jenis);
-    $jumlahHalaman = (int) max(1, ceil($total / $perHalaman));
 ?>
 <div class="a-admin-akun a-page">
+    <nav class="a-breadcrumb" aria-label="Breadcrumb">
+        <a href="<?= esc(site_url('admin'), 'attr') ?>">Beranda Admin</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page"><?= esc($judulDaftar) ?></span>
+    </nav>
     <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Administrasi / Akun</p>
@@ -186,18 +190,16 @@
                         </tbody>
                     </table>
                 </div>
-                <?php if ($jumlahHalaman > 1): ?>
-                    <nav class="a-pager" aria-label="Halaman akun">
-                        <span>Halaman <?= (int) $halaman ?> dari <?= $jumlahHalaman ?></span>
-                        <div class="a-admin-akun__pagination">
-                            <?php foreach ([$halaman - 1 => 'Sebelumnya', $halaman + 1 => 'Berikutnya'] as $tujuan => $label): ?>
-                                <?php if ($tujuan >= 1 && $tujuan <= $jumlahHalaman): ?>
-                                    <a class="a-btn a-btn--sekunder" href="<?= esc($lokasi . '?' . http_build_query(['cari' => $cari, 'status' => $status, 'gen' => $genFilter, 'halaman' => $tujuan]), 'attr') ?>"><?= esc($label) ?></a>
-                                <?php endif ?>
-                            <?php endforeach ?>
-                        </div>
-                    </nav>
-                <?php endif ?>
+                <?= view('components/pager', [
+                    'urlPath' => 'admin/' . $jenis,
+                    'pageParam' => 'halaman',
+                    'halaman' => $halaman,
+                    'perHalaman' => $perHalaman,
+                    'total' => $total,
+                    'filter' => ['cari' => $cari, 'status' => $status, 'gen' => $siswa ? $genFilter : null],
+                    'label' => 'akun ' . $judulDaftar,
+                    'anchor' => 'judul-daftar',
+                ]) ?>
             <?php endif ?>
         </section>
     </div>

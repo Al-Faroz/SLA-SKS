@@ -81,6 +81,8 @@
                                 <form method="post" class="a-form a-form-penugasan"
                                     action="<?= esc(site_url('admin/mapel-guru/' . (int) $item['id'] . '/gen/' . (int) $angkatanAktif . '/guru'), 'attr') ?>">
                                     <?= csrf_field() ?>
+                                    <input type="hidden" name="halaman_mapel" value="<?= (int) $mapelHalaman ?>">
+                                    <input type="hidden" name="halaman_riwayat" value="<?= (int) $riwayatHalaman ?>">
                                     <div class="a-field">
                                         <label class="a-label" for="guru-mapel-<?= (int) $item['id'] ?>">Guru pengampu</label>
                                         <select id="guru-mapel-<?= (int) $item['id'] ?>" name="guru_id">
@@ -101,6 +103,16 @@
                     <?php endforeach ?>
                 </tbody>
             </table></div>
+            <?= view('components/pager', [
+                'urlPath' => 'admin/mapel-guru',
+                'pageParam' => 'halaman_mapel',
+                'halaman' => $mapelHalaman,
+                'perHalaman' => $mapelPerHalaman,
+                'total' => $mapelTotal,
+                'filter' => ['gen' => $angkatanAktif, 'halaman_riwayat' => $riwayatHalaman],
+                'label' => 'penetapan Guru per Gen',
+                'anchor' => 'judul-pengampu',
+            ]) ?>
         <?php endif ?>
     <?php endif ?>
 </section>
@@ -110,7 +122,7 @@
     <?php if ($riwayat === []): ?>
         <div class="a-empty" role="status">Belum ada penetapan atau pergantian Guru per Gen.</div>
     <?php else: ?>
-        <p class="a-help">Menampilkan 25 perubahan terbaru, seluruh riwayat tetap tersimpan di database.</p>
+        <p class="a-help">Menampilkan 25 perubahan per halaman. Seluruh riwayat tetap tersimpan dan dapat dibuka melalui navigasi halaman.</p>
         <div class="a-tabel-gulir"><table class="a-tbl a-tbl--cards a-tbl--riwayat-guru">
             <thead><tr>
                 <th scope="col">Gen</th><th scope="col">Mapel</th>
@@ -128,6 +140,16 @@
                 <?php endforeach ?>
             </tbody>
         </table></div>
+        <?= view('components/pager', [
+            'urlPath' => 'admin/mapel-guru',
+            'pageParam' => 'halaman_riwayat',
+            'halaman' => $riwayatHalaman,
+            'perHalaman' => $riwayatPerHalaman,
+            'total' => $riwayatTotal,
+            'filter' => ['gen' => $angkatanAktif, 'halaman_mapel' => $mapelHalaman],
+            'label' => 'riwayat penetapan Guru',
+            'anchor' => 'judul-riwayat',
+        ]) ?>
     <?php endif ?>
 </section>
 </div>

@@ -5,10 +5,14 @@ on:
     paths:
       - 'app/Views/admin/akun_daftar.php'
       - 'app/Views/admin/mapel_guru.php'
+      - 'app/Views/components/pager.php'
+      - 'app/Controllers/AdminReferensi.php'
+      - 'app/Services/ReferensiService.php'
       - 'public/assets/css/app.css'
       - 'docs/13-DESIGN-SYSTEM-CSS.md'
       - 'docs/assets/galeri-komponen.html'
       - 'tests/unit/TabelAdminResponsifTest.php'
+      - 'tests/unit/PaginationAdminTest.php'
       - '.github/workflows/qa-tabel-admin-responsif.yml'
   workflow_dispatch:
 
@@ -31,6 +35,12 @@ jobs:
         run: |
           php -l app/Views/admin/akun_daftar.php
           php -l app/Views/admin/mapel_guru.php
+          php -l app/Views/components/pager.php
+          php -l app/Controllers/AdminReferensi.php
+          php -l app/Services/ReferensiService.php
           php -l tests/unit/TabelAdminResponsifTest.php
+          php -l tests/unit/PaginationAdminTest.php
       - name: Periksa struktur UI dan regresi aksi
-        run: vendor/bin/phpunit --no-coverage tests/unit/TabelAdminResponsifTest.php
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/TabelAdminResponsifTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PaginationAdminTest.php

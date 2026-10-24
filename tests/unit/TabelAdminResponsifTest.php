@@ -24,8 +24,9 @@ final class TabelAdminResponsifTest extends TestCase
         self::assertStringContainsString('$siswa ? \'NISN\' : \'Username\'', $view);
         self::assertStringContainsString('class="a-admin-akun__penempatan"', $view);
         self::assertStringContainsString("csrf_field()", $view);
-        self::assertStringContainsString("a-pager", $view);
-        self::assertStringContainsString("'halaman' => " . '$tujuan', $view);
+        self::assertStringContainsString("view('components/pager'", $view);
+        self::assertStringContainsString("'pageParam' => 'halaman'", $view);
+        self::assertStringContainsString("'filter' => ['cari' => " . '$cari', $view);
         self::assertStringContainsString('reset-sandi', $view);
     }
 
@@ -42,6 +43,8 @@ final class TabelAdminResponsifTest extends TestCase
         self::assertStringContainsString('name="alasan"', $view);
         self::assertStringContainsString('Simpan pengampu', $view);
         self::assertStringContainsString("csrf_field()", $view);
+        self::assertStringContainsString("'pageParam' => 'halaman_mapel'", $view);
+        self::assertStringContainsString("'pageParam' => 'halaman_riwayat'", $view);
     }
 
     public function testKomponenKartuDokumentasiDanCSSAda(): void

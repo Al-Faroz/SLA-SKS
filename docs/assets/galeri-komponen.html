@@ -56,6 +56,26 @@
             <p class="a-help" id="galeri-tabel-adaptif">Contoh galeri saja. Label sel ditampilkan ketika tabel berubah menjadi kartu; halaman aplikasi tetap memerlukan endpoint aksi sendiri.</p>
         </section>
         <section class="a-card">
+            <h2>Pagination server-side</h2>
+            <p class="a-help">Ini contoh visual pagination. Nomor dan tautan sebenarnya dihitung oleh server pada halaman aplikasi.</p>
+            <div class="a-page">
+                <nav class="a-pager a-pager--lengkap" aria-label="Contoh pagination">
+                    <div class="a-pager__ringkasan"><span>26–50 dari 126 data</span><span>Halaman 2 dari 6</span></div>
+                    <div class="a-pager__aksi">
+                        <span class="a-pager__tombol">Pertama</span>
+                        <span class="a-pager__tombol">Sebelumnya</span>
+                        <span class="a-pager__tombol">1</span>
+                        <span class="a-pager__tombol is-aktif" aria-current="page">2</span>
+                        <span class="a-pager__tombol">3</span>
+                        <span class="a-pager__elipsis">…</span>
+                        <span class="a-pager__tombol">6</span>
+                        <span class="a-pager__tombol">Berikutnya</span>
+                        <span class="a-pager__tombol">Terakhir</span>
+                    </div>
+                </nav>
+            </div>
+        </section>
+        <section class="a-card">
             <h2>Langkah dan terkunci</h2>
             <ol class="a-langkah"><li>Diagnostik · selesai</li><li>Materi · aktif</li><li class="is-terkunci">Sumatif · terkunci, tuntaskan tugas lebih dulu</li></ol>
         </section>
@@ -75,9 +95,16 @@
 
     <section class="a-card">
         <h2>Breadcrumb dan referensi K2</h2>
-        <nav class="a-breadcrumb" aria-label="Contoh breadcrumb">
-            <span>Beranda Admin</span><span aria-hidden="true">/</span><span aria-current="page">Mapel &amp; Guru</span>
-        </nav>
+        <div class="a-page">
+            <nav class="a-breadcrumb" aria-label="Contoh breadcrumb">
+                <a href="#galeri-breadcrumb">Beranda Admin</a>
+                <span aria-hidden="true">/</span>
+                <a href="#galeri-breadcrumb">Data Akademik</a>
+                <span aria-hidden="true">/</span>
+                <span aria-current="page">Mapel &amp; Guru per Gen</span>
+            </nav>
+            <p class="a-help" id="galeri-breadcrumb">Contoh visual: tautan pertama transparan, tautan kedua hijau sangat lembut, halaman aktif hijau lebih tegas dan bukan tautan.</p>
+        </div>
         <p class="a-help">Contoh tabel penugasan G1: satu pasangan Gen–Mapel memiliki satu Guru aktif. Form perubahan memiliki alasan dan jejak audit.</p>
         <div class="a-tabel-gulir">
             <table class="a-tbl"><thead><tr><th>Mapel</th><th>Pengampu</th></tr></thead><tbody>

@@ -155,9 +155,9 @@ final class ReferensiService
      * Semua penetapan G1 aktif hanya per pasangan Gen + mapel.
      * Tidak membaca ref_mapel.guru_id warisan sebagai izin.
      *
-     * @return array{mapel:list<array<string,mixed>>,guru:list<array<string,mixed>>,angkatan:list<array<string,mixed>>,angkatanAktif:?int,riwayat:list<array<string,mixed>>}
+     * @return array<string,mixed>
      */
-    public function daftarMapel(?int $genDipilih = null): array
+    public function daftarMapel(?int $genDipilih = null, int $halamanMapel = 1, int $halamanRiwayat = 1): array
     {
         $this->adminId();
 
@@ -171,13 +171,19 @@ final class ReferensiService
         }
         $genAktif = $genDipilih ?? ($ids[0] ?? null);
 
+        // Halaman penetapan Guru dipotong langsung pada SQL; data tidak seluruhnya dikirim ke view.
+        $mapelPerHalaman = 25;
+        $mapelTotal = (int) $this->db->table('ref_mapel')->countAllResults();
+        $mapelJumlahHalaman = max(1, (int) ceil($mapelTotal / $mapelPerHalaman));
+        $mapelHalaman = min(max(1, $halamanMapel), $mapelJumlahHalaman);
         $mapel = $this->db->query(
             'SELECT m.id, m.kode, m.nama, pg.guru_id, p.nama AS guru_nama
              FROM ref_mapel m
              LEFT JOIN penugasan_guru_gen pg ON pg.mapel_id = m.id AND pg.angkatan_id = ?
              LEFT JOIN pengguna p ON p.id = pg.guru_id
-             ORDER BY m.nama ASC',
-            [$genAktif ?? 0]
+             ORDER BY m.nama ASC, m.id ASC
+             LIMIT ? OFFSET ?',
+            [$genAktif ?? 0, $mapelPerHalaman, ($mapelHalaman - 1) * $mapelPerHalaman]
         )->getResultArray();
 
         $guru = $this->db->table('pengguna p')
@@ -187,13 +193,20 @@ final class ReferensiService
             ->orderBy('p.nama', 'ASC')
             ->get()->getResultArray();
 
+        // Riwayat tetap lintas Gen seperti halaman lama; kini seluruh halaman dapat dibuka.
+        $riwayatPerHalaman = 25;
+        $riwayatTotal = (int) $this->db->table('riwayat_penugasan_guru_gen')->countAllResults();
+        $riwayatJumlahHalaman = max(1, (int) ceil($riwayatTotal / $riwayatPerHalaman));
+        $riwayatHalaman = min(max(1, $halamanRiwayat), $riwayatJumlahHalaman);
         $riwayat = $this->db->table('riwayat_penugasan_guru_gen r')
             ->select('r.id,r.alasan,r.waktu,g.kode AS gen_kode,m.nama AS mapel_nama,p1.nama AS guru_lama,p2.nama AS guru_baru')
             ->join('ref_angkatan g', 'g.id = r.angkatan_id')
             ->join('ref_mapel m', 'm.id = r.mapel_id')
             ->join('pengguna p1', 'p1.id = r.guru_sebelum_id', 'left')
             ->join('pengguna p2', 'p2.id = r.guru_sesudah_id', 'left')
-            ->orderBy('r.id', 'DESC')->limit(25)->get()->getResultArray();
+            ->orderBy('r.id', 'DESC')
+            ->limit($riwayatPerHalaman, ($riwayatHalaman - 1) * $riwayatPerHalaman)
+            ->get()->getResultArray();
 
         return [
             'mapel' => $mapel,
@@ -201,6 +214,12 @@ final class ReferensiService
             'angkatan' => $angkatan,
             'angkatanAktif' => $genAktif,
             'riwayat' => $riwayat,
+            'mapelTotal' => $mapelTotal,
+            'mapelHalaman' => $mapelHalaman,
+            'mapelPerHalaman' => $mapelPerHalaman,
+            'riwayatTotal' => $riwayatTotal,
+            'riwayatHalaman' => $riwayatHalaman,
+            'riwayatPerHalaman' => $riwayatPerHalaman,
         ];
     }
 
