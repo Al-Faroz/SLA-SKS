@@ -75,5 +75,7 @@ final class PaginationAdminTest extends TestCase
         $css = self::source('public/assets/css/app.css');
         self::assertStringContainsString('.a-page .a-breadcrumb a:nth-of-type(2)', $css);
         self::assertStringContainsString('.a-page .a-breadcrumb [aria-current="page"]', $css);
+        self::assertStringContainsString('min-height: 24px', $css);
+        self::assertStringContainsString('padding: 2px 7px', $css);
     }
 }
