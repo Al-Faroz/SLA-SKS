@@ -207,6 +207,10 @@ final class KatalogPembelajaranSiswaService
         if ($tp === null || !$tp['akses']['buka']) {
             throw new DomainException('TP belum dapat dibuka. Periksa urutan TP pada semester Anda.');
         }
+        $detail = $this->db->table('tp')->select('rumusan,indikator')
+            ->where('id', $tpId)->get()->getRowArray();
+        $tp['rumusan'] = (string) ($detail['rumusan'] ?? '');
+        $tp['indikator'] = (string) ($detail['indikator'] ?? '');
         // Data yang aman dibaca sebelum diagnostik: judul Materi saja, bukan
         // URL berkas, jawaban, kunci atau teks petunjuk tugas.
         $materi = $this->db->table('materi')
