@@ -30,6 +30,7 @@ $routes->get('guru/tp/(:num)/bank-soal', 'GuruBankSoal::index/$1', ['filter' => 
 $routes->get('guru/tp/(:num)/bank-soal/soal/(:segment)/baru', 'GuruSoal::baru/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/soal/(:segment)', 'GuruSoal::simpan/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/bank-soal/soal/(:num)/edit', 'GuruSoal::edit/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/soal/(:num)', 'GuruSoal::lihatSoal/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/soal/(:segment)/(:num)', 'GuruSoal::simpan/$1/$2/$3', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/soal/(:num)/status', 'GuruSoal::status/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/gambar', 'GuruSoal::uploadGambar/$1', ['filter' => 'auth:guru']);
