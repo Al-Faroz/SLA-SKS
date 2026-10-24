@@ -1,0 +1,42 @@
+name: QA S08A Media Materi Siswa
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/MateriSiswaService.php'
+      - 'app/Controllers/SiswaMateri.php'
+      - 'app/Controllers/SiswaPembelajaran.php'
+      - 'app/Views/siswa/materi.php'
+      - 'app/Views/siswa/rincian_tp.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/css/app.css'
+      - 'tests/unit/MateriSiswaDatabaseTest.php'
+      - '.github/workflows/qa-s08a-materi-siswa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Pasang dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/MateriSiswaService.php
+          php -l app/Controllers/SiswaMateri.php
+          php -l app/Controllers/SiswaPembelajaran.php
+          php -l app/Views/siswa/materi.php
+          php -l app/Views/siswa/rincian_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/MateriSiswaDatabaseTest.php
+      - name: SQLite Gen dan media privat
+        run: vendor/bin/phpunit --no-coverage tests/unit/MateriSiswaDatabaseTest.php
