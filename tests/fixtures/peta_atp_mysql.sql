@@ -55,6 +55,19 @@ CREATE TABLE tp (
  struktur_versi INT UNSIGNED NOT NULL,
  FOREIGN KEY (paket_semester_id) REFERENCES paket_semester(id)
 ) ENGINE=InnoDB;
+CREATE TABLE berkas (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ tp_id BIGINT UNSIGNED NOT NULL,
+ nama_acak VARCHAR(64) NOT NULL,
+ mime VARCHAR(90) NOT NULL,
+ ukuran_byte INT UNSIGNED NOT NULL,
+ checksum CHAR(64) NOT NULL,
+ halaman SMALLINT UNSIGNED NULL,
+ durasi_detik INT UNSIGNED NULL,
+ dibuat_pada DATETIME NOT NULL,
+ UNIQUE KEY uq_berkas_nama (nama_acak),
+ FOREIGN KEY (tp_id) REFERENCES tp(id)
+) ENGINE=InnoDB;
 CREATE TABLE materi (
  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
  tp_id BIGINT UNSIGNED NOT NULL,
@@ -70,7 +83,8 @@ CREATE TABLE materi (
  aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
  UNIQUE KEY uq_materi_row_uuid (tp_id,row_uuid),
  UNIQUE KEY uq_materi_urutan (tp_id,urutan),
- FOREIGN KEY (tp_id) REFERENCES tp(id)
+ FOREIGN KEY (tp_id) REFERENCES tp(id),
+ FOREIGN KEY (berkas_id) REFERENCES berkas(id)
 ) ENGINE=InnoDB;
 
 INSERT INTO pengguna (id,nama,status,wajib_ganti_sandi,versi_sesi) VALUES

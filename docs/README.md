@@ -26,6 +26,7 @@
 - `docs/TEMPLATE_SOAL_SLA-SKS.docx` — struktur Word Soal Global yang diselaraskan ke **SLA-SKS-WORD-V1**, satu tipe PG lima opsi A–E. Generator per TP/jenis ujian mengikuti ukuran bank aktual; **berkas `docs/` berisi contoh, sedangkan unduhan Guru harus menghasilkan semua slot pertanyaan/opsi/kunci kosong sesuai jumlah bank yang diatur di aplikasi**.
 - `docs/assets/galeri-komponen.html` — galeri visual CSS yang diperbarui bersama perubahan kode UI.
 - [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
+- **[Keputusan final validasi PDF Materi](KEPUTUSAN-VALIDASI-PDF-MATERI.md)** — pembatasan 15 MB/40 halaman untuk storage hosting, bug PDF yang sudah FIX di XAMPP, batas parser tersisa dan tes regresi wajib. Baca sebelum perubahan kode media; catatan implementasi ini **bukan Master ke-17**.
 
 ## Ketentuan perubahan
 - Aturan hidup pada dokumen domain masing-masing, tanpa membuat versi alternatif. Dokumen lain merujuk domain utama.
