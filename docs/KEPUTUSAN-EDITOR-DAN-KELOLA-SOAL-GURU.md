@@ -41,3 +41,11 @@ Script mengambil paket resmi `suneditor@3.3.3` berlisensi MIT dari npm dan menem
 
 **Status bertahap PR #34:** Daftar/tambah/edit/nonaktifkan dan gambar privat tersedia untuk Guru TP Draf; Equation Word/OMML belum dapat diedit tanpa kehilangan format dan akan ditolak dengan pesan spesifik. Hapus pada UI adalah **nonaktifkan** yang dapat dibalik, bukan DELETE SQL. Sanitasi HTML saat ini menjaga teks, tabel, list, RTL, dan gambar terotorisasi; format yang tak terwakili editor tidak boleh diam-diam merusak data. Aset gambar manual per TP dibatasi 100 file atau 100 MB; kebijakan pembersihan aset yatim perlu desain terpisah agar aset soal historis tidak terhapus.
 
+
+## Penyempurnaan UI Bank Soal — 24 Oktober 2026
+
+1. Daftar soal tetap memakai tabel semantik dan heading kolom pada desktop; di lebar layar sampai 980 px diubah secara CSS menjadi kartu berlabel tanpa menyembunyikan tindakan, pertanyaan atau status. Komponen opt-in `.a-tbl--cards` menggunakan atribut `data-label` untuk setiap sel. Penerapan awal pada ringkasan, daftar soal, dan riwayat impor; halaman lain dapat mengadopsi pola yang sama setelah pemeriksaan masing-masing, tanpa mengubah seluruh tabel global secara sembrono.
+2. Fitur **Gambar** bawaan SunEditor v3 digunakan langsung di area pertanyaan/opsi yang sedang diedit. Pilih tombol Gambar → pilih berkas PNG/JPEG → gambar otomatis disisipkan pada titik penyuntingan. Tidak ada lagi form unggah dan tombol sisipkan terpisah. Event `onImageUploadBefore` mengirim berkas ke endpoint Guru yang sudah memiliki CSRF, validasi MIME dan ukuran, serta penyimpanan privat. SunEditor menerima URL privat internal; gambar eksternal atau data URI tidak boleh disimpan ke DB.
+3. Bila gambar sedang diunggah, penyimpanan soal menunggu sampai selesai (tombol simpan tidak mengirim form ketika unggahan aktif). Bila gagal, berikan pesan jelas di area editor; tidak menyamarkan error sebagai akses ditolak.
+4. Tabel lain di aplikasi perlu audit responsivitas terpisah (360/390/768/1024/1366 px). Jangan mengubah tampilan seluruh halaman tanpa uji per-peran.
+
