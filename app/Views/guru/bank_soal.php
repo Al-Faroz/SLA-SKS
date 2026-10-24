@@ -46,6 +46,30 @@
                     <button class="a-btn a-btn--sekunder" type="submit">Unduh Word <?= esc(ucfirst($jenis)) ?></button>
                 </form>
             <?php endforeach ?>
+            <h3 class="a-jarak-atas">Unggah Word untuk validasi</h3>
+            <p class="a-help">Pratinjau validasi hanya memeriksa dokumen; tidak menambah atau mengubah bank soal. Gunakan template yang diunduh dari TP ini.</p>
+            <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenis => $namaJenis): ?>
+                <form method="post" enctype="multipart/form-data" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/word/' . $jenis . '/pratinjau'), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <div class="a-field">
+                        <label class="a-label" for="unggah-word-<?= esc($jenis, 'attr') ?>">Word <?= esc($namaJenis) ?> (.docx)</label>
+                        <input class="a-input" type="file" id="unggah-word-<?= esc($jenis, 'attr') ?>" name="word_soal" accept=".docx" required>
+                    </div>
+                    <button type="submit" class="a-btn a-btn--sekunder">Periksa Word <?= esc($namaJenis) ?></button>
+                </form>
+            <?php endforeach ?>
+        <?php endif ?>
+        <?php if ($pesan = session()->getFlashdata('word_galat')): ?>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+        <?php endif ?>
+        <?php if ($pesan = session()->getFlashdata('word_sukses')): ?>
+            <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+            <?php $rincianWord = session()->getFlashdata('word_rincian'); ?>
+            <?php if (is_array($rincianWord)): ?>
+                <div class="a-tabel-gulir"><table class="a-tbl"><thead><tr><th>Deteksi konten Word tiap soal</th></tr></thead><tbody>
+                    <?php foreach ($rincianWord as $item): ?><tr><td><?= esc($item) ?></td></tr><?php endforeach ?>
+                </tbody></table></div>
+            <?php endif ?>
         <?php endif ?>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke Rincian TP</a>
     </section>
