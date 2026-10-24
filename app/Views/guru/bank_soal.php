@@ -17,7 +17,7 @@
     </header>
     <section class="a-card" aria-labelledby="bank-soal-status">
         <h2 id="bank-soal-status">Ketersediaan bank soal</h2>
-        <p class="a-help">Ringkasan hanya menampilkan jumlah soal aktif, tanpa pertanyaan atau kunci jawaban. Tahap ini belum menyediakan pembuatan, unduhan Word, atau impor soal.</p>
+        <p class="a-help">Ringkasan hanya menampilkan jumlah soal aktif, tanpa pertanyaan atau kunci jawaban. Unduhan template Word kosong tersedia untuk TP draf. Impor Word dan pengelolaan bank soal belum tersedia.</p>
         <div class="a-tabel-gulir">
             <table class="a-tbl">
                 <thead><tr><th scope="col">Jenis ujian</th><th scope="col">Soal aktif</th><th scope="col">Jumlah tayang</th><th scope="col">Status jumlah</th></tr></thead>
