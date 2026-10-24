@@ -76,6 +76,13 @@ final class KelolaSoalGuruService
             throw new DomainException('Pilih tepat satu kunci jawaban A–E.');
         }
         $sebelumnya = $soalId !== null ? $this->lihat($tpId, $soalId) : null;
+        // OMML belum mempunyai editor WYSIWYG lossless: lindungi rumus asli Word.
+        $periksaKaya = $sebelumnya !== null
+            ? json_decode((string) ($sebelumnya['konten_terstruktur_json'] ?? ''), true) : null;
+        if (is_array($periksaKaya) && (int) ($periksaKaya['konten']['rumus'] ?? 0) > 0) {
+            throw new DomainException('Soal dengan Equation Word belum dapat diedit tanpa risiko kehilangan rumus. ' .
+                'Sunting melalui Word dahulu; editor matematika visual sedang disiapkan.');
+        }
         $richLama = $sebelumnya !== null
             ? json_decode((string) ($sebelumnya['konten_terstruktur_json'] ?? ''), true) : null;
         $wordSource = is_array($richLama) ? ($richLama['word_source_id'] ?? null) : null;
@@ -132,6 +139,8 @@ final class KelolaSoalGuruService
                     || !hash_equals(self::versi($row), (string) $input['versi'])) {
                     throw new DomainException('Soal sudah diubah di tempat lain. Muat ulang dan tinjau lagi.');
                 }
+                // Menyunting soal nonaktif tidak otomatis mengaktifkannya kembali.
+                $record['aktif'] = (int) $row['aktif'];
                 $this->db->table('soal')->where('id', $soalId)
                     ->where('tp_id', $tpId)->where('jenis', $jenis)->update($record);
             }
