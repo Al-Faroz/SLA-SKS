@@ -1,0 +1,67 @@
+name: QA S06B Diagnostik End to End
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/MesinDiagnostikSiswaService.php'
+      - 'app/Services/HtmlSoalGuruService.php'
+      - 'app/Controllers/SiswaUjian.php'
+      - 'app/Views/siswa/diagnostik_ujian.php'
+      - 'app/Views/siswa/diagnostik_petunjuk.php'
+      - 'app/Views/siswa/rincian_tp.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/diagnostik-ujian.js'
+      - 'public/assets/css/app.css'
+      - 'tests/integration/MesinDiagnostikMariaDbTest.php'
+      - 'tests/unit/MesinDiagnostikMediaTest.php'
+      - '.github/workflows/qa-s06b-diagnostik.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: testroot
+          MARIADB_DATABASE: sla_s06_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      SLA_TEST_DB_DSN: 'mysql:dbname=sla_s06_test;host=127.0.0.1;port=3306;charset=utf8mb4'
+      SLA_TEST_DB_USER: root
+      SLA_TEST_DB_PASS: testroot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, pdo_mysql, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Pasang dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint dan JavaScript syntax
+        run: |
+          php -l app/Services/MesinDiagnostikSiswaService.php
+          php -l app/Services/HtmlSoalGuruService.php
+          php -l app/Controllers/SiswaUjian.php
+          php -l app/Views/siswa/diagnostik_ujian.php
+          php -l app/Views/siswa/diagnostik_petunjuk.php
+          php -l app/Views/siswa/rincian_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/integration/MesinDiagnostikMariaDbTest.php
+          php -l tests/unit/MesinDiagnostikMediaTest.php
+          node --check public/assets/js/diagnostik-ujian.js
+      - name: Pengujian sanitasi media dan keamanan UI
+        run: vendor/bin/phpunit --no-coverage tests/unit/MesinDiagnostikMediaTest.php
+      - name: Pengujian MariaDB percobaan dan hasil Diagnostik
+        run: vendor/bin/phpunit --no-coverage tests/integration/MesinDiagnostikMariaDbTest.php
