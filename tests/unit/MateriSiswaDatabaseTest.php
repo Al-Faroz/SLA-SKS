@@ -14,6 +14,7 @@ final class MateriSiswaDatabaseTest extends TestCase
 {
     private BaseConnection $db;
     private string $file;
+    private string $folder;
 
     protected function setUp(): void
     {
@@ -89,9 +90,9 @@ final class MateriSiswaDatabaseTest extends TestCase
                 'versi_paket_yang_ditugaskan'=>1,'status'=>'tuntas','dimulai_pada'=>'2026-10-24 00:00:00'],
         ]);
         $nama = str_repeat('a',48) . '.pdf';
-        $folder = rtrim(WRITEPATH, '/\\') . '/uploads/materi';
-        if (!is_dir($folder)) mkdir($folder, 0700, true);
-        $this->file = $folder . '/' . $nama;
+        $this->folder = sys_get_temp_dir() . '/sla_s08a_' . bin2hex(random_bytes(8));
+        if (!mkdir($this->folder, 0700, true)) throw new RuntimeException('Folder uji sementara tidak tersedia.');
+        $this->file = $this->folder . '/' . $nama;
         file_put_contents($this->file, "%PDF-1.4\n% uji sintetis\n");
         $this->db->table('berkas')->insert([
             'id'=>9,'tp_id'=>1,'nama_acak'=>$nama,'mime'=>'application/pdf',
@@ -102,6 +103,7 @@ final class MateriSiswaDatabaseTest extends TestCase
     protected function tearDown(): void
     {
         if (isset($this->file) && is_file($this->file)) unlink($this->file);
+        if (isset($this->folder) && is_dir($this->folder)) rmdir($this->folder);
         if (isset($this->db)) $this->db->close();
         parent::tearDown();
     }
@@ -111,7 +113,7 @@ final class MateriSiswaDatabaseTest extends TestCase
         return new MateriSiswaService($this->db, static fn (): array => [
             'id'=>$userId,'peran_aktif'=>$role,'status'=>'aktif',
             'wajib_ganti_sandi'=>0,
-        ]);
+        ], $this->folder);
     }
 
     public function testGagalDiagnostikBisaMelihatMateriPertamaTapiKeduaTerkunci(): void
