@@ -45,9 +45,19 @@ final class MediaEditorSoalService
             || $info[0] > 3000 || $info[1] > 3000) {
             throw new DomainException('Resolusi gambar maksimal 3000 × 3000 piksel.');
         }
+        $folder = self::dir($tpId);
+        // Batas penggunaan file mencegah penumpukan unggahan gambar di shared hosting.
+        $files = array_merge(glob($folder . '*.png') ?: [], glob($folder . '*.jpg') ?: []);
+        $total = 0;
+        foreach ($files as $existing) {
+            $total += (int) filesize($existing);
+        }
+        if (count($files) >= 100 || $total + $size > 100 * 1024 * 1024) {
+            throw new DomainException('Ruang gambar soal TP sudah mencapai batas. Hubungi Admin untuk penataan aset.');
+        }
         $id = bin2hex(random_bytes(16));
         $suffix = $mime === 'image/png' ? '.png' : '.jpg';
-        $target = self::dir($tpId) . $id . $suffix;
+        $target = $folder . $id . $suffix;
         if (!copy($temp, $target)) {
             throw new RuntimeException('Gambar gagal disimpan.');
         }
