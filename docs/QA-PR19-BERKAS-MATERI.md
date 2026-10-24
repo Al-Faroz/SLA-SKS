@@ -92,3 +92,13 @@ CI: QA Berkas Materi #39933983805, QA Materi Draf #39933983584, QA Peta ATP #399
 6. Pastikan URL privat `/writable/uploads/materi/` tidak dapat diakses langsung. Jangan merger sampai semua hasil uji browser didokumentasikan.
 
 **Catatan:** tes otomatis tidak mensimulasikan viewer PDF nyata di Chrome/Firefox atau konfigurasi CSP Apache XAMPP. Ini wajib diperiksa manual.
+
+## Laporan pemilik 24 Oktober 2026 — Tambah Materi PDF tidak tersimpan
+
+Pengguna melaporkan sudah melengkapi form dan memilih PDF, menekan Tambah Materi Draf, namun Materi tidak tersimpan. Penyebab konkret belum bisa ditentukan karena pesan error/berkas PDF tidak disertakan. Dua kondisi nyata yang diidentifikasi dari kode:
+- Validator PDF yang konservatif menolak PDF modern/kompleks termasuk xref-stream/ObjStm dan revisi inkremental walaupun batas halaman/MB terpenuhi. Batas ini belum dilonggarkan karena perlu pemeriksaan keamanan yang andal.
+- Pengaturan server `post_max_size` dan `upload_max_filesize` dapat lebih rendah dari limit aplikasi 15 MB. Jika POST terlalu besar, field formulir kosong; jika file melebihi batas upload PHP, UploadedFile berisi kode galat, bukan file valid.
+
+Perbaikan pada controller: periksa Content-Length terhadap post_max_size ketika body kosong, terjemahkan kode PHP UPLOAD_ERR_* yang relevan menjadi pesan berbahasa Indonesia, arahkan redirect gagal/sukses ke fragment #tambah-materi, dan tampilkan galat langsung pada formulir Tambah Materi. JS juga memeriksa 15/10 MB di browser tanpa menonaktifkan submit hanya karena PDF dipilih. Validasi PDF di server tetap wajib dan tidak dilemahkan.
+
+QA otomatis PASS, tetapi **belum memverifikasi PDF spesifik milik pengguna** maupun konfigurasi PHP XAMPP. Uji ulang setelah pull, dan jika gagal catat teks alert yang sekarang terlihat, nilai upload_max_filesize/post_max_size, ukuran file, serta apakah file menggunakan object-stream/xref-stream (jangan kirim data siswa rahasia).
