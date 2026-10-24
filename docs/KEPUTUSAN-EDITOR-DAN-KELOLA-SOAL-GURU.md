@@ -28,3 +28,16 @@ Guru dapat melihat, menambah, mengedit dan menonaktifkan soal Diagnostik/Sumatif
 
 ## Catatan pelaksanaan
 Implementasikan bertahap melalui PR. Tunjukkan batas yang belum didukung (misalnya editor gambar baru dan Equation Word) secara jujur. Jangan menyatakan fitur selesai sampai PHPUnit, pengujian database dan XAMPP relevan lulus.
+
+## Instalasi editor lokal dan deploy shared hosting
+
+Setelah pull branch pengujian, jalankan **sekali saja** dari root proyek Windows:
+
+```bat
+powershell -ExecutionPolicy Bypass -File tools\install-suneditor.ps1
+```
+
+Script mengambil paket resmi `suneditor@3.3.3` berlisensi MIT dari npm dan menempatkan JS/CSS di `public/assets/vendor/suneditor/`. **Aplikasi tidak memerlukan CDN saat digunakan.** Berkas vendor diabaikan Git agar tidak tercampur dengan kode proyek; saat deploy shared hosting, unggah pula direktori vendor tersebut ke lokasi yang sama di hosting. Tanpa pemasangan aset, halaman tetap menyediakan textarea dan menampilkan pemberitahuan bahwa WYSIWYG belum tersedia.
+
+**Status bertahap PR #34:** Daftar/tambah/edit/nonaktifkan dan gambar privat tersedia untuk Guru TP Draf; Equation Word/OMML belum dapat diedit tanpa kehilangan format dan akan ditolak dengan pesan spesifik. Hapus pada UI adalah **nonaktifkan** yang dapat dibalik, bukan DELETE SQL. Sanitasi HTML saat ini menjaga teks, tabel, list, RTL, dan gambar terotorisasi; format yang tak terwakili editor tidak boleh diam-diam merusak data. Aset gambar manual per TP dibatasi 100 file atau 100 MB; kebijakan pembersihan aset yatim perlu desain terpisah agar aset soal historis tidak terhapus.
+
