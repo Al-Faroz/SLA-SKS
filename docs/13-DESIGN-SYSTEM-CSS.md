@@ -264,3 +264,14 @@ Tautan rekomendasi perbaikan CP pada checklist final diarahkan ke Peta ATP, buka
 
 **SQL:** tidak ada patch baru. Tabel progres_tp dari patch 0014 serta enam tabel ujian dari patch 0015 wajib sudah tersedia. Tanpa Migration/Seeder dan tanpa mengubah validasi PDF/Word.
 
+
+## S08A — Pembaca Materi Siswa berbasis snapshot terpin (24 Oktober 2026)
+
+Setelah Diagnostik menghasilkan `progres_tp.status=belajar`, halaman Rincian TP menampilkan **Buka Materi 1** yang benar-benar dapat dibuka. Materi selanjutnya **tetap terkunci** sampai aktivitas media, Resume final, dan HOTS final Materi sebelumnya tersedia; jangan memakai status palsu seperti "sudah dipelajari" ketika bukti waktu aktif belum ditangani. Jika `status=tuntas`, semua Materi boleh dibaca **secara sukarela** tanpa Kirim Resume/HOTS resmi dan tanpa mengubah nilai Diagnostik. Status `diagnostik`/`perlu_bantuan` tidak membuka media.
+
+- Rute `GET /siswa/tp/{tp}/materi/{id}` dan `/media` dilindungi filter Siswa **serta** pemeriksaan Gen, semester, TP pertama Siap, progres dan checksum `versi_konten_tp` di Service. Daftar/isi Materi berasal dari **snapshot terpin**, bukan perubahan database Materi live. ID yang ditebak, berkas Gen lain, dan Materi lebih jauh ditolak server tanpa membuka file privat.
+- Pembaca PDF, gambar, audio (HTTP Range) dan iframe YouTube-nocookie sudah tersedia dengan MIME yang dipersempit, berkas privat `writable/uploads/materi/`, larangan path traversal, header `nosniff` dan `Cache-Control: private, no-store`; link file fisik tidak dikirim ke HTML. Validasi **upload PDF yang FIX** tidak diubah.
+- Petunjuk Resume dan HOTS tiap Materi tampil baca-saja. **S08A belum membuat ketuntasan media, heartbeat, pelacakan semua halaman PDF, 90% putar video/audio, maupun draf dan Kirim Final**. Implementasi S08B wajib mengikuti docs/06 (§3) dan S09/S10 sebelum membuka Materi 2. Jangan membuat tombol Kirim palsu atau otomatis menandai lengkap karena file dibuka.
+- Gaya baru `a-siswa-media`, `a-siswa-materi-instruksi`, `a-siswa-materi-buka` hanya untuk pembaca Siswa; 360/390/768 dan desktop, reuses `a-media-video`, `a-materi-pdf`, `a-materi-audio`, `a-materi-gambar`.
+- **SQL tidak berubah**, GET tidak menulis progres atau skor. QA sintetis harus menguji `belajar` hanya Materi 1, `tuntas` sukarela, progres belum diagnostik, akun Guru, lintas Gen, URL Materi 2, checksum rusak, media privat serta tidak ada mutasi.
+

@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Services\AuthService;
 use App\Services\KatalogPembelajaranSiswaService;
+use App\Services\MateriSiswaService;
 use App\Services\NavigasiService;
 use App\Services\ProgresTpSiswaService;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -76,6 +77,11 @@ final class SiswaPembelajaran extends BaseController
         return $this->halaman(static function () use ($tpId): array {
             $data = (new KatalogPembelajaranSiswaService())->rincianTp($tpId);
             $data['progres'] = (new ProgresTpSiswaService())->status($tpId);
+            if ($data['progres'] !== null
+                && in_array($data['progres']['status'], ['belajar', 'tuntas'], true)) {
+                // Data berasal dari snapshot terpin, bukan versi live milik Guru.
+                $data['materi'] = (new MateriSiswaService())->daftar($tpId)['materi'];
+            }
             return $data;
         }, 'siswa/rincian_tp');
     }

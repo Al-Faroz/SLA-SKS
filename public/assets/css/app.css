@@ -1314,3 +1314,26 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-ujian-meter { width:100%; }
     .a-ujian-pilihan { padding:10px; }
 }
+
+/* S08A — Pembaca Materi Siswa; pemutaran dan pembacaan tidak sama dengan ketuntasan. */
+.a-siswa-materi-buka { display:inline-flex; margin:8px 0 0; vertical-align:middle;
+    min-height:38px; align-items:center; white-space:normal; }
+.a-siswa-media { min-width:0; overflow-wrap:anywhere; }
+.a-siswa-media .a-materi-pdf { margin:14px 0; min-height:440px; }
+.a-siswa-media .a-materi-pdf iframe { width:100%; min-height:440px; }
+.a-siswa-media .a-materi-audio audio { max-width:100%; width:100%; }
+.a-siswa-media .a-materi-gambar img { max-width:100%; height:auto; object-fit:contain; }
+.a-siswa-media .a-media-video { width:100%; max-width:100%; }
+.a-siswa-materi-instruksi { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px; margin:14px 0; }
+.a-siswa-materi-instruksi > section { min-width:0; border:1px solid #dae7df;
+    border-radius:10px; padding:14px; background:#f8fbf9; overflow-wrap:anywhere; }
+.a-siswa-materi-instruksi h3 { margin:0 0 10px; }
+@media(max-width:700px) {
+    .a-siswa-materi-instruksi { grid-template-columns:minmax(0,1fr); }
+    .a-siswa-media .a-materi-pdf,.a-siswa-media .a-materi-pdf iframe { min-height:340px; }
+}
+@media(max-width:430px) {
+    .a-siswa-materi-instruksi > section { padding:11px; }
+    .a-siswa-materi-buka { display:flex; width:100%; justify-content:center; }
+}

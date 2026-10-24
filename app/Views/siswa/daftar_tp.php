@@ -43,9 +43,9 @@
                 <?php endforeach ?>
             </div>
         <?php endif ?>
-        <p class="a-help a-jarak-atas">Halaman ini belum menjalankan Diagnostik,
-            menghitung progres, ataupun menetapkan ketuntasan. Fitur tersebut akan tersedia
-            setelah mesin alur pembelajaran diterapkan.</p>
+        <p class="a-help a-jarak-atas">Daftar ini menunjukkan urutan TP. Buka Rincian TP
+            untuk menjalankan Diagnostik, melihat hasil, atau membaca Materi yang sudah diizinkan.
+            Materi berikutnya tetap menunggu persyaratan pembelajaran sebelumnya.</p>
     </section>
 </div>
 <?= $this->endSection() ?>
