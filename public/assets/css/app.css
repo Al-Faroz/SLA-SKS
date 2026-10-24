@@ -1214,3 +1214,37 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-siswa-aktivasi { padding:12px; }
     .a-siswa-aktivasi form .a-btn { width:100%; justify-content:center; }
 }
+
+/* S05: petunjuk & pemeriksaan perangkat Diagnostik, tanpa memulai ujian. */
+.a-diagnostik-ringkasan { display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px; margin:15px 0; }
+.a-diagnostik-ringkasan > div { display:flex; flex-direction:column; gap:5px;
+    padding:13px; border:1px solid #d6e7dc; border-radius:10px;
+    background:#f3f8f5; min-width:0; overflow-wrap:anywhere; }
+.a-diagnostik-ringkasan strong { font-size:1.1rem; color:#165d42; }
+.a-diagnostik-ringkasan span { color:#4c6356; font-size:.79rem; }
+.a-diagnostik-petunjuk { margin:12px 0 18px; padding-left:25px; line-height:1.7; }
+.a-diagnostik-petunjuk li { margin-bottom:8px; }
+.a-diagnostik-cek { table-layout:fixed; min-width:0; }
+.a-diagnostik-cek thead th:nth-child(1) { width:35%; }
+.a-diagnostik-cek thead th:nth-child(2) { width:21%; }
+.a-diagnostik-cek thead th:nth-child(3) { width:44%; }
+.a-diagnostik-cek :is(th,td) { overflow-wrap:anywhere; }
+.a-diagnostik-tombol { display:flex; flex-wrap:wrap; align-items:center;
+    gap:10px; margin:16px 0; }
+.a-diagnostik-tombol button { min-height:42px; white-space:normal; }
+.a-diagnostik-hasil { flex:1 1 100%; margin:0; padding:10px 12px;
+    border-radius:8px; background:#f2f5f3; border:1px solid #d2e0d8;
+    overflow-wrap:anywhere; }
+.a-diagnostik-hasil[data-status="success"] { background:#e8f5eb; border-color:#a9daba; color:#155b38; }
+.a-diagnostik-hasil[data-status="failed"] { background:#fff4df; border-color:#efd29b; color:#755119; }
+.a-diagnostik-hasil[data-status="checking"] { background:#edf4f9; border-color:#bdd5e7; color:#225a77; }
+@media(max-width:980px) {
+    .a-diagnostik-ringkasan { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .a-diagnostik-cek.a-tbl--cards { width:100%; min-width:0; table-layout:auto; }
+}
+@media(max-width:460px) {
+    .a-diagnostik-ringkasan > div { padding:10px; }
+    .a-diagnostik-tombol button { flex:1 1 100%; }
+    .a-diagnostik-petunjuk { padding-left:20px; }
+}

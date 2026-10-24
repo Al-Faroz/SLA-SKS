@@ -66,10 +66,17 @@
                     Memuat ulang halaman tidak membuat progres baru.
                 </div>
             <?php endif ?>
+            <?php if ($progres !== null && $progres['status'] === 'diagnostik'): ?>
+                <p><a class="a-btn a-btn--sekunder"
+                    href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/diagnostik/petunjuk'), 'attr') ?>">
+                    Baca petunjuk &amp; uji kesiapan perangkat
+                </a></p>
+            <?php endif ?>
             <p class="a-help">
                 <strong>Diagnostik wajib adalah langkah ujian pertama.</strong>
-                Mesin Diagnostik dengan pemeriksaan fullscreen, pengacakan soal,
-                durasi server, dan penyimpanan jawaban sedang menjadi tahap implementasi berikutnya.
+                Halaman petunjuk dan uji kemampuan fullscreen kini tersedia bagi
+                siswa dengan progres Diagnostik. Mesin percobaan, pengacakan soal,
+                timer server dan penyimpanan jawaban masih dalam tahap berikutnya.
                 <strong>Belum ada tombol menjalankan ujian.</strong> Materi tetap terkunci
                 sampai alur ujian menghasilkan keputusan sah.
             </p>
