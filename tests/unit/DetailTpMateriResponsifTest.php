@@ -13,18 +13,18 @@ final class DetailTpMateriResponsifTest extends TestCase
         return $source;
     }
 
-    public function testTabelIdentitasChecklistDanMateriMemilikiPolaResponsif(): void
+    public function testTabelIdentitasDanMateriTetapResponsifTanpaChecklistGanda(): void
     {
         $view = self::file('app/Views/guru/detail_tp.php');
         self::assertStringContainsString('a-tbl a-tp-identitas', $view);
-        self::assertStringContainsString('a-tbl a-tbl--cards a-tp-checklist', $view);
+        self::assertStringNotContainsString('a-tbl a-tbl--cards a-tp-checklist', $view);
+        self::assertStringContainsString('id="kesiapan-tp"', $view);
+        self::assertStringContainsString('Lihat status dan versi TP', $view);
         self::assertStringContainsString('a-tbl a-tbl--cards a-tp-materi-tabel', $view);
-        foreach (['Komponen', 'Status', 'Keterangan', 'No.', 'Judul', 'Jenis',
-            'Pratinjau', 'Urutan', 'Edit', 'Hapus'] as $label) {
+        foreach (['No.', 'Judul', 'Jenis', 'Status', 'Pratinjau', 'Urutan', 'Edit', 'Hapus'] as $label) {
             self::assertStringContainsString('data-label="' . $label . '"', $view);
         }
-        self::assertStringContainsString("a-tp-status", $view);
-        self::assertStringContainsString("'terpenuhi'", $view);
+        self::assertStringNotContainsString('Pemeriksaan awal kelengkapan konten', $view);
     }
 
     public function testSeluruhTindakanMateriTetapAdaDanMenggunakanPostCsrf(): void
