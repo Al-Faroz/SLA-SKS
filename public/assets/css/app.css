@@ -781,3 +781,31 @@ a:hover { text-decoration-thickness: 2px; }
 @media (max-width: 640px) {
     .a-materi-pdf { height: 70vh; min-height: 400px; }
 }
+
+/* G07 — petunjuk Resume/HOTS pada pratinjau Guru; tidak mengubah upload media. */
+.a-materi-kegiatan {
+    display: grid;
+    gap: var(--a-ruang-3);
+    margin-block: var(--a-ruang-6);
+    padding-top: var(--a-ruang-4);
+    border-top: 1px solid var(--a-garis);
+    min-width: 0;
+}
+.a-materi-kegiatan > h2 { margin: 0; }
+.a-materi-kegiatan > section {
+    min-width: 0;
+    padding: var(--a-ruang-4);
+    border: 1px solid var(--a-garis);
+    border-radius: var(--a-radius-kecil);
+    background: var(--a-latar);
+}
+.a-materi-kegiatan > section h3 { margin: 0 0 var(--a-ruang-3); }
+.a-materi-kegiatan .a-teks-pratinjau {
+    margin: 0;
+    overflow-wrap: anywhere;
+    line-height: var(--a-tinggi-baris);
+    white-space: normal;
+}
+@media (max-width: 390px) {
+    .a-materi-kegiatan > section { padding: var(--a-ruang-3); }
+}

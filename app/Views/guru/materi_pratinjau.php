@@ -63,6 +63,26 @@
                 <img src="<?= esc($urlMedia, 'attr') ?>" alt="Gambar materi <?= esc($materi['judul'], 'attr') ?>" loading="lazy">
             </div>
         <?php endif ?>
+        <div class="a-materi-kegiatan">
+            <h2>Petunjuk kegiatan Materi</h2>
+            <p class="a-help">Periksa kedua petunjuk sebelum menayangkan Materi kepada siswa. Ini hanya pratinjau, bukan tempat mengirim jawaban siswa.</p>
+            <section aria-labelledby="pratinjau-resume">
+                <h3 id="pratinjau-resume">Resume</h3>
+                <?php if (trim((string) ($materi['petunjuk_resume'] ?? '')) !== ''): ?>
+                    <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_resume'])) ?></p>
+                <?php else: ?>
+                    <p class="a-help">Petunjuk Resume belum tersedia.</p>
+                <?php endif ?>
+            </section>
+            <section aria-labelledby="pratinjau-hots">
+                <h3 id="pratinjau-hots">Tugas HOTS</h3>
+                <?php if (trim((string) ($materi['petunjuk_hots'] ?? '')) !== ''): ?>
+                    <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_hots'])) ?></p>
+                <?php else: ?>
+                    <p class="a-help">Petunjuk HOTS belum tersedia.</p>
+                <?php endif ?>
+            </section>
+        </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke rincian TP</a>
     </section>
 </div>
