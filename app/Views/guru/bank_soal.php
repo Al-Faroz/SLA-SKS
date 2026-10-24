@@ -46,6 +46,18 @@
                     <button class="a-btn a-btn--sekunder" type="submit">Unduh Word <?= esc(ucfirst($jenis)) ?></button>
                 </form>
             <?php endforeach ?>
+            <h3>Uji unggah Word</h3>
+            <p class="a-help">Unggah file Word yang telah diisi, kemudian periksa struktur dan teks soal. Konten kaya hanya dideteksi; belum diimpor ke database.</p>
+            <?php foreach (['diagnostik'=>'Diagnostik','sumatif'=>'Sumatif'] as $jenis => $label): ?>
+                <form class="a-form a-jarak-atas" method="post" enctype="multipart/form-data" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/unggah/' . $jenis), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <div class="a-field">
+                        <label class="a-label" for="soal-word-<?= esc($jenis, 'attr') ?>">File Word <?= esc($label) ?></label>
+                        <input class="a-input" type="file" id="soal-word-<?= esc($jenis, 'attr') ?>" name="word" accept=".docx" required>
+                    </div>
+                    <button type="submit" class="a-btn a-btn--sekunder">Unggah & periksa <?= esc($label) ?></button>
+                </form>
+            <?php endforeach ?>
         <?php endif ?>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke Rincian TP</a>
     </section>
