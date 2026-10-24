@@ -44,7 +44,7 @@ final class PdfMateriValidator
         if (preg_match_all('~/OpenAction\\b~', $pdf, $openActions) > 0) {
             if (count($openActions[0]) !== 1
                 || preg_match(
-                    '~/OpenAction\\s*\\[\\s*(\\d+)\\s+(\\d+)\\s+R\\s+/(FitH|FitV|FitBH|FitBV|Fit|FitB)(?=\\s|\\])(?:(\\s+)null)?\\s*\\]',
+                    '~/OpenAction\\s*\\[\\s*(\\d+)\\s+(\\d+)\\s+R\\s+/(FitH|FitV|FitBH|FitBV|Fit|FitB)(?=\\s|\\])(?:(\\s+)null)?\\s*\\]~',
                     $pdf,
                     $destinasi,
                     PREG_OFFSET_CAPTURE
