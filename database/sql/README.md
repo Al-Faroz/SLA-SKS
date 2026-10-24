@@ -108,3 +108,20 @@ siswa di GitHub. Jika skema yang terpasang ternyata memiliki tabel setara
 `progres_tp`, lakukan review dan penyelarasan patch, bukan menjalankan DDL
 yang berpotensi konflik.
 
+
+## S06A — Fondasi Mesin Ujian Diagnostik / Sumatif Ketat (24 Oktober 2026)
+
+**Patch:** `database/sql/updates/0015_mesin_ujian_fondasi.sql`, **sesudah** `0014_progres_tp_pin.sql`.
+
+Tahap S06A membangun **skema historis** dan **aturan domain murni**, belum mengizinkan siswa membuat percobaan. Akses S05 petunjuk dan uji fullscreen tetap seperti PR #45. **Tidak ada rute Mulai Ujian, tombol ujian, jawaban, atau nilai baru**.
+
+1. **Backup database XAMPP lebih dahulu**. Jangan mengimpor ulang dump instalasi atau memodifikasi progres nyata.
+2. Periksa `SHOW TABLES LIKE 'percobaan_ujian';` dan `SHOW CREATE TABLE progres_tp;`. Jika sudah ada tabel ujian, **hentikan** dan bandingkan struktur; SQL tahap ini bukan patch overwrite.
+3. Impor **sekali** `0015_mesin_ujian_fondasi.sql` melalui phpMyAdmin pada database lokal yang sudah mengandung `progres_tp`, `versi_konten_tp`. DDL MySQL/MariaDB melakukan implicit commit: backup diperlukan bila ada kegagalan sebagian. **Jangan hapus tabel hasil impor parsial tanpa inspeksi terlebih dahulu**.
+4. Verifikasi enam tabel: `percobaan_ujian`, `butir_percobaan`, `jawaban_percobaan`, `riwayat_status_ujian`, `segmen_jeda_ujian`, `pelanggaran_ujian`. Jalankan `SHOW CREATE TABLE percobaan_ujian;` dan `SELECT COUNT(*) AS total FROM percobaan_ujian;`, semestinya **0**.
+5. Tidak perlu menekan tombol lain di S05: pada tahap ini halaman tidak diubah. Pengujian otomatis menggunakan data sintetis, bukan siswa XAMPP/hosting.
+6. **S06B** akan menambahkan adapter transaksional `FOR UPDATE`, rekonsiliasi pada setiap request, antarmuka fullscreen tanpa sidebar, token percobaan sulit ditebak, pengacakan dalam transaksi, penyimpanan jawaban idempoten dan penilaian sah. Tombol Mulai Ujian hanya boleh muncul setelah seluruh kontrol itu terhubung dan diuji.
+
+**Kontrak tabel:** `percobaan_ujian` mengikat `progres_tp` dan `versi_konten_tp`; `butir_percobaan` menyimpan opsi/kunci teracak, `jawaban_percobaan` memiliki UNIQUE per percobaan–butir dan FK komposit yang mencegah jawaban pada butir milik percobaan lain. Segmen jeda, riwayat status, dan insiden memiliki riwayat append-only. Keadaan batal tidak mempunyai nilai sah; batas 20/90/180/300 detik dan pelanggaran ketiga berasal dari Master Document 07, bukan konfigurasi baru.
+
+**QA:** PHPUnit aturan murni, uji PHP lint, serta impor DDL menggunakan **MariaDB sementara dengan parent sintetis** di GitHub Actions. Pengujian MariaDB bukan bukti otomatis kesesuaian semua tipe FK pada dump MySQL XAMPP; uji impor lokal tetap wajib. Tidak ada Migration/Seeder atau data siswa nyata di repo.
