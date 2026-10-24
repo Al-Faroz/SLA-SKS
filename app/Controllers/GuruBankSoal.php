@@ -133,7 +133,8 @@ final class GuruBankSoal extends BaseController
             }, $hasil['soal']);
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
                 ->with('word_sukses', $pesan)
-                ->with('word_rincian', $ringkas);
+                ->with('word_rincian', $ringkas)
+                ->with('word_soal', $hasil['soal']);
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
                 ->with('word_galat', $e->getMessage());
