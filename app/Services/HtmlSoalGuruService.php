@@ -25,7 +25,7 @@ final class HtmlSoalGuruService
             throw new DomainException('Isi soal atau pilihan terlalu panjang (maksimal 100 KB).');
         }
         if (preg_match('~<\\s*(script|style|iframe|object|embed|svg|math|form|input|video|audio|canvas|link|meta)\\b~i', $html)) {
-            throw new DomainException('Konten aktif/gambar belum didukung lewat editor. Gunakan Word untuk gambar atau sisipkan teks/tabel biasa.');
+            throw new DomainException('Konten aktif tidak diizinkan. Gunakan fitur yang tersedia pada editor soal.');
         }
         $old = libxml_use_internal_errors(true);
         $dom = new DOMDocument('1.0', 'UTF-8');
@@ -129,7 +129,7 @@ final class HtmlSoalGuruService
     public static function untukGuru(string $html, int $tpId, ?string $wordSource = null): string
     {
         return preg_replace_callback('/src="(soal-image:([0-9a-f]{32})|word-image:(rId[0-9]+))"/', static function (array $m) use ($tpId, $wordSource): string {
-            if ($m[2] !== '') {
+            if (($m[2] ?? '') !== '') {
                 $url = site_url('guru/tp/' . $tpId . '/bank-soal/aset/' . $m[2]);
             } elseif ($wordSource !== null && preg_match('/^[0-9a-f]{32}$/D', $wordSource)) {
                 $url = site_url('guru/tp/' . $tpId . '/bank-soal/media/' . $wordSource . '/' . $m[3]);
