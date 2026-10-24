@@ -86,7 +86,10 @@ final class PetunjukDiagnostikSiswaTest extends TestCase
         self::assertStringNotContainsString("['soal']", $view);
         self::assertStringNotContainsString("['kunci']", $view);
         self::assertStringContainsString("Uji fullscreen perangkat", $view);
-        self::assertStringContainsString("Pelaksanaan Diagnostik belum diaktifkan", $view);
+        self::assertStringContainsString('Masuk ruang Tes Diagnostik', $view);
+        self::assertStringContainsString("if (\$boleh_uji)", $view);
+        self::assertStringContainsString("'/diagnostik/ujian'", $view);
+        self::assertStringContainsString('Percobaan baru dibuat setelah fullscreen', $view);
         self::assertStringContainsString("SiswaDiagnostik::petunjuk", $routes);
         self::assertStringContainsString("'auth:siswa'", $routes);
     }
