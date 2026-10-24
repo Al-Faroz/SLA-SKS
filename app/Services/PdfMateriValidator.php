@@ -25,11 +25,20 @@ final class PdfMateriValidator
         if (! is_string($pdf) || ! preg_match('/^%PDF-1\.[0-7](?:\r\n|\n|\r)/', $pdf)) {
             throw new DomainException('Header PDF tidak dikenali.');
         }
-        if (substr_count($pdf, '%%EOF') !== 1 || substr_count($pdf, 'startxref') !== 1) {
-            throw new DomainException('PDF dengan revisi inkremental atau penutup tidak jelas ditolak.');
+        // Jangan hitung token "%%EOF" atau "startxref" di seluruh berkas.
+        // Data gambar/stream PDF adalah biner dan dapat memuat byte yang sama.
+        $polaAkhir = '/(?:\A|[\r\n])startxref[ \t]*[\r\n]+([0-9]+)[ \t]*[\r\n]+%%EOF[ \t]*(?:\r?\n)?\z/D';
+        $penutup = preg_match_all(
+            '/(?:\A|[\r\n])startxref[ \t]*[\r\n]+[0-9]+[ \t]*[\r\n]+%%EOF(?=[ \t\r\n]|\z)/',
+            $pdf
+        );
+        if ($penutup === false || $penutup > 1) {
+            self::catatMasalahAkhir($pdf, 'multiple_end_markers');
+            throw new DomainException('PDF memiliki lebih dari satu revisi struktural atau penutup yang tidak sah.');
         }
-        if (! preg_match('/startxref\s+(\d+)\s+%%EOF\s*$/D', $pdf, $matches)) {
-            throw new DomainException('Struktur akhir PDF tidak valid.');
+        if (preg_match($polaAkhir, $pdf, $matches) !== 1) {
+            self::catatMasalahAkhir($pdf, 'invalid_final_trailer');
+            throw new DomainException('Penutup berkas PDF yang diterima server tidak terbaca. Pastikan unggahan lengkap.');
         }
         $xref = (int) $matches[1];
         if ($xref < 1 || $xref >= $size || substr($pdf, $xref, 4) !== 'xref') {
@@ -122,4 +131,24 @@ final class PdfMateriValidator
         }
         return $halaman;
     }
+
+    /**
+     * Diagnostik privat untuk membandingkan PDF yang diterima Apache dengan
+     * berkas asli. Tidak mencatat konten maupun nama dokumen pengguna.
+     */
+    private static function catatMasalahAkhir(string $pdf, string $alasan): void
+    {
+        if (! function_exists('log_message')) {
+            return;
+        }
+        log_message(
+            'warning',
+            '[MATERI-PDF] alasan=' . $alasan
+                . ' bytes=' . strlen($pdf)
+                . ' sha256=' . hash('sha256', $pdf)
+                . ' eof_literal=' . substr_count($pdf, '%%EOF')
+                . ' startxref_literal=' . substr_count($pdf, 'startxref')
+        );
+    }
+
 }
