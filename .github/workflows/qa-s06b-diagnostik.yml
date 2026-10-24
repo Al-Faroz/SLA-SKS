@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'app/Services/MesinDiagnostikSiswaService.php'
+      - 'app/Services/HtmlSoalGuruService.php'
       - 'app/Controllers/SiswaUjian.php'
       - 'app/Views/siswa/diagnostik_ujian.php'
       - 'app/Views/siswa/diagnostik_petunjuk.php'
@@ -12,6 +13,7 @@ on:
       - 'public/assets/js/diagnostik-ujian.js'
       - 'public/assets/css/app.css'
       - 'tests/integration/MesinDiagnostikMariaDbTest.php'
+      - 'tests/unit/MesinDiagnostikMediaTest.php'
       - '.github/workflows/qa-s06b-diagnostik.yml'
   workflow_dispatch:
 
@@ -50,12 +52,16 @@ jobs:
       - name: PHP lint dan JavaScript syntax
         run: |
           php -l app/Services/MesinDiagnostikSiswaService.php
+          php -l app/Services/HtmlSoalGuruService.php
           php -l app/Controllers/SiswaUjian.php
           php -l app/Views/siswa/diagnostik_ujian.php
           php -l app/Views/siswa/diagnostik_petunjuk.php
           php -l app/Views/siswa/rincian_tp.php
           php -l app/Config/Routes.php
           php -l tests/integration/MesinDiagnostikMariaDbTest.php
+          php -l tests/unit/MesinDiagnostikMediaTest.php
           node --check public/assets/js/diagnostik-ujian.js
+      - name: Pengujian sanitasi media dan keamanan UI
+        run: vendor/bin/phpunit --no-coverage tests/unit/MesinDiagnostikMediaTest.php
       - name: Pengujian MariaDB percobaan dan hasil Diagnostik
         run: vendor/bin/phpunit --no-coverage tests/integration/MesinDiagnostikMariaDbTest.php
