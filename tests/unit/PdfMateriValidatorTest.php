@@ -129,6 +129,39 @@ final class PdfMateriValidatorTest extends TestCase
         PdfMateriValidator::periksa($file);
     }
 
+    public function testPdfNormalDenganRevisiMetadataNavigasiXyzDanC2paDiterima(): void
+    {
+        // Meniru PDF manual 10 halaman yang mempunyai revisi metadata
+        // Content Credentials serta navigasi /XYZ (bukan skrip aktif).
+        $file = $this->pdf(10, '/OpenAction [3 0 R /XYZ null null 0]');
+        $pdf = (string) file_get_contents($file);
+        preg_match('/startxref\s+(\d+)\s+%%EOF\s*$/D', $pdf, $oldXref);
+        $mulai = strlen($pdf);
+        $obj = "1 1 obj\n"
+            . "<< /Type /Catalog /Pages 2 0 R\n"
+            . "/OpenAction [3 0 R /XYZ null null 0]\n"
+            . "/Metadata 14 0 R /Names << /EmbeddedFiles << /Names [(Content Credentials) 14 0 R] >> >> >>\n"
+            . "endobj\n";
+        $offset = strlen($pdf) + strlen($obj);
+        $pdf .= $obj;
+        $pdf .= "14 0 obj\n<< /Type /EmbeddedFile /Subtype /application#2Fc2pa /Length 5 >>\n"
+            . "stream\nhello\nendstream\nendobj\n";
+        $xref = strlen($pdf);
+        $pdf .= "xref\n1 1\n" . sprintf("%010d 00001 n \n", $mulai);
+        $pdf .= "14 1\n" . sprintf("%010d 00000 n \n", $offset);
+        $pdf .= "trailer\n<< /Size 15 /Root 1 1 R /Prev " . $oldXref[1] . " >>\n";
+        $pdf .= "startxref\n" . $xref . "\n%%EOF\n";
+        file_put_contents($file, $pdf);
+        self::assertSame(10, PdfMateriValidator::periksa($file));
+        self::assertSame(10, BerkasMateriService::validasi($file, 'pdf', 'materi.pdf')['halaman']);
+    }
+
+    public function testSkripAktifDenganNamaPdfEncodedTetapDitolak(): void
+    {
+        $this->expectException(DomainException::class);
+        PdfMateriValidator::periksa($this->pdf(1, '/Java#53cript /#4aS (alert)'));
+    }
+
     public function testPdfSatuHalamanValid(): void
     {
         $file = $this->pdf(1);
