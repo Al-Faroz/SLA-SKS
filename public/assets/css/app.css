@@ -860,3 +860,7 @@ a:hover { text-decoration-thickness: 2px; }
  .a-soal-kunci label { flex: 1; justify-content: center; }
  .a-soal-aksi .a-btn { flex: 1; text-align: center; }
 }
+
+/* Semua tabel soal manual tampil bergaris termasuk sel bersarang. */
+.a-word-preview table { border-collapse: collapse; border: 1px solid #afc7bb; max-width: 100%; }
+.a-word-preview table th, .a-word-preview table td { border: 1px solid #afc7bb; padding: 8px 10px; vertical-align: top; }
