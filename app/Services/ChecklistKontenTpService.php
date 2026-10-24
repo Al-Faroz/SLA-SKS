@@ -14,12 +14,19 @@ final class ChecklistKontenTpService
      *  @param list<array<string,mixed>> $materi
      *  @return list<array{label:string,terpenuhi:bool,keterangan:string}>
      */
-    public static function periksa(array $tp, array $materi): array
+    public static function periksa(array $tp, array $materi, ?int $jumlahTautanCp = null): array
     {
         $hasil = [];
         foreach (['kode_tp' => 'Kode TP', 'rumusan' => 'Rumusan TP', 'indikator' => 'Indikator ketercapaian'] as $kolom => $label) {
             $ada = trim((string) ($tp[$kolom] ?? '')) !== '';
             $hasil[] = ['label' => $label, 'terpenuhi' => $ada, 'keterangan' => $ada ? 'Terisi' : 'Belum diisi'];
+        }
+
+        if ($jumlahTautanCp !== null) {
+            $adaCp = $jumlahTautanCp > 0;
+            $hasil[] = ['label' => 'Tautan CP pada TP', 'terpenuhi' => $adaCp,
+                'keterangan' => $adaCp ? $jumlahTautanCp . ' CP tertaut (status/versi/CP utama belum diverifikasi)'
+                    : 'TP belum ditautkan dengan CP'];
         }
 
         $adaMateri = count($materi) > 0;
