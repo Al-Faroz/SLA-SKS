@@ -54,7 +54,9 @@ if ($materi['berkas_id'] !== null) {
             action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi['id']), 'attr') ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
-            <?= view('guru/_materi_fields', ['nilai' => $nilaiSunting, 'galatKolom' => $kolomSuntingGalat]) ?>
+            <div class="a-materi-form-fields">
+                <?= view('guru/_materi_fields', ['nilai' => $nilaiSunting, 'galatKolom' => $kolomSuntingGalat]) ?>
+            </div>
             <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Simpan perubahan Materi</button>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke daftar Materi</a>
             <p class="a-help" data-materi-status aria-live="polite">Belum ada perubahan dikirim.</p>
