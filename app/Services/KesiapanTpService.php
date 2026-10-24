@@ -252,10 +252,20 @@ final class KesiapanTpService
                 throw new DomainException('Konfirmasi harus dilakukan Guru pengampu yang sedang masuk.');
             }
 
+            // Snapshot adalah keadaan efektif setelah diterbitkan, bukan draf sebelum
+            // perubahan status. Semua Materi yang lolos readiness menjadi aktif.
+            $snapshotTp = array_replace($cek['tp'], ['status' => 'siap']);
+            $snapshotPaket = array_replace($cek['paket'], [
+                'status' => $cek['paket']['status'] === 'draf' ? 'aktif' : $cek['paket']['status'],
+            ]);
+            $snapshotMateri = array_map(
+                static fn (array $row): array => array_replace($row, ['aktif' => 1]),
+                $cek['materi']
+            );
             $snapshot = [
                 'format' => 'SLA-SKS-TP-V1',
-                'tp' => $cek['tp'], 'paket' => $cek['paket'],
-                'cp' => $cek['cp'], 'materi' => $cek['materi'], 'soal' => $cek['soal'],
+                'tp' => $snapshotTp, 'paket' => $snapshotPaket,
+                'cp' => $cek['cp'], 'materi' => $snapshotMateri, 'soal' => $cek['soal'],
             ];
             $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
             $waktu = gmdate('Y-m-d H:i:s');
