@@ -46,4 +46,16 @@ final class ChecklistKontenTpServiceTest extends TestCase
         self::assertTrue($hasil[6]['terpenuhi']);
         self::assertFalse($hasil[7]['terpenuhi']);
     }
+    public function testTautanCpHilangDitandaiDanCpTertautBelumDianggapValid(): void
+    {
+        $tp = ['kode_tp' => 'TP-01', 'rumusan' => 'Menganalisis', 'indikator' => 'Menjelaskan'];
+        $kosong = ChecklistKontenTpService::periksa($tp, [], 0);
+        self::assertSame('Tautan CP pada TP', $kosong[3]['label']);
+        self::assertFalse($kosong[3]['terpenuhi']);
+
+        $ada = ChecklistKontenTpService::periksa($tp, [], 2);
+        self::assertTrue($ada[3]['terpenuhi']);
+        self::assertStringContainsString('belum diverifikasi', $ada[3]['keterangan']);
+    }
+
 }
