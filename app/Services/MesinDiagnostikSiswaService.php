@@ -388,10 +388,13 @@ final class MesinDiagnostikSiswaService
         });
     }
 
-    public function tindakan(int $tpId, string $token, string $aksi): array
+    public function tindakan(int $tpId, string $token, string $aksi, bool $fullscreen = false): array
     {
         if (!in_array($aksi, ['heartbeat','keluar_fullscreen','pulih','kirim'], true)) {
             throw new DomainException('Tindakan ujian tidak dikenal.');
+        }
+        if (in_array($aksi, ['heartbeat','pulih','kirim'], true) && !$fullscreen) {
+            throw new DomainException('Aktifkan fullscreen sebelum melanjutkan atau mengirim ujian.');
         }
         return $this->transact($tpId, $token, function ($row, $s, $now) use ($aksi) {
             $id = (int) $row['id'];
