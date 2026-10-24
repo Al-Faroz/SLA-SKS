@@ -19,7 +19,7 @@ final class HtmlSoalGuruService
         'ul', 'ol', 'li', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
         'span', 'a'];
 
-    public static function bersihkan(string $html, int $tpId = 0, ?string $wordSource = null): array
+    public static function bersihkan(string $html, int $tpId = 0, ?string $wordSource = null, bool $gambarTanpaTeks = false): array
     {
         if (strlen($html) > 100000) {
             throw new DomainException('Isi soal atau pilihan terlalu panjang (maksimal 100 KB).');
@@ -45,7 +45,7 @@ final class HtmlSoalGuruService
                 $out .= self::node($node, $tpId, $wordSource);
             }
             $teks = trim(preg_replace('/\\s+/u', ' ', (string) $root->textContent) ?? '');
-            if ($teks === '') {
+            if ($teks === '' && !($gambarTanpaTeks && str_contains($out, '<img '))) {
                 throw new DomainException('Pertanyaan dan semua pilihan A–E harus memiliki isi.');
             }
             return ['html' => $out, 'teks' => $teks];
