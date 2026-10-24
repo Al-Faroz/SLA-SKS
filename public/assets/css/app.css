@@ -1167,3 +1167,34 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-kesiapan-ringkasan > div { padding:10px; }
     .a-kesiapan-ringkasan strong { font-size:16px; }
 }
+
+/* S01-S03 Katalog Pembelajaran Siswa: baca-saja hingga mesin Diagnostik tersedia. */
+.a-siswa-kartu-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr)); gap:14px; margin-top:14px; }
+.a-siswa-kartu { display:flex; flex-direction:column; gap:9px; min-width:0; padding:18px;
+    border:1px solid #d6e4dc; background:#fff; border-radius:12px;
+    overflow-wrap:anywhere; }
+.a-siswa-kartu h3 { margin:0; line-height:1.4; font-size:1.05rem; }
+.a-siswa-kartu .a-proto-eyebrow { margin:0; }
+.a-siswa-kartu .a-help { margin:0; }
+.a-siswa-kartu > .a-btn { align-self:flex-start; margin-top:auto; max-width:100%; }
+.a-siswa-daftar-tp { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-top:16px; }
+.a-siswa-tp-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+    gap:9px 18px; margin-bottom:7px; }
+.a-siswa-tp-heading > div { min-width:0; flex:1 1 250px; }
+.a-siswa-status { display:inline-flex; align-items:center; max-width:100%;
+    border:1px solid #d5ded9; color:#475f52; background:#f0f3f1;
+    padding:5px 10px; border-radius:100px; font-size:.83rem; font-weight:650; line-height:1.35;
+    white-space:normal; text-align:center; }
+.a-siswa-status.pratinjau { border-color:#b8dfc6; background:#e8f5ec; color:#145e3c; }
+.a-siswa-status.menunggu { border-color:#efd6ad; background:#fff4df; color:#815b19; }
+.a-siswa-status.terkunci,.a-siswa-status.dilewati { background:#f1f3f3; }
+.a-siswa-materi-ringkas { margin:12px 0; padding-left:26px; }
+.a-siswa-materi-ringkas li { padding:11px 6px; border-bottom:1px solid #e3ede7;
+    display:list-item; overflow-wrap:anywhere; }
+.a-siswa-materi-ringkas li > .a-siswa-status { margin-left:12px; vertical-align:middle; }
+@media(max-width:520px) {
+    .a-siswa-kartu { padding:14px; }
+    .a-siswa-tp-heading { display:grid; gap:8px; }
+    .a-siswa-materi-ringkas li > .a-siswa-status { margin:7px 0 0; display:table; }
+    .a-siswa-kartu .a-btn { width:100%; text-align:center; justify-content:center; }
+}
