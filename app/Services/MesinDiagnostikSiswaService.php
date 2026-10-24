@@ -313,6 +313,20 @@ final class MesinDiagnostikSiswaService
         ];
     }
 
+    private static function htmlSiswa(string $html, int $tpId, string $token, ?string $source): string
+    {
+        if ($html === '') return '';
+        $sanitasi = HtmlSoalGuruService::bersihkan($html, $tpId, $source)['html'];
+        return preg_replace_callback('/src="(soal-image:([a-f0-9]{32})|word-image:(rId[0-9]+))"/', 
+            static function (array $m) use ($tpId, $token): string {
+                $tipe = !empty($m[2]) ? 'editor' : 'word';
+                $id = !empty($m[2]) ? $m[2] : $m[3];
+                return 'src="' . htmlspecialchars(site_url('siswa/tp/' . $tpId .
+                    '/diagnostik/media/' . $token . '/' . $tipe . '/' . $id),
+                    ENT_QUOTES, 'UTF-8') . '"';
+            }, $sanitasi) ?? '';
+    }
+
     /** GET yang merekonsiliasi waktu; soal hanya bila sedang berjalan. */
     public function status(int $tpId, string $token): array
     {
@@ -323,7 +337,20 @@ final class MesinDiagnostikSiswaService
                 ->select('id,posisi,pertanyaan,konten_terstruktur_json,opsi_acak_json')
                 ->where('percobaan_ujian_id', (int) $row['id'])
                 ->orderBy('posisi', 'ASC')->get()->getResultArray();
-            $out['soal'] = array_map(static fn ($b) => SusunButirUjianService::untukSiswa($b), $butir);
+            $out['soal'] = [];
+            foreach ($butir as $b) {
+                $soal = SusunButirUjianService::untukSiswa($b);
+                $rich = json_decode((string) ($b['konten_terstruktur_json'] ?? ''), true);
+                $source = is_array($rich) && is_string($rich['word_source_id'] ?? null)
+                    ? $rich['word_source_id'] : null;
+                $soal['html_pertanyaan'] = self::htmlSiswa((string) $soal['html_pertanyaan'],
+                    $tpId, (string) $row['token_publik'], $source);
+                foreach ($soal['html_opsi'] as $huruf => $html) {
+                    $soal['html_opsi'][$huruf] = self::htmlSiswa((string) $html,
+                        $tpId, (string) $row['token_publik'], $source);
+                }
+                $out['soal'][] = $soal;
+            }
             $saved = $this->db->table('jawaban_percobaan')
                 ->select('butir_percobaan_id,opsi_dipilih')
                 ->where('percobaan_ujian_id', (int) $row['id'])->get()->getResultArray();
@@ -340,7 +367,8 @@ final class MesinDiagnostikSiswaService
         }
         return $this->transact($tpId, $token, function ($row, $s, $now) use ($butirId, $pilih) {
             if (!AturanWaktuUjianService::bolehMenjawab($s)) {
-                throw new DomainException('Jawaban ditolak saat jeda atau ujian sudah berakhir.');
+                return array_merge(self::info($s), ['tersimpan' => false,
+                    'pesan' => 'Jawaban ditolak karena ujian sedang jeda atau telah berakhir.']);
             }
             $ada = $this->db->table('butir_percobaan')
                 ->where('id', $butirId)->where('percobaan_ujian_id', $row['id'])
@@ -365,7 +393,7 @@ final class MesinDiagnostikSiswaService
             $id = (int) $row['id'];
             if ($aksi === 'kirim') {
                 if (!AturanWaktuUjianService::bolehMenjawab($s)) {
-                    throw new DomainException('Ujian sedang jeda atau sudah berakhir.');
+                    return self::info($s);
                 }
                 return self::info($this->finalisasi($s, $now, 'Dikirim oleh Siswa.'));
             }
