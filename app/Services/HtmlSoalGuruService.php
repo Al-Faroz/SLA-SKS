@@ -19,12 +19,12 @@ final class HtmlSoalGuruService
         'ul', 'ol', 'li', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
         'span', 'a'];
 
-    public static function bersihkan(string $html): array
+    public static function bersihkan(string $html, int $tpId = 0, ?string $wordSource = null): array
     {
         if (strlen($html) > 100000) {
             throw new DomainException('Isi soal atau pilihan terlalu panjang (maksimal 100 KB).');
         }
-        if (preg_match('~<\\s*(script|style|iframe|object|embed|svg|math|img|form|input|video|audio|canvas|link|meta)\\b~i', $html)) {
+        if (preg_match('~<\\s*(script|style|iframe|object|embed|svg|math|form|input|video|audio|canvas|link|meta)\\b~i', $html)) {
             throw new DomainException('Konten aktif/gambar belum didukung lewat editor. Gunakan Word untuk gambar atau sisipkan teks/tabel biasa.');
         }
         $old = libxml_use_internal_errors(true);
@@ -42,7 +42,7 @@ final class HtmlSoalGuruService
             }
             $out = '';
             foreach ($root->childNodes as $node) {
-                $out .= self::node($node);
+                $out .= self::node($node, $tpId, $wordSource);
             }
             $teks = trim(preg_replace('/\\s+/u', ' ', (string) $root->textContent) ?? '');
             if ($teks === '') {
@@ -55,7 +55,7 @@ final class HtmlSoalGuruService
         }
     }
 
-    private static function node(DOMNode $n): string
+    private static function node(DOMNode $n, int $tpId, ?string $wordSource): string
     {
         if ($n->nodeType === XML_TEXT_NODE) {
             return htmlspecialchars($n->nodeValue ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -64,6 +64,27 @@ final class HtmlSoalGuruService
             return '';
         }
         $tag = strtolower($n->tagName);
+        if ($tag === 'img') {
+            $src = $n->getAttribute('src');
+            $path = (string) (parse_url($src, PHP_URL_PATH) ?: '');
+            $file = null;
+            if (preg_match('~^soal-image:([0-9a-f]{32})$~D', $src, $m)) {
+                $file = $m[1];
+            } elseif (preg_match('~/guru/tp/(\\d+)/bank-soal/aset/([0-9a-f]{32})$~D', $path, $m)
+                && (int) $m[1] === $tpId) {
+                $file = $m[2];
+            }
+            if ($file !== null) {
+                return '<img class="a-word-image" alt="Ilustrasi soal" src="soal-image:' . $file . '">';
+            }
+            if ($wordSource !== null && preg_match('/^[0-9a-f]{32}$/D', $wordSource)
+                && (preg_match('/^word-image:(rId[0-9]+)$/D', $src, $m)
+                || preg_match('~/guru/tp/' . preg_quote((string) $tpId, '~')
+                    . '/bank-soal/media/' . preg_quote($wordSource, '~') . '/(rId[0-9]+)$~D', $path, $m))) {
+                return '<img class="a-word-image" alt="Ilustrasi Word" src="word-image:' . $m[1] . '">';
+            }
+            throw new DomainException('Gambar tidak dikenal. Gunakan unggah gambar di editor soal.');
+        }
         if (!in_array($tag, self::TAG, true)) {
             // Tidak izinkan isi script/style dan elemen yang dapat memuat kode.
             if (in_array($tag, ['script', 'style', 'svg', 'iframe', 'object', 'form', 'textarea'], true)) {
@@ -71,7 +92,7 @@ final class HtmlSoalGuruService
             }
             $inner = '';
             foreach ($n->childNodes as $child) {
-                $inner .= self::node($child);
+                $inner .= self::node($child, $tpId, $wordSource);
             }
             return $inner;
         }
@@ -104,4 +125,19 @@ final class HtmlSoalGuruService
         }
         return '<' . $tag . $attr . '>' . $inner . '</' . $tag . '>';
     }
+    /** Token gambar di database ditukar menjadi endpoint berizin saat dirender untuk Guru. */
+    public static function untukGuru(string $html, int $tpId, ?string $wordSource = null): string
+    {
+        return preg_replace_callback('/src="(soal-image:([0-9a-f]{32})|word-image:(rId[0-9]+))"/', static function (array $m) use ($tpId, $wordSource): string {
+            if ($m[2] !== '') {
+                $url = site_url('guru/tp/' . $tpId . '/bank-soal/aset/' . $m[2]);
+            } elseif ($wordSource !== null && preg_match('/^[0-9a-f]{32}$/D', $wordSource)) {
+                $url = site_url('guru/tp/' . $tpId . '/bank-soal/media/' . $wordSource . '/' . $m[3]);
+            } else {
+                return 'alt="Gambar Word tidak tersedia"';
+            }
+            return 'src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '"';
+        }, $html) ?? '';
+    }
+
 }
