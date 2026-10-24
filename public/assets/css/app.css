@@ -946,14 +946,14 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* Navigasi hierarki: tautan tetap <a>; lokasi aktif adalah label, bukan tautan palsu. */
 .a-page .a-breadcrumb {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 7px;
-    margin-bottom: 17px; font-size: 12px; line-height: 1.35;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 5px;
+    margin-bottom: 9px; font-size: 12px; line-height: 1.35;
 }
 .a-page .a-breadcrumb a,
 .a-page .a-breadcrumb [aria-current="page"] {
-    display: inline-flex; align-items: center; min-height: 34px;
-    padding: 6px 12px; border-radius: 9px; border: 1px solid #cbded4;
-    font-weight: 650; text-decoration: none;
+    display: inline-flex; align-items: center; min-height: 24px;
+    padding: 2px 7px; border-radius: 5px; border: 1px solid #cbded4;
+    font-size: inherit; font-weight: 650; text-decoration: none;
     overflow-wrap: anywhere; max-width: 100%;
 }
 .a-page .a-breadcrumb a { background: transparent; color: #145b43; }
@@ -989,7 +989,7 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 @media (max-width: 420px) {
     .a-page .a-breadcrumb { gap: 5px; }
     .a-page .a-breadcrumb a,
-    .a-page .a-breadcrumb [aria-current="page"] { padding: 6px 9px; font-size: 11px; }
+    .a-page .a-breadcrumb [aria-current="page"] { padding: 2px 6px; font-size: 11px; min-height: 23px; }
     .a-pager__aksi { gap: 4px; }
     .a-pager__tombol { min-width: 36px; padding-inline: 8px; }
 }
