@@ -7,6 +7,8 @@ namespace App\Controllers;
 use App\Services\AuthService;
 use App\Services\KatalogPembelajaranSiswaService;
 use App\Services\NavigasiService;
+use App\Services\ProgresTpSiswaService;
+use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 use Throwable;
@@ -71,7 +73,28 @@ final class SiswaPembelajaran extends BaseController
 
     public function tp(int $tpId): ResponseInterface|string
     {
-        return $this->halaman(static fn (): array =>
-            (new KatalogPembelajaranSiswaService())->rincianTp($tpId), 'siswa/rincian_tp');
+        return $this->halaman(static function () use ($tpId): array {
+            $data = (new KatalogPembelajaranSiswaService())->rincianTp($tpId);
+            $data['progres'] = (new ProgresTpSiswaService())->status($tpId);
+            return $data;
+        }, 'siswa/rincian_tp');
+    }
+
+    /** Hanya aksi POST nyata: mengikat versi TP, tidak memulai percobaan ujian. */
+    public function mulaiTp(int $tpId): RedirectResponse
+    {
+        try {
+            $progres = (new ProgresTpSiswaService())->mulai($tpId);
+            return redirect()->to(site_url('siswa/tp/' . $tpId))
+                ->with('sukses_mulai_tp', 'TP sudah diaktifkan. Versi konten #' .
+                    (int) $progres['versi_konten_tp_id'] . ' tersimpan untuk akun Anda.');
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('siswa/tp/' . $tpId))
+                ->with('galat_mulai_tp', $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Aktivasi TP siswa gagal: {error}', ['error' => $e->getMessage()]);
+            return redirect()->to(site_url('siswa/tp/' . $tpId))
+                ->with('galat_mulai_tp', 'Aktivasi TP belum berhasil. Periksa bahwa SQL progres TP sudah diimpor.');
+        }
     }
 }
