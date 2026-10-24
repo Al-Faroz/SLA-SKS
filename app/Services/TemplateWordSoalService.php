@@ -60,7 +60,7 @@ final class TemplateWordSoalService
             return '<w:p><w:pPr><w:spacing w:before="' . $before . '" w:after="' . $after .
                 '"/>' . $extra . '</w:pPr>' . $run($text, $bold, $color, $size) . '</w:p>';
         };
-        $cell = static function (string $t, int $width, string $mode = 'normal') use ($run): string {
+        $cell = static function (string $t, int $width, string $mode = 'normal', bool $keepNext = false) use ($run): string {
             $backgrounds = [
                 'header' => '17533F', 'question' => 'E4F2EC',
                 'option-a' => 'FFFFFF', 'option-b' => 'F4F8FA', 'answer' => 'EDF7F0',
@@ -74,15 +74,16 @@ final class TemplateWordSoalService
                 '" w:type="dxa"/><w:shd w:val="clear" w:fill="' . $background . '"/>' .
                 '<w:tcMar><w:top w:w="105" w:type="dxa"/><w:start w:w="115" w:type="dxa"/>' .
                 '<w:bottom w:w="105" w:type="dxa"/><w:end w:w="115" w:type="dxa"/></w:tcMar>' .
-                '<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:before="0"/></w:pPr>' .
+                '<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:after="0" w:before="0"/>' .
+                ($keepNext ? '<w:keepNext/>' : '') . '</w:pPr>' .
                 $run($t, $bold, $textColor, $font) . '</w:p></w:tc>';
         };
-        $row = static function (string $a, string $b, string $c, string $mode = 'normal') use ($cell): string {
+        $row = static function (string $a, string $b, string $c, string $mode = 'normal', bool $keepNext = false) use ($cell): string {
             $first = $mode === 'option-a' || $mode === 'option-b' ? 'question' : $mode;
             return '<w:tr><w:trPr><w:cantSplit/>' .
                 ($mode === 'header' ? '<w:tblHeader w:val="true"/>' : '') .
-                '</w:trPr>' . $cell($a, 1900, $first) . $cell($b, 6300, $mode) .
-                $cell($c, 1000, $mode === 'header' ? 'header' : 'answer') . '</w:tr>';
+                '</w:trPr>' . $cell($a, 1900, $first, $keepNext) . $cell($b, 6300, $mode, $keepNext) .
+                $cell($c, 1000, $mode === 'header' ? 'header' : 'answer', $keepNext) . '</w:tr>';
         };
 
         $body = $p('SLA-SKS  /  FORMULIR BANK SOAL', 'eyebrow') .
@@ -119,9 +120,9 @@ final class TemplateWordSoalService
             '<w:right w:val="single"/><w:insideH w:val="single"/><w:insideV w:val="single"/>' .
             '</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="1900"/><w:gridCol w:w="6300"/><w:gridCol w:w="1000"/></w:tblGrid>' . $row('Bagian', 'Isi', 'Benar', 'header');
         for ($n = 1; $n <= $jumlah; $n++) {
-            $table .= $row('Soal ' . $n, '', '', 'question');
+            $table .= $row('Soal ' . $n, '', '', 'question', true);
             foreach (['A', 'B', 'C', 'D', 'E'] as $pilihan) {
-                $table .= $row($pilihan, '', '', $n % 2 === 0 ? 'option-b' : 'option-a');
+                $table .= $row($pilihan, '', '', $n % 2 === 0 ? 'option-b' : 'option-a', $pilihan !== 'E');
             }
         }
         $body .= $table . '</w:tbl>';
