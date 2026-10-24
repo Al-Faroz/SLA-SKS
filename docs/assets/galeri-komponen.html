@@ -35,7 +35,25 @@
         <section class="a-card">
             <h2>Tabel</h2>
             <div class="a-tabel-gulir"><table class="a-tbl"><thead><tr><th scope="col">TP</th><th scope="col">Status</th><th scope="col">Nilai</th></tr></thead><tbody><tr><td>TP-01</td><td>Tuntas</td><td>86</td></tr><tr><td>TP-02</td><td>Menunggu Guru</td><td>Sementara</td></tr></tbody></table></div>
-            <p class="a-help">Pada layar sempit, tabel dapat digulir.</p>
+            <p class="a-help">Untuk data padat tanpa form, tabel biasa dapat digulir pada layar sempit.</p>
+        </section>
+        <section class="a-card">
+            <h2>Tabel adaptif: desktop menjadi kartu di HP</h2>
+            <p class="a-help">Contoh komponen <code>a-tbl--cards</code>; header kolom tetap semantik, sedangkan setiap sel mempunyai label yang muncul pada layar sempit.</p>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards">
+                    <thead><tr><th scope="col">Nama</th><th scope="col">Gen</th><th scope="col">Status</th><th scope="col">Tindakan</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" data-label="Nama">Contoh Akun Guru</th>
+                            <td data-label="Gen">Gen Contoh</td>
+                            <td data-label="Status"><span class="a-badge a-badge--siap">Aktif</span></td>
+                            <td data-label="Tindakan"><a class="a-btn a-btn--sekunder" href="#galeri-tabel-adaptif">Tinjau contoh</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="a-help" id="galeri-tabel-adaptif">Contoh galeri saja. Label sel ditampilkan ketika tabel berubah menjadi kartu; halaman aplikasi tetap memerlukan endpoint aksi sendiri.</p>
         </section>
         <section class="a-card">
             <h2>Langkah dan terkunci</h2>
