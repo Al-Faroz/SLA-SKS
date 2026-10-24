@@ -70,7 +70,7 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         foreach (["'peran_aktif'", "'siswa'", "'wajib_ganti_sandi'",
             "'pp.angkatan_id'", "'p.angkatan_id'", "'p.status'", "'aktif'",
             "'pp.mapel_id = p.mapel_id'", "'pp.semester = p.semester'",
-            "'pp.tahun_ajaran_id = p.tahun_ajaran_id'", "'versi_konten_tp'",
+            "'pp.tahun_ajaran_id = p.tahun_ajaran_id'", "versi_konten_tp",
             "if (\$tp === null || !\$tp['akses']['buka'])"] as $needle) {
             self::assertStringContainsString($needle, $file);
         }
