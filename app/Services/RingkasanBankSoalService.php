@@ -20,7 +20,7 @@ final class RingkasanBankSoalService
     }
 
     /** @return array<string,array{aktif:int,target:int,minimal:int,memadai:bool}> */
-    public function lihat(int $tpId, array $tp): array
+    public function lihat(int $tpId): array
     {
         $hitung = ['diagnostik' => 0, 'sumatif' => 0];
         foreach ($this->db->table('soal')
@@ -34,7 +34,8 @@ final class RingkasanBankSoalService
             }
         }
 
-        return self::susun($tp, $hitung);
+        $tp = $this->db->table('tp')->select('diag_tayang,sum_tayang')->where('id', $tpId)->get()->getRowArray();
+        return self::susun($tp ?? [], $hitung);
     }
 
     /** @param array<string,int> $hitung
