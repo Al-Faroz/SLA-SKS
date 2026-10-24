@@ -48,9 +48,10 @@ CREATE TABLE butir_percobaan (
   pertanyaan TEXT NOT NULL,
   konten_terstruktur_json LONGTEXT NULL,
   opsi_acak_json LONGTEXT NOT NULL,
-  kunci_acak CHAR(1) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  kunci_acak ENUM('A','B','C','D','E') NOT NULL,
   PRIMARY KEY(id),
   UNIQUE KEY uq_butir_posisi(percobaan_ujian_id,posisi),
+  UNIQUE KEY uq_butir_id_attempt(id,percobaan_ujian_id),
   KEY ix_butir_soal_asal(soal_asal_id),
   CONSTRAINT fk_butir_ujian FOREIGN KEY(percobaan_ujian_id) REFERENCES percobaan_ujian(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -59,13 +60,14 @@ CREATE TABLE jawaban_percobaan (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   percobaan_ujian_id BIGINT UNSIGNED NOT NULL,
   butir_percobaan_id BIGINT UNSIGNED NOT NULL,
-  opsi_dipilih CHAR(1) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  opsi_dipilih ENUM('A','B','C','D','E') NOT NULL,
   waktu_disimpan DATETIME NOT NULL,
   PRIMARY KEY(id),
   UNIQUE KEY uq_jawaban_butir(percobaan_ujian_id,butir_percobaan_id),
-  KEY ix_jawaban_butir(butir_percobaan_id),
+  KEY ix_jawaban_butir_dan_ujian(butir_percobaan_id,percobaan_ujian_id),
   CONSTRAINT fk_jawaban_ujian FOREIGN KEY(percobaan_ujian_id) REFERENCES percobaan_ujian(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT fk_jawaban_butir FOREIGN KEY(butir_percobaan_id) REFERENCES butir_percobaan(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT fk_jawaban_butir_ujian FOREIGN KEY(butir_percobaan_id,percobaan_ujian_id)
+    REFERENCES butir_percobaan(id,percobaan_ujian_id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE riwayat_status_ujian (
