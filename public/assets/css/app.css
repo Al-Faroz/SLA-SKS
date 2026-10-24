@@ -824,3 +824,18 @@ a:hover { text-decoration-thickness: 2px; }
 .a-word-preview table.a-word-table td,
 .a-word-preview table.a-word-table th { border: 1px solid var(--a-garis, #bccbd2); padding: 8px 10px; }
 .a-word-preview table.a-word-table table.a-word-table { margin: 4px 0; }
+
+/* Review Word: tiap soal mandiri, hemat ruang dan tetap terbaca pada HP. */
+.a-word-review-list { display: grid; gap: 14px; margin-top: 18px; }
+.a-word-review-item { border: 1px solid #d2e1dc; border-radius: 12px; background: #fff; overflow: hidden; }
+.a-word-review-item summary { cursor: pointer; padding: 14px 18px; background: #eaf4ee; color: #174b37; font-weight: 700; }
+.a-word-review-item summary:focus-visible { outline: 3px solid #147e5a; outline-offset: -3px; }
+.a-word-review-item > .a-word-preview { padding: 18px 18px 4px; }
+.a-word-review-item > .a-tabel-gulir { margin: 10px 16px 16px; }
+.a-word-review-item .a-word-preview img { max-width: 100%; height: auto; }
+.a-word-review-item .a-word-table td { border: 1px solid #bccbd2; padding: 8px 12px; }
+@media (max-width: 640px) {
+  .a-word-review-item summary { padding: 12px; }
+  .a-word-review-item > .a-word-preview { padding: 12px; }
+  .a-word-review-item > .a-tabel-gulir { margin: 8px 10px 12px; }
+}
