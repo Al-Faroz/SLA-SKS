@@ -48,17 +48,17 @@
                     <div class="a-empty" role="status"><p>Paket telah dibuat, tetapi belum memiliki TP.</p></div>
                 <?php else: ?>
                     <div class="a-tabel-gulir">
-                        <table class="a-tbl">
+                        <table class="a-tbl a-tbl--cards a-tbl--peta-atp">
                             <thead><tr><th scope="col">Urutan</th><th scope="col">Kode TP</th><th scope="col">Judul</th><th scope="col">Versi paket</th><th scope="col">Status TP</th></tr></thead>
                             <tbody>
                             <?php foreach ($data['tp'] as $tp): ?>
                                 <?php $paketTp = null; foreach ($data['paket'] as $p) { if ((int) $p['id'] === (int) $tp['paket_semester_id']) { $paketTp = $p; break; } } ?>
                                 <tr>
-                                    <td><?= (int) $tp['urutan_atp'] ?></td>
-                                    <td><?= esc($tp['kode_tp']) ?></td>
-                                    <td><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc($tp['judul']) ?></a></td>
-                                    <td><?= $paketTp === null ? '—' : (int) $paketTp['nomor_versi'] ?></td>
-                                    <td><span class="a-badge"><?= esc($tp['status']) ?></span></td>
+                                    <th scope="row" data-label="Urutan"><?= (int) $tp['urutan_atp'] ?></th>
+                                    <td data-label="Kode TP"><?= esc($tp['kode_tp']) ?></td>
+                                    <td data-label="Judul TP" class="a-tbl--peta-atp__judul"><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc($tp['judul']) ?></a></td>
+                                    <td data-label="Versi paket"><?= $paketTp === null ? '—' : (int) $paketTp['nomor_versi'] ?></td>
+                                    <td data-label="Status TP"><span class="a-badge"><?= esc($tp['status']) ?></span></td>
                                 </tr>
                             <?php endforeach ?>
                             </tbody>
