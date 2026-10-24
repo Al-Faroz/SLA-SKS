@@ -27,8 +27,9 @@ final class ImporBankSoalService
         if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
             throw new RuntimeException('Penyimpanan Word privat tidak tersedia.');
         }
-        if (!is_file($dir . '.htaccess')) {
-            @file_put_contents($dir . '.htaccess', "Require all denied\nDeny from all\n", LOCK_EX);
+        if (!is_file($dir . '.htaccess')
+            && @file_put_contents($dir . '.htaccess', "Require all denied\nDeny from all\n", LOCK_EX) === false) {
+            throw new RuntimeException('Proteksi penyimpanan Word tidak dapat dipasang.');
         }
         return $dir;
     }
@@ -41,9 +42,29 @@ final class ImporBankSoalService
         return self::folder() . $id . '.docx';
     }
 
+    /**
+     * Bersihkan unggahan belum dikonfirmasi yang sudah kedaluwarsa.
+     * Word yang telah diterapkan tidak dihapus karena merupakan sumber aset historis.
+     */
+    private function bersihkanPratinjau(): void
+    {
+        $rows = $this->db->table('impor_soal_docx')
+            ->select('id')->where('status', 'pratinjau')
+            ->where('kedaluwarsa_pada <', date('Y-m-d H:i:s'))
+            ->limit(50)->get()->getResultArray();
+        foreach ($rows as $row) {
+            $this->db->table('impor_soal_docx')->where('id', $row['id'])
+                ->where('status', 'pratinjau')->update(['status' => 'kedaluwarsa']);
+            if ($this->db->affectedRows() === 1) {
+                @unlink(self::lokasi((string) $row['id']));
+            }
+        }
+    }
+
     /** @return array{id:string,jumlah:int} */
     public function unggah(string $file, int $tpId, int $guruId, string $jenis): array
     {
+        $this->bersihkanPratinjau();
         $rincian = (new DetailTpService($this->db))->lihat($tpId);
         if ($rincian['tp']['status'] !== 'draf' || !in_array($jenis, ['diagnostik', 'sumatif'], true)) {
             throw new DomainException('Bank soal hanya bisa diunggah pada TP draf.');
@@ -149,6 +170,21 @@ final class ImporBankSoalService
             }
 
             $jenis = (string) $rincian['row']['jenis'];
+            $terakhir = $this->db->table('impor_soal_docx')
+                ->select('id,checksum')->where('tp_id', $tpId)->where('jenis', $jenis)
+                ->where('status', 'diterapkan')->orderBy('diterapkan_pada', 'DESC')
+                ->get(1)->getRowArray();
+            if ($terakhir !== null && hash_equals((string) $terakhir['checksum'], (string) $stage['checksum'])) {
+                // Impor identik terakhir: konfirmasi ulang tidak mengubah soal.
+                $this->db->table('impor_soal_docx')->where('id', $id)->where('status', 'pratinjau')
+                    ->update(['status' => 'diterapkan', 'diterapkan_pada' => date('Y-m-d H:i:s')]);
+                if ($this->db->affectedRows() !== 1 || $this->db->transStatus() === false) {
+                    throw new RuntimeException('Penyimpanan konfirmasi identik gagal.');
+                }
+                $this->db->transCommit();
+                return ['jumlah' => count($parsed['soal']), 'baru' => 0,
+                    'diubah' => 0, 'status' => 'tidak_berubah'];
+            }
             $baru = 0;
             $diubah = 0;
             foreach ($parsed['soal'] as $soal) {
