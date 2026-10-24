@@ -116,3 +116,17 @@ Tindak lanjut yang diperlukan: perbarui branch; coba lagi dan catat pesan **Mate
 Masalah UI terkonfirmasi dari kode (tanpa perlu data tambahan pengguna): `guru/detail_tp.php` menampilkan notifikasi `galat`/`sukses` untuk editor TP pada kartu **Rumusan dan indikator** di posisi atas, sedangkan controller tambah Materi juga memakai key sama dan kembali ke `#tambah-materi`. Akibatnya pesan penolakan PDF dapat terlihat jauh dari formulir dan pengguna hanya melihat Materi tidak bertambah. Setelah keluhan berulang, key dipisah menjadi `materi_galat`/`materi_sukses` untuk `GuruMateri::tambah`, dibaca sekali di atas formulir Tambah Materi, dan copy bantuan disesuaikan dengan PDF yang sudah aktif pada Service. Notifikasi editor TP tetap menggunakan key `galat`/`sukses` masing-masing.
 
 **Harus diverifikasi manual:** setelah pull, lakukan unggah PDF ulang, baca pesan tepat di atas formulir. Jika jenis PDF ditolak karena struktur, dokumentasikan teks penolakan. Jika file diunggah dan diterima, periksa baris baru serta tombol Pratinjau. Perubahan ini terutama memperbaiki visibilitas kegagalan dan **tidak menjamin PDF spesifik pengguna pasti valid**.
+
+## Kasus PDF jsPDF satu halaman — perbaikan 24 Oktober 2026
+
+Pengguna mengunggah contoh `Masuk CMS MIN 6 JEMBER.pdf` **hanya untuk pemeriksaan lokal**, tidak dimasukkan ke GitHub. Hasil inspeksi byte PDF lokal: PDF 1.3 dari jsPDF 1.x-master, 59.242 byte, 1 halaman, tidak terenkripsi, tanpa JavaScript atau formulir interaktif. File memuat kode katalog:
+```pdf
+/OpenAction [3 0 R /FitH null]
+```
+Tujuan tersebut hanya mengatur **tampilan awal halaman**, bukan aksi yang menjalankan skrip. Validator sebelumnya memblokir **seluruh** token `/OpenAction` tanpa membedakan format, sehingga menolak berkas normal dengan alasan generik. Ini akar penolakan konkret pada file contoh.
+
+Perbaikan dalam `app/Services/PdfMateriValidator.php`: hanya `/OpenAction` array tujuan tampilan ke objek `/Page` yang terverifikasi dengan mode Fit/FitH/FitV/FitB/FitBH/FitBV sederhana yang diterima; referensi yang bukan halaman, dictionary action, JavaScript, Launch, URL dan struktur lain tetap ditolak. PDF asli tidak dimodifikasi. Validasi ukuran 15 MB/40 halaman, MIME, xref, enkripsi dan akses privat tetap berlaku.
+
+QA regresi `tests/unit/PdfMateriValidatorTest.php`: contoh jsPDF 1 halaman dengan OpenAction FitH valid; OpenAction Launch, target bukan Page dan campuran instruksi JS ditolak. Inspeksi lokal file unggahan menunjukkan satu-satunya pola larangan lama yang cocok adalah `/OpenAction` dengan `/FitH null`; objek target `3 0` adalah `/Page` dan seluruh pemeriksaan xref, katalog, jumlah halaman lainnya cocok. **Belum diuji pada browser XAMPP pemilik** setelah patch.
+
+Jika kelak ditemukan contoh PDF modern/berstruktur lain, identifikasi terpisah dan jangan menonaktifkan pemeriksaan action secara umum. Jangan commit dokumen nyata atau URL berisi identitas sekolah jika tidak relevan dengan QA.
