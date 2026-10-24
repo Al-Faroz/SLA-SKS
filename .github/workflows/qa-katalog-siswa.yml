@@ -11,6 +11,7 @@ on:
       - 'app/Config/Routes.php'
       - 'public/assets/css/app.css'
       - 'tests/unit/KatalogPembelajaranSiswaTest.php'
+      - 'tests/unit/KatalogPembelajaranSiswaDatabaseTest.php'
       - '.github/workflows/qa-katalog-siswa.yml'
   workflow_dispatch:
 
@@ -25,7 +26,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo, sqlite3, pdo_sqlite
           coverage: none
       - name: Instal dependensi
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -41,5 +42,8 @@ jobs:
           php -l app/Services/NavigasiService.php
           php -l app/Config/Routes.php
           php -l tests/unit/KatalogPembelajaranSiswaTest.php
+          php -l tests/unit/KatalogPembelajaranSiswaDatabaseTest.php
       - name: Unit test gate dan privasi Siswa
-        run: vendor/bin/phpunit --no-coverage tests/unit/KatalogPembelajaranSiswaTest.php
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/KatalogPembelajaranSiswaTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/KatalogPembelajaranSiswaDatabaseTest.php
