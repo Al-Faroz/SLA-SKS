@@ -1,0 +1,46 @@
+name: QA Petunjuk Diagnostik S05
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/PetunjukDiagnostikSiswaService.php'
+      - 'app/Controllers/SiswaDiagnostik.php'
+      - 'app/Views/siswa/diagnostik_petunjuk.php'
+      - 'app/Views/siswa/rincian_tp.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/diagnostik-preflight.js'
+      - 'public/assets/css/app.css'
+      - 'tests/unit/PetunjukDiagnostikSiswaTest.php'
+      - 'tests/unit/PetunjukDiagnostikSiswaDatabaseTest.php'
+      - '.github/workflows/qa-petunjuk-diagnostik.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Pasang dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint dan JavaScript syntax
+        run: |
+          php -l app/Services/PetunjukDiagnostikSiswaService.php
+          php -l app/Controllers/SiswaDiagnostik.php
+          php -l app/Views/siswa/diagnostik_petunjuk.php
+          php -l app/Views/siswa/rincian_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/PetunjukDiagnostikSiswaTest.php
+          php -l tests/unit/PetunjukDiagnostikSiswaDatabaseTest.php
+          node --check public/assets/js/diagnostik-preflight.js
+      - name: Pemeriksaan kontrak bank, privasi dan fullscreen
+        run: vendor/bin/phpunit --no-coverage tests/unit/PetunjukDiagnostikSiswaTest.php
+      - name: Integrasi SQLite Gen dan snapshot terpin
+        run: vendor/bin/phpunit --no-coverage tests/unit/PetunjukDiagnostikSiswaDatabaseTest.php
