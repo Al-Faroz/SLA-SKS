@@ -40,6 +40,9 @@ final class TemplateWordSoalServiceTest extends TestCase
             self::assertStringNotContainsString('✓</w:t>', $xml);
             self::assertIsString($meta);
             self::assertStringContainsString('SLA-SKS-WORD-V1', $meta);
+            self::assertStringContainsString('KETENTUAN PENGISIAN TEMPLATE SOAL', $xml);
+            self::assertStringContainsString('w:tblLayout w:type="fixed"', $xml);
+            self::assertStringContainsString('w:gridCol w:w="6300"', $xml);
         } finally {
             if (is_file($file)) {
                 unlink($file);
