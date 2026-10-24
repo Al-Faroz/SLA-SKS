@@ -15,7 +15,15 @@
             <p class="a-proto-muted"><?= esc($tp['kode_tp'] . ' — ' . $tp['judul']) ?></p>
         </div>
     </header>
-    <section class="a-card" aria-labelledby="materi-pratinjau-heading">
+    <nav class="a-pratinjau-navigasi" aria-label="Navigasi pratinjau Materi">
+        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']) . '#daftar-materi', 'attr') ?>">← Daftar Materi</a>
+        <a class="a-btn a-btn--sekunder" href="#materi-pratinjau-heading">Ke bagian media</a>
+        <a class="a-btn a-btn--sekunder" href="#petunjuk-materi">Petunjuk Resume &amp; HOTS</a>
+        <?php if ($tp['status'] === 'draf'): ?>
+            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi['id'] . '/edit'), 'attr') ?>">Sunting Materi</a>
+        <?php endif ?>
+    </nav>
+    <section class="a-card a-pratinjau-media" aria-labelledby="materi-pratinjau-heading">
         <h2 id="materi-pratinjau-heading">
             <?= esc(match ($materi['jenis']) {
                 'youtube' => 'Video pembelajaran YouTube',
@@ -26,6 +34,11 @@
             }) ?>
         </h2>
         <p class="a-help">Pratinjau hanya untuk Guru yang ditugaskan pada Gen–Mapel ini. Halaman ini tidak mengubah progres siswa.</p>
+        <div class="a-pratinjau-info" aria-label="Informasi media">
+            <span class="a-pratinjau-info__item">Jenis: <strong><?= esc(strtoupper((string) $materi['jenis'])) ?></strong></span>
+            <span class="a-pratinjau-info__item">Urutan: <strong><?= (int) $materi['urutan'] ?></strong></span>
+            <span class="a-pratinjau-info__item">Status: <strong><?= (int) $materi['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></strong></span>
+        </div>
         <?php if ((int) $materi['aktif'] !== 1): ?>
             <div class="a-alert" role="status">Materi masih Nonaktif dan belum ditayangkan kepada siswa.</div>
         <?php endif ?>
@@ -63,7 +76,7 @@
                 <img src="<?= esc($urlMedia, 'attr') ?>" alt="Gambar materi <?= esc($materi['judul'], 'attr') ?>" loading="lazy">
             </div>
         <?php endif ?>
-        <div class="a-materi-kegiatan">
+        <div class="a-materi-kegiatan" id="petunjuk-materi">
             <h2>Petunjuk kegiatan Materi</h2>
             <p class="a-help">Periksa kedua petunjuk sebelum menayangkan Materi kepada siswa. Ini hanya pratinjau, bukan tempat mengirim jawaban siswa.</p>
             <section aria-labelledby="pratinjau-resume">
@@ -83,7 +96,9 @@
                 <?php endif ?>
             </section>
         </div>
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke rincian TP</a>
+        <div class="a-pratinjau-aksi-bawah">
+            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']) . '#daftar-materi', 'attr') ?>">Kembali ke daftar Materi</a>
+        </div>
     </section>
 </div>
 <?= $this->endSection() ?>
