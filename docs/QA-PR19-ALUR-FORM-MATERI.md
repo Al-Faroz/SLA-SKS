@@ -51,3 +51,11 @@ Automated:
 - Workflow `.github/workflows/qa-berkas-materi.yml` menjalankan lint PHP/JS, unit, dan integrasi dengan MySQL QA sementara.
 
 Manual XAMPP (belum dilakukan): **backup DB+writable terlebih dulu**, pull branch PR. Uji (a) Tambah YouTube; (b) Tambah PDF valid dan baca pesan bila ditolak; (c) PDF salah; (d) PDF melebihi batas PHP; (e) Gambar/Audio; (f) Sunting tanpa file pengganti; (g) Sunting dengan file pengganti; (h) hilangkan kolom wajib; (i) duplikasi submit; (j) tab TP versi lama; (k) TP Siap; (l) Guru Gen lain; (m) desktop/HP dan akses keyboard. Jangan mengubah .env, SQL, index.php atau struktur root.
+
+## Penegasan batas PDF sesuai Master Document — 24 Oktober 2026
+
+Tujuan utama batas ukuran PDF adalah menekan pemakaian ruang penyimpanan hosting, sedangkan batas halaman membatasi panjang bahan belajar. Dokumen 05 §5 menetapkan PDF <=15 MB dan <=40 halaman; dokumen 10 menyimpan nilai bawaan 15 dan 40. Dokumen 14 §4 juga mengharuskan MIME asli, pemeriksaan halaman dan skrip aktif. Tidak ada aturan bisnis yang mewajibkan PDF tanpa revisi inkremental atau melarang navigasi normal, hyperlink, anotasi dan metadata Content Credentials (C2PA).
+
+Validator baru menghitung daun halaman melalui pohon Pages aktif, bukan jumlah penanda teks di dalam biner. PDF berukuran <=15 MiB dan 1–40 halaman diterima bila struktur halaman dapat dihitung dan tidak ada skrip aktif atau enkripsi. Navigasi /XYZ, revisi inkremental dan metadata C2PA tidak lagi ditolak secara otomatis. Struktur tidak dapat diperiksa (misalnya object stream terkompresi yang belum didukung parser) tetap ditolak dengan pesan umum; tidak ada perubahan dependensi, SQL atau konfigurasi hosting.
+
+Uji regresi mencakup PDF sepuluh halaman dengan /Prev, OpenAction /XYZ, dan metadata C2PA, serta penolakan 41 halaman dan skrip aktif tersamarkan. Uji unggah browser XAMPP file nyata tetap diperlukan sebelum PR digabung.
