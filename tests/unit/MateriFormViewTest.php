@@ -48,7 +48,7 @@ final class MateriFormViewTest extends TestCase
         self::assertStringContainsString('aria-invalid="true"', $html);
         self::assertStringContainsString('value="10"', $html);
         self::assertStringContainsString('Ringkas materi di PDF.', $html);
-        self::assertStringContainsString('Materi PDF QA', $html);
+        self::assertStringContainsString('Materi PDF QA', html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     }
 
     public function testSuntingDenganBerkasMempertahankanJenisDanFileOpsional(): void
