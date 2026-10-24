@@ -943,3 +943,53 @@ a:hover { text-decoration-thickness: 2px; }
   .a-tbl--penugasan.a-tbl--cards .a-form-penugasan .a-btn { width:100%; justify-content:center; }
   .a-admin-akun__tabel.a-tbl--cards .a-admin-akun__aksi .a-btn { flex:1 1 auto; text-align:center; }
 }
+
+/* Navigasi hierarki: tautan tetap <a>; lokasi aktif adalah label, bukan tautan palsu. */
+.a-page .a-breadcrumb {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 7px;
+    margin-bottom: 17px; font-size: 12px; line-height: 1.35;
+}
+.a-page .a-breadcrumb a,
+.a-page .a-breadcrumb [aria-current="page"] {
+    display: inline-flex; align-items: center; min-height: 34px;
+    padding: 6px 12px; border-radius: 9px; border: 1px solid #cbded4;
+    font-weight: 650; text-decoration: none;
+    overflow-wrap: anywhere; max-width: 100%;
+}
+.a-page .a-breadcrumb a { background: transparent; color: #145b43; }
+.a-page .a-breadcrumb a:nth-of-type(2) { background: #f1f8f4; border-color: #c2dbce; }
+.a-page .a-breadcrumb a:nth-of-type(n+3) { background: #e9f4ee; border-color: #acd2bd; }
+.a-page .a-breadcrumb a:hover {
+    background: #e0f2e8; border-color: #91bda8; color: #103f2f;
+}
+.a-page .a-breadcrumb a:focus-visible {
+    outline: 3px solid #168458; outline-offset: 2px;
+}
+.a-page .a-breadcrumb [aria-current="page"] {
+    background: #dff1e8; color: #104f39; border-color: #afd7c1;
+    cursor: default;
+}
+.a-page .a-breadcrumb [aria-hidden="true"] {
+    color: #81938d; padding-inline: 2px; user-select: none;
+}
+/* Pagination kanonis untuk semua daftar: konten server-side, bukan JS sembunyikan baris. */
+.a-page .a-pager--lengkap { gap: 10px 20px; padding-block: 15px 4px; }
+.a-pager__ringkasan { display: flex; flex-wrap: wrap; gap: 4px 16px;
+    align-items: center; color: var(--a-redup); font-size: 12px; }
+.a-pager__aksi { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.a-pager__tombol { display: inline-flex; align-items: center; justify-content: center;
+    min-width: 37px; min-height: 38px; padding: 7px 11px;
+    border: 1px solid #cadbd3; border-radius: 8px; background: transparent;
+    color: #185641; text-decoration: none; font-size: 12px; font-weight: 650; }
+a.a-pager__tombol:hover { background: #e9f5ee; border-color: #90bba5; }
+a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2px; }
+.a-pager__tombol.is-aktif { background: #15674b; color: #fff; border-color: #15674b; }
+.a-pager__tombol.is-nonaktif { opacity: .52; cursor: default; }
+.a-pager__elipsis { min-width: 20px; text-align: center; color: #667e74; }
+@media (max-width: 420px) {
+    .a-page .a-breadcrumb { gap: 5px; }
+    .a-page .a-breadcrumb a,
+    .a-page .a-breadcrumb [aria-current="page"] { padding: 6px 9px; font-size: 11px; }
+    .a-pager__aksi { gap: 4px; }
+    .a-pager__tombol { min-width: 36px; padding-inline: 8px; }
+}
