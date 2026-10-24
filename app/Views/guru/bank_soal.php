@@ -70,12 +70,12 @@
                                 <?php if ($tp['status'] === 'draf'): ?>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
                                     <form class="a-soal-status-form" method="post"
-                                        onsubmit="return confirm('<?= (int) $item['aktif'] === 1 ? 'Nonaktifkan' : 'Aktifkan' ?> soal ini?');"
+                                        onsubmit="return confirm('<?= (int) $item['aktif'] === 1 ? 'Hapus soal dari bank aktif tanpa menghapus arsip' : 'Pulihkan' ?> soal ini?');"
                                         action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id'] . '/status'), 'attr') ?>">
                                         <?= csrf_field() ?>
                                         <input type="hidden" name="aktif" value="<?= (int) $item['aktif'] === 1 ? '0' : '1' ?>">
                                         <input type="hidden" name="versi" value="<?= esc(\App\Services\KelolaSoalGuruService::versi($item), 'attr') ?>">
-                                        <button class="a-btn a-btn--sekunder" type="submit"><?= (int) $item['aktif'] === 1 ? 'Nonaktifkan' : 'Aktifkan' ?></button>
+                                        <button class="a-btn a-btn--sekunder" type="submit"><?= (int) $item['aktif'] === 1 ? 'Hapus dari Aktif' : 'Pulihkan' ?></button>
                                     </form>
                                 <?php else: ?>Lihat saja<?php endif ?>
                             </td>
