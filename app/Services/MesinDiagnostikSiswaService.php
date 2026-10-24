@@ -320,7 +320,7 @@ final class MesinDiagnostikSiswaService
     private static function htmlSiswa(string $html, int $tpId, string $token, ?string $source): string
     {
         if ($html === '') return '';
-        $sanitasi = HtmlSoalGuruService::bersihkan($html, $tpId, $source)['html'];
+        $sanitasi = HtmlSoalGuruService::bersihkan($html, $tpId, $source, true)['html'];
         return preg_replace_callback('/src="(soal-image:([a-f0-9]{32})|word-image:(rId[0-9]+))"/', 
             static function (array $m) use ($tpId, $token): string {
                 $tipe = !empty($m[2]) ? 'editor' : 'word';
