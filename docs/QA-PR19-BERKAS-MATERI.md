@@ -102,3 +102,11 @@ Pengguna melaporkan sudah melengkapi form dan memilih PDF, menekan Tambah Materi
 Perbaikan pada controller: periksa Content-Length terhadap post_max_size ketika body kosong, terjemahkan kode PHP UPLOAD_ERR_* yang relevan menjadi pesan berbahasa Indonesia, arahkan redirect gagal/sukses ke fragment #tambah-materi, dan tampilkan galat langsung pada formulir Tambah Materi. JS juga memeriksa 15/10 MB di browser tanpa menonaktifkan submit hanya karena PDF dipilih. Validasi PDF di server tetap wajib dan tidak dilemahkan.
 
 QA otomatis PASS, tetapi **belum memverifikasi PDF spesifik milik pengguna** maupun konfigurasi PHP XAMPP. Uji ulang setelah pull, dan jika gagal catat teks alert yang sekarang terlihat, nilai upload_max_filesize/post_max_size, ukuran file, serta apakah file menggunakan object-stream/xref-stream (jangan kirim data siswa rahasia).
+
+## Investigasi lanjutan 24 Oktober 2026 — skrip DebugBar bukan error upload
+
+Pemilik masih melaporkan PDF tidak tersimpan dan menempelkan kode JavaScript `document.addEventListener('DOMContentLoaded', loadDoc, false)` dari **CodeIgniter DebugBar**. Kode itu bukan exception, HTTP response upload atau pesan penolakan PDF; dari isinya tidak dapat diketahui apakah request POST mencapai controller, ditolak CSRF, melewati batas PHP, atau gagal oleh validasi PDF. Jangan menebak satu penyebab sebagai fakta.
+
+Ditambahkan tes realistis `testPdfDariDompdfAsliDapatDiunggah` yang menghasilkan PDF asli menggunakan `dompdf/dompdf` dari dependency yang memang sudah ada dan menjalankan `BerkasMateriService::validasi`; CI QA Berkas Materi **PASS** [run #40048962798](https://github.com/Al-Faroz/SLA-SKS/actions/runs/40048962798): 8 tes PDF/12 assertions serta seluruh regresi validasi berkas, Materi, akses Guru, integrasi upload dan Hapus PASS. Ini membuktikan salah satu PDF nyata bisa diterima, tetapi **tidak membuktikan bahwa PDF yang diuji pengguna diterima**.
+
+Tindak lanjut yang diperlukan: perbarui branch; coba lagi dan catat pesan **Materi belum disimpan** pada formulir. Jika pesan tidak muncul, periksa di Browser DevTools tab Network request POST `guru/tp/{id}/materi`: status HTTP (contoh 200/302/403/413/500) dan halaman response, tanpa membagikan cookie/CSRF/kredensial. Bila diperlukan, gunakan PDF contoh anonim yang gagal untuk tes reproduksi format. PR belum boleh di-merge.
