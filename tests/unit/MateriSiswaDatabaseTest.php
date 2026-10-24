@@ -190,9 +190,9 @@ final class MateriSiswaDatabaseTest extends TestCase
         $this->svc()->media(1,31);
         self::assertSame(2,$this->db->table('progres_tp')->countAllResults());
     }
-    private function progresMediaService(int $userId, callable $clock): \App\\Services\\ProgresMediaMateriSiswaService
+    private function progresMediaService(int $userId, callable $clock): \App\Services\ProgresMediaMateriSiswaService
     {
-        return new \App\\Services\\ProgresMediaMateriSiswaService(
+        return new \App\Services\ProgresMediaMateriSiswaService(
             $this->db, static fn (): array => [
                 'id'=>$userId,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
             ], $clock
