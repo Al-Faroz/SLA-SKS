@@ -41,7 +41,7 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
         <?php if ($pesan = session()->getFlashdata('soal_galat')): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
         <?php endif ?>
-        <p class="a-help">Gunakan format teks, tabel, dan bahasa Arab pada editor. Gambar bisa diunggah dengan tombol di bawah. Untuk rumus kompleks dari Word, pastikan tampilannya tetap benar sebelum menyimpan.</p>
+        <p class="a-help">Gunakan format teks, tabel, dan bahasa Arab pada editor. Klik tombol Gambar pada toolbar SunEditor, pilih file PNG/JPEG, lalu gambar otomatis masuk pada posisi kursor. Untuk rumus kompleks dari Word, pastikan tampilannya tetap benar sebelum menyimpan.</p>
         <form id="form-soal-guru" class="a-form" method="post" action="<?= esc(site_url($tujuan), 'attr') ?>">
             <?= csrf_field() ?>
             <?php if ($soal): ?><input type="hidden" name="versi" value="<?= esc($soal_versi, 'attr') ?>"><?php endif ?>
@@ -67,12 +67,8 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
                     <?php endforeach ?>
                 </div>
             </div>
-            <div class="a-soal-aset">
-                <label for="gambar-editor" class="a-label">Tambahkan gambar pada area editor yang terakhir diklik</label>
-                <input id="gambar-editor" type="file" accept="image/png,image/jpeg">
-                <button class="a-btn a-btn--sekunder" id="unggah-gambar-soal" type="button">Sisipkan gambar</button>
-                <p class="a-help" id="status-gambar-soal" role="status">PNG/JPEG maksimal 2 MB. Gambar disimpan privat pada server.</p>
-            </div>
+            <p class="a-help a-soal-gambar-info">Untuk gambar: klik tombol <strong>Gambar</strong> di toolbar pertanyaan atau opsi yang sedang Anda sunting, pilih file PNG/JPEG (maksimal 2 MB). Tidak perlu langkah unggah terpisah.</p>
+            <p class="a-help" id="status-gambar-soal" role="status" aria-live="polite"></p>
             <div class="a-soal-aksi">
                 <button class="a-btn a-btn--utama" type="submit">Simpan Soal</button>
                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url($uri . '?jenis=' . $jenis), 'attr') ?>">Batal</a>

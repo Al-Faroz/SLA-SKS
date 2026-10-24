@@ -19,15 +19,15 @@
         <h2 id="bank-soal-status">Ketersediaan bank soal</h2>
         <p class="a-help">Ringkasan hanya menampilkan jumlah soal aktif, tanpa pertanyaan atau kunci jawaban. Unduhan template Word kosong tersedia untuk TP draf. Setelah unggah, Guru meninjau isi Word kemudian mengonfirmasi penyimpanan pada TP draf.</p>
         <div class="a-tabel-gulir">
-            <table class="a-tbl">
+            <table class="a-tbl a-tbl--cards">
                 <thead><tr><th scope="col">Jenis ujian</th><th scope="col">Soal aktif</th><th scope="col">Jumlah tayang</th><th scope="col">Status jumlah</th></tr></thead>
                 <tbody>
                     <?php foreach ($ringkasan_bank as $jenis => $data): ?>
                         <tr>
-                            <th scope="row"><?= esc(ucfirst($jenis)) ?></th>
-                            <td><?= (int) $data['aktif'] ?></td>
-                            <td><?= (int) $data['target'] ?></td>
-                            <td><?= $data['memadai'] ? 'Jumlah mencukupi' : 'Belum mencukupi' ?></td>
+                            <th scope="row" data-label="Jenis ujian"><?= esc(ucfirst($jenis)) ?></th>
+                            <td data-label="Soal aktif"><?= (int) $data['aktif'] ?></td>
+                            <td data-label="Jumlah tayang"><?= (int) $data['target'] ?></td>
+                            <td data-label="Status jumlah"><?= $data['memadai'] ? 'Jumlah mencukupi' : 'Belum mencukupi' ?></td>
                         </tr>
                     <?php endforeach ?>
                 </tbody>
@@ -54,18 +54,18 @@
             <?php if (empty($daftar_soal)): ?>
                 <p class="a-help a-jarak-atas">Belum ada soal. Tambahkan langsung melalui aplikasi atau impor Word.</p>
             <?php else: ?>
-                <div class="a-tabel-gulir a-jarak-atas"><table class="a-tbl">
+                <div class="a-tabel-gulir a-jarak-atas"><table class="a-tbl a-tbl--cards a-tbl--bank">
                     <thead><tr><th scope="col">Urutan</th><th scope="col">Pertanyaan</th><th scope="col">Status</th>
                         <th scope="col">Asal</th><th scope="col">Tindakan</th></tr></thead>
                     <tbody>
                     <?php foreach ($daftar_soal as $item): ?>
                         <?php $sumber = json_decode((string) ($item['konten_terstruktur_json'] ?? ''), true); ?>
                         <tr>
-                            <th scope="row"><?= (int) $item['urutan'] ?></th>
-                            <td><?= esc(mb_strimwidth((string) $item['pertanyaan'], 0, 140, '…', 'UTF-8')) ?></td>
-                            <td><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></td>
-                            <td><?= is_array($sumber) && ($sumber['origin'] ?? '') === 'manual' ? 'Editor aplikasi' : 'Word' ?></td>
-                            <td>
+                            <th scope="row" data-label="Nomor"><?= (int) $item['urutan'] ?></th>
+                            <td data-label="Pertanyaan" class="a-tbl--bank__soal"><?= esc(mb_strimwidth((string) $item['pertanyaan'], 0, 140, '…', 'UTF-8')) ?></td>
+                            <td data-label="Status"><span class="a-soal-status-badge <?= (int) $item['aktif'] === 1 ? 'is-aktif' : '' ?>"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
+                            <td data-label="Asal"><?= is_array($sumber) && ($sumber['origin'] ?? '') === 'manual' ? 'Editor aplikasi' : 'Word' ?></td>
+                            <td data-label="Tindakan" class="a-soal-kolom-tindakan"><div class="a-soal-tindakan">
                                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id']), 'attr') ?>">Lihat</a>
                                 <?php if ($tp['status'] === 'draf'): ?>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
@@ -78,6 +78,7 @@
                                         <button class="a-btn a-btn--sekunder" type="submit"><?= (int) $item['aktif'] === 1 ? 'Hapus dari Aktif' : 'Pulihkan' ?></button>
                                     </form>
                                 <?php else: ?>Lihat saja<?php endif ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach ?>
@@ -120,15 +121,15 @@
             <h3 class="a-jarak-atas">Riwayat unggah dan review</h3>
             <p class="a-help">Buka pratinjau tersimpan untuk melihat ulang pertanyaan, opsi, gambar, tabel, dan kunci. Arsip Word disimpan privat di server.</p>
             <div class="a-tabel-gulir">
-                <table class="a-tbl">
+                <table class="a-tbl a-tbl--cards">
                     <thead><tr><th scope="col">Jenis</th><th scope="col">Dibuat</th><th scope="col">Status</th><th scope="col">Tindakan</th></tr></thead>
                     <tbody>
                     <?php foreach ($word_riwayat as $riwayat): ?>
                         <tr>
-                            <td><?= esc(ucfirst($riwayat['jenis'])) ?></td>
-                            <td><?= esc($riwayat['dibuat_pada']) ?></td>
-                            <td><?= $riwayat['status'] === 'diterapkan' ? 'Sudah disimpan' : 'Dalam review' ?></td>
-                            <td>
+                            <td data-label="Jenis"><?= esc(ucfirst($riwayat['jenis'])) ?></td>
+                            <td data-label="Dibuat"><?= esc($riwayat['dibuat_pada']) ?></td>
+                            <td data-label="Status"><?= $riwayat['status'] === 'diterapkan' ? 'Sudah disimpan' : 'Dalam review' ?></td>
+                            <td data-label="Tindakan">
                                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/review/' . $riwayat['id']), 'attr') ?>">Lihat review</a>
                             </td>
                         </tr>
