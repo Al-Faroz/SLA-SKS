@@ -29,6 +29,24 @@
             </table>
         </div>
     </section>
+    <section class="a-card a-jarak-atas" aria-labelledby="checklist-konten-tp">
+        <h2 id="checklist-konten-tp">Pemeriksaan awal kelengkapan konten</h2>
+        <p class="a-help">Daftar ini membantu Guru melengkapi TP dan Materi. Ini belum pemeriksaan akhir TP Siap: CP, bank soal Diagnostik/Sumatif, pengaturan ujian, keamanan dan publikasi masih harus diperiksa.</p>
+        <div class="a-tabel-gulir">
+            <table class="a-tbl">
+                <thead><tr><th scope="col">Komponen</th><th scope="col">Status</th><th scope="col">Keterangan</th></tr></thead>
+                <tbody>
+                    <?php foreach ($checklist_konten as $cek): ?>
+                        <tr>
+                            <th scope="row"><?= esc($cek['label']) ?></th>
+                            <td><?= $cek['terpenuhi'] ? 'Terisi' : 'Perlu dilengkapi' ?></td>
+                            <td><?= esc($cek['keterangan']) ?></td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
     <section class="a-card a-jarak-atas" aria-labelledby="rumusan-tp">
         <h2 id="rumusan-tp">Rumusan dan indikator</h2>
         <?php if (session()->getFlashdata('sukses')): ?>
