@@ -121,7 +121,20 @@ final class KesiapanTpService
             ->where('tp_id', $tpId)->orderBy('nomor_versi', 'DESC')->get(1)->getRowArray();
         return ['tp' => $tp, 'paket' => $paket, 'materi' => $materi, 'cp' => $cp,
             'soal' => $soal, 'cek' => $cek, 'siap' => !in_array(false, array_column($cek, 'terpenuhi'), true),
+            'sidik_jari' => self::sidikJari($tp, $paket, $cp, $materi, $soal),
             'versi_terbit' => $versi];
+    }
+
+    /**
+     * Mengikat konfirmasi pada konten yang benar-benar ditinjau Guru.
+     * Token tidak memuat atau memperlihatkan kunci jawaban.
+     */
+    public static function sidikJari(array $tp, array $paket, array $cp, array $materi, array $soal): string
+    {
+        return hash('sha256', json_encode(
+            [$tp, $paket, $cp, $materi, $soal],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        ));
     }
 
     /** @return list<array{kode:string,label:string,terpenuhi:bool,keterangan:string,tautan:string}> */
@@ -227,9 +240,10 @@ final class KesiapanTpService
     }
 
     /** Publikasi tidak boleh dicoba tanpa tanda tinjau akademik dari Guru. */
-    public function terbitkan(int $tpId, int $guruId, int $strukturVersi, bool $diperiksa): int
+    public function terbitkan(int $tpId, int $guruId, int $strukturVersi, bool $diperiksa, string $sidikJari): int
     {
-        if (!$diperiksa || $guruId < 1 || $strukturVersi < 1) {
+        if (!$diperiksa || $guruId < 1 || $strukturVersi < 1
+            || !preg_match('/^[a-f0-9]{64}$/D', $sidikJari)) {
             throw new DomainException('Periksa semua komponen dan centang konfirmasi akademik sebelum TP disiapkan.');
         }
         $this->db->transBegin();
@@ -243,6 +257,9 @@ final class KesiapanTpService
             $cek = $this->periksa($tpId); // G1 + readiness di dalam lock
             if ($cek['tp']['status'] !== 'draf' || !$cek['siap']) {
                 throw new DomainException('Ada komponen TP yang belum lengkap. Perbaiki daftar pemeriksaan terlebih dahulu.');
+            }
+            if (!hash_equals($cek['sidik_jari'], $sidikJari)) {
+                throw new DomainException('Konten TP berubah sejak pemeriksaan. Muat ulang, tinjau perubahannya, lalu konfirmasi kembali.');
             }
             if ($cek['versi_terbit'] !== null) {
                 throw new DomainException('TP sudah memiliki versi publikasi; gunakan prosedur koreksi.');
