@@ -46,6 +46,31 @@ final class GuruMateri extends BaseController
             && (float) $nilai <= PHP_INT_MAX ? (int) $nilai : null;
     }
 
+    private function batasPhpByte(string $nilai): int
+    {
+        if (! preg_match('/^\\s*(\\d+(?:\\.\\d+)?)\\s*([KMG]?)\\s*$/i', $nilai, $m)) {
+            return 0;
+        }
+        $pengali = match (strtoupper($m[2])) {
+            'G' => 1073741824, 'M' => 1048576, 'K' => 1024, default => 1,
+        };
+        return (int) ((float) $m[1] * $pengali);
+    }
+
+    private function pesanUpload(int $kode): string
+    {
+        return match ($kode) {
+            UPLOAD_ERR_INI_SIZE => 'File melebihi batas upload_max_filesize PHP (' . ini_get('upload_max_filesize') . ').',
+            UPLOAD_ERR_FORM_SIZE => 'Ukuran file melebihi batas formulir.',
+            UPLOAD_ERR_PARTIAL => 'Berkas hanya terunggah sebagian. Silakan unggah kembali.',
+            UPLOAD_ERR_NO_FILE => 'Belum ada file yang dipilih.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Folder sementara PHP untuk unggahan tidak tersedia.',
+            UPLOAD_ERR_CANT_WRITE => 'PHP tidak dapat menulis berkas sementara.',
+            UPLOAD_ERR_EXTENSION => 'Ekstensi PHP menghentikan unggahan.',
+            default => 'Unggahan gagal (kode ' . $kode . ').',
+        };
+    }
+
     private function kembali(int $tpId, string $pesan, bool $sukses = false): RedirectResponse
     {
         return redirect()->to(site_url('guru/tp/' . $tpId))
@@ -57,13 +82,23 @@ final class GuruMateri extends BaseController
         $data = $this->formulir();
         $versi = $this->versi();
         if ($data === null || $versi === null) {
-            return $this->kembali($tpId, 'Data formulir Materi tidak valid.');
+            $panjang = (int) $this->request->getHeaderLine('Content-Length');
+            $batasPost = $this->batasPhpByte((string) ini_get('post_max_size'));
+            if ($panjang > 0 && $batasPost > 0 && $panjang > $batasPost) {
+                return $this->kembali($tpId,
+                    'Ukuran unggahan melebihi batas post_max_size PHP (' . ini_get('post_max_size')
+                    . '). Periksa pengaturan PHP XAMPP bersama pengelola server.');
+            }
+            return $this->kembali($tpId, 'Formulir Materi tidak lengkap atau sudah berubah. Periksa semua kolom, lalu muat ulang jika perlu.');
         }
         try {
             if (in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
                 $file = $this->request->getFile('media');
-                if ($file === null) {
-                    throw new DomainException('Pilih file media sebelum menyimpan.');
+                if ($file === null || $file->getError() === UPLOAD_ERR_NO_FILE) {
+                    throw new DomainException('Pilih berkas ' . strtoupper((string) $data['jenis']) . ' sebelum menyimpan Materi.');
+                }
+                if (! $file->isValid()) {
+                    throw new DomainException($this->pesanUpload($file->getError()));
                 }
                 (new BerkasMateriService())->tambahDenganMedia($tpId, $versi, $data, $file);
             } else {
