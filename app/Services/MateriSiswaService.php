@@ -18,14 +18,18 @@ final class MateriSiswaService
     private KatalogPembelajaranSiswaService $katalog;
     private ProgresTpSiswaService $progres;
     private $akunSaatIni;
+    private string $folderMateri;
 
-    public function __construct(?BaseConnection $db = null, ?callable $akunSaatIni = null)
+    public function __construct(?BaseConnection $db = null, ?callable $akunSaatIni = null,
+        ?string $folderMateri = null)
     {
         $this->db = $db ?? db_connect();
         $this->akunSaatIni = $akunSaatIni
             ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
         $this->katalog = new KatalogPembelajaranSiswaService($this->db, $this->akunSaatIni);
         $this->progres = new ProgresTpSiswaService($this->db, $this->akunSaatIni);
+        $this->folderMateri = $folderMateri ?? rtrim(WRITEPATH, DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'materi';
     }
 
     /**
@@ -164,7 +168,7 @@ final class MateriSiswaService
         if ($ext === null || !preg_match('/^[a-f0-9]{48}\\.' . $ext . '$/D', $nama)) {
             throw new DomainException('Metadata media tidak sah.');
         }
-        $path = rtrim(WRITEPATH, '/\\') . '/uploads/materi/' . $nama;
+        $path = rtrim($this->folderMateri, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $nama;
         $bytes = (int) ($row['ukuran_byte'] ?? 0);
         if ($bytes < 1 || !is_file($path) || !is_readable($path)
             || (int) filesize($path) !== $bytes) {
