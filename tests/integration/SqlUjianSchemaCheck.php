@@ -81,4 +81,19 @@ try {
         throw $e;
     }
 }
-echo "S06A MariaDB: 6 tabel, FK, unique answer PASS\n";
+// FK komposit: jawaban percobaan kedua tidak boleh menunjuk butir milik percobaan pertama.
+$db->prepare(
+    'INSERT INTO percobaan_ujian(token_publik,progres_tp_id,versi_konten_tp_id,jenis,nomor_percobaan,'
+    . 'status,jumlah_soal,kkm,durasi_detik,sisa_detik,dibuat_pada,diubah_pada) VALUES(?,?,?, ?,2,?,10,75,1800,1800,?,?)'
+)->execute([str_repeat('d', 48), 11, 21, 'diagnostik', 'baru', $now, $now]);
+$otherAttempt = (int) $db->lastInsertId();
+try {
+    $db->prepare('INSERT INTO jawaban_percobaan(percobaan_ujian_id,butir_percobaan_id,opsi_dipilih,waktu_disimpan) VALUES(?,?,?,?)')
+        ->execute([$otherAttempt, $butir, 'A', $now]);
+    throw new RuntimeException('FOREIGN KEY jawaban lintas percobaan tidak terjaga.');
+} catch (PDOException $e) {
+    if ((string) $e->getCode() !== '23000') {
+        throw $e;
+    }
+}
+echo "S06A MariaDB: 6 tabel, FK dan UNIQUE + larangan jawaban silang attempt PASS\n";
