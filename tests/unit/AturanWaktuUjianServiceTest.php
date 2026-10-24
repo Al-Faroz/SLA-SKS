@@ -97,13 +97,14 @@ final class AturanWaktuUjianServiceTest extends TestCase
         self::assertFalse(Waktu::bolehMenjawab($s));
     }
 
-    public function testWaktuHabisMenjadiSelesaiSahTanpaSkorPrematur(): void
+    public function testWaktuHabisMenuntutFinalisasiAtomikDanMenolakJawaban(): void
     {
         $s = Waktu::awal(300, 1000);
         for ($i = 1; $i <= 30; $i++) {
             $s = Waktu::heartbeat($s, 1000 + $i * 10);
         }
-        self::assertSame('selesai_sah', $s['status']);
+        self::assertSame('berjalan', $s['status']);
+        self::assertTrue($s['harus_finalisasi']);
         self::assertSame(0, $s['sisa_detik']);
         self::assertNull($s['skor'] ?? null);
         self::assertFalse(Waktu::bolehMenjawab($s));
