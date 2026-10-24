@@ -121,7 +121,7 @@ final class HtmlSoalGuruService
         }
         $inner = '';
         foreach ($n->childNodes as $child) {
-            $inner .= self::node($child);
+            $inner .= self::node($child, $tpId, $wordSource);
         }
         return '<' . $tag . $attr . '>' . $inner . '</' . $tag . '>';
     }
