@@ -63,14 +63,15 @@ final class KatalogPembelajaranSiswaService
         $q = $this->db->table('penugasan_paket pp')
             ->select('p.id,p.angkatan_id,p.mapel_id,p.semester,p.tahun_ajaran_id,p.nomor_versi,' .
                 'm.kode AS kode_mapel,m.nama AS nama_mapel')
-            ->join('paket_semester p', 'p.id=pp.paket_id')
+            ->join('paket_semester p', 'p.id=pp.paket_id'
+                . ' AND p.angkatan_id=pp.angkatan_id'
+                . ' AND p.mapel_id=pp.mapel_id'
+                . ' AND p.semester=pp.semester'
+                . ' AND p.tahun_ajaran_id=pp.tahun_ajaran_id')
             ->join('ref_mapel m', 'm.id=p.mapel_id')
             ->where('pp.angkatan_id', $genId)
             ->where('p.angkatan_id', $genId)
-            ->where('p.status', 'aktif')
-            ->where('pp.mapel_id = p.mapel_id', null, false)
-            ->where('pp.semester = p.semester', null, false)
-            ->where('pp.tahun_ajaran_id = p.tahun_ajaran_id', null, false);
+            ->where('p.status', 'aktif');
         if ($mapelId !== null) {
             $q->where('p.mapel_id', $mapelId);
         }
