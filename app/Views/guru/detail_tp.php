@@ -47,6 +47,11 @@
             </table>
         </div>
     </section>
+    <section class="a-card a-jarak-atas" aria-labelledby="bank-soal-tautan">
+        <h2 id="bank-soal-tautan">Bank soal Diagnostik dan Sumatif</h2>
+        <p class="a-help">Lihat jumlah soal aktif untuk TP ini. Pengelolaan dan impor Word bank soal akan tersedia pada tahap berikutnya.</p>
+        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal'), 'attr') ?>">Lihat bank soal</a>
+    </section>
     <section class="a-card a-jarak-atas" aria-labelledby="rumusan-tp">
         <h2 id="rumusan-tp">Rumusan dan indikator</h2>
         <?php if (session()->getFlashdata('sukses')): ?>
