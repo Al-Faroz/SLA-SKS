@@ -70,6 +70,35 @@ final class PdfMateriValidatorTest extends TestCase
         self::assertSame('application/pdf', $hasil['mime']);
     }
 
+    public function testOpenActionTampilanAwalJsPdfBiasaDiterima(): void
+    {
+        // Reproduksi struktur jsPDF: /OpenAction [3 0 R /FitH null].
+        // Hanya memindahkan viewport ke halaman pertama, tanpa menjalankan aksi.
+        $file = $this->pdf(1, '/OpenAction [3 0 R /FitH null]');
+        self::assertSame(1, PdfMateriValidator::periksa($file));
+        $hasil = BerkasMateriService::validasi($file, 'pdf', 'materi-jsPDF.pdf');
+        self::assertSame(1, $hasil['halaman']);
+    }
+
+    public function testOpenActionDenganLaunchTetapDitolak(): void
+    {
+        $this->expectException(DomainException::class);
+        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction << /S /Launch /F (cmd.exe) >>'));
+    }
+
+    public function testOpenActionKeObjekSelainHalamanDitolak(): void
+    {
+        $this->expectException(DomainException::class);
+        // Objek 1 adalah katalog, bukan halaman.
+        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction [1 0 R /FitH null]'));
+    }
+
+    public function testOpenActionYangMenyisipkanInstruksiAktifDitolak(): void
+    {
+        $this->expectException(DomainException::class);
+        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction [3 0 R /FitH null] /JS (alert)'));
+    }
+
     public function testPdfSatuHalamanValid(): void
     {
         $file = $this->pdf(1);
