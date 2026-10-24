@@ -24,7 +24,7 @@ final class DetailTpService
     }
 
     /**
-     * @return array{tp:array<string,mixed>,paket:array<string,mixed>,jumlah_materi:int,materi:list<array<string,mixed>>}
+     * @return array{tp:array<string,mixed>,paket:array<string,mixed>,jumlah_materi:int,materi:list<array<string,mixed>>,checklist_konten:list<array{label:string,terpenuhi:bool,keterangan:string}>}
      */
     public function lihat(int $tpId): array
     {
@@ -77,7 +77,8 @@ final class DetailTpService
             ->orderBy('id', 'ASC')
             ->get()->getResultArray();
 
-        return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => count($materi), 'materi' => $materi];
+        return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => count($materi), 'materi' => $materi,
+            'checklist_konten' => ChecklistKontenTpService::periksa($tp, $materi)];
     }
 
     /**
