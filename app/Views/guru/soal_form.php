@@ -11,7 +11,7 @@ if (is_array($rich) && !empty($rich['html_pertanyaan'])) {
     );
     foreach (['A','B','C','D','E'] as $huruf) {
         if (!empty($rich['html_opsi'][$huruf])) {
-            $raw['opsi_' . strtolower($huruf)] = HtmlSoalGuruService::untukGuru(
+            $raw['opsi_' . strtolower($huruf)] = \App\Services\HtmlSoalGuruService::untukGuru(
                 $rich['html_opsi'][$huruf], (int) $tp['id'], is_string($wordSource) ? $wordSource : null
             );
         }
