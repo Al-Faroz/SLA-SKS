@@ -12,6 +12,7 @@ use App\Services\TemplateWordSoalService;
 use App\Services\KunciTemplateWordService;
 use App\Services\PratinjauWordSoalService;
 use App\Services\RenderWordSoalService;
+use App\Services\ImporBankSoalService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -106,54 +107,91 @@ final class GuruBankSoal extends BaseController
             ->setBody($data);
     }
 
+    /**
+     * POST unggah Word: validasi + staging privat, belum melakukan mutasi soal.
+     */
     public function pratinjauWord(int $tpId, string $jenis): ResponseInterface|string
     {
         try {
-            $rincian = (new DetailTpService())->lihat($tpId);
-            if ($rincian['tp']['status'] !== 'draf' || ! in_array($jenis, ['diagnostik', 'sumatif'], true)) {
-                throw new DomainException('Impor hanya diperbolehkan pada TP draf dan jenis ujian yang sah.');
+            if (!in_array($jenis, ['diagnostik', 'sumatif'], true)) {
+                throw new DomainException('Jenis ujian tidak dikenal.');
             }
-            $berkas = $this->request->getFile('word_soal');
-            if ($berkas === null || ! $berkas->isValid()
-                || strtolower($berkas->getClientExtension()) !== 'docx'
-                || $berkas->getSize() > 15 * 1024 * 1024) {
-                throw new DomainException('Pilih berkas .docx maksimal 15 MB.');
+            $file = $this->request->getFile('word_soal');
+            if ($file === null || !$file->isValid()
+                || strtolower($file->getClientExtension()) !== 'docx'
+                || $file->getSize() > 15 * 1024 * 1024) {
+                throw new DomainException('Pilih berkas DOCX maksimal 15 MB.');
             }
             $akun = (new AuthService())->penggunaSaatIni();
-            $hasil = PratinjauWordSoalService::periksa(
-                $berkas->getTempName(), $tpId, (int) $akun['id'],
-                (int) $rincian['paket']['id'], (int) $rincian['tp']['struktur_versi'],
-                $jenis, KunciTemplateWordService::ambil()
+            $stage = (new ImporBankSoalService())->unggah(
+                $file->getTempName(), $tpId, (int) $akun['id'], $jenis
             );
-            $pesan = 'Validasi ' . ucfirst($jenis) . ' berhasil: ' . $hasil['jumlah']
-                . ' soal terstruktur. Pratinjau ini belum menyimpan soal ke database.';
-            $ringkas = array_map(static function (array $row): string {
-                return 'Soal ' . $row['nomor'] . ': gambar ' . $row['konten']['gambar']
-                    . ', rumus ' . $row['konten']['rumus'] . ', tabel ' . $row['konten']['tabel']
-                    . ', teks Arab ' . $row['konten']['arab'];
-            }, $hasil['soal']);
-            // Render dalam request unggah; gambar tidak diletakkan dalam sesi/flashdata.
-            $hasil = RenderWordSoalService::hasil($berkas->getTempName(), $hasil);
-            return view('guru/bank_soal', array_merge($rincian, [
-                'judul' => 'Pratinjau Word Bank Soal',
-                'namaPengguna' => $akun['nama'],
-                'peranAktif' => 'Guru',
-                'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
-                'ringkasan_bank' => (new RingkasanBankSoalService())->lihat($tpId),
-                'word_pratinjau' => $hasil['soal'],
-                'word_pesan' => $pesan,
-                'word_rincian_hasil' => $ringkas,
-            ]));
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal/review/' . $stage['id']));
         } catch (DomainException $e) {
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
-                ->with('word_galat', $e->getMessage());
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))->with('word_galat', $e->getMessage());
         } catch (\Throwable $e) {
-            log_message('error', 'Validasi Word gagal TP {id}: {message}', [
-                'id' => $tpId, 'message' => $e->getMessage(),
-            ]);
+            log_message('error', 'Unggah bank soal gagal: {reason}', ['reason' => $e->getMessage()]);
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
-                ->with('word_galat', 'Dokumen belum dapat diperiksa. Periksa format DOCX.');
+                ->with('word_galat', 'Berkas belum dapat diproses. Periksa format atau kapasitas penyimpanan.');
         }
     }
 
+    public function reviewWord(int $tpId, string $id): ResponseInterface|string
+    {
+        try {
+            $akun = (new AuthService())->penggunaSaatIni();
+            $rincian = (new DetailTpService())->lihat($tpId);
+            $stage = (new ImporBankSoalService())->buka($tpId, (int) $akun['id'], $id, false);
+            $hasil = RenderWordSoalService::hasil($stage['path'], $stage['hasil']);
+            $telahDisimpan = $stage['row']['status'] === 'diterapkan';
+            return view('guru/review_bank_soal', array_merge($rincian, [
+                'judul' => 'Review Bank Soal Word',
+                'namaPengguna' => $akun['nama'],
+                'peranAktif' => 'Guru',
+                'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
+                'word_review' => $hasil,
+                'word_import_id' => $id,
+                'word_sudah_disimpan' => $telahDisimpan,
+                'word_expired' => strtotime((string) $stage['row']['kedaluwarsa_pada']) < time(),
+            ]));
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))->with('word_galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Review bank soal gagal: {reason}', ['reason' => $e->getMessage()]);
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('word_galat', 'Pratinjau gagal dibuka. Silakan unggah ulang.');
+        }
+    }
+
+    public function konfirmasiWord(int $tpId, string $id): ResponseInterface
+    {
+        try {
+            $akun = (new AuthService())->penggunaSaatIni();
+            $hasil = (new ImporBankSoalService())->konfirmasi($tpId, (int) $akun['id'], $id);
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('word_sukses', $hasil['jumlah'] . ' soal berhasil diproses: '
+                    . $hasil['baru'] . ' baru, ' . $hasil['diubah'] . ' diperbarui. '
+                    . 'Soal lama yang tidak ada pada Word tetap disimpan.');
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal/review/' . $id))
+                ->with('word_galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Konfirmasi bank soal gagal: {reason}', ['reason' => $e->getMessage()]);
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+                ->with('word_galat', 'Penyimpanan bank soal gagal. Tidak ada perubahan parsial yang disimpan.');
+        }
+    }
+
+    public function mediaWord(int $tpId, string $id, string $rid): ResponseInterface
+    {
+        try {
+            $akun = (new AuthService())->penggunaSaatIni();
+            $gambar = (new ImporBankSoalService())->gambar($tpId, (int) $akun['id'], $id, $rid);
+            return $this->response->setHeader('Content-Type', $gambar['mime'])
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody($gambar['data']);
+        } catch (\Throwable $e) {
+            return $this->response->setStatusCode(404)->setBody('Gambar tidak tersedia.');
+        }
+    }
 }
