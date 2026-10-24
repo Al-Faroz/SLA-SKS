@@ -66,6 +66,7 @@
                             <td><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></td>
                             <td><?= is_array($sumber) && ($sumber['origin'] ?? '') === 'manual' ? 'Editor aplikasi' : 'Word' ?></td>
                             <td>
+                                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id']), 'attr') ?>">Lihat</a>
                                 <?php if ($tp['status'] === 'draf'): ?>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
                                     <form class="a-soal-status-form" method="post"
