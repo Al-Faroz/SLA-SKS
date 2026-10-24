@@ -29,29 +29,11 @@
             </table>
         </div>
     </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="checklist-konten-tp">
-        <h2 id="checklist-konten-tp">Pemeriksaan awal kelengkapan konten</h2>
-        <p class="a-help">Daftar ini membantu Guru melengkapi TP dan Materi. Ini belum pemeriksaan akhir TP Siap: CP, bank soal Diagnostik/Sumatif, pengaturan ujian, keamanan dan publikasi masih harus diperiksa.</p>
-        <div class="a-tabel-gulir">
-            <table class="a-tbl a-tbl--cards a-tp-checklist">
-                <thead><tr><th scope="col">Komponen</th><th scope="col">Status</th><th scope="col">Keterangan</th></tr></thead>
-                <tbody>
-                    <?php foreach ($checklist_konten as $cek): ?>
-                        <tr>
-                            <th scope="row" data-label="Komponen"><?= esc($cek['label']) ?></th>
-                            <td data-label="Status"><span class="a-tp-status <?= $cek['terpenuhi'] ? 'is-lengkap' : 'is-kurang' ?>"><?= $cek['terpenuhi'] ? 'Terisi' : 'Perlu dilengkapi' ?></span></td>
-                            <td data-label="Keterangan"><?= esc($cek['keterangan']) ?></td>
-                        </tr>
-                    <?php endforeach ?>
-                </tbody>
-            </table>
-        </div>
-    </section>
     <section class="a-card a-jarak-atas" id="kesiapan-tp" aria-labelledby="kesiapan-tp-judul">
-        <h2 id="kesiapan-tp-judul">Kesiapan TP Siap</h2>
-        <p class="a-help">Periksa CP aktif dan utama, seluruh Materi/Resume/HOTS,
-            bank Diagnostik dan Sumatif, media, parameter ujian, serta
-            versi konten sebelum mengunci TP.</p>
+        <h2 id="kesiapan-tp-judul"><?= $tp['status'] === 'siap' ? 'Status publikasi TP' : 'Pemeriksaan kesiapan TP' ?></h2>
+        <p class="a-help"><?= $tp['status'] === 'siap'
+            ? 'TP telah diterbitkan. Lihat status penguncian dan riwayat versi konten pada halaman kesiapan.'
+            : 'Satu pemeriksaan final untuk CP, Materi, Resume/HOTS, bank soal, media, dan pengaturan sebelum TP diterbitkan.' ?></p>
         <?php if ($tp['status'] === 'siap'): ?>
             <div class="a-alert" role="status">TP sudah Siap dan terkunci.
                 Pemeriksaan dan versi konten tetap dapat dilihat.</div>

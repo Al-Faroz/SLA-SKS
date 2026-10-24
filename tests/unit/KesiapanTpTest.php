@@ -141,4 +141,28 @@ final class KesiapanTpTest extends TestCase
         )['terpenuhi']);
     }
 
+    public function testHanyaSatuChecklistDitampilkanPadaHalamanKesiapan(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $detail = file_get_contents($root . '/app/Views/guru/detail_tp.php');
+        $kesiapan = file_get_contents($root . '/app/Views/guru/kesiapan_tp.php');
+        $service = file_get_contents($root . '/app/Services/KesiapanTpService.php');
+        self::assertIsString($detail);
+        self::assertIsString($kesiapan);
+        self::assertIsString($service);
+
+        self::assertStringNotContainsString('Pemeriksaan awal kelengkapan konten', $detail);
+        self::assertStringNotContainsString('checklist-konten-tp', $detail);
+        self::assertStringNotContainsString('foreach ($checklist_konten', $detail);
+        self::assertSame(1, substr_count($detail, 'id="kesiapan-tp"'));
+        self::assertStringContainsString("'/kesiapan'", $detail);
+
+        self::assertSame(1, substr_count($kesiapan, 'id="judul-checklist-akhir"'));
+        self::assertStringContainsString('Daftar pemeriksaan final', $kesiapan);
+        self::assertStringContainsString("if (\$tp['status'] === 'siap')", $detail);
+        self::assertStringContainsString("if (\$tp['status'] === 'draf')", $kesiapan);
+        self::assertStringNotContainsString("'#checklist-konten-tp'", $service);
+        self::assertStringContainsString("'guru/peta-atp'", $service);
+    }
+
 }
