@@ -34,6 +34,56 @@
             </table>
         </div>
         <p class="a-help">Jumlah yang mencukupi belum berarti soal siap dipublikasikan: isi soal, opsi A–E, kunci dan aset tetap harus diperiksa.</p>
+        <section class="a-soal-daftar" aria-labelledby="judul-daftar-bank">
+            <h3 id="judul-daftar-bank">Daftar soal yang tersimpan</h3>
+            <nav class="a-soal-tabs" aria-label="Jenis bank soal">
+                <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenisTab => $namaTab): ?>
+                    <a href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenisTab), 'attr') ?>"
+                        class="a-btn a-btn--sekunder <?= $jenis_dipilih === $jenisTab ? 'is-aktif' : '' ?>"
+                        <?= $jenis_dipilih === $jenisTab ? 'aria-current="page"' : '' ?>><?= esc($namaTab) ?></a>
+                <?php endforeach ?>
+            </nav>
+            <?php if ($tp['status'] === 'draf'): ?>
+                <a class="a-btn a-btn--utama a-jarak-atas"
+                    href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . $jenis_dipilih . '/baru'), 'attr') ?>">
+                    + Tambah Soal <?= esc(ucfirst($jenis_dipilih)) ?>
+                </a>
+            <?php else: ?>
+                <p class="a-help">TP sudah Siap. Penambahan dan koreksi memerlukan proses khusus.</p>
+            <?php endif ?>
+            <?php if (empty($daftar_soal)): ?>
+                <p class="a-help a-jarak-atas">Belum ada soal. Tambahkan langsung melalui aplikasi atau impor Word.</p>
+            <?php else: ?>
+                <div class="a-tabel-gulir a-jarak-atas"><table class="a-tbl">
+                    <thead><tr><th scope="col">Urutan</th><th scope="col">Pertanyaan</th><th scope="col">Status</th>
+                        <th scope="col">Asal</th><th scope="col">Tindakan</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($daftar_soal as $item): ?>
+                        <?php $sumber = json_decode((string) ($item['konten_terstruktur_json'] ?? ''), true); ?>
+                        <tr>
+                            <th scope="row"><?= (int) $item['urutan'] ?></th>
+                            <td><?= esc(mb_strimwidth((string) $item['pertanyaan'], 0, 140, '…', 'UTF-8')) ?></td>
+                            <td><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></td>
+                            <td><?= is_array($sumber) && ($sumber['origin'] ?? '') === 'manual' ? 'Editor aplikasi' : 'Word' ?></td>
+                            <td>
+                                <?php if ($tp['status'] === 'draf'): ?>
+                                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
+                                    <form class="a-soal-status-form" method="post"
+                                        onsubmit="return confirm('<?= (int) $item['aktif'] === 1 ? 'Nonaktifkan' : 'Aktifkan' ?> soal ini?');"
+                                        action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . (int) $item['id'] . '/status'), 'attr') ?>">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="aktif" value="<?= (int) $item['aktif'] === 1 ? '0' : '1' ?>">
+                                        <input type="hidden" name="versi" value="<?= esc(\App\Services\KelolaSoalGuruService::versi($item), 'attr') ?>">
+                                        <button class="a-btn a-btn--sekunder" type="submit"><?= (int) $item['aktif'] === 1 ? 'Nonaktifkan' : 'Aktifkan' ?></button>
+                                    </form>
+                                <?php else: ?>Lihat saja<?php endif ?>
+                            </td>
+                        </tr>
+                    <?php endforeach ?>
+                    </tbody>
+                </table></div>
+            <?php endif ?>
+        </section>
         <?php if ($tp['status'] === 'draf'): ?>
             <h3>Unduh template Word kosong</h3>
             <p class="a-help">Pilih jumlah soal yang akan dibuat. Setiap soal memiliki satu bagian pertanyaan dan lima opsi A–E, seluruhnya kosong. Pilih jumlah soal, unduh, isi, lalu unggah untuk review dan konfirmasi.</p>
@@ -59,10 +109,10 @@
                 </form>
             <?php endforeach ?>
         <?php endif ?>
-        <?php if ($pesan = session()->getFlashdata('word_galat')): ?>
+        <?php if ($pesan = session()->getFlashdata('soal_galat') ?? session()->getFlashdata('word_galat')): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
         <?php endif ?>
-        <?php if ($pesan = session()->getFlashdata('word_sukses')): ?>
+        <?php if ($pesan = session()->getFlashdata('soal_sukses') ?? session()->getFlashdata('word_sukses')): ?>
             <div class="a-alert" role="status"><?= esc($pesan) ?></div>
         <?php endif ?>
         <?php if (!empty($word_riwayat)): ?>
