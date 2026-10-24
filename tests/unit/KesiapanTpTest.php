@@ -114,6 +114,7 @@ final class KesiapanTpTest extends TestCase
         self::assertIsString($detail);
         self::assertIsString($route);
         self::assertStringContainsString('tinjau_akademik', $view);
+        self::assertStringContainsString('name="sidik_jari"', $view);
         self::assertStringContainsString('csrf_field()', $view);
         self::assertStringContainsString('Konfirmasi &amp; Jadikan TP Siap', $view);
         self::assertStringContainsString("if (\$siap)", $view);
@@ -121,4 +122,14 @@ final class KesiapanTpTest extends TestCase
         self::assertStringContainsString('Periksa kesiapan TP Siap', $detail);
         self::assertStringContainsString("GuruKesiapanTp::siapkan", $route);
     }
+    public function testSidikJariMendeteksiSuntinganSoalTanpaMengubahStrukturVersi(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $awal = KesiapanTpService::sidikJari($tp, $paket, $cp, $materi, $soal);
+        self::assertSame(64, strlen($awal));
+        self::assertSame($awal, KesiapanTpService::sidikJari($tp, $paket, $cp, $materi, $soal));
+        $soal[0]['kunci'] = 'B';
+        self::assertNotSame($awal, KesiapanTpService::sidikJari($tp, $paket, $cp, $materi, $soal));
+    }
+
 }
