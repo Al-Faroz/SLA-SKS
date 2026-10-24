@@ -1079,3 +1079,61 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
   .a-tp-materi-tabel.a-tbl--cards .a-materi-aksi .a-btn { width:auto; min-height:42px; }
   .a-materi-form-fields { gap:12px; }
 }
+
+/* Audit responsivitas tahap D — pratinjau media Materi Guru, terisolasi dari upload. */
+.a-pratinjau-navigasi {
+    display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px;
+}
+.a-pratinjau-navigasi .a-btn {
+    min-height:36px; padding:7px 12px; line-height:1.35;
+    white-space:normal; text-align:center; text-decoration:none;
+}
+.a-pratinjau-info {
+    display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 18px;
+}
+.a-pratinjau-info__item {
+    display:inline-flex; flex-wrap:wrap; gap:5px; align-items:center;
+    padding:7px 11px; border-radius:8px; border:1px solid #d2e3db;
+    background:#f2f8f5; color:#325144; font-size:12px;
+}
+.a-pratinjau-info__item strong { color:#14553b; }
+.a-pratinjau-media { min-width:0; }
+.a-pratinjau-media :is(.a-media-video, .a-materi-pdf, .a-materi-audio, .a-materi-gambar) {
+    max-width:100%; min-width:0; margin-inline:auto;
+}
+.a-pratinjau-media .a-media-details { display:block; min-width:0; max-width:100%; }
+.a-pratinjau-media .a-media-details > summary {
+    display:inline-flex; align-items:center; width:max-content; max-width:100%;
+    cursor:pointer; list-style-position:inside; white-space:normal;
+}
+.a-pratinjau-media .a-media-details > summary:focus-visible {
+    outline:3px solid #168458; outline-offset:3px;
+}
+.a-pratinjau-media .a-media-video { width:min(100%, 960px); aspect-ratio:16 / 9; }
+.a-pratinjau-media .a-materi-pdf {
+    width:100%; height:clamp(370px, 76vh, 880px); min-height:0;
+}
+.a-pratinjau-media .a-materi-gambar img { max-width:100%; height:auto; object-fit:contain; }
+.a-pratinjau-media .a-materi-audio audio { width:100%; max-width:100%; }
+.a-pratinjau-media .a-materi-kegiatan { grid-template-columns:minmax(0,1fr); gap:14px; }
+.a-pratinjau-media .a-materi-kegiatan > :is(h2,p) { grid-column:1/-1; }
+.a-pratinjau-media .a-materi-kegiatan > section { min-width:0; overflow-wrap:anywhere; }
+.a-pratinjau-media .a-materi-kegiatan .a-teks-pratinjau {
+    white-space:pre-wrap; overflow-wrap:anywhere; word-break:normal;
+}
+.a-pratinjau-aksi-bawah { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.a-pratinjau-aksi-bawah .a-btn { white-space:normal; }
+@media(min-width:1100px) {
+    .a-pratinjau-media .a-materi-kegiatan { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:640px) {
+    .a-pratinjau-navigasi .a-btn { flex:1 1 calc(50% - 8px); min-width:0; }
+    .a-pratinjau-media .a-materi-pdf {
+        height:clamp(280px, 65vh, 620px); min-height:0;
+    }
+    .a-pratinjau-media .a-materi-kegiatan > section { padding:12px; }
+}
+@media(max-width:390px) {
+    .a-pratinjau-navigasi .a-btn { flex-basis:100%; }
+    .a-pratinjau-info__item { flex:1 1 auto; }
+}
