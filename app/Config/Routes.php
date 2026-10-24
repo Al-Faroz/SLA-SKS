@@ -27,6 +27,7 @@ $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/bank-soal', 'GuruBankSoal::index/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/word/(:segment)', 'GuruBankSoal::unduh/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)', 'GuruDetailTp::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi', 'GuruMateri::tambah/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/materi/(:num)/edit', 'GuruMateri::edit/$1/$2', ['filter' => 'auth:guru']);
