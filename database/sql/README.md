@@ -125,3 +125,42 @@ Tahap S06A membangun **skema historis** dan **aturan domain murni**, belum mengi
 **Kontrak tabel:** `percobaan_ujian` mengikat `progres_tp` dan `versi_konten_tp`; `butir_percobaan` menyimpan opsi/kunci teracak, `jawaban_percobaan` memiliki UNIQUE per percobaan–butir dan FK komposit yang mencegah jawaban pada butir milik percobaan lain. Segmen jeda, riwayat status, dan insiden memiliki riwayat append-only. Keadaan batal tidak mempunyai nilai sah; batas 20/90/180/300 detik dan pelanggaran ketiga berasal dari Master Document 07, bukan konfigurasi baru.
 
 **QA:** PHPUnit aturan murni, uji PHP lint, serta impor DDL menggunakan **MariaDB sementara dengan parent sintetis** di GitHub Actions. Pengujian MariaDB bukan bukti otomatis kesesuaian semua tipe FK pada dump MySQL XAMPP; uji impor lokal tetap wajib. Tidak ada Migration/Seeder atau data siswa nyata di repo.
+
+## S06B — Pelaksanaan Diagnostik nyata (24 Oktober 2026)
+
+**Tidak ada SQL tambahan untuk tahap ini.** S06B menggunakan tabel yang
+sudah dibuat melalui patch 0014 (progres_tp) dan 0015 (enam tabel ujian).
+**Jangan mengimpor ulang** dua patch tersebut bila tabel sudah tersedia.
+
+Sebelum pengujian browser XAMPP:
+1. Backup database dan gunakan akun **Siswa khusus uji**, bukan data siswa nyata,
+   sebab Diagnostik yang selesai/batal bersifat historis dan tidak tersedia reset.
+2. Login Siswa dengan TP pertama Siap serta progres Diagnostik yang terpin;
+   buka S05, lalu **Masuk ruang Tes Diagnostik**.
+3. Uji masuk fullscreen. Sebelum fullscreen berhasil, tidak boleh ada baris
+   `percobaan_ujian`. Sesudah mulai, harus ada satu percobaan serta butir teracak.
+4. Uji pilihan A–E, pergantian soal, refresh, koneksi offline, keluar fullscreen,
+   jeda/pulih, submit, timeout aktif dan hasil. **Simpan** hanya berhasil jika server
+   mengonfirmasi. Percobaan batal tak boleh memiliki skor.
+5. Pastikan satu siswa tidak memperoleh dua percobaan normal dari refresh/klik
+   dua kali. Perubahan status progres menjadi `tuntas` (≥KKM), `belajar` (<KKM)
+   atau `perlu_bantuan` (batal) adalah perubahan data **nyata**.
+6. Uji halaman hasil/status setelah ujian selesai, akses Gen lain dan perangkat
+   tanpa fullscreen. Bila error, kumpulkan teks error dan status di tabel
+   percobaan; **jangan** DELETE, TRUNCATE, DROP, reset skor ataupun mengubah
+   snapshot untuk mencoba lagi. Laporkan agar diperbaiki melalui patch aman.
+7. Modul tindak lanjut Guru pada percobaan batal serta pelaksanaan Materi,
+   Resume/HOTS, Sumatif dan laporan masih tahap lanjutan.
+
+Pemeriksaan SQL baca-saja:
+
+```sql
+SELECT id, progres_tp_id, jenis, status, jumlah_soal,
+       jumlah_pelanggaran_fullscreen, skor, jumlah_benar
+FROM percobaan_ujian
+ORDER BY id DESC;
+SELECT percobaan_ujian_id, COUNT(*) AS jawaban_disimpan
+FROM jawaban_percobaan
+GROUP BY percobaan_ujian_id;
+```
+
