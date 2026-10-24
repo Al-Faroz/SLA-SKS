@@ -41,11 +41,11 @@ final class TemplateWordSoalService
         $esc = static fn (string $t): string => htmlspecialchars($t, ENT_XML1 | ENT_QUOTES, 'UTF-8');
         $p = static fn (string $t): string => '<w:p><w:r><w:t xml:space="preserve">' .
             htmlspecialchars($t, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</w:t></w:r></w:p>';
-        $cell = static fn (string $t): string => '<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr>' .
+        $cell = static fn (string $t, int $width): string => '<w:tc><w:tcPr><w:tcW w:w="' . $width . '" w:type="dxa"/></w:tcPr>' .
             '<w:p><w:r><w:t xml:space="preserve">' . htmlspecialchars($t, ENT_XML1 | ENT_QUOTES, 'UTF-8') .
             '</w:t></w:r></w:p></w:tc>';
         $row = static fn (string $a, string $b, string $c): string =>
-            '<w:tr>' . $cell($a) . $cell($b) . $cell($c) . '</w:tr>';
+            '<w:tr>' . $cell($a, 1900) . $cell($b, 6300) . $cell($c, 1000) . '</w:tr>';
 
         $body = $p('SLA-SKS — BANK SOAL ' . strtoupper($jenis));
         foreach ([
@@ -59,11 +59,23 @@ final class TemplateWordSoalService
         ] as $label => $nilai) {
             $body .= $p($label . ': ' . $nilai);
         }
-        $body .= $p('Isi setiap Soal, pilihan A–E dan tepat satu tanda ✓ di kolom Benar. Jangan mengubah identitas template.');
-        $table = '<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>' .
+        $body .= $p('KETENTUAN PENGISIAN TEMPLATE SOAL');
+        foreach ([
+            '1. Identitas Gen, Guru, Mapel, Kurikulum, Semester, TP dan jenis ujian telah diisi otomatis oleh sistem.',
+            '2. Jangan mengubah label Bagian / Soal n / A–E atau urutan baris. Isi hanya kolom Isi dan Benar.',
+            '3. Setiap soal wajib mempunyai lima pilihan A–E yang terisi. Beri tanda ✓ pada tepat satu pilihan benar.',
+            '4. Gambar, teks Arab/RTL, aksara Jawa/Unicode, Equation Word (Insert → Equation) dan tabel termasuk tabel bersarang boleh ditempatkan pada kolom Isi soal maupun pilihan.',
+            '5. Audio dan video menggunakan tautan Google Drive dengan izin Viewer: tulis Audio: atau Video: di sel Isi, diikuti URL Google Drive. Jangan menyisipkan file audio/video langsung atau tautan YouTube/Vimeo.',
+            '6. Periksa keutuhan gambar, rumus, tabel dan pemutaran media pada pratinjau sebelum konfirmasi impor.',
+            '7. Dokumen ini adalah template kosong; jangan menyalin soal contoh dari dokumen referensi. Simpan sebagai .docx sebelum unggah.',
+        ] as $petunjuk) {
+            $body .= $p($petunjuk);
+        }
+        $body .= $p('PILIHAN GANDA — Isi semua sel Isi, kemudian tandai tepat satu jawaban ✓ pada kolom Benar.');
+        $table = '<w:tbl><w:tblPr><w:tblW w:w="9200" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders>' .
             '<w:top w:val="single"/><w:left w:val="single"/><w:bottom w:val="single"/>' .
             '<w:right w:val="single"/><w:insideH w:val="single"/><w:insideV w:val="single"/>' .
-            '</w:tblBorders></w:tblPr>' . $row('Bagian', 'Isi', 'Benar');
+            '</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="1900"/><w:gridCol w:w="6300"/><w:gridCol w:w="1000"/></w:tblGrid>' . $row('Bagian', 'Isi', 'Benar');
         for ($n = 1; $n <= $jumlah; $n++) {
             $table .= $row('Soal ' . $n, '', '');
             foreach (['A', 'B', 'C', 'D', 'E'] as $pilihan) {

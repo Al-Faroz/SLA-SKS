@@ -818,3 +818,9 @@ a:hover { text-decoration-thickness: 2px; }
 .a-word-preview .a-word-table td { padding: 8px 12px; white-space: normal; vertical-align: top; }
 .a-word-preview .a-word-image { display: block; max-width: 100%; max-height: 500px; width: auto; height: auto; margin: 10px 0; object-fit: contain; }
 .a-word-preview .a-word-math { font-family: serif; white-space: pre-wrap; }
+
+/* Garis tabel Word bersarang jelas untuk pembaca dan Guru. */
+.a-word-preview table.a-word-table { border-collapse: collapse; border: 1px solid var(--a-garis, #bccbd2); }
+.a-word-preview table.a-word-table td,
+.a-word-preview table.a-word-table th { border: 1px solid var(--a-garis, #bccbd2); padding: 8px 10px; }
+.a-word-preview table.a-word-table table.a-word-table { margin: 4px 0; }
