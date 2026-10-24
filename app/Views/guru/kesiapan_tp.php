@@ -96,6 +96,7 @@
                 method="post" onsubmit="return confirm('TP akan diterbitkan dan dikunci. Lanjutkan?');">
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
+                <input type="hidden" name="sidik_jari" value="<?= esc($sidik_jari, 'attr') ?>">
                 <label class="a-kesiapan-konfirmasi">
                     <input type="checkbox" name="tinjau_akademik" value="ya" required>
                     Saya sudah meninjau dan menyetujui keakuratan materi, CP,
