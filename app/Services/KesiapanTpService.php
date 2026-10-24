@@ -170,7 +170,7 @@ final class KesiapanTpService
             $detail . '#identitas-tp');
         self::tambahCek($hasil, 'cp', 'CP resmi aktif dan cocok', $validCp && $utama === 1,
             'Setiap CP harus aktif, Fase D, sesuai Mapel/Kurikulum, dengan tepat satu CP utama.',
-            $detail . '#checklist-konten-tp');
+            'guru/peta-atp');
 
         self::tambahCek($hasil, 'materi', 'Minimal satu Materi', count($materi) >= 1,
             'TP wajib memiliki paling sedikit satu Materi.', $detail . '#daftar-materi');
