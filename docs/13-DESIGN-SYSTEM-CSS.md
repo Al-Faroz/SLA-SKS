@@ -183,3 +183,13 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - **Tidak ada perubahan** `PdfMateriValidator.php`, `MateriService`, endpoint upload/pratinjau, otorisasi G1, .env, SQL, metadata media maupun batas PDF final. Catatan `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md` tetap berlaku.
 - QA manual: 360, 390, 768, 980, 1100 dan desktop; lihat TP dengan ≥4 Materi berbeda PDF/YouTube/Audio/Gambar, urutan naik/turun, preview, edit media, aksi hapus konfirmasi, TP Siap tanpa edit. Cek opsi file dan validasi PHP masih sama.
 
+
+## Audit responsivitas tahap D — Pratinjau Media Guru (24 Oktober 2026)
+
+- **Lingkup:** halaman `/guru/tp/{tpId}/materi/{materiId}/pratinjau`, mengikuti hasil FIX audit daftar Materi. Tambahkan navigasi cepat menuju daftar Materi (`#daftar-materi`), bagian media dan petunjuk Resume/HOTS. Tautan `Sunting Materi` muncul hanya ketika TP masih `draf`; seluruh tujuan menggunakan rute yang telah ada. Navigasi bukan pengganti breadcrumb kecil.
+- Bagian atas menampilkan jenis, urutan dan status Materi secara ringkas. Tombol atau label tidak menyamar sebagai aksi: tautan benar-benar menuju ID halaman atau endpoint yang tersedia.
+- Pratinjau **YouTube** dan **PDF** tetap menggunakan elemen `details` (tidak otomatis mengunduh/menjalankan pemutar sebelum dibuka), ukuran video proporsional 16:9. PDF disesuaikan tinggi viewport pada HP, tetapi tautan **Buka PDF di tab baru** tetap tersedia apabila browser tidak mendukung iframe. Jangan mengubah validator PDF 15 MB/40 halaman, konten berkas atau izin akses privat.
+- **Audio** tetap memakai `<audio controls preload="metadata">`, **Gambar** tetap `<img>` berukuran proporsional, keduanya tidak boleh menyebabkan scroll horizontal pada HP.
+- Petunjuk **Resume** dan **HOTS** satu kolom pada HP/tablet dan dua kolom pada desktop ≥1100px, mempertahankan isi teks yang di-escape. Karena view memakai `nl2br`, teks kegiatan tidak boleh ditambahkan `white-space:pre-wrap` yang akan menduplikasi baris.
+- Style dibatasi pada kelas `a-pratinjau-*` agar tidak merombak pemutar publik, media siswa, form upload, atau kartu yang sudah FIX. Uji pada lebar 360/390/768/1100px; cek YouTube, PDF, audio, gambar, Materi Nonaktif, status TP Siap, link navigasi, keyboard, dan browser tanpa pemutar PDF.
+
