@@ -60,8 +60,9 @@ final class ProgresMediaMateriSiswaService
         $this->db->transBegin();
         try {
             $progresId = (int) $ctx['progres']['id'];
+            $lock = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
             $p = $this->db->query(
-                'SELECT id,status,versi_konten_tp_id FROM progres_tp WHERE id=? FOR UPDATE',
+                'SELECT id,status,versi_konten_tp_id FROM progres_tp WHERE id=?' . $lock,
                 [$progresId]
             )->getRowArray();
             if (!$p || $p['status'] !== 'belajar'
@@ -70,7 +71,7 @@ final class ProgresMediaMateriSiswaService
                 throw new DomainException('Status atau versi TP berubah. Muat ulang halaman.');
             }
             $row = $this->db->query(
-                'SELECT * FROM progres_materi WHERE progres_tp_id=? AND materi_id=? AND versi_konten_tp_id=? FOR UPDATE',
+                'SELECT * FROM progres_materi WHERE progres_tp_id=? AND materi_id=? AND versi_konten_tp_id=?' . $lock,
                 [$progresId, $materiId, (int) $p['versi_konten_tp_id']]
             )->getRowArray();
             if ($row !== null && $row['jenis'] !== $jenis) {
