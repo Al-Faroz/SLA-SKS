@@ -77,6 +77,12 @@ final class GuruMateri extends BaseController
             ->with($sukses ? 'sukses' : 'galat', $pesan);
     }
 
+    private function kembaliTambah(int $tpId, string $pesan, bool $sukses = false): RedirectResponse
+    {
+        return redirect()->to(site_url('guru/tp/' . $tpId) . '#tambah-materi')
+            ->with($sukses ? 'sukses' : 'galat', $pesan);
+    }
+
     public function tambah(int $tpId): RedirectResponse
     {
         $data = $this->formulir();
@@ -85,11 +91,11 @@ final class GuruMateri extends BaseController
             $panjang = (int) $this->request->getHeaderLine('Content-Length');
             $batasPost = $this->batasPhpByte((string) ini_get('post_max_size'));
             if ($panjang > 0 && $batasPost > 0 && $panjang > $batasPost) {
-                return $this->kembali($tpId,
+                return $this->kembaliTambah($tpId,
                     'Ukuran unggahan melebihi batas post_max_size PHP (' . ini_get('post_max_size')
                     . '). Periksa pengaturan PHP XAMPP bersama pengelola server.');
             }
-            return $this->kembali($tpId, 'Formulir Materi tidak lengkap atau sudah berubah. Periksa semua kolom, lalu muat ulang jika perlu.');
+            return $this->kembaliTambah($tpId, 'Formulir Materi tidak lengkap atau sudah berubah. Periksa semua kolom, lalu muat ulang jika perlu.');
         }
         try {
             if (in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
@@ -104,12 +110,12 @@ final class GuruMateri extends BaseController
             } else {
                 (new MateriDrafService())->tambah($tpId, $versi, $data);
             }
-            return $this->kembali($tpId, 'Materi draf dan sumber belajar berhasil disimpan. Materi masih nonaktif.', true);
+            return $this->kembaliTambah($tpId, 'Materi draf dan sumber belajar berhasil disimpan. Materi masih nonaktif.', true);
         } catch (DomainException $e) {
-            return $this->kembali($tpId, $e->getMessage());
+            return $this->kembaliTambah($tpId, $e->getMessage());
         } catch (Throwable $e) {
             log_message('error', 'Tambah Materi beserta media gagal: ' . get_class($e));
-            return $this->kembali($tpId, 'Gagal menyimpan Materi/media. Periksa file, izin writable dan konfigurasi upload PHP.');
+            return $this->kembaliTambah($tpId, 'Gagal menyimpan Materi/media. Periksa file, izin writable dan konfigurasi upload PHP.');
         }
     }
 
