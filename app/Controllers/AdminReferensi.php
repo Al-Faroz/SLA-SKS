@@ -81,8 +81,16 @@ final class AdminReferensi extends BaseController
         if ($pilihan !== null && (! is_string($pilihan) || ! ctype_digit($pilihan) || (int) $pilihan < 1)) {
             return redirect()->to(site_url('admin/mapel-guru'))->with('galat', 'Pilih Gen yang tersedia.');
         }
+        // Dua daftar mempunyai parameter halaman terpisah, tanpa mengganggu filter Gen.
+        $halamanMapel = $this->request->getGet('halaman_mapel');
+        $halamanRiwayat = $this->request->getGet('halaman_riwayat');
+        $page = static fn ($nilai): int => is_string($nilai) && ctype_digit($nilai)
+            ? max(1, (int) $nilai) : 1;
         try {
-            $data = $this->service()->daftarMapel($pilihan === null ? null : (int) $pilihan);
+            $data = $this->service()->daftarMapel(
+                $pilihan === null ? null : (int) $pilihan,
+                $page($halamanMapel), $page($halamanRiwayat)
+            );
         } catch (DomainException $e) {
             return redirect()->to(site_url('admin/mapel-guru'))->with('galat', $e->getMessage());
         }
@@ -111,7 +119,13 @@ final class AdminReferensi extends BaseController
     {
         $masukan = $this->masukan('guru_id');
         $guruId = $masukan === '' ? null : (ctype_digit($masukan) ? (int) $masukan : -1);
-        $kembali = site_url('admin/mapel-guru') . '?gen=' . $angkatanId;
+        $page = static fn ($nilai): int => is_string($nilai) && ctype_digit($nilai)
+            ? max(1, (int) $nilai) : 1;
+        $kembali = site_url('admin/mapel-guru') . '?' . http_build_query([
+            'gen' => $angkatanId,
+            'halaman_mapel' => $page($this->request->getPost('halaman_mapel')),
+            'halaman_riwayat' => $page($this->request->getPost('halaman_riwayat')),
+        ]) . '#judul-pengampu';
 
         try {
             $this->service()->tetapkanGuru($mapelId, $angkatanId, $guruId, $this->masukan('alasan'));
