@@ -1,0 +1,60 @@
+name: QA S06A Fondasi Mesin Ujian Ketat
+
+on:
+  pull_request:
+    paths:
+      - 'database/sql/updates/0015_mesin_ujian_fondasi.sql'
+      - 'database/sql/README.md'
+      - 'app/Services/AturanWaktuUjianService.php'
+      - 'app/Services/SusunButirUjianService.php'
+      - 'tests/unit/AturanWaktuUjianServiceTest.php'
+      - 'tests/unit/SusunButirUjianServiceTest.php'
+      - 'tests/integration/SqlUjianSchemaCheck.php'
+      - '.github/workflows/qa-s06a-mesin-ujian.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: testroot
+          MARIADB_DATABASE: sla_s06_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      SLA_TEST_DB_DSN: 'mysql:dbname=sla_s06_test;host=127.0.0.1;port=3306;charset=utf8mb4'
+      SLA_TEST_DB_USER: root
+      SLA_TEST_DB_PASS: testroot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, pdo_mysql, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Composer install
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/AturanWaktuUjianService.php
+          php -l app/Services/SusunButirUjianService.php
+          php -l tests/unit/AturanWaktuUjianServiceTest.php
+          php -l tests/unit/SusunButirUjianServiceTest.php
+          php -l tests/integration/SqlUjianSchemaCheck.php
+      - name: Unit test waktu Ketat dan acak opsi
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/SusunButirUjianServiceTest.php
+      - name: Impor patch SQL pada MariaDB sintetis
+        run: php tests/integration/SqlUjianSchemaCheck.php
