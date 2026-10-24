@@ -147,6 +147,12 @@ final class CpDaftarService
         if (count($rows) > 5000) {
             throw new DomainException('Hasil ekspor melebihi 5.000 CP. Persempit filter sebelum mengunduh.');
         }
+        return self::buatBerkas($rows);
+    }
+
+    /** Membangun XLSX menggunakan teks eksplisit, bukan formula yang dapat dieksekusi. */
+    public static function buatBerkas(array $rows): string
+    {
         $xlsx = new Spreadsheet();
         try {
             $sheet = $xlsx->getActiveSheet();
