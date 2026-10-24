@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Services\KatalogPembelajaranSiswaService;
 use CodeIgniter\Database\BaseConnection;
-use DomainException;
 use PHPUnit\Framework\TestCase;
 
 /**
