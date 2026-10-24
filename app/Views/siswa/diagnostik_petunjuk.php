@@ -92,13 +92,20 @@
                 </p>
             </div>
         <?php endif ?>
-        <div class="a-alert" role="status">
-            <strong>Pelaksanaan Diagnostik belum diaktifkan.</strong>
-            Halaman ini hanya menilai kesiapan data dan kemampuan fullscreen.
-            Tidak membuat percobaan, menampilkan soal/kunci, menghitung skor,
-            atau mencatat pelanggaran. Kemampuan fullscreen harus diperiksa
-            kembali pada saat ujian benar-benar dimulai.
-        </div>
+        <?php if ($boleh_uji): ?>
+            <div class="a-alert" role="status">
+                <strong>Diagnostik sudah tersedia.</strong>
+                Gunakan tombol berikut untuk membuka ruang ujian khusus tanpa sidebar.
+                Percobaan baru dibuat setelah fullscreen berhasil dimasuki dari ruang ujian,
+                bukan saat membuka petunjuk ini.
+            </div>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/diagnostik/ujian'), 'attr') ?>">
+                Masuk ruang Tes Diagnostik
+            </a>
+        <?php else: ?>
+            <p class="a-help">Ruang ujian belum bisa dimasuki sampai seluruh persyaratan server terpenuhi.</p>
+        <?php endif ?>
     </section>
     <p class="a-kesiapan-kembali">
         <a class="a-btn a-btn--sekunder"
