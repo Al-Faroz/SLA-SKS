@@ -1248,3 +1248,69 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-diagnostik-tombol button { flex:1 1 100%; }
     .a-diagnostik-petunjuk { padding-left:20px; }
 }
+
+/* S06B Ujian Ketat: shell mandiri, tanpa navigasi samping ataupun elemen dashboard. */
+.a-ujian-halaman { margin:0; min-height:100vh; background:#edf3f6; }
+.a-ujian { max-width:1180px; min-height:100vh; margin:0 auto; padding:16px 24px 32px; color:#162d32; }
+.a-ujian [hidden] { display:none!important; }
+.a-ujian-header { display:flex; justify-content:space-between; align-items:center; gap:18px;
+    border-radius:12px; padding:14px 20px; background:#fff; border:1px solid #d6e4df; }
+.a-ujian-logo { display:block; font-weight:800; color:#16583f; }
+.a-ujian-subtitle { margin:4px 0 0; font-size:.9rem; overflow-wrap:anywhere; }
+.a-ujian-meter { flex-shrink:0; display:flex; flex-direction:column; gap:2px; text-align:center;
+    padding:8px 15px; border-radius:9px; background:#e8f6ec; }
+.a-ujian-meter span { font-size:.78rem; }
+.a-ujian-meter strong { font-size:1.45rem; font-variant-numeric:tabular-nums; color:#145a3d; }
+.a-ujian-sambutan,.a-ujian-kerja,.a-ujian-hasil { margin-top:16px; padding:24px;
+    border-radius:12px; border:1px solid #d6e4df; background:#fff; }
+.a-ujian-sambutan { max-width:750px; margin-inline:auto; }
+.a-ujian-sambutan h1,.a-ujian-hasil h1 { margin:0 0 12px; font-size:1.5rem; }
+.a-ujian-sambutan p { line-height:1.65; }
+.a-ujian-sambutan .a-btn { margin:8px 8px 8px 0; }
+.a-ujian-peringatan { background:#fff4df; border:1px solid #e6d2a5; border-radius:9px; padding:12px; }
+.a-ujian-statusbar { display:flex; flex-wrap:wrap; justify-content:space-between;
+    align-items:center; gap:9px; font-size:.88rem; color:#395d4d; margin-bottom:14px; }
+.a-ujian-soal { border:1px solid #dde8e2; border-radius:10px; padding:20px; }
+.a-ujian-soal h1 { font-size:1.12rem; margin:0 0 16px; }
+.a-ujian-pertanyaan { line-height:1.65; overflow-wrap:anywhere; margin-bottom:17px; }
+.a-ujian-opsi { border:0; padding:0; margin:0; display:grid; gap:9px; min-width:0; }
+.a-ujian-opsi legend { font-weight:700; margin-bottom:12px; }
+.a-ujian-pilihan { border:1px solid #d6e6dd; border-radius:9px; display:flex; gap:12px;
+    align-items:flex-start; padding:12px 15px; cursor:pointer; line-height:1.5;
+    min-width:0; overflow-wrap:anywhere; }
+.a-ujian-pilihan:has(input:checked) { border-color:#198154; background:#eaf6ef; }
+.a-ujian-pilihan input { flex-shrink:0; margin-top:5px; }
+.a-ujian-pilihan strong { flex-shrink:0; }
+.a-ujian-pilihan > span { min-width:0; flex:1; }
+.a-ujian-pertanyaan :is(img,table),.a-ujian-pilihan :is(img,table) { max-width:100%; }
+.a-ujian-pertanyaan img,.a-ujian-pilihan img { height:auto; object-fit:contain; }
+.a-ujian-pertanyaan table,.a-ujian-pilihan table { display:block; overflow-x:auto; border-collapse:collapse; }
+.a-ujian-pertanyaan :is(td,th),.a-ujian-pilihan :is(td,th) {
+    padding:7px; border:1px solid #d9e6df; }
+.a-ujian-navigator { display:grid; gap:14px; margin-top:18px; }
+.a-ujian-navigator > div:first-child { display:flex; flex-wrap:wrap; gap:6px; }
+.a-ujian-navbutir { min-width:40px; min-height:40px; border-radius:8px;
+    border:1px solid #c6d9ce; background:#fff; color:#265440; font-weight:700; cursor:pointer; }
+.a-ujian-navbutir.is-terjawab { border-color:#168258; background:#e5f4eb; }
+.a-ujian-navbutir.is-aktif { background:#145e42; color:#fff; }
+.a-ujian-navaksi { display:flex; flex-wrap:wrap; gap:8px; }
+.a-ujian-navaksi .a-btn { min-height:42px; white-space:normal; }
+.a-ujian-overlay { position:fixed; inset:0; z-index:9999; display:grid;
+    place-items:center; background:#172b30f0; padding:16px; }
+.a-ujian-overlay__isi { max-width:540px; width:100%; padding:28px;
+    background:#fff; border-radius:14px; box-shadow:0 12px 42px #0004; }
+.a-ujian-overlay__isi h2 { margin:0 0 16px; }
+.a-ujian-overlay__isi p { line-height:1.6; }
+.a-ujian-skor { font-size:1.5rem; font-weight:800; color:#165d40; }
+@media(max-width:700px) {
+    .a-ujian { padding:8px 10px 22px; }
+    .a-ujian-header { padding:10px 12px; flex-wrap:wrap; }
+    .a-ujian-kerja,.a-ujian-sambutan,.a-ujian-hasil { padding:15px; }
+    .a-ujian-soal { padding:12px; }
+    .a-ujian-navaksi .a-btn { flex:1 1 46%; }
+}
+@media(max-width:390px) {
+    .a-ujian-navaksi .a-btn { flex:1 1 100%; }
+    .a-ujian-meter { width:100%; }
+    .a-ujian-pilihan { padding:10px; }
+}
