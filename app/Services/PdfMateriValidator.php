@@ -7,11 +7,15 @@ namespace App\Services;
 use DomainException;
 
 /**
- * PDF konservatif untuk hosting PHP tanpa binary/extension tambahan.
- * Hanya PDF klasik dengan tabel xref dan objek eksplisit diterima;
- * PDF terkompresi ObjStm, revisi inkremental, aksi aktif, dan formulir ditolak.
- * OpenAction tujuan tampilan halaman yang tervalidasi bukan aksi aktif.
- * Fail-closed: format yang tidak bisa diaudit tidak boleh dipublikasikan.
+ * PDF bahan belajar: batas biaya penyimpanan 15 MiB / 40 halaman.
+ *
+ * Pemeriksaan keamanan hanya menolak aksi aktif, enkripsi dan file yang
+ * tidak dapat dibaca. Revisi inkremental, navigasi halaman, hyperlink,
+ * anotasi, metadata Content Credentials serta filter gambar yang normal
+ * bukan alasan penolakan.
+ *
+ * Parser terbatas ke pohon halaman yang tercatat sebagai objek eksplisit.
+ * Objek terkompresi (ObjStm) tidak dilonggarkan tanpa parser yang aman.
  */
 final class PdfMateriValidator
 {
@@ -22,133 +26,159 @@ final class PdfMateriValidator
             throw new DomainException('PDF maksimal 15 MB dan tidak boleh kosong.');
         }
         $pdf = @file_get_contents($path);
-        if (! is_string($pdf) || ! preg_match('/^%PDF-1\.[0-7](?:\r\n|\n|\r)/', $pdf)) {
-            throw new DomainException('Header PDF tidak dikenali.');
-        }
-        // Jangan hitung token "%%EOF" atau "startxref" di seluruh berkas.
-        // Data gambar/stream PDF adalah biner dan dapat memuat byte yang sama.
-        $polaAkhir = '/(?:\A|[\r\n])startxref[ \t]*[\r\n]+([0-9]+)[ \t]*[\r\n]+%%EOF[ \t]*(?:\r?\n)?\z/D';
-        $penutup = preg_match_all(
-            '/(?:\A|[\r\n])startxref[ \t]*[\r\n]+[0-9]+[ \t]*[\r\n]+%%EOF(?=[ \t\r\n]|\z)/',
-            $pdf
-        );
-        if ($penutup === false || $penutup > 1) {
-            self::catatMasalahAkhir($pdf, 'multiple_end_markers');
-            throw new DomainException('PDF memiliki lebih dari satu revisi struktural atau penutup yang tidak sah.');
-        }
-        if (preg_match($polaAkhir, $pdf, $matches) !== 1) {
-            self::catatMasalahAkhir($pdf, 'invalid_final_trailer');
-            throw new DomainException('Penutup berkas PDF yang diterima server tidak terbaca. Pastikan unggahan lengkap.');
-        }
-        $xref = (int) $matches[1];
-        if ($xref < 1 || $xref >= $size || substr($pdf, $xref, 4) !== 'xref') {
-            throw new DomainException('Tabel indeks PDF tidak valid atau format PDF belum didukung.');
-        }
-        // PDF buatan jsPDF/Word dapat memuat /OpenAction berupa tujuan tampilan
-        // halaman saat dibuka (mis. [3 0 R /FitH null]). Ini BUKAN skrip.
-        // Hanya whitelist yang menunjuk langsung ke objek /Page diterima;
-        // dictionary action, JavaScript, URL dan instruksi lain tetap ditolak.
-        $openActionPage = null;
-        $untukPemeriksaan = $pdf;
-        if (preg_match_all('~/OpenAction\\b~', $pdf, $openActions) > 0) {
-            if (count($openActions[0]) !== 1
-                || preg_match(
-                    '~/OpenAction\\s*\\[\\s*(\\d+)\\s+(\\d+)\\s+R\\s+/(FitH|FitV|FitBH|FitBV|Fit|FitB)(?=\\s|\\])(?:(\\s+)null)?\\s*\\]~',
-                    $pdf,
-                    $destinasi,
-                    PREG_OFFSET_CAPTURE
-                ) !== 1) {
-                throw new DomainException('PDF menggunakan aksi saat dibuka yang tidak didukung.');
-            }
-            $mode = $destinasi[3][0];
-            $memakaiNull = isset($destinasi[4]) && $destinasi[4][1] >= 0;
-            if ($memakaiNull !== in_array($mode, ['FitH', 'FitV', 'FitBH', 'FitBV'], true)) {
-                throw new DomainException('Tujuan tampilan awal PDF tidak valid.');
-            }
-            $openActionPage = $destinasi[1][0] . ':' . $destinasi[2][0];
-            $offset = $destinasi[0][1];
-            // Hilangkan hanya token aman dari pemindaian larangan aksi.
-            // File asli TIDAK diubah; disimpan utuh setelah pemeriksaan.
-            $untukPemeriksaan = substr_replace(
-                $pdf,
-                str_repeat(' ', strlen($destinasi[0][0])),
-                $offset,
-                strlen($destinasi[0][0])
-            );
+        if (! is_string($pdf) || ! preg_match('/^%PDF-(?:1\.[0-7]|2\.0)(?:\r\n|\r|\n)/', $pdf)) {
+            throw new DomainException('File bukan PDF yang dapat dibaca.');
         }
 
-        // Semua struktur di luar stream diperiksa sebagai objek eksplisit.
-        // Bentuk ini dengan sengaja menolak ObjStm/XRef stream dan filter ambigu.
-        if (preg_match('~/\\s*(?:ObjStm|XRef|Encrypt|Prev|JavaScript|JS|OpenAction|AA|Launch|EmbeddedFile|Filespec|AcroForm|XFA|RichMedia|Movie|Sound|Rendition|GoToR|SubmitForm|ImportData|URI|Annots|Names|Collection|Perms|3D)\\b~i', $untukPemeriksaan)
-            || preg_match('~/[A-Za-z0-9]*\\#[0-9a-fA-F]{2}~', $untukPemeriksaan)
-            || preg_match('~/Filter\\s*\\[(?!\\s*/FlateDecode\\s*\\])~', $untukPemeriksaan)
-            || str_contains($untukPemeriksaan, '/ObjStm')
-            || str_contains($untukPemeriksaan, '/XRef')) {
-            throw new DomainException('PDF mengandung fitur aktif atau struktur yang belum diizinkan.');
+        // Baca trailer TERAKHIR; EOF sebelumnya dapat berasal dari revisi sah.
+        if (preg_match('/(?:\A|[\r\n])startxref[ \t]*[\r\n]+(\d+)[ \t]*[\r\n]+%%EOF[ \t]*(?:\r?\n)?\z/D', $pdf, $akhir) !== 1) {
+            throw new DomainException('PDF tidak lengkap atau rusak. Pilih file PDF yang dapat dibuka.');
         }
-        $tanpaStream = preg_replace('/\bstream\r?\n.*?\r?\nendstream\b/s', '\n', $pdf);
+        $xref = (int) $akhir[1];
+        if ($xref < 1 || $xref >= $size) {
+            throw new DomainException('PDF tidak lengkap atau rusak.');
+        }
+        if (substr($pdf, $xref, 4) !== 'xref'
+            && ! preg_match('/^\d+\s+\d+\s+obj\b.{0,500}\/Type\s*\/XRef\b/s', substr($pdf, $xref, 700))) {
+            throw new DomainException('Struktur file PDF tidak dapat dibaca.');
+        }
+
+        // Jangan lakukan penyisiran aksi pada byte stream gambar/audio
+        // yang bisa berisi token seperti nama PDF secara kebetulan.
+        $tanpaStream = preg_replace('/\bstream\r?\n.*?\r?\nendstream\b/s', ' ', $pdf);
         if (! is_string($tanpaStream)) {
-            throw new DomainException('Isi PDF tidak dapat diperiksa.');
+            throw new DomainException('File PDF tidak dapat dibaca.');
         }
-        preg_match_all('/(?:^|\r?\n)(\d+)\s+(\d+)\s+obj\b(.*?)\bendobj\b/s', $tanpaStream, $objects, PREG_SET_ORDER);
-        if (count($objects) < 3 || count($objects) > 10000) {
-            throw new DomainException('Struktur objek PDF tidak dikenali.');
+        $namaTerurai = preg_replace_callback(
+            '~/(?:[^\x00-\x20<>\[\](){}%/])+~',
+            static function (array $m): string {
+                return (string) preg_replace_callback('/#([0-9a-fA-F]{2})/',
+                    static fn (array $h): string => chr(hexdec($h[1])), $m[0]);
+            },
+            $tanpaStream
+        );
+        if (! is_string($namaTerurai)) {
+            throw new DomainException('File PDF tidak dapat dibaca.');
         }
 
-        $halaman = 0;
-        $jumlahRoot = false;
-        $ids = [];
-        $halamanIds = [];
-        foreach ($objects as $o) {
-            $id = $o[1] . ':' . $o[2];
-            if (isset($ids[$id])) {
-                throw new DomainException('Objek PDF memiliki versi ganda.');
+        // Enkripsi/skrip dan instruksi aksi aktif tetap tidak diizinkan.
+        // URI, bookmark, anotasi, metadata C2PA dan revisi biasa diperbolehkan.
+        if (preg_match('~/(?:Encrypt|JavaScript|JS|AA|Launch|SubmitForm|ImportData|GoToR|RichMedia|Rendition|XFA)\b~i', $namaTerurai)) {
+            throw new DomainException('PDF memuat skrip atau aksi otomatis yang tidak diizinkan.');
+        }
+        if (preg_match('~/ObjStm\b~', $namaTerurai)) {
+            // Tanpa decoder ObjStm, aksi tersembunyi tak dapat diaudit.
+            throw new DomainException('Halaman PDF tidak dapat diperiksa. Gunakan PDF biasa yang dapat dibaca.');
+        }
+
+        preg_match_all('/(?:^|[\r\n])\s*(\d+)\s+(\d+)\s+obj\b(.*?)\bendobj\b/s',
+            $tanpaStream, $hasil, PREG_SET_ORDER);
+        if (count($hasil) < 3 || count($hasil) > 20000) {
+            throw new DomainException('Struktur halaman PDF tidak dapat diperiksa.');
+        }
+        $objects = [];
+        foreach ($hasil as $obj) {
+            // Revisi inkremental sah dapat memperbarui objek yang sama.
+            // Objek pada revisi terakhir adalah versi yang berlaku.
+            $objects[$obj[1] . ':' . $obj[2]] = $obj[3];
+        }
+        preg_match_all('~/Root\s+(\d+)\s+(\d+)\s+R\b~', $namaTerurai, $roots, PREG_SET_ORDER);
+        if ($roots === []) {
+            throw new DomainException('PDF tidak memiliki katalog halaman yang dapat dibaca.');
+        }
+        $root = end($roots);
+        $idKatalog = $root[1] . ':' . $root[2];
+        $katalog = $objects[$idKatalog] ?? '';
+        if (! preg_match('~/Type\s*/Catalog\b~', $katalog)
+            || ! preg_match('~/Pages\s+(\d+)\s+(\d+)\s+R\b~', $katalog, $pages)) {
+            throw new DomainException('PDF tidak memiliki katalog halaman yang dapat dibaca.');
+        }
+
+        $sudahDikunjungi = [];
+        $halamanDitemukan = [];
+        $jumlah = self::hitungHalaman($pages[1] . ':' . $pages[2], $objects,
+            $sudahDikunjungi, $halamanDitemukan, 0);
+        if ($jumlah < 1 || $jumlah > 40) {
+            throw new DomainException('PDF harus berisi 1–40 halaman.');
+        }
+
+        // OpenAction berbentuk tujuan tampilan saja (Fit / XYZ) tidak
+        // menjalankan kode. Dictionary tindakan tetap ditolak.
+        preg_match_all('~/OpenAction\b~', $namaTerurai, $semuaOpen);
+        preg_match_all(
+            '~(/OpenAction\s*\[\s*(\d+)\s+(\d+)\s+R\s+/(FitBH|FitBV|FitH|FitV|FitB|Fit|XYZ)\b([^\]]*)\])~',
+            $namaTerurai, $tujuan, PREG_SET_ORDER
+        );
+        if (count($semuaOpen[0]) !== count($tujuan)) {
+            throw new DomainException('PDF memuat aksi otomatis yang tidak diizinkan.');
+        }
+        foreach ($tujuan as $t) {
+            $referensi = $t[2] . ':' . $t[3];
+            $argumen = trim($t[5]);
+            $arg = $argumen === '' ? [] : preg_split('/\s+/', $argumen);
+            $angkaAtauNull = static fn (string $x): bool =>
+                $x === 'null' || preg_match('/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/D', $x) === 1;
+            $jumlahArg = match ($t[4]) {
+                'Fit', 'FitB' => 0,
+                'XYZ' => 3,
+                default => 1,
+            };
+            if (! isset($halamanDitemukan[$referensi])
+                || count($arg) !== $jumlahArg
+                || array_filter($arg, static fn ($x): bool => ! $angkaAtauNull($x)) !== []) {
+                throw new DomainException('Navigasi awal PDF tidak dapat dibaca.');
             }
-            $ids[$id] = true;
-            $dict = $o[3];
-            if (preg_match('~/Type\s*/Page(?![A-Za-z])~', $dict)) {
-                if (! preg_match('~/Parent\s+\d+\s+\d+\s+R\b~', $dict)) {
-                    throw new DomainException('Halaman PDF tidak memiliki induk.');
-                }
-                ++$halaman;
-                $halamanIds[$id] = true;
-            } elseif (preg_match('~/Type\s*/Pages\b~', $dict)
-                && preg_match('~/Count\s+(\d+)\b~', $dict, $cnt)) {
-                $jumlahRoot = $jumlahRoot || (int) $cnt[1] === $halaman;
-                // Verified separately after full scan.
-                $counts[] = (int) $cnt[1];
-            }
         }
-        if ($openActionPage !== null && ! isset($halamanIds[$openActionPage])) {
-            throw new DomainException('Tujuan tampilan awal PDF tidak mengarah pada halaman dokumen.');
-        }
-        $counts = $counts ?? [];
-        if ($halaman < 1 || $halaman > 40 || ! in_array($halaman, $counts, true)) {
-            throw new DomainException('PDF harus berisi 1–40 halaman dengan daftar halaman konsisten.');
-        }
-        if (! preg_match('~/Root\s+\d+\s+\d+\s+R\b~', substr($pdf, $xref))) {
-            throw new DomainException('PDF tidak memiliki katalog dokumen yang valid.');
-        }
-        return $halaman;
+        return $jumlah;
     }
 
     /**
-     * Diagnostik privat untuk membandingkan PDF yang diterima Apache dengan
-     * berkas asli. Tidak mencatat konten maupun nama dokumen pengguna.
+     * Hitung LEAF halaman berdasarkan /Kids aktif, bukan jumlah marker
+     * biner atau Count yang bisa saja keliru pada revisi lama.
+     *
+     * @param array<string,string> $objects
+     * @param array<string,bool> $visited
+     * @param array<string,bool> $pages
      */
-    private static function catatMasalahAkhir(string $pdf, string $alasan): void
-    {
-        if (! function_exists('log_message')) {
-            return;
+    private static function hitungHalaman(
+        string $ref,
+        array $objects,
+        array &$visited,
+        array &$pages,
+        int $depth
+    ): int {
+        if ($depth > 32 || isset($visited[$ref]) || ! isset($objects[$ref])) {
+            throw new DomainException('Struktur halaman PDF tidak dapat diperiksa.');
         }
-        log_message(
-            'warning',
-            '[MATERI-PDF] alasan=' . $alasan
-                . ' bytes=' . strlen($pdf)
-                . ' sha256=' . hash('sha256', $pdf)
-                . ' eof_literal=' . substr_count($pdf, '%%EOF')
-                . ' startxref_literal=' . substr_count($pdf, 'startxref')
-        );
+        $visited[$ref] = true;
+        $body = $objects[$ref];
+        if (preg_match('~/Type\s*/Page(?![A-Za-z])~', $body)) {
+            if (! preg_match('~/Parent\s+\d+\s+\d+\s+R\b~', $body)) {
+                throw new DomainException('Struktur halaman PDF tidak lengkap.');
+            }
+            $pages[$ref] = true;
+            return 1;
+        }
+        if (! preg_match('~/Type\s*/Pages\b~', $body)
+            || ! preg_match('~/Kids\s*\[(.*?)\]~s', $body, $kids)) {
+            throw new DomainException('Daftar halaman PDF tidak dapat dibaca.');
+        }
+        preg_match_all('/(\d+)\s+(\d+)\s+R\b/', $kids[1], $children, PREG_SET_ORDER);
+        if ($children === [] || count($children) > 10000) {
+            throw new DomainException('Daftar halaman PDF tidak valid.');
+        }
+        $total = 0;
+        foreach ($children as $child) {
+            $total += self::hitungHalaman($child[1] . ':' . $child[2],
+                $objects, $visited, $pages, $depth + 1);
+            if ($total > 40) {
+                throw new DomainException('PDF melebihi batas 40 halaman.');
+            }
+        }
+        if (preg_match('~/Count\s+(\d+)\b~', $body, $jumlahTercatat)
+            && (int) $jumlahTercatat[1] !== $total) {
+            throw new DomainException('Jumlah halaman PDF tidak konsisten.');
+        }
+        return $total;
     }
-
 }
