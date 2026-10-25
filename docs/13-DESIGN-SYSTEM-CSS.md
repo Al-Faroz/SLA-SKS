@@ -296,3 +296,15 @@ Setelah Diagnostik menghasilkan `progres_tp.status=belajar`, halaman Rincian TP 
 - Tampilan memakai CSS prefiks `a-pembaca-*` dan `a-materi-lanjut`, responsif HP/laptop, tanpa Bootstrap/React/Vue. Tidak ada patch SQL; tidak menyentuh fitur ujian/hasil diagnostik maupun validasi upload PDF 15MB/40 halaman.
 - QA: uji siswa `tuntas` dapat berpindah Materi 1→2 tanpa waktu; `belajar` tidak dapat membuka Materi 2; Materi terakhir tidak menyediakan tautan selanjutnya; PDF dan gambar fullscreen/ESC, gambar zoom 50–300% dan reset; mode HP, browser yang menolak fullscreen, scrollbar dan heartbeat setelah zoom.
 
+
+## Koreksi S08C — Zoom gambar presisi (25 Oktober 2026)
+
+Perbaikan laporan XAMPP: zoom sebelumnya melakukan `img.style.width = zoom + '%'`, yaitu persentase **lebar area pembaca**, bukan perbesaran relatif ke gambar yang pas di layar. Hal ini menyebabkan gambar kecil/portrait terdistorsi secara pengalaman, serta posisi baca bergeser saat zoom/fullscreen.
+
+- Pembaca kini menghitung **skala muat** berdasarkan `naturalWidth`/`naturalHeight` dan kedua dimensi viewport (`min(1, areaW/imageW, areaH/imageH)`). Pada 100% seluruh gambar terlihat dan tidak dipaksa membesar melewati resolusi asli.
+- Tombol 50–300% mengubah **ukuran piksel hasil skala muat** pada stage pusat; scroll horizontal/vertikal tersedia saat gambar melebihi viewport. Perubahan zoom mempertahankan pusat gambar yang sedang dibaca, bukan selalu ke pojok kiri atas.
+- `ResizeObserver` menghitung ulang pada perubahan lebar/tinggi pembaca; event `fullscreenchange` menghitung ulang setelah layout fullscreen berubah. Fullscreen PDF yang sudah FIX tidak diubah.
+- Tombol plus/minus/reset, keyboard +/−/0, Ctrl+scroll, dan drag mouse pada gambar yang lebih besar dapat dipakai; interaksi sentuh mempertahankan scroll asli. Gambar yang belum/salah dimuat tidak dapat di-zoom dan menampilkan galat. File asli tidak dimodifikasi.
+- Area aktivitas `data-gambar-observer` S08B, izin Media Gen, nilai, status Diagnostik, timer resmi dan SQL **tidak berubah**. Kontrol presentasi zoom tidak menandai durasi atau ketuntasan.
+- Pengujian ditambah JavaScript **perilaku** (Node vm: lanskap/potret/gambar kecil, ukuran 100–300%, scroll, fullscreen, zoom terpusat, Ctrl+wheel/keyboard, gagal muat), di samping PHP/SQLite regresi. **Uji XAMPP browser tetap diperlukan** pada gambar sebenarnya serta Ctrl+F5 bila aset cache masih versi lama.
+

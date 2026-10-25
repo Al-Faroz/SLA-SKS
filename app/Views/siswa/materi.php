@@ -81,10 +81,12 @@
                         aria-pressed="false">Layar penuh</button>
                 </div>
                 <div class="a-pembaca-gambar-frame" data-gambar-observer tabindex="0"
-                    aria-label="Area gambar yang dapat digulir ketika diperbesar">
-                    <img data-gambar-materi src="<?= esc($media_url, 'attr') ?>"
-                        alt="Gambar materi <?= esc($materi['judul'], 'attr') ?>"
-                        loading="lazy">
+                    aria-label="Area gambar. Gunakan tombol zoom, lalu gulir untuk melihat detail gambar.">
+                    <div class="a-pembaca-gambar-stage" data-gambar-stage>
+                        <img data-gambar-materi src="<?= esc($media_url, 'attr') ?>"
+                            alt="Gambar materi <?= esc($materi['judul'], 'attr') ?>"
+                            draggable="false" loading="lazy">
+                    </div>
                 </div>
                 <p class="a-pembaca-pesan" data-pembaca-pesan role="status" aria-live="polite"></p>
             </div>
@@ -162,6 +164,6 @@
     <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (in_array($materi['jenis'], ['gambar', 'pdf'], true)): ?>
-    <script src="<?= esc(base_url('public/assets/js/pembaca-materi.js'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/pembaca-materi.js?v=20261025-zoom2'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?= $this->endSection() ?>

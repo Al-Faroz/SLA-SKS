@@ -1,0 +1,30 @@
+name: QA Perbaikan Zoom Gambar Siswa
+
+on:
+  pull_request:
+    paths:
+      - 'public/assets/js/pembaca-materi.js'
+      - 'public/assets/css/app.css'
+      - 'app/Views/siswa/materi.php'
+      - 'tests/js/zoom-gambar-materi.test.cjs'
+      - 'tests/unit/PembacaMateriNavigasiTest.php'
+      - '.github/workflows/qa-zoom-gambar-materi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zoom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Periksa sintaks pembaca gambar
+        run: |
+          node --check public/assets/js/pembaca-materi.js
+          node --check tests/js/zoom-gambar-materi.test.cjs
+      - name: Uji zoom, scroll, fullscreen, portrait dan landscape
+        run: node --test tests/js/zoom-gambar-materi.test.cjs
