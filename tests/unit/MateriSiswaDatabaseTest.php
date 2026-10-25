@@ -125,6 +125,10 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertFalse($all[1]['buka']);
         self::assertSame('PDF historis',$all[0]['judul']);
         self::assertSame('Tulis ringkasan',$this->svc()->lihat(1,31)['materi']['petunjuk_resume']);
+        $berikutnya=$this->svc()->lihat(1,31)['materi_berikutnya'];
+        self::assertSame(32,$berikutnya['id']);
+        self::assertFalse($berikutnya['boleh_buka']);
+        self::assertStringContainsString('HOTS',$berikutnya['alasan']);
         $this->expectException(\DomainException::class);
         $this->svc()->lihat(1,32);
     }
@@ -152,6 +156,10 @@ final class MateriSiswaDatabaseTest extends TestCase
         $detail=$this->svc(102)->lihat(1,32);
         self::assertStringContainsString('youtube-nocookie.com/embed/abcdefghijk',$detail['video_url']);
         self::assertNull($detail['media_url']);
+        $awal=$this->svc(102)->lihat(1,31);
+        self::assertSame(32,$awal['materi_berikutnya']['id']);
+        self::assertTrue($awal['materi_berikutnya']['boleh_buka']);
+        self::assertNull($detail['materi_berikutnya']);
     }
 
     public function testGenLainTidakDapatMembukaMedia(): void
