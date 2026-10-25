@@ -70,3 +70,7 @@ TP/Materi/soal **draf yang belum diterbitkan dan belum punya progres/percobaan**
 
 ## 9. UI Guru
 Ruang utama: **Pilih Gen–Mapel/Kurikulum → Peta ATP enam semester → Editor TP dan Materi → Bank Word Diagnostik/Sumatif → Checklist TP Siap**. Menampilkan status kosong/loading/error/locked, breadcrumb Gen–Mapel, pratinjau dan tautan memperbaiki. TP Siap hanya menawarkan Lihat, Riwayat Versi, Ajukan Koreksi, tidak `Tarik ke Draf`.
+
+### Audit keselarasan instruksi dan bank HOTS (25 Oktober 2026)
+
+Kontrak satu tugas HOTS per Materi pada §5–6 **tetap berlaku**. Kode saat audit menyimpan `materi.petunjuk_hots` dari editor Guru dan membekukannya ke snapshot siswa; `tugas_hots_materi` adalah bank perintah Guru; `jawaban_hots_materi` adalah jawaban siswa. Ini **tiga objek berbeda** yang tidak boleh tertukar. `KesiapanTpService` saat ini memeriksa petunjuk HOTS, belum memeriksa baris bank tugas Guru. Belum boleh menyimpulkan tugas lengkap atau mengubah readiness, TP Siap, snapshot terpin, dan progres tanpa memeriksa dump terbaru serta kontrak akademik §5–6. Temuan teknis, bukan perubahan aturan bisnis.
