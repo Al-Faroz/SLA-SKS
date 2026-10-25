@@ -17,6 +17,7 @@
     let ytMemutar = false;
     let gambarTerlihat = false;
     let resetPdf = true;
+    let memuatUlang = false;
     const statusEl = root.querySelector('[data-media-status]');
     const waktuEl = root.querySelector('[data-media-waktu]');
     const bilah = root.querySelector('[data-media-bilah]');
@@ -43,19 +44,51 @@
 
     function tampil(data) {
         selesai = data.media_selesai === true;
-        const secs = Number(data.waktu_aktif_detik) || 0;
+        const secs = Math.max(0, Number(data.waktu_aktif_detik) || 0);
         const required = Math.max(1, Number(data.minimal_detik) || 1);
-        bilah.value = Math.min(100, Math.floor(secs * 100 / required));
-        waktuEl.textContent = 'Waktu aktif tersimpan: ' + secs
-            + ' detik. Minimal: ' + required + ' detik.'
-            + (data.persen_putar_minimal ? ' Pemutaran minimal: 90% durasi.' : '');
-        if (jenis === 'pdf' && Number(data.halaman_total) > 0) {
-            waktuEl.textContent += ' Halaman selesai: ' + Number(data.halaman_selesai)
-                + '/' + Number(data.halaman_total) + '.';
+        const persentase = [secs / required];
+        const waktuCukup = secs >= required ? 'Terpenuhi' : 'Belum terpenuhi';
+        let rincian = 'Waktu belajar: ' + secs + '/' + required
+            + ' detik (' + waktuCukup + ').';
+
+        if (data.persen_putar_minimal) {
+            const target = Number(data.pemutaran_minimal_detik);
+            const putar = Math.max(0, Number(data.waktu_putar_detik) || 0);
+            const terjauh = Math.max(0, Number(data.posisi_terjauh_detik) || 0);
+            const durasi = Number(data.durasi_media_detik);
+            if (Number.isFinite(target) && target > 0) {
+                persentase.push(putar / target, terjauh / target);
+                rincian += ' Video/audio: durasi ' + durasi + ' detik; '
+                    + 'waktu putar diakui ' + putar + '/' + target + ' detik; '
+                    + 'posisi terjauh ' + terjauh + '/' + target
+                    + ' detik (syarat 90% durasi).';
+            } else {
+                persentase.push(0);
+                rincian += ' Menunggu metadata durasi video/audio untuk memeriksa syarat 90%.';
+            }
         }
+        if (jenis === 'pdf' && Number(data.halaman_total) > 0) {
+            const total = Math.max(1, Number(data.halaman_total));
+            const sudah = Math.max(0, Number(data.halaman_selesai) || 0);
+            persentase.push(sudah / total);
+            rincian += ' Halaman selesai: ' + sudah + '/' + total + '.';
+        }
+        // Bilah menunjukkan syarat yang paling tertinggal, bukan waktu saja.
+        bilah.value = selesai ? 100 : Math.min(99,
+            Math.max(0, Math.floor(100 * Math.min(...persentase))));
+        waktuEl.textContent = rincian;
+
         if (selesai) {
-            bilah.value = 100;
-            statusText('Media selesai dan tersimpan di server. Perbarui halaman untuk membuka Resume dan HOTS.');
+            statusText('Seluruh syarat media terpenuhi dan tersimpan di server.');
+            // Form dikendalikan server; buka melalui GET baru, bukan melewati gate via DOM.
+            if (!memuatUlang && document.querySelector('[data-kegiatan-tunggu-media]')) {
+                memuatUlang = true;
+                statusText('Media selesai. Membuka formulir Resume…');
+                window.location.reload();
+            }
+        } else if (data.persen_putar_minimal && secs >= required) {
+            statusText('Waktu belajar sudah cukup, tetapi pemutaran 90% durasi '
+                + 'belum terpenuhi. Terus putar video/audio dari pemutar.');
         } else {
             statusText(data.pesan || 'Menunggu aktivitas media.');
         }

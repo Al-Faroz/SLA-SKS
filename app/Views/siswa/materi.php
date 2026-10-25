@@ -121,7 +121,7 @@
                 data-csrf-hash="<?= esc(csrf_hash(), 'attr') ?>">
                 <h3>Aktivitas belajar</h3>
                 <p data-media-status role="status" aria-live="polite">Memeriksa progres media…</p>
-                <progress data-media-bilah value="0" max="100" aria-label="Kemajuan waktu belajar"></progress>
+                <progress data-media-bilah value="0" max="100" aria-label="Kemajuan keseluruhan syarat media"></progress>
                 <p data-media-waktu class="a-help">Waktu aktif tersimpan: 0 detik.</p>
                 <p class="a-help">
                     Selesai media tidak membuka Materi selanjutnya sebelum Resume dan HOTS
@@ -169,14 +169,16 @@
                             menunggu penilaian Guru.</div>
                         <div class="a-kegiatan-jawaban"><?= nl2br(esc($rekaman['isi'])) ?></div>
                     <?php elseif (!$izin): ?>
-                        <div class="a-alert" role="status">
+                        <div class="a-alert" role="status"<?= !$kegiatan['media_selesai'] ? ' data-kegiatan-tunggu-media' : '' ?>>
                             <?= $kegiatan['media_selesai']
                                 ? 'Kirim Final Resume terlebih dahulu sebelum mengerjakan HOTS.'
                                 : 'Selesaikan media Materi sesuai ketentuan sebelum mengerjakan Resume/HOTS.' ?>
                             <?php if (!$kegiatan['media_selesai']): ?>
                                 <a class="a-btn a-btn--sekunder" href="<?= esc(current_url(), 'attr') ?>">
-                                    Perbarui status media dan kegiatan
+                                    Muat ulang status kegiatan
                                 </a>
+                                <p class="a-help">Halaman ini diperbarui otomatis setelah seluruh syarat media terpenuhi.
+                                    Memuat ulang tidak melewati syarat 90% pemutaran video/audio.</p>
                             <?php endif ?>
                         </div>
                     <?php else: ?>
@@ -235,7 +237,7 @@
     </nav>
 </div>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261025-status90'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261025-s09s10'), 'attr') ?>" defer></script>

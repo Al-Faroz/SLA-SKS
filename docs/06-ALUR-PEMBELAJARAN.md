@@ -95,3 +95,7 @@ best-effort (tidak dapat membuktikan mata benar-benar membaca).
 ### Koreksi S09/S10 — minimum teks mengikuti snapshot TP siswa
 
 Nilai `resume_min` (rentang Master 10–1000) dan `tugas_min` (50–5000) dibaca dari `snapshot_json.tp` pada `versi_konten_tp` yang **terpin** di progres siswa. UI serta validasi POST server memakai nilai yang sama, bukan TP live atau angka bawaan hardcode. Nilai snapshot di luar rentang Master / tidak tersedia ditolak dengan galat konfigurasi; tidak melakukan fallback diam-diam, mengubah TP Siap, atau menulis data. Draf tetap boleh singkat. Siswa jalur Diagnostik tuntas tetap tidak dapat mengirim kegiatan resmi. Tidak ada SQL baru.
+
+### Koreksi status Youtube/audio yang terlihat penuh tetapi belum tuntas (25-10-2026)
+
+Bilah progres media harus mencerminkan **seluruh syarat server**, bukan waktu aktif Guru saja. Untuk audio/YouTube, tampilkan terpisah waktu belajar, waktu pemutaran yang benar-benar diakui server, durasi video/audio, dan posisi terjauh yang mencapai minimal 90% durasi (seek tidak dihitung sebagai pemutaran). Status 380/360 detik **tidak otomatis tuntas** bila pemutaran video baru sebagian. Bila seluruh syarat telah tercapai, halaman memuat ulang sekali untuk merender formulir Resume dari server; HTML tidak membuka gate tanpa pemeriksaan server. Tidak mengubah aturan 90% Master, data siswa atau SQL.

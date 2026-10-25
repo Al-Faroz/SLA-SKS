@@ -149,15 +149,31 @@ final class ProgresMediaMateriSiswaService
         $min = max(1, (int) $materi['min_waktu_detik']);
         if ($jenis === 'gambar') $min = max(30, $min);
         $selesai = !$sukarela && ($row['status'] ?? '') === 'media_selesai';
+        $aktif = (int) ($row['waktu_aktif_detik'] ?? 0);
+        $putar = (int) ($row['waktu_putar_detik'] ?? 0);
+        $terjauh = (int) ($row['posisi_terjauh_detik'] ?? 0);
+        $durasi = isset($row['durasi_media_detik'])
+            ? (int) $row['durasi_media_detik'] : null;
+        $harusPutar = $durasi !== null && $durasi >= 5
+            ? (int) ceil($durasi * AturanAktivitasMateriService::PERSEN_PUTAR / 100) : null;
+        $perluPutar = in_array($jenis, ['audio', 'youtube'], true);
         return [
             'jenis' => $jenis, 'sukarela' => $sukarela,
             'status' => $sukarela ? 'sukarela' : ($row['status'] ?? 'belum_dimulai'),
             'media_selesai' => $selesai,
-            'waktu_aktif_detik' => (int) ($row['waktu_aktif_detik'] ?? 0),
-            'waktu_putar_detik' => (int) ($row['waktu_putar_detik'] ?? 0),
-            'posisi_terjauh_detik' => (int) ($row['posisi_terjauh_detik'] ?? 0),
-            'minimal_detik' => $min, 'persen_putar_minimal' =>
-                in_array($jenis, ['audio','youtube'], true) ? 90 : null,
+            'waktu_aktif_detik' => $aktif,
+            'waktu_putar_detik' => $putar,
+            'posisi_terjauh_detik' => $terjauh,
+            'durasi_media_detik' => $durasi,
+            'minimal_detik' => $min,
+            'syarat_waktu_terpenuhi' => $aktif >= $min,
+            'pemutaran_minimal_detik' => $perluPutar ? $harusPutar : null,
+            'syarat_putar_terpenuhi' => $perluPutar && $harusPutar !== null
+                ? $putar >= $harusPutar : null,
+            'syarat_jangkauan_terpenuhi' => $perluPutar && $harusPutar !== null
+                ? $terjauh >= $harusPutar : null,
+            'persen_putar_minimal' => $perluPutar
+                ? AturanAktivitasMateriService::PERSEN_PUTAR : null,
             'pesan' => $sukarela
                 ? 'Belajar sukarela tidak mempengaruhi nilai TP.'
                 : ($jenis === 'pdf'
