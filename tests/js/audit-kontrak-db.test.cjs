@@ -25,4 +25,8 @@ test('SOP memerlukan dump terbaru dan mengakui hosting belum deploy',()=>{
   assert.match(a,/belum pernah diunggah ke hosting/);
   assert.match(agents,/dump SQL lokal terbaru/);
   assert.match(a,/SQL 0018/);
+  assert.match(a,/sla_sks_v3 \(3\)\.sql/);
+  assert.match(a,/52 tabel/);
+  assert.match(a,/jawaban_hots_materi.*14 kolom/);
+  assert.doesNotMatch(a,/dump terbaru diterima\./i);
 });
