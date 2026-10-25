@@ -42,6 +42,9 @@ $routes->post('siswa/tp/(:num)/diagnostik/(:segment)/tindakan', 'SiswaUjian::tin
 $routes->get('siswa/tp/(:num)/diagnostik/media/(:segment)/(:segment)/(:segment)', 'SiswaUjian::media/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
 $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
+$routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
+$routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::lihat/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::siapkan/$1', ['filter' => 'auth:guru']);

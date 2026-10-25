@@ -317,3 +317,14 @@ dan area kanvas yang dapat di-scroll. Komponen menggunakan a-pembaca-* dan
 a-pdf-* pada app.css, bukan framework CSS baru. Error render dan
 ketidakcocokan halaman tampak langsung, tanpa mengklaim selesai.
 Kontrol keyboard PageUp/PageDown/ArrowLeft/ArrowRight; toolbar responsif.
+
+
+### Komponen G10/G11 (25-10-2026)
+
+Antrean Guru memakai tabel a-tbl, filter Gen–Mapel terotorisasi dan
+paginasi server 25 baris. Detail menampilkan identitas siswa/TP/Materi,
+isi jawaban dengan linebreak ter-escape, pesan salah/sukses, nilai 0–100,
+konfirmasi final, umpan balik dan tombol Simpan & Berikutnya. Elemen
+.a-penilaian-* dalam app.css mengikuti tombol, form dan warna yang
+sudah ada. Halaman tidak menampilkan aksi mengubah nilai historis;
+revisi harus melalui jalur AB-33.

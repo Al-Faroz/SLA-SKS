@@ -266,3 +266,35 @@ langsung uji pembaca PDF siswa di branch S08D setelah backup rutin. Setiap
 detak PDF tercatat pada snapshot Materi terpin; jumlah halaman berasal
 dari berkas unggahan Guru. Perubahan ini tidak menyentuh
 PdfMateriValidator.php atau validator batas 15 MB/40 halaman.
+
+
+### G10/G11 Penilaian Guru — tanpa impor SQL baru
+
+Tabel Resume/HOTS SQL 0017 yang sudah berhasil diimpor memiliki
+kolom nilai, dinilai_oleh, dinilai_pada, umpan_balik. Tahap G10/G11
+menggunakan kolom tersebut; **jangan impor ulang SQL 0016/0017**,
+jangan DROP/TRUNCATE jawaban atau progres. Pemeriksaan nilai pertama
+menggunakan transaksi, audit, dan perizinan G1 per Gen–Mapel; koreksi
+nilai historis tetap memerlukan alur AB-33 terpisah.
+
+
+### Koreksi nama tabel HOTS dan pemulihan instalasi 0017 parsial (25-10-2026)
+
+Inspeksi dump lokal memperlihatkan tabel tugas_hots_materi **sudah merupakan
+bank pertanyaan HOTS Guru**, berisi materi_id, row_uuid, pertanyaan, petunjuk.
+Tabel tersebut TIDAK BOLEH dihapus, diubah nama atau dipakai menyimpan
+jawaban siswa. Jawaban siswa sekarang menggunakan tabel jawaban_hots_materi.
+
+Untuk database lokal yang sempat mengimpor 0017 parsial (resume_materi ada,
+sementara jawaban_hots_materi belum ada), **jangan impor 0017 lagi**.
+Backup database, jalankan qa/0018_verifikasi_jawaban_hots_readonly.sql.
+Pastikan resume_materi 14 kolom, tabel bank Guru tetap utuh (5 kolom), dan
+jawaban_hots_materi masih BELUM_ADA. Lalu impor HANYA
+updates/0018_pemulihan_jawaban_hots_materi.sql sekali. Jalankan QA baca-saja
+kembali untuk mengonfirmasi jawaban_hots_materi 14 kolom. Tidak ada DROP,
+TRUNCATE, reset nilai atau migrasi/seeder. Instalasi baru memakai SQL 0017
+terkoreksi dan tidak perlu memanggil 0018 lagi.
+
+Kesalahan query database tidak boleh ditampilkan sebagai 403; kegagalan
+skema ditampilkan 503 dengan petunjuk memperbaiki SQL. 403 tetap khusus
+masalah hak akses yang sah.

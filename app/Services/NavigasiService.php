@@ -19,6 +19,8 @@ final class NavigasiService
         }
         if ($peran === 'guru') {
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
+            $menu[] = ['label' => 'Antrean Penilaian', 'path' => 'guru/penilaian',
+                'aktif' => $aktif === 'penilaian'];
         }
         if ($peran === 'admin') {
             foreach ([

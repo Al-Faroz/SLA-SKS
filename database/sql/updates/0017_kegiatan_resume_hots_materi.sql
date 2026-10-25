@@ -1,7 +1,9 @@
 -- SLA-SKS v2.4 S09/S10 (2026-10-25).
 -- Impor SEKALI sesudah 0016; WAJIB backup database; jangan mereset nilai/progres.
 -- Kedua tabel mengikat siswa melalui progres_tp dan snapshot TP terpin.
--- STOP jika salah satu tabel sudah ada; jangan impor ulang atau memakai DROP.
+-- Instalasi baru: periksa resume_materi/jawaban_hots_materi belum ada.
+-- Dump lokal dengan 0017 parsial: jalankan hanya patch pemulihan 0018.
+-- tugas_hots_materi adalah bank pertanyaan Guru; JANGAN ubah/hapus.
 -- Verifikasi dulu melalui database/sql/qa/0017_verifikasi_kegiatan_readonly.sql.
 -- CHECK inline pada kolom nilai agar lebih kompatibel dengan parser phpMyAdmin.
 SET NAMES utf8mb4;
@@ -35,7 +37,7 @@ CREATE TABLE resume_materi (
         REFERENCES pengguna(id) ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE tugas_hots_materi (
+CREATE TABLE jawaban_hots_materi (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     progres_tp_id BIGINT UNSIGNED NOT NULL,
     materi_id BIGINT UNSIGNED NOT NULL,
@@ -54,18 +56,18 @@ CREATE TABLE tugas_hots_materi (
     UNIQUE KEY uq_hots_per_materi (progres_tp_id,materi_id,versi_konten_tp_id),
     KEY ix_hots_materi (materi_id,status),
     KEY ix_hots_penilai (dinilai_oleh),
-    CONSTRAINT fk_hots_progres FOREIGN KEY (progres_tp_id)
+    CONSTRAINT fk_jawaban_hots_progres FOREIGN KEY (progres_tp_id)
         REFERENCES progres_tp(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_hots_materi FOREIGN KEY (materi_id)
+    CONSTRAINT fk_jawaban_hots_materi FOREIGN KEY (materi_id)
         REFERENCES materi(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_hots_versi FOREIGN KEY (versi_konten_tp_id)
+    CONSTRAINT fk_jawaban_hots_versi FOREIGN KEY (versi_konten_tp_id)
         REFERENCES versi_konten_tp(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT fk_hots_penilai FOREIGN KEY (dinilai_oleh)
+    CONSTRAINT fk_jawaban_hots_penilai FOREIGN KEY (dinilai_oleh)
         REFERENCES pengguna(id) ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Verifikasi pasca impor (baca saja):
 -- SHOW CREATE TABLE resume_materi;
--- SHOW CREATE TABLE tugas_hots_materi;
+-- SHOW CREATE TABLE jawaban_hots_materi;
 -- SELECT COUNT(*) FROM resume_materi;
--- SELECT COUNT(*) FROM tugas_hots_materi;
+-- SELECT COUNT(*) FROM jawaban_hots_materi;

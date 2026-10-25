@@ -44,6 +44,13 @@
                 href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">Periksa kesiapan TP Siap</a>
         <?php endif ?>
     </section>
+    <section class="a-card a-jarak-atas" aria-labelledby="antrean-penilaian">
+        <h2 id="antrean-penilaian">Penilaian siswa</h2>
+        <p class="a-help">Resume dan HOTS final diperiksa oleh Guru aktif berdasarkan Gen–Mapel.
+            Nilai awal tidak dapat ditimpa; koreksi menggunakan alur khusus.</p>
+        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">
+            Buka Antrean Penilaian</a>
+    </section>
     <section class="a-card a-jarak-atas" aria-labelledby="bank-soal-tautan">
         <h2 id="bank-soal-tautan">Bank soal Diagnostik dan Sumatif</h2>
         <p class="a-help">Lihat jumlah soal aktif untuk TP ini. Kelola soal aktif, sunting soal draf, atau impor Word untuk TP ini.</p>

@@ -32,7 +32,7 @@ final class KegiatanMateriSiswaService
     {
         return match ($jenis) {
             'resume' => 'resume_materi',
-            'hots' => 'tugas_hots_materi',
+            'hots' => 'jawaban_hots_materi',
             default => throw new DomainException('Jenis kegiatan tidak dikenal.'),
         };
     }
@@ -77,7 +77,7 @@ final class KegiatanMateriSiswaService
             ->where($key)->get()->getRowArray();
         $resume = $sukarela ? null : $this->db->table('resume_materi')
             ->where($key)->get()->getRowArray();
-        $hots = $sukarela ? null : $this->db->table('tugas_hots_materi')
+        $hots = $sukarela ? null : $this->db->table('jawaban_hots_materi')
             ->where($key)->get()->getRowArray();
         return [
             'sukarela' => $sukarela,

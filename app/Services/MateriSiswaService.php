@@ -203,7 +203,7 @@ final class MateriSiswaService
         foreach ([
             'progres_materi' => 'media_selesai',
             'resume_materi' => 'final',
-            'tugas_hots_materi' => 'final',
+            'jawaban_hots_materi' => 'final',
         ] as $tabel => $harus) {
             $row = $this->db->table($tabel)->select('status')
                 ->where($key)->get()->getRowArray();

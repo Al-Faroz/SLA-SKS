@@ -123,3 +123,15 @@ Karena MySQL lokal dan MariaDB hosting **berbeda mesin**, semua enum, CHECK cons
 
 ## 7. Larangan penghapusan
 Tidak ada tombol/batch yang menghapus fisik siswa, sertifikat, riwayat nilai, snapshot ujian, file historis, atau log akademik. Data akun nonaktif tetap ada. Berkas temporer upload yang belum sah boleh dibersihkan dengan pembeda jelas dari dokumen historis.
+
+
+### Dua entitas HOTS berbeda dalam implementasi (25-10-2026)
+
+Nama tugas_hots_materi pada skema operasional adalah **bank perintah/
+pertanyaan HOTS oleh Guru** yang terhubung ke Materi. Untuk menjalankan
+Resume/HOTS per Materi yang dikerjakan siswa, **jawaban HOTS siswa** disimpan
+di jawaban_hots_materi, dengan progres_tp_id, materi_id,
+versi_konten_tp_id, isi, status, nilai, penilai dan waktu. Tabel resume_materi
+menyimpan Resume siswa. Perbedaan ini memperbaiki benturan nama SQL 0017,
+tidak mengubah aturan pembelajaran maupun bobot nilai. Pemulihan parsial
+memakai SQL 0018 yang additive dan hanya diimpor jika diperlukan.

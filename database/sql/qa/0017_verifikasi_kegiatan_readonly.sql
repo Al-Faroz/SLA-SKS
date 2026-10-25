@@ -5,6 +5,8 @@
 SELECT DATABASE() AS database_aktif, VERSION() AS versi_server;
 
 -- KEDUANYA SUDAH_ADA = jangan impor 0017 kembali.
+-- Tabel tugas_hots_materi adalah bank pertanyaan Guru, bukan jawaban siswa.
+-- Jika hanya resume sudah ada, jalankan patch pemulihan SQL 0018.
 -- HANYA SATU SUDAH_ADA = hentikan, periksa instalasi parsial.
 SELECT target.nama_tabel AS tabel,
        CASE WHEN t.TABLE_NAME IS NULL THEN 'BELUM_ADA'
@@ -13,7 +15,7 @@ SELECT target.nama_tabel AS tabel,
 FROM (
     SELECT 'resume_materi' AS nama_tabel
     UNION ALL
-    SELECT 'tugas_hots_materi'
+    SELECT 'jawaban_hots_materi'
 ) AS target
 LEFT JOIN information_schema.TABLES AS t
     ON t.TABLE_SCHEMA = DATABASE()
@@ -30,7 +32,7 @@ SELECT TABLE_NAME AS tabel,
        )) AS kolom_dikenali
 FROM information_schema.COLUMNS
 WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME IN ('resume_materi', 'tugas_hots_materi')
+  AND TABLE_NAME IN ('resume_materi', 'jawaban_hots_materi')
 GROUP BY TABLE_NAME
 ORDER BY TABLE_NAME;
 
@@ -39,7 +41,7 @@ SELECT TABLE_NAME AS tabel, CONSTRAINT_NAME AS nama_kendala,
        CONSTRAINT_TYPE AS jenis_kendala
 FROM information_schema.TABLE_CONSTRAINTS
 WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME IN ('resume_materi', 'tugas_hots_materi')
+  AND TABLE_NAME IN ('resume_materi', 'jawaban_hots_materi')
 ORDER BY TABLE_NAME, CONSTRAINT_TYPE, CONSTRAINT_NAME;
 
 -- FK masing-masing harus ke progres_tp, materi, versi_konten_tp, pengguna.
@@ -48,7 +50,7 @@ SELECT TABLE_NAME AS tabel, COLUMN_NAME AS kolom,
        REFERENCED_COLUMN_NAME AS kolom_rujukan
 FROM information_schema.KEY_COLUMN_USAGE
 WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME IN ('resume_materi', 'tugas_hots_materi')
+  AND TABLE_NAME IN ('resume_materi', 'jawaban_hots_materi')
   AND REFERENCED_TABLE_NAME IS NOT NULL
 ORDER BY TABLE_NAME, COLUMN_NAME;
 
