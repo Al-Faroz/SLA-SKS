@@ -454,6 +454,40 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(0,$this->db->table('resume_materi')->countAllResults());
     }
 
+    public function testYoutube380DetikDari360BelumCukupJikaDurasiPanjang(): void
+    {
+        $row = $this->db->table('versi_konten_tp')
+            ->where('id',3)->get()->getRowArray();
+        $snap = json_decode($row['snapshot_json'],true);
+        $snap['materi'][0]['jenis'] = 'youtube';
+        $snap['materi'][0]['berkas_id'] = null;
+        $snap['materi'][0]['url_youtube'] = 'https://www.youtube.com/watch?v=abcdefghijk';
+        $snap['materi'][0]['min_waktu_detik'] = 360;
+        $json = json_encode($snap,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
+        $this->db->table('versi_konten_tp')->where('id',3)->update([
+            'snapshot_json'=>$json,'checksum'=>hash('sha256',$json),
+        ]);
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'youtube','status'=>'berjalan',
+            'waktu_aktif_detik'=>380, 'waktu_putar_detik'=>380,
+            'posisi_terjauh_detik'=>380,'durasi_media_detik'=>3600,
+        ]);
+        $svc=$this->progresMediaService(101,static fn():int=>1500);
+        $data=$svc->status(1,31);
+        self::assertSame(380,$data['waktu_aktif_detik']);
+        self::assertSame(360,$data['minimal_detik']);
+        self::assertTrue($data['syarat_waktu_terpenuhi']);
+        self::assertSame(3240,$data['pemutaran_minimal_detik']);
+        self::assertFalse($data['syarat_putar_terpenuhi']);
+        self::assertFalse($data['syarat_jangkauan_terpenuhi']);
+        self::assertFalse($data['media_selesai']);
+        self::assertFalse((new \App\Services\KegiatanMateriSiswaService(
+            $this->db,static fn():array=>[
+                'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]))->status(1,31)['media_selesai']);
+    }
+
     public function testTuntasDiagnostikTidakDapatMengirimJawaban(): void
     {
         $this->jadikanMediaPertamaGambar();

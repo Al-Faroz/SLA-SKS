@@ -57,6 +57,23 @@ final class AturanAktivitasMateriTest extends TestCase
         self::assertSame(90, $s['posisi_terjauh_detik']);
     }
 
+    public function testYoutube360DetikTetapBerjalanJikaVideonyaPanjang(): void
+    {
+        $s = Media::awal('youtube', 1000, 0, 3600);
+        // Contoh laporan pengguna: 380/360 detik, video berdurasi 3600 detik.
+        for ($i = 1; $i <= 38; $i++) {
+            $s = Media::detak($s, 'youtube', 1000 + $i * 10,
+                $i * 10, 3600, 360);
+        }
+        self::assertSame(380, $s['waktu_aktif_detik']);
+        self::assertSame('berjalan', $s['status']);
+        for ($i = 39; $i <= 324; $i++) {
+            $s = Media::detak($s, 'youtube', 1000 + $i * 10,
+                $i * 10, 3600, 360);
+        }
+        self::assertSame('media_selesai', $s['status']);
+    }
+
     public function testMelewatiVideoDenganSeekTidakDihitungSebagaiPutar(): void
     {
         $s = Media::awal('youtube', 1000, 0, 120);

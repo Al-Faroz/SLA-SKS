@@ -11,6 +11,7 @@ on:
       - 'public/assets/js/aktivitas-materi.js'
       - 'database/sql/updates/0016_progres_aktivitas_materi.sql'
       - 'tests/unit/AturanAktivitasMateriTest.php'
+      - 'tests/js/aktivitas-materi-status.test.cjs'
       - 'tests/unit/MateriSiswaDatabaseTest.php'
       - 'tests/integration/SqlProgresMateriCheck.php'
       - '.github/workflows/qa-s08b-aktivitas-media.yml'
@@ -59,6 +60,7 @@ jobs:
           php -l tests/unit/MateriSiswaDatabaseTest.php
           php -l tests/integration/SqlProgresMateriCheck.php
           node --check public/assets/js/aktivitas-materi.js
+          node --test tests/js/aktivitas-materi-status.test.cjs
       - name: Aturan waktu aktif dan seek
         run: vendor/bin/phpunit --no-coverage tests/unit/AturanAktivitasMateriTest.php
       - name: Integrasi SQLite izin dan heartbeat
