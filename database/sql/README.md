@@ -229,3 +229,30 @@ atau mengimpor ulang nilai Diagnostik maupun progres siswa.
 
 Belum ada UI penilaian Guru ataupun Sumatif dalam tahap ini. Tabel menyimpan
 kolom penilaian untuk tahap berikutnya, namun tidak mengisi nilai secara otomatis.
+
+
+### Galat #1050 dan peringatan CHECK pada impor 0017 (25 Oktober 2026)
+
+JANGAN impor 0017 ulang atau DROP/TRUNCATE tabel yang telah terbentuk.
+Galat server #1050 Table already exists berarti objek target telah ada.
+Tiga peringatan Data statis pada CHECK berasal dari parser phpMyAdmin,
+bukan kode galat yang sama. SQL untuk instalasi BARU diperbaiki agar
+CHECK berada inline di definisi kolom nilai (rentang 0–100 tetap dijaga).
+Tabel yang sudah terbentuk dengan constraint CHECK lama tetap sah, tidak
+perlu dibuat ulang atau diubah.
+
+LANGKAH AMAN:
+1. Di phpMyAdmin pilih DB aktif, jalankan file
+   database/sql/qa/0017_verifikasi_kegiatan_readonly.sql pada tab SQL.
+   File hanya SELECT metadata dari information_schema.
+2. Jika KEDUA tabel SUDAH_ADA, cocokkan 14 kolom per tabel, PRIMARY,
+   UNIQUE gabungan, empat FOREIGN KEY, dan CHECK skor (jika didukung).
+   Jika cocok, SQL 0017 telah terpasang: jangan impor ulang.
+3. Jika hanya salah satu tabel yang ada atau strukturnya berbeda,
+   STOP. Jangan menjalankan sisa CREATE sembarangan atau menghapus tabel;
+   simpan hasil pemeriksaan tanpa data pribadi untuk patch additive terarah.
+4. Hanya jika kedua tabel BELUM_ADA, backup DB lalu impor sekali.
+   Tidak menggunakan CREATE TABLE IF NOT EXISTS sebab dapat
+   menyamarkan struktur tabel yang sudah ada tetapi tidak cocok.
+
+Pengujian SQL di MariaDB CI bukan pengganti verifikasi MySQL di XAMPP.

@@ -1,6 +1,9 @@
 -- SLA-SKS v2.4 S09/S10 (2026-10-25).
 -- Impor SEKALI sesudah 0016; WAJIB backup database; jangan mereset nilai/progres.
 -- Kedua tabel mengikat siswa melalui progres_tp dan snapshot TP terpin.
+-- STOP jika salah satu tabel sudah ada; jangan impor ulang atau memakai DROP.
+-- Verifikasi dulu melalui database/sql/qa/0017_verifikasi_kegiatan_readonly.sql.
+-- CHECK inline pada kolom nilai agar lebih kompatibel dengan parser phpMyAdmin.
 SET NAMES utf8mb4;
 
 CREATE TABLE resume_materi (
@@ -14,7 +17,7 @@ CREATE TABLE resume_materi (
     dibuat_pada DATETIME NOT NULL,
     diubah_pada DATETIME NOT NULL,
     dikirim_pada DATETIME NULL,
-    nilai TINYINT UNSIGNED NULL,
+    nilai TINYINT UNSIGNED NULL CHECK (nilai <= 100),
     dinilai_oleh BIGINT UNSIGNED NULL,
     umpan_balik VARCHAR(1000) NULL,
     dinilai_pada DATETIME NULL,
@@ -29,8 +32,7 @@ CREATE TABLE resume_materi (
     CONSTRAINT fk_resume_versi FOREIGN KEY (versi_konten_tp_id)
         REFERENCES versi_konten_tp(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_resume_penilai FOREIGN KEY (dinilai_oleh)
-        REFERENCES pengguna(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT ck_resume_nilai CHECK (nilai IS NULL OR nilai <= 100)
+        REFERENCES pengguna(id) ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE tugas_hots_materi (
@@ -44,7 +46,7 @@ CREATE TABLE tugas_hots_materi (
     dibuat_pada DATETIME NOT NULL,
     diubah_pada DATETIME NOT NULL,
     dikirim_pada DATETIME NULL,
-    nilai TINYINT UNSIGNED NULL,
+    nilai TINYINT UNSIGNED NULL CHECK (nilai <= 100),
     dinilai_oleh BIGINT UNSIGNED NULL,
     umpan_balik VARCHAR(1000) NULL,
     dinilai_pada DATETIME NULL,
@@ -59,8 +61,7 @@ CREATE TABLE tugas_hots_materi (
     CONSTRAINT fk_hots_versi FOREIGN KEY (versi_konten_tp_id)
         REFERENCES versi_konten_tp(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
     CONSTRAINT fk_hots_penilai FOREIGN KEY (dinilai_oleh)
-        REFERENCES pengguna(id) ON UPDATE RESTRICT ON DELETE RESTRICT,
-    CONSTRAINT ck_hots_nilai CHECK (nilai IS NULL OR nilai <= 100)
+        REFERENCES pengguna(id) ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Verifikasi pasca impor (baca saja):
