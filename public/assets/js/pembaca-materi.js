@@ -193,7 +193,7 @@
         // Perhitungan otomatis saat fullscreen masuk/keluar dan lebar viewport
         // berubah. Observer hanya pada viewport, tidak pada gambar/stage.
         if ('ResizeObserver' in window) {
-            new ResizeObserver(() => gambarUlang()).observe(area);
+            new window.ResizeObserver(() => gambarUlang()).observe(area);
         } else {
             window.addEventListener('resize', gambarUlang);
         }
