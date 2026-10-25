@@ -1,4 +1,4 @@
-# SQL SLA-SKS v2.3 — Pembaruan berurutan
+# SQL SLA-SKS — Panduan pembaruan bernomor (Master v2.4)
 
 ## Instalasi lama dengan K2-0003 (sudah ada data)
 
@@ -213,17 +213,18 @@ Patch additive: database/sql/updates/0017_kegiatan_resume_hots_materi.sql.
 0016_progres_aktivitas_materi.sql (serta 0014/0015) terpasang. Jangan mereset
 atau mengimpor ulang nilai Diagnostik maupun progres siswa.
 
-1. Periksa tabel resume_materi dan tugas_hots_materi **belum tersedia**.
+1. Periksa tabel resume_materi dan **jawaban_hots_materi** belum tersedia.
+   Tabel **tugas_hots_materi adalah bank pertanyaan Guru** dan tidak boleh dibuat ulang.
    Jika salah satunya sudah ada, hentikan dan bandingkan struktur.
 2. Impor 0017 **sekali** melalui phpMyAdmin pada database XAMPP yang digunakan.
-3. Jalankan SHOW CREATE TABLE untuk kedua tabel; SELECT COUNT(*) pada tabel
+3. Jalankan SHOW CREATE TABLE untuk resume_materi dan jawaban_hots_materi; SELECT COUNT(*) pada tabel
    awal semestinya 0 sebelum ada pengiriman.
 4. Siswa pengujian jalur belajar: buka Materi pertama, tuntaskan media,
    Simpan Draf Resume, reload, Kirim Final Resume, Simpan/Kirim Final HOTS;
    setelah semua terpenuhi tombol Materi Selanjutnya dapat dibuka.
    Jalur tuntas Diagnostik hanya membaca sukarela. Pengiriman final dua kali
    tidak membuat duplikat, draf setelah final ditolak.
-5. PDF belum memenuhi media_selesai selama PDF.js belum dipasang.
+5. Arsip tahap sebelum PDF.js: PDF tidak dapat menyelesaikan media saat itu; **pada tahap S08D pembaca PDF.js lokal sudah dibuat**.
    Jangan bypass dengan SQL manual. Pengiriman jawaban dan penilaian Guru
    memerlukan integritas proses belajar.
 
@@ -298,3 +299,9 @@ terkoreksi dan tidak perlu memanggil 0018 lagi.
 Kesalahan query database tidak boleh ditampilkan sebagai 403; kegagalan
 skema ditampilkan 503 dengan petunjuk memperbaiki SQL. 403 tetap khusus
 masalah hak akses yang sah.
+
+### Gerbang wajib SQL baru — 25 Oktober 2026
+
+**Kondisi saat ini: XAMPP lokal, belum deploy ke hosting.** Pekerjaan SQL berikutnya hanya boleh dimulai sesudah menerima dan memeriksa dump terbaru setelah patch terakhir. Dump sebelumnya `sla_sks_v3 (2).sql` dibuat 25-10-2026 pukul 10.24 (MariaDB 10.4.32), memiliki bank HOTS Guru `tugas_hots_materi`, tetapi belum punya `jawaban_hots_materi`. **File itu tidak otomatis mewakili database yang sekarang**, sebab modul Guru telah berhasil dibuka setelah SQL 0018.
+
+Sebelum SQL baru: jalankan `qa/audit_kontrak_database_readonly.sql` di DB yang benar, verifikasi metadata dan `schema_version`; bandingkan SQL historis serta query Service; backup DB+`writable/`. Jangan impor ulang 0017 atau 0018 jika objek telah ada. Semua perubahan skema harus patch **bernomor baru**, additive, diuji terhadap seluruh tabel nyata dan diputuskan setelah dump terbaru. Jangan me-reset database, menimpa data siswa, atau menaruh dump privat di repo.

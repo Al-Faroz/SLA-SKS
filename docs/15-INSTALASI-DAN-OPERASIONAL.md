@@ -3,7 +3,7 @@
 ## 1. Target deployment
 - **Hosting:** shared hosting; Apache/LiteSpeed dengan `mod_rewrite`/dukungan `.htaccess` yang diverifikasi nyata. `index.php` dan `.htaccess` **di ROOT** proyek.
 - **Bahasa/framework:** PHP stabil kompatibel CI4 dan seluruh paket, Composer 2 (instal dependency boleh dilakukan sebelum upload jika hosting tidak memiliki SSH), ekstensi `intl`, `mbstring`, `mysqli`/`mysqlnd`, `curl`, `gd`, `zip`, `fileinfo`, `xml`, `dom`, `opcache`, `openssl`; `memory_limit` memadai untuk Excel/PDF.
-- **Database:** MySQL lokal, **MariaDB hosting**; dump SQL dan patch update wajib diuji di keduanya.
+- **Database:** XAMPP lokal menggunakan **MariaDB 10.4.32 menurut header dump lama**; server aktif wajib diverifikasi dari dump terbaru. Shared hosting/MariaDB masih **target, belum ada aplikasi yang diunggah/deploy**. Kompatibilitas hosting dipersiapkan, bukan diklaim telah diuji di hosting.
 - **Alamat publik:** domain HTTPS permanen untuk QR dan cookie aman. Nama/identitas sekolah diisi Admin saat setup.
 - **Aset:** CSS kustom + JavaScript native tanpa bundler; PDF.js + page-flip ringan disajikan lokal; YouTube untuk video; PhpSpreadsheet, Dompdf, endroid QR untuk dokumen.
 - **Skala:** satu kelas khusus maksimum per Gen, jumlah akun/berkas kecil. Ukuran server dihitung dari gambar/PDF per TP, bukan dari jumlah siswa semata.
@@ -41,7 +41,7 @@ sla-sks/
 
 ### Pemutakhiran skema lama ke v2.4
 - Repository sudah melewati K1/K2/K3A, sedangkan PR #13 masih memakai struktur BAB lama. **Jangan mengasumsikan nomor patch SQL terakhir**; periksa dump lokal dan `schema_version` aktual. Patch yang pernah diterapkan tidak boleh ditimpa/diedit dan diminta impor ulang.
-- Untuk **lokal pengembangan**, gunakan prosedur dump SQL lama → analisis/pemetaan data yang diperlukan → dump final baru → backup → **pemilik secara manual menghapus tabel pada database lokal yang ditentukan** → impor baru (§8).
+- Untuk **lokal pengembangan**, setiap tugas DB dimulai dari dump SQL **terbaru sesudah update terakhir** → pemetaan tabel/relasi/patch → patch additive bernomor baru dan pemeriksaan baca-saja → backup → pengguna impor sendiri. **Reset tabel bukan prosedur baku** dan memerlukan permintaan/izin eksplisit khusus database lokal terpilih (§8).
 - Untuk hosting/produksi, perubahan harus memakai **SQL pembaruan bernomor lebih tinggi dari yang telah diterapkan**, menjaga data dan audit, serta diuji sebagai patch non-destruktif di database salinan, **bukan reset tabel**.
 - Guru mengikuti Gen–Mapel dan paket/TP khusus Gen, histori progres/sertifikat dipertahankan. Pemetaan ambigu wajib diperiksa sebelum konversi.
 
@@ -75,9 +75,10 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 - [ ] PDF sertifikat berisi NISN, QR publik **tanpa NISN**, arsip versi.
 - [ ] Backup manual dan uji pemulihan telah dicatat.
 
-## 8. Prosedur khusus reset ulang database **lokal pengembangan** v2.4
-1. **Belum dieksekusi dalam PR Master ini.** Pemilik akan mengirim dump SQL lokal terkini saat implementasi dimulai. Developer harus menganalisis `schema_version`, tabel, constraint dan isi data terlebih dulu.
-2. Developer menyusun **dump SQL instalasi final baru** beserta data lama yang memang diperlukan dan aman dipindah; siapkan laporan pemetaan lama→baru, jumlah objek sebelum/sesudah, hash/referensi dan indikasi data ambigu. Jangan otomatis menghapus siswa, akun, nilai atau versi hanya karena skema berubah.
-3. Pemilik **membuat backup dump asli dan `writable/`**, mengonfirmasi database lokal tujuan, lalu **secara manual menghapus seluruh tabel hanya di database lokal yang telah dipilih**, kemudian mengimpor dump SQL baru melalui phpMyAdmin/CLI; lakukan cek data/relasi/login/TP/CP setelah impor.
-4. **Tidak pernah melakukan DROP/TRUNCATE database produksi/hosting**. Untuk shared hosting/MariaDB, gunakan patch SQL bernomor non-destruktif dengan rencana backup/restore sendiri.
-5. Tidak menggunakan CI4 Migration/Seeder; root `index.php`, `.htaccess`, `.env` dan URL lokal yang telah berfungsi **jangan diubah**.
+## 8. SOP SQL untuk pengembangan XAMPP lokal (kondisi aktual)
+1. **Belum ada deployment ke hosting**. Seluruh implementasi dan uji manual pada XAMPP lokal; jangan menyatakan pengujian hosting telah dilakukan. Header dump sebelumnya mencatat MariaDB 10.4.32 dan harus divalidasi lagi dari dump terbaru.
+2. Sebelum **setiap** tugas SQL/database, minta dump SQL XAMPP terbaru yang benar-benar terunggah **sesudah impor patch terakhir**. Baca nama database, waktu ekspor, versi engine, CREATE TABLE/INDEX/FK/CHECK, baris historis yang relevan, dan `schema_version`.
+3. Peta kontrak Master 05/10 terhadap semua Service dan tabel yang ada. Contoh wajib: `tugas_hots_materi` (bank pertanyaan Guru) tidak boleh tertukar dengan `jawaban_hots_materi` (pengumpulan siswa). Jangan membuat tabel atau indeks duplikat ketika patch historis sebagian sudah ada.
+4. Patch **nomor baru** bersifat additive; sertakan QA baca-saja sebelum/sesudah, uji DDL di MariaDB versi lokal aktual pada skema terisolasi/tersanitasi, pemeriksaan phpMyAdmin, dan rencana pemulihan berbasis backup (DDL tidak otomatis rollback).
+5. Pemilik melakukan backup database dan `writable/`, memilih target serta mengimpor patch sendiri. **Dilarang DROP/TRUNCATE/reset tanpa permintaan dan izin eksplisit**, meskipun masih XAMPP lokal. Jangan mengubah `.env`, root front controller atau URL yang sudah FIX tanpa alasan dan izin.
+6. Ketika hosting benar-benar disiapkan kelak, lakukan pemeriksaan kompatibilitas MariaDB/PHP/Apache/LiteSpeed/HTTPS dan akses privat secara terpisah sebelum upload. SOP hosting pada §3–7 adalah **rencana deployment**, bukan laporan bahwa aplikasi telah diunggah.
