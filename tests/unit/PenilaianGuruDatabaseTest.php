@@ -171,9 +171,14 @@ final class PenilaianGuruDatabaseTest extends TestCase
         $this->db->table('penugasan_guru_gen')->where('id',1)
             ->update(['guru_id'=>202]);
         $baru = $this->svc(202);
-        self::assertSame(1,$baru->antrean()['total']);
+        // Guru B kini mengampu dua pasangan: Gen A (alih G1) dan Gen B.
+        self::assertSame(2,$baru->antrean()['total']);
+        $g1 = $baru->penugasan();
+        self::assertCount(2,$g1);
+        self::assertSame(1,$baru->antrean($g1[0])['total']);
         $baru->simpan('hots',7,100,'Sangat baik');
-        self::assertSame(0,$baru->antrean()['total']);
+        self::assertSame(1,$baru->antrean()['total']);
+        self::assertSame(0,$baru->antrean($g1[0])['total']);
         self::assertSame(101,(int) $baru->lihat('resume',1)['dinilai_oleh']);
         try {
             $baru->simpan('resume',1,95,'Ubah nilai lama');
