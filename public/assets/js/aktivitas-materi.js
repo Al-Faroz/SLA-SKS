@@ -107,14 +107,18 @@
 
     if (jenis === 'gambar') {
         const image = document.querySelector('[data-gambar-materi]');
-        if (image && 'IntersectionObserver' in window) {
+        const viewport = document.querySelector('[data-gambar-observer]');
+        if (image && viewport && 'IntersectionObserver' in window) {
             const observer = new IntersectionObserver(entries => {
+                // Ukur area pembaca yang terlihat, bukan rasio gambar:
+                // zoom dapat membuat gambar 300% sehingga sebagian besar
+                // pixels berada di luar viewport walau area baca aktif.
                 gambarTerlihat = entries.some(entry => entry.isIntersecting
                     && entry.intersectionRatio >= .5);
             }, {threshold:[0, .5, 1]});
-            observer.observe(image);
+            observer.observe(viewport);
         } else if (image) {
-            // Browser tanpa IntersectionObserver tidak mengklaim gambar terlihat.
+            // Browser tanpa IntersectionObserver tidak mengklaim area dibaca.
             statusText('Browser tidak mendukung pemeriksaan tampilan gambar.');
         }
     }
