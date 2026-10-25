@@ -39,3 +39,22 @@ Siswa melihat angka/status sementara dan perubahan resmi setelah commit, bukan r
 
 ### Aggregasi HOTS per Materi untuk mempertahankan bobot v2.4
 Satu TP memiliki beberapa Materi, setiap Materi mempunyai satu nilai Resume dan satu nilai HOTS (0–100) bila siswa melalui jalur belajar. **Rata-rata aritmetika seluruh Resume** menjadi `rata_rata_resume`; **rata-rata aritmetika seluruh HOTS per Materi** menjadi `rata_rata_hots_materi`. Komponen berbobot **tetap 20/30/50 bawaan**; tidak membuat bobot per Materi atau mengubah kebijakan ketuntasan ujian. Seluruh Resume/HOTS wajib bernilai sebelum hasil final/sertifikat, walaupun salah satu bobot nol. Tindakan Guru, histori penilaian dan pemeriksaan kemiripan menggunakan **Materi yang sama** untuk pekerjaan sejenis.
+
+
+### Implementasi G10/G11: antrean Guru dan penilaian pertama (25 Oktober 2026)
+
+Layar Guru /guru/penilaian mencantumkan jawaban Resume/HOTS yang sudah
+terkirim final tetapi belum dinilai, dengan penugasan aktif Gen–Mapel
+sebagai batas hak. Daftar ditata urutan pengiriman tertua dan berpaginasi
+SQL 25 per halaman. Halaman detail menampilkan jawaban, petunjuk Materi
+dari snapshot versi TP siswa serta nilai integer 0–100 dan umpan balik
+opsional 1.000 karakter.
+
+Service menegakkan G1 per Gen–Mapel di server dan memeriksa ulang di
+transaksi yang mengunci progres TP dan penugasan; nilai awal hanya
+ditulis jika NULL. POST ulang identik idempoten, sedangkan perubahan
+nilai harus melalui AB-33, bukan overwrite. Identitas penilai asli dan
+audit append-only dipertahankan. Penilaian tidak mengunci Materi
+berikutnya: cukup Resume/HOTS final. Agregat final TP, koreksi nilai,
+sertifikat, notifikasi internal, dan alur Sumatif belum dianggap selesai
+oleh tahap ini; jangan menerbitkan nilai akhir sebelum semua syarat.

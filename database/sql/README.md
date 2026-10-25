@@ -266,3 +266,13 @@ langsung uji pembaca PDF siswa di branch S08D setelah backup rutin. Setiap
 detak PDF tercatat pada snapshot Materi terpin; jumlah halaman berasal
 dari berkas unggahan Guru. Perubahan ini tidak menyentuh
 PdfMateriValidator.php atau validator batas 15 MB/40 halaman.
+
+
+### G10/G11 Penilaian Guru — tanpa impor SQL baru
+
+Tabel Resume/HOTS SQL 0017 yang sudah berhasil diimpor memiliki
+kolom nilai, dinilai_oleh, dinilai_pada, umpan_balik. Tahap G10/G11
+menggunakan kolom tersebut; **jangan impor ulang SQL 0016/0017**,
+jangan DROP/TRUNCATE jawaban atau progres. Pemeriksaan nilai pertama
+menggunakan transaksi, audit, dan perizinan G1 per Gen–Mapel; koreksi
+nilai historis tetap memerlukan alur AB-33 terpisah.
