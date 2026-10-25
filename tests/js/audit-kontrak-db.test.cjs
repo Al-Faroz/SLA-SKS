@@ -22,7 +22,7 @@ test('Master memisahkan bank HOTS Guru dan jawaban siswa',()=>{
 test('SOP memerlukan dump terbaru dan mengakui hosting belum deploy',()=>{
   const a=read('docs/AUDIT-KONTRAK-DATABASE-LOKAL.md');
   const agents=read('AGENTS.md');
-  assert.match(a,/belum pernah diunggah ke hosting/);
+  assert.match(a,/hosting belum pernah dipakai\/deploy/);
   assert.match(agents,/dump SQL lokal terbaru/);
   assert.match(a,/SQL 0018/);
   assert.match(a,/sla_sks_v3 \(3\)\.sql/);
