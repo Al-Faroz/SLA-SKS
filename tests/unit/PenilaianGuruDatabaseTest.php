@@ -32,7 +32,8 @@ final class PenilaianGuruDatabaseTest extends TestCase
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER)',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,guru_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER)',
             'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,dinilai_pada TEXT,umpan_balik TEXT)',
-            'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,dinilai_pada TEXT,umpan_balik TEXT)',
+            'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,materi_id INTEGER,row_uuid TEXT,pertanyaan TEXT,petunjuk TEXT)',
+            'CREATE TABLE jawaban_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,dinilai_pada TEXT,umpan_balik TEXT)',
             'CREATE TABLE log_aktivitas(id INTEGER PRIMARY KEY AUTOINCREMENT,pengguna_id INTEGER,peran_aktif TEXT,peristiwa TEXT,catatan TEXT,waktu TEXT)',
         ] as $ddl) $this->db->query($ddl);
         $this->db->table('ref_angkatan')->insertBatch([
@@ -93,7 +94,7 @@ final class PenilaianGuruDatabaseTest extends TestCase
                 'isi'=>'Draf belum final','status'=>'draf','revisi'=>1,
                 'dikirim_pada'=>null],
         ]);
-        $this->db->table('tugas_hots_materi')->insert([
+        $this->db->table('jawaban_hots_materi')->insert([
             'id'=>7,'progres_tp_id'=>1,'materi_id'=>10,'versi_konten_tp_id'=>1010,
             'isi'=>'Analisis HOTS A','status'=>'final','revisi'=>1,
             'dikirim_pada'=>'2026-10-25 00:12:00',
@@ -112,6 +113,21 @@ final class PenilaianGuruDatabaseTest extends TestCase
             'id'=>$id,'peran_aktif'=>$role,'status'=>'aktif',
             'wajib_ganti_sandi'=>0,
         ]);
+    }
+
+    public function testBankTugasHotsGuruTerpisahDariJawabanSiswa(): void
+    {
+        $this->db->table('tugas_hots_materi')->insert([
+            'materi_id'=>10, 'row_uuid'=>'bank-01',
+            'pertanyaan'=>'Pertanyaan yang dibuat Guru',
+            'petunjuk'=>'Instruksi',
+        ]);
+        $this->svc()->simpan('hots',7,88,'Baik');
+        self::assertSame(1,$this->db->table('tugas_hots_materi')->countAllResults());
+        self::assertSame('Pertanyaan yang dibuat Guru',
+            $this->db->table('tugas_hots_materi')->get()->getRow('pertanyaan'));
+        self::assertSame(88,(int)$this->db->table('jawaban_hots_materi')
+            ->where('id',7)->get()->getRow('nilai'));
     }
 
     public function testAntreanG1PerGenDanHanyaJawabanFinalBelumDinilai(): void
@@ -221,7 +237,7 @@ final class PenilaianGuruDatabaseTest extends TestCase
     public function testFilterPaginasiTetapBerdasarkanSQLDanDrafTidakMuncul(): void
     {
         for ($i=0;$i<30;$i++) {
-            $this->db->table('tugas_hots_materi')->insert([
+            $this->db->table('jawaban_hots_materi')->insert([
                 'progres_tp_id'=>3,'materi_id'=>10,
                 'versi_konten_tp_id'=>1010,'isi'=>'Jawaban ' . $i,
                 'status'=>'final','revisi'=>1,

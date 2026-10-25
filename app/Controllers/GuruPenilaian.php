@@ -58,10 +58,19 @@ final class GuruPenilaian extends BaseController
                         'Filter antrean tidak valid. Gunakan pilihan Gen–Mapel yang tersedia.');
             }
             return $this->blokir($e->getMessage());
+        } catch (RuntimeException $e) {
+            log_message('error', 'Antrean penilaian: {error}', ['error'=>$e->getMessage()]);
+            return $this->response->setStatusCode(503)->setBody(
+                view('publik/galat_sistem', [
+                    'judul' => 'Modul penilaian belum siap',
+                    'pesan' => 'Struktur jawaban HOTS siswa belum terpasang.'
+                        . ' Administrator perlu memeriksa patch SQL 0018.',
+                ])
+            );
         } catch (Throwable $e) {
             log_message('error', 'Antrean penilaian: {error}', ['error'=>$e->getMessage()]);
             return $this->response->setStatusCode(500)->setBody(
-                view('publik/ditolak', ['judul'=>'Antrean belum dapat dimuat'])
+                view('publik/galat_sistem', ['judul'=>'Antrean penilaian gagal dimuat'])
             );
         }
         return view('guru/antrean_penilaian', [
@@ -86,7 +95,7 @@ final class GuruPenilaian extends BaseController
         } catch (Throwable $e) {
             log_message('error', 'Detail penilaian: {error}', ['error'=>$e->getMessage()]);
             return $this->response->setStatusCode(500)->setBody(
-                view('publik/ditolak', ['judul'=>'Detail belum dapat dibuka'])
+                view('publik/galat_sistem', ['judul'=>'Detail penilaian gagal dimuat'])
             );
         }
         return view('guru/nilai_kegiatan', [

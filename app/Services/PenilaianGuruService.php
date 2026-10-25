@@ -137,10 +137,19 @@ final class PenilaianGuruService
             . "'" . $jenis . "' AS jenis";
     }
 
+    /** Periksa tabel jawaban siswa; jangan memakai bank tugas HOTS milik Guru. */
+    private function pastikanSkema(): void
+    {
+        if (!$this->db->tableExists('jawaban_hots_materi')) {
+            throw new RuntimeException('Tabel jawaban HOTS siswa belum terpasang. Periksa SQL 0018.');
+        }
+    }
+
     /** @return array{baris:array,total:int,halaman:int,jumlah_halaman:int} */
     public function antrean(?array $filter = null, int $halaman = 1): array
     {
         $guruId = $this->guruId();
+        $this->pastikanSkema();
         if ($halaman < 1 || $halaman > 100000) {
             throw new DomainException('Halaman antrean tidak valid.');
         }
@@ -179,6 +188,7 @@ final class PenilaianGuruService
     public function lihat(string $jenis, int $id): array
     {
         $guru = $this->guruId();
+        $this->pastikanSkema();
         if ($id < 1) throw new DomainException('Tugas tidak valid.');
         $row = $this->db->query(self::kolom($jenis) . self::sumber($jenis)
             . ' AND r.id=?', [$guru, $id])->getRowArray();
