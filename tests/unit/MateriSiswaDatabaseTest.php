@@ -35,11 +35,12 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,nomor_versi INTEGER,snapshot_json TEXT,checksum TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
-            'CREATE TABLE berkas(id INTEGER PRIMARY KEY,tp_id INTEGER,nama_acak TEXT,mime TEXT,ukuran_byte INTEGER)',
+            'CREATE TABLE berkas(id INTEGER PRIMARY KEY,tp_id INTEGER,nama_acak TEXT,mime TEXT,ukuran_byte INTEGER,halaman INTEGER)',
             'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dibuat_pada TEXT,diubah_pada TEXT,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,umpan_balik TEXT,dinilai_pada TEXT)',
             'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dibuat_pada TEXT,diubah_pada TEXT,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,umpan_balik TEXT,dinilai_pada TEXT)',
             'CREATE TABLE log_aktivitas(id INTEGER PRIMARY KEY AUTOINCREMENT,pengguna_id INTEGER,peran_aktif TEXT,peristiwa TEXT,catatan TEXT,waktu TEXT)',
             'CREATE TABLE progres_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,jenis TEXT,status TEXT,waktu_aktif_detik INTEGER DEFAULT 0,waktu_putar_detik INTEGER DEFAULT 0,posisi_terakhir_detik INTEGER,posisi_terjauh_detik INTEGER DEFAULT 0,durasi_media_detik INTEGER,halaman_total INTEGER,halaman_selesai INTEGER DEFAULT 0,heartbeat_terakhir_pada TEXT,dibuat_pada TEXT,diubah_pada TEXT,media_selesai_pada TEXT)',
+            'CREATE TABLE halaman_progres_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_materi_id INTEGER,nomor_halaman INTEGER,waktu_aktif_detik INTEGER,selesai_pada TEXT,UNIQUE(progres_materi_id,nomor_halaman))',
         ] as $query) $this->db->query($query);
         $this->db->table('ref_angkatan')->insertBatch([
             ['id'=>1,'kode'=>'GENA','nama'=>'Gen A','semester_mulai'=>4],
@@ -100,7 +101,7 @@ final class MateriSiswaDatabaseTest extends TestCase
         file_put_contents($this->file, "%PDF-1.4\n% uji sintetis\n");
         $this->db->table('berkas')->insert([
             'id'=>9,'tp_id'=>1,'nama_acak'=>$nama,'mime'=>'application/pdf',
-            'ukuran_byte'=>filesize($this->file),
+            'ukuran_byte'=>filesize($this->file),'halaman'=>2,
         ]);
     }
 
@@ -253,16 +254,74 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
     }
 
-    public function testMediaPdfTidakBolehDinyatakanSelesaiMelaluiDetak(): void
+    public function testPdfDuaHalamanServerDanGerbangResume(): void
     {
-        $service=$this->progresMediaService(101,static fn (): int => 1000);
+        $now = 1000;
+        $service = $this->progresMediaService(101,
+            static function() use (&$now): int { return $now; });
         try {
-            $service->detak(1,31,true,null,null);
-            self::fail('Iframe PDF tidak menyediakan bukti per halaman.');
+            $service->detak(1, 31, true, null, null, 1, 1);
+            self::fail('Jumlah halaman klien tidak boleh palsu.');
         } catch (\DomainException $e) {
-            self::assertStringContainsString('PDF.js',$e->getMessage());
+            self::assertStringContainsString('jumlah halaman', $e->getMessage());
         }
-        self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
+        self::assertSame(0, $this->db->table('progres_materi')->countAllResults());
+        $service->detak(1,31,true,null,null,1,2);
+        $now = 1010;
+        $service->detak(1,31,true,null,null,1,2);
+        $now = 1020;
+        $status = $service->detak(1,31,true,null,null,1,2);
+        self::assertSame(1, $status['halaman_selesai']);
+        self::assertFalse($status['media_selesai']);
+        $now = 1030;
+        $service->detak(1,31,true,null,null,2,2);
+        $now = 1040;
+        $service->detak(1,31,true,null,null,2,2);
+        $now = 1050;
+        $status = $service->detak(1,31,true,null,null,2,2);
+        self::assertSame(2, $status['halaman_selesai']);
+        self::assertFalse($status['media_selesai']);
+        $now = 1060;
+        $service->detak(1,31,true,null,null,2,2);
+        $now = 1070;
+        $status = $service->detak(1,31,true,null,null,2,2);
+        self::assertTrue($status['media_selesai']);
+        self::assertSame(60, $status['waktu_aktif_detik']);
+        self::assertSame(2, $this->db->table('halaman_progres_materi')->countAllResults());
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn(): array => ['id'=>101, 'peran_aktif'=>'siswa', 'status'=>'aktif',
+                'wajib_ganti_sandi'=>0]);
+        self::assertTrue($k->status(1,31)['media_selesai']);
+    }
+
+    public function testPdfPindahHalamanDanJedaPanjangTidakMenghitungWaktu(): void
+    {
+        $now = 1000;
+        $service = $this->progresMediaService(101,
+            static function() use (&$now): int { return $now; });
+        $service->detak(1,31,true,null,null,1,2);
+        $now = 1010;
+        $service->detak(1,31,true,null,null,2,2);
+        $now = 1110;
+        $status = $service->detak(1,31,true,null,null,2,2);
+        self::assertSame(0, $status['waktu_aktif_detik']);
+        $now = 1120;
+        $status = $service->detak(1,31,true,null,null,2,2);
+        self::assertSame(10, $status['waktu_aktif_detik']);
+        $this->expectException(\DomainException::class);
+        $service->detak(1,31,true,null,null,3,2);
+    }
+
+    public function testPdfSukarelaTidakMencatatProgresResmi(): void
+    {
+        $service = $this->progresMediaService(102,static fn():int => 1000);
+        try {
+            $service->detak(1,31,true,null,null,1,2);
+            self::fail('Siswa tuntas tidak boleh mencatat detak resmi.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('sukarela',$e->getMessage());
+        }
+        self::assertSame(0, $this->db->table('progres_materi')->countAllResults());
     }
 
     public function testResumeHotsHanyaSetelahMediaDanBerurutanSertaFinalIdempoten(): void
