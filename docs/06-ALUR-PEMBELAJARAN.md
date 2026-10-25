@@ -68,3 +68,26 @@ Diagnostik tetap dapat membaca sukarela tanpa mengirim jawaban resmi.
 Resume minimal 50 dan HOTS 200 karakter; maksimal teknis 12.000 karakter.
 PDF belum dapat menuntaskan media tanpa PDF.js lokal. Skor Guru dan Sumatif
 belum diterbitkan pada tahap ini.
+
+### S08D — Pembaca PDF.js lokal dan progres per halaman (25 Oktober 2026)
+
+Pembaca PDF siswa hanya memakai library dan worker PDF.js 3.2.146 lokal
+(public/assets/vendor/pdfjs/3.2.146), lisensi Apache-2.0. Tidak memakai CDN
+atau iframe browser untuk mencatat pembelajaran resmi. PDF yang diperbolehkan
+tetap sesuai validator dan keputusan PDF Materi yang sudah FIX (maks. 15 MB,
+40 halaman, tanpa pembatasan tambahan pada revisi normal file).
+
+Semua halaman dirender satu per satu dengan Prev/Next, zoom 50–200%,
+fullscreen dan navigasi keyboard. Metadata jumlah halaman diperiksa terhadap
+berkas privat dalam snapshot TP; data klien tidak boleh mengurangi jumlahnya.
+Heartbeat aktif tiap ~10 detik; interval pertama/berganti halaman, saat
+perenderan, tab berpindah/kehilangan fokus, koneksi hilang, dan jarak detak
+di luar 5–20 detik tidak dihitung otomatis. Setiap halaman memerlukan
+sekurang-kurangnya 15 detik kredensial waktu server; seluruh halaman lengkap
+dan min_waktu_detik Guru harus terpenuhi sebelum media_selesai.
+
+Progress ditulis ke progres_materi dan halaman_progres_materi dari SQL 0016
+melalui transaksi InnoDB, snapshot dan akses siswa divalidasi server. Resume
+dan HOTS tetap harus final. Belajar PDF sukarela setelah lulus Diagnostik
+tetap tanpa pencatatan/penilaian resmi. Sinyal browser adalah mitigasi
+best-effort (tidak dapat membuktikan mata benar-benar membaca).
