@@ -66,7 +66,12 @@
                                     <span class="a-penilaian-terpisah">Materi <?= (int) $r['urutan_materi'] ?>:
                                         <?= esc($r['materi_judul']) ?></span>
                                 </td>
-                                <td><span class="a-badge"><?= esc(strtoupper($r['jenis'])) ?></span></td>
+                                <td><span class="a-badge"><?= esc(strtoupper($r['jenis'])) ?></span>
+                                    <?php if ((float) $r['kemiripan'] >= 60): ?>
+                                        <span class="a-badge" title="Indikasi kesamaan teks, perlu pemeriksaan Guru">
+                                            Perlu dicek <?= esc((string)$r['kemiripan']) ?>%</span>
+                                    <?php endif ?>
+                                </td>
                                 <td><a class="a-btn a-btn--sekunder"
                                     href="<?= esc(site_url('guru/penilaian/' . $r['jenis']
                                         . '/' . (int) $r['id']), 'attr') ?>">Nilai jawaban</a></td>

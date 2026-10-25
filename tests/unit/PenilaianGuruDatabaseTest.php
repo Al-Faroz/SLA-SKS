@@ -233,5 +233,30 @@ final class PenilaianGuruDatabaseTest extends TestCase
         self::assertCount(25,$svc->antrean()['baris']);
         self::assertCount(7,$svc->antrean(null,2)['baris']);
         self::assertSame(2,$svc->antrean(null,999)['halaman']);
+    }    public function testKemiripanTrigramBukanPenilaianOtomatis(): void
+    {
+        self::assertSame(100.0,PenilaianGuruService::kemiripan(
+            'Belajar dengan Guru dapat membangun karakter baik.',
+            'belajar dengan GURU dapat membangun karakter baik'));
+        self::assertSame(0.0,PenilaianGuruService::kemiripan(
+            'Membaca buku sejarah bangsa', 'Audio alat membantu menjelaskan teori'));
+        self::assertSame(100.0,PenilaianGuruService::kemiripan('مرحبا عالم','مرحبا عالم'));
+        self::assertSame(0.0,PenilaianGuruService::kemiripan('','teks lainnya'));
     }
+
+    public function testTugasMiripMendapatIndikatorTanpaMengubahNilai(): void
+    {
+        $jawaban='Belajar dengan Guru dapat membangun karakter baik untuk masa depan.';
+        $this->db->table('resume_materi')->where('id',1)->update(['isi'=>$jawaban]);
+        $this->db->table('resume_materi')->where('id',3)
+            ->update(['isi'=>$jawaban,'status'=>'final',
+                'dikirim_pada'=>'2026-10-25 00:14:00']);
+        $detail=$this->svc()->lihat('resume',1);
+        self::assertSame(100.0,$detail['kemiripan']);
+        self::assertNull($detail['nilai']);
+        $antrean=$this->svc()->antrean();
+        self::assertSame(3,$antrean['total']);
+        self::assertSame(100.0,$antrean['baris'][0]['kemiripan']);
+    }
+
 }

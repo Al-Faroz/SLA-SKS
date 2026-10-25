@@ -55,6 +55,49 @@ final class PenilaianGuruService
         return $teks;
     }
 
+    /** Indikator 3-gram kata: bukan keputusan kecurangan/penilaian. */
+    public static function kemiripan(string $pertama, string $kedua): float
+    {
+        $tokens = static function (string $teks): array {
+            $teks = mb_strtolower($teks, 'UTF-8');
+            $teks = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $teks);
+            $kata = preg_split('/\s+/u', trim((string) $teks), -1, PREG_SPLIT_NO_EMPTY);
+            $kata = is_array($kata) ? $kata : [];
+            if (count($kata) < 3) return array_fill_keys($kata, true);
+            $set = [];
+            for ($i = 0; $i <= count($kata) - 3; $i++) {
+                $set[implode(' ', array_slice($kata, $i, 3))] = true;
+            }
+            return $set;
+        };
+        $a = $tokens($pertama);
+        $b = $tokens($kedua);
+        if (!$a || !$b) return 0.0;
+        $irisan = count(array_intersect_key($a, $b));
+        $gabungan = count($a) + count($b) - $irisan;
+        return $gabungan > 0 ? round(100 * $irisan / $gabungan, 1) : 0.0;
+    }
+
+    private function skorKemiripan(string $jenis, array $data): float
+    {
+        $tabel = self::tabel($jenis);
+        $row = $this->db->table($tabel . ' x')
+            ->select('x.isi')
+            ->join('progres_tp pr','pr.id=x.progres_tp_id')
+            ->join('siswa s','s.id=pr.siswa_id')
+            ->where('x.materi_id',(int)$data['materi_id'])
+            ->where('x.versi_konten_tp_id',(int)$data['versi_konten_tp_id'])
+            ->where('s.angkatan_id',(int)$data['angkatan_id'])
+            ->where('x.status','final')->where('x.id !=',(int)$data['id'])
+            ->limit(500)->get()->getResultArray();
+        $max = 0.0;
+        foreach ($row as $other) {
+            $max = max($max, self::kemiripan(
+                (string)$data['isi'], (string)$other['isi']));
+        }
+        return $max;
+    }
+
     public function penugasan(): array
     {
         $this->guruId();
@@ -125,6 +168,10 @@ final class PenilaianGuruService
             . ' ORDER BY dikirim_pada ASC,id ASC,jenis ASC'
             . ' LIMIT ' . $perPage . ' OFFSET ' . (($halaman - 1) * $perPage),
             $bindings)->getResultArray();
+        foreach ($rows as &$r) {
+            $r['kemiripan'] = $this->skorKemiripan((string)$r['jenis'], $r);
+        }
+        unset($r);
         return ['baris'=>$rows,'total'=>$total,'halaman'=>$halaman,
             'jumlah_halaman'=>$pages];
     }
@@ -154,6 +201,7 @@ final class PenilaianGuruService
                 $row['materi_judul_snapshot'] = (string) ($materi['judul'] ?? '');
                 $row['petunjuk'] = (string) ($materi[$jenis === 'resume'
                     ? 'petunjuk_resume' : 'petunjuk_hots'] ?? '');
+                $row['kemiripan'] = $this->skorKemiripan($jenis, $row);
                 return $row;
             }
         }

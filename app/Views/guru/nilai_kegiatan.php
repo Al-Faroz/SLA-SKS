@@ -31,6 +31,13 @@
             Jawaban final tidak dapat diubah siswa.</p>
         <h3>Petunjuk dari Materi versi siswa</h3>
         <div class="a-penilaian-isi"><?= nl2br(esc((string) $tugas['petunjuk'])) ?></div>
+        <?php if ((float) $tugas['kemiripan'] >= 60): ?>
+            <div class="a-alert" role="status">
+                <strong>Perlu dicek:</strong> kemiripan <?= esc((string)$tugas['kemiripan']) ?>%
+                dengan jawaban lain pada Materi dan snapshot yang sama.
+                Indikator ini bukan bukti kecurangan dan tidak mengubah nilai secara otomatis.
+            </div>
+        <?php endif ?>
         <h3>Jawaban siswa</h3>
         <div class="a-penilaian-isi"><?= nl2br(esc((string) $tugas['isi'])) ?></div>
     </section>
