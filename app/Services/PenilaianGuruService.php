@@ -114,9 +114,10 @@ final class PenilaianGuruService
             array_push($bindings, ...$args);
         }
         $subquery = implode(' UNION ALL ', $parts);
-        $total = (int) $this->db->query(
+        $count = $this->db->query(
             'SELECT COUNT(*) AS jumlah FROM (' . $subquery . ') q',
-            $bindings)->getRow('jumlah');
+            $bindings)->getRowArray();
+        $total = (int) ($count['jumlah'] ?? 0);
         $perPage = 25;
         $pages = max(1, (int) ceil($total / $perPage));
         $halaman = min($pages, $halaman);
