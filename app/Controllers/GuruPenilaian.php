@@ -63,6 +63,7 @@ final class GuruPenilaian extends BaseController
             return $this->response->setStatusCode(503)->setBody(
                 view('publik/galat_sistem', [
                     'judul' => 'Modul penilaian belum siap',
+                    'kodeGalat' => 503,
                     'pesan' => 'Struktur jawaban HOTS siswa belum terpasang.'
                         . ' Administrator perlu memeriksa patch SQL 0018.',
                 ])
