@@ -259,4 +259,15 @@ final class PenilaianGuruDatabaseTest extends TestCase
         self::assertSame(100.0,$antrean['baris'][0]['kemiripan']);
     }
 
+    public function testGuruAktifTanpaPenugasanMelihatAntreanKosongBukan403(): void
+    {
+        $this->db->table('penugasan_guru_gen')->where('guru_id',101)->delete();
+        $svc = $this->svc(101);
+        self::assertSame([], $svc->penugasan());
+        $result = $svc->antrean();
+        self::assertSame(0, $result['total']);
+        self::assertSame([], $result['baris']);
+        self::assertSame(1, $result['halaman']);
+    }
+
 }

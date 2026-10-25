@@ -31,7 +31,12 @@ final class GuruPenilaian extends BaseController
     private function blokir(string $pesan): ResponseInterface
     {
         return $this->response->setStatusCode(403)->setBody(
-            view('publik/ditolak', ['judul' => $pesan])
+            view('publik/ditolak', [
+                'judul' => 'Akses penilaian ditolak',
+                'pesan' => $pesan,
+                'tautanPath' => 'guru/peta-atp',
+                'labelTautan' => 'Periksa penugasan pada Peta ATP',
+            ])
         );
     }
 
@@ -46,6 +51,12 @@ final class GuruPenilaian extends BaseController
             $data = $svc->antrean($dipilih, $halaman);
             $akun = (new AuthService())->penggunaSaatIni();
         } catch (DomainException $e) {
+            if ($this->request->getGet('pilihan') !== null
+                || $this->request->getGet('halaman') !== null) {
+                return redirect()->to(site_url('guru/penilaian'))
+                    ->with('nilai_galat',
+                        'Filter antrean tidak valid. Gunakan pilihan Gen–Mapel yang tersedia.');
+            }
             return $this->blokir($e->getMessage());
         } catch (Throwable $e) {
             log_message('error', 'Antrean penilaian: {error}', ['error'=>$e->getMessage()]);

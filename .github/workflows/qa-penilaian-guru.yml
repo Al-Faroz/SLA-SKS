@@ -10,6 +10,9 @@ on:
       - 'app/Services/NavigasiService.php'
       - 'public/assets/js/penilaian-guru.js'
       - 'tests/unit/PenilaianGuruDatabaseTest.php'
+      - 'tests/unit/AuthFilterPeranAktifTest.php'
+      - 'app/Filters/AuthFilter.php'
+      - 'app/Views/publik/ditolak.php'
       - '.github/workflows/qa-penilaian-guru.yml'
   workflow_dispatch:
 permissions:
@@ -35,7 +38,10 @@ jobs:
           php -l app/Config/Routes.php
           php -l app/Services/NavigasiService.php
           php -l tests/unit/PenilaianGuruDatabaseTest.php
+          php -l tests/unit/AuthFilterPeranAktifTest.php
+          php -l app/Filters/AuthFilter.php
+          php -l app/Views/publik/ditolak.php
       - name: SQLite integration
-        run: vendor/bin/phpunit tests/unit/PenilaianGuruDatabaseTest.php --no-coverage
+        run: vendor/bin/phpunit tests/unit/PenilaianGuruDatabaseTest.php tests/unit/AuthFilterPeranAktifTest.php --no-coverage
       - name: JavaScript syntax
         run: node --check public/assets/js/penilaian-guru.js

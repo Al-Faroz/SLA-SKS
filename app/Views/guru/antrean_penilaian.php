@@ -14,6 +14,9 @@
                 Nilai yang sudah tersimpan tidak dapat diubah dari halaman ini.</p>
         </div>
     </header>
+    <?php if (session()->getFlashdata('nilai_galat')): ?>
+        <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('nilai_galat')) ?></div>
+    <?php endif ?>
     <?php if (session()->getFlashdata('nilai_sukses')): ?>
         <div class="a-alert" role="status"><?= esc(session()->getFlashdata('nilai_sukses')) ?></div>
     <?php endif ?>
