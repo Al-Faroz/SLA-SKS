@@ -101,7 +101,13 @@ final class GuruPenilaian extends BaseController
             $svc = new PenilaianGuruService();
             $svc->simpan($jenis, $id, (int) $skor, $umpan);
             if ($this->request->getPost('lanjut') === 'berikutnya') {
-                $queue = $svc->antrean(null, 1);
+                // Berikutnya tetap pada Gen–Mapel tugas yang baru dinilai,
+                // jangan melompat ke Gen lain pada akun Guru multi penugasan.
+                $dinilai = $svc->lihat($jenis, $id);
+                $queue = $svc->antrean([
+                    'angkatan_id' => (int) $dinilai['angkatan_id'],
+                    'mapel_id' => (int) $dinilai['mapel_id'],
+                ], 1);
                 if ($queue['baris'] !== []) {
                     $next = $queue['baris'][0];
                     return redirect()->to(site_url('guru/penilaian/'
