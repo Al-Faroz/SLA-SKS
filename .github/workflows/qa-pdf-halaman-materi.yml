@@ -1,0 +1,50 @@
+name: QA S08D PDF.js Materi Siswa
+on:
+  pull_request:
+    paths:
+      - 'app/Services/ProgresPdfMateriSiswaService.php'
+      - 'app/Services/ProgresMediaMateriSiswaService.php'
+      - 'app/Services/MateriSiswaService.php'
+      - 'app/Controllers/SiswaAktivitasMateri.php'
+      - 'app/Views/siswa/materi.php'
+      - 'public/assets/js/pembaca-pdf-materi.js'
+      - 'public/assets/js/aktivitas-materi.js'
+      - 'public/assets/vendor/pdfjs/**'
+      - 'tests/unit/MateriSiswaDatabaseTest.php'
+      - 'tests/js/pdf-halaman-materi.test.cjs'
+      - '.github/workflows/qa-pdf-halaman-materi.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pdf-halaman:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: PHP syntax
+        run: |
+          php -l app/Services/ProgresPdfMateriSiswaService.php
+          php -l app/Services/ProgresMediaMateriSiswaService.php
+          php -l app/Services/MateriSiswaService.php
+          php -l app/Controllers/SiswaAktivitasMateri.php
+          php -l app/Views/siswa/materi.php
+          php -l tests/unit/MateriSiswaDatabaseTest.php
+      - name: PHP integration S08D & S09
+        run: vendor/bin/phpunit --no-coverage tests/unit/MateriSiswaDatabaseTest.php
+      - name: JavaScript syntax and viewer behavior
+        run: |
+          node --check public/assets/js/pembaca-pdf-materi.js
+          node --check public/assets/js/aktivitas-materi.js
+          node --test tests/js/pdf-halaman-materi.test.cjs
+      - name: PDF.js worker and license
+        run: |
+          test -s public/assets/vendor/pdfjs/3.2.146/pdf.min.js
+          test -s public/assets/vendor/pdfjs/3.2.146/pdf.worker.min.js
+          grep -q 'Apache License' public/assets/vendor/pdfjs/3.2.146/LICENSE

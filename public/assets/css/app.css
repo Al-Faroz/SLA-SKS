@@ -1404,3 +1404,18 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-kegiatan-jawaban { background:var(--a-latar); border:1px solid var(--a-garis);
     border-radius:var(--a-radius-kecil); padding:14px; white-space:normal; overflow-wrap:anywhere; }
 @media(max-width:600px) { .a-kegiatan-aksi .a-btn { flex:1 1 140px; justify-content:center; } }
+
+
+/* S08D pembaca PDF.js lokal: area kanvas di-scroll, toolbar aktif di fullscreen. */
+.a-pdf-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.a-pdf-controls output { font-weight:600; font-size:.85rem; }
+.a-pdf-kanvas-area { overflow:auto; overscroll-behavior:contain;
+    background:var(--a-latar, #f3f6f4); text-align:center; padding:8px;
+    box-sizing:border-box; }
+.a-pdf-kanvas-area canvas { display:block; margin:0 auto; max-width:none;
+    background:#fff; box-shadow:0 1px 3px #0002; }
+.a-pembaca-fullscreen:fullscreen .a-pdf-kanvas-area { flex:1 1 auto; min-height:0; }
+@media (max-width:600px) {
+    .a-pdf-controls { width:100%; justify-content:center; }
+    .a-pdf-kanvas-area { min-height:260px; }
+}

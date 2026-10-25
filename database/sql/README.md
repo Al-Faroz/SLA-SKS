@@ -256,3 +256,13 @@ LANGKAH AMAN:
    menyamarkan struktur tabel yang sudah ada tetapi tidak cocok.
 
 Pengujian SQL di MariaDB CI bukan pengganti verifikasi MySQL di XAMPP.
+
+### S08D Pembaca PDF per halaman: **TANPA impor SQL baru**
+
+Menggunakan kedua tabel yang telah dibuat SQL 0016, yaitu progres_materi dan
+halaman_progres_materi. Patch 0017 yang sudah FIX tetap sama; jangan impor
+0016 atau 0017 ulang dan jangan menghapus data. Jika tabel 0016 ada,
+langsung uji pembaca PDF siswa di branch S08D setelah backup rutin. Setiap
+detak PDF tercatat pada snapshot Materi terpin; jumlah halaman berasal
+dari berkas unggahan Guru. Perubahan ini tidak menyentuh
+PdfMateriValidator.php atau validator batas 15 MB/40 halaman.

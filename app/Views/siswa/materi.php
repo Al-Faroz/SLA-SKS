@@ -36,23 +36,36 @@
                 halaman aktif, dan kecepatan normal. Minimal 90% durasi
                 serta waktu belajar yang ditentukan Guru.</p>
         <?php elseif ($materi['jenis'] === 'pdf'): ?>
-            <div class="a-materi-pdf a-pembaca-fullscreen" data-pembaca-fullscreen>
+            <div class="a-materi-pdf a-pembaca-fullscreen" data-pembaca-fullscreen
+                data-pdf-pembaca data-pdf-ready="tidak"
+                data-pdf-url="<?= esc($media_url, 'attr') ?>"
+                data-pdf-worker="<?= esc(base_url('public/assets/vendor/pdfjs/3.2.146/pdf.worker.min.js'), 'attr') ?>"
+                data-pdf-expected="<?= (int) $materi['halaman_pdf'] ?>">
                 <div class="a-pembaca-toolbar">
                     <span class="a-pembaca-toolbar__judul">Pembaca PDF</span>
-                    <button class="a-btn a-btn--sekunder" type="button"
-                        data-pembaca-toggle aria-label="Perbesar PDF ke layar penuh"
-                        aria-pressed="false">Layar penuh</button>
+                    <div class="a-pdf-controls" role="group" aria-label="Navigasi halaman PDF">
+                        <button class="a-btn a-btn--sekunder" type="button" data-pdf-sebelum disabled>← Sebelumnya</button>
+                        <output data-pdf-jumlah aria-live="polite">Memuat PDF…</output>
+                        <button class="a-btn a-btn--sekunder" type="button" data-pdf-berikut disabled>Berikutnya →</button>
+                    </div>
+                    <div class="a-pdf-controls" role="group" aria-label="Zoom PDF">
+                        <button class="a-btn a-btn--sekunder" type="button" data-pdf-perkecil disabled aria-label="Perkecil halaman PDF">−</button>
+                        <output data-pdf-zoom>100%</output>
+                        <button class="a-btn a-btn--sekunder" type="button" data-pdf-perbesar disabled aria-label="Perbesar halaman PDF">+</button>
+                    </div>
+                    <button class="a-btn a-btn--sekunder" type="button" data-pembaca-toggle
+                        aria-label="Perbesar PDF ke layar penuh" aria-pressed="false">Layar penuh</button>
                 </div>
-                <div class="a-pembaca-pdf-frame">
-                    <iframe src="<?= esc($media_url, 'attr') ?>#toolbar=1"
-                        title="PDF pembelajaran: <?= esc($materi['judul'], 'attr') ?>"
-                        loading="lazy" allowfullscreen></iframe>
+                <div class="a-pembaca-pdf-frame a-pdf-kanvas-area" data-pdf-baca-area tabindex="0"
+                    aria-label="Halaman PDF, gunakan tombol navigasi atau PageUp/PageDown untuk berpindah.">
+                    <canvas data-pdf-kanvas aria-label="Halaman PDF materi pembelajaran"></canvas>
                 </div>
-                <p class="a-pembaca-pesan" data-pembaca-pesan role="status" aria-live="polite"></p>
+                <p class="a-pembaca-pesan" data-pdf-pesan role="status" aria-live="polite">Memuat pembaca PDF lokal…</p>
+                <p class="a-pembaca-pesan" data-pembaca-pesan role="status"></p>
             </div>
-            <p class="a-help">PDF dapat dibaca. Namun pembaca PDF.js lokal belum terpasang:
-                sistem <strong>belum</strong> menghitung halaman PDF sebagai selesai.
-                Diperlukan seluruh halaman dan waktu aktif per halaman yang sah.</p>
+            <p class="a-help">Baca semua halaman setidaknya 15 detik per halaman saat tab aktif.
+                Durasi minimum dari Guru tetap berlaku. Zoom dan layar penuh hanya mengubah tampilan.
+                Jika membaca sukarela, tidak ada progres resmi.</p>
         <?php elseif ($materi['jenis'] === 'audio'): ?>
             <div class="a-materi-audio">
                 <audio controls preload="metadata" data-audio-materi
@@ -112,7 +125,7 @@
                 <p data-media-waktu class="a-help">Waktu aktif tersimpan: 0 detik.</p>
                 <p class="a-help">
                     Selesai media tidak membuka Materi selanjutnya sebelum Resume dan HOTS
-                    Materi ini dikirim final. Draf/Kirim Final tersedia pada tahap berikutnya.
+                    Materi ini dikirim final. Resume dan HOTS tersedia setelah media ini selesai.
                 </p>
             </div>
         <?php endif ?>
@@ -226,6 +239,10 @@
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261025-s09s10'), 'attr') ?>" defer></script>
+<?php endif ?>
+<?php if ($materi['jenis'] === 'pdf'): ?>
+    <script src="<?= esc(base_url('public/assets/vendor/pdfjs/3.2.146/pdf.min.js'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/pembaca-pdf-materi.js?v=20261025-s08d'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (in_array($materi['jenis'], ['gambar', 'pdf'], true)): ?>
     <script src="<?= esc(base_url('public/assets/js/pembaca-materi.js?v=20261025-zoom2'), 'attr') ?>" defer></script>

@@ -308,3 +308,12 @@ Perbaikan laporan XAMPP: zoom sebelumnya melakukan `img.style.width = zoom + '%'
 - Area aktivitas `data-gambar-observer` S08B, izin Media Gen, nilai, status Diagnostik, timer resmi dan SQL **tidak berubah**. Kontrol presentasi zoom tidak menandai durasi atau ketuntasan.
 - Pengujian ditambah JavaScript **perilaku** (Node vm: lanskap/potret/gambar kecil, ukuran 100–300%, scroll, fullscreen, zoom terpusat, Ctrl+wheel/keyboard, gagal muat), di samping PHP/SQLite regresi. **Uji XAMPP browser tetap diperlukan** pada gambar sebenarnya serta Ctrl+F5 bila aset cache masih versi lama.
 
+
+### Implementasi UI S08D PDF siswa (25-10-2026)
+
+Pembaca PDF.js lokal dimuat hanya di halaman siswa dengan Materi jenis PDF:
+toolbar halaman Sebelumnya/Berikutnya, zoom 50–200%, fullscreen,
+dan area kanvas yang dapat di-scroll. Komponen menggunakan a-pembaca-* dan
+a-pdf-* pada app.css, bukan framework CSS baru. Error render dan
+ketidakcocokan halaman tampak langsung, tanpa mengklaim selesai.
+Kontrol keyboard PageUp/PageDown/ArrowLeft/ArrowRight; toolbar responsif.

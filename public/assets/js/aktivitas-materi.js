@@ -16,6 +16,7 @@
     let yt = null;
     let ytMemutar = false;
     let gambarTerlihat = false;
+    let resetPdf = true;
     const statusEl = root.querySelector('[data-media-status]');
     const waktuEl = root.querySelector('[data-media-waktu]');
     const bilah = root.querySelector('[data-media-bilah]');
@@ -48,9 +49,13 @@
         waktuEl.textContent = 'Waktu aktif tersimpan: ' + secs
             + ' detik. Minimal: ' + required + ' detik.'
             + (data.persen_putar_minimal ? ' Pemutaran minimal: 90% durasi.' : '');
+        if (jenis === 'pdf' && Number(data.halaman_total) > 0) {
+            waktuEl.textContent += ' Halaman selesai: ' + Number(data.halaman_selesai)
+                + '/' + Number(data.halaman_total) + '.';
+        }
         if (selesai) {
             bilah.value = 100;
-            statusText('Media selesai dan tersimpan di server. Lanjutkan Resume lalu HOTS ketika tersedia.');
+            statusText('Media selesai dan tersimpan di server. Perbarui halaman untuk membuka Resume dan HOTS.');
         } else {
             statusText(data.pesan || 'Menunggu aktivitas media.');
         }
@@ -64,6 +69,17 @@
                 return null;
             }
             return { aktif: 'ya', posisi: '', durasi: '' };
+        }
+        if (jenis === 'pdf') {
+            const pdf = document.querySelector('[data-pdf-pembaca]');
+            if (!pdf || pdf.dataset.pdfReady !== 'ya') return null;
+            const halaman = Number(pdf.dataset.pdfHalaman);
+            const total = Number(pdf.dataset.pdfTotal);
+            if (!Number.isInteger(halaman) || !Number.isInteger(total)
+                || halaman < 1 || total < 1 || halaman > total) return null;
+            return {aktif:'ya', posisi:'', durasi:'',
+                halaman:String(halaman), jumlah_halaman:String(total),
+                reset: resetPdf ? 'ya' : 'tidak'};
         }
         if (jenis === 'audio') {
             const player = document.querySelector('[data-audio-materi]');
@@ -97,6 +113,13 @@
         sedangKirim = true;
         try {
             const result = await request('POST', active);
+            if (jenis === 'pdf') {
+                const frame = document.querySelector('[data-pdf-pembaca]');
+                if (active.reset === 'ya' && frame?.dataset.pdfReady === 'ya'
+                    && frame.dataset.pdfHalaman === active.halaman && amanDilihat()) {
+                    resetPdf = false;
+                }
+            }
             tampil(result);
         } catch (err) {
             statusText('Belum tersimpan: ' + err.message + ' Pastikan koneksi aktif.');
@@ -149,7 +172,20 @@
     }
     request('GET').then(tampil).catch(err => statusText(
         'Progres belum dapat dimuat: ' + err.message + '.'));
-    if (jenis !== 'pdf') {
-        window.setInterval(detak, 10000);
+    if (jenis === 'pdf') {
+        document.addEventListener('visibilitychange', () => {
+            resetPdf = true;
+            if (document.visibilityState === 'visible') detak();
+        });
+        window.addEventListener('blur', () => { resetPdf = true; });
+        window.addEventListener('focus', () => { resetPdf = true; detak(); });
+        document.querySelector('[data-pdf-pembaca]')?.addEventListener(
+            'pdf-halaman-siap', () => {
+                resetPdf = true;
+                // Detak langsung pada halaman baru tidak menambah kredit,
+                // hanya mencatat nomor halaman terakhir dari klien yang aktif.
+                detak();
+            });
     }
+    window.setInterval(detak, 10000);
 })();
