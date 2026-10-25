@@ -19,6 +19,15 @@ final class PembacaMateriNavigasiTest extends TestCase
         self::assertStringContainsString('data-zoom-kurang', $view);
         self::assertStringContainsString('data-zoom-reset', $view);
         self::assertStringContainsString('data-zoom-nilai', $view);
+        self::assertStringContainsString('data-gambar-stage', $view);
+        self::assertStringContainsString('draggable="false"', $view);
+        self::assertStringContainsString('naturalWidth', $js);
+        self::assertStringContainsString('naturalHeight', $js);
+        self::assertStringContainsString('ResizeObserver', $js);
+        self::assertStringContainsString("skalaMuat", $js);
+        self::assertStringContainsString('area.scrollLeft', $js);
+        self::assertStringContainsString('area.scrollTop', $js);
+        self::assertStringNotContainsString("gambar.style.width = zoom + '%'", $js);
         self::assertStringContainsString('requestFullscreen()', $js);
         self::assertStringContainsString('exitFullscreen()', $js);
         self::assertStringContainsString('fullscreenchange', $js);
