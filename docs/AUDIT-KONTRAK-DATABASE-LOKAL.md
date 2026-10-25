@@ -33,3 +33,7 @@
 E2E-016 (tugas Materi saat TP Siap), E2E-020–024 dan 095 (jalur belajar dan draf/final), E2E-039 dan 073–074 (Guru memberi skor dengan jawaban pengujian), E2E-066–069 (SQL dan backup/restore). Antrean kosong saja **tidak membuktikan** alur penilaian telah selesai.
 
 **Status:** dump `sla_sks_v3 (3).sql` telah diterima dan diperiksa pada tingkat struktur; **tidak diperlukan unggah ulang untuk audit ini**. Audit kontrak Master/kode berikutnya boleh mengacu pada struktur ini; perubahan SQL apa pun tetap membutuhkan pemetaan perubahan dan uji menyeluruh sebelum diimpor. PR ini tidak mengubah database.
+
+### Implementasi terpisah: batas S09/S10 dari snapshot TP
+
+Perbaikan pada branch `fix/v24-minimum-kegiatan-dari-snapshot-tp` menggunakan `resume_min`/`tugas_min` pada versi TP terpin untuk tampilan dan validasi Kirim Final, dengan batas Master 05 yang sama. Kode tidak membaca konfigurasi TP live sebagai pengganti snapshot. Pengujian meliputi batas khusus, nilai live berubah, snapshot tidak sah, dan gerbang final. **Penyatuan tugas HOTS bank Guru dengan petunjuk Materi masih menjadi temuan terpisah dan tidak diubah oleh patch ini.**

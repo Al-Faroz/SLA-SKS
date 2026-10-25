@@ -65,7 +65,7 @@ antar-tab, dan audit final. Akses Materi berikutnya harus memenuhi ketiga
 bukti dari versi konten TP yang terpin: media_selesai, Resume final,
 dan HOTS final untuk seluruh Materi sebelumnya. Siswa yang tuntas melalui
 Diagnostik tetap dapat membaca sukarela tanpa mengirim jawaban resmi.
-Resume minimal 50 dan HOTS 200 karakter; maksimal teknis 12.000 karakter.
+Resume dan HOTS minimal sesuai `tp.resume_min`/`tp.tugas_min` pada snapshot TP siswa (bawaan 50/200 karakter); maksimal teknis 12.000 karakter.
 PDF belum dapat menuntaskan media tanpa PDF.js lokal. Skor Guru dan Sumatif
 belum diterbitkan pada tahap ini.
 
@@ -91,3 +91,7 @@ melalui transaksi InnoDB, snapshot dan akses siswa divalidasi server. Resume
 dan HOTS tetap harus final. Belajar PDF sukarela setelah lulus Diagnostik
 tetap tanpa pencatatan/penilaian resmi. Sinyal browser adalah mitigasi
 best-effort (tidak dapat membuktikan mata benar-benar membaca).
+
+### Koreksi S09/S10 — minimum teks mengikuti snapshot TP siswa
+
+Nilai `resume_min` (rentang Master 10–1000) dan `tugas_min` (50–5000) dibaca dari `snapshot_json.tp` pada `versi_konten_tp` yang **terpin** di progres siswa. UI serta validasi POST server memakai nilai yang sama, bukan TP live atau angka bawaan hardcode. Nilai snapshot di luar rentang Master / tidak tersedia ditolak dengan galat konfigurasi; tidak melakukan fallback diam-diam, mengubah TP Siap, atau menulis data. Draf tetap boleh singkat. Siswa jalur Diagnostik tuntas tetap tidak dapat mengirim kegiatan resmi. Tidak ada SQL baru.

@@ -59,6 +59,12 @@ final class MateriSiswaService
             throw new DomainException('Snapshot pembelajaran tidak sah. Hubungi Guru.');
         }
         $snapshot = json_decode($versi['snapshot_json'], true, 512, JSON_THROW_ON_ERROR);
+        $tpSnapshot = $snapshot['tp'] ?? null;
+        if (!is_array($tpSnapshot) || (int) ($tpSnapshot['id'] ?? 0) !== $tpId) {
+            throw new DomainException('Konfigurasi TP pada snapshot tidak sah. Hubungi Guru.');
+        }
+        $minimalResume = KegiatanMateriSiswaService::batasMinimal('resume', $tpSnapshot);
+        $minimalHots = KegiatanMateriSiswaService::batasMinimal('hots', $tpSnapshot);
         $materi = $snapshot['materi'] ?? null;
         if (!is_array($materi) || $materi === []) {
             throw new DomainException('Daftar Materi versi TP ini belum tersedia.');
@@ -76,7 +82,8 @@ final class MateriSiswaService
             }
             $ids[$id] = true;
         }
-        return ['katalog' => $katalog, 'progres' => $p, 'materi' => $materi];
+        return ['katalog' => $katalog, 'progres' => $p, 'materi' => $materi,
+            'minimal_resume' => $minimalResume, 'minimal_hots' => $minimalHots];
     }
 
     /** @return array{progres:array,materi:list<array<string,mixed>>} */
@@ -166,6 +173,8 @@ final class MateriSiswaService
                 ? site_url('siswa/tp/' . $tpId . '/materi/' . $materiId . '/media') : null,
             'video_url' => $video,
             'sukarela' => $sukarela,
+            'minimal_resume' => $ctx['minimal_resume'],
+            'minimal_hots' => $ctx['minimal_hots'],
             'materi_berikutnya' => $berikutnya,
         ];
     }
