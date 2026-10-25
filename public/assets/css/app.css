@@ -1370,8 +1370,13 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     height:100%; min-height:0; }
 .a-pembaca-gambar-frame { width:100%; height:min(72vh,700px); min-height:310px;
     overflow:auto; overscroll-behavior:contain; background:#e7edeb; text-align:center; }
-.a-siswa-media .a-materi-gambar .a-pembaca-gambar-frame img { display:block; margin:0 auto;
-    max-width:none; width:100%; height:auto; object-fit:contain; }
+.a-pembaca-gambar-stage { display:flex; align-items:center; justify-content:center;
+    min-width:100%; min-height:100%; box-sizing:border-box; }
+.a-siswa-media .a-materi-gambar .a-pembaca-gambar-frame img { display:block; flex:0 0 auto;
+    margin:0; width:auto; height:auto; max-width:none; max-height:none; object-fit:contain;
+    user-select:none; -webkit-user-drag:none; }
+.a-pembaca-gambar-frame.is-zoomed { cursor:grab; }
+.a-pembaca-gambar-frame.is-zoomed:active { cursor:grabbing; }
 .a-pembaca-fullscreen:fullscreen { display:flex; flex-direction:column; background:#f8faf9;
     border:0; border-radius:0; width:100vw; height:100vh; }
 .a-pembaca-fullscreen:fullscreen .a-pembaca-toolbar { flex:0 0 auto; }
