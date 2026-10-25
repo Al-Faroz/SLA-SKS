@@ -1,0 +1,23 @@
+name: QA Audit Kontrak Database
+on:
+  pull_request:
+    paths:
+      - 'docs/AUDIT-KONTRAK-DATABASE-LOKAL.md'
+      - 'docs/10-DATABASE.md'
+      - 'AGENTS.md'
+      - 'database/sql/qa/audit_kontrak_database_readonly.sql'
+      - 'tests/js/audit-kontrak-db.test.cjs'
+      - '.github/workflows/qa-audit-kontrak-db.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-only-kontrak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: QA statis metadata dan Master
+        run: node --test tests/js/audit-kontrak-db.test.cjs
