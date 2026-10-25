@@ -160,6 +160,11 @@
                             <?= $kegiatan['media_selesai']
                                 ? 'Kirim Final Resume terlebih dahulu sebelum mengerjakan HOTS.'
                                 : 'Selesaikan media Materi sesuai ketentuan sebelum mengerjakan Resume/HOTS.' ?>
+                            <?php if (!$kegiatan['media_selesai']): ?>
+                                <a class="a-btn a-btn--sekunder" href="<?= esc(current_url(), 'attr') ?>">
+                                    Perbarui status media dan kegiatan
+                                </a>
+                            <?php endif ?>
                         </div>
                     <?php else: ?>
                         <form method="post" data-kegiatan-form

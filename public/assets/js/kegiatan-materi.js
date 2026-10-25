@@ -24,14 +24,22 @@
             });
         });
         form.addEventListener('submit', event => {
-            if (form.dataset.aksi === 'kirim'
+            if (form.dataset.mengirim === 'ya') {
+                event.preventDefault();
+                return;
+            }
+            const aksi = event.submitter?.value || form.dataset.aksi || 'simpan';
+            if (aksi === 'kirim'
                 && !window.confirm('Kirim jawaban final? Setelah dikirim tidak dapat diubah.')) {
                 event.preventDefault();
                 return;
             }
             mengirim = true;
+            form.dataset.mengirim = 'ya';
+            form.setAttribute('aria-busy', 'true');
             status.textContent = 'Mengirim jawaban ke server…';
-            form.querySelectorAll('button[type="submit"]').forEach(button => button.disabled = true);
+            // Jangan men-disable submitter sekarang: HTML belum membentuk
+            // payload dan name="aksi" akan hilang dari POST jika disabled.
         });
     });
     window.addEventListener('beforeunload', event => {
