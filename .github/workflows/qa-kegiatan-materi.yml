@@ -1,0 +1,42 @@
+name: QA S09 S10 Resume HOTS
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KegiatanMateriSiswaService.php'
+      - 'app/Services/MateriSiswaService.php'
+      - 'app/Controllers/SiswaKegiatanMateri.php'
+      - 'app/Controllers/SiswaMateri.php'
+      - 'app/Views/siswa/materi.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/kegiatan-materi.js'
+      - 'public/assets/css/app.css'
+      - 'database/sql/updates/0017_kegiatan_resume_hots_materi.sql'
+      - 'tests/unit/KegiatanMateriSiswaTest.php'
+      - '.github/workflows/qa-kegiatan-materi.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Dependensi CI4
+        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: PHP lint
+        run: |
+          php -l app/Services/KegiatanMateriSiswaService.php
+          php -l app/Services/MateriSiswaService.php
+          php -l app/Controllers/SiswaKegiatanMateri.php
+          php -l app/Controllers/SiswaMateri.php
+          php -l app/Views/siswa/materi.php
+          php -l app/Config/Routes.php
+      - name: PHPUnit S09 S10
+        run: vendor/bin/phpunit tests/unit/KegiatanMateriSiswaTest.php tests/unit/MateriSiswaDatabaseTest.php --no-coverage
+      - name: JavaScript syntax
+        run: node --check public/assets/js/kegiatan-materi.js
