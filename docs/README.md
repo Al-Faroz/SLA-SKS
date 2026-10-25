@@ -32,7 +32,8 @@
 - Aturan hidup pada dokumen domain masing-masing, tanpa membuat versi alternatif. Dokumen lain merujuk domain utama.
 - **PR dokumentasi ini tidak otomatis mengubah kode atau SQL**. Branch implementasi terpisah mengacu v2.4; tiap langkah diikuti tes dan persetujuan pemilik sebelum merge.
 - **PR #13** masih implementasi berdasarkan hierarki lama; **jangan merge** sebelum selaras.
-- Dump SQL lokal dikirim pemilik nanti; developer menganalisis, memilih data aman yang perlu dipertahankan, menyusun dump final. Pemilik backup, mengosongkan database lokal sendiri, lalu mengimpor. **Bukan prosedur reset produksi**.
+- **Gerbang DB wajib:** pemilik mengirim dump XAMPP terbaru sebelum *setiap* pekerjaan SQL/DB; developer memverifikasi bahwa dump dibuat sesudah patch terakhir, baru menyusun perubahan additive. Tidak ada reset tanpa permintaan/izin eksplisit dan backup. Proyek belum diunggah ke hosting.
+- [Audit kontrak database dan gerbang QA lokal](AUDIT-KONTRAK-DATABASE-LOKAL.md) — pelengkap non-Master; tidak memuat dump/data pribadi.
 
 ## Peta dependensi
 | Pekerjaan | Aturan domain | Implementasi | Verifikasi |
