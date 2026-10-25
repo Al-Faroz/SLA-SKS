@@ -85,15 +85,19 @@ final class MateriSiswaService
         $ctx = $this->konteks($tpId);
         $tuntas = $ctx['progres']['status'] === 'tuntas';
         $rows = [];
+        $rantaiSelesai = true;
         foreach ($ctx['materi'] as $i => $m) {
-            $boleh = $tuntas || $i === 0;
+            $boleh = $tuntas || $i === 0 || $rantaiSelesai;
             $rows[] = [
                 'id' => (int) $m['id'], 'urutan' => (int) $m['urutan'],
                 'judul' => (string) $m['judul'], 'jenis' => (string) $m['jenis'],
                 'buka' => $boleh, 'sukarela' => $tuntas,
-                'status' => $tuntas ? 'Baca sukarela' : ($boleh ? 'Baca Materi pertama'
+                'status' => $tuntas ? 'Baca sukarela' : ($boleh ? 'Materi dapat dibuka'
                     : 'Menunggu media, Resume dan HOTS Materi sebelumnya'),
             ];
+            if (!$tuntas) {
+                $rantaiSelesai = $rantaiSelesai && $this->kegiatanSelesai($ctx, (int) $m['id']);
+            }
         }
         return ['progres' => $ctx['progres'], 'materi' => $rows];
     }
@@ -127,13 +131,15 @@ final class MateriSiswaService
         }
         $next = $pos !== null ? ($ctx['materi'][$pos + 1] ?? null) : null;
         $sukarela = $ctx['progres']['status'] === 'tuntas';
+        $lolosMateriIni = $sukarela || $this->kegiatanSelesai($ctx, $materiId);
         $berikutnya = $next === null ? null : [
             'id' => (int) $next['id'],
             'urutan' => (int) $next['urutan'],
             'judul' => (string) $next['judul'],
-            'boleh_buka' => $sukarela,
+            'boleh_buka' => $lolosMateriIni,
             'alasan' => $sukarela ? 'Materi sukarela, tanpa syarat durasi atau tugas.'
-                : 'Selesaikan media, Kirim Final Resume, dan Kirim Final HOTS Materi ini dahulu.',
+                : ($lolosMateriIni ? 'Media, Resume, dan HOTS final telah terpenuhi.'
+                : 'Selesaikan media, Kirim Final Resume, dan Kirim Final HOTS Materi ini dahulu.'),
         ];
         return [
             'tp' => $ctx['katalog']['tp'], 'progres' => $ctx['progres'],
@@ -161,9 +167,39 @@ final class MateriSiswaService
             if ($ctx['progres']['status'] === 'tuntas' || $i === 0) {
                 return $m;
             }
+            $semuaSebelumnya = true;
+            for ($j = 0; $j < $i; $j++) {
+                $semuaSebelumnya = $semuaSebelumnya
+                    && $this->kegiatanSelesai($ctx, (int) $ctx['materi'][$j]['id']);
+            }
+            if ($semuaSebelumnya) {
+                return $m;
+            }
             throw new DomainException('Materi berikutnya menunggu Resume dan HOTS final sebelumnya.');
         }
         throw new DomainException('Materi tidak tersedia pada snapshot TP siswa.');
+    }
+
+    /** Gerbang berurutan dihitung di server untuk tiga syarat pada versi terpin. */
+    private function kegiatanSelesai(array $ctx, int $materiId): bool
+    {
+        $key = [
+            'progres_tp_id' => (int) $ctx['progres']['id'],
+            'versi_konten_tp_id' => (int) $ctx['progres']['versi_konten_tp_id'],
+            'materi_id' => $materiId,
+        ];
+        foreach ([
+            'progres_materi' => 'media_selesai',
+            'resume_materi' => 'final',
+            'tugas_hots_materi' => 'final',
+        ] as $tabel => $harus) {
+            $row = $this->db->table($tabel)->select('status')
+                ->where($key)->get()->getRowArray();
+            if (($row['status'] ?? '') !== $harus) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Data privat untuk controller streaming; path/nama_acak tidak pernah dikirim ke view. */

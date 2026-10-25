@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
+use App\Services\KegiatanMateriSiswaService;
 use App\Services\MateriSiswaService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -14,7 +15,7 @@ use Throwable;
 /** S08A: akses baca media privat; tidak mengubah nilai/progres tanpa bukti belajar. */
 final class SiswaMateri extends BaseController
 {
-    protected $helpers = ['url'];
+    protected $helpers = ['url', 'form'];
 
     public function lihat(int $tpId, int $materiId): ResponseInterface|string
     {
@@ -22,6 +23,7 @@ final class SiswaMateri extends BaseController
             $auth = new AuthService();
             if (!$auth->izinkan('siswa')) throw new DomainException('Akses hanya untuk Siswa.');
             $data = (new MateriSiswaService())->lihat($tpId, $materiId);
+            $data['kegiatan'] = (new KegiatanMateriSiswaService())->status($tpId, $materiId);
             $akun = $auth->penggunaSaatIni();
             $this->response->setHeader('Cache-Control', 'private, no-store');
             return view('siswa/materi', array_merge($data, [

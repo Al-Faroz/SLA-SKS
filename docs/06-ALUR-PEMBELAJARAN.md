@@ -55,3 +55,16 @@ Lencana per siswa/paket satu kali: `langkah_pertama`, `lolos_diagnostik`, `tp_tu
 
 ## 6. Halaman Siswa
 S01 Beranda, S02 Semester (**daftar TP**), S03 **Detail TP dan daftar Materi** (menggantikan layar BAB), S04 langkah TP/diagnostik, S05 petunjuk ujian, S06 ujian, S07 hasil, S08 materi, S09 Resume per Materi, S10 HOTS per Materi, S11 lencana, S12 nilai, S13 sertifikat. Pengumuman/notifikasi/FAQ/profil merupakan halaman umum. Semuanya ramah HP kecuali Sumatif yang memerlukan desktop/laptop fullscreen sebagaimana dokumen 07.
+
+
+### Tahap implementasi S09/S10 (25 Oktober 2026)
+
+Formulir Resume dan HOTS per Materi sudah ditautkan ke POST server dengan
+Simpan Draf manual, Kirim Final permanen, revisi untuk mendeteksi konflik
+antar-tab, dan audit final. Akses Materi berikutnya harus memenuhi ketiga
+bukti dari versi konten TP yang terpin: media_selesai, Resume final,
+dan HOTS final untuk seluruh Materi sebelumnya. Siswa yang tuntas melalui
+Diagnostik tetap dapat membaca sukarela tanpa mengirim jawaban resmi.
+Resume minimal 50 dan HOTS 200 karakter; maksimal teknis 12.000 karakter.
+PDF belum dapat menuntaskan media tanpa PDF.js lokal. Skor Guru dan Sumatif
+belum diterbitkan pada tahap ini.

@@ -204,3 +204,55 @@ antikecurangan absolut.
 
 **QA:** MariaDB sementara di GitHub Actions (DDL/FK/UNIQUE) dan unit test
 aturan durasi. Uji browser dan impor pada MySQL XAMPP tetap diperlukan.
+
+
+## S09/S10 — Resume dan HOTS per Materi (25 Oktober 2026)
+
+Patch additive: database/sql/updates/0017_kegiatan_resume_hots_materi.sql.
+**Backup MySQL/MariaDB dan writable/ sebelum impor.** Jalankan SETELAH
+0016_progres_aktivitas_materi.sql (serta 0014/0015) terpasang. Jangan mereset
+atau mengimpor ulang nilai Diagnostik maupun progres siswa.
+
+1. Periksa tabel resume_materi dan tugas_hots_materi **belum tersedia**.
+   Jika salah satunya sudah ada, hentikan dan bandingkan struktur.
+2. Impor 0017 **sekali** melalui phpMyAdmin pada database XAMPP yang digunakan.
+3. Jalankan SHOW CREATE TABLE untuk kedua tabel; SELECT COUNT(*) pada tabel
+   awal semestinya 0 sebelum ada pengiriman.
+4. Siswa pengujian jalur belajar: buka Materi pertama, tuntaskan media,
+   Simpan Draf Resume, reload, Kirim Final Resume, Simpan/Kirim Final HOTS;
+   setelah semua terpenuhi tombol Materi Selanjutnya dapat dibuka.
+   Jalur tuntas Diagnostik hanya membaca sukarela. Pengiriman final dua kali
+   tidak membuat duplikat, draf setelah final ditolak.
+5. PDF belum memenuhi media_selesai selama PDF.js belum dipasang.
+   Jangan bypass dengan SQL manual. Pengiriman jawaban dan penilaian Guru
+   memerlukan integritas proses belajar.
+
+Belum ada UI penilaian Guru ataupun Sumatif dalam tahap ini. Tabel menyimpan
+kolom penilaian untuk tahap berikutnya, namun tidak mengisi nilai secara otomatis.
+
+
+### Galat #1050 dan peringatan CHECK pada impor 0017 (25 Oktober 2026)
+
+JANGAN impor 0017 ulang atau DROP/TRUNCATE tabel yang telah terbentuk.
+Galat server #1050 Table already exists berarti objek target telah ada.
+Tiga peringatan Data statis pada CHECK berasal dari parser phpMyAdmin,
+bukan kode galat yang sama. SQL untuk instalasi BARU diperbaiki agar
+CHECK berada inline di definisi kolom nilai (rentang 0–100 tetap dijaga).
+Tabel yang sudah terbentuk dengan constraint CHECK lama tetap sah, tidak
+perlu dibuat ulang atau diubah.
+
+LANGKAH AMAN:
+1. Di phpMyAdmin pilih DB aktif, jalankan file
+   database/sql/qa/0017_verifikasi_kegiatan_readonly.sql pada tab SQL.
+   File hanya SELECT metadata dari information_schema.
+2. Jika KEDUA tabel SUDAH_ADA, cocokkan 14 kolom per tabel, PRIMARY,
+   UNIQUE gabungan, empat FOREIGN KEY, dan CHECK skor (jika didukung).
+   Jika cocok, SQL 0017 telah terpasang: jangan impor ulang.
+3. Jika hanya salah satu tabel yang ada atau strukturnya berbeda,
+   STOP. Jangan menjalankan sisa CREATE sembarangan atau menghapus tabel;
+   simpan hasil pemeriksaan tanpa data pribadi untuk patch additive terarah.
+4. Hanya jika kedua tabel BELUM_ADA, backup DB lalu impor sekali.
+   Tidak menggunakan CREATE TABLE IF NOT EXISTS sebab dapat
+   menyamarkan struktur tabel yang sudah ada tetapi tidak cocok.
+
+Pengujian SQL di MariaDB CI bukan pengganti verifikasi MySQL di XAMPP.

@@ -36,6 +36,9 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
             'CREATE TABLE berkas(id INTEGER PRIMARY KEY,tp_id INTEGER,nama_acak TEXT,mime TEXT,ukuran_byte INTEGER)',
+            'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dibuat_pada TEXT,diubah_pada TEXT,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,umpan_balik TEXT,dinilai_pada TEXT)',
+            'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dibuat_pada TEXT,diubah_pada TEXT,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,umpan_balik TEXT,dinilai_pada TEXT)',
+            'CREATE TABLE log_aktivitas(id INTEGER PRIMARY KEY AUTOINCREMENT,pengguna_id INTEGER,peran_aktif TEXT,peristiwa TEXT,catatan TEXT,waktu TEXT)',
             'CREATE TABLE progres_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,jenis TEXT,status TEXT,waktu_aktif_detik INTEGER DEFAULT 0,waktu_putar_detik INTEGER DEFAULT 0,posisi_terakhir_detik INTEGER,posisi_terjauh_detik INTEGER DEFAULT 0,durasi_media_detik INTEGER,halaman_total INTEGER,halaman_selesai INTEGER DEFAULT 0,heartbeat_terakhir_pada TEXT,dibuat_pada TEXT,diubah_pada TEXT,media_selesai_pada TEXT)',
         ] as $query) $this->db->query($query);
         $this->db->table('ref_angkatan')->insertBatch([
@@ -260,6 +263,83 @@ final class MateriSiswaDatabaseTest extends TestCase
             self::assertStringContainsString('PDF.js',$e->getMessage());
         }
         self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
+    }
+
+    public function testResumeHotsHanyaSetelahMediaDanBerurutanSertaFinalIdempoten(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn (): array => [
+                'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]);
+        try {
+            $k->simpan(1,31,'resume','simpan','Draf saya',0);
+            self::fail('Draf belum diizinkan sebelum media selesai.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('media',$e->getMessage());
+        }
+        $now = 1000;
+        $media = $this->progresMediaService(101,static function () use (&$now): int {return $now;});
+        $media->detak(1,31,true,null,null);
+        foreach ([1010,1020,1030] as $now) $media->detak(1,31,true,null,null);
+        try {
+            $k->simpan(1,31,'hots','kirim',str_repeat('H',200),0);
+            self::fail('HOTS tanpa Resume final ditolak.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('Resume',$e->getMessage());
+        }
+        $saved = $k->simpan(1,31,'resume','simpan','Draf singkat',0);
+        self::assertSame('draf',$saved['status']);
+        self::assertSame(1,$saved['revisi']);
+        self::assertSame('Draf singkat',$k->status(1,31)['resume']['isi']);
+        $panjang = str_repeat('R',50);
+        $final = $k->simpan(1,31,'resume','kirim',$panjang,1);
+        self::assertSame('final',$final['status']);
+        $k->simpan(1,31,'resume','kirim',$panjang,1);
+        self::assertSame(1,$this->db->table('resume_materi')->countAllResults());
+        try {
+            $k->simpan(1,31,'resume','simpan','Tulis ulang',2);
+            self::fail('Final immutable.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('final',$e->getMessage());
+        }
+        self::assertFalse($this->svc()->lihat(1,31)['materi_berikutnya']['boleh_buka']);
+        $k->simpan(1,31,'hots','kirim',str_repeat('H',200),0);
+        self::assertTrue($this->svc()->lihat(1,31)['materi_berikutnya']['boleh_buka']);
+        self::assertSame(32,$this->svc()->lihat(1,32)['materi']['id']);
+        self::assertSame(2,$this->db->table('log_aktivitas')->countAllResults());
+    }
+
+    public function testTuntasDiagnostikTidakDapatMengirimJawaban(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn (): array => [
+                'id'=>102,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]);
+        $this->expectException(\DomainException::class);
+        $k->simpan(1,31,'resume','kirim',str_repeat('x',50),0);
+    }
+
+    public function testSimpanDenganRevisiLamaDitolakTanpaTimpa(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'gambar','status'=>'media_selesai',
+        ]);
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn (): array => [
+                'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]);
+        $k->simpan(1,31,'resume','simpan','Teks asli',0);
+        try {
+            $k->simpan(1,31,'resume','simpan','Teks lain',0);
+            self::fail('Konflik revisi harus ditolak.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('tab lain',$e->getMessage());
+        }
+        self::assertSame('Teks asli',$k->status(1,31)['resume']['isi']);
     }
 
 }
