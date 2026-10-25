@@ -31,7 +31,7 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,nomor_versi INTEGER,status TEXT)',
             'CREATE TABLE penugasan_paket(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,paket_id INTEGER)',
-            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,rumusan TEXT,indikator TEXT)',
+            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,rumusan TEXT,indikator TEXT,resume_min INTEGER,tugas_min INTEGER)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,nomor_versi INTEGER,snapshot_json TEXT,checksum TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
@@ -65,13 +65,16 @@ final class MateriSiswaDatabaseTest extends TestCase
             'id'=>1,'paket_semester_id'=>8,'kode_tp'=>'TP-1',
             'judul'=>'Materi sejarah','urutan_atp'=>1,'status'=>'siap',
             'rumusan'=>'Rumusan', 'indikator'=>'Indikator',
+            'resume_min'=>50, 'tugas_min'=>200,
         ]);
         $this->db->table('materi')->insertBatch([
             ['id'=>31,'tp_id'=>1,'urutan'=>1,'judul'=>'PDF materi','jenis'=>'pdf','aktif'=>1],
             ['id'=>32,'tp_id'=>1,'urutan'=>2,'judul'=>'Video materi','jenis'=>'youtube','aktif'=>1],
         ]);
         $snap = [
-            'format'=>'SLA-SKS-TP-V1','tp'=>['id'=>1,'status'=>'siap'],
+            'format'=>'SLA-SKS-TP-V1','tp'=>[
+                'id'=>1,'status'=>'siap','resume_min'=>'50','tugas_min'=>'200',
+            ],
             'materi'=>[
                 ['id'=>31,'tp_id'=>1,'urutan'=>1,'aktif'=>1,'judul'=>'PDF historis',
                     'jenis'=>'pdf','berkas_id'=>9,'min_waktu_detik'=>60,
@@ -210,6 +213,19 @@ final class MateriSiswaDatabaseTest extends TestCase
                 'id'=>$userId,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
             ], $clock
         );
+    }
+
+    /** Memodifikasi fixture snapshot TEST SAJA; checksum tetap sah. */
+    private function ubahBatasSnapshot(int $resume, int $hots): void
+    {
+        $row = $this->db->table('versi_konten_tp')
+            ->where('id',3)->get()->getRowArray();
+        $snap = json_decode($row['snapshot_json'], true, 512, JSON_THROW_ON_ERROR);
+        $snap['tp']['resume_min'] = (string) $resume;
+        $snap['tp']['tugas_min'] = (string) $hots;
+        $json = json_encode($snap,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);
+        $this->db->table('versi_konten_tp')->where('id',3)
+            ->update(['snapshot_json'=>$json,'checksum'=>hash('sha256',$json)]);
     }
 
     private function jadikanMediaPertamaGambar(): void
@@ -385,6 +401,57 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertTrue($this->svc()->lihat(1,31)['materi_berikutnya']['boleh_buka']);
         self::assertSame(32,$this->svc()->lihat(1,32)['materi']['id']);
         self::assertSame(2,$this->db->table('log_aktivitas')->countAllResults());
+    }
+
+    public function testBatasKegiatanVersiTerpinBukanNilaiTPLive(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $this->ubahBatasSnapshot(80,250);
+        $this->db->table('tp')->where('id',1)->update([
+            'resume_min'=>10,'tugas_min'=>50,
+        ]);
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'gambar','status'=>'media_selesai',
+        ]);
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn():array=>['id'=>101,'peran_aktif'=>'siswa',
+                'status'=>'aktif','wajib_ganti_sandi'=>0]);
+        $status=$k->status(1,31);
+        self::assertSame(80,$status['minimal_resume']);
+        self::assertSame(250,$status['minimal_hots']);
+        try {
+            $k->simpan(1,31,'resume','kirim',str_repeat('R',79),0);
+            self::fail('Angka live 10 tidak boleh mengganti snapshot 80.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('80 karakter',$e->getMessage());
+        }
+        $k->simpan(1,31,'resume','kirim',str_repeat('R',80),0);
+        try {
+            $k->simpan(1,31,'hots','kirim',str_repeat('H',249),0);
+            self::fail('Angka live 50 tidak boleh mengganti snapshot 250.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('250 karakter',$e->getMessage());
+        }
+        $k->simpan(1,31,'hots','kirim',str_repeat('H',250),0);
+        self::assertTrue($this->svc()->lihat(1,31)['materi_berikutnya']['boleh_buka']);
+        self::assertSame(1,$this->db->table('resume_materi')->countAllResults());
+        self::assertSame(1,$this->db->table('jawaban_hots_materi')->countAllResults());
+    }
+
+    public function testSnapshotTanpaBatasMinimalDitolakTanpaMengubahData(): void
+    {
+        $this->ubahBatasSnapshot(0,0);
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn():array=>['id'=>101,'peran_aktif'=>'siswa',
+                'status'=>'aktif','wajib_ganti_sandi'=>0]);
+        try {
+            $k->status(1,31);
+            self::fail('Snapshot tanpa batas sah harus ditolak.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('snapshot TP',$e->getMessage());
+        }
+        self::assertSame(0,$this->db->table('resume_materi')->countAllResults());
     }
 
     public function testTuntasDiagnostikTidakDapatMengirimJawaban(): void

@@ -37,10 +37,30 @@ final class KegiatanMateriSiswaService
         };
     }
 
-    public static function batasMinimal(string $jenis): int
+    /**
+     * Batas historis berasal dari tp di dalam snapshot terpin, bukan TP live.
+     * Master 05: Resume 10..1000; HOTS 50..5000. Tidak fallback diam-diam.
+     *
+     * @param array<string,mixed> $tpSnapshot
+     */
+    public static function batasMinimal(string $jenis, array $tpSnapshot): int
     {
         self::tabel($jenis);
-        return $jenis === 'resume' ? 50 : 200;
+        $field = $jenis === 'resume' ? 'resume_min' : 'tugas_min';
+        $minimum = $jenis === 'resume' ? 10 : 50;
+        $maksimum = $jenis === 'resume' ? 1000 : 5000;
+        $raw = $tpSnapshot[$field] ?? null;
+        if (!is_int($raw)
+            && !(is_string($raw) && preg_match('/^[0-9]{1,5}$/D', $raw) === 1)) {
+            throw new DomainException('Konfigurasi batas ' . strtoupper($jenis)
+                . ' pada snapshot TP tidak sah. Hubungi Guru.');
+        }
+        $value = (int) $raw;
+        if ($value < $minimum || $value > $maksimum) {
+            throw new DomainException('Batas ' . strtoupper($jenis)
+                . ' pada snapshot TP di luar aturan Master. Hubungi Guru.');
+        }
+        return $value;
     }
 
     public static function normalisasi(string $teks): string
@@ -48,16 +68,23 @@ final class KegiatanMateriSiswaService
         return trim(str_replace(["\r\n", "\r"], "\n", $teks));
     }
 
-    public static function validasi(string $jenis, string $teks, bool $final): string
+    public static function validasi(string $jenis, string $teks, bool $final,
+        int $minimal): string
     {
+        self::tabel($jenis);
+        $batasBawah = $jenis === 'resume' ? 10 : 50;
+        $batasAtas = $jenis === 'resume' ? 1000 : 5000;
+        if ($minimal < $batasBawah || $minimal > $batasAtas) {
+            throw new DomainException('Batas minimal kegiatan tidak sah.');
+        }
         $teks = self::normalisasi($teks);
         $len = mb_strlen($teks, 'UTF-8');
         if ($len > 12000) {
             throw new DomainException('Jawaban terlalu panjang (maksimal 12.000 karakter).');
         }
-        if ($final && $len < self::batasMinimal($jenis)) {
+        if ($final && $len < $minimal) {
             throw new DomainException('Jawaban final minimal '
-                . self::batasMinimal($jenis) . ' karakter.');
+                . $minimal . ' karakter sesuai versi TP siswa.');
         }
         return $teks;
     }
@@ -84,8 +111,8 @@ final class KegiatanMateriSiswaService
             'media_selesai' => ($media['status'] ?? null) === 'media_selesai',
             'resume' => self::publik($resume),
             'hots' => self::publik($hots),
-            'minimal_resume' => 50,
-            'minimal_hots' => 200,
+            'minimal_resume' => (int) $ctx['minimal_resume'],
+            'minimal_hots' => (int) $ctx['minimal_hots'],
         ];
     }
 
@@ -109,11 +136,14 @@ final class KegiatanMateriSiswaService
             throw new DomainException('Aksi atau revisi jawaban tidak sah.');
         }
         $final = $aksi === 'kirim';
-        $teks = self::validasi($jenis, $teks, $final);
         $ctx = $this->materi->lihat($tpId, $materiId);
         if ($ctx['sukarela'] || $ctx['progres']['status'] !== 'belajar') {
             throw new DomainException('Jalur tuntas Diagnostik tidak mengirim tugas resmi.');
         }
+        // Parameter diambil sesudah otorisasi + verifikasi checksum versi terpin.
+        $minimal = (int) ($jenis === 'resume'
+            ? $ctx['minimal_resume'] : $ctx['minimal_hots']);
+        $teks = self::validasi($jenis, $teks, $final, $minimal);
         $akun = ($this->akun)();
         $p = $ctx['progres'];
         $pid = (int) $p['id'];
