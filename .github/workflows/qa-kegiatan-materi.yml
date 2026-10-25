@@ -11,6 +11,8 @@ on:
       - 'public/assets/js/kegiatan-materi.js'
       - 'public/assets/css/app.css'
       - 'database/sql/updates/0017_kegiatan_resume_hots_materi.sql'
+      - 'database/sql/updates/0018_pemulihan_jawaban_hots_materi.sql'
+      - 'database/sql/qa/0018_verifikasi_jawaban_hots_readonly.sql'
       - 'tests/unit/KegiatanMateriSiswaTest.php'
       - 'tests/integration/SqlKegiatanMateriCheck.php'
       - 'database/sql/qa/0017_verifikasi_kegiatan_readonly.sql'

@@ -58,3 +58,13 @@ audit append-only dipertahankan. Penilaian tidak mengunci Materi
 berikutnya: cukup Resume/HOTS final. Agregat final TP, koreksi nilai,
 sertifikat, notifikasi internal, dan alur Sumatif belum dianggap selesai
 oleh tahap ini; jangan menerbitkan nilai akhir sebelum semua syarat.
+
+
+### Implementasi pemisahan bank HOTS dan jawaban HOTS (25-10-2026)
+
+Perintah HOTS milik Guru tersimpan pada tabel tugas_hots_materi. Jawaban
+HOTS yang dikirim siswa dan diberi nilai 0–100 oleh Guru tersimpan pada
+tabel jawaban_hots_materi, terikat ke progres TP/versi snapshot. Pemisahan
+nama ini hanya memperbaiki konflik struktur SQL, bukan mengganti bobot,
+KKM atau aturan penilaian akademik. SQL 0018 khusus untuk pemulihan
+instalasi 0017 yang sempat terhenti.
