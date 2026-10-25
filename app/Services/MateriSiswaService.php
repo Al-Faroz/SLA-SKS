@@ -118,6 +118,17 @@ final class MateriSiswaService
         } else {
             throw new DomainException('Jenis media tidak dikenal.');
         }
+        // Metadata halaman tersimpan saat Guru mengunggah file, bukan angka klien.
+        $halamanPdf = null;
+        if ($jenis === 'pdf') {
+            $berkas = $this->db->table('berkas')
+                ->select('halaman')->where('id', (int) $m['berkas_id'])
+                ->where('tp_id', $tpId)->get()->getRowArray();
+            $halamanPdf = (int) ($berkas['halaman'] ?? 0);
+            if ($halamanPdf < 1 || $halamanPdf > 40) {
+                throw new DomainException('Jumlah halaman PDF belum sah. Hubungi Guru.');
+            }
+        }
         // Navigasi berasal dari snapshot TP TERPIN, bukan ID Materi live.
         // Materi lanjutan tetap membutuhkan media + Resume final + HOTS final.
         // Sampai S09/S10 tersedia tidak ada bukti final tersebut:
@@ -147,6 +158,7 @@ final class MateriSiswaService
                 'id' => (int) $m['id'], 'urutan' => (int) $m['urutan'],
                 'judul' => (string) $m['judul'], 'jenis' => $jenis,
                 'min_waktu_detik' => (int) ($m['min_waktu_detik'] ?? 0),
+                'halaman_pdf' => $halamanPdf,
                 'petunjuk_resume' => (string) ($m['petunjuk_resume'] ?? ''),
                 'petunjuk_hots' => (string) ($m['petunjuk_hots'] ?? ''),
             ],

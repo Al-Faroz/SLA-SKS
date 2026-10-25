@@ -44,15 +44,20 @@ final class SiswaAktivitasMateri extends BaseController
         $aktif = $this->request->getPost('aktif') === 'ya';
         $rawPos = $this->request->getPost('posisi');
         $rawDur = $this->request->getPost('durasi');
+        $rawHalaman = $this->request->getPost('halaman');
+        $rawJumlah = $this->request->getPost('jumlah_halaman');
         $parse = static fn ($v): ?int => is_string($v) && preg_match('/^\\d{1,5}$/D', $v)
             ? (int) $v : null;
         if (!$aktif || ($rawPos !== '' && $parse($rawPos) === null)
-            || ($rawDur !== '' && $parse($rawDur) === null)) {
+            || ($rawDur !== '' && $parse($rawDur) === null)
+            || ($rawHalaman !== null && $parse($rawHalaman) === null)
+            || ($rawJumlah !== null && $parse($rawJumlah) === null)) {
             return $this->response(['ok' => false,
                 'pesan' => 'Sinyal aktivitas media tidak sah.'], 422);
         }
         return $this->jalankan(static fn (): array =>
             (new ProgresMediaMateriSiswaService())->detak(
-                $tpId, $materiId, $aktif, $parse($rawPos), $parse($rawDur)));
+                $tpId, $materiId, $aktif, $parse($rawPos), $parse($rawDur),
+                $parse($rawHalaman), $parse($rawJumlah)));
     }
 }
