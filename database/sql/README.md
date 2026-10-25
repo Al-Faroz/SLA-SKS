@@ -204,3 +204,28 @@ antikecurangan absolut.
 
 **QA:** MariaDB sementara di GitHub Actions (DDL/FK/UNIQUE) dan unit test
 aturan durasi. Uji browser dan impor pada MySQL XAMPP tetap diperlukan.
+
+
+## S09/S10 — Resume dan HOTS per Materi (25 Oktober 2026)
+
+Patch additive: database/sql/updates/0017_kegiatan_resume_hots_materi.sql.
+**Backup MySQL/MariaDB dan writable/ sebelum impor.** Jalankan SETELAH
+0016_progres_aktivitas_materi.sql (serta 0014/0015) terpasang. Jangan mereset
+atau mengimpor ulang nilai Diagnostik maupun progres siswa.
+
+1. Periksa tabel resume_materi dan tugas_hots_materi **belum tersedia**.
+   Jika salah satunya sudah ada, hentikan dan bandingkan struktur.
+2. Impor 0017 **sekali** melalui phpMyAdmin pada database XAMPP yang digunakan.
+3. Jalankan SHOW CREATE TABLE untuk kedua tabel; SELECT COUNT(*) pada tabel
+   awal semestinya 0 sebelum ada pengiriman.
+4. Siswa pengujian jalur belajar: buka Materi pertama, tuntaskan media,
+   Simpan Draf Resume, reload, Kirim Final Resume, Simpan/Kirim Final HOTS;
+   setelah semua terpenuhi tombol Materi Selanjutnya dapat dibuka.
+   Jalur tuntas Diagnostik hanya membaca sukarela. Pengiriman final dua kali
+   tidak membuat duplikat, draf setelah final ditolak.
+5. PDF belum memenuhi media_selesai selama PDF.js belum dipasang.
+   Jangan bypass dengan SQL manual. Pengiriman jawaban dan penilaian Guru
+   memerlukan integritas proses belajar.
+
+Belum ada UI penilaian Guru ataupun Sumatif dalam tahap ini. Tabel menyimpan
+kolom penilaian untuk tahap berikutnya, namun tidak mengisi nilai secara otomatis.
