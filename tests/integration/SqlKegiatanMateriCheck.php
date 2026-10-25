@@ -75,9 +75,23 @@ if ((int)$db->query('SELECT COUNT(*) FROM tugas_hots_materi')->fetchColumn() !==
 }
 echo "S09/S10 MariaDB 11.4: FK, UNIQUE, CHECK, dan bank Guru tetap utuh PASS\n";
 
-// Simulasikan XAMPP dengan 0017 terpasang sebagian, di DATABASE TEST SAJA:
-// rename tabel jawaban yang baru dibuat, lalu jalankan patch pemulihan 0018.
-$db->exec('RENAME TABLE jawaban_hots_materi TO jawaban_hots_materi_fixture_0017');
+// Simulasi impor parsial di database sementara TERPISAH, tanpa DROP/RENAME.
+// Guard utama pada awal skrip memastikan ini hanya berjalan di CI test.
+$db->exec('CREATE DATABASE sla_s09_test_partial CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci');
+$db->exec('USE sla_s09_test_partial');
+foreach (['progres_tp', 'materi', 'versi_konten_tp', 'pengguna'] as $table) {
+    $db->exec('CREATE TABLE ' . $table
+        . ' (id BIGINT UNSIGNED NOT NULL PRIMARY KEY) ENGINE=InnoDB');
+    $db->exec('INSERT INTO ' . $table . ' VALUES(1)');
+}
+// Buat kondisi yang sama seperti dump pengguna: resume_materi sudah ada,
+// tugas_hots_materi adalah bank Guru, jawaban_hots_materi belum ada.
+$db->exec('CREATE TABLE resume_materi LIKE sla_s09_test.resume_materi');
+$db->exec('CREATE TABLE tugas_hots_materi LIKE sla_s09_test.tugas_hots_materi');
+$db->exec('INSERT INTO tugas_hots_materi SELECT * FROM sla_s09_test.tugas_hots_materi');
+if ((int)$db->query('SELECT COUNT(*) FROM tugas_hots_materi')->fetchColumn() !== 1) {
+    throw new RuntimeException('Fixture bank HOTS Guru tidak utuh.');
+}
 $fix = file_get_contents(dirname(__DIR__,2)
     . '/database/sql/updates/0018_pemulihan_jawaban_hots_materi.sql');
 if (!is_string($fix)) throw new RuntimeException('SQL 0018 tidak ditemukan.');
@@ -85,7 +99,7 @@ $fix = preg_replace('/^--.*$/m', '', $fix);
 foreach (explode(';', $fix) as $statement) {
     if (trim($statement) !== '') $db->exec($statement);
 }
-if ($db->query('SHOW COLUMNS FROM jawaban_hots_materi')->rowCount() < 14) {
+if (count($db->query('SHOW COLUMNS FROM jawaban_hots_materi')->fetchAll(PDO::FETCH_ASSOC)) !== 14) {
     throw new RuntimeException('Pemulihan 0018 tidak membentuk kolom lengkap.');
 }
 if ((int)$db->query('SELECT COUNT(*) FROM tugas_hots_materi')->fetchColumn() !== 1) {
