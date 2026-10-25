@@ -1,0 +1,42 @@
+name: QA S08C Navigasi dan Pembaca Materi
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/MateriSiswaService.php'
+      - 'app/Views/siswa/materi.php'
+      - 'public/assets/js/pembaca-materi.js'
+      - 'public/assets/js/aktivitas-materi.js'
+      - 'public/assets/css/app.css'
+      - 'tests/unit/PembacaMateriNavigasiTest.php'
+      - 'tests/unit/MateriSiswaDatabaseTest.php'
+      - '.github/workflows/qa-s08c-navigasi-pembaca.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint dan JS syntax
+        run: |
+          php -l app/Services/MateriSiswaService.php
+          php -l app/Views/siswa/materi.php
+          php -l tests/unit/PembacaMateriNavigasiTest.php
+          php -l tests/unit/MateriSiswaDatabaseTest.php
+          node --check public/assets/js/pembaca-materi.js
+          node --check public/assets/js/aktivitas-materi.js
+      - name: Uji UI navigasi, zoom, fullscreen
+        run: vendor/bin/phpunit --no-coverage tests/unit/PembacaMateriNavigasiTest.php
+      - name: Uji gate siswa belajar dan tuntas pada SQLite sintetis
+        run: vendor/bin/phpunit --no-coverage tests/unit/MateriSiswaDatabaseTest.php

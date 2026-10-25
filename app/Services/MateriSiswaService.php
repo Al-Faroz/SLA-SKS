@@ -114,6 +114,27 @@ final class MateriSiswaService
         } else {
             throw new DomainException('Jenis media tidak dikenal.');
         }
+        // Navigasi berasal dari snapshot TP TERPIN, bukan ID Materi live.
+        // Materi lanjutan tetap membutuhkan media + Resume final + HOTS final.
+        // Sampai S09/S10 tersedia tidak ada bukti final tersebut:
+        // jalur belajar tidak boleh memperoleh tautan loncat Materi.
+        $pos = null;
+        foreach ($ctx['materi'] as $i => $item) {
+            if ((int) $item['id'] === $materiId) {
+                $pos = $i;
+                break;
+            }
+        }
+        $next = $pos !== null ? ($ctx['materi'][$pos + 1] ?? null) : null;
+        $sukarela = $ctx['progres']['status'] === 'tuntas';
+        $berikutnya = $next === null ? null : [
+            'id' => (int) $next['id'],
+            'urutan' => (int) $next['urutan'],
+            'judul' => (string) $next['judul'],
+            'boleh_buka' => $sukarela,
+            'alasan' => $sukarela ? 'Materi sukarela, tanpa syarat durasi atau tugas.'
+                : 'Selesaikan media, Kirim Final Resume, dan Kirim Final HOTS Materi ini dahulu.',
+        ];
         return [
             'tp' => $ctx['katalog']['tp'], 'progres' => $ctx['progres'],
             'materi' => [
@@ -126,7 +147,8 @@ final class MateriSiswaService
             'media_url' => $video === null
                 ? site_url('siswa/tp/' . $tpId . '/materi/' . $materiId . '/media') : null,
             'video_url' => $video,
-            'sukarela' => $ctx['progres']['status'] === 'tuntas',
+            'sukarela' => $sukarela,
+            'materi_berikutnya' => $berikutnya,
         ];
     }
 
