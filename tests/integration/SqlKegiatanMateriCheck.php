@@ -64,3 +64,29 @@ foreach (['resume_materi', 'tugas_hots_materi'] as $table) {
     }
 }
 echo "S09/S10 MariaDB 11.4: FK, UNIQUE, CHECK nilai dan kedua tabel PASS\n";
+
+
+$diagnostikSql = file_get_contents(dirname(__DIR__,2)
+    . '/database/sql/qa/0017_verifikasi_kegiatan_readonly.sql');
+if (!is_string($diagnostikSql)) {
+    throw new RuntimeException('SQL diagnostik 0017 tidak ditemukan.');
+}
+$bersih = preg_replace('/^--.*$/m', '', $diagnostikSql);
+if (!is_string($bersih) || preg_match('/\b(?:CREATE|DROP|ALTER|TRUNCATE|UPDATE|DELETE|INSERT|REPLACE)\b/i',
+    $bersih)) {
+    throw new RuntimeException('Diagnostik 0017 harus selalu baca-saja.');
+}
+$jumlah = 0;
+foreach (explode(';', $bersih) as $statement) {
+    if (trim($statement) === '') continue;
+    if (preg_match('/^\s*SELECT\b/i', $statement) !== 1) {
+        throw new RuntimeException('Diagnostik 0017 hanya boleh SELECT.');
+    }
+    $hasil = $db->query($statement)->fetchAll(PDO::FETCH_ASSOC);
+    if (!is_array($hasil)) throw new RuntimeException('Hasil diagnostik tidak sah.');
+    $jumlah++;
+}
+if ($jumlah !== 5) {
+    throw new RuntimeException('Semua lima pemeriksaan diagnostik harus dijalankan.');
+}
+echo "S09/S10 diagnostik read-only 0017: 5 kueri PASS\n";
