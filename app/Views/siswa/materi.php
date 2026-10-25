@@ -119,20 +119,76 @@
     </section>
 
     <section class="a-card a-jarak-atas a-materi-kegiatan" aria-labelledby="petunjuk-kegiatan">
-        <h2 id="petunjuk-kegiatan">Petunjuk kegiatan</h2>
-        <div class="a-siswa-materi-instruksi">
-            <section>
-                <h3>Resume Materi <?= (int) $materi['urutan'] ?></h3>
-                <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_resume'])) ?></p>
-            </section>
-            <section>
-                <h3>HOTS Materi <?= (int) $materi['urutan'] ?></h3>
-                <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_hots'])) ?></p>
-            </section>
-        </div>
-        <p class="a-help"><?= $sukarela
-            ? 'Resume dan HOTS resmi tidak diwajibkan atau dinilai pada jalur lulus Diagnostik.'
-            : 'Simpan Draf dan Kirim Final belum tersedia pada tahap ini; tidak ada pengiriman tugas palsu.' ?></p>
+        <h2 id="petunjuk-kegiatan">Kegiatan Materi <?= (int) $materi['urutan'] ?></h2>
+        <?php if (session()->getFlashdata('kegiatan_sukses')): ?>
+            <div class="a-alert" role="status"><?= esc(session()->getFlashdata('kegiatan_sukses')) ?></div>
+        <?php endif ?>
+        <?php if (session()->getFlashdata('kegiatan_gagal')): ?>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('kegiatan_gagal')) ?></div>
+        <?php endif ?>
+        <?php if ($sukarela): ?>
+            <p class="a-help">TP sudah tuntas dari Diagnostik. Resume dan HOTS berikut hanya petunjuk baca;
+                tidak ada pengumpulan atau nilai tambahan.</p>
+            <h3>Petunjuk Resume</h3>
+            <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_resume'])) ?></p>
+            <h3>Petunjuk HOTS</h3>
+            <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_hots'])) ?></p>
+        <?php else: ?>
+            <?php foreach (['resume', 'hots'] as $jenisKegiatan): ?>
+                <?php
+                $rekaman = $kegiatan[$jenisKegiatan];
+                $adalahHots = $jenisKegiatan === 'hots';
+                $izin = $kegiatan['media_selesai']
+                    && (!$adalahHots || $kegiatan['resume']['status'] === 'final');
+                $terkirim = $rekaman['status'] === 'final';
+                $label = $adalahHots ? 'HOTS' : 'Resume';
+                $petunjuk = $adalahHots ? $materi['petunjuk_hots'] : $materi['petunjuk_resume'];
+                $batas = $adalahHots ? $kegiatan['minimal_hots'] : $kegiatan['minimal_resume'];
+                $isian = old('jenis') === $jenisKegiatan
+                    ? (string) old('jawaban') : $rekaman['isi'];
+                ?>
+                <div class="a-kegiatan-editor">
+                    <h3><?= esc($label) ?> Materi <?= (int) $materi['urutan'] ?></h3>
+                    <p class="a-teks-pratinjau"><?= nl2br(esc($petunjuk)) ?></p>
+                    <?php if ($terkirim): ?>
+                        <div class="a-alert" role="status">Jawaban <?= esc($label) ?> terkirim final
+                            <?= esc((string) $rekaman['dikirim_pada']) ?> UTC. Tidak dapat diubah;
+                            menunggu penilaian Guru.</div>
+                        <div class="a-kegiatan-jawaban"><?= nl2br(esc($rekaman['isi'])) ?></div>
+                    <?php elseif (!$izin): ?>
+                        <div class="a-alert" role="status">
+                            <?= $kegiatan['media_selesai']
+                                ? 'Kirim Final Resume terlebih dahulu sebelum mengerjakan HOTS.'
+                                : 'Selesaikan media Materi sesuai ketentuan sebelum mengerjakan Resume/HOTS.' ?>
+                        </div>
+                    <?php else: ?>
+                        <form method="post" data-kegiatan-form
+                            action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/materi/'
+                                . (int) $materi['id'] . '/kegiatan/' . $jenisKegiatan), 'attr') ?>">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="jenis" value="<?= esc($jenisKegiatan, 'attr') ?>">
+                            <input type="hidden" name="revisi" value="<?= (int) $rekaman['revisi'] ?>">
+                            <label class="a-label" for="jawaban-<?= esc($jenisKegiatan, 'attr') ?>">Jawaban <?= esc($label) ?></label>
+                            <textarea id="jawaban-<?= esc($jenisKegiatan, 'attr') ?>" name="jawaban"
+                                class="a-kegiatan-teks" rows="9" maxlength="12000"
+                                aria-describedby="panduan-<?= esc($jenisKegiatan, 'attr') ?>"><?= esc($isian) ?></textarea>
+                            <p id="panduan-<?= esc($jenisKegiatan, 'attr') ?>" class="a-help">
+                                Minimal <?= (int) $batas ?> karakter untuk kirim final; maksimal 12.000.
+                                Simpan draf manual. Tidak ada penyimpanan otomatis.
+                            </p>
+                            <p class="a-help" data-kegiatan-indikator role="status">Tidak ada perubahan yang belum disimpan.</p>
+                            <?php if ($rekaman['status'] === 'draf'): ?>
+                                <p class="a-help">Draf terakhir tersimpan <?= esc((string) $rekaman['diubah_pada']) ?> UTC.</p>
+                            <?php endif ?>
+                            <div class="a-kegiatan-aksi">
+                                <button class="a-btn a-btn--sekunder" type="submit" name="aksi" value="simpan">Simpan draf</button>
+                                <button class="a-btn a-btn--utama" type="submit" name="aksi" value="kirim">Kirim final</button>
+                            </div>
+                        </form>
+                    <?php endif ?>
+                </div>
+            <?php endforeach ?>
+        <?php endif ?>
     </section>
     <nav class="a-kesiapan-kembali a-materi-lanjut" aria-label="Navigasi materi">
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']), 'attr') ?>">
@@ -146,13 +202,13 @@
                     Materi Selanjutnya <span aria-hidden="true">→</span>
                 </a>
                 <span class="a-materi-lanjut__keterangan">Materi <?= (int) $materi_berikutnya['urutan'] ?>:
-                    <?= esc($materi_berikutnya['judul']) ?> — belajar sukarela</span>
+                    <?= esc($materi_berikutnya['judul']) ?><?= $sukarela ? ' — belajar sukarela' : '' ?></span>
             <?php else: ?>
                 <button class="a-btn a-btn--utama" type="button"
                     disabled aria-describedby="a-materi-lanjut-syarat">Materi Selanjutnya</button>
                 <p class="a-materi-lanjut__keterangan" id="a-materi-lanjut-syarat">
                     <?= esc($materi_berikutnya['alasan']) ?>
-                    Tombol akan tersedia setelah alur Resume dan HOTS final diimplementasikan.
+                    Materi berikutnya akan terbuka setelah seluruh syarat sah.
                 </p>
             <?php endif ?>
         <?php else: ?>
@@ -162,6 +218,9 @@
 </div>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js'), 'attr') ?>" defer></script>
+<?php endif ?>
+<?php if (!$sukarela): ?>
+    <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261025-s09s10'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (in_array($materi['jenis'], ['gambar', 'pdf'], true)): ?>
     <script src="<?= esc(base_url('public/assets/js/pembaca-materi.js?v=20261025-zoom2'), 'attr') ?>" defer></script>

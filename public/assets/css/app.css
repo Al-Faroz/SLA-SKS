@@ -1391,3 +1391,16 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-pembaca-gambar-frame { min-height:250px; }
     .a-pembaca-pdf-frame { min-height:300px; }
 }
+
+/* S09/S10 - editor Resume dan HOTS Materi, responsif. */
+.a-kegiatan-editor { border-top:1px solid var(--a-garis); margin-top:20px; padding-top:18px; }
+.a-kegiatan-editor h3 { margin:0 0 12px; }
+.a-kegiatan-teks { display:block; width:100%; min-height:210px; padding:12px;
+    border:1px solid var(--a-garis); border-radius:var(--a-radius-kecil);
+    background:var(--a-permukaan); color:var(--a-teks); font:inherit; line-height:1.6;
+    resize:vertical; box-sizing:border-box; }
+.a-kegiatan-teks:focus-visible { outline:3px solid var(--a-primer); outline-offset:2px; }
+.a-kegiatan-aksi { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:12px; }
+.a-kegiatan-jawaban { background:var(--a-latar); border:1px solid var(--a-garis);
+    border-radius:var(--a-radius-kecil); padding:14px; white-space:normal; overflow-wrap:anywhere; }
+@media(max-width:600px) { .a-kegiatan-aksi .a-btn { flex:1 1 140px; justify-content:center; } }
