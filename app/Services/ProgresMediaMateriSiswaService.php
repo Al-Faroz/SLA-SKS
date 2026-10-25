@@ -47,7 +47,7 @@ final class ProgresMediaMateriSiswaService
     /** @return array<string,mixed> */
     public function detak(int $tpId, int $materiId, bool $aktif,
         ?int $posisi, ?int $durasi, ?int $halaman = null,
-        ?int $jumlahHalaman = null): array
+        ?int $jumlahHalaman = null, bool $resetPdf = false): array
     {
         if (!$aktif) throw new DomainException('Heartbeat hanya diterima saat media aktif.');
         // Konteks selalu diperiksa ulang, termasuk ID dari URL.
@@ -58,7 +58,7 @@ final class ProgresMediaMateriSiswaService
         $jenis = (string) $ctx['materi']['jenis'];
         if ($jenis === 'pdf') {
             return (new ProgresPdfMateriSiswaService($this->db, $this->clock))
-                ->detak($ctx, $materiId, $halaman, $jumlahHalaman);
+                ->detak($ctx, $materiId, $halaman, $jumlahHalaman, $resetPdf);
         }
         $min = (int) $ctx['materi']['min_waktu_detik'];
         if ($min < 1) throw new DomainException('Batas waktu media pada snapshot belum sah.');

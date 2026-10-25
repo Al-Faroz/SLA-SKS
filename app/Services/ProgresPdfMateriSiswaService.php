@@ -68,7 +68,8 @@ final class ProgresPdfMateriSiswaService
         ];
     }
 
-    public function detak(array $ctx, int $materiId, ?int $halaman, ?int $jumlah): array
+    public function detak(array $ctx, int $materiId, ?int $halaman, ?int $jumlah,
+        bool $reset = false): array
     {
         if ($ctx['sukarela'] || $ctx['progres']['status'] !== 'belajar') {
             throw new DomainException('Belajar sukarela tidak membuat progres resmi.');
@@ -116,7 +117,7 @@ final class ProgresPdfMateriSiswaService
                 $last = strtotime((string) $row['heartbeat_terakhir_pada'] . ' UTC');
                 $dt = $now - (int) $last;
                 $same = (int) $row['posisi_terakhir_detik'] === $halaman;
-                $kredit = $same && $dt >= 5 && $dt <= 20 ? $dt : 0;
+                $kredit = !$reset && $same && $dt >= 5 && $dt <= 20 ? $dt : 0;
                 $waktuTotal = (int) $row['waktu_aktif_detik'] + $kredit;
                 $pageDone = (int) $row['halaman_selesai'];
                 if ($kredit > 0) {

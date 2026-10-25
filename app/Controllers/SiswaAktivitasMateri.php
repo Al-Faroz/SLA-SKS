@@ -55,9 +55,10 @@ final class SiswaAktivitasMateri extends BaseController
             return $this->response(['ok' => false,
                 'pesan' => 'Sinyal aktivitas media tidak sah.'], 422);
         }
-        return $this->jalankan(static fn (): array =>
+        return $this->jalankan(fn (): array =>
             (new ProgresMediaMateriSiswaService())->detak(
                 $tpId, $materiId, $aktif, $parse($rawPos), $parse($rawDur),
-                $parse($rawHalaman), $parse($rawJumlah)));
+                $parse($rawHalaman), $parse($rawJumlah),
+                $this->request->getPost('reset') === 'ya'));
     }
 }

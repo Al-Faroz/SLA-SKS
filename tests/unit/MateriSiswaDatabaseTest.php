@@ -312,6 +312,23 @@ final class MateriSiswaDatabaseTest extends TestCase
         $service->detak(1,31,true,null,null,3,2);
     }
 
+    public function testPdfResetSetelahBackgroundTidakMemberiKreditPalsu(): void
+    {
+        $now = 1000;
+        $service = $this->progresMediaService(101,
+            static function () use (&$now):int {return $now;});
+        $service->detak(1,31,true,null,null,1,2);
+        $now = 1010;
+        $status = $service->detak(1,31,true,null,null,1,2);
+        self::assertSame(10,$status['waktu_aktif_detik']);
+        $now = 1020;
+        $status = $service->detak(1,31,true,null,null,1,2,true);
+        self::assertSame(10,$status['waktu_aktif_detik']);
+        $now = 1030;
+        $status = $service->detak(1,31,true,null,null,1,2);
+        self::assertSame(20,$status['waktu_aktif_detik']);
+    }
+
     public function testPdfSukarelaTidakMencatatProgresResmi(): void
     {
         $service = $this->progresMediaService(102,static fn():int => 1000);
