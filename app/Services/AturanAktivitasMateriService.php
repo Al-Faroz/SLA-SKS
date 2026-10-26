@@ -103,7 +103,12 @@ final class AturanAktivitasMateriService
             $awal['waktu_putar_detik'] = (int) $awal['waktu_putar_detik'] + $kredit;
         }
         $awal['waktu_aktif_detik'] = (int) $awal['waktu_aktif_detik'] + $kredit;
-        $awal['heartbeat_terakhir_pada'] = $now;
+        // Gambar: heartbeat <5 detik tidak kredit dan tidak memindah
+        // baseline waktu. Sisa interval masih dapat diverifikasi.
+        if ($jenis !== 'gambar' || $resetSesi
+            || $dt >= self::DETAK_MINIMAL) {
+            $awal['heartbeat_terakhir_pada'] = $now;
+        }
         $cukup = $jenis === 'gambar'
             ? (int) $awal['waktu_aktif_detik'] >= max(self::GAMBAR_MINIMAL, $minimal)
             : self::memenuhiPemutaran($awal, $minimal, (int) $durasi);

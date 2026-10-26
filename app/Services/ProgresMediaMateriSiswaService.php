@@ -166,7 +166,8 @@ final class ProgresMediaMateriSiswaService
                     'posisi_terakhir_detik' => $next['posisi_terakhir_detik'],
                     'posisi_terjauh_detik' => $next['posisi_terjauh_detik'],
                     'durasi_media_detik' => $next['durasi_media_detik'],
-                    'heartbeat_terakhir_pada' => self::tanggal($now),
+                    'heartbeat_terakhir_pada' =>
+                        self::tanggal((int) $next['heartbeat_terakhir_pada']),
                     'diubah_pada' => self::tanggal($now),
                 ];
                 if ($next['status'] === 'media_selesai') {

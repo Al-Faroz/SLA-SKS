@@ -318,6 +318,21 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame([],$status['halaman_belum_selesai']);
     }
 
+    public function testPdfDetakTerlaluCepatTetapBisaKreditDiDetakBerikut(): void
+    {
+        $now=1000;
+        $svc=$this->progresMediaService(101,
+            static function() use (&$now):int {return $now;});
+        $svc->detak(1,31,true,null,null,1,2);
+        $now=1004;
+        self::assertSame(0,
+            $svc->detak(1,31,true,null,null,1,2)['waktu_aktif_detik']);
+        $now=1006;
+        $data=$svc->detak(1,31,true,null,null,1,2);
+        self::assertSame(6,$data['waktu_aktif_detik']);
+        self::assertSame(6,$data['waktu_per_halaman'][1]);
+    }
+
     public function testGambarWaktuSudahCukupDirekonsiliasiSaatGET(): void
     {
         $this->jadikanMediaPertamaGambar();

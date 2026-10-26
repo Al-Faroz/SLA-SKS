@@ -167,6 +167,10 @@ final class ProgresPdfMateriSiswaService
                 $dt = $now - (int) $last;
                 $same = (int) $row['posisi_terakhir_detik'] === $halaman;
                 $kredit = !$reset && $same && $dt >= 5 && $dt <= 20 ? $dt : 0;
+                // Jika detak datang setelah 3–4 detik, jangan menghanguskan
+                // awal interval sah pada halaman yang sama.
+                $waktuHeartbeat = !$reset && $same && $dt >= 0 && $dt < 5
+                    ? (string) $row['heartbeat_terakhir_pada'] : $nowText;
                 $waktuTotal = (int) $row['waktu_aktif_detik'] + $kredit;
                 $pageDone = (int) $row['halaman_selesai'];
                 if ($kredit > 0) {
@@ -204,7 +208,7 @@ final class ProgresPdfMateriSiswaService
                     'posisi_terakhir_detik' => $halaman,
                     'posisi_terjauh_detik' => max(
                         (int) $row['posisi_terjauh_detik'], $halaman),
-                    'heartbeat_terakhir_pada' => $nowText,
+                    'heartbeat_terakhir_pada' => $waktuHeartbeat,
                     'diubah_pada' => $nowText,
                 ];
                 if ($complete) $payload['media_selesai_pada'] = $nowText;

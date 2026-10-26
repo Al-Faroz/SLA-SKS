@@ -60,6 +60,17 @@ final class AturanAktivitasMateriTest extends TestCase
         self::assertSame('berjalan',$s['status']);
     }
 
+    public function testHeartbeatEmpatDetikGambarTidakHanguskanInterval(): void
+    {
+        $s=Media::awal('gambar',1000,null,null);
+        $s=Media::detak($s,'gambar',1004,null,null,30);
+        self::assertSame(0,$s['waktu_aktif_detik']);
+        self::assertSame(1000,$s['heartbeat_terakhir_pada']);
+        $s=Media::detak($s,'gambar',1006,null,null,30);
+        self::assertSame(6,$s['waktu_aktif_detik']);
+        self::assertSame(1006,$s['heartbeat_terakhir_pada']);
+    }
+
     public function testGambarTuntasPresisiPadaTigaPuluhDetikDenganDetakLimaDetik(): void
     {
         $s=Media::awal('gambar',1000,null,null);
