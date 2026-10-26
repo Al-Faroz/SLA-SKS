@@ -19,6 +19,33 @@ final class AturanAktivitasMateriService
     public const GAMBAR_MINIMAL = 30;
     public const PERSEN_PUTAR = 90;
 
+    /**
+     * Video/audio selesai pada batas yang tercapai terlebih dahulu:
+     * min(minimal Guru, 90% durasi media). Tidak menghitung waktu jeda/seek.
+     */
+    public static function batasEfektif(int $minimalGuru, int $durasiMedia): int
+    {
+        if ($minimalGuru < 1 || $minimalGuru > 10800
+            || $durasiMedia < 5 || $durasiMedia > 10800) {
+            throw new DomainException('Pengaturan waktu atau durasi media tidak sah.');
+        }
+        return min($minimalGuru, (int) ceil($durasiMedia * self::PERSEN_PUTAR / 100));
+    }
+
+    /**
+     * Digunakan oleh heartbeat dan rekonsiliasi progres terdahulu.
+     * Hanya waktu putar yang sah menurut jam server dihitung.
+     *
+     * @param array<string,mixed> $state
+     */
+    public static function memenuhiPemutaran(array $state, int $minimalGuru,
+        int $durasiMedia): bool
+    {
+        $batas = self::batasEfektif($minimalGuru, $durasiMedia);
+        return (int) ($state['waktu_aktif_detik'] ?? 0) >= $batas
+            && (int) ($state['waktu_putar_detik'] ?? 0) >= $batas;
+    }
+
     public static function awal(string $jenis, int $now, ?int $posisi, ?int $durasi): array
     {
         self::validasiMedia($jenis, $posisi, $durasi);
@@ -78,9 +105,7 @@ final class AturanAktivitasMateriService
         $awal['heartbeat_terakhir_pada'] = $now;
         $cukup = $jenis === 'gambar'
             ? (int) $awal['waktu_aktif_detik'] >= max(self::GAMBAR_MINIMAL, $minimal)
-            : (int) $awal['waktu_aktif_detik'] >= $minimal
-                && (int) $awal['waktu_putar_detik'] >= (int) ceil($durasi * .9)
-                && (int) $awal['posisi_terjauh_detik'] >= (int) ceil($durasi * .9);
+            : self::memenuhiPemutaran($awal, $minimal, (int) $durasi);
         if ($cukup) $awal['status'] = 'media_selesai';
         return $awal;
     }

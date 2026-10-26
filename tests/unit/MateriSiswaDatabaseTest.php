@@ -454,7 +454,7 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(0,$this->db->table('resume_materi')->countAllResults());
     }
 
-    public function testYoutube380DetikDari360BelumCukupJikaDurasiPanjang(): void
+    public function testYoutube380DetikDari360DirekonsiliasiDariProgresLama(): void
     {
         $row = $this->db->table('versi_konten_tp')
             ->where('id',3)->get()->getRowArray();
@@ -477,15 +477,22 @@ final class MateriSiswaDatabaseTest extends TestCase
         $data=$svc->status(1,31);
         self::assertSame(380,$data['waktu_aktif_detik']);
         self::assertSame(360,$data['minimal_detik']);
-        self::assertTrue($data['syarat_waktu_terpenuhi']);
+        self::assertSame(360,$data['batas_efektif_detik']);
+        self::assertTrue($data['syarat_efektif_terpenuhi']);
         self::assertSame(3240,$data['pemutaran_minimal_detik']);
-        self::assertFalse($data['syarat_putar_terpenuhi']);
-        self::assertFalse($data['syarat_jangkauan_terpenuhi']);
-        self::assertFalse($data['media_selesai']);
-        self::assertFalse((new \App\Services\KegiatanMateriSiswaService(
+        self::assertFalse($data['syarat_putar_terpenuhi']); // informasi 90%, bukan gate
+        self::assertTrue($data['media_selesai']);
+        self::assertSame('media_selesai',
+            $this->db->table('progres_materi')->where('materi_id',31)
+                ->get()->getRow('status'));
+        self::assertNotNull($this->db->table('progres_materi')
+            ->where('materi_id',31)->get()->getRow('media_selesai_pada'));
+        self::assertTrue((new \App\Services\KegiatanMateriSiswaService(
             $this->db,static fn():array=>[
                 'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
             ]))->status(1,31)['media_selesai']);
+        $svc->status(1,31);
+        self::assertSame(1,$this->db->table('progres_materi')->countAllResults());
     }
 
     public function testTuntasDiagnostikTidakDapatMengirimJawaban(): void

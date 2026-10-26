@@ -57,21 +57,48 @@ final class AturanAktivitasMateriTest extends TestCase
         self::assertSame(90, $s['posisi_terjauh_detik']);
     }
 
-    public function testYoutube360DetikTetapBerjalanJikaVideonyaPanjang(): void
+    public function testVideoPanjangBerhentiPadaBatasGuruLebihDulu(): void
     {
+        self::assertSame(600, Media::batasEfektif(600, 900));
+        self::assertSame(360, Media::batasEfektif(360, 9968));
         $s = Media::awal('youtube', 1000, 0, 3600);
-        // Contoh laporan pengguna: 380/360 detik, video berdurasi 3600 detik.
-        for ($i = 1; $i <= 38; $i++) {
-            $s = Media::detak($s, 'youtube', 1000 + $i * 10,
-                $i * 10, 3600, 360);
+        for ($i = 1; $i <= 35; $i++) {
+            $s = Media::detak($s, 'youtube', 1000 + $i * 10, $i * 10, 3600, 360);
         }
-        self::assertSame(380, $s['waktu_aktif_detik']);
         self::assertSame('berjalan', $s['status']);
-        for ($i = 39; $i <= 324; $i++) {
-            $s = Media::detak($s, 'youtube', 1000 + $i * 10,
-                $i * 10, 3600, 360);
-        }
+        $s = Media::detak($s, 'youtube', 1360, 360, 3600, 360);
         self::assertSame('media_selesai', $s['status']);
+        self::assertSame(360, $s['waktu_putar_detik']);
+        self::assertSame(360, $s['posisi_terjauh_detik']);
+    }
+
+    public function testVideoPendekBerhentiPadaSembilanPuluhPersenLebihDulu(): void
+    {
+        self::assertSame(378, Media::batasEfektif(600, 420));
+        $s = Media::awal('youtube', 1000, 0, 420);
+        for ($i = 1; $i <= 37; $i++) {
+            $s = Media::detak($s, 'youtube', 1000 + $i * 10, $i * 10, 420, 600);
+        }
+        self::assertSame('berjalan', $s['status']);
+        $s = Media::detak($s, 'youtube', 1380, 380, 420, 600);
+        self::assertSame('media_selesai', $s['status']);
+        self::assertSame(380, $s['waktu_putar_detik']);
+    }
+
+    public function testSeekTidakMemenuhiBatasMeskipunPosisiJauh(): void
+    {
+        $s = Media::awal('youtube', 1000, 0, 900);
+        $s = Media::detak($s, 'youtube', 1010, 750, 900, 600);
+        self::assertSame(750, $s['posisi_terjauh_detik']);
+        self::assertSame(0, $s['waktu_putar_detik']);
+        self::assertSame('berjalan', $s['status']);
+        self::assertFalse(Media::memenuhiPemutaran($s, 600, 900));
+    }
+
+    public function testGuruDanDurasiTidakSahDitolak(): void
+    {
+        $this->expectException(\DomainException::class);
+        Media::batasEfektif(600, 0);
     }
 
     public function testMelewatiVideoDenganSeekTidakDihitungSebagaiPutar(): void
