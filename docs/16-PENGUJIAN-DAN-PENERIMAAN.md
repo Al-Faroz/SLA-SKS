@@ -195,3 +195,5 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Zoom/resize pada halaman sama tidak menyebabkan reset halaman; ganti nomor halaman, tab tersembunyi dan kehilangan fokus mereset sesi.
 - Status PDF menampilkan waktu per halaman serta daftar yang belum selesai. Resume hanya terbuka jika seluruh halaman memenuhi 15 detik serta total waktu Guru terpenuhi.
 - Tidak mengubah video YouTube/audio yang sudah FIX, tidak menambah SQL dan tidak melakukan reset data siswa. Uji akhir interaksi nyata diperlukan di XAMPP.
+
+**Regresi visibilitas PDF:** canvas PDF sudah dirender tetapi area pembaca <50% viewport ⇒ tidak ada POST heartbeat; setelah area terlihat ⇒ detak baseline tanpa kredit, berikutnya tiap 5 detik. Scroll keluar/masuk lagi harus reset dan tidak menambah durasi sembunyi. Navigasi ke halaman lain harus memakai nomor baru dan baseline baru.

@@ -112,3 +112,88 @@ test('pembukaan Resume tidak melewati izin server',()=>{
     assert.match(script,/data\.media_selesai\s*===\s*true/);
     assert.match(script,/window\.location\.reload\(\)/);
 });
+
+
+test('PDF tanpa area pembaca terlihat tidak mengirim detak, kembali terlihat reset',async()=>{
+    const sent=[];
+    let observer;
+    let interval;
+    const pdfHandlers={};
+    const area={};
+    const pdf={dataset:{pdfReady:'ya',pdfHalaman:'1',pdfTotal:'2'},
+        addEventListener(key,handler){pdfHandlers[key]=handler;}};
+    const root={
+        dataset:{mediaUrl:'/aktivitas',mediaJenis:'pdf',csrfName:'csrf',csrfHash:'token'},
+        querySelector(key) {
+            return ({
+                '[data-media-status]':{textContent:''},
+                '[data-media-waktu]':{textContent:''},
+                '[data-media-bilah]':{value:0},
+            })[key]||null;
+        },
+    };
+    // Reuse persistent DOM objects for assertions and progressive output.
+    const items={status:{textContent:''},waktu:{textContent:''},bar:{value:0}};
+    root.querySelector=key=>({
+        '[data-media-status]':items.status,
+        '[data-media-waktu]':items.waktu,
+        '[data-media-bilah]':items.bar,
+    })[key]||null;
+    const document={
+        visibilityState:'visible', hasFocus:()=>true,
+        addEventListener(){},
+        querySelector(key) {
+            return ({
+                '[data-media-progres]':root,
+                '[data-pdf-pembaca]':pdf,
+                '[data-pdf-baca-area]':area,
+            })[key]||null;
+        },
+    };
+    const window={
+        IntersectionObserver:function(fn){observer=fn;this.observe=()=>{};},
+        addEventListener(){},
+        setInterval(fn,ms){interval={fn,ms};},
+        location:{reload(){}},
+    };
+    const FormData=class{
+        constructor(){this.fields={};}
+        append(k,v){this.fields[k]=v;}
+    };
+    const fetch=async(url,opts={})=>{
+        if(opts.method==='POST')sent.push({...opts.body.fields});
+        return {ok:true,json:async()=>({ok:true,csrf:'token',data:{
+            media_selesai:false,minimal_detik:60,halaman_total:2,
+            halaman_selesai:0,halaman_belum_selesai:[1,2],
+            waktu_per_halaman:{1:0,2:0},
+        }})};
+    };
+    vm.runInNewContext(script,{window,document,fetch,
+        navigator:{onLine:true},FormData,console,Number,Math,Promise});
+    const settle=()=>new Promise(resolve=>setImmediate(resolve));
+    await settle();
+    assert.equal(interval.ms,5000);
+    await interval.fn();
+    await settle();
+    assert.equal(sent.length,0);
+    observer([{isIntersecting:true,intersectionRatio:0.85}]);
+    await settle();
+    assert.equal(sent.length,1);
+    assert.equal(sent[0].reset,'ya');
+    assert.equal(sent[0].halaman,'1');
+    await interval.fn();
+    await settle();
+    assert.equal(sent[1].reset,'tidak');
+    observer([{isIntersecting:false,intersectionRatio:0.1}]);
+    await interval.fn();
+    await settle();
+    assert.equal(sent.length,2);
+    observer([{isIntersecting:true,intersectionRatio:0.9}]);
+    await settle();
+    assert.equal(sent[2].reset,'ya');
+    pdf.dataset.pdfHalaman='2';
+    pdfHandlers['pdf-halaman-siap']();
+    await settle();
+    assert.equal(sent[3].reset,'ya');
+    assert.equal(sent[3].halaman,'2');
+});

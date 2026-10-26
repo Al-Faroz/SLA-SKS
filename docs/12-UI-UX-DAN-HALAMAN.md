@@ -168,3 +168,5 @@ Indikator progres harus memperlihatkan syarat yang sebenarnya: audio menampilkan
 ### Status presisi Gambar dan PDF (26 Oktober 2026)
 
 Waktu gambar/PDF dibaca dari heartbeat sah 5 detik. Gambar yang tidak terlihat/fokus tidak memberi kredit; kembali aktif memulai baseline baru, tanpa mereset akumulasi waktu. PDF menampilkan detik baca untuk halaman aktif (misalnya 10/15 detik) dan halaman lain yang belum selesai. Zoom/fullscreen/resize tidak memberi kredit otomatis dan tidak menghanguskan progres halaman yang telah sah. Hanya status media_selesai dari server yang mengaktifkan Resume melalui pemuatan ulang.
+
+**Area PDF:** selain pemeriksaan halaman PDF.js yang sudah render, waktu hanya dihitung ketika area pembaca setidaknya setengah terlihat di layar dan tab/jendela aktif. Status menampilkan sisa durasi per halaman; tidak memberi kredit ketika siswa sedang melihat bagian halaman web lainnya.
