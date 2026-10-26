@@ -109,6 +109,23 @@
                 dengan tab aktif, selama minimal 30 detik atau waktu Guru
                 (mana yang lebih lama).</p>
         <?php endif ?>
+        <?php if (in_array($materi['jenis'], ['audio', 'gambar', 'pdf'], true) && !$sukarela): ?>
+            <div class="a-jarak-atas" aria-label="Akses unduh materi">
+                <?php if ($kegiatan['media_selesai']): ?>
+                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('siswa/tp/'
+                        . (int) $tp['id'] . '/materi/' . (int) $materi['id'] . '/unduh'), 'attr') ?>">
+                        Unduh Materi <?= esc(strtoupper($materi['jenis'])) ?>
+                    </a>
+                <?php else: ?>
+                    <button type="button" class="a-btn a-btn--sekunder" disabled
+                        title="Selesaikan durasi belajar media untuk mengunduh">
+                        Unduh Materi (terkunci)
+                    </button>
+                    <p class="a-help">Unduhan tersedia setelah waktu belajar media selesai
+                        dan disahkan server.</p>
+                <?php endif ?>
+            </div>
+        <?php endif ?>
         <?php if ($sukarela): ?>
             <div class="a-alert" role="status">
                 TP sudah Tuntas melalui Diagnostik. Materi ini hanya untuk belajar sukarela,

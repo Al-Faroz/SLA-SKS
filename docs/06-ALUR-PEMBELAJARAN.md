@@ -151,3 +151,8 @@ Ketika gambar keluar dari viewport, tab tersembunyi, atau browser blur, detak pe
 PDF memulai sesi hanya setelah halaman berhasil dirender oleh PDF.js. Reset terjadi saat **nomor halaman berpindah** atau fokus/visibilitas terputus; zoom/resize pada halaman yang sama tidak mereset waktu baca. Respons status memberikan detik baca tiap halaman yang tercatat server, halaman yang masih kurang, dan sisa minimum total. Halaman resmi selesai ketika mempunyai rekaman selesai dan waktu sah 15 detik atau lebih. Resume terbuka hanya setelah seluruh syarat server selesai, HOTS setelah Resume final. Tidak ada perubahan SQL, nilai maupun hasil historis.
 
 **Pelengkap visibilitas PDF (26 Oktober 2026):** PDF tidak mendapat kredit hanya karena canvas telah berhasil dirender. Area pembaca harus terlihat setidaknya 50% dalam viewport browser, tab aktif dan jendela fokus. Keluar area dan masuk kembali mereset baseline sesi sehingga durasi saat PDF tidak terlihat tidak terhitung, tanpa menghapus waktu halaman yang sudah dicatat.
+
+
+### Unduh media siswa setelah ketuntasan (26 Oktober 2026)
+
+Untuk media **audio, gambar dan PDF**, siswa jalur belajar wajib mendapatkan tombol `Unduh Materi` **hanya setelah** status media pada progres TP terpin adalah `media_selesai`, sama seperti gerbang Resume. Sebelum itu tombol terkunci. Unduhan menggunakan endpoint autentikasi siswa dan verifikasi ulang progres server, bukan hanya sembunyi tombol HTML. Nama fisik berkas privat tidak pernah diekspos. YouTube tidak menyediakan unduhan. HOTS tetap sesudah Resume final. Tidak memerlukan SQL baru.

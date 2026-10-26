@@ -333,6 +333,42 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(6,$data['waktu_per_halaman'][1]);
     }
 
+    public function testUnduhTerkunciSebelumMediaSelesaiDanTerbukaSetelahnya(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $svc = $this->svc();
+        try {
+            $svc->mediaUntukUnduh(1,31);
+            self::fail('Materi belum selesai tidak boleh diunduh.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('waktu belajar',$e->getMessage());
+        }
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'gambar','status'=>'media_selesai',
+            'waktu_aktif_detik'=>30,
+        ]);
+        // File privat pada fixture lain; gerbangnya sudah lulus bila
+        // error berikut berasal dari verifikasi metadata/berkas, bukan waktu.
+        try {
+            $svc->mediaUntukUnduh(1,31);
+        } catch (\DomainException $e) {
+            self::assertStringNotContainsString('waktu belajar',$e->getMessage());
+        }
+    }
+
+    public function testUnduhTidakDiberikanUntukJalurDiagnostikTuntas(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $this->db->table('progres_tp')->where('id',11)->update(['status'=>'tuntas']);
+        try {
+            $this->svc()->mediaUntukUnduh(1,31);
+            self::fail('Jalur sukarela tidak memiliki akses unduh resmi.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('jalur belajar wajib',$e->getMessage());
+        }
+    }
+
     public function testGambarWaktuSudahCukupDirekonsiliasiSaatGET(): void
     {
         $this->jadikanMediaPertamaGambar();

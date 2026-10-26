@@ -223,6 +223,28 @@ final class MateriSiswaService
         return true;
     }
 
+    /**
+     * Gerbang unduh terpisah: hak melihat inline bukan izin mengunduh.
+     * Hanya jalur wajib dengan media_selesai versi TP yang terpin.
+     */
+    public function mediaUntukUnduh(int $tpId, int $materiId): array
+    {
+        $ctx = $this->konteks($tpId);
+        if (($ctx['progres']['status'] ?? '') !== 'belajar') {
+            throw new DomainException('Unduhan hanya tersedia pada jalur belajar wajib.');
+        }
+        $this->materiBerizin($ctx, $materiId);
+        $row = $this->db->table('progres_materi')->select('status')
+            ->where('progres_tp_id', (int) $ctx['progres']['id'])
+            ->where('materi_id', $materiId)
+            ->where('versi_konten_tp_id', (int) $ctx['progres']['versi_konten_tp_id'])
+            ->get()->getRowArray();
+        if (($row['status'] ?? '') !== 'media_selesai') {
+            throw new DomainException('Tuntaskan waktu belajar media sebelum mengunduh.');
+        }
+        return $this->media($tpId, $materiId);
+    }
+
     /** Data privat untuk controller streaming; path/nama_acak tidak pernah dikirim ke view. */
     public function media(int $tpId, int $materiId): array
     {

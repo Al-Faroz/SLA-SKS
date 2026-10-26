@@ -111,6 +111,48 @@ final class SiswaMateri extends BaseController
         }
     }
 
+    /** S08: unduh berkas asli hanya setelah gerbang media selesai di server. */
+    public function unduh(int $tpId, int $materiId): ResponseInterface
+    {
+        try {
+            $item = (new MateriSiswaService())->mediaUntukUnduh($tpId, $materiId);
+            $ekstensi = [
+                'application/pdf' => 'pdf',
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/webp' => 'webp',
+                'audio/mpeg' => 'mp3',
+                'audio/mp4' => 'm4a',
+            ][$item['mime']] ?? null;
+            if ($ekstensi === null) {
+                throw new DomainException('Jenis berkas unduhan tidak sah.');
+            }
+            // Tidak menerima path/nama file dari URL atau input siswa.
+            $nama = 'materi-' . $tpId . '-' . $materiId . '.' . $ekstensi;
+            $data = @file_get_contents($item['path']);
+            if ($data === false || strlen($data) !== (int) $item['bytes']) {
+                throw new DomainException('Berkas unduhan belum tersedia.');
+            }
+            return $this->response->setStatusCode(200)
+                ->setHeader('Content-Type', $item['mime'])
+                ->setHeader('Content-Length', (string) strlen($data))
+                ->setHeader('Content-Disposition', 'attachment; filename="' . $nama . '"')
+                ->setHeader('Cache-Control', 'private, no-store, max-age=0')
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Security-Policy', "default-src 'none'; sandbox")
+                ->setBody($data);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(404)
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody('Unduhan belum tersedia. Tuntaskan waktu belajar media.');
+        } catch (Throwable $e) {
+            log_message('error', 'S08 unduh Materi siswa: {error}', ['error' => $e->getMessage()]);
+            return $this->response->setStatusCode(500)
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody('Unduhan materi gagal. Hubungi pengelola.');
+        }
+    }
+
     private function tidakSahRange(int $size): ResponseInterface
     {
         return $this->response->setStatusCode(416)
