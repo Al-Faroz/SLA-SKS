@@ -7,7 +7,7 @@ const vm=require('node:vm');
 const src=fs.readFileSync(path.resolve(__dirname,
   '../../public/assets/js/aktivitas-materi-checkpoint.js'),'utf8');
 
-function makeImage() {
+function makeImage(minimum=30) {
   const events={};
   let observer=()=>{};
   let interval;
@@ -55,12 +55,12 @@ function makeImage() {
     const fields=opts.body?.fields||{};
     calls.push({url,fields});
     let data={status:'belum_dimulai',media_selesai:false,
-      waktu_aktif_detik:0,minimal_detik:30};
+      waktu_aktif_detik:0,minimal_detik:minimum};
     if(url==='/mulai')data={...data,status:'berjalan'};
     if(url==='/checkpoint'){
       const report=JSON.parse(fields.laporan);
-      data={...data,status:report.total>=30?'media_selesai':'berjalan',
-        media_selesai:report.total>=30,waktu_aktif_detik:report.total};
+      data={...data,status:report.total>=minimum?'media_selesai':'berjalan',
+        media_selesai:report.total>=minimum,waktu_aktif_detik:report.total};
     }
     return {ok:true,json:async()=>({csrf:'new',ok:true,data})};
   };
@@ -135,4 +135,18 @@ test('UI menyediakan route unduh terpisah, gate Resume, dan CSRF checkpoint',()=
   assert.match(view,/data-media-scope/);
   assert.match(view,/aktivitas-materi-checkpoint\.js/);
   assert.match(src,/form\.append\(tokenName,csrf\)/);
+});
+
+
+test('media panjang hanya checkpoint berkala setiap 180 detik',async()=>{
+  const x=makeImage(360);
+  await x.settle();x.observe(true);
+  await x.tick(1);
+  await x.tick(170);
+  assert.equal(x.calls.filter(c=>c.url==='/checkpoint').length,0);
+  await x.tick(11);
+  const ck=x.calls.filter(c=>c.url==='/checkpoint');
+  assert.equal(ck.length,1);
+  assert.ok(JSON.parse(ck[0].fields.laporan).total>=170);
+  assert.equal(x.reloads,0,'belum syarat 360 sehingga Resume terkunci');
 });
