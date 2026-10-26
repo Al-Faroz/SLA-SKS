@@ -39,6 +39,7 @@ final class ProgresPdfMateriSiswaService
         $done = 0;
         $belum = range(1, $total);
         $pageTimes = [];
+        $selesaiResmi = [];
         if ($row !== null) {
             // Detail waktu per halaman dari database, bukan kalkulasi client.
             $pageRows = $this->db->table('halaman_progres_materi')
@@ -50,12 +51,12 @@ final class ProgresPdfMateriSiswaService
                 if ($pageNo < 1 || $pageNo > $total) continue;
                 $pageTimes[$pageNo] = max(0, (int) $part['waktu_aktif_detik']);
                 if ($part['selesai_pada'] !== null && $pageTimes[$pageNo] >= 15) {
-                    $done++;
+                    $selesaiResmi[$pageNo] = true;
                 }
             }
             $belum = array_values(array_filter(range(1, $total),
                 static fn (int $pageNo): bool =>
-                    !isset($pageTimes[$pageNo]) || $pageTimes[$pageNo] < 15));
+                    !isset($selesaiResmi[$pageNo])));
             $done = $total - count($belum);
             // Pulihkan status progres yang memenuhi syarat tanpa mengarang waktu.
             // Guard berpatokan progres siswa milik versi TP yang terpin.
