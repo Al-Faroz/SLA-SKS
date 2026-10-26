@@ -101,7 +101,7 @@
                                 <tr>
                                     <th scope="row" data-label="BAB"><?= esc($labelBab) ?></th>
                                     <td data-label="Kode TP"><?= esc($tp['kode_tp']) ?></td>
-                                    <td data-label="Nama TP" class="a-tbl--peta-atp__judul"><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc($tp['nama_tp'] ?: $tp['judul']) ?></a></td>
+                                    <td data-label="Nama TP" class="a-tbl--peta-atp__judul"><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc(($tp['nama_tp'] ?? '') !== '' ? $tp['nama_tp'] : $tp['judul']) ?></a></td>
                                     <td data-label="Jenis"><?= esc(isset($tp['jenis_tp']) ? ($tp['jenis_tp'] === 'non_esensial' ? 'NonEsensial' : 'Esensial') : 'Lama') ?></td>
                                     <td data-label="Versi paket"><?= $paketTp === null ? '—' : (int) $paketTp['nomor_versi'] ?></td>
                                     <td data-label="Status TP"><span class="a-badge"><?= esc($tp['status']) ?></span></td>

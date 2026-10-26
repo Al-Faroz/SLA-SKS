@@ -29,6 +29,9 @@ final class GuruBab extends BaseController
             (new BabService())->buat((int) $paket, $nama, $deskripsi);
         } catch (DomainException $e) {
             return redirect()->to($tujuan)->with('galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal menyimpan BAB pada paket: ' . get_class($e));
+            return redirect()->to($tujuan)->with('galat', 'BAB belum tersimpan. Periksa data atau hubungi Admin.');
         }
         return redirect()->to($tujuan)->with('sukses', 'BAB berhasil ditambahkan.');
     }
