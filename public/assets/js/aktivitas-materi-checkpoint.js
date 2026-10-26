@@ -32,6 +32,8 @@
     let previous = null;
     let previousTick = null;
     let lastCheckpointAt = Date.now();
+    let nextStartAt = 0;
+    let nextSyncAt = 0;
     let lastData = null;
 
     const blank = () => ({total:0,pages:{},pos:0,dur:0,halaman:1});
@@ -212,7 +214,8 @@
 
     let starting=false;
     async function start(sample) {
-        if (anchored || starting || busy || !connected || !sample) return;
+        if (anchored || starting || busy || !connected || !sample
+            || Date.now() < nextStartAt) return;
         starting=true;
         try {
             const data=await api(root.dataset.mediaStart,{
@@ -224,12 +227,17 @@
             started=true;
             mergeServer(data);
             notice='';
-        } catch (e) {notice='Belum bisa memulai sinkronisasi: '+e.message;}
+            nextStartAt=0;
+        } catch (e) {
+            notice='Belum bisa memulai sinkronisasi: '+e.message;
+            nextStartAt=Date.now()+15000;
+        }
         finally {starting=false;display();}
     }
 
     async function sync() {
-        if (busy || !anchored || !connected || finished) return;
+        if (busy || !anchored || !connected || finished
+            || Date.now() < nextSyncAt) return;
         if (!started)started=true;
         busy=true;
         try {
@@ -243,10 +251,13 @@
             mergeServer(data);
             notice='';
             lastCheckpointAt=Date.now();
+            nextSyncAt=0;
             store();
         } catch (e) {
             notice='Checkpoint belum diterima server: '+e.message
                 +' Progres lokal tidak dihapus.';
+            // Jangan POST tiap detik bila server sedang gagal / shared hosting sibuk.
+            nextSyncAt=Date.now()+15000;
         } finally {busy=false;display();}
     }
 
@@ -299,7 +310,8 @@
         connected=false;resetSegment();notice='';display();
     });
     window.addEventListener('online',()=>{
-        connected=true;resetSegment();notice='';sync();
+        connected=true;resetSegment();notice='';
+        nextStartAt=0;nextSyncAt=0;sync();
     });
     if (jenis==='gambar' || jenis==='pdf') {
         const area=jenis==='gambar'
