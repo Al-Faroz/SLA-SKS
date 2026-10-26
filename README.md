@@ -5,7 +5,7 @@ MTs Fase D · LMS CodeIgniter 4 · Admin, Guru, Siswa, Pimpinan · 6 semester.
 > **Status:** Master v2.5 dan SQL v4 sedang disiapkan pada branch review. **Kode aplikasi di XAMPP belum diubah ke kontrak baru**. Tidak boleh menyatakan fitur siap sampai implementasi dan tes manual selesai.
 
 ## Alur produk terbaru
-**Mapel (1 CP operasional) → Semester → BAB → TP**. ATP Guru dibuat melalui aplikasi atau impor template Excel yang sudah dimiliki proyek dan akan diadaptasi (termasuk macro pada tahap lanjutan). Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misalnya `BIND.8.1.1`). Nomor BAB berlanjut semester 1–2, 3–4, 5–6. Nama BAB/TP maksimal 35 karakter, deskripsi maksimal 225.
+**Mapel (1 CP operasional) → Semester → BAB → TP**. ATP Guru dibuat melalui aplikasi atau impor template Excel manual (.xlsx) yang sudah disiapkan; tanpa macro, tombol pembentukan otomatis, atau pemasangan VBA. Generator/validator di aplikasi akan diselaraskan pada tahap implementasi. Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misalnya `BIND.8.1.1`). Nomor BAB berlanjut semester 1–2, 3–4, 5–6. Nama BAB/TP maksimal 35 karakter, deskripsi maksimal 225.
 
 TP **Esensial** tanpa Materi/nilai LMS, tetapi tetap masuk ATP dan daftar nilai sertifikat. TP **NonEsensial** tepat satu Materi. Diagnostik minimal 10 soal adalah gerbang: lulus boleh melewati Materi, Resume, HOTS; yang tidak lulus wajib Materi→Resume→HOTS. **Keduanya wajib Sumatif minimal 30 soal**. Nilai jalur gagal Diagnostik = 20% Resume +20% HOTS +60% Sumatif; jalur lulus = 100% Sumatif. KKM default Admin/khusus Guru; Sumatif < KKM mendapat satu remedial, skor tertinggi dipakai, TP tetap selesai walau di bawah KKM.
 

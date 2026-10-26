@@ -1,41 +1,65 @@
-# Rencana Kerja SLA-SKS v2.5 — Perombakan Pola 26 Oktober 2026
+# RENCANA KERJA IMPLEMENTASI SLA-SKS v2.5 — Setelah Template ATP Manual
+**Tanggal:** 26 Oktober 2026 · **Target lingkungan:** CI4/XAMPP lokal dan MySQL/MariaDB shared hosting.
 
-> **Status:** rencana prioritas, bukan daftar fitur yang diklaim telah selesai. Urutan disusun agar bisa di-PR/merge dan diuji XAMPP bertahap; tidak langsung melompat ke sertifikat/dasbor sebelum fondasi.
+> **Jenis dokumen:** rencana pelaksanaan konkret setelah pemilik menyetujui template ATP **manual tanpa macro**. Dokumen ini menggantikan rencana sebelumnya yang mengharuskan pembuatan file `.xlsm`. Ini BUKAN klaim fitur sudah diimplementasikan.
 
-## Tahap A — Pekerjaan sekarang (4 tugas pemilik)
-| Langkah | Hasil yang diharapkan | Gerbang selesai |
-|---|---|---|
-| A1 | Catatan progres & mana yang dipertahankan/diubah/arsip | Membandingkan repo v2.4 dan dump terbaru, tanpa nama siswa/credential di Git |
-| A2 | Revisi **16 Master Document v2.5** dan README/AGENTS | Tidak ada kebijakan lama yang masih mengikat, konflik keputusan ditandai, PR review belum merge |
-| A3 | Rencana kerja transisi v2.5, ketergantungan dan E2E baru | Urutan realistis; fitur tunda disebut jelas |
-| A4 | SQL lokal baru `sla_sks_v4` dari salinan data v3 | SQL privat terpisah, v3 tetap utuh, audit QA impor oleh pemilik; belum perlu ubah `.env` |
+## A. Kondisi yang telah diverifikasi
+1. **Repository:** `main` saat pemeriksaan masih memuat kode/aturan model v2.4, tanpa BAB; revisi dokumen v2.5 ada di **PR #65 (DRAFT, belum merge)**. Implementasi CI4 yang sudah berjalan tidak otomatis mengikuti SQL v4.
+2. **Database:** pemilik melaporkan `sla_sks_v4_LOKAL_PRIVAT_DIPERBAIKI_R2.sql` berhasil diimpor dengan **268 kueri**. Keberhasilan impor tersebut belum termasuk bukti QA lengkap tabel/FK/versi; **jangan mengubah `.env` atau menyatakan DB v4 FIX** sebelum QA baca-saja terbukti.
+3. **Excel:** `TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx` sudah dibuat berdasarkan workbook lama. Memiliki **10 sheet** (MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII); 20 baris BAB dan 80 baris TP kosong per semester; **tanpa macro, tombol Proses, rumus pembentukan otomatis**. Tidak ada tugas menanam VBA, meminta pengguna memasang `.bas`, atau membuat `.xlsm`.
+4. **Data historis:** salinan v4 menyimpan pengguna, siswa, CP, soal, media, snapshot dan ujian lama. TP lama memiliki 4 materi sehingga tidak boleh otomatis dianggap TP NonEsensial aktif dalam kontrak satu materi.
+5. **Komponen aplikasi yang bisa dipakai kembali:** `PetaTpService`, `DetailTpService`, `KesiapanTpService`, `ProgresTpSiswaService`, `ProgresMediaMateriSiswaService`, `SiswaUjian` dan rute terkait. Ini titik refaktor, bukan bukti siap untuk v4.
+6. **Hal yang harus diperbaiki pada PR dokumen:** teks AGENTS.md tentang Diagnostik yang langsung menuntaskan TP sudah diperbarui pada branch, seperti juga referensi Excel bermakro. Patch SQL publik V4-0001 di PR masih perlu diselaraskan/ditinjau dengan paket **R2** yang benar-benar diimpor; **jangan menjalankan patch lama di v4**.
 
-**Pekerjaan baru boleh diklaim 'selesai' untuk A4 setelah berhasil impor di XAMPP dan audit query baca-saja.** File SQL berhasil dihasilkan saja tidak membuktikan DB sudah terpasang.
+## B. Kontrak inti yang tidak boleh berubah
+- **Mapel → satu CP operasional (boleh banyak elemen/versi) → Semester → BAB → TP**; enam semester Fase D, nomor BAB berlanjut S1–S2 untuk VII, S3–S4 untuk VIII, S5–S6 untuk IX; kembali BAB 1 pada kelas baru.
+- Nama BAB/TP maksimal 35 karakter, deskripsi masing-masing maksimal 225; `KODEMAPEL.KELAS.NOBAB.NOTP`, contoh `BIND.8.1.1`. Nomor TP kembali 1 dalam BAB baru.
+- ATP diisi Guru **langsung dalam aplikasi atau dari Excel manual**. TP Esensial ada di ATP/sertifikat tetapi tanpa materi/ujian/nilai; TP NonEsensial memiliki **tepat satu materi aktif**.
+- Diagnostik ≥10 soal hanya gate. Lulus boleh melewati Materi/Resume/HOTS; gagal wajib satu Materi → Resume final → HOTS final. **Semua** TP NonEsensial wajib Sumatif ≥30 soal.
+- Nilai gagal Diagnostik 20% Resume +20% HOTS +60% Sumatif; lulus Diagnostik 100% Sumatif. Remedial **sekali** bila Sumatif < KKM dan ambil skor tertinggi. Status TP Selesai tidak membutuhkan nilai ≥KKM.
+- Progres semester hanya dari TP NonEsensial. Pra-Semester ujian serentak pada jadwal Admin setelah semua TP NonEsensial selesai. Nilai Pra-Semester berdiri sendiri; **tidak ada nilai akhir semester**.
+- Guru dapat **export semua siswa dan nilai TP** walaupun hanya satu nilai ada. Kolom Pra-Semester tetap ditampilkan kosong bila belum terlaksana. Jangan menahan export sampai Pra-Semester selesai.
+- Model B aktivitas media client-side dengan checkpoint server **4 menit + saat selesai/pindah tahap**; validasi server tetap wajib. PDF 15 MB/40 halaman, zoom/fullscreen, unduh audio/gambar/PDF setelah gate diakui harus dipertahankan.
 
-## Tahap B — SETELAH tahap A dan pemeriksaan pengguna
-**B1. File ATP Excel bermakro (prioritas sesudah A):** gunakan berkas `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` sebagai dasar, buat versi baru bermakro dengan pengaturan yang disepakati, memuat 6 semester, BAB bernomor sambung, TP Esensial/NonEsensial, kode TP, nama35/deskripsi225, CP Mapel, identitas Gen/Guru terkunci sesuai generator. Tentukan format impor yang aman: macro tidak dieksekusi oleh server; validasi sel dan metadata; pratinjau hasil impor. **Belum dikerjakan sekarang.**
+## C. Urutan PR implementasi
+| Urutan | PR / tahap | Hasil konkret (Service, Controller, UI, data) | Gerbang penerimaan |
+|---:|---|---|---|
+| **0** | **Fondasi dokumen & DB v4** | Sinkronkan semua Master v2.5, hilangkan referensi macro dan kebijakan Diagnostik lama. Samakan patch SQL publik dengan R2, verifikasi 58 tabel, PK/FK, `schema_version`, 37 akun/17 siswa/20 mapel dan retensi materi/attempt. **Tanpa rewrite DB sumber v3.** | QA SQL baca-saja PASS, PR #65 lolos review dan disetujui merge sebelum PR fitur tergantungnya |
+| **1** | **Template ATP resmi** | Tambahkan workbook manual `.xlsx` yang sudah dibuat ke `docs/` sebagai template acuan resmi, mengganti atau memversioning template lama. Tetapkan **rentang sel, header dan identitas** sesuai template 10 sheet; larang file contoh menjadi data riil. Tidak ada macro/VBA. | Buka normal Excel, sheet/header/validasi sel sesuai; file sumber di GitHub dapat diambil; versi template tercatat |
+| **2** | **Fondasi BAB–TP dan CP** | Ubah `PetaTpService`, `DetailTpService`/Controller dan UI Guru agar mengelola BAB dan TP per Gen–Mapel. CRUD BAB draf; kode TP/urutan dari konteks, jenis Esensial/NonEsensial, CP mapel, aturan lintas semester; tidak mengubah TP Siap historis. | Guru Gen A tidak akses B; dua semester satu kelas nomor BAB sambung; kelas berikutnya reset; kode salah ditolak |
+| **3** | **Impor ATP Excel manual** | Generator unduh workbook berdasar file resmi dan isi identitas Gen–Mapel–Kurikulum/CP dari SERVER. Parser `.xlsx` baca sheet SEMESTER 1–6, BAB dan TP manual; cek sheet/kolom/jenis, kode dan relasi; **pratinjau tambah/ubah/tetap/galat** → konfirmasi transaksi idempoten. Baris hilang bukan hapus; sheet CONTOH diabaikan; formula/metadata identitas tak dipercaya. | File valid masuk tepat, kode TP salah/duplikat/lintas Gen ditolak; impor ulang tidak ganda; tidak ubah TP Siap; galat menyebut sheet/baris |
+| **4** | **Editor TP dan kesiapan** | TP Esensial tanpa form Materi/ujian/Resume/HOTS; NonEsensial tepat satu Materi. Ubah `KesiapanTpService`, `MateriDrafService`, snapshot dan CSS halaman BAB/TP mengikuti standar 12/13. | Esensial siap tanpa materi; NonEsensial menolak 0 atau >1 aktif; versi siswa lama aman |
+| **5** | **Bank soal dan kesiapan Diagnostik/Sumatif** | Adaptasi generator/unggah Word dua bank per TP; batas Diagnostik ≥10 dan Sumatif ≥30. Pertahankan PG A–E, Equation/tabel/gambar/Arab, pratinjau aman dan asset privat. | Validasi jumlah dan konten rich, tidak bocor kunci, impor berulang idempoten |
+| **6** | **Siswa: BAB → TP dan Diagnostik** | Katalog siswa dan `ProgresTpSiswaService` hanya hitung NonEsensial. Diagnostik lulus membuka jalur Sumatif tanpa syarat Materi/Resume/HOTS; gagal menjalani media/resume/HOTS. Esensial informatif saja. | Tidak mungkin lulus Diagnostik langsung menuntaskan TP; URL siswa Gen lain ditolak |
+| **7** | **Satu Materi & Model B** | Sesuaikan pembaca YouTube/audio/gambar/PDF, checkpoint 4 menit, offline/retry, gate Resume/HOTS; unduh hanya audio/gambar/PDF setelah waktu sah. Gunakan komponen media existing, jangan ulang masalah validator PDF. | Waktu tak hilang saat gangguan jaringan; gate ditolak bila belum checkpoint sah; PDF/zoom/fullscreen/download regresi PASS |
+| **8** | **Sumatif, remedial dan Nilai TP** | Satu Sumatif wajib untuk semua NonEsensial, remedial maksimal satu jika skor awal < KKM, skor tertinggi. KKM default Admin/khusus Guru, skor Resume/HOTS dan nilai sementara/final di Service; status Selesai terpisah nilai KKM. | Jalur nilai 20/20/60 & 100%, Sumatif wajib, remedial sekali, TP tetap selesai meski skor rendah |
+| **9** | **Export Nilai Guru (jangan tunggu Pra-Semester)** | Export XLSX seluruh siswa Gen–Mapel/semester; kolom TP Esensial tanpa nilai, NonEsensial nilai/sedang menunggu, Pra-Semester **kolom kosong hingga ada nilai**. Filter & formula-injection aman. | Berfungsi saat **baru ada satu nilai TP**, NULL ≠ 0, siswa tak bernilai tetap muncul, akses lintas Gen ditolak |
+| **10** | **Pra-Semester serentak** | Admin menjadwalkan per paket semester; Guru mengelola bank gabungan seluruh BAB (≥30 soal); gunakan mesin ujian Ketat lama dengan jendela waktu, snapshot/insiden, remedial sekali, hasil mandiri. Hubungkan hasil dengan Export Nilai. | Siswa belum selesai seluruh NonEsensial ditolak; di luar jadwal ditolak; nilainya muncul di ekspor tanpa agregat |
+| **11** | **Sertifikat & laporan** | Daftar BAB/semua TP; Esensial tanpa nilai, NonEsensial bernilai; versi PDF/QR/TTD audit. Tidak ada nilai akhir semester. Laporan Guru/Pimpinan lengkap sesuai izin. | Histori pengganti aman; ujian Pra-Semester tidak otomatis jadi gate penerbitan tanpa keputusan pemilik |
+| **12** | **Dashboard, notifikasi, E2E final** | Dashboard setiap peran memakai data BAB/TP/Pra, notifikasi internal, pengumuman, FAQ; responsif HP/laptop; audit dan test E2E-113–134 plus regresi fitur sebelumnya. | Unit/feature/integration PASS; manual QA XAMPP per peran, tanpa perubahan tidak diminta |
 
-**B2. Finalisasi rincian implementasi pola baru:** turunkan Master v2.5 menjadi rencana PR kode/SQL dan matriks regression test final setelah hasil ATP Excel dapat diverifikasi. Rencana tingkat modul sudah terpetakan dalam Tahap C–K berikut, bukan klaim pekerjaan kode telah dimulai.
+**Pemisahan tugas:** Satu PR untuk satu tahap/dependensi kecil. Jika suatu tahap terlalu luas, pecah menjadi beberapa PR teknis tetapi urutan akademik di atas dipertahankan. Tidak ada UI dummy atau tombol palsu.
 
-## Tahap implementasi aplikasi setelah Excel
-| Tahap | Fokus implementasi | Prasyarat | Uji lokal |
-|---|---|---|---|
-| C | `bab`, CP tunggal Mapel/multi-elemen, kode BAB/TP, CRUD ATP langsung, editor/import Excel | v4 valid + Excel disetujui | BAB sambung lintas semester, jenis TP, otorisasi G1 |
-| D | TP Esensial/NonEsensial, kesiapan TP, satu Materi aktif, snapshot versi, kartu UI | C | Esensial tanpa kegiatan; NonEsensial menolak 0/>1 Materi |
-| E | Perbaikan generator/import Word bank Soal, ≥10 Diagnostik, ≥30 Sumatif, rich content dan media | D | DOCX soal Arab/rumus/gambar/tabel, pratinjau, anti kunci bocor |
-| F | Alur siswa Semester→BAB→TP, diagnostik gate, satu Materi, Model B checkpoint 4 menit, Resume/HOTS, unduh media | D+E | Gating, offline-resync, layar media, jalur lulus/gagal |
-| G | Sumatif wajib, remedial 1, skor tertinggi, nilai TP dua jalur, status Selesai walau <KKM | F | 20:20:60 vs 100%, nilai sementara, audit attempt |
-| H | Jadwal Admin & bank soal gabungan BAB Pra-Semester, ujian Ketat serentak | G | Belum selesai TP ditolak, jadwal, fullscreen, remedial, nilai mandiri |
-| I | Export Nilai Guru seluruh siswa dengan semua kolom TP dan Pra-Semester termasuk parsial | G+H (format Pra disiapkan sebelumnya) | Satu skor dapat diunduh, NULL bukan 0, G1 |
-| J | Sertifikat daftar TP Esensial/NonEsensial, koreksi revisi dan QR/TTD privat | G+I+keputusan Pra terkait sertifikat | No nilai akhir semester, label Esensial, histori tidak hilang |
-| K | Dashboard, laporan akhir, notifikasi, bantuan, performa/responsif, QA lintas peran | C–J | E2E-113–134, unit/feature, audit SQL, browser desktop+HP |
+## D. Peta workbook manual — kontrak impor
+| Sheet | Perlakuan server |
+|---|---|
+| **MULAI DI SINI** | Panduan saja; **tidak ada tabel input jumlah BAB/TP atau tombol proses** |
+| **RINGKASAN** | Saat download, Gen/Guru/Mapel/Kurikulum berasal dari akun server; pada upload metadata dari workbook wajib diverifikasi, tidak dipakai untuk menaikkan hak akses |
+| **REFERENSI CP** | Diisi versi CP aktif yang sesuai Mapel/Fase/Kurikulum; dipakai untuk rujukan, bukan instruksi menambah CP resmi |
+| **SEMESTER 1–6** | Parse **Bagian A** tabel BAB dan **Bagian B** tabel TP. Header Bagian A di baris 12 dan Bagian B baris 38 pada file yang diperiksa. Data BAB memiliki nomor/nama/deskripsi; data TP nomor BAB/urutan/kode/jenis/nama/deskripsi/1 Materi/perkiraan media/elemen CP/catatan. Semua field akademik diverifikasi oleh Service. |
+| **CONTOH MAT VII** | **JANGAN PERNAH DIIMPOR** sebagai ATP nyata |
 
-## Prinsip penyerahan per tahap
-1. Audit dokumen Master terkait, query SQL atas dump terbaru dan kondisi kode aktual; gunakan branch terpisah.
-2. Satu PR fokus per kelompok, sertakan SQL patch bernomor **jika** schema berubah, bukan migration/seeder; tidak commit data nyata.
-3. Jalankan syntax/unit/feature bila tersedia; tulis hasil tes yang benar-benar dijalankan.
-4. Review dan merge **setelah PASS**; pemilik pull ke `G:\xampp\htdocs\sla-sks`, menguji URL lokal, mengirim tangkapan layar/error; ulangi jika belum sesuai.
-5. Tidak mengubah `.env`, ROOT `index.php`, kebijakan G1, privasi, atau mengulang isu upload PDF yang sudah FIX tanpa bukti bug baru.
+**Kapasitas:** workbook ini menyediakan 20 baris BAB dan 80 TP tiap sheet semester. Template harus menampilkan batas fisiknya dengan jelas; batas akademik tidak disamakan dengan 20/80. Jika kapasitas perlu ditambah nantinya, gunakan template revisi berversi dan validator yang sesuai tanpa menambah macro.
 
-## Keputusan belum final
-Relasi penyelesaian Pra-Semester terhadap **hak terbit sertifikat** serta pencetakan nilai Pra-Semester pada sertifikat belum diputuskan. Jangan mengarang keputusan sebelum tahap J; nilai Pra-Semester tetap tersedia di ekspor dan hasil siswa.
+**Uji wajib workbook:** BAB nomor 1..3 di semester 1 dan nomor 4.. di semester 2; kelas VIII kembali BAB 1; TP urut 1,2,3 dalam BAB dan kembali 1 dalam BAB baru; kode misalnya `BIND.7.4.2`; beda jenis TP; gagal bila kode tidak cocok dengan mapel/kelas/nomor BAB/urutan, BAB dirujuk tetapi tak ada, atau TP NonEsensial menyalahi materi tunggal. File Excel tanpa formula otomatis: server **menghitung dan memeriksa** identitas dari baris input.
+
+## E. Aturan penyerahan dan cek pengguna
+1. **Audit kondisi terbaru:** README/AGENTS/Master, dump SQL v4 terbaru saat ada perubahan SQL, kode PHP saat PR dimulai.
+2. Branch terpisah; CodeIgniter 4 MVC+Service, HTML/CSS custom/JS native, root `index.php` dan `.htaccess` tidak dipindahkan; `.env` dan koneksi DB tidak dimodifikasi otomatis.
+3. DB memakai **file SQL bernomor**, tanpa CI4 Migration/Seeder, tidak mereset/menimpa data historis. Jika skema harus berubah, patch additive bernomor baru dengan petunjuk impor. Tidak pernah commit dump privat/NISN/hash/sesi/jawaban siswa.
+4. Jalankan `php -l` file diubah, PHPUnit unit/feature terkait, tes Excel/parser sintetis dan SQL read-only bila tersedia. Laporkan hasil yang **benar-benar** dijalankan; keberhasilan statis tidak sama dengan sukses browser.
+5. Buka PR tanpa merge; pemilik meninjau, lalu pull dan uji di `G:\xampp\htdocs\sla-sks` pada `http://localhost/sla-sks/`. Perbaiki regresi berdasarkan hasil nyata, baru lanjut tahap berikutnya.
+6. **Belum diputuskan** apakah Pra-Semester harus selesai sebelum sertifikat diterbitkan dan apakah nilainya dicetak; jangan membuat kebijakan tersembunyi.
+
+## F. Titik mulai yang direkomendasikan
+**Kerjakan Tahap 0 lebih dulu:** QA database v4 R2 dan sinkronisasi patch publik (patch repo sebelumnya belum konsisten), lalu tandai Master v2.5 siap ditinjau. **Tahap 1** menempatkan workbook manual resmi di repository; sesudah itu **Tahap 2–3** mengimplementasikan editor BAB–TP dan impor Excel secara nyata. Jangan melompat ke Pra-Semester/sertifikat sebelum siswa dan nilai TP bekerja.

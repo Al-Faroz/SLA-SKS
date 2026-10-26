@@ -23,7 +23,7 @@ Admin mengelola CP resmi, sumber dan versi menurut Mapel/Fase/Kurikulum. Versi r
 
 ## 4. Paket, Gen dan ATP Guru
 Satu `paket_semester` per Gen–Mapel–Semester–Tahun Ajaran/Kurikulum/versi. Guru aktif G1 menyusun **semua BAB dan TP, baik Esensial maupun NonEsensial**, langsung di aplikasi **atau impor dari template Excel ATP yang sudah ada dan akan direvisi**. Impor boleh parsial semester, harus pratinjau dan konfirmasi, idempoten, tanpa menghapus baris yang hilang.
-- Template lama `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` menjadi referensi awal. Revisi Excel **bermakro dan pengaturan tambahannya adalah tahap terpisah setelah skema/dokumen ini selesai**, bukan diklaim selesai saat ini. Pengembangan impor harus memeriksa makro secara aman dan tidak mengeksekusinya di server.
+- Template awal `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` sudah dipakai sebagai acuan desain. **Keputusan terbaru: Excel ATP manual (.xlsx), tanpa macro dan tombol Proses.** File hasil adaptasi disiapkan secara lokal, belum otomatis menjadi template resmi di repository. Guru mengisi BAB dan TP pada 6 sheet semester; kode TP diisi manual dan diverifikasi penuh oleh server saat impor. Generator unduhan akan menambahkan konteks Gen–Mapel/CP dari server.
 - Guru mengelola BAB, TP, materi tunggal NonEsensial, petunjuk Resume/HOTS dan bank soal; TP Siap/riwayat snapshot serta koreksi A/B/C mengikuti aturan lama yang kompatibel.
 - Paket, konten, soal dan nilai antargen tidak otomatis dibagikan, walaupun kode TP dapat serupa.
 
