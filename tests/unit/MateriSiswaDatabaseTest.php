@@ -147,6 +147,85 @@ final class MateriSiswaDatabaseTest extends TestCase
         $this->svc()->media(1,32);
     }
 
+
+    public function testCheckpointPdfTigaMenitDanOfflineMenyimpanWaktuKumulatif(): void
+    {
+        $now=1000;
+        $akun=static fn():array=>[
+            'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif',
+            'wajib_ganti_sandi'=>0,
+        ];
+        $clock=static function() use (&$now):int{return $now;};
+        $svc=new \App\Services\CheckpointMateriSiswaService($this->db,$akun,$clock);
+        $start=$svc->mulai(1,31,null,null,1);
+        self::assertFalse($start['media_selesai']);
+        $now=1045;
+        $half=$svc->kirim(1,31,[
+            'total'=>45,'halaman'=>2,'halaman_detik'=>['1'=>20,'2'=>25],
+        ]);
+        self::assertFalse($half['media_selesai']);
+        self::assertSame(2,$half['halaman_selesai']);
+        self::assertSame(45,$half['waktu_aktif_detik']);
+        self::assertSame([], $half['halaman_belum_selesai']);
+        $now=1060;
+        $done=$svc->kirim(1,31,[
+            'total'=>60,'halaman'=>2,'halaman_detik'=>['1'=>20,'2'=>40],
+        ]);
+        self::assertTrue($done['media_selesai']);
+        self::assertSame(60,$done['waktu_aktif_detik']);
+        self::assertSame(2,$this->db->table('halaman_progres_materi')->countAllResults());
+        $again=$svc->kirim(1,31,[
+            'total'=>60,'halaman'=>2,'halaman_detik'=>['1'=>20,'2'=>40],
+        ]);
+        self::assertTrue($again['media_selesai']);
+        self::assertSame(60,$again['waktu_aktif_detik']);
+        self::assertSame('SLA-SKS-Materi-31.pdf',
+            $this->svc()->unduh(1,31)['unduh_nama']);
+    }
+
+    public function testCheckpointTidakMengizinkanWaktuMendahuluiJamServer(): void
+    {
+        $now=1000;
+        $akun=static fn():array=>[
+            'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif',
+            'wajib_ganti_sandi'=>0,
+        ];
+        $clock=static function() use (&$now):int{return $now;};
+        $svc=new \App\Services\CheckpointMateriSiswaService($this->db,$akun,$clock);
+        $svc->mulai(1,31,null,null,1);
+        $now=1010;
+        try {
+            $svc->kirim(1,31,[
+                'total'=>180,'halaman'=>1,'halaman_detik'=>['1'=>180],
+            ]);
+            self::fail('Tidak boleh menerima 180 detik dalam 10 detik server.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('jam server',$e->getMessage());
+        }
+        self::assertSame(0,
+            (int)$this->db->table('progres_materi')->get()->getRow('waktu_aktif_detik'));
+    }
+
+    public function testCheckpointKoneksiTerputusDapatMenyinkronkanWaktuTanpaReset(): void
+    {
+        $now=1000;
+        $akun=static fn():array=>[
+            'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif',
+            'wajib_ganti_sandi'=>0,
+        ];
+        $clock=static function() use (&$now):int{return $now;};
+        $svc=new \App\Services\CheckpointMateriSiswaService($this->db,$akun,$clock);
+        $svc->mulai(1,31,null,null,1);
+        // Koneksi hilang sesudah mulai; data baru dikirim 5 menit kemudian.
+        $now=1300;
+        $data=$svc->kirim(1,31,[
+            'total'=>300,'halaman'=>2,'halaman_detik'=>['1'=>150,'2'=>150],
+        ]);
+        self::assertTrue($data['media_selesai']);
+        self::assertSame(300,$data['waktu_aktif_detik']);
+        self::assertSame(2,$data['halaman_selesai']);
+    }
+
     public function testUnduhBerkasDitolakSebelumMediaSelesai(): void
     {
         $this->expectException(\DomainException::class);
