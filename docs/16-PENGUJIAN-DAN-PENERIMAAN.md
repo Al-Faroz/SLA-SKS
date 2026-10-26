@@ -197,3 +197,13 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Tidak mengubah video YouTube/audio yang sudah FIX, tidak menambah SQL dan tidak melakukan reset data siswa. Uji akhir interaksi nyata diperlukan di XAMPP.
 
 **Regresi visibilitas PDF:** canvas PDF sudah dirender tetapi area pembaca <50% viewport ⇒ tidak ada POST heartbeat; setelah area terlihat ⇒ detak baseline tanpa kredit, berikutnya tiap 5 detik. Scroll keluar/masuk lagi harus reset dan tidak menambah durasi sembunyi. Navigasi ke halaman lain harus memakai nomor baru dan baseline baru.
+
+
+### E2E Model B 3 menit + unduh materi setelah selesai (26-10-2026)
+
+- Aktivitas media yang sah menaikkan penghitung browser tiap 1 detik; POST checkpoint pada 180 detik dan final lebih cepat jika syarat sudah tercapai. Reload browser ketika online tidak menghapus detik di server.
+- Offline setelah baseline pertama: aktivitas sementara disimpan di localStorage pada scope siswa–progres–versi TP dan tidak direset; setelah koneksi pulih dilaporkan kumulatif. Server tidak menerima klaim 180 detik bila sejak baseline server baru berlalu 10 detik.
+- Duplikasi POST final/checkpoint dengan total sama tidak menambah detik/halaman dua kali. Tidak boleh menurunkan total dari checkpoint lama. Sinkronisasi PDF memeriksa total == jumlah penambahan per halaman dan seluruh halaman 15 detik sebelum lengkap.
+- Pengujian negatif: akses siswa/Gen lain, jenis media palsu, laporan terlalu besar, waktu lebih cepat daripada jam server, data HTML/JS dimodifikasi, autentikasi habis, browser localStorage tidak tersedia, perpindahan perangkat dan offline sebelum sesi pertama. Hapus storage harus menjelaskan risiko kehilangan data lokal, bukan janji penyelamatan otomatis.
+- Sebelum `media_selesai`, baik tombol maupun URL langsung `/unduh` ditolak untuk audio/gambar/PDF. Setelah `media_selesai`, tombol muncul tanpa harus menunggu Resume Final; header Content-Disposition attachment dan Content-Type benar. URL siswa lain/tidak berizin tetap ditolak. Streaming inline tidak otomatis memberi izin download resmi.
+- Browser desktop/HP dan MariaDB 10.4 XAMPP perlu diuji manual; workflow CI tidak menggantikannya. Timer/heartbeat ujian tidak diubah.

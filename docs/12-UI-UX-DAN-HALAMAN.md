@@ -170,3 +170,10 @@ Indikator progres harus memperlihatkan syarat yang sebenarnya: audio menampilkan
 Waktu gambar/PDF dibaca dari heartbeat sah 5 detik. Gambar yang tidak terlihat/fokus tidak memberi kredit; kembali aktif memulai baseline baru, tanpa mereset akumulasi waktu. PDF menampilkan detik baca untuk halaman aktif (misalnya 10/15 detik) dan halaman lain yang belum selesai. Zoom/fullscreen/resize tidak memberi kredit otomatis dan tidak menghanguskan progres halaman yang telah sah. Hanya status media_selesai dari server yang mengaktifkan Resume melalui pemuatan ulang.
 
 **Area PDF:** selain pemeriksaan halaman PDF.js yang sudah render, waktu hanya dihitung ketika area pembaca setidaknya setengah terlihat di layar dan tab/jendela aktif. Status menampilkan sisa durasi per halaman; tidak memberi kredit ketika siswa sedang melihat bagian halaman web lainnya.
+
+
+### S08 — indikator lokal, sinkronisasi dan Unduh Materi (26-10-2026)
+
+Aktivitas media menampilkan angka **perkiraan waktu di perangkat**, **waktu yang disahkan server**, dan **detik menunggu sinkronisasi**; pembaruan layar setiap 1 detik. Checkpoint otomatis per 3 menit dan segera setelah syarat tercapai. Saat offline, tampilkan pesan bahwa progres sementara masih ada pada perangkat; siswa boleh melanjutkan pembacaan dalam tab aktif, tetapi Resume dan unduhan tetap menunggu pengesahan server. Kegagalan sinkronisasi tidak boleh menghapus progres lokal.
+
+Untuk materi dengan berkas privat Audio/Gambar/PDF, sediakan tombol **Unduh Materi** di blok jelas. Tombol terkunci sampai `media_selesai`, pada saat yang sama Resume terbuka. HOTS tetap menunggu Resume Final. Link langsung ke URL unduh sebelum tuntas harus ditolak server, dengan pesan akses yang tepat, tidak bergantung pada atribut `download` saja. YouTube tidak diberi unduhan lokal.

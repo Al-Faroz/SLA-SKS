@@ -145,3 +145,8 @@ memakai SQL 0018 yang additive dan hanya diimpor jika diperlukan.
 - `jawaban_hots_materi`: pengumpulan HOTS siswa, status final/draf, nilai, identitas penilai; terpisah dari `resume_materi`.
 - Belum selaras: `KesiapanTpService` saat ini hanya memeriksa `petunjuk_hots`, belum ada pengecekan baris bank Guru. Master 05 mewajibkan satu tugas HOTS per Materi. **Jangan mengubah kebijakan, memutasi TP Siap atau menambah tugas otomatis** sebelum dump terbaru dan implikasi snapshot dinilai.
 - Koreksi struktur historis harus memakai patch baru dan uji kegagalan impor sebagian, tidak menamai ulang atau membuat ulang tabel yang sudah ada.
+
+
+### Pemanfaatan tabel eksisting untuk checkpoint Model B (26-10-2026)
+
+Checkpoint 180 detik tidak memerlukan tabel baru. `progres_materi.waktu_aktif_detik` dan `waktu_putar_detik` menyimpan total kumulatif **yang disahkan server**; `heartbeat_terakhir_pada` menjadi jangkar jam server antarpengiriman. `halaman_progres_materi` menyimpan angka kumulatif halaman PDF. Browser menyimpan sementara angka kumulatif sendiri di localStorage (bukan tabel utama), sehingga retry tidak boleh menggandakan detik. Server membatasi kenaikan terhadap selang jam server dan mencocokkan rincian halaman; tidak menerima klaim total melebihi batas teknis. Tidak ada migrasi, seeder, DROP, UPDATE manual ataupun patch SQL untuk tahap ini.

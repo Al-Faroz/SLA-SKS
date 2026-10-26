@@ -85,3 +85,12 @@ Tidak ada sistem login Google, API LMS eksternal, pembayaran, push notification,
 - `/guru/tp/{id}` mengelola Materi/media/Resume/HOTS per Materi dan checklist `TP Siap`. Domain Service minimum: `AtpService`, `ImporAtpService`, `TpService`, `MateriService`, `ImporSoalWordService`, `UjianService`, `NilaiService`, `IdentitasService`. Nama kelas boleh diselaraskan konvensi proyek tanpa mengubah kontrak bisnis.
 - `GET /admin/kurikulum-cp/ekspor`: XLSX daftar CP dan status versi sesuai filter, admin-only. `/admin/pengelola`, `/admin/siswa`, `/admin/mapel-guru` memakai paginasi server. `POST /admin/identitas/logo-aplikasi` mengunggah logo aplikasi sekaligus menghasilkan/favicon terkait.
 - Semua endpoint mutasi POST dengan CSRF, validasi role aktif di Controller **dan** Service, transaksi serta audit. Tidak menambahkan migrations/seeder, framework JS baru atau mengubah root CI4.
+
+
+### API checkpoint pembelajaran media (26 Oktober 2026)
+
+- `POST /siswa/tp/{tp}/materi/{materi}/mulai-media`: mencatat baseline waktu server ketika siswa pertama kali aktif membaca/memutar media.
+- `POST /siswa/tp/{tp}/materi/{materi}/checkpoint`: menerima JSON angka **kumulatif** dalam form `laporan`, setiap 180 detik, saat syarat media tercapai atau ketika koneksi pulih. Transaksi harus memvalidasi sesi siswa, akses Gen, versi TP terpin, jenis media, batas waktu server, rincian halaman dan idempotensi. Request tidak boleh mengubah status siswa lain.
+- `GET /siswa/tp/{tp}/materi/{materi}/unduh`: hanya audio/gambar/PDF setelah `media_selesai` untuk progres siswa aktif; berkas privat dikirim sebagai attachment. Endpoint `/media` untuk streaming/tampilan tidak otomatis memberikan hak untuk `/unduh`.
+
+Checkpoint media **berbeda dari ujian**: aturan pause/fullscreen/heartbeat ujian tetap server-side sesuai Master 07. Data lokal merupakan kandidat, bukan otoritas pengesahan kelulusan.
