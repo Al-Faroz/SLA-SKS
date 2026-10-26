@@ -335,7 +335,6 @@ final class MateriSiswaDatabaseTest extends TestCase
 
     public function testUnduhTerkunciSebelumMediaSelesaiDanTerbukaSetelahnya(): void
     {
-        $this->jadikanMediaPertamaGambar();
         $svc = $this->svc();
         try {
             $svc->mediaUntukUnduh(1,31);
@@ -345,7 +344,7 @@ final class MateriSiswaDatabaseTest extends TestCase
         }
         $this->db->table('progres_materi')->insert([
             'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
-            'jenis'=>'gambar','status'=>'media_selesai',
+            'jenis'=>'pdf','status'=>'media_selesai',
             'waktu_aktif_detik'=>30,
         ]);
         $berkas = $svc->mediaUntukUnduh(1,31);
@@ -359,7 +358,6 @@ final class MateriSiswaDatabaseTest extends TestCase
 
     public function testUnduhTidakDiberikanUntukJalurDiagnostikTuntas(): void
     {
-        $this->jadikanMediaPertamaGambar();
         $this->db->table('progres_tp')->where('id',11)->update(['status'=>'tuntas']);
         try {
             $this->svc()->mediaUntukUnduh(1,31);
