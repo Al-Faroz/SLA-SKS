@@ -91,7 +91,7 @@ final class ProgresMediaMateriSiswaService
     /** @return array<string,mixed> */
     public function detak(int $tpId, int $materiId, bool $aktif,
         ?int $posisi, ?int $durasi, ?int $halaman = null,
-        ?int $jumlahHalaman = null, bool $resetPdf = false): array
+        ?int $jumlahHalaman = null, bool $resetSesi = false): array
     {
         if (!$aktif) throw new DomainException('Heartbeat hanya diterima saat media aktif.');
         // Konteks selalu diperiksa ulang, termasuk ID dari URL.
@@ -102,7 +102,7 @@ final class ProgresMediaMateriSiswaService
         $jenis = (string) $ctx['materi']['jenis'];
         if ($jenis === 'pdf') {
             return (new ProgresPdfMateriSiswaService($this->db, $this->clock))
-                ->detak($ctx, $materiId, $halaman, $jumlahHalaman, $resetPdf);
+                ->detak($ctx, $materiId, $halaman, $jumlahHalaman, $resetSesi);
         }
         $min = (int) $ctx['materi']['min_waktu_detik'];
         if ($min < 1) throw new DomainException('Batas waktu media pada snapshot belum sah.');
@@ -157,7 +157,8 @@ final class ProgresMediaMateriSiswaService
                     'heartbeat_terakhir_pada' => (int) strtotime($row['heartbeat_terakhir_pada'] . ' UTC'),
                 ];
                 $next = AturanAktivitasMateriService::detak(
-                    $state, $jenis, $now, $posisi, $durasi, $min);
+                    $state, $jenis, $now, $posisi, $durasi, $min,
+                    $jenis === 'gambar' && $resetSesi);
                 $data = [
                     'status' => $next['status'],
                     'waktu_aktif_detik' => $next['waktu_aktif_detik'],

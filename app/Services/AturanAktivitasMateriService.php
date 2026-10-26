@@ -60,7 +60,7 @@ final class AturanAktivitasMateriService
 
     /** @param array<string,mixed> $awal */
     public static function detak(array $awal, string $jenis, int $now,
-        ?int $posisi, ?int $durasi, int $minimal): array
+        ?int $posisi, ?int $durasi, int $minimal, bool $resetSesi = false): array
     {
         self::validasiMedia($jenis, $posisi, $durasi);
         if ($minimal < 1 || $minimal > 10800) {
@@ -79,7 +79,8 @@ final class AturanAktivitasMateriService
         if ($jenis === 'gambar') {
             // Tidak ada cara membuktikan pandangan mata; UI hanya mengirim saat
             // gambar >=50% di viewport, tab terlihat dan browser fokus.
-            if ($dt >= self::DETAK_MINIMAL && $dt <= self::DETAK_MAKSIMAL) {
+            if (!$resetSesi && $dt >= self::DETAK_MINIMAL
+                && $dt <= self::DETAK_MAKSIMAL) {
                 $kredit = $dt;
             }
         } else {

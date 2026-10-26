@@ -38,18 +38,25 @@ final class ProgresPdfMateriSiswaService
         $minTotal = max(15 * $total, (int) $ctx['materi']['min_waktu_detik']);
         $done = 0;
         $belum = range(1, $total);
+        $pageTimes = [];
         if ($row !== null) {
-            $completePages = $this->db->table('halaman_progres_materi')
-                ->select('nomor_halaman')
+            // Detail waktu per halaman dari database, bukan kalkulasi client.
+            $pageRows = $this->db->table('halaman_progres_materi')
+                ->select('nomor_halaman, waktu_aktif_detik, selesai_pada')
                 ->where('progres_materi_id', (int) $row['id'])
-                ->where('selesai_pada IS NOT NULL', null, false)
                 ->get()->getResultArray();
-            $sudah = array_map(static fn (array $p): int =>
-                (int) $p['nomor_halaman'], $completePages);
-            $sudah = array_values(array_unique(array_filter($sudah,
-                static fn (int $p): bool => $p >= 1 && $p <= $total)));
-            $done = count($sudah);
-            $belum = array_values(array_diff(range(1, $total), $sudah));
+            foreach ($pageRows as $part) {
+                $pageNo = (int) $part['nomor_halaman'];
+                if ($pageNo < 1 || $pageNo > $total) continue;
+                $pageTimes[$pageNo] = max(0, (int) $part['waktu_aktif_detik']);
+                if ($part['selesai_pada'] !== null && $pageTimes[$pageNo] >= 15) {
+                    $done++;
+                }
+            }
+            $belum = array_values(array_filter(range(1, $total),
+                static fn (int $pageNo): bool =>
+                    !isset($pageTimes[$pageNo]) || $pageTimes[$pageNo] < 15));
+            $done = $total - count($belum);
             // Pulihkan status progres yang memenuhi syarat tanpa mengarang waktu.
             // Guard berpatokan progres siswa milik versi TP yang terpin.
             if (!$sukarela && ($ctx['progres']['status'] ?? '') === 'belajar'
@@ -88,6 +95,9 @@ final class ProgresPdfMateriSiswaService
             'halaman_total' => $total,
             'halaman_selesai' => $done,
             'halaman_belum_selesai' => $belum,
+            'waktu_per_halaman' => $pageTimes,
+            'halaman_terakhir_dilihat' => $row !== null
+                ? (int) ($row['posisi_terakhir_detik'] ?? 0) : 0,
             'minimal_per_halaman_detik' => 15,
             'pesan' => $sukarela
                 ? 'Belajar PDF sukarela tidak membuat progres resmi.'
