@@ -111,27 +111,80 @@
     </section>
     <section class="a-card" id="cp-daftar" aria-labelledby="judul-cp-daftar">
         <h2 id="judul-cp-daftar">Daftar CP dan status versinya</h2>
+        <?php if (!empty($cpFilterGalat)): ?>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($cpFilterGalat) ?></div>
+        <?php endif ?>
+        <form class="a-cp__filter" action="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>#cp-daftar" method="get">
+            <div class="a-field">
+                <label class="a-label" for="cp-cari">Cari kode, elemen, mapel atau kurikulum</label>
+                <input id="cp-cari" type="search" name="cari" maxlength="80" value="<?= esc($cpFilter['cari'], 'attr') ?>" placeholder="Cari CP">
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="cp-mapel-filter">Mata pelajaran</label>
+                <select id="cp-mapel-filter" name="mapel">
+                    <option value="">Semua mapel</option>
+                    <?php foreach ($mapel as $m): ?>
+                        <option value="<?= (int) $m['id'] ?>" <?= $cpFilter['mapel'] === (int) $m['id'] ? 'selected' : '' ?>><?= esc($m['kode'] . ' — ' . $m['nama']) ?></option>
+                    <?php endforeach ?>
+                </select>
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="cp-kur-filter">Kurikulum</label>
+                <select id="cp-kur-filter" name="kurikulum">
+                    <option value="">Semua kurikulum</option>
+                    <?php foreach ($kurikulum as $k): ?>
+                        <option value="<?= (int) $k['id'] ?>" <?= $cpFilter['kurikulum'] === (int) $k['id'] ? 'selected' : '' ?>><?= esc($k['nama'] . ' · ' . $k['versi']) ?></option>
+                    <?php endforeach ?>
+                </select>
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="cp-status-filter">Status versi</label>
+                <select id="cp-status-filter" name="status">
+                    <option value="semua" <?= $cpFilter['status'] === 'semua' ? 'selected' : '' ?>>Semua status</option>
+                    <option value="aktif" <?= $cpFilter['status'] === 'aktif' ? 'selected' : '' ?>>Punya versi aktif</option>
+                    <option value="draf" <?= $cpFilter['status'] === 'draf' ? 'selected' : '' ?>>Punya draf</option>
+                    <option value="belum" <?= $cpFilter['status'] === 'belum' ? 'selected' : '' ?>>Belum terbit</option>
+                </select>
+            </div>
+            <div class="a-cp__filter-aksi">
+                <button class="a-btn a-btn--utama" type="submit">Terapkan filter</button>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp') . '#cp-daftar', 'attr') ?>">Reset</a>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/ekspor') . '?' . http_build_query($cpFilter), 'attr') ?>">Ekspor Excel (.xlsx)</a>
+            </div>
+        </form>
+        <p class="a-help" role="status"><?= (int) $cpTotal ?> CP sesuai filter · 25 CP per halaman. Ekspor Excel mencakup seluruh hasil filter.</p>
         <?php if ($cp === []): ?>
-            <div class="a-empty" role="status"><strong>Belum ada referensi CP.</strong><p>Gunakan formulir di atas untuk menyiapkan draf CP resmi.</p></div>
+            <div class="a-empty" role="status"><strong><?= $cpTotal === 0 ? 'Tidak ada CP yang cocok.' : 'Tidak ada data pada halaman ini.' ?></strong>
+                <p>Sesuaikan filter atau gunakan formulir CP di atas untuk membuat draf baru.</p></div>
         <?php else: ?>
             <div class="a-tabel-gulir">
-                <table class="a-tbl a-cp__tabel">
+                <table class="a-tbl a-tbl--cards a-cp__tabel">
                     <thead><tr><th scope="col">Kode CP</th><th scope="col">Kurikulum</th><th scope="col">Mapel / Fase</th><th scope="col">Versi resmi</th><th scope="col">Draf</th><th scope="col">Aksi</th></tr></thead>
                     <tbody>
                     <?php foreach ($cp as $item): ?>
                         <tr>
-                            <td><strong><?= esc($item['kode']) ?></strong></td>
-                            <td><?= esc($item['kurikulum_nama']) ?><small class="a-cp__detail"><?= esc($item['kurikulum_versi']) ?></small></td>
-                            <td><?= esc($item['mapel_nama']) ?> · <?= esc($item['fase']) ?></td>
-                            <td><?= $item['versi_aktif_id'] === null ? '<span class="a-badge a-badge--tunggu">Belum terbit</span>' : 'v' . (int) $item['versi_aktif'] ?></td>
-                            <td><?= $item['versi_draf_id'] === null ? '—' : 'v' . (int) $item['versi_draf'] ?></td>
-                            <td><a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Lihat versi</a></td>
+                            <th scope="row" data-label="Kode CP"><strong><?= esc($item['kode']) ?></strong></th>
+                            <td data-label="Kurikulum"><?= esc($item['kurikulum_nama']) ?><small class="a-cp__detail"><?= esc($item['kurikulum_versi']) ?></small></td>
+                            <td data-label="Mapel / Fase"><?= esc($item['mapel_nama']) ?> · <?= esc($item['fase']) ?></td>
+                            <td data-label="Versi resmi"><?= $item['versi_aktif_id'] === null ? '<span class="a-badge a-badge--tunggu">Belum terbit</span>' : 'v' . (int) $item['versi_aktif'] ?></td>
+                            <td data-label="Draf"><?= $item['versi_draf_id'] === null ? '—' : 'v' . (int) $item['versi_draf'] ?></td>
+                            <td data-label="Aksi"><a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Lihat versi</a></td>
                         </tr>
                     <?php endforeach ?>
                     </tbody>
                 </table>
             </div>
         <?php endif ?>
+        <?= view('components/pager', [
+            'urlPath' => 'admin/kurikulum-cp',
+            'pageParam' => 'halaman',
+            'halaman' => $cpHalaman,
+            'perHalaman' => $cpPerHalaman,
+            'total' => $cpTotal,
+            'filter' => $cpFilter,
+            'label' => 'referensi CP',
+            'anchor' => 'cp-daftar',
+        ]) ?>
     </section>
 </div>
 <?= $this->endSection() ?>

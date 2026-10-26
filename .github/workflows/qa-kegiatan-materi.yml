@@ -1,0 +1,68 @@
+name: QA S09 S10 Resume HOTS
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KegiatanMateriSiswaService.php'
+      - 'app/Services/MateriSiswaService.php'
+      - 'app/Controllers/SiswaKegiatanMateri.php'
+      - 'app/Controllers/SiswaMateri.php'
+      - 'app/Views/siswa/materi.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/kegiatan-materi.js'
+      - 'public/assets/css/app.css'
+      - 'database/sql/updates/0017_kegiatan_resume_hots_materi.sql'
+      - 'database/sql/updates/0018_pemulihan_jawaban_hots_materi.sql'
+      - 'database/sql/qa/0018_verifikasi_jawaban_hots_readonly.sql'
+      - 'tests/unit/KegiatanMateriSiswaTest.php'
+      - 'tests/integration/SqlKegiatanMateriCheck.php'
+      - 'database/sql/qa/0017_verifikasi_kegiatan_readonly.sql'
+      - 'tests/js/kegiatan-materi.test.cjs'
+      - '.github/workflows/qa-kegiatan-materi.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: testroot
+          MARIADB_DATABASE: sla_s09_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      SLA_TEST_DB_DSN: 'mysql:dbname=sla_s09_test;host=127.0.0.1;port=3306;charset=utf8mb4'
+      SLA_TEST_DB_USER: root
+      SLA_TEST_DB_PASS: testroot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite, pdo_mysql
+          coverage: none
+      - name: Dependensi CI4
+        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: PHP lint
+        run: |
+          php -l app/Services/KegiatanMateriSiswaService.php
+          php -l app/Services/MateriSiswaService.php
+          php -l app/Controllers/SiswaKegiatanMateri.php
+          php -l app/Controllers/SiswaMateri.php
+          php -l app/Views/siswa/materi.php
+          php -l app/Config/Routes.php
+      - name: PHPUnit S09 S10
+        run: vendor/bin/phpunit tests/unit/KegiatanMateriSiswaTest.php tests/unit/MateriSiswaDatabaseTest.php --no-coverage
+      - name: JavaScript syntax
+        run: node --check public/assets/js/kegiatan-materi.js
+      - name: Verifikasi SQL 0017 di MariaDB
+        run: php tests/integration/SqlKegiatanMateriCheck.php
+      - name: Uji perilaku submit dan konfirmasi form
+        run: node --test tests/js/kegiatan-materi.test.cjs

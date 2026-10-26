@@ -35,7 +35,191 @@
         <section class="a-card">
             <h2>Tabel</h2>
             <div class="a-tabel-gulir"><table class="a-tbl"><thead><tr><th scope="col">TP</th><th scope="col">Status</th><th scope="col">Nilai</th></tr></thead><tbody><tr><td>TP-01</td><td>Tuntas</td><td>86</td></tr><tr><td>TP-02</td><td>Menunggu Guru</td><td>Sementara</td></tr></tbody></table></div>
-            <p class="a-help">Pada layar sempit, tabel dapat digulir.</p>
+            <p class="a-help">Untuk data padat tanpa form, tabel biasa dapat digulir pada layar sempit.</p>
+        </section>
+        <section class="a-card">
+            <h2>Tabel adaptif: desktop menjadi kartu di HP</h2>
+            <p class="a-help">Contoh komponen <code>a-tbl--cards</code>; header kolom tetap semantik, sedangkan setiap sel mempunyai label yang muncul pada layar sempit.</p>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards">
+                    <thead><tr><th scope="col">Nama</th><th scope="col">Gen</th><th scope="col">Status</th><th scope="col">Tindakan</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" data-label="Nama">Contoh Akun Guru</th>
+                            <td data-label="Gen">Gen Contoh</td>
+                            <td data-label="Status"><span class="a-badge a-badge--siap">Aktif</span></td>
+                            <td data-label="Tindakan"><a class="a-btn a-btn--sekunder" href="#galeri-tabel-adaptif">Tinjau contoh</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="a-help" id="galeri-tabel-adaptif">Contoh galeri saja. Label sel ditampilkan ketika tabel berubah menjadi kartu; halaman aplikasi tetap memerlukan endpoint aksi sendiri.</p>
+        </section>
+        <section class="a-card">
+            <h2>Pagination server-side</h2>
+            <p class="a-help">Ini contoh visual pagination. Nomor dan tautan sebenarnya dihitung oleh server pada halaman aplikasi.</p>
+            <div class="a-page">
+                <nav class="a-pager a-pager--lengkap" aria-label="Contoh pagination">
+                    <div class="a-pager__ringkasan"><span>26–50 dari 126 data</span><span>Halaman 2 dari 6</span></div>
+                    <div class="a-pager__aksi">
+                        <span class="a-pager__tombol">Pertama</span>
+                        <span class="a-pager__tombol">Sebelumnya</span>
+                        <span class="a-pager__tombol">1</span>
+                        <span class="a-pager__tombol is-aktif" aria-current="page">2</span>
+                        <span class="a-pager__tombol">3</span>
+                        <span class="a-pager__elipsis">…</span>
+                        <span class="a-pager__tombol">6</span>
+                        <span class="a-pager__tombol">Berikutnya</span>
+                        <span class="a-pager__tombol">Terakhir</span>
+                    </div>
+                </nav>
+            </div>
+        </section>
+        <section class="a-card">
+            <h2>Tabel CP dan peta ATP responsif</h2>
+            <p class="a-help">Contoh tampilan statis tabel CP dan TP. Di HP setiap baris berubah menjadi kartu dengan label yang tetap jelas.</p>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards a-cp__tabel">
+                    <thead><tr><th>Kode CP</th><th>Kurikulum</th><th>Mapel/Fase</th><th>Versi resmi</th><th>Draf</th><th>Aksi</th></tr></thead>
+                    <tbody><tr><th scope="row" data-label="Kode CP">CP-CONTOH</th>
+                        <td data-label="Kurikulum">Kurikulum Contoh</td>
+                        <td data-label="Mapel / Fase">SKI · D</td>
+                        <td data-label="Versi resmi"><span class="a-badge a-badge--siap">v1</span></td>
+                        <td data-label="Draf">—</td>
+                        <td data-label="Aksi"><span class="a-badge">Contoh</span></td></tr></tbody>
+                </table>
+            </div>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards a-tbl--peta-atp">
+                    <thead><tr><th>Urutan</th><th>Kode TP</th><th>Judul</th><th>Versi paket</th><th>Status TP</th></tr></thead>
+                    <tbody><tr><th scope="row" data-label="Urutan">1</th>
+                        <td data-label="Kode TP">TP-CONTOH</td>
+                        <td data-label="Judul TP">Identifikasi sumber sejarah</td>
+                        <td data-label="Versi paket">1</td>
+                        <td data-label="Status TP">Draf</td></tr></tbody>
+                </table>
+            </div>
+        </section>
+        <section class="a-card">
+            <h2>Contoh tabel Materi responsif Guru</h2>
+            <p class="a-help">Contoh statis: daftar Materi tampil sebagai tabel di desktop dan kartu berlabel di HP, termasuk status, aksi urutan dan media.</p>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards a-tp-materi-tabel">
+                    <thead><tr><th>No.</th><th>Judul</th><th>Jenis</th><th>Status</th><th>Pratinjau</th><th>Urutan</th><th>Edit</th><th>Hapus</th></tr></thead>
+                    <tbody><tr>
+                        <th scope="row" data-label="No.">1</th>
+                        <td data-label="Judul" class="a-tp-materi-judul">Pengenalan sumber sejarah</td>
+                        <td data-label="Jenis">PDF</td>
+                        <td data-label="Status"><span class="a-badge">Nonaktif</span></td>
+                        <td data-label="Pratinjau">Tersedia</td>
+                        <td data-label="Urutan">Naik · Turun</td>
+                        <td data-label="Edit">Sunting</td>
+                        <td data-label="Hapus">Konfirmasi</td>
+                    </tr></tbody>
+                </table>
+            </div>
+        </section>
+        <section class="a-card" id="galeri-pratinjau">
+            <h2>Pratinjau Media Guru — informasi dan petunjuk</h2>
+            <p class="a-help">Contoh visual responsif tanpa memuat media, mengirim progres siswa, atau menyimpan jawaban.</p>
+            <div class="a-pratinjau-navigasi" aria-label="Contoh navigasi pratinjau">
+                <a class="a-btn a-btn--sekunder" href="#galeri-pratinjau">Daftar Materi</a>
+                <a class="a-btn a-btn--sekunder" href="#contoh-petunjuk">Petunjuk Resume &amp; HOTS</a>
+            </div>
+            <div class="a-pratinjau-info" aria-label="Contoh informasi media">
+                <span class="a-pratinjau-info__item">Jenis: <strong>PDF</strong></span>
+                <span class="a-pratinjau-info__item">Urutan: <strong>1</strong></span>
+                <span class="a-pratinjau-info__item">Status: <strong>Nonaktif</strong></span>
+            </div>
+            <div class="a-pratinjau-media">
+                <div class="a-materi-kegiatan" id="contoh-petunjuk">
+                    <h2>Petunjuk kegiatan Materi</h2>
+                    <p class="a-help">Dua kartu sejajar di desktop dan satu kolom di HP.</p>
+                    <section><h3>Resume</h3><p class="a-teks-pratinjau">Tuliskan rangkuman materi dengan bahasa sendiri.</p></section>
+                    <section><h3>Tugas HOTS</h3><p class="a-teks-pratinjau">Jelaskan hubungan sebab dan akibat berdasarkan materi.</p></section>
+                </div>
+            </div>
+        </section>
+        <section class="a-card" id="galeri-kesiapan-tp">
+            <h2>Pemeriksaan akhir TP Siap</h2>
+            <p class="a-help">Contoh visual tanpa mengubah data: jumlah pemeriksaan, alasan, serta tautan perbaikan.</p>
+            <div class="a-kesiapan-ringkasan">
+                <div><strong>3 / 4</strong><span>Ketentuan terpenuhi</span></div>
+                <div><strong>2</strong><span>Materi</span></div>
+                <div><strong>30</strong><span>Soal aktif</span></div>
+                <div><strong>Draf</strong><span>Status pemeriksaan</span></div>
+            </div>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards a-kesiapan-tabel">
+                    <thead><tr><th>Ketentuan</th><th>Status</th><th>Keterangan / tindak lanjut</th></tr></thead>
+                    <tbody>
+                        <tr><th scope="row" data-label="Ketentuan">CP utama</th>
+                            <td data-label="Status"><span class="a-tp-status is-lengkap">Terpenuhi</span></td>
+                            <td data-label="Tindak lanjut">CP sesuai Fase D</td></tr>
+                        <tr><th scope="row" data-label="Ketentuan">Bank Sumatif</th>
+                            <td data-label="Status"><span class="a-tp-status is-kurang">Perlu perbaikan</span></td>
+                            <td data-label="Tindak lanjut">Tambahkan soal sampai jumlah tayang terpenuhi.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="a-card" id="contoh-aktivasi-siswa">
+            <h2>Aktivasi TP siswa dan versi konten terpin</h2>
+            <p class="a-help">Contoh visual statis tanpa tombol POST atau data progres nyata.</p>
+            <div class="a-siswa-aktivasi">
+                <h3>Status pembelajaran TP</h3>
+                <p class="a-help">Sebelum aktif: siswa perlu menyetujui pengikatan
+                    versi konten satu kali. Tidak ada percobaan Diagnostik saat aktivasi.</p>
+                <span class="a-siswa-status pratinjau">TP belum diaktifkan</span>
+                <div class="a-alert" role="status">
+                    <strong>Setelah aktivasi:</strong> progres sudah tersimpan;
+                    snapshot versi digunakan tetap saat ujian tersedia.
+                </div>
+            </div>
+        </section>
+        <section class="a-card" id="contoh-preflight-diagnostik">
+            <h2>Petunjuk dan preflight Diagnostik</h2>
+            <p class="a-help">Contoh desain statis, bukan ujian atau pemeriksaan fullscreen aktif.</p>
+            <div class="a-diagnostik-ringkasan">
+                <div><strong>10</strong><span>Soal ditayangkan</span></div>
+                <div><strong>30 menit</strong><span>Durasi</span></div>
+                <div><strong>1</strong><span>Percobaan normal</span></div>
+                <div><strong>Ketat</strong><span>Profil keamanan</span></div>
+            </div>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards a-diagnostik-cek">
+                    <thead><tr><th>Persyaratan</th><th>Status</th><th>Keterangan</th></tr></thead>
+                    <tbody><tr>
+                        <th scope="row" data-label="Persyaratan">Bank Diagnostik</th>
+                        <td data-label="Status"><span class="a-tp-status is-lengkap">Terpenuhi</span></td>
+                        <td data-label="Keterangan">Contoh jumlah dan format sah</td>
+                    </tr></tbody>
+                </table>
+            </div>
+            <p class="a-diagnostik-hasil" data-status="failed" role="status">
+                Contoh: browser tidak mendukung fullscreen; gunakan desktop/laptop.
+            </p>
+        </section>
+        <section class="a-card" id="contoh-pembaca-siswa">
+            <h2>Pembaca Siswa — fullscreen, zoom, dan Materi Selanjutnya</h2>
+            <p class="a-help">Contoh visual statis. Tombol pembaca aktif pada halaman Materi Siswa, bukan di galeri.</p>
+            <div class="a-pembaca-fullscreen">
+                <div class="a-pembaca-toolbar">
+                    <span class="a-pembaca-toolbar__judul">Pembaca gambar</span>
+                    <span class="a-pembaca-zoom-controls"><span class="a-btn a-btn--sekunder">−</span>
+                        <output>100%</output><span class="a-btn a-btn--sekunder">+</span>
+                        <span class="a-btn a-btn--sekunder">Atur ulang</span></span>
+                    <span class="a-btn a-btn--sekunder">Layar penuh</span>
+                </div>
+                <p class="a-help" style="padding:12px">Area gambar PDF/gambar diperluas saat fullscreen;
+                    gambar dapat di-zoom 50–300% dan digulir.</p>
+            </div>
+            <nav class="a-materi-lanjut" aria-label="Contoh navigasi materi">
+                <span class="a-btn a-btn--sekunder">Kembali ke Rincian TP</span>
+                <span class="a-btn a-btn--utama">Materi Selanjutnya</span>
+                <span class="a-materi-lanjut__keterangan">Pada jalur belajar, tombol tetap terkunci
+                    sampai media, Resume dan HOTS final. Jalur tuntas bebas membaca sukarela.</span>
+            </nav>
         </section>
         <section class="a-card">
             <h2>Langkah dan terkunci</h2>
@@ -57,9 +241,16 @@
 
     <section class="a-card">
         <h2>Breadcrumb dan referensi K2</h2>
-        <nav class="a-breadcrumb" aria-label="Contoh breadcrumb">
-            <span>Beranda Admin</span><span aria-hidden="true">/</span><span aria-current="page">Mapel &amp; Guru</span>
-        </nav>
+        <div class="a-page">
+            <nav class="a-breadcrumb" aria-label="Contoh breadcrumb">
+                <a href="#galeri-breadcrumb">Beranda Admin</a>
+                <span aria-hidden="true">/</span>
+                <a href="#galeri-breadcrumb">Data Akademik</a>
+                <span aria-hidden="true">/</span>
+                <span aria-current="page">Mapel &amp; Guru per Gen</span>
+            </nav>
+            <p class="a-help" id="galeri-breadcrumb">Contoh visual: tautan pertama transparan, tautan kedua hijau sangat lembut, halaman aktif hijau lebih tegas dan bukan tautan.</p>
+        </div>
         <p class="a-help">Contoh tabel penugasan G1: satu pasangan Gen–Mapel memiliki satu Guru aktif. Form perubahan memiliki alasan dan jejak audit.</p>
         <div class="a-tabel-gulir">
             <table class="a-tbl"><thead><tr><th>Mapel</th><th>Pengampu</th></tr></thead><tbody>
@@ -164,6 +355,37 @@
         </details>
       </div>
     </section>
+    <section class="a-card" aria-labelledby="galeri-kegiatan">
+        <h2 id="galeri-kegiatan">S09/S10 · Editor Resume/HOTS (contoh statis)</h2>
+        <p class="a-help">Media selesai, Resume final, HOTS final. Tidak ada autosave.</p>
+        <div class="a-kegiatan-editor">
+            <label class="a-label" for="contoh-jawaban">Jawaban Resume</label>
+            <textarea class="a-kegiatan-teks" id="contoh-jawaban" rows="4" readonly>Contoh jawaban, belum dikirim.</textarea>
+            <p class="a-help">Perubahan belum disimpan. Minimal 50 karakter untuk Kirim Final.</p>
+            <div class="a-kegiatan-aksi"><span class="a-btn a-btn--sekunder">Simpan draf</span>
+            <span class="a-btn a-btn--utama">Kirim final</span></div>
+        </div>
+    </section>
+  <section class="a-card" aria-labelledby="galeri-pdf-halaman">
+      <h2 id="galeri-pdf-halaman">S08D · Pembaca PDF.js Materi siswa (contoh statis)</h2>
+      <p class="a-help">Halaman 1 dari 4 · 15 detik per halaman · progres sah dari server.</p>
+      <div class="a-pembaca-toolbar">
+          <span class="a-pembaca-toolbar__judul">Pembaca PDF</span>
+          <div class="a-pdf-controls"><span class="a-btn a-btn--sekunder">Sebelumnya</span>
+              <output>Halaman 1 dari 4</output><span class="a-btn a-btn--sekunder">Berikutnya</span></div>
+          <div class="a-pdf-controls"><span class="a-btn a-btn--sekunder">−</span>
+              <output>100%</output><span class="a-btn a-btn--sekunder">+</span></div>
+          <span class="a-btn a-btn--sekunder">Layar penuh</span>
+      </div>
+      <p class="a-help">PDF hanya diberi kredit halaman setelah berhasil dirender dan tab aktif.</p>
+  </section>
+  <section class="a-card" aria-labelledby="galeri-nilai">
+      <h2 id="galeri-nilai">G10/G11 · Penilaian Resume dan HOTS (contoh statis)</h2>
+      <p class="a-help">Antrean terfilter Gen–Mapel; simpan nilai awal 0–100.</p>
+      <div class="a-penilaian-isi">Jawaban siswa yang dikirim final; hanya Guru pengampu berhak menilai.</div>
+      <div class="a-penilaian-aksi"><span class="a-btn a-btn--utama">Simpan nilai</span>
+      <span class="a-btn a-btn--sekunder">Simpan &amp; berikutnya</span></div>
+  </section>
 </main>
 </body>
 </html>

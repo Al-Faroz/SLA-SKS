@@ -1,0 +1,36 @@
+name: QA Detail TP dan Materi Responsif
+
+on:
+  pull_request:
+    paths:
+      - 'app/Views/guru/detail_tp.php'
+      - 'app/Views/guru/materi_edit.php'
+      - 'public/assets/css/app.css'
+      - 'docs/13-DESIGN-SYSTEM-CSS.md'
+      - 'docs/assets/galeri-komponen.html'
+      - 'tests/unit/DetailTpMateriResponsifTest.php'
+      - '.github/workflows/qa-detail-tp-materi-responsif.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pemeriksaan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Periksa sintaks PHP view dan tes
+        run: |
+          php -l app/Views/guru/detail_tp.php
+          php -l app/Views/guru/materi_edit.php
+          php -l tests/unit/DetailTpMateriResponsifTest.php
+      - name: Periksa regresi tabel dan aksi Materi
+        run: vendor/bin/phpunit --no-coverage tests/unit/DetailTpMateriResponsifTest.php

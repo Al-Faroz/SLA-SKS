@@ -26,3 +26,5 @@ Dokumen resmi proyek terdiri atas **16 Master Document** di [docs/README.md](doc
 - Template kerja acuan: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` dan `docs/TEMPLATE_SOAL_SLA-SKS.docx`; aplikasi akan menghasilkan unduhan yang terkait identitas/TP aktual.
 
 > **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](docs/STATUS-TEMPLATE-V2.4.md).
+
+> **Status 25-10-2026:** aplikasi masih XAMPP lokal, belum pernah deploy ke hosting. Sebelum tugas SQL/DB, wajib minta dan telaah dump terbaru XAMPP sesudah update terakhir. Tanpa dump terkini jangan membuat SQL patch baru, mereset data, atau mengklaim struktur lokal sudah diverifikasi. Lihat [gerbang audit](docs/AUDIT-KONTRAK-DATABASE-LOKAL.md).

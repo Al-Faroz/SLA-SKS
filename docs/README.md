@@ -26,12 +26,14 @@
 - `docs/TEMPLATE_SOAL_SLA-SKS.docx` — struktur Word Soal Global yang diselaraskan ke **SLA-SKS-WORD-V1**, satu tipe PG lima opsi A–E. Generator per TP/jenis ujian mengikuti ukuran bank aktual; **berkas `docs/` berisi contoh, sedangkan unduhan Guru harus menghasilkan semua slot pertanyaan/opsi/kunci kosong sesuai jumlah bank yang diatur di aplikasi**.
 - `docs/assets/galeri-komponen.html` — galeri visual CSS yang diperbarui bersama perubahan kode UI.
 - [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
+- **[Keputusan final validasi PDF Materi](KEPUTUSAN-VALIDASI-PDF-MATERI.md)** — pembatasan 15 MB/40 halaman untuk storage hosting, bug PDF yang sudah FIX di XAMPP, batas parser tersisa dan tes regresi wajib. Baca sebelum perubahan kode media; catatan implementasi ini **bukan Master ke-17**.
 
 ## Ketentuan perubahan
 - Aturan hidup pada dokumen domain masing-masing, tanpa membuat versi alternatif. Dokumen lain merujuk domain utama.
 - **PR dokumentasi ini tidak otomatis mengubah kode atau SQL**. Branch implementasi terpisah mengacu v2.4; tiap langkah diikuti tes dan persetujuan pemilik sebelum merge.
 - **PR #13** masih implementasi berdasarkan hierarki lama; **jangan merge** sebelum selaras.
-- Dump SQL lokal dikirim pemilik nanti; developer menganalisis, memilih data aman yang perlu dipertahankan, menyusun dump final. Pemilik backup, mengosongkan database lokal sendiri, lalu mengimpor. **Bukan prosedur reset produksi**.
+- **Gerbang DB wajib:** pemilik mengirim dump XAMPP terbaru sebelum *setiap* pekerjaan SQL/DB; developer memverifikasi bahwa dump dibuat sesudah patch terakhir, baru menyusun perubahan additive. Tidak ada reset tanpa permintaan/izin eksplisit dan backup. Proyek belum diunggah ke hosting.
+- [Audit kontrak database dan gerbang QA lokal](AUDIT-KONTRAK-DATABASE-LOKAL.md) — pelengkap non-Master; tidak memuat dump/data pribadi.
 
 ## Peta dependensi
 | Pekerjaan | Aturan domain | Implementasi | Verifikasi |
@@ -43,3 +45,5 @@
 | SQL/hosting/backup | 10, 15 | AGENTS.md dan README | 16 |
 
 > **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](STATUS-TEMPLATE-V2.4.md).
+
+- [KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md](KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md) — keputusan teknis CRUD soal Guru, SunEditor lokal dan perlindungan edit manual dari impor ulang Word.

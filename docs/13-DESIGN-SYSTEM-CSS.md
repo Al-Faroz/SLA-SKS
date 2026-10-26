@@ -146,3 +146,185 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - Logo aplikasi tersentralisasi sebagai favicon dan identitas visual; ukuran varian dihasilkan tanpa mengganti sumber/versi secara liar, nama merek konsisten di header/login.
 - Pratinjau soal Word: tabel akademik di dalam sel pertanyaan/opsi harus tetap terbaca/responsif, gambar tidak overflow, equation dapat di-scroll apabila lebar melebihi mobile, pemutar Drive aman. Warna status/fokus mengikuti token existing `a-`.
 - Pembaruan CSS visual wajib diikuti perubahan `docs/assets/galeri-komponen.html` ketika kode implementasi UI dikerjakan; dokumen ini **tidak** mengklaim galeri runtime sudah berubah.
+
+## Audit tabel responsif tahap A — Admin Pengelola/Siswa dan Guru per Gen (24 Oktober 2026)
+
+- Pola `a-tbl--cards` diterapkan **secara opt-in** pada tabel yang setiap barisnya berdiri sendiri. Pada desktop tetap memakai header kolom/tabel semantik; pada lebar ≤980px, setiap baris menjadi kartu yang memiliki `data-label` di tiap sel. Jangan memasang pola ini pada tabel matriks yang perlu hubungan baris–kolom atau data komparatif kompleks; matriks tetap gunakan scroll dengan label tetap.
+- Tahap pertama: tabel daftar Pengelola dan Siswa (satu template `app/Views/admin/akun_daftar.php`), tabel penetapan Guru per Gen, dan tabel riwayat penetapan (`app/Views/admin/mapel_guru.php`). Pertahankan pemilihan Gen, label form, tindakan per baris, perlindungan CSRF, filter dan pagination server-side.
+- Tabel penetapan harus tetap memberi ruang sejajar untuk input **Guru / Alasan / Simpan** di desktop; pada layar sempit, masing-masing kontrol disusun vertikal dengan label, tanpa input/tombol terpotong.
+- Periksa ukuran 360, 390, 768, 980 dan 1100px, keyboard focus/tab, opsi dropdown panjang, aksi reset sandi, penempatan Gen dan pagination. Tidak mengubah format ataupun endpoint data.
+- Komponen demo responsif telah ditambahkan di `docs/assets/galeri-komponen.html`. Implementasi tahap berikutnya melakukan audit tabel CP/ATP dan referensi yang membutuhkan struktur berbeda, tanpa override CSS global secara sembrono.
+
+
+## Breadcrumb pill dan pagination daftar Admin (24 Oktober 2026)
+
+- Breadcrumb kanonis `a-breadcrumb` (ukuran tetap ringkas: teks 12px, tinggi tombol sekitar 24px, padding 2px 7px; bukan tombol aksi besar): setiap elemen yang benar-benar memiliki endpoint tetap memakai elemen `<a>` dengan gaya tombol **transparan** untuk tingkat pertama, hijau sangat ringan untuk tingkat kedua/lanjut, dan hover/fokus keyboard terlihat. Posisi saat ini memakai `<span aria-current="page">` dengan latar hijau lembut **tanpa membuat tautan palsu**. Pemisah `/` memakai `aria-hidden="true"`. Di layar 360px seluruh pill dapat wrap tanpa overflow.
+- Komponen `app/Views/components/pager.php` memakai `a-pager--lengkap`: rentang data, total dan halaman; tautan Pertama/Sebelumnya, angka sekitar halaman aktif, Berikutnya/Terakhir; kontrol di ujung menjadi label nonaktif, bukan tautan tanpa fungsi. URL dibangun dengan `http_build_query` dari filter tepercaya; `aria-current="page"` untuk nomor aktif dan anchor ke judul daftar untuk memudahkan navigasi.
+- Pengelola/Siswa: tetap 25 akun per halaman di SQL, mempertahankan `cari`, `status` dan `gen`. Mapel–Guru: daftar penugasan 25 mapel per halaman dengan `halaman_mapel`, riwayat lintas Gen 25 perubahan per halaman dengan `halaman_riwayat`; navigasi masing-masing menjaga Gen dan halaman daftar lainnya. POST penugasan kembali ke halaman penugasan semula.
+- Uji penerimaan pada 360, 390, 768, 1100px dan desktop; filter yang menghasilkan 0/1/lebih dari 25 data, halaman terakhir, ID halaman di luar rentang, perubahan Gen, penetapan dan redirect setelah POST. Pagination adalah query SQL (`LIMIT/OFFSET`), bukan JS yang menyembunyikan baris di browser.
+- Struktur akses Admin dan mekanisme MySQL/MariaDB yang sudah berlaku tidak berubah. Contoh tampilan ada di `docs/assets/galeri-komponen.html`.
+
+
+## Audit tabel responsif tahap B — Daftar CP dan Peta ATP (24 Oktober 2026)
+
+- **Admin / Kurikulum & CP:** hanya tabel Daftar CP dan Status Versinya mendapat filter kode/mapel/kurikulum/status, jumlah total, pager SQL 25 data/halaman, dan ekspor XLSX sesuai filter tanpa memaksa seluruh CP dimuat. Ekspor mencakup seluruh hasil filter, dibatasi 5.000 CP demi memori shared hosting, dan menulis setiap sel sebagai teks agar awalan `=`, `+`, `-` atau `@` tidak menjadi formula.
+- Tabel CP yang tiap barisnya independen memakai `a-tbl--cards` di layar ≤980px dengan `data-label` Kode, Kurikulum, Mapel/Fase, Versi resmi, Draf dan Aksi. Tabel kurikulum dan formulir CP tidak dirombak pada tahap ini.
+- **Guru / Peta ATP enam semester:** setiap TP menjadi kartu berlabel pada ≤980px; nomor urut ATP, kode, judul (link Detail TP), versi paket dan status tetap tampil. Urutan serta relasi Gen–Mapel–Semester tidak diubah; enam semester dan penanganan data kosong tetap sama.
+- Gunakan `a-cp__filter`, `a-cp__tabel.a-tbl--cards`, `a-tbl--peta-atp` sesuai CSS; hindari global override untuk tabel matriks akademik. Periksa 360/390/768/1100px, dropdown panjang, keyboard, status kosong dan filter >25 CP, link ke detail, serta worksheet Excel pada LibreOffice/Excel.
+- QA: uji dengan 0/1/26/60 CP; pagination/filter/export konsisten dan tidak menyebabkan CP milik mapel lain ikut; status versi CP tetap immutable.
+
+
+## Audit tabel responsif tahap C — Detail TP dan Materi Guru (24 Oktober 2026)
+
+- Halaman `guru/tp/{id}`: tabel **Identitas TP** tetap bentuk key/value agar tidak memboroskan layar HP; lebar kolom label dibatasi, judul/kode dapat membungkus tanpa scroll horizontal.
+- **Pemeriksaan TP:** halaman Rincian TP tidak lagi menampilkan tabel pemeriksaan awal yang menduplikasi checklist final. Satu-satunya daftar pemeriksaan untuk Guru ada pada `/guru/tp/{id}/kesiapan` menggunakan `a-tbl--cards a-kesiapan-tabel`, dengan status berteks, alasan, dan tautan perbaikan.
+- **Daftar Materi/Submateri** delapan kolom memakai `a-tbl--cards a-tp-materi-tabel`; desktop mempertahankan kolom terpisah No., Judul, Jenis, Status, Pratinjau, Urutan, Edit, Hapus. Layar ≤980px mengubah baris menjadi kartu berlabel untuk mengurangi scroll. Aksi Naik/Turun menjadi tombol berdampingan bila muat, dan tombol Pratinjau, Sunting, Hapus tetap memiliki endpoint/form semula, CSRF dan konfirmasi hapus.
+- **Form tambah dan edit Materi** memakai satu wrapper `a-materi-form-fields` pada partial field yang telah ada: satu kolom mobile, dua kolom pada desktop ≥1100px; input media dan URL YouTube mengambil lebar penuh agar informasi PDF 15 MB/40 halaman dan pesan kesalahan tetap terbaca. Input file pada browser tetap tidak dapat diisi ulang otomatis setelah gagal.
+- **Tidak ada perubahan** `PdfMateriValidator.php`, `MateriService`, endpoint upload/pratinjau, otorisasi G1, .env, SQL, metadata media maupun batas PDF final. Catatan `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md` tetap berlaku.
+- QA manual: 360, 390, 768, 980, 1100 dan desktop; lihat TP dengan ≥4 Materi berbeda PDF/YouTube/Audio/Gambar, urutan naik/turun, preview, edit media, aksi hapus konfirmasi, TP Siap tanpa edit. Cek opsi file dan validasi PHP masih sama.
+
+
+## Audit responsivitas tahap D — Pratinjau Media Guru (24 Oktober 2026)
+
+- **Lingkup:** halaman `/guru/tp/{tpId}/materi/{materiId}/pratinjau`, mengikuti hasil FIX audit daftar Materi. Tambahkan navigasi cepat menuju daftar Materi (`#daftar-materi`), bagian media dan petunjuk Resume/HOTS. Tautan `Sunting Materi` muncul hanya ketika TP masih `draf`; seluruh tujuan menggunakan rute yang telah ada. Navigasi bukan pengganti breadcrumb kecil.
+- Bagian atas menampilkan jenis, urutan dan status Materi secara ringkas. Tombol atau label tidak menyamar sebagai aksi: tautan benar-benar menuju ID halaman atau endpoint yang tersedia.
+- Pratinjau **YouTube** dan **PDF** tetap menggunakan elemen `details` (tidak otomatis mengunduh/menjalankan pemutar sebelum dibuka), ukuran video proporsional 16:9. PDF disesuaikan tinggi viewport pada HP, tetapi tautan **Buka PDF di tab baru** tetap tersedia apabila browser tidak mendukung iframe. Jangan mengubah validator PDF 15 MB/40 halaman, konten berkas atau izin akses privat.
+- **Audio** tetap memakai `<audio controls preload="metadata">`, **Gambar** tetap `<img>` berukuran proporsional, keduanya tidak boleh menyebabkan scroll horizontal pada HP.
+- Petunjuk **Resume** dan **HOTS** satu kolom pada HP/tablet dan dua kolom pada desktop ≥1100px, mempertahankan isi teks yang di-escape. Karena view memakai `nl2br`, teks kegiatan tidak boleh ditambahkan `white-space:pre-wrap` yang akan menduplikasi baris.
+- Style dibatasi pada kelas `a-pratinjau-*` agar tidak merombak pemutar publik, media siswa, form upload, atau kartu yang sudah FIX. Uji pada lebar 360/390/768/1100px; cek YouTube, PDF, audio, gambar, Materi Nonaktif, status TP Siap, link navigasi, keyboard, dan browser tanpa pemutar PDF.
+
+
+## Tahap akademik: Kesiapan dan Publikasi TP Siap (24 Oktober 2026)
+
+- **UI Guru:** `/guru/tp/{id}/kesiapan` adalah pemeriksaan akhir, bukan checklist konten awal. Komponen `a-kesiapan-ringkasan` menampilkan progres pemeriksaan, Materi, soal dan status; `a-tbl--cards a-kesiapan-tabel` memuat alasan serta tautan perbaikan, responsif pada 360px. Halaman Detail TP memiliki tautan ke pemeriksaan akhir.
+- **Pemeriksaan server:** identitas TP; CP terbit/aktif sesuai Fase D, Mapel, Kurikulum paket, dengan tepat satu CP utama; seluruh Materi dengan urutan utuh, media valid dan berkas tersedia, waktu belajar, Resume/HOTS; Diagnostik aktif ≥10 dan ≥tayang, Sumatif aktif ≥5 dan ≥tayang, semua soal PG A–E satu kunci; KKM/durasi/minimal karakter/bobot/kuota sesuai Master 05; sumber Word/gambar masih tersedia. Tidak mengulang validasi struktur PDF yang sudah FIX.
+- **Penguncian:** tombol Konfirmasi & Jadikan TP Siap muncul **hanya bila seluruh pemeriksaan otomatis lulus dan TP masih draf**. Guru wajib mencentang pernyataan telah memeriksa akademik. POST dilindungi CSRF/filter Guru, Service mengulang otorisasi penugasan G1, lock baris TP, ulang readiness, cocokkan `struktur_versi`, simpan snapshot `versi_konten_tp`, tandai soal dengan versi, aktifkan Materi, ubah TP menjadi `siap`, aktifkan paket yang masih draf dan tulis log aktivitas dalam **satu transaksi**. TP Siap tidak mempunyai tombol kembali ke Draf; koreksi akademik adalah modul selanjutnya.
+- **Keamanan:** soal dan kunci di snapshot tidak dicetak dalam HTML checklist atau dikirim ke browser. Checklist hanya menampilkan jumlah/status dan identitas publik. Media tetap privat, tanpa URL file fisik; pengecekan ketersediaan tidak menjadi scan PDF tambahan.
+- **Tidak ada SQL update**, `.env`, migration/seeder atau revisi upload. Sudah memakai tabel `versi_konten_tp`, `soal`, `materi`, `tp`, `paket_semester` dan `log_aktivitas` yang ada dalam dump. Tabel student/attempt yang belum diimplementasikan bukan target tahap ini; tampilan siswa/ujian belum diklaim siap sebelum tahap lanjutan.
+- **QA** wajib: TP belum lengkap tetap draf, CP berbeda Mapel/Fase, bank 0/di bawah target, kunci/opsi tidak lengkap, media hilang, urutan Materi loncat, versi berubah antara GET dan POST, Guru beda Gen, idempotensi dua klik, setelah sukses snapshot v1 dan status siap, refresh serta penolakan edit konten biasa; uji di XAMPP MySQL dan MariaDB sebelum merge.
+
+
+## Perbaikan duplikasi checklist Rincian TP (24 Oktober 2026)
+
+Setelah publikasi TP Siap terbukti berjalan di localhost, tampilan **Pemeriksaan awal kelengkapan konten** pada Rincian TP dihapus. Bagian yang tersisa hanya kartu navigasi **Pemeriksaan kesiapan TP** (untuk Draf) atau **Status publikasi TP** (untuk Siap). Daftar pemeriksaan akademik berada tunggal di halaman `/guru/tp/{id}/kesiapan`; ketika sudah Siap, halaman tersebut tetap bisa dibaca tanpa menyediakan aksi penerbitan ulang.
+
+Tautan rekomendasi perbaikan CP pada checklist final diarahkan ke Peta ATP, bukan anchor checklist awal yang sudah dihapus. Penghilangan tabel awal bersifat antarmuka saja: tidak ada rollback, pembatalan publikasi, perubahan status TP, penghapusan snapshot, perubahan database, ataupun modifikasi aturan pemeriksaan akhir. Unit test mencegah tabel ganda muncul kembali.
+
+## Tahap S01–S03 — Katalog Pembelajaran Siswa (24 Oktober 2026)
+
+- **Tahap awal yang aman:** Beranda Siswa → `/siswa/pembelajaran` (mapel) → `/siswa/mapel/{id}` (enam semester) → `/siswa/semester/{paketId}` (daftar TP) → `/siswa/tp/{tpId}` (rincian TP pertama yang Siap). Semua halaman baca-saja; menu Pembelajaran hanya muncul untuk peran Siswa. Tidak ada tombol ujian, media belajar, Resume/HOTS, atau progres palsu.
+- Hak akses diperiksa ulang di Controller dan Service: akun Siswa aktif, sandi awal diganti, `siswa.angkatan_id` valid; hanya `penugasan_paket` pada **Gen siswa**, paket `aktif`, serta pasangan Gen/Mapel/semester/tahun ajaran yang sama yang boleh ditampilkan. ID paket/TP dari Gen lain atau TP yang terkunci ditolak dengan respons generik. Kelas/rombel bukan sumber hak; `ref_mapel.guru_id` warisan tidak digunakan.
+- Urutan mengikuti `COALESCE(siswa.semester_mulai, ref_angkatan.semester_mulai)`. Semester sebelumnya ditandai **Dilewati** tanpa nilai. Semester setelah semester mulai tetap terkunci sampai progres akademik disediakan; pada semester mulai, hanya TP urutan pertama yang **Siap dan sudah memiliki versi snapshot** boleh dibuka dalam mode rincian. TP Draf, TP tanpa versi, dan TP berikutnya tidak dapat diakses via mengubah ID URL.
+- Detail TP menampilkan kode, judul, rumusan, indikator dan **judul daftar Materi saja**; tidak menampilkan HTML media, URL berkas privat, pertanyaan/kunci ujian maupun teks tugas sebelum Diagnostik. Pemanggilan GET tidak membuat progres/attempt/versi pin.
+- Teks **Siap — lihat rincian TP** tidak sama dengan **Mulai Diagnostik**. Progres yang terpenuhi, perpindahan semester, ketuntasan dan penguncian versi historis harus dikerjakan oleh mesin pembelajaran dan ujian pada tahap berikutnya. Skema dump lokal saat tahap ini belum memiliki tabel progres operasional yang diimplementasikan: jangan mengarang status tuntas.
+- UI memakai `a-siswa-kartu-grid`, `a-siswa-kartu`, `a-siswa-status` dan `a-siswa-materi-ringkas` pada 360/390/768/1100px, tanpa mengganti shell/CSS global.
+- **QA penerimaan:** Siswa Gen yang punya TP Siap dapat membuka rincian pertama sesuai semester mulai; Guru/Admin/Pimpinan tidak dapat mengakses. Coba akses paket/TP Gen lain dengan ID URL, semester dilewati, semester berikutnya, TP Draf dan TP kedua; semuanya tetap terkunci. Cek kondisi tanpa Gen/paket/snapshot, semua screen mobile. Tidak ada perubahan SQL, .env, upload PDF/Word atau data TP Siap.
+
+
+## Fondasi S04a — Aktivasi TP dan pengikatan snapshot versi siswa (24 Oktober 2026)
+
+- **Aksi nyata:** ketika siswa pertama kali memilih `Aktifkan TP & simpan versi` pada S03, POST `/siswa/tp/{id}/mulai` secara transaksional mencatat satu baris `progres_tp` untuk siswa login, TP, versi paket yang ditugaskan, serta `versi_konten_tp_id`. Halaman GET tetap baca-saja; refresh dan POST berulang tidak menciptakan progres atau audit duplikat. Status awal baris `diagnostik` **bukan berarti** percobaan ujian telah dimulai.
+- **Gate di Service:** Siswa aktif dari Gen pemilik, paket aktif, hanya TP pertama semester mulai yang Siap, versi snapshot bertanda checksum SHA-256 serta memiliki struktur TP/Materi/Soal yang benar. Service mengunci baris siswa dan TP dalam transaksi InnoDB, cek hak dan versi ulang, mengembalikan pin yang ada jika sudah pernah dimulai.
+- **UI:** `a-siswa-aktivasi` memberi penjelasan dampak permanen dan meminta konfirmasi sebelum POST. Setelah berhasil, status dan ID versi konten terpin terlihat; tidak ada pertanyaan/kunci ujian, akses media atau tombol `Mulai Diagnostik` palsu.
+- **SQL:** `database/sql/updates/0014_progres_tp_pin.sql`, manual impor satu kali sesuai `database/sql/README.md`, **tanpa migration/seeder**, tidak menghapus data. Progres siswa yang dimulai tetap bersejarah walaupun versi TP selanjutnya diterbitkan.
+- **Batas tahap:** mesin ujian Ketat, preflight fullscreen, heartbeat dan skor Diagnostik belum diaktifkan. Implementasikan terpisah dan jalankan pengujian XAMPP sebelum membuka tombol ujian. Gunakan akun uji, bukan data siswa nyata, untuk pengetesan aktivasi irreversibel.
+
+
+## S05 — Petunjuk & pemeriksaan fullscreen Diagnostik (24 Oktober 2026)
+
+- Halaman `GET /siswa/tp/{id}/diagnostik/petunjuk` tersedia setelah Siswa mengaktifkan TP dan progres berada pada tahap Diagnostik. Menampilkan nama TP, jumlah soal tayang, durasi dan ketentuan **profil Ketat**, dengan pemeriksaan **server** atas Gen, TP Siap, status progres, checksum snapshot terpin, bank soal PG A–E dan kunci (pemeriksaan kunci hanya di server).
+- **Privasi:** halaman hanya menerima ringkasan jumlah/status, tidak pernah mengirim teks pertanyaan, opsi, kunci atau `snapshot_json`. Tidak ada `percobaan_ujian`, timer, nilai, atau jawaban yang diciptakan lewat GET. Status kesiapan data tidak sama dengan izin menjalankan ujian.
+- Tombol **Uji fullscreen perangkat** memakai `requestFullscreen()` **dari klik siswa** dan memeriksa `document.fullscreenEnabled` serta `document.fullscreenElement`, menampilkan hasil berhasil/gagal/ditolak/offline dan tombol keluar fullscreen. Tidak menyembunyikan pesan ketidakcocokan perangkat dan tidak menganggap User-Agent sebagai bukti. Semua uji ini **belum memulai ujian** dan wajib diulang saat S06 benar-benar dibangun.
+- CSS `a-diagnostik-*` hanya untuk layar S05, kartu ringkasan empat metrik, checklist `a-tbl--cards`, target tombol ≥42px, fallback layar sempit dan `role=status` untuk hasil. Tidak merombak UX Guru maupun aturan upload PDF/Word.
+- **Batasan implementasi:** desain penuh S06 memerlukan patch SQL berurutan berikutnya untuk `percobaan_ujian`, `jawaban_percobaan`, `riwayat_status_ujian`, `segmen_jeda_ujian`, `pelanggaran_ujian` sesuai docs/07. Jangan buat tombol **Mulai ujian** sebelum ada transaksi aman, waktu aktif server, timeout koneksi, fullscreen yang ditangani, pengacakan soal/opsi serta hasil sah/batal. Hanya browser yang berhasil fullscreen dapat melanjutkan setelah modul S06 selesai.
+- QA: uji TP 1 Siap dengan progres terpin, akses Gen lain (404), siswa tanpa aktivasi (404), bank soal kurang, checksum rusak, fullscreen diterima/ditolak, perangkat HP yang tidak mendukung, putus jaringan, keyboard, lebar 360/390/768/1100px. Tidak ada SQL baru pada tahap S05; `0014_progres_tp_pin.sql` tetap menjadi prasyarat.
+
+
+## S06A — Kontrak mesin ujian Ketat di server (24 Oktober 2026)
+
+- **Tahap persiapan backend**, tidak mengubah halaman siswa S05 atau membuat tombol ujian palsu. Belum ada UI S06. Skema SQL `0015_mesin_ujian_fondasi.sql` menyediakan percobaan, snapshot butir, jawaban idempoten, riwayat status, segmen jeda, serta pelanggaran.
+- `SusunButirUjianService` memilih **soal Diagnostik aktif hanya dari snapshot versi TP terpin**, mengacak tanpa penggantian menggunakan `random_int` untuk soal dan kelima opsi A–E, serta menyimpan kunci yang sudah dipetakan sesuai opsi baru di sisi server. Struktur HTML/Word opsional dipetakan per opsi untuk dipakai renderer berizin S06B; kunci/asal soal tidak dimasukkan dalam proyeksi `untukSiswa`.
+- `AturanWaktuUjianService` membentuk transisi murni dari timestamp **server** dan angka durasi aktif: timeout koneksi 20 detik (20 detik deteksi tetap aktif), jeda fullscreen 90 detik/kejadian, 180 detik akumulatif, pelanggaran ketiga batal tanpa skor, koneksi maksimum 300 detik, pause tak boleh menerima jawaban, overlap pause tidak dihitung ganda. Kebijakan tidak bergantung worker 24 jam; adapter S06B wajib merekonsiliasi tiap request.
+- **Belum tersedia adapter database dan antarmuka ujian**. Jika waktu aktif menjadi nol, Service hanya mengembalikan `harus_finalisasi=true` dan menolak jawaban; ia **tidak** mengubah status menjadi `selesai_sah` tanpa skor. S06B wajib menghitung nilai dan menyimpan status `selesai_sah` + skor **atomik** sebelum memberi hasil. UI S06 tanpa sidebar, fullscreen user-gesture, akses media historis, timer server, hasil S07 dan penanganan keputusan Guru masih tahap lanjutan.
+- **Tanpa perubahan UI/CSS global, rute ujian, `.env`, validator PDF, atau data TP Siap.** SQL diimpor manual sekali setelah backup sesuai petunjuk database.
+
+
+## S06B — Pelaksanaan Diagnostik Ketat nyata (24 Oktober 2026)
+
+**Sudah diimplementasikan:** S05 Petunjuk → halaman /siswa/tp/{id}/diagnostik/ujian memakai shell standalone **tanpa sidebar/panel**. GET ruang ujian belum membuat percobaan. Tombol siswa meminta Fullscreen API dari gesture nyata sebelum POST mulai; perangkat yang menolak fullscreen tidak mengirim POST. CSRF session aktif pada semua POST.
+
+- **Otorisasi:** cek peran Siswa, akun aktif, Gen/paket, TP pertama Siap, progres dan versi terpin di Service. Percobaan dan media/pertanyaan diikat ke progres pemilik serta token acak 48 heksadesimal. Belum ada izin mengulang Diagnostik dibatalkan: keputusan Guru diperlukan.
+- **Integritas:** Service memilih/mengacak soal dari snapshot terpin, lalu pada satu transaksi membuat percobaan, semua butir, status dan audit. SELECT FOR UPDATE memastikan POST dua kali mengambil token sama. Bank Diagnostik tidak bercampur Sumatif.
+- **Soal dan media:** server hanya mengirim proyeksi tanpa kunci/ID soal asal; teks soal/opsi di-escape, HTML kaya disanitasi sebelum diberi URL gambar privat **berizin siswa pemilik percobaan dan butir terpilih**. Word gambar-only didukung saat render dengan opsi khusus sanitizer; editor Guru lama tetap memakai validasi aslinya. Tautan media tidak membuka endpoint Guru.
+- **Aksi ujian:** jawaban PG disimpan dan dikonfirmasi server melalui UPSERT unik per percobaan–butir; tanpa acknowledgment tidak dianggap tersimpan. Timer UI hanya tampilan, server sumber kebenaran. Setiap GET status, heartbeat, jawab, kirim, jeda, dan pulih merekonsiliasi state di bawah lock. Fullscreen keluar membuat jeda, riwayat dan insiden terhitung (blur/visibility/fullscreenchange tumpang tindih tidak menghitung tiga kali). Timeout koneksi 20 detik, jeda maksimal 300 detik. Jeda fullscreen 90 detik/kejadian, 180 detik total; pelanggaran ketiga batal.
+- **Hasil:** kirim/waktu habis melakukan finalisasi atomik hanya saat status berjalan. Skor dihitung dari butir/kunci historis dan jawaban tersimpan; status menjadi selesai_sah dengan nilai dan jumlah benar. Progres TP menjadi tuntas bila skor ≥KKM atau belajar bila belum. Batal menjadi perlu_bantuan tanpa skor dan menunggu keputusan Guru. Modul Materi/Resume/HOTS, penilaian komponen, sertifikat dan keputusan Guru untuk mengulang belum diimplementasikan.
+- **UI:** kelas .a-ujian-* terisolasi: header/timer, navigator soal, status server, soal rich HTML, kirim berkonfirmasi, overlay jeda dan hasil; responsif untuk HP. Cache-Control no-store dan Referrer-Policy no-referrer. Tidak ada notifikasi, sidebar atau perayaan selama ujian.
+- **Batas pengamanan browser:** Fullscreen API adalah mitigasi best-effort, bukan bukti kriptografis anticurang. Shared hosting merekonsiliasi pada setiap request; transisi tepat detik ke-20 tidak bisa dijamin tanpa worker/request.
+- **QA:** PHPUnit MariaDB sintetis menguji begin ganda idempoten, sepuluh butir tanpa kunci di JSON, upsert, submit skor 100/tuntas, tiga insiden pembatalan, Gen lain ditolak; unit test gambar-only dan HTML aktif. **Pengujian manual XAMPP wajib** dengan siswa uji, Word tabel/gambar/Equation, editor manual, mobile, refresh, offline, tab pindah, timer dan timeout 90/180/300 detik. Jangan gunakan siswa nyata untuk uji percobaan permanen.
+
+**SQL:** tidak ada patch baru. Tabel progres_tp dari patch 0014 serta enam tabel ujian dari patch 0015 wajib sudah tersedia. Tanpa Migration/Seeder dan tanpa mengubah validasi PDF/Word.
+
+
+## S08A — Pembaca Materi Siswa berbasis snapshot terpin (24 Oktober 2026)
+
+Setelah Diagnostik menghasilkan `progres_tp.status=belajar`, halaman Rincian TP menampilkan **Buka Materi 1** yang benar-benar dapat dibuka. Materi selanjutnya **tetap terkunci** sampai aktivitas media, Resume final, dan HOTS final Materi sebelumnya tersedia; jangan memakai status palsu seperti "sudah dipelajari" ketika bukti waktu aktif belum ditangani. Jika `status=tuntas`, semua Materi boleh dibaca **secara sukarela** tanpa Kirim Resume/HOTS resmi dan tanpa mengubah nilai Diagnostik. Status `diagnostik`/`perlu_bantuan` tidak membuka media.
+
+- Rute `GET /siswa/tp/{tp}/materi/{id}` dan `/media` dilindungi filter Siswa **serta** pemeriksaan Gen, semester, TP pertama Siap, progres dan checksum `versi_konten_tp` di Service. Daftar/isi Materi berasal dari **snapshot terpin**, bukan perubahan database Materi live. ID yang ditebak, berkas Gen lain, dan Materi lebih jauh ditolak server tanpa membuka file privat.
+- Pembaca PDF, gambar, audio (HTTP Range) dan iframe YouTube-nocookie sudah tersedia dengan MIME yang dipersempit, berkas privat `writable/uploads/materi/`, larangan path traversal, header `nosniff` dan `Cache-Control: private, no-store`; link file fisik tidak dikirim ke HTML. Validasi **upload PDF yang FIX** tidak diubah.
+- Petunjuk Resume dan HOTS tiap Materi tampil baca-saja. **S08A belum membuat ketuntasan media, heartbeat, pelacakan semua halaman PDF, 90% putar video/audio, maupun draf dan Kirim Final**. Implementasi S08B wajib mengikuti docs/06 (§3) dan S09/S10 sebelum membuka Materi 2. Jangan membuat tombol Kirim palsu atau otomatis menandai lengkap karena file dibuka.
+- Gaya baru `a-siswa-media`, `a-siswa-materi-instruksi`, `a-siswa-materi-buka` hanya untuk pembaca Siswa; 360/390/768 dan desktop, reuses `a-media-video`, `a-materi-pdf`, `a-materi-audio`, `a-materi-gambar`.
+- **SQL tidak berubah**, GET tidak menulis progres atau skor. QA sintetis harus menguji `belajar` hanya Materi 1, `tuntas` sukarela, progres belum diagnostik, akun Guru, lintas Gen, URL Materi 2, checksum rusak, media privat serta tidak ada mutasi.
+
+
+## S08B — Pencatatan aktivitas media siswa (24 Oktober 2026)
+
+- **Prasyarat SQL:** impor sekali `database/sql/updates/0016_progres_aktivitas_materi.sql` sesudah patch 0014–0015, backup dahulu, tanpa migrasi/seeder. Dua tabel: `progres_materi` unik berdasarkan progres TP + Materi + versi snapshot terpin, dan `halaman_progres_materi` untuk pencatatan PDF.js nanti.
+- GET `/siswa/tp/{tp}/materi/{materi}/aktivitas` hanya membaca progres. POST URL yang sama menyimpan heartbeat di transaksi setelah cek **peran Siswa, Gen, TP, snapshot, status `belajar`, Materi pertama yang diizinkan** dan lock progres TP/row media. GET tidak membuat progres; siswa `tuntas` belajar sukarela tidak bisa menyimpan kredit resmi.
+- **Gambar:** kredit berdasarkan interval server 5–20 detik. Browser hanya mengirim ketika gambar tampil ≥50% viewport, gambar sudah dimuat, tab terlihat serta fokus. Minimal 30 detik atau waktu Guru, mana yang lebih besar.
+- **Audio/YouTube:** browser hanya mengirim selama pemutaran aktif dengan kecepatan normal, tab terlihat dan fokus. Server memeriksa selisih detak 5–20 detik serta delta posisi pemutar yang wajar. Seek maju, posisi mundur dan jarak heartbeat berlebihan tidak memperoleh kredit. Penetapan `media_selesai` mensyaratkan waktu aktif minimal Guru **dan** total waktu putar serta posisi terjauh ≥90% durasi. Metadata durasi dilaporkan pemutar: ini mitigasi untuk aktivitas belajar, **bukan jaminan anti-manipulasi absolut**. Video memakai YouTube IFrame API; ketika API terhalang jaringan, progress tidak boleh bertambah secara palsu.
+- **PDF:** iframe browser yang telah tersedia tetap bisa dibaca, tetapi **tidak mengirim heartbeat yang mengklaim per halaman dan tidak dapat `media_selesai`**. Master 06 mensyaratkan pembaca PDF.js **lokal**, seluruh halaman disaksikan dan waktu aktif default 15 detik per halaman. Integrasi pustaka lokal dan bukti halaman masih tahap S08B lanjutan; dilarang menggunakan waktu berada pada iframe sebagai pengganti pembaca. Tidak mengubah validasi upload PDF yang sudah dinyatakan FIX.
+- Media selesai **bukan** Resume final atau HOTS final. Materi 2+ tetap terkunci hingga S09/S10 sah. Tidak ada nilai TP atau status ujian yang dimutasi oleh heartbeat. Pesan berhasil/gagal, offline, media belum aktif, status server, progress bar dan tampilan 360px memakai CSS terisolasi `a-siswa-media-progres`.
+- QA: pengujian deterministik atas 5–20 detik, timeout, seek, durasi, ambang waktu dan larangan PDF; SQLite sintetis untuk Gen/pin/progres idempoten; DDL pada MariaDB sementara untuk FK/UNIQUE. **Uji XAMPP nyata** dengan gambar dan audio/YouTube, tab background, pause, seek, refresh, koneksi putus, dan periksa status per siswa.
+
+
+## S08C — Navigasi Materi, fullscreen pembaca dan zoom gambar (25 Oktober 2026)
+
+- Halaman `/siswa/tp/{tp}/materi/{id}` menyediakan **Kembali ke Rincian TP** dan **Materi Selanjutnya** berdasarkan urutan `materi` pada snapshot versi TP siswa. Pada jalur `tuntas` karena lulus Diagnostik, semua Materi bersifat sukarela sehingga tautan berikutnya aktif langsung tanpa kewajiban waktu/media/Resume/HOTS. Pada jalur `belajar`, tombol berikutnya ditampilkan **terkunci** dengan alasan "media, Resume final, dan HOTS final belum terpenuhi". Belum ada layanan Resume/HOTS final yang dapat membuktikannya, sehingga tombol tidak pernah membuka Materi 2 pada S08C. **Service server tetap menolak URL Materi 2 yang ditebak.**
+- Media **PDF dan gambar** dibungkus `a-pembaca-fullscreen` dengan tombol **Layar penuh / Keluar layar penuh** yang benar-benar memanggil Fullscreen API saat klik. Toolbar tetap ada di dalam area fullscreen, Escape menutup fullscreen; browser/perangkat yang menolak menampilkan pesan galat. PDF masih memakai pembaca browser/iframe; fungsi fullscreen tidak menggantikan persyaratan PDF.js lokal dan tidak memberikan kredit halaman.
+- Gambar mempunyai toolbar **Perkecil − / Perbesar + / Atur ulang**, rentang **50–300%** langkah 25%, indikator persentase, scroll area saat diperbesar, dan pintasan +, −, 0 ketika fokus di area gambar. Pembesaran tidak menandai materi selesai dan tidak memodifikasi file asli, database, nilai, maupun waktu belajar.
+- Heartbeat gambar S08B kini mengamati keterlihatan **area pembaca** `data-gambar-observer` (bukan rasio seluruh piksel gambar yang dapat membesar 300%). Masih memerlukan gambar telah termuat, tab terlihat/fokus, serta interval server yang sah. Ini mempertahankan pembelajaran aktif di fullscreen/zoom tanpa kredit palsu dari tab tersembunyi.
+- Tampilan memakai CSS prefiks `a-pembaca-*` dan `a-materi-lanjut`, responsif HP/laptop, tanpa Bootstrap/React/Vue. Tidak ada patch SQL; tidak menyentuh fitur ujian/hasil diagnostik maupun validasi upload PDF 15MB/40 halaman.
+- QA: uji siswa `tuntas` dapat berpindah Materi 1→2 tanpa waktu; `belajar` tidak dapat membuka Materi 2; Materi terakhir tidak menyediakan tautan selanjutnya; PDF dan gambar fullscreen/ESC, gambar zoom 50–300% dan reset; mode HP, browser yang menolak fullscreen, scrollbar dan heartbeat setelah zoom.
+
+
+## Koreksi S08C — Zoom gambar presisi (25 Oktober 2026)
+
+Perbaikan laporan XAMPP: zoom sebelumnya melakukan `img.style.width = zoom + '%'`, yaitu persentase **lebar area pembaca**, bukan perbesaran relatif ke gambar yang pas di layar. Hal ini menyebabkan gambar kecil/portrait terdistorsi secara pengalaman, serta posisi baca bergeser saat zoom/fullscreen.
+
+- Pembaca kini menghitung **skala muat** berdasarkan `naturalWidth`/`naturalHeight` dan kedua dimensi viewport (`min(1, areaW/imageW, areaH/imageH)`). Pada 100% seluruh gambar terlihat dan tidak dipaksa membesar melewati resolusi asli.
+- Tombol 50–300% mengubah **ukuran piksel hasil skala muat** pada stage pusat; scroll horizontal/vertikal tersedia saat gambar melebihi viewport. Perubahan zoom mempertahankan pusat gambar yang sedang dibaca, bukan selalu ke pojok kiri atas.
+- `ResizeObserver` menghitung ulang pada perubahan lebar/tinggi pembaca; event `fullscreenchange` menghitung ulang setelah layout fullscreen berubah. Fullscreen PDF yang sudah FIX tidak diubah.
+- Tombol plus/minus/reset, keyboard +/−/0, Ctrl+scroll, dan drag mouse pada gambar yang lebih besar dapat dipakai; interaksi sentuh mempertahankan scroll asli. Gambar yang belum/salah dimuat tidak dapat di-zoom dan menampilkan galat. File asli tidak dimodifikasi.
+- Area aktivitas `data-gambar-observer` S08B, izin Media Gen, nilai, status Diagnostik, timer resmi dan SQL **tidak berubah**. Kontrol presentasi zoom tidak menandai durasi atau ketuntasan.
+- Pengujian ditambah JavaScript **perilaku** (Node vm: lanskap/potret/gambar kecil, ukuran 100–300%, scroll, fullscreen, zoom terpusat, Ctrl+wheel/keyboard, gagal muat), di samping PHP/SQLite regresi. **Uji XAMPP browser tetap diperlukan** pada gambar sebenarnya serta Ctrl+F5 bila aset cache masih versi lama.
+
+
+### Implementasi UI S08D PDF siswa (25-10-2026)
+
+Pembaca PDF.js lokal dimuat hanya di halaman siswa dengan Materi jenis PDF:
+toolbar halaman Sebelumnya/Berikutnya, zoom 50–200%, fullscreen,
+dan area kanvas yang dapat di-scroll. Komponen menggunakan a-pembaca-* dan
+a-pdf-* pada app.css, bukan framework CSS baru. Error render dan
+ketidakcocokan halaman tampak langsung, tanpa mengklaim selesai.
+Kontrol keyboard PageUp/PageDown/ArrowLeft/ArrowRight; toolbar responsif.
+
+
+### Komponen G10/G11 (25-10-2026)
+
+Antrean Guru memakai tabel a-tbl, filter Gen–Mapel terotorisasi dan
+paginasi server 25 baris. Detail menampilkan identitas siswa/TP/Materi,
+isi jawaban dengan linebreak ter-escape, pesan salah/sukses, nilai 0–100,
+konfirmasi final, umpan balik dan tombol Simpan & Berikutnya. Elemen
+.a-penilaian-* dalam app.css mengikuti tombol, form dan warna yang
+sudah ada. Halaman tidak menampilkan aksi mengubah nilai historis;
+revisi harus melalui jalur AB-33.

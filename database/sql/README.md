@@ -1,4 +1,4 @@
-# SQL SLA-SKS v2.3 — Pembaruan berurutan
+# SQL SLA-SKS — Panduan pembaruan bernomor (Master v2.4)
 
 ## Instalasi lama dengan K2-0003 (sudah ada data)
 
@@ -70,3 +70,238 @@ Ketika versi baru diterbitkan, status versi aktif lama menjadi diarsipkan; teks 
 **Batas tahap K3A:** proposal CP dari Guru dan keputusan Admin atas usulan (`usulan_cp`) serta penautan TP–CP belum tersedia, harus dibangun pada PR akademik berikutnya sebelum BAB/TP aktif. Setelah modul siap, penautan TP baru hanya memilih versi CP `aktif` dengan kurikulum/mapel/fase yang cocok; tautan historis tetap.
 
 Jika impor gagal setelah sebagian DDL, periksa database dan pulihkan backup sebelum mencoba kembali.
+
+## S01-0014 — Progres TP dan version pinning Siswa (v2.4, 24 Oktober 2026)
+
+**Prasyarat:** database XAMPP telah berisi skema v2.4 terkini dan memiliki tabel
+`siswa`, `tp`, `paket_semester`, `versi_konten_tp`, `penugasan_paket`.
+Berkas SQL: `database/sql/updates/0014_progres_tp_pin.sql`.
+
+1. **Backup** database aktif menggunakan phpMyAdmin sebelum perubahan, serta
+   simpan backup `writable/` sebagai bagian prosedur proyek. Gunakan database
+   pengujian lokal dahulu, bukan database produksi.
+2. Pastikan tabel belum ada: `SHOW TABLES LIKE 'progres_tp';`. Jika sudah ada,
+   **hentikan** dan periksa struktur/data; jangan mengimpor ulang atau mereset.
+3. Impor **sekali** `0014_progres_tp_pin.sql` melalui phpMyAdmin pada database
+   SLA-SKS v2.4. Patch ini **hanya CREATE TABLE**, tanpa DROP/DELETE/TRUNCATE
+   dan tanpa Migration/Seeder. Karena DDL MySQL memiliki implicit commit,
+   rollback otomatis terhadap CREATE TABLE **tidak tersedia**; gunakan backup
+   bila impor gagal dan pemeriksaan sebelum mencoba ulang.
+4. Verifikasi `SHOW CREATE TABLE progres_tp;` dan
+   `SELECT COUNT(*) AS total FROM progres_tp;` (awal 0).
+5. Pada TP **Siap**, login **Siswa pengujian** dari Gen/paket yang benar.
+   Buka `/siswa/tp/{id}`, klik `Aktifkan TP & simpan versi`, lalu cek ulang
+   halaman dan `SELECT id,siswa_id,tp_id,versi_konten_tp_id,status FROM progres_tp;`.
+   Semestinya **satu** record per siswa–TP–versi paket; status `diagnostik`,
+   dengan versi snapshot yang tetap ketika reload/POST berulang.
+6. Coba siswa dari Gen lain dan TP selanjutnya; harus ditolak. **Jangan**
+   memakai akun siswa nyata untuk uji aktivasi sebelum disepakati karena
+   pengikatan historis bersifat permanen dan tidak memiliki tombol reset.
+7. Belum membuat `percobaan_ujian`, jawaban, skor, ataupun progres Materi.
+   Diagnostik wajib dipasang pada tahap selanjutnya; **tidak ada tombol
+   Mulai Diagnostik** sebelum keamanan fullscreen/timer/acak soal tersedia.
+
+**Kompatibilitas:** kolom/progres berkaitan langsung dengan `siswa`, `tp`,
+`paket_semester`, dan `versi_konten_tp`; nama tabel dan tipe FK memerlukan
+verifikasi terhadap skema nyata sebelum impor hosting MariaDB. Tidak ada data
+siswa di GitHub. Jika skema yang terpasang ternyata memiliki tabel setara
+`progres_tp`, lakukan review dan penyelarasan patch, bukan menjalankan DDL
+yang berpotensi konflik.
+
+
+## S06A — Fondasi Mesin Ujian Diagnostik / Sumatif Ketat (24 Oktober 2026)
+
+**Patch:** `database/sql/updates/0015_mesin_ujian_fondasi.sql`, **sesudah** `0014_progres_tp_pin.sql`.
+
+Tahap S06A membangun **skema historis** dan **aturan domain murni**, belum mengizinkan siswa membuat percobaan. Akses S05 petunjuk dan uji fullscreen tetap seperti PR #45. **Tidak ada rute Mulai Ujian, tombol ujian, jawaban, atau nilai baru**.
+
+1. **Backup database XAMPP lebih dahulu**. Jangan mengimpor ulang dump instalasi atau memodifikasi progres nyata.
+2. Periksa `SHOW TABLES LIKE 'percobaan_ujian';` dan `SHOW CREATE TABLE progres_tp;`. Jika sudah ada tabel ujian, **hentikan** dan bandingkan struktur; SQL tahap ini bukan patch overwrite.
+3. Impor **sekali** `0015_mesin_ujian_fondasi.sql` melalui phpMyAdmin pada database lokal yang sudah mengandung `progres_tp`, `versi_konten_tp`. DDL MySQL/MariaDB melakukan implicit commit: backup diperlukan bila ada kegagalan sebagian. **Jangan hapus tabel hasil impor parsial tanpa inspeksi terlebih dahulu**.
+4. Verifikasi enam tabel: `percobaan_ujian`, `butir_percobaan`, `jawaban_percobaan`, `riwayat_status_ujian`, `segmen_jeda_ujian`, `pelanggaran_ujian`. Jalankan `SHOW CREATE TABLE percobaan_ujian;` dan `SELECT COUNT(*) AS total FROM percobaan_ujian;`, semestinya **0**.
+5. Tidak perlu menekan tombol lain di S05: pada tahap ini halaman tidak diubah. Pengujian otomatis menggunakan data sintetis, bukan siswa XAMPP/hosting.
+6. **S06B** akan menambahkan adapter transaksional `FOR UPDATE`, rekonsiliasi pada setiap request, antarmuka fullscreen tanpa sidebar, token percobaan sulit ditebak, pengacakan dalam transaksi, penyimpanan jawaban idempoten dan penilaian sah. Tombol Mulai Ujian hanya boleh muncul setelah seluruh kontrol itu terhubung dan diuji.
+
+**Kontrak tabel:** `percobaan_ujian` mengikat `progres_tp` dan `versi_konten_tp`; `butir_percobaan` menyimpan opsi/kunci teracak, `jawaban_percobaan` memiliki UNIQUE per percobaan–butir dan FK komposit yang mencegah jawaban pada butir milik percobaan lain. Segmen jeda, riwayat status, dan insiden memiliki riwayat append-only. Keadaan batal tidak mempunyai nilai sah; batas 20/90/180/300 detik dan pelanggaran ketiga berasal dari Master Document 07, bukan konfigurasi baru.
+
+**QA:** PHPUnit aturan murni, uji PHP lint, serta impor DDL menggunakan **MariaDB sementara dengan parent sintetis** di GitHub Actions. Pengujian MariaDB bukan bukti otomatis kesesuaian semua tipe FK pada dump MySQL XAMPP; uji impor lokal tetap wajib. Tidak ada Migration/Seeder atau data siswa nyata di repo.
+
+## S06B — Pelaksanaan Diagnostik nyata (24 Oktober 2026)
+
+**Tidak ada SQL tambahan untuk tahap ini.** S06B menggunakan tabel yang
+sudah dibuat melalui patch 0014 (progres_tp) dan 0015 (enam tabel ujian).
+**Jangan mengimpor ulang** dua patch tersebut bila tabel sudah tersedia.
+
+Sebelum pengujian browser XAMPP:
+1. Backup database dan gunakan akun **Siswa khusus uji**, bukan data siswa nyata,
+   sebab Diagnostik yang selesai/batal bersifat historis dan tidak tersedia reset.
+2. Login Siswa dengan TP pertama Siap serta progres Diagnostik yang terpin;
+   buka S05, lalu **Masuk ruang Tes Diagnostik**.
+3. Uji masuk fullscreen. Sebelum fullscreen berhasil, tidak boleh ada baris
+   `percobaan_ujian`. Sesudah mulai, harus ada satu percobaan serta butir teracak.
+4. Uji pilihan A–E, pergantian soal, refresh, koneksi offline, keluar fullscreen,
+   jeda/pulih, submit, timeout aktif dan hasil. **Simpan** hanya berhasil jika server
+   mengonfirmasi. Percobaan batal tak boleh memiliki skor.
+5. Pastikan satu siswa tidak memperoleh dua percobaan normal dari refresh/klik
+   dua kali. Perubahan status progres menjadi `tuntas` (≥KKM), `belajar` (<KKM)
+   atau `perlu_bantuan` (batal) adalah perubahan data **nyata**.
+6. Uji halaman hasil/status setelah ujian selesai, akses Gen lain dan perangkat
+   tanpa fullscreen. Bila error, kumpulkan teks error dan status di tabel
+   percobaan; **jangan** DELETE, TRUNCATE, DROP, reset skor ataupun mengubah
+   snapshot untuk mencoba lagi. Laporkan agar diperbaiki melalui patch aman.
+7. Modul tindak lanjut Guru pada percobaan batal serta pelaksanaan Materi,
+   Resume/HOTS, Sumatif dan laporan masih tahap lanjutan.
+
+Pemeriksaan SQL baca-saja:
+
+```sql
+SELECT id, progres_tp_id, jenis, status, jumlah_soal,
+       jumlah_pelanggaran_fullscreen, skor, jumlah_benar
+FROM percobaan_ujian
+ORDER BY id DESC;
+SELECT percobaan_ujian_id, COUNT(*) AS jawaban_disimpan
+FROM jawaban_percobaan
+GROUP BY percobaan_ujian_id;
+```
+
+
+## S08B — Pencatatan aktivitas media (24 Oktober 2026)
+
+**Patch baru:** `database/sql/updates/0016_progres_aktivitas_materi.sql`.
+Sesudah `0014_progres_tp_pin.sql` dan `0015_mesin_ujian_fondasi.sql` yang
+sudah diimpor. **Backup database XAMPP** lebih dahulu. Impor hanya sekali
+dengan phpMyAdmin pada database SLA-SKS yang sedang digunakan. Jangan
+mengimpor ulang dump instalasi, menghapus hasil percobaan ujian, atau
+menerapkan Migration/Seeder.
+
+Dua tabel ditambahkan: `progres_materi` (unik per progres TP × Materi ×
+versi snapshot terpin) dan `halaman_progres_materi` (satu baris per halaman
+per progres untuk pembaca PDF.js lokal pada tahap berikutnya).
+
+Verifikasi baca-saja:
+```sql
+SHOW CREATE TABLE progres_materi;
+SHOW CREATE TABLE halaman_progres_materi;
+SELECT COUNT(*) AS jumlah_progres_media FROM progres_materi;
+SELECT progres_tp_id,materi_id,jenis,status,waktu_aktif_detik,waktu_putar_detik
+FROM progres_materi ORDER BY id DESC;
+```
+
+Saat pertama diimpor, jumlah progres media seharusnya **0**. Setelah
+Siswa pengujian jalur `belajar` menonton audio/YouTube atau melihat gambar
+di halaman aktif, POST heartbeat menciptakan progres bila diperlukan, dan
+kredit detik berikutnya hanya berasal dari request berjarak 5–20 detik,
+dihitung dengan jam server. Progres `media_selesai` hanya untuk durasi
+yang lolos aturan; **bukan** tanda tugas Resume/HOTS selesai. Jalur
+`tuntas` belajar sukarela tidak menciptakan baris progres resmi.
+
+**Batas tahap:** pembaca PDF yang ada di S08A masih iframe browser.
+Iframe tidak membuktikan halaman yang dibaca. S08B tidak mengarang
+kredit PDF: pencatatan PDF sampai `media_selesai` menunggu PDF.js lokal
+dan pengujian aktivitas setiap halaman; tabel halaman sengaja masih kosong.
+Peristiwa browser (fokus/pemutar) adalah mitigasi best-effort, bukan bukti
+antikecurangan absolut.
+
+**QA:** MariaDB sementara di GitHub Actions (DDL/FK/UNIQUE) dan unit test
+aturan durasi. Uji browser dan impor pada MySQL XAMPP tetap diperlukan.
+
+
+## S09/S10 — Resume dan HOTS per Materi (25 Oktober 2026)
+
+Patch additive: database/sql/updates/0017_kegiatan_resume_hots_materi.sql.
+**Backup MySQL/MariaDB dan writable/ sebelum impor.** Jalankan SETELAH
+0016_progres_aktivitas_materi.sql (serta 0014/0015) terpasang. Jangan mereset
+atau mengimpor ulang nilai Diagnostik maupun progres siswa.
+
+1. Periksa tabel resume_materi dan **jawaban_hots_materi** belum tersedia.
+   Tabel **tugas_hots_materi adalah bank pertanyaan Guru** dan tidak boleh dibuat ulang.
+   Jika salah satunya sudah ada, hentikan dan bandingkan struktur.
+2. Impor 0017 **sekali** melalui phpMyAdmin pada database XAMPP yang digunakan.
+3. Jalankan SHOW CREATE TABLE untuk resume_materi dan jawaban_hots_materi; SELECT COUNT(*) pada tabel
+   awal semestinya 0 sebelum ada pengiriman.
+4. Siswa pengujian jalur belajar: buka Materi pertama, tuntaskan media,
+   Simpan Draf Resume, reload, Kirim Final Resume, Simpan/Kirim Final HOTS;
+   setelah semua terpenuhi tombol Materi Selanjutnya dapat dibuka.
+   Jalur tuntas Diagnostik hanya membaca sukarela. Pengiriman final dua kali
+   tidak membuat duplikat, draf setelah final ditolak.
+5. Arsip tahap sebelum PDF.js: PDF tidak dapat menyelesaikan media saat itu; **pada tahap S08D pembaca PDF.js lokal sudah dibuat**.
+   Jangan bypass dengan SQL manual. Pengiriman jawaban dan penilaian Guru
+   memerlukan integritas proses belajar.
+
+Belum ada UI penilaian Guru ataupun Sumatif dalam tahap ini. Tabel menyimpan
+kolom penilaian untuk tahap berikutnya, namun tidak mengisi nilai secara otomatis.
+
+
+### Galat #1050 dan peringatan CHECK pada impor 0017 (25 Oktober 2026)
+
+JANGAN impor 0017 ulang atau DROP/TRUNCATE tabel yang telah terbentuk.
+Galat server #1050 Table already exists berarti objek target telah ada.
+Tiga peringatan Data statis pada CHECK berasal dari parser phpMyAdmin,
+bukan kode galat yang sama. SQL untuk instalasi BARU diperbaiki agar
+CHECK berada inline di definisi kolom nilai (rentang 0–100 tetap dijaga).
+Tabel yang sudah terbentuk dengan constraint CHECK lama tetap sah, tidak
+perlu dibuat ulang atau diubah.
+
+LANGKAH AMAN:
+1. Di phpMyAdmin pilih DB aktif, jalankan file
+   database/sql/qa/0017_verifikasi_kegiatan_readonly.sql pada tab SQL.
+   File hanya SELECT metadata dari information_schema.
+2. Jika KEDUA tabel SUDAH_ADA, cocokkan 14 kolom per tabel, PRIMARY,
+   UNIQUE gabungan, empat FOREIGN KEY, dan CHECK skor (jika didukung).
+   Jika cocok, SQL 0017 telah terpasang: jangan impor ulang.
+3. Jika hanya salah satu tabel yang ada atau strukturnya berbeda,
+   STOP. Jangan menjalankan sisa CREATE sembarangan atau menghapus tabel;
+   simpan hasil pemeriksaan tanpa data pribadi untuk patch additive terarah.
+4. Hanya jika kedua tabel BELUM_ADA, backup DB lalu impor sekali.
+   Tidak menggunakan CREATE TABLE IF NOT EXISTS sebab dapat
+   menyamarkan struktur tabel yang sudah ada tetapi tidak cocok.
+
+Pengujian SQL di MariaDB CI bukan pengganti verifikasi MySQL di XAMPP.
+
+### S08D Pembaca PDF per halaman: **TANPA impor SQL baru**
+
+Menggunakan kedua tabel yang telah dibuat SQL 0016, yaitu progres_materi dan
+halaman_progres_materi. Patch 0017 yang sudah FIX tetap sama; jangan impor
+0016 atau 0017 ulang dan jangan menghapus data. Jika tabel 0016 ada,
+langsung uji pembaca PDF siswa di branch S08D setelah backup rutin. Setiap
+detak PDF tercatat pada snapshot Materi terpin; jumlah halaman berasal
+dari berkas unggahan Guru. Perubahan ini tidak menyentuh
+PdfMateriValidator.php atau validator batas 15 MB/40 halaman.
+
+
+### G10/G11 Penilaian Guru — tanpa impor SQL baru
+
+Tabel Resume/HOTS SQL 0017 yang sudah berhasil diimpor memiliki
+kolom nilai, dinilai_oleh, dinilai_pada, umpan_balik. Tahap G10/G11
+menggunakan kolom tersebut; **jangan impor ulang SQL 0016/0017**,
+jangan DROP/TRUNCATE jawaban atau progres. Pemeriksaan nilai pertama
+menggunakan transaksi, audit, dan perizinan G1 per Gen–Mapel; koreksi
+nilai historis tetap memerlukan alur AB-33 terpisah.
+
+
+### Koreksi nama tabel HOTS dan pemulihan instalasi 0017 parsial (25-10-2026)
+
+Inspeksi dump lokal memperlihatkan tabel tugas_hots_materi **sudah merupakan
+bank pertanyaan HOTS Guru**, berisi materi_id, row_uuid, pertanyaan, petunjuk.
+Tabel tersebut TIDAK BOLEH dihapus, diubah nama atau dipakai menyimpan
+jawaban siswa. Jawaban siswa sekarang menggunakan tabel jawaban_hots_materi.
+
+Untuk database lokal yang sempat mengimpor 0017 parsial (resume_materi ada,
+sementara jawaban_hots_materi belum ada), **jangan impor 0017 lagi**.
+Backup database, jalankan qa/0018_verifikasi_jawaban_hots_readonly.sql.
+Pastikan resume_materi 14 kolom, tabel bank Guru tetap utuh (5 kolom), dan
+jawaban_hots_materi masih BELUM_ADA. Lalu impor HANYA
+updates/0018_pemulihan_jawaban_hots_materi.sql sekali. Jalankan QA baca-saja
+kembali untuk mengonfirmasi jawaban_hots_materi 14 kolom. Tidak ada DROP,
+TRUNCATE, reset nilai atau migrasi/seeder. Instalasi baru memakai SQL 0017
+terkoreksi dan tidak perlu memanggil 0018 lagi.
+
+Kesalahan query database tidak boleh ditampilkan sebagai 403; kegagalan
+skema ditampilkan 503 dengan petunjuk memperbaiki SQL. 403 tetap khusus
+masalah hak akses yang sah.
+
+### Gerbang wajib SQL baru — 25 Oktober 2026
+
+**Kondisi saat ini: XAMPP lokal, belum deploy ke hosting.** Pekerjaan SQL berikutnya hanya boleh dimulai sesudah menerima dan memeriksa dump terbaru setelah patch terakhir. Dump TERBARU yang telah diterima dan diperiksa untuk audit ini ialah `sla_sks_v3 (3).sql` (203.295 byte, 52 tabel; header phpMyAdmin 25-10-2026 pukul 11.01, sementara metadata Windows Properties 17.01 pada hari yang sama). `jawaban_hots_materi` **sudah ada (14 kolom)** bersama `resume_materi` (14 kolom) dan bank Guru `tugas_hots_materi` (5 kolom). **Jangan impor ulang SQL 0017 atau 0018** pada kondisi tersebut. Perbedaan waktu pada header dan Windows tidak boleh ditafsirkan sebagai perbedaan file ataupun bukti zona waktu tertentu.
+
+Sebelum SQL baru: jalankan `qa/audit_kontrak_database_readonly.sql` di DB yang benar, verifikasi metadata dan `schema_version`; bandingkan SQL historis serta query Service; backup DB+`writable/`. Jangan impor ulang 0017 atau 0018 jika objek telah ada. Semua perubahan skema harus patch **bernomor baru**, additive, diuji terhadap seluruh tabel nyata dan diputuskan setelah dump terbaru. Jangan me-reset database, menimpa data siswa, atau menaruh dump privat di repo.

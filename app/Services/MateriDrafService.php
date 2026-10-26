@@ -9,7 +9,7 @@ use DomainException;
 use Throwable;
 
 /**
- * CRUD terbatas Materi TP draf; tanpa penghapusan, publikasi atau unggahan berkas.
+ * CRUD Materi TP draf (tanpa publikasi/unggah berkas langsung).
  * Seluruh operasi mengunci TP induk, menguji hak G1 dan versi struktur.
  */
 final class MateriDrafService
@@ -25,7 +25,7 @@ final class MateriDrafService
     }
 
     /** @return array{judul:string,jenis:string,petunjuk_resume:string,petunjuk_hots:string,min_waktu_detik:int,url_youtube:?string} */
-    private function bersihkan(array $input): array
+    public function bersihkan(array $input): array
     {
         $judul = trim((string) ($input['judul'] ?? ''));
         $jenis = (string) ($input['jenis'] ?? '');
@@ -36,12 +36,20 @@ final class MateriDrafService
         $waktu = $formatMenit ? (int) round((float) $menit * 60) : -1;
         $url = trim((string) ($input['url_youtube'] ?? ''));
 
-        if ($judul === '' || mb_strlen($judul) > 180
-            || ! in_array($jenis, ['pdf', 'gambar', 'audio', 'youtube'], true)
-            || $resume === '' || mb_strlen($resume) > 20000
-            || $hots === '' || mb_strlen($hots) > 20000
-            || ! $formatMenit || $waktu < 0 || $waktu > 65535) {
-            throw new DomainException('Lengkapi judul, jenis media, petunjuk Resume/HOTS dan waktu yang valid.');
+        if ($judul === '' || mb_strlen($judul) > 180) {
+            throw new DomainException('Judul Materi wajib diisi (maksimal 180 karakter).');
+        }
+        if (! in_array($jenis, ['pdf', 'gambar', 'audio', 'youtube'], true)) {
+            throw new DomainException('Pilih jenis media yang tersedia: YouTube, PDF, Gambar atau Audio.');
+        }
+        if ($resume === '' || mb_strlen($resume) > 20000) {
+            throw new DomainException('Petunjuk Resume wajib diisi (maksimal 20.000 karakter).');
+        }
+        if ($hots === '' || mb_strlen($hots) > 20000) {
+            throw new DomainException('Petunjuk tugas HOTS wajib diisi (maksimal 20.000 karakter).');
+        }
+        if (! $formatMenit || $waktu < 0 || $waktu > 65535) {
+            throw new DomainException('Minimal waktu belajar harus 0–1092,25 menit; gunakan paling banyak 2 angka desimal.');
         }
 
         if ($jenis === 'youtube') {
@@ -131,8 +139,62 @@ final class MateriDrafService
             if ($lama['jenis'] !== $data['jenis'] && $lama['berkas_id'] !== null) {
                 throw new DomainException('Jenis media tidak boleh diubah ketika berkas sudah terhubung.');
             }
+                        if (in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true) && $lama['berkas_id'] === null) {
+                throw new DomainException('Pilih file PDF, gambar atau audio sebelum menyimpan perubahan Materi.');
+            }
             $this->db->table('materi')->where('id', $materiId)->where('tp_id', $tpId)
                 ->update($data);
+        });
+    }
+
+    /**
+     * Hapus hanya Materi pada TP draf milik Guru G1.
+     * FK database mencegah penghapusan Materi yang sudah direferensikan progres,
+     * tugas, snapshot, atau data historis. Berkas privat tidak ikut dihapus.
+     */
+    public function hapus(int $tpId, int $materiId, int $versi): void
+    {
+        if ($materiId < 1) {
+            throw new DomainException('Materi tidak ditemukan.');
+        }
+        $this->ubah($tpId, $versi, function () use ($tpId, $materiId): void {
+            $lama = $this->db->table('materi')->select('id,urutan')
+                ->where('id', $materiId)->where('tp_id', $tpId)
+                ->get()->getRowArray();
+            if ($lama === null) {
+                throw new DomainException('Materi tidak ditemukan dalam TP.');
+            }
+
+            // Lindungi semua referensi historis; jangan mengandalkan
+            // cascading delete pada database yang dipasang pengguna.
+            $tabelRujukan = [
+                'progres_materi', 'resume_materi', 'tugas_hots_materi',
+            ];
+            foreach ($tabelRujukan as $tabel) {
+                if ($this->db->tableExists($tabel)
+                    && $this->db->fieldExists('materi_id', $tabel)
+                    && $this->db->table($tabel)->where('materi_id', $materiId)->countAllResults() > 0) {
+                    throw new DomainException('Materi sudah memiliki aktivitas siswa sehingga tidak dapat dihapus.');
+                }
+            }
+
+            $this->db->table('materi')->where('id', $materiId)
+                ->where('tp_id', $tpId)->delete();
+            if ($this->db->affectedRows() !== 1) {
+                throw new DomainException('Materi tidak berhasil dihapus.');
+            }
+
+            // Setelah nomor yang dihapus kosong, geser baris sesudahnya
+            // secara menaik agar UNIQUE(tp_id, urutan) tetap terjaga.
+            $sesudah = $this->db->table('materi')->select('id,urutan')
+                ->where('tp_id', $tpId)
+                ->where('urutan >', (int) $lama['urutan'])
+                ->orderBy('urutan', 'ASC')->get()->getResultArray();
+            foreach ($sesudah as $baris) {
+                $this->db->table('materi')
+                    ->where('id', $baris['id'])->where('tp_id', $tpId)
+                    ->update(['urutan' => (int) $baris['urutan'] - 1]);
+            }
         });
     }
 

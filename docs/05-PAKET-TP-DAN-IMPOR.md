@@ -42,6 +42,7 @@ Struktur tabel Word: **Bagian | Isi | Benar**, satu blok `Soal n` dengan pertany
 
 ## 5. Media materi dan kegiatan Guru
 - PDF ≤15 MB, ≤40 halaman bawaan; gambar JPG/PNG/WebP dengan inspeksi dan kompres khusus **materi** sampai 1600 px; audio materi mp3/m4a ≤10 MB bawaan dan HTTP Range; video **materi pembelajaran** berupa tautan YouTube/embed yang valid. Media soal Word menggunakan **Google Drive** sesuai §3, tidak mengganti kebijakan media materi.
+  - **Catatan implementasi PDF yang telah diuji di XAMPP:** [Keputusan final validasi PDF Materi](KEPUTUSAN-VALIDASI-PDF-MATERI.md). Fokus batas file/halaman untuk kapasitas hosting dan panjang bahan belajar; jangan menambah larangan format internal PDF normal di luar ketentuan keamanan dokumen 14. Catatan ini tidak mengubah nilai batas atau hak akses.
 - Setiap Materi memiliki media/sumber belajar, instruksi Resume dan **satu tugas HOTS terkait Materi**, termasuk petunjuk. Guru tidak mengulang input judul Materi yang sudah diimpor. Semua media tampil pada pratinjau Guru.
 - Draf Resume/HOTS siswa disimpan manual; pengiriman final, penilaian dan prasyarat materi lanjut mengikuti dokumen 06/08.
 
@@ -69,3 +70,7 @@ TP/Materi/soal **draf yang belum diterbitkan dan belum punya progres/percobaan**
 
 ## 9. UI Guru
 Ruang utama: **Pilih Gen–Mapel/Kurikulum → Peta ATP enam semester → Editor TP dan Materi → Bank Word Diagnostik/Sumatif → Checklist TP Siap**. Menampilkan status kosong/loading/error/locked, breadcrumb Gen–Mapel, pratinjau dan tautan memperbaiki. TP Siap hanya menawarkan Lihat, Riwayat Versi, Ajukan Koreksi, tidak `Tarik ke Draf`.
+
+### Audit keselarasan instruksi dan bank HOTS (25 Oktober 2026)
+
+Kontrak satu tugas HOTS per Materi pada §5–6 **tetap berlaku**. Kode saat audit menyimpan `materi.petunjuk_hots` dari editor Guru dan membekukannya ke snapshot siswa; `tugas_hots_materi` adalah bank perintah Guru; `jawaban_hots_materi` adalah jawaban siswa. Ini **tiga objek berbeda** yang tidak boleh tertukar. `KesiapanTpService` saat ini memeriksa petunjuk HOTS, belum memeriksa baris bank tugas Guru. Belum boleh menyimpulkan tugas lengkap atau mengubah readiness, TP Siap, snapshot terpin, dan progres tanpa memeriksa dump terbaru serta kontrak akademik §5–6. Temuan teknis, bukan perubahan aturan bisnis.

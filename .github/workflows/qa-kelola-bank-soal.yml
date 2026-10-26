@@ -1,0 +1,50 @@
+name: QA Kelola Bank Soal Guru
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/HtmlSoalGuruService.php'
+      - 'app/Services/KelolaSoalGuruService.php'
+      - 'app/Services/MediaEditorSoalService.php'
+      - 'app/Services/ImporBankSoalService.php'
+      - 'app/Controllers/GuruSoal.php'
+      - 'app/Views/guru/soal_*.php'
+      - 'app/Views/guru/bank_soal.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/soal-editor.js'
+      - 'tests/unit/KelolaSoalGuruTest.php'
+      - '.github/workflows/qa-kelola-bank-soal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-dan-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/HtmlSoalGuruService.php
+          php -l app/Services/KelolaSoalGuruService.php
+          php -l app/Services/MediaEditorSoalService.php
+          php -l app/Services/ImporBankSoalService.php
+          php -l app/Controllers/GuruSoal.php
+          php -l app/Controllers/GuruBankSoal.php
+          php -l app/Views/guru/soal_form.php
+          php -l app/Views/guru/soal_lihat.php
+          php -l app/Views/guru/bank_soal.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/KelolaSoalGuruTest.php
+      - name: JavaScript lint
+        run: node --check public/assets/js/soal-editor.js
+      - name: Unit test kelola soal
+        run: vendor/bin/phpunit --no-coverage tests/unit/KelolaSoalGuruTest.php

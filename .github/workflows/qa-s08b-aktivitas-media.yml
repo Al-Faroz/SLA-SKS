@@ -1,0 +1,70 @@
+name: QA S08B Aktivitas Media Siswa
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/AturanAktivitasMateriService.php'
+      - 'app/Services/ProgresMediaMateriSiswaService.php'
+      - 'app/Controllers/SiswaAktivitasMateri.php'
+      - 'app/Views/siswa/materi.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/aktivitas-materi.js'
+      - 'database/sql/updates/0016_progres_aktivitas_materi.sql'
+      - 'tests/unit/AturanAktivitasMateriTest.php'
+      - 'tests/js/aktivitas-materi-status.test.cjs'
+      - 'tests/unit/MateriSiswaDatabaseTest.php'
+      - 'tests/js/aktivitas-materi-presisi.test.cjs'
+      - 'tests/integration/SqlProgresMateriCheck.php'
+      - '.github/workflows/qa-s08b-aktivitas-media.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: testroot
+          MARIADB_DATABASE: sla_s08_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      SLA_TEST_DB_DSN: 'mysql:dbname=sla_s08_test;host=127.0.0.1;port=3306;charset=utf8mb4'
+      SLA_TEST_DB_USER: root
+      SLA_TEST_DB_PASS: testroot
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, pdo_mysql, mbstring, intl, gd, zip, xml, dom, fileinfo, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP/JS lint
+        run: |
+          php -l app/Services/AturanAktivitasMateriService.php
+          php -l app/Services/ProgresMediaMateriSiswaService.php
+          php -l app/Controllers/SiswaAktivitasMateri.php
+          php -l app/Views/siswa/materi.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/AturanAktivitasMateriTest.php
+          php -l tests/unit/MateriSiswaDatabaseTest.php
+          php -l tests/integration/SqlProgresMateriCheck.php
+          node --check public/assets/js/aktivitas-materi.js
+          node --test tests/js/aktivitas-materi-status.test.cjs tests/js/aktivitas-materi-presisi.test.cjs
+      - name: Aturan waktu aktif dan seek
+        run: vendor/bin/phpunit --no-coverage tests/unit/AturanAktivitasMateriTest.php
+      - name: Integrasi SQLite izin dan heartbeat
+        run: vendor/bin/phpunit --no-coverage tests/unit/MateriSiswaDatabaseTest.php
+      - name: Schema MariaDB dua tabel
+        run: php tests/integration/SqlProgresMateriCheck.php

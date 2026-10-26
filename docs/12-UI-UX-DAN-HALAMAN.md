@@ -139,3 +139,39 @@ Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyb
 - Kartu konteks Gen–Mapel/Kurikulum, tombol **Unduh Excel ATP enam semester** dan Unggah Peta, pratinjau dengan validasi daftar CP resmi sesuai mapel saja.
 - Setiap TP mempunyai status draf/perlu dilengkapi/Siap, Materi berurutan dan tugas Resume/HOTS **per Materi**, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
 - Preview soal menampilkan konten kaya Word **pada pertanyaan dan A–E**, tabel di dalam tabel, Equation, gambar, pemutar audio/video Google Drive bila valid; soal/catatan yang gagal tidak dapat dikonfirmasi.
+
+
+### S08B YouTube/audio — tampilan syarat tercepat (26-10-2026)
+
+S08 menampilkan durasi media, minimum Guru, 90% media, **batas efektif yang lebih pendek**, waktu pemutaran yang benar-benar diakui dan bilah kemajuan berdasarkan batas efektif (bukan hanya satu syarat lain). Penghitung media yang tersimpan dan sudah memenuhi batas langsung membuka editor Resume melalui refresh hasil verifikasi server; HOTS tetap setelah Resume final. Jika API pemutar gagal, tampilkan galat yang dapat dimengerti tanpa memberi kredit waktu palsu. Menekan link refresh tidak bypass pemeriksaan server.
+
+
+### S09/S10 — status pengiriman dan pembatasan paste (26 Oktober 2026)
+
+Editor Resume/HOTS menampilkan indikator jumlah karakter sesuai batas
+snapshot dan alasan gagal kirim final tepat di editor. Tombol Simpan draf
+dan Kirim final menggunakan form action berbeda menuju endpoint
+POST terotorisasi. Redirect hasil kiriman menuju bagian Resume/HOTS
+yang bersangkutan. Input pada POST gagal dipulihkan; final sukses
+ditampilkan sebagai jawaban terkunci sesudah reload.
+
+Browser menolak paste/copy/cut dan drag/drop biasa sebagai pencegahan
+dasar; tidak menghalangi Unicode atau pengetikan normal. Kebijakan ini
+bukan bukti keaslian tulisan dan tidak bisa menjamin semua cara tempel
+dihentikan. Server tetap memeriksa final tanpa JavaScript.
+
+
+### S08 Audio / Gambar / PDF — perbaikan sinkronisasi status (26 Oktober 2026)
+
+Indikator progres harus memperlihatkan syarat yang sebenarnya: audio menampilkan waktu putar sah dan batas efektif, gambar menampilkan waktu total yang diakui server serta sisa durasi, dan PDF menampilkan waktu total, jumlah halaman selesai, daftar beberapa halaman yang belum memenuhi minimal 15 detik dan alasan belum tuntas. Bilah media tidak boleh 100% hanya karena satu syarat selesai. Begitu server menyatakan `media_selesai`, GET ulang merender Resume tanpa perlu klik tombol manual; HOTS tetap sesudah Resume Final. Gagal/tertunda heartbeat tidak boleh dinyatakan sukses palsu.
+
+### Status presisi Gambar dan PDF (26 Oktober 2026)
+
+Waktu gambar/PDF dibaca dari heartbeat sah 5 detik. Gambar yang tidak terlihat/fokus tidak memberi kredit; kembali aktif memulai baseline baru, tanpa mereset akumulasi waktu. PDF menampilkan detik baca untuk halaman aktif (misalnya 10/15 detik) dan halaman lain yang belum selesai. Zoom/fullscreen/resize tidak memberi kredit otomatis dan tidak menghanguskan progres halaman yang telah sah. Hanya status media_selesai dari server yang mengaktifkan Resume melalui pemuatan ulang.
+
+**Area PDF:** selain pemeriksaan halaman PDF.js yang sudah render, waktu hanya dihitung ketika area pembaca setidaknya setengah terlihat di layar dan tab/jendela aktif. Status menampilkan sisa durasi per halaman; tidak memberi kredit ketika siswa sedang melihat bagian halaman web lainnya.
+
+
+### Unduh materi setelah media_selesai
+
+Pada kartu Media Audio/Gambar/PDF, tampilkan tombol `Unduh Materi` yang nonaktif dengan penjelasan ketika waktu belajar belum selesai. Setelah server menetapkan `media_selesai`, tampilkan tautan unduh asli. URL harus memiliki gerbang backend yang sama, tidak cukup kontrol tombol saja; respons attachment menggunakan nama berkas aman dan tidak membocorkan path privat.

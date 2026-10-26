@@ -142,3 +142,65 @@ Fitur dinyatakan selesai bila **aturan domain + izin + data SQL + route/service 
 
 ### Uji kontrak SQL lokal khusus v2.4
 Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin pemilik**, periksa jumlah data terpilih, FK, nomor ATP dan referensi CP, login sah (tanpa membuka password/hash ke log), tidak ada BAB operasional baru, TP berelasi langsung ke paket, HOTS per Materi, kemampuan restore; **uji di MariaDB dengan jalur non-destruktif yang berbeda**. Uji ini **belum** dilakukan pada perubahan dokumen saja.
+
+## 5. Gerbang wajib audit SQL/DB sebelum menerima fitur (25-10-2026)
+- Dump XAMPP **terbaru setelah patch terakhir** sudah benar-benar diterima; periksa waktu ekspor, nama DB, versi MariaDB/MySQL, skema, indeks, FK/UNIQUE/CHECK, status `schema_version` dan histori yang harus dipertahankan. Dump lama tidak dapat dijadikan bukti DB aktif.
+- **Regresi benturan nama:** tabel bank HOTS Guru `tugas_hots_materi` dapat berisi baris dan tetap utuh saat jawaban siswa ditulis pada `jawaban_hots_materi`; Resume di `resume_materi`. Jangan membuat fixture yang hanya mencakup tabel baru.
+- **Regresi kontrak Materi:** TP Siap memiliki media, instruksi Resume dan satu tugas HOTS per Materi sesuai Master 05; periksa snapshot terpin, tabel bank Guru, dan kesiapan tanpa memodifikasi progres/TP Siap secara tak sah.
+- **Regresi konfigurasi:** minimal panjang Resume/HOTS harus mengacu pada `tp.resume_min` dan `tp.tugas_min` versi snapshot, bukan nilai default hardcode; pengujian berbagai konfigurasi dan versi TP sebelum perubahan Service dinyatakan FIX.
+- **Regresi pengguna:** E2E-020–024, 039, 073–074, 095–098 termasuk draf/final, rute Guru Gen lain, idempoten, penilaian 0–100, koreksi nilai, banyak Materi dan status siswa tuntas Diagnostik.
+- **Galat yang benar:** masalah SQL bukan HTTP 403 atau instruksi ganti peran; 403 khusus izin sah, 503 khusus dependensi hilang, 500 untuk kegagalan server lain, log internal tanpa data sensitif.
+- **Lingkungan uji:** jalankan SQL pada salinan struktur MariaDB XAMPP versi aktual, serta mesin kompatibilitas terpisah; GitHub Actions sukses tidak berarti browser/DB lokal telah lolos. **Hosting belum digunakan.**
+- **Perubahan aman:** backup DB+`writable/`, QA sebelum/sesudah hanya SELECT; patch additive bernomor baru, tidak overwrite patch yang sudah pernah diterapkan, tidak reset data, dan tidak push dump SQL privat.
+
+
+### E2E pengganti ketentuan ganda S08B (26-10-2026)
+
+- Guru 600 detik; YouTube 420 detik: batas efektif 378 detik, tepat saat waktu putar sah mencapai 378 maka media_selesai, Resume terbuka. Tidak menunggu 600 detik.
+- Guru 600 detik; YouTube 900 detik: batas efektif 600 detik, tepat saat pemutaran sah mencapai 600 maka media_selesai. Tidak menunggu 810 detik.
+- Guru 360 detik; video 9.968 detik; progres lama mencatat 380 detik waktu putar sah: GET status siswa merekonsiliasi ke media_selesai secara idempoten tanpa memutar ulang, kemudian form Resume dibuka dari server.
+- Hanya lompatan seek posisi jauh tetapi `waktu_putar_detik` kurang target tidak membuka Resume. Keadaan tab tersembunyi, seek, playback cepat, jeda panjang, siswa bukan pemilik progres atau jalur sukarela juga tidak boleh memberi kredit/akses.
+- Audio mengikuti keputusan sama; gambar/PDF tetap mengikuti syaratnya sendiri; tidak ada SQL baru dan progres/nilai historis tidak di-reset.
+
+
+### Regresi S09/S10 Kirim Final HOTS dan anti-paste (26 Oktober 2026)
+
+- Setelah media selesai dan Resume final, HOTS dapat Simpan draf.
+  Kirim final HOTS dengan teks minimal sesuai tugas_min snapshot harus
+  menulis final di jawaban_hots_materi dan membuka Materi berikutnya.
+- HOTS terlalu pendek ditolak dengan pesan yang terlihat di editor,
+  bukan hanya atas halaman, dan isian POST gagal tidak hilang.
+- Rute eksplisit /simpan dan /kirim tidak menggantungkan aksi pada
+  kelengkapan parameter submitter; mismatch URL/aksi ditolak.
+- POST final identik idempoten; tidak mengubah nilai/penilai dan tidak
+  membuat log ganda. Bank Guru tugas_hots_materi tetap utuh.
+- Browser mencegah paste, copy/cut, drop dan beforeinput paste biasa,
+  namun pengetikan biasa/Unicode tetap berfungsi. Ini mitigasi saja,
+  bukan anti-kecurangan absolut.
+
+
+### Regresi S08 non-YouTube — pencatatan batas waktu (26 Oktober 2026)
+
+- Audio dengan waktu Guru lebih lama dari 90% durasi: putaran sah mencapai 90% => media_selesai; audio pendek mencatat heartbeat awal dan sisa detak saat `ended`, tanpa menganggap seek sebagai waktu putar.
+- Gambar dengan waktu minimum Guru 60 detik: hanya detak ketika gambar termuat, area gambar >=50% viewport, tab aktif/fokus. Waktu aktif 60 detik yang telah tercatat namun status masih berjalan direkonsiliasi oleh server tanpa menghapus hasil.
+- PDF dua halaman: keduanya minimal 15 detik; total harus mencapai waktu Guru, tidak cukup hanya membuka seluruh halaman atau mencapai total tanpa melihat salah satu halaman. Daftar halaman belum lengkap muncul di UI; sinyal perpindahan saat request sebelumnya berlangsung tidak hilang.
+- Status selesai membuka Resume via reload server, HOTS hanya setelah Resume final; siswa jalur Diagnostik tuntas dan akses Gen lain tetap ditolak untuk pengiriman resmi. Tidak ada perubahan SQL/versi TP/hasil penilaian.
+
+### Uji regresi presisi Gambar/PDF (26 Oktober 2026)
+
+- Gambar selesai pada enam detak 5 detik sah ketika area pengamatan sedikitnya 50% terlihat dan tab fokus.
+- Scroll gambar ke luar viewport atau kehilangan fokus lalu kembali: reset sesi tidak boleh memberi kredit bagi waktu tersembunyi; akumulasi sebelumnya tidak hilang.
+- Detak pada 4 detik tidak dihitung dan tidak membuang baseline. Detak berikut di detik ke-6 menghitung 6 detik sah. Interval di atas 20 detik tetap nol.
+- PDF tiap halaman selesai tepat setelah 15 detik sah, bukan harus menunggu 20 atau 30 detik; halaman lain tetap perlu sesi sendiri.
+- Zoom/resize pada halaman sama tidak menyebabkan reset halaman; ganti nomor halaman, tab tersembunyi dan kehilangan fokus mereset sesi.
+- Status PDF menampilkan waktu per halaman serta daftar yang belum selesai. Resume hanya terbuka jika seluruh halaman memenuhi 15 detik serta total waktu Guru terpenuhi.
+- Tidak mengubah video YouTube/audio yang sudah FIX, tidak menambah SQL dan tidak melakukan reset data siswa. Uji akhir interaksi nyata diperlukan di XAMPP.
+
+**Regresi visibilitas PDF:** canvas PDF sudah dirender tetapi area pembaca <50% viewport ⇒ tidak ada POST heartbeat; setelah area terlihat ⇒ detak baseline tanpa kredit, berikutnya tiap 5 detik. Scroll keluar/masuk lagi harus reset dan tidak menambah durasi sembunyi. Navigasi ke halaman lain harus memakai nomor baru dan baseline baru.
+
+
+### Regresi akses unduh Media
+
+- Siswa jalur wajib sebelum `media_selesai` tidak dapat membuka `.../unduh` sekalipun mengetik URL langsung. Setelah media_selesai, audio/gambar/PDF dapat diunduh dengan `Content-Disposition: attachment`.
+- Siswa lintas Gen, versi TP yang berbeda, atau Materi berikutnya terkunci tetap ditolak. Siswa jalur Diagnostik tuntas (belajar sukarela) tidak memperoleh tombol unduh resmi.
+- YouTube tidak memiliki unduhan. URL file dari media yang digunakan untuk preview tetap inline, tidak menjadi jalan pintas mengunduh resmi tanpa ketuntasan.

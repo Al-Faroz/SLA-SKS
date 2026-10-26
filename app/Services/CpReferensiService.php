@@ -119,7 +119,7 @@ final class CpReferensiService
     }
 
     /** @return array{kurikulum:list<array<string,mixed>>,mapel:list<array<string,mixed>>,cp:list<array<string,mixed>>} */
-    public function daftar(): array
+    public function daftar(bool $sertakanCp = true): array
     {
         $this->admin();
         $kurikulum = $this->db->table('ref_kurikulum')
@@ -127,19 +127,24 @@ final class CpReferensiService
             ->orderBy('id', 'DESC')->get()->getResultArray();
         $mapel = $this->db->table('ref_mapel')
             ->select('id,kode,nama')->orderBy('nama')->get()->getResultArray();
-        $cp = $this->db->query(
-            "SELECT c.id,c.kode,m.nama AS mapel_nama,k.nama AS kurikulum_nama,
-                    k.versi AS kurikulum_versi, f.kode AS fase,
-                    a.id AS versi_aktif_id,a.nomor_versi AS versi_aktif,
-                    d.id AS versi_draf_id,d.nomor_versi AS versi_draf
-             FROM ref_cp c
-             INNER JOIN ref_mapel m ON m.id=c.mapel_id
-             INNER JOIN ref_kurikulum k ON k.id=c.kurikulum_id
-             INNER JOIN ref_fase f ON f.id=c.fase_id
-             LEFT JOIN ref_cp_versi a ON a.cp_id=c.id AND a.status='aktif'
-             LEFT JOIN ref_cp_versi d ON d.cp_id=c.id AND d.status='draf'
-             ORDER BY m.nama,c.kode,c.id"
-        )->getResultArray();
+        // Hanya halaman lama yang masih membutuhkan seluruh CP. Halaman daftar baru
+        // memakai pagination SQL pada CpDaftarService (tanpa memuat semua CP).
+        $cp = [];
+        if ($sertakanCp) {
+            $cp = $this->db->query(
+                "SELECT c.id,c.kode,m.nama AS mapel_nama,k.nama AS kurikulum_nama,
+                        k.versi AS kurikulum_versi, f.kode AS fase,
+                        a.id AS versi_aktif_id,a.nomor_versi AS versi_aktif,
+                        d.id AS versi_draf_id,d.nomor_versi AS versi_draf
+                 FROM ref_cp c
+                 INNER JOIN ref_mapel m ON m.id=c.mapel_id
+                 INNER JOIN ref_kurikulum k ON k.id=c.kurikulum_id
+                 INNER JOIN ref_fase f ON f.id=c.fase_id
+                 LEFT JOIN ref_cp_versi a ON a.cp_id=c.id AND a.status='aktif'
+                 LEFT JOIN ref_cp_versi d ON d.cp_id=c.id AND d.status='draf'
+                 ORDER BY m.nama,c.kode,c.id"
+            )->getResultArray();
+            }
         return compact('kurikulum', 'mapel', 'cp');
     }
 

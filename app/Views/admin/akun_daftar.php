@@ -4,9 +4,13 @@
     $siswa = $jenis === 'siswa';
     $judulDaftar = $siswa ? 'Siswa' : 'Pengelola';
     $lokasi = site_url('admin/' . $jenis);
-    $jumlahHalaman = (int) max(1, ceil($total / $perHalaman));
 ?>
 <div class="a-admin-akun a-page">
+    <nav class="a-breadcrumb" aria-label="Breadcrumb">
+        <a href="<?= esc(site_url('admin'), 'attr') ?>">Beranda Admin</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page"><?= esc($judulDaftar) ?></span>
+    </nav>
     <header class="a-proto-heading a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Administrasi / Akun</p>
@@ -138,7 +142,7 @@
                 <div class="a-empty" role="status"><strong>Belum ada hasil.</strong><p>Belum ada akun atau tidak ada yang cocok dengan filter.</p></div>
             <?php else: ?>
                 <div class="a-tabel-gulir">
-                    <table class="a-tbl a-admin-akun__tabel">
+                    <table class="a-tbl a-tbl--cards a-admin-akun__tabel">
                         <thead><tr>
                             <th scope="col">Nama</th><th scope="col"><?= $siswa ? 'NISN' : 'Username' ?></th>
                             <th scope="col"><?= $siswa ? 'Gen' : 'Peran' ?></th>
@@ -147,9 +151,9 @@
                         <tbody>
                             <?php foreach ($pengguna as $akun): ?>
                             <tr>
-                                <td><strong><?= esc($akun['nama']) ?></strong><small class="a-admin-akun__subtitle"><?= (int) $akun['wajib_ganti_sandi'] ? 'Wajib ganti sandi' : 'Sandi aktif' ?></small></td>
-                                <td><?= esc($akun['username']) ?></td>
-                                <td>
+                                <th scope="row" data-label="Nama"><strong><?= esc($akun['nama']) ?></strong><small class="a-admin-akun__subtitle"><?= (int) $akun['wajib_ganti_sandi'] ? 'Wajib ganti sandi' : 'Sandi aktif' ?></small></th>
+                                <td data-label="<?= $siswa ? 'NISN' : 'Username' ?>"><?= esc($akun['username']) ?></td>
+                                <td data-label="<?= $siswa ? 'Gen' : 'Peran' ?>">
                                     <?php if ($siswa): ?>
                                         <?php if ($akun['angkatan_id'] === null): ?>
                                             <span class="a-badge a-badge--tunggu">Belum ditempatkan</span>
@@ -175,8 +179,8 @@
                                         <?= esc(implode(', ', $akun['daftar_peran'])) ?>
                                     <?php endif ?>
                                 </td>
-                                <td><span class="a-badge <?= $akun['status'] === 'aktif' ? 'a-badge--siap' : 'a-badge--tunggu' ?>"><?= esc(ucfirst($akun['status'])) ?></span></td>
-                                <td><div class="a-admin-akun__aksi">
+                                <td data-label="Status"><span class="a-badge <?= $akun['status'] === 'aktif' ? 'a-badge--siap' : 'a-badge--tunggu' ?>"><?= esc(ucfirst($akun['status'])) ?></span></td>
+                                <td data-label="Aksi"><div class="a-admin-akun__aksi">
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/edit'), 'attr') ?>">Ubah</a>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/reset-sandi'), 'attr') ?>">Reset sandi</a>
                                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/' . (int) $akun['id'] . '/status'), 'attr') ?>"><?= $akun['status'] === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' ?></a>
@@ -186,18 +190,16 @@
                         </tbody>
                     </table>
                 </div>
-                <?php if ($jumlahHalaman > 1): ?>
-                    <nav class="a-pager" aria-label="Halaman akun">
-                        <span>Halaman <?= (int) $halaman ?> dari <?= $jumlahHalaman ?></span>
-                        <div class="a-admin-akun__pagination">
-                            <?php foreach ([$halaman - 1 => 'Sebelumnya', $halaman + 1 => 'Berikutnya'] as $tujuan => $label): ?>
-                                <?php if ($tujuan >= 1 && $tujuan <= $jumlahHalaman): ?>
-                                    <a class="a-btn a-btn--sekunder" href="<?= esc($lokasi . '?' . http_build_query(['cari' => $cari, 'status' => $status, 'gen' => $genFilter, 'halaman' => $tujuan]), 'attr') ?>"><?= esc($label) ?></a>
-                                <?php endif ?>
-                            <?php endforeach ?>
-                        </div>
-                    </nav>
-                <?php endif ?>
+                <?= view('components/pager', [
+                    'urlPath' => 'admin/' . $jenis,
+                    'pageParam' => 'halaman',
+                    'halaman' => $halaman,
+                    'perHalaman' => $perHalaman,
+                    'total' => $total,
+                    'filter' => ['cari' => $cari, 'status' => $status, 'gen' => $siswa ? $genFilter : null],
+                    'label' => 'akun ' . $judulDaftar,
+                    'anchor' => 'judul-daftar',
+                ]) ?>
             <?php endif ?>
         </section>
     </div>

@@ -24,7 +24,7 @@ final class DetailTpService
     }
 
     /**
-     * @return array{tp:array<string,mixed>,paket:array<string,mixed>,jumlah_materi:int,materi:list<array<string,mixed>>}
+     * @return array{tp:array<string,mixed>,paket:array<string,mixed>,jumlah_materi:int,materi:list<array<string,mixed>>,checklist_konten:list<array{label:string,terpenuhi:bool,keterangan:string}>}
      */
     public function lihat(int $tpId): array
     {
@@ -77,7 +77,14 @@ final class DetailTpService
             ->orderBy('id', 'ASC')
             ->get()->getResultArray();
 
-        return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => count($materi), 'materi' => $materi];
+        // Indikator keberadaan tautan, bukan pemeriksaan CP utama/aktif/cocok.
+        // Fixture QA lama bisa belum memiliki tabel tp_cp.
+        $jumlahTautanCp = $this->db->tableExists('tp_cp')
+            ? $this->db->table('tp_cp')->where('tp_id', $tpId)->countAllResults()
+            : null;
+
+        return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => count($materi), 'materi' => $materi,
+            'checklist_konten' => ChecklistKontenTpService::periksa($tp, $materi, $jumlahTautanCp)];
     }
 
     /**

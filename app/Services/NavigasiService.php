@@ -13,8 +13,14 @@ final class NavigasiService
         $menu = [
             ['label' => 'Beranda', 'path' => $peran, 'aktif' => $aktif === $peran],
         ];
+        if ($peran === 'siswa') {
+            $menu[] = ['label' => 'Pembelajaran', 'path' => 'siswa/pembelajaran',
+                'aktif' => $aktif === 'pembelajaran'];
+        }
         if ($peran === 'guru') {
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
+            $menu[] = ['label' => 'Antrean Penilaian', 'path' => 'guru/penilaian',
+                'aktif' => $aktif === 'penilaian'];
         }
         if ($peran === 'admin') {
             foreach ([

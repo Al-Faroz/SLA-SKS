@@ -9,7 +9,7 @@
 4. Diagnostik SKS percepatan dua tahun/ketuntasan dan nilai madrasah dipertahankan persis; skor HOTS beberapa Materi menjadi komponen rata-rata HOTS TP, bobot 20/30/50 tetap.
 5. Admin CP tanpa kewajiban metadata resmi berulang; versi/sumber tetap dapat ditelusuri. KBC terintegrasi sesuai relevansi.
 6. UI enam halaman dan pagination/export/logo/favicon/profil mengikuti dokumen 12/13.
-7. Database **lokal pengembangan** nanti diganti melalui prosedur dump lama→analisis→pilih data perlu→buat dump final→backup→pemilik hapus tabel lokal→pemilik impor. Jangan menjalankan operasi destruktif di produksi.
+7. Database **masih XAMPP lokal, belum pernah deploy ke hosting**. Sebelum tiap pekerjaan SQL, pemilik mengirim **dump terbaru setelah pembaruan terakhir**. Developer memeriksa skema/versi/data sebelum patch baru. Default patch additive aman; **tidak mereset/menghapus tabel tanpa permintaan dan izin eksplisit**, bahkan di localhost.
 
 ## Data instalasi yang belum diberikan (bukan keputusan produk)
 - Dump SQL lokal terkini, versi PHP/MySQL/MariaDB nyata, data identitas sekolah/Guru/Gen/CP yang resmi.

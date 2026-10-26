@@ -1,0 +1,47 @@
+name: QA G10 G11 Penilaian Guru
+on:
+  pull_request:
+    paths:
+      - 'app/Services/PenilaianGuruService.php'
+      - 'app/Controllers/GuruPenilaian.php'
+      - 'app/Views/guru/antrean_penilaian.php'
+      - 'app/Views/guru/nilai_kegiatan.php'
+      - 'app/Config/Routes.php'
+      - 'app/Services/NavigasiService.php'
+      - 'public/assets/js/penilaian-guru.js'
+      - 'tests/unit/PenilaianGuruDatabaseTest.php'
+      - 'tests/unit/AuthFilterPeranAktifTest.php'
+      - 'app/Filters/AuthFilter.php'
+      - 'app/Views/publik/ditolak.php'
+      - '.github/workflows/qa-penilaian-guru.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Composer
+        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: PHP lint
+        run: |
+          php -l app/Services/PenilaianGuruService.php
+          php -l app/Controllers/GuruPenilaian.php
+          php -l app/Views/guru/antrean_penilaian.php
+          php -l app/Views/guru/nilai_kegiatan.php
+          php -l app/Config/Routes.php
+          php -l app/Services/NavigasiService.php
+          php -l tests/unit/PenilaianGuruDatabaseTest.php
+          php -l tests/unit/AuthFilterPeranAktifTest.php
+          php -l app/Filters/AuthFilter.php
+          php -l app/Views/publik/ditolak.php
+      - name: SQLite integration
+        run: vendor/bin/phpunit tests/unit/PenilaianGuruDatabaseTest.php tests/unit/AuthFilterPeranAktifTest.php --no-coverage
+      - name: JavaScript syntax
+        run: node --check public/assets/js/penilaian-guru.js

@@ -64,7 +64,7 @@
             <?php if ($guru === []): ?>
                 <div class="a-alert a-alert--info" role="status">Belum ada akun aktif dengan peran Guru. Buat akun Guru melalui pengelolaan pengguna terlebih dahulu.</div>
             <?php endif ?>
-            <div class="a-tabel-gulir"><table class="a-tbl a-tbl--luas">
+            <div class="a-tabel-gulir"><table class="a-tbl a-tbl--cards a-tbl--penugasan">
                 <thead><tr>
                     <th scope="col">Mata pelajaran</th>
                     <th scope="col">Guru pengampu Gen ini</th>
@@ -73,14 +73,16 @@
                 <tbody>
                     <?php foreach ($mapel as $item): ?>
                         <tr>
-                            <td><strong><?= esc($item['kode']) ?></strong><div><?= esc($item['nama']) ?></div></td>
-                            <td><?= $item['guru_id'] === null
+                            <th scope="row" data-label="Mata pelajaran"><strong><?= esc($item['kode']) ?></strong><div><?= esc($item['nama']) ?></div></th>
+                            <td data-label="Guru pengampu"><?= $item['guru_id'] === null
                                 ? '<span class="a-badge a-badge--tunggu">Belum ditugaskan</span>'
                                 : esc($item['guru_nama'] ?? 'Guru tidak tersedia') ?></td>
-                            <td>
+                            <td data-label="Ubah pengampu">
                                 <form method="post" class="a-form a-form-penugasan"
                                     action="<?= esc(site_url('admin/mapel-guru/' . (int) $item['id'] . '/gen/' . (int) $angkatanAktif . '/guru'), 'attr') ?>">
                                     <?= csrf_field() ?>
+                                    <input type="hidden" name="halaman_mapel" value="<?= (int) $mapelHalaman ?>">
+                                    <input type="hidden" name="halaman_riwayat" value="<?= (int) $riwayatHalaman ?>">
                                     <div class="a-field">
                                         <label class="a-label" for="guru-mapel-<?= (int) $item['id'] ?>">Guru pengampu</label>
                                         <select id="guru-mapel-<?= (int) $item['id'] ?>" name="guru_id">
@@ -101,6 +103,16 @@
                     <?php endforeach ?>
                 </tbody>
             </table></div>
+            <?= view('components/pager', [
+                'urlPath' => 'admin/mapel-guru',
+                'pageParam' => 'halaman_mapel',
+                'halaman' => $mapelHalaman,
+                'perHalaman' => $mapelPerHalaman,
+                'total' => $mapelTotal,
+                'filter' => ['gen' => $angkatanAktif, 'halaman_riwayat' => $riwayatHalaman],
+                'label' => 'penetapan Guru per Gen',
+                'anchor' => 'judul-pengampu',
+            ]) ?>
         <?php endif ?>
     <?php endif ?>
 </section>
@@ -110,8 +122,8 @@
     <?php if ($riwayat === []): ?>
         <div class="a-empty" role="status">Belum ada penetapan atau pergantian Guru per Gen.</div>
     <?php else: ?>
-        <p class="a-help">Menampilkan 25 perubahan terbaru, seluruh riwayat tetap tersimpan di database.</p>
-        <div class="a-tabel-gulir"><table class="a-tbl">
+        <p class="a-help">Menampilkan 25 perubahan per halaman. Seluruh riwayat tetap tersimpan dan dapat dibuka melalui navigasi halaman.</p>
+        <div class="a-tabel-gulir"><table class="a-tbl a-tbl--cards a-tbl--riwayat-guru">
             <thead><tr>
                 <th scope="col">Gen</th><th scope="col">Mapel</th>
                 <th scope="col">Sebelum → Sesudah</th><th scope="col">Alasan</th><th scope="col">Waktu (UTC)</th>
@@ -119,15 +131,25 @@
             <tbody>
                 <?php foreach ($riwayat as $item): ?>
                     <tr>
-                        <td><?= esc($item['gen_kode']) ?></td>
-                        <td><?= esc($item['mapel_nama']) ?></td>
-                        <td><?= esc($item['guru_lama'] ?? 'Belum ada') ?> → <?= esc($item['guru_baru'] ?? 'Belum ada') ?></td>
-                        <td><?= esc($item['alasan']) ?></td>
-                        <td><?= esc($item['waktu']) ?></td>
+                        <th scope="row" data-label="Gen"><?= esc($item['gen_kode']) ?></th>
+                        <td data-label="Mapel"><?= esc($item['mapel_nama']) ?></td>
+                        <td data-label="Sebelum → Sesudah"><?= esc($item['guru_lama'] ?? 'Belum ada') ?> → <?= esc($item['guru_baru'] ?? 'Belum ada') ?></td>
+                        <td data-label="Alasan"><?= esc($item['alasan']) ?></td>
+                        <td data-label="Waktu (UTC)"><?= esc($item['waktu']) ?></td>
                     </tr>
                 <?php endforeach ?>
             </tbody>
         </table></div>
+        <?= view('components/pager', [
+            'urlPath' => 'admin/mapel-guru',
+            'pageParam' => 'halaman_riwayat',
+            'halaman' => $riwayatHalaman,
+            'perHalaman' => $riwayatPerHalaman,
+            'total' => $riwayatTotal,
+            'filter' => ['gen' => $angkatanAktif, 'halaman_mapel' => $mapelHalaman],
+            'label' => 'riwayat penetapan Guru',
+            'anchor' => 'judul-riwayat',
+        ]) ?>
     <?php endif ?>
 </section>
 </div>

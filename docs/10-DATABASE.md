@@ -13,10 +13,10 @@ Nama di bawah adalah **kontrak desain**. Saat menulis dump SQL, cocokan dengan `
 | Akun | `pengguna`, `pengguna_peran`, `siswa`, `profil_pengelola`, `ci_sessions` | akun bersama; siswa NISN dan Gen, staf profil kontak/foto, sandi hash, status & audit |
 | Referensi | `ref_angkatan`, `ref_semester`, `ref_mapel`, `penugasan_guru_gen`, `riwayat_penugasan_guru_gen`, `ref_jenjang`, `ref_fase`, `ref_kelas`, `ref_kurikulum`, `ref_tahun_ajaran` | Guru aktif unik per Gen–Mapel; mapel tidak lagi mempunyai Guru global; semester 1–6 |
 | CP | `ref_cp`, `ref_cp_versi`, `usulan_cp`, `tp_cp` | CP versi immutable, usulan diputus Admin, tepat satu CP utama per TP |
-| Konten | `paket_semester`, `penugasan_paket`, `tp`, `tp_cp`, `versi_konten_tp`, `materi`, `berkas` | `paket_semester.angkatan_id` wajib; objek TP/soal/materi khusus satu Gen, historis terjaga |
+| Konten | `paket_semester`, `penugasan_paket`, `tp`, `tp_cp`, `versi_konten_tp`, `materi`, `tugas_hots_materi`, `berkas` | `paket_semester.angkatan_id` wajib; objek TP/soal/materi khusus satu Gen, historis terjaga |
 | Impor | `impor_atp`, `impor_atp_baris`, `impor_soal_docx`, `impor_soal_baris`, `impor_akun`, `impor_akun_baris` | Impor ATP Excel, bank soal DOCX dan impor akun adalah alur terpisah; checksum/versi/UUID/idempoten serta jejak Admin |
 | Asesmen | `soal`, `pilihan`, `percobaan_ujian`, `jawaban_percobaan`, `riwayat_status_ujian`, `segmen_jeda_ujian`, `pelanggaran_ujian`, `tambahan_percobaan` | snapshot soal/kunci/opsi server, server timer, attempt sah/batal terpisah |
-| Belajar | `progres_tp`, `progres_materi`, `resume_materi`, `tugas_hots_materi` | progres/versi TP terpin, draf DB manual, nilai dan siapa menilai |
+| Belajar | `progres_tp`, `progres_materi`, `halaman_progres_materi`, `resume_materi`, `jawaban_hots_materi` | progres/versi TP terpin; jawaban Resume/HOTS draf/final, nilai dan penilai asli |
 | Koreksi | `koreksi_tp`, `usulan_koreksi_nilai`, `riwayat_nilai`, `koreksi_ujian`, `riwayat_identitas` | pengusul, pemutus, versi asal, alasan, nilai sebelum/sesudah |
 | Hasil | `sertifikat`, `sertifikat_aktif`, `pekerjaan_revisi_sertifikat`, `log_sertifikat`, `lencana_siswa` | nomor/QR unik, satu berlaku per pasangan, histori immutable |
 | Branding | `pengaturan`, `aset_identitas`, `template_sertifikat`, `template_sertifikat_versi` | data madrasah, logo aplikasi sebagai favicon, TTD PNG privat dan template historis, template historis |
@@ -34,10 +34,12 @@ flowchart TD
  M --> P
  P --> TP[tp]
  TP --> MT[materi]
+ MT --> TH[tugas_hots_materi bank Guru]
  TP --> CP[tp_cp dan ref_cp_versi]
  TP --> PR[progres_tp siswa]
  PR --> EX[percobaan_ujian]
- PR --> RS[resume/tugas]
+ PR --> RS[resume_materi siswa]
+ PR --> JH[jawaban_hots_materi siswa]
  S --> CER[sertifikat historis]
  P --> CER
  CER --> ACT[sertifikat_aktif]
@@ -104,7 +106,7 @@ database/sql/
 - Jangan pernah menyimpan dump data siswa nyata pada repo. Ekspor data produksi dan backup hanya berada di lokasi privat.
 
 ### Transisi basis data ke kontrak v2.4
-**Pola yang diminta pemilik khusus localhost:** ketika implementasi dimulai, pemilik akan mengirim dump SQL lokal terkini. Developer wajib **menganalisis skema, versi dan isi dump**, memilih data lama yang perlu dipertahankan, membuat **dump instalasi final baru yang telah mencakup data terpilih**, dan memberikan petunjuk import. **Pemilik secara eksplisit akan mengosongkan seluruh tabel DB lokal yang dipilih setelah backup**, kemudian mengimpor dump baru di XAMPP. Jangan menjatuhkan tabel dari aplikasi atau menjalankan operasi tersebut sebelum dump ditinjau dan persetujuan tetap jelas. **Reset ini hanya untuk database lokal pengembangan, tidak berlaku untuk hosting/produksi**; produksi memakai patch additive bernomor yang aman.
+**Kebijakan XAMPP terkini:** setiap pekerjaan SQL/DB memerlukan **dump terbaru yang dikirim pemilik setelah patch terakhir**, diverifikasi header dan skema/histori penuh. Rancangan perubahan memilih patch additive bernomor baru beserta QA baca-saja; dump lama tidak boleh dianggap DB terkini. **Reset seluruh tabel bukan prosedur default**, hanya boleh jika pemilik meminta secara spesifik dan memberi persetujuan setelah backup. Hosting **belum digunakan**; uji target hosting direncanakan terpisah.
 
 - Jika masih ada tabel `bab`, `versi_konten_bab`, `tugas_tp` pada dump **historis** (bukan kontrak skema final), analisis relasi/isinya terlebih dulu; transformasi data terpilih ke **`tp` sebagai unit langsung di bawah `paket_semester`**, `versi_konten_tp`, dan **`tugas_hots_materi`**. Konflik banyak TP per BAB tidak boleh otomatis dipaksa jadi satu atau dihapus: petakan TP dan materi berdasarkan identitas/urutan, catat ambiguitas untuk diperiksa.
 - Tidak mengasumsikan dump lama bersih atau tabel `0009` sudah lengkap. Periksa `schema_version`, FK, jumlah/unik identitas, kemiripan data, hash pengguna, referensi Gen/CP, histori ujian dan file privat. Tidak memasukkan data siswa nyata/credential/backup privat ke GitHub.
@@ -123,3 +125,23 @@ Karena MySQL lokal dan MariaDB hosting **berbeda mesin**, semua enum, CHECK cons
 
 ## 7. Larangan penghapusan
 Tidak ada tombol/batch yang menghapus fisik siswa, sertifikat, riwayat nilai, snapshot ujian, file historis, atau log akademik. Data akun nonaktif tetap ada. Berkas temporer upload yang belum sah boleh dibersihkan dengan pembeda jelas dari dokumen historis.
+
+
+### Dua entitas HOTS berbeda dalam implementasi (25-10-2026)
+
+Nama tugas_hots_materi pada skema operasional adalah **bank perintah/
+pertanyaan HOTS oleh Guru** yang terhubung ke Materi. Untuk menjalankan
+Resume/HOTS per Materi yang dikerjakan siswa, **jawaban HOTS siswa** disimpan
+di jawaban_hots_materi, dengan progres_tp_id, materi_id,
+versi_konten_tp_id, isi, status, nilai, penilai dan waktu. Tabel resume_materi
+menyimpan Resume siswa. Perbedaan ini memperbaiki benturan nama SQL 0017,
+tidak mengubah aturan pembelajaran maupun bobot nilai. Pemulihan parsial
+memakai SQL 0018 yang additive dan hanya diimpor jika diperlukan.
+
+### Audit kontrak tiga objek HOTS dan syarat dump terkini (25-10-2026)
+
+- `materi.petunjuk_hots`: petunjuk yang sekarang diedit Guru, dibaca siswa dari snapshot TP terpin.
+- `tugas_hots_materi`: bank perintah HOTS Guru per Materi; **bukan** tabel pengumpulan siswa.
+- `jawaban_hots_materi`: pengumpulan HOTS siswa, status final/draf, nilai, identitas penilai; terpisah dari `resume_materi`.
+- Belum selaras: `KesiapanTpService` saat ini hanya memeriksa `petunjuk_hots`, belum ada pengecekan baris bank Guru. Master 05 mewajibkan satu tugas HOTS per Materi. **Jangan mengubah kebijakan, memutasi TP Siap atau menambah tugas otomatis** sebelum dump terbaru dan implikasi snapshot dinilai.
+- Koreksi struktur historis harus memakai patch baru dan uji kegagalan impor sebagian, tidak menamai ulang atau membuat ulang tabel yang sudah ada.

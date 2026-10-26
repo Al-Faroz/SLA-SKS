@@ -23,15 +23,57 @@ $routes->post('admin/foto-profil/(:num)/setujui', 'Profil::setujuiFoto/$1', ['fi
 $routes->post('peran/ganti', 'Akun::prosesGantiPeran', ['filter' => 'auth']);
 
 $routes->get('siswa', 'Akun::berandaSiswa', ['filter' => 'auth:siswa']);
+$routes->get('siswa/pembelajaran', 'SiswaPembelajaran::mapel', ['filter' => 'auth:siswa']);
+$routes->get('siswa/mapel/(:num)', 'SiswaPembelajaran::semester/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/semester/(:num)', 'SiswaPembelajaran::paket/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)', 'SiswaPembelajaran::tp/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/materi/(:num)', 'SiswaMateri::lihat/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/materi/(:num)/media', 'SiswaMateri::media/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/materi/(:num)/unduh', 'SiswaMateri::unduh/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/materi/(:num)/aktivitas', 'SiswaAktivitasMateri::status/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/materi/(:num)/aktivitas', 'SiswaAktivitasMateri::detak/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/materi/(:num)/kegiatan/(:segment)', 'SiswaKegiatanMateri::simpan/$1/$2/$3', ['filter' => 'auth:siswa']);
+// Aksi submitter tidak boleh hilang dari POST: endpoint eksplisit final/draf.
+$routes->post('siswa/tp/(:num)/materi/(:num)/kegiatan/(:segment)/(:segment)', 'SiswaKegiatanMateri::simpan/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/mulai', 'SiswaPembelajaran::mulaiTp/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/diagnostik/petunjuk', 'SiswaDiagnostik::petunjuk/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/diagnostik/ujian', 'SiswaUjian::halaman/$1', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/diagnostik/mulai', 'SiswaUjian::mulai/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/diagnostik/(:segment)/status', 'SiswaUjian::status/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/diagnostik/(:segment)/jawab', 'SiswaUjian::jawab/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/diagnostik/(:segment)/tindakan', 'SiswaUjian::tindakan/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/diagnostik/media/(:segment)/(:segment)/(:segment)', 'SiswaUjian::media/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
 $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
+$routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
+$routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::lihat/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::siapkan/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal', 'GuruBankSoal::index/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/soal/(:segment)/baru', 'GuruSoal::baru/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/soal/(:segment)', 'GuruSoal::simpan/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/soal/(:num)/edit', 'GuruSoal::edit/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/soal/(:num)', 'GuruSoal::lihatSoal/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/soal/(:segment)/(:num)', 'GuruSoal::simpan/$1/$2/$3', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/soal/(:num)/status', 'GuruSoal::status/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/gambar', 'GuruSoal::uploadGambar/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/aset/(:segment)', 'GuruSoal::gambar/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/word/(:segment)', 'GuruBankSoal::unduh/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/word/(:segment)/pratinjau', 'GuruBankSoal::pratinjauWord/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/review/(:segment)', 'GuruBankSoal::reviewWord/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/review/(:segment)/konfirmasi', 'GuruBankSoal::konfirmasiWord/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/bank-soal/media/(:segment)/(:segment)', 'GuruBankSoal::mediaWord/$1/$2/$3', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)', 'GuruDetailTp::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi', 'GuruMateri::tambah/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/materi/(:num)/edit', 'GuruMateri::edit/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/materi/(:num)/pratinjau', 'GuruMateri::pratinjau/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi/(:num)', 'GuruMateri::simpan/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi/(:num)/media', 'GuruMateri::unggahMedia/$1/$2', ['filter' => 'auth:guru']);
+$routes->get('guru/tp/(:num)/materi/(:num)/media', 'GuruMateri::bukaMedia/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi/(:num)/urut', 'GuruMateri::urut/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/materi/(:num)/hapus', 'GuruMateri::hapus/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
 $routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan']);
 // K2B v2.3 — satu autentikasi, dua ruang administrasi akun.
@@ -77,6 +119,7 @@ $routes->get('admin/siswa/impor/(:segment)/galat', 'AdminImporAkun::galatSiswa/$
 
 // K3A — Kurikulum dan CP resmi berversi. Hanya Admin aktif; semua POST global CSRF.
 $routes->get('admin/kurikulum-cp', 'AdminKurikulumCp::index', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/ekspor', 'AdminKurikulumCp::eksporCp', ['filter' => 'auth:admin']);
 $routes->post('admin/kurikulum-cp/kurikulum', 'AdminKurikulumCp::simpanKurikulum', ['filter' => 'auth:admin']);
 $routes->post('admin/kurikulum-cp', 'AdminKurikulumCp::simpanCp', ['filter' => 'auth:admin']);
 $routes->get('admin/kurikulum-cp/(:num)', 'AdminKurikulumCp::detail/$1', ['filter' => 'auth:admin']);

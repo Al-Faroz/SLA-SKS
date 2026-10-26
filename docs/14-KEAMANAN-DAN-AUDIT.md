@@ -85,3 +85,12 @@ Keputusan: **backup manual melalui SOP sekolah**, bukan janji backup otomatis. T
 - Google Drive hanya URL domain terpercaya hasil parsing ketat, lalu memerlukan pratinjau pemutaran yang nyata; tidak menyalin atau mengeksekusi remote HTML. Jangan menganggap status tautan publik Google selalu tersedia atau membuka kredensial Guru.
 - Bank soal/kunci/snapshot ujian hanya dapat diakses Guru/Admin berhak; siswa tidak menerima kunci sebelum kebijakan ujian mengizinkan. File unggahan/hasil parser/gambar disimpan privat dan melalui controller cek izin. Aset lama dipertahankan untuk percobaan historis.
 - Logo aplikasi diunggah dengan validasi MIME sungguhan, dimensi dan batas ukuran serta pemeriksaan decode; buat varian favicon aman dan ganti pointer aktif atomik, jangan izinkan SVG/script atau unggahan berbahaya disajikan dari origin aplikasi.
+
+
+### Mitigasi clipboard pada jawaban tertulis siswa (26 Oktober 2026)
+
+Browser S09/S10 menolak paste, copy, cut dan drop pada textarea sebagai
+pengamanan best-effort. Pengamanan klien dapat dilewati sehingga bukan
+bukti anti-plagiarisme; tidak ada hukuman otomatis. Validasi panjang,
+snapshot terpin, akses, final immutable dan audit tetap di server,
+sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.

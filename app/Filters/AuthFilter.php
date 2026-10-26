@@ -11,6 +11,37 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 final class AuthFilter implements FilterInterface
 {
+    /**
+     * Pesan akun sendiri saat peran aktif tidak memenuhi filter.
+     * Tidak mengganti role atau memberi akses secara otomatis.
+     *
+     * @param array<string,mixed> $akun
+     * @return array{pesan:string,tautanPath:string,labelTautan:string}
+     */
+    public static function informasiPeranDitolak(array $akun, string $wajib): array
+    {
+        $aktif = ucfirst((string) ($akun['peran_aktif'] ?? ''));
+        $tujuan = ucfirst($wajib);
+        $roles = $akun['daftar_peran'] ?? [];
+        if (is_array($roles) && in_array($wajib, $roles, true)) {
+            return [
+                'pesan' => 'Peran aktif Anda sekarang ' . $aktif
+                    . ', sedangkan halaman ini memerlukan peran ' . $tujuan
+                    . '. Buka Profil & Peran, pilih ' . $tujuan
+                    . ', lalu tekan Aktifkan peran. Penugasan Guru tidak perlu diubah.',
+                'tautanPath' => 'profil',
+                'labelTautan' => 'Buka Profil & Peran',
+            ];
+        }
+        return [
+            'pesan' => 'Halaman ini memerlukan peran ' . $tujuan
+                . ', tetapi akun Anda belum memiliki peran tersebut. '
+                . 'Periksa profil dan hubungi Admin jika perlu perubahan peran.',
+            'tautanPath' => 'profil',
+            'labelTautan' => 'Periksa Profil & Peran',
+        ];
+    }
+
     public function before(RequestInterface $request, $arguments = null)
     {
         helper('url');
@@ -32,9 +63,10 @@ final class AuthFilter implements FilterInterface
 
         $wajibPeran = $arguments[0] ?? null;
         if ($wajibPeran !== null && $pengguna['peran_aktif'] !== $wajibPeran) {
-            return service('response')->setStatusCode(403)->setBody(view('publik/ditolak', [
-                'judul' => 'Akses ditolak',
-            ]));
+            $informasi = self::informasiPeranDitolak($pengguna, (string) $wajibPeran);
+            return service('response')->setStatusCode(403)->setBody(
+                view('publik/ditolak', ['judul' => 'Akses ditolak'] + $informasi)
+            );
         }
 
         return null;

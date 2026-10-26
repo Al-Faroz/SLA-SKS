@@ -13,3 +13,15 @@
 11. Jangan hapus/timpa data nilai, attempt, file, sertifikat, CP/TP Siap dan riwayat versi produksi. Koreksi konten akademik lewat permohonan Guru dan keputusan Admin tanpa menyetujui usulan diri sendiri; sertifikat tidak dicabut.
 12. Semua UI memiliki normal/kosong/loading/sukses/gagal/locked, keyboard, kontras, mobile. Semua tombol berfungsi; komponen baru wajib masuk galeri saat implementasi kode. E2E sesuai `docs/16-PENGUJIAN-DAN-PENERIMAAN.md`.
 13. Bekerja di branch terpisah, PR untuk review, **jangan merge `main` tanpa PASS**. PR #13 masih memakai model lama; revisi implementasi lewat branch baru setelah Master ini direview. Lakukan tes nyata bila mampu dan jujur tentang yang belum diuji.
+
+14. **Keputusan final PDF Materi (hasil uji XAMPP 24-10-2026):** baca `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md` **sebelum** mengubah `PdfMateriValidator.php`, upload atau pratinjau. Fokus aturan **PDF maksimal 15 MB dan 40 halaman** untuk kapasitas hosting/panjang materi; PDF normal dengan revisi inkremental, navigasi, metadata C2PA, hyperlink atau anotasi **tidak boleh ditolak hanya karena format internalnya**. Keamanan aktif dan akses privat tetap. Pengguna telah menyatakan masalah upload PDF sebelumnya **FIX**; jangan membahas ulang tanpa laporan bug baru yang nyata. Catatan ini tidak mengubah 16 Master Document.
+
+
+## Aturan tambahan gerbang audit SQL (25 Oktober 2026)
+- **Status deployment:** aplikasi hanya sedang dibangun/diuji di XAMPP lokal, **belum pernah dipasang ke hosting**. Shared hosting/MariaDB adalah target kompatibilitas di masa datang; jangan mengklaim sudah diuji/diupload.
+- **Sebelum SETIAP pekerjaan SQL/database** (CREATE/ALTER/patch/import, query bergantung struktur, pemetaan atau perbaikan data), wajib minta **dump SQL lokal terbaru yang benar-benar terunggah** dan dibuat **sesudah patch terakhir**. Jangan menganggap dump percakapan lama mewakili DB berjalan.
+- Verifikasi header waktu, versi server, nama DB, DDL seluruh tabel relevan, kolom, indeks/FK/CHECK, row count/agregat yang aman, `schema_version`, SQL patch sebelumnya dan query yang memakai tabel yang sama.
+- Jangan membuat fixture tes hanya berdasarkan skema yang diasumsikan Service; sertakan tabel historis/indeks/relasi yang sudah ada, skenario patch parsial, tab phpMyAdmin dan uji XAMPP sebelum klaim fitur FIX.
+- Default: patch SQL **additive bernomor baru**, QA sebelum/sesudah **baca-saja**, backup DB dan `writable/`. Jangan mengedit patch historis yang sudah pernah diimpor lalu meminta impor ulang. Dilarang reset/DROP/TRUNCATE tanpa permintaan serta persetujuan eksplisit khusus database lokal dan backup.
+- Dump privat, akun/identitas siswa, password/hash, backup dan kredensial tidak boleh dimasukkan ke GitHub/workflow atau publik. Audit teknis boleh memakai skema sintetis yang meniru DDL realistis.
+- Jika dump terbaru belum terlampir/terverifikasi, **hentikan perubahan SQL**, lanjutkan hanya telaah/dokumentasi/tes yang tidak mengubah DB dan jelaskan keterbatasan pemeriksaan.

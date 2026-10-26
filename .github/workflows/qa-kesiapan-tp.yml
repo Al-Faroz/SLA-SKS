@@ -1,0 +1,41 @@
+name: QA Kesiapan dan Publikasi TP Siap
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KesiapanTpService.php'
+      - 'app/Controllers/GuruKesiapanTp.php'
+      - 'app/Views/guru/kesiapan_tp.php'
+      - 'app/Views/guru/detail_tp.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/css/app.css'
+      - 'docs/13-DESIGN-SYSTEM-CSS.md'
+      - 'tests/unit/KesiapanTpTest.php'
+      - '.github/workflows/qa-kesiapan-tp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Pasang dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Periksa sintaks PHP
+        run: |
+          php -l app/Services/KesiapanTpService.php
+          php -l app/Controllers/GuruKesiapanTp.php
+          php -l app/Views/guru/kesiapan_tp.php
+          php -l app/Views/guru/detail_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/KesiapanTpTest.php
+      - name: Uji invariant akademik dan konfirmasi UI
+        run: vendor/bin/phpunit --no-coverage tests/unit/KesiapanTpTest.php

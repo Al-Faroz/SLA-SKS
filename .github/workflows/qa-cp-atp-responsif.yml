@@ -1,0 +1,44 @@
+name: QA Daftar CP dan Peta ATP Responsif
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/CpDaftarService.php'
+      - 'app/Services/CpReferensiService.php'
+      - 'app/Controllers/AdminKurikulumCp.php'
+      - 'app/Views/admin/kurikulum_cp.php'
+      - 'app/Views/guru/peta_tp.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/css/app.css'
+      - 'docs/13-DESIGN-SYSTEM-CSS.md'
+      - 'docs/assets/galeri-komponen.html'
+      - 'tests/unit/CpDaftarResponsifTest.php'
+      - '.github/workflows/qa-cp-atp-responsif.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pemeriksaan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/CpDaftarService.php
+          php -l app/Services/CpReferensiService.php
+          php -l app/Controllers/AdminKurikulumCp.php
+          php -l app/Views/admin/kurikulum_cp.php
+          php -l app/Views/guru/peta_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/CpDaftarResponsifTest.php
+      - name: Unit test filter, XLSX dan tampilan responsif
+        run: vendor/bin/phpunit --no-coverage tests/unit/CpDaftarResponsifTest.php

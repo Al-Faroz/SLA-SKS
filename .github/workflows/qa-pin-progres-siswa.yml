@@ -1,0 +1,46 @@
+name: QA Progres TP dan Pin Versi Siswa
+
+on:
+  pull_request:
+    paths:
+      - 'database/sql/updates/0014_progres_tp_pin.sql'
+      - 'database/sql/README.md'
+      - 'app/Services/ProgresTpSiswaService.php'
+      - 'app/Controllers/SiswaPembelajaran.php'
+      - 'app/Views/siswa/rincian_tp.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/css/app.css'
+      - 'docs/13-DESIGN-SYSTEM-CSS.md'
+      - 'docs/assets/galeri-komponen.html'
+      - 'tests/unit/ProgresTpSiswaTest.php'
+      - 'tests/unit/ProgresTpSiswaDatabaseTest.php'
+      - '.github/workflows/qa-pin-progres-siswa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo, sqlite3, pdo_sqlite
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/ProgresTpSiswaService.php
+          php -l app/Controllers/SiswaPembelajaran.php
+          php -l app/Views/siswa/rincian_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/ProgresTpSiswaTest.php
+          php -l tests/unit/ProgresTpSiswaDatabaseTest.php
+      - name: Uji checksum, peran, snapshot dan endpoint
+        run: vendor/bin/phpunit --no-coverage tests/unit/ProgresTpSiswaTest.php
+      - name: Uji idempotensi, rollback dan hak Gen dengan SQLite
+        run: vendor/bin/phpunit --no-coverage tests/unit/ProgresTpSiswaDatabaseTest.php
