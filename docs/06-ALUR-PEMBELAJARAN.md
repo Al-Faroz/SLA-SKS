@@ -29,7 +29,7 @@ flowchart TD
 Alur ini merupakan **kebijakan akademik internal madrasah untuk SKS percepatan dua tahun**. Diagnostik wajib; jika lulus, siswa tidak wajib menuntaskan media/Resume/HOTS dan nilainya dari Diagnostik. Jika tidak lulus, **setiap Materi memiliki Resume dan HOTS sendiri** dan setelah semua Materi final siswa mengikuti Sumatif. Guru tidak boleh memaksakan siswa jalur lulus Diagnostik mengirim tugas resmi; belajar sukarela tidak mempengaruhi nilai.
 
 ## 3. Syarat materi dan media
-- PDF melalui PDF.js lokal: seluruh halaman pernah dilihat, waktu aktif default 15 detik/halaman. YouTube dan audio dihitung waktu putar nyata default ≥90% durasi; gambar default terlihat ≥30 detik. Guru dapat mengatur `min_waktu_detik` untuk draf.
+- PDF melalui PDF.js lokal: seluruh halaman pernah dilihat, waktu aktif default 15 detik/halaman. **Untuk video YouTube/audio, batas efektif adalah yang tercapai lebih cepat: waktu minimum Guru ATAU 90% durasi media**, dihitung dari pemutaran sah oleh server; jeda dan seek tidak dihitung. Gambar default terlihat ≥30 detik. Guru dapat mengatur `min_waktu_detik` saat TP masih draf.
 - Heartbeat server kira-kira tiap **10 detik**; satu detak menambah maksimum 20 detik dan interval minimal 5 detik. Tab/background/jeda/refresh tidak boleh dihitung sebagai waktu belajar aktif palsu. Validasi jam server; jangan mempercayai durasi dari klien.
 - Satu Materi berikutnya dibuka setelah media wajib selesai serta **Resume dan HOTS Materi sebelumnya terkirim final**; tidak perlu menunggu skor Guru. Simpan draf tidak dianggap final. Jika ada lebih dari satu jenis media, syarat materi memeriksa seluruh yang diwajibkan.
 - Progres TP berdasarkan langkah jalur aktif; TP lulus Diagnostik langsung 100%. Semester tidak 100% hingga semua TP terencana Siap dan tuntas.
@@ -98,4 +98,13 @@ Nilai `resume_min` (rentang Master 10–1000) dan `tugas_min` (50–5000) dibaca
 
 ### Koreksi status Youtube/audio yang terlihat penuh tetapi belum tuntas (25-10-2026)
 
-Bilah progres media harus mencerminkan **seluruh syarat server**, bukan waktu aktif Guru saja. Untuk audio/YouTube, tampilkan terpisah waktu belajar, waktu pemutaran yang benar-benar diakui server, durasi video/audio, dan posisi terjauh yang mencapai minimal 90% durasi (seek tidak dihitung sebagai pemutaran). Status 380/360 detik **tidak otomatis tuntas** bila pemutaran video baru sebagian. Bila seluruh syarat telah tercapai, halaman memuat ulang sekali untuk merender formulir Resume dari server; HTML tidak membuka gate tanpa pemeriksaan server. Tidak mengubah aturan 90% Master, data siswa atau SQL.
+**Riwayat:** versi 25-10-2026 pernah menampilkan kedua syarat secara bersamaan (AND), sehingga angka 380/360 masih dianggap belum cukup untuk video panjang. **Aturan AND telah diganti** oleh keputusan terbaru 26-10-2026; gunakan ketentuan di bawah, bukan logika lama.
+
+
+### Keputusan final 26-10-2026 — syarat YouTube/audio yang lebih cepat
+
+Waktu media resmi berakhir ketika **syarat yang lebih pendek terpenuhi terlebih dahulu**: `min(min_waktu_detik Guru, ceil(0.9 * durasi_media_detik))`. Sebagai contoh, minimum Guru 600 detik pada video 420 detik akan selesai setelah **378 detik** pemutaran sah; minimum Guru 600 detik pada video 900 detik akan selesai setelah **600 detik**. Kasus minimum Guru 360 detik dan video sepanjang 9.968 detik diselesaikan setelah **360 detik pemutaran sah**, bukan 8.972 detik.
+
+Waktu pemutaran dihitung melalui heartbeat 5–20 detik dari jam server, menggunakan perubahan posisi yang masuk akal; seek maju/mundur, jeda, playback bukan 1x, tab/background dan interval detak terlalu panjang tidak menambah kredit. Posisi terjauh hanya informasi diagnostik, **bukan syarat tambahan yang membatalkan batas efektif**. Tampilan menunjukkan durasi media, kedua pembanding, target yang berlaku, dan pemutaran sah. Setelah media_selesai, Resume dibuka oleh server, kemudian HOTS setelah Resume final.
+
+**Rekonsiliasi data lama:** bagi siswa yang sudah memiliki `waktu_putar_detik` dan `waktu_aktif_detik` sah setidaknya batas efektif tetapi statusnya `berjalan`, GET status siswa merekonsiliasi status menjadi `media_selesai` secara idempoten untuk progres milik siswa/versi terpin tersebut. Tidak melakukan tambah waktu palsu, menyunting snapshot, impor ulang SQL atau menghapus progres. PDF, gambar dan siswa jalur Diagnostik tuntas tidak berubah.

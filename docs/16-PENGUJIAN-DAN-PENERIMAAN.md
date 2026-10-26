@@ -152,3 +152,12 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - **Galat yang benar:** masalah SQL bukan HTTP 403 atau instruksi ganti peran; 403 khusus izin sah, 503 khusus dependensi hilang, 500 untuk kegagalan server lain, log internal tanpa data sensitif.
 - **Lingkungan uji:** jalankan SQL pada salinan struktur MariaDB XAMPP versi aktual, serta mesin kompatibilitas terpisah; GitHub Actions sukses tidak berarti browser/DB lokal telah lolos. **Hosting belum digunakan.**
 - **Perubahan aman:** backup DB+`writable/`, QA sebelum/sesudah hanya SELECT; patch additive bernomor baru, tidak overwrite patch yang sudah pernah diterapkan, tidak reset data, dan tidak push dump SQL privat.
+
+
+### E2E pengganti ketentuan ganda S08B (26-10-2026)
+
+- Guru 600 detik; YouTube 420 detik: batas efektif 378 detik, tepat saat waktu putar sah mencapai 378 maka media_selesai, Resume terbuka. Tidak menunggu 600 detik.
+- Guru 600 detik; YouTube 900 detik: batas efektif 600 detik, tepat saat pemutaran sah mencapai 600 maka media_selesai. Tidak menunggu 810 detik.
+- Guru 360 detik; video 9.968 detik; progres lama mencatat 380 detik waktu putar sah: GET status siswa merekonsiliasi ke media_selesai secara idempoten tanpa memutar ulang, kemudian form Resume dibuka dari server.
+- Hanya lompatan seek posisi jauh tetapi `waktu_putar_detik` kurang target tidak membuka Resume. Keadaan tab tersembunyi, seek, playback cepat, jeda panjang, siswa bukan pemilik progres atau jalur sukarela juga tidak boleh memberi kredit/akses.
+- Audio mengikuti keputusan sama; gambar/PDF tetap mengikuti syaratnya sendiri; tidak ada SQL baru dan progres/nilai historis tidak di-reset.
