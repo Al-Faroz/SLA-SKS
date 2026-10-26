@@ -120,6 +120,13 @@
                 data-media-jenis="<?= esc($materi['jenis'], 'attr') ?>"
                 data-media-url="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
                     . '/materi/' . (int) $materi['id'] . '/aktivitas'), 'attr') ?>"
+                data-media-start="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                    . '/materi/' . (int) $materi['id'] . '/mulai-media'), 'attr') ?>"
+                data-media-checkpoint="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                    . '/materi/' . (int) $materi['id'] . '/checkpoint'), 'attr') ?>"
+                data-media-scope="<?= esc(hash('sha256',(string)$progres['id']
+                    . '|' . (string)$progres['versi_konten_tp_id']
+                    . '|' . (string)$materi['id']), 'attr') ?>"
                 data-csrf-name="<?= esc(csrf_token(), 'attr') ?>"
                 data-csrf-hash="<?= esc(csrf_hash(), 'attr') ?>">
                 <h3>Aktivitas belajar</h3>
@@ -267,7 +274,7 @@
     </nav>
 </div>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-presisi2'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi-checkpoint.js?v=20261026-checkpoint180'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261026-final2'), 'attr') ?>" defer></script>
