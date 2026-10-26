@@ -57,6 +57,7 @@ function setupImage() {
         }})};
     };
     vm.runInNewContext(script,{window,document,navigator:{onLine:true},
+        IntersectionObserver:window.IntersectionObserver,
         fetch,FormData,console,Number,Math,Promise});
     const settle=()=>new Promise(resolve=>setImmediate(resolve));
     return {sent,events,interval,document,
@@ -169,6 +170,7 @@ test('PDF tanpa area pembaca terlihat tidak mengirim detak, kembali terlihat res
         }})};
     };
     vm.runInNewContext(script,{window,document,fetch,
+        IntersectionObserver:window.IntersectionObserver,
         navigator:{onLine:true},FormData,console,Number,Math,Promise});
     const settle=()=>new Promise(resolve=>setImmediate(resolve));
     await settle();
