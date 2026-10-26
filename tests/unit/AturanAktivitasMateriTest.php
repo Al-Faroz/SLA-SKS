@@ -46,15 +46,24 @@ final class AturanAktivitasMateriTest extends TestCase
         self::assertSame(10, $s['waktu_aktif_detik']);
     }
 
-    public function testPemutaranAudioMemerlukanSembilanPuluhPersenDanWaktu(): void
+    public function testAudioMengikutiBatasYangLebihCepat(): void
     {
         $s = Media::awal('audio', 1000, 0, 100);
-        for ($i = 1; $i <= 9; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $s = Media::detak($s, 'audio', 1000 + $i * 10, $i * 10, 100, 50);
         }
+        self::assertSame('berjalan', $s['status']);
+        $s = Media::detak($s, 'audio', 1050, 50, 100, 50);
         self::assertSame('media_selesai', $s['status']);
-        self::assertSame(90, $s['waktu_putar_detik']);
-        self::assertSame(90, $s['posisi_terjauh_detik']);
+        self::assertSame(50, $s['waktu_putar_detik']);
+        self::assertSame(50, $s['posisi_terjauh_detik']);
+
+        $s2 = Media::awal('audio', 2000, 0, 100);
+        for ($i = 1; $i <= 9; $i++) {
+            $s2 = Media::detak($s2, 'audio', 2000 + $i * 10, $i * 10, 100, 150);
+        }
+        self::assertSame('media_selesai', $s2['status']);
+        self::assertSame(90, $s2['waktu_putar_detik']);
     }
 
     public function testVideoPanjangBerhentiPadaBatasGuruLebihDulu(): void
