@@ -133,12 +133,7 @@
 
     <section class="a-card a-jarak-atas a-materi-kegiatan" aria-labelledby="petunjuk-kegiatan">
         <h2 id="petunjuk-kegiatan">Kegiatan Materi <?= (int) $materi['urutan'] ?></h2>
-        <?php if (session()->getFlashdata('kegiatan_sukses')): ?>
-            <div class="a-alert" role="status"><?= esc(session()->getFlashdata('kegiatan_sukses')) ?></div>
-        <?php endif ?>
-        <?php if (session()->getFlashdata('kegiatan_gagal')): ?>
-            <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('kegiatan_gagal')) ?></div>
-        <?php endif ?>
+
         <?php if ($sukarela): ?>
             <p class="a-help">TP sudah tuntas dari Diagnostik. Resume dan HOTS berikut hanya petunjuk baca;
                 tidak ada pengumpulan atau nilai tambahan.</p>
@@ -160,8 +155,16 @@
                 $isian = old('jenis') === $jenisKegiatan
                     ? (string) old('jawaban') : $rekaman['isi'];
                 ?>
-                <div class="a-kegiatan-editor">
+                <div class="a-kegiatan-editor" id="kegiatan-<?= esc($jenisKegiatan, 'attr') ?>">
                     <h3><?= esc($label) ?> Materi <?= (int) $materi['urutan'] ?></h3>
+                    <?php if (session()->getFlashdata('kegiatan_jenis') === $jenisKegiatan): ?>
+                        <?php if (session()->getFlashdata('kegiatan_sukses')): ?>
+                            <div class="a-alert" role="status"><?= esc(session()->getFlashdata('kegiatan_sukses')) ?></div>
+                        <?php endif ?>
+                        <?php if (session()->getFlashdata('kegiatan_gagal')): ?>
+                            <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('kegiatan_gagal')) ?></div>
+                        <?php endif ?>
+                    <?php endif ?>
                     <p class="a-teks-pratinjau"><?= nl2br(esc($petunjuk)) ?></p>
                     <?php if ($terkirim): ?>
                         <div class="a-alert" role="status">Jawaban <?= esc($label) ?> terkirim final
@@ -182,27 +185,34 @@
                             <?php endif ?>
                         </div>
                     <?php else: ?>
+                        <?php $ruteKegiatan = 'siswa/tp/' . (int) $tp['id'] . '/materi/'
+                            . (int) $materi['id'] . '/kegiatan/' . $jenisKegiatan; ?>
                         <form method="post" data-kegiatan-form
-                            action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/materi/'
-                                . (int) $materi['id'] . '/kegiatan/' . $jenisKegiatan), 'attr') ?>">
+                            data-minimal="<?= (int) $batas ?>"
+                            action="<?= esc(site_url($ruteKegiatan), 'attr') ?>">
                             <?= csrf_field() ?>
                             <input type="hidden" name="jenis" value="<?= esc($jenisKegiatan, 'attr') ?>">
                             <input type="hidden" name="revisi" value="<?= (int) $rekaman['revisi'] ?>">
                             <label class="a-label" for="jawaban-<?= esc($jenisKegiatan, 'attr') ?>">Jawaban <?= esc($label) ?></label>
                             <textarea id="jawaban-<?= esc($jenisKegiatan, 'attr') ?>" name="jawaban"
                                 class="a-kegiatan-teks" rows="9" maxlength="12000"
+                                spellcheck="true" autocomplete="off"
                                 aria-describedby="panduan-<?= esc($jenisKegiatan, 'attr') ?>"><?= esc($isian) ?></textarea>
                             <p id="panduan-<?= esc($jenisKegiatan, 'attr') ?>" class="a-help">
                                 Minimal <?= (int) $batas ?> karakter untuk kirim final; maksimal 12.000.
                                 Simpan draf manual. Tidak ada penyimpanan otomatis.
+                                Penempelan dan salin dari editor dibatasi sebagai pencegahan dasar di browser.
                             </p>
-                            <p class="a-help" data-kegiatan-indikator role="status">Tidak ada perubahan yang belum disimpan.</p>
+                            <p class="a-help" data-kegiatan-indikator role="status" aria-live="polite">Tidak ada perubahan yang belum disimpan.</p>
+                            <p class="a-help" data-kegiatan-validasi role="status" aria-live="polite"></p>
                             <?php if ($rekaman['status'] === 'draf'): ?>
                                 <p class="a-help">Draf terakhir tersimpan <?= esc((string) $rekaman['diubah_pada']) ?> UTC.</p>
                             <?php endif ?>
                             <div class="a-kegiatan-aksi">
-                                <button class="a-btn a-btn--sekunder" type="submit" name="aksi" value="simpan">Simpan draf</button>
-                                <button class="a-btn a-btn--utama" type="submit" name="aksi" value="kirim">Kirim final</button>
+                                <button class="a-btn a-btn--sekunder" type="submit" name="aksi" value="simpan"
+                                    formaction="<?= esc(site_url($ruteKegiatan . '/simpan'), 'attr') ?>">Simpan draf</button>
+                                <button class="a-btn a-btn--utama" type="submit" name="aksi" value="kirim"
+                                    formaction="<?= esc(site_url($ruteKegiatan . '/kirim'), 'attr') ?>">Kirim final</button>
                             </div>
                         </form>
                     <?php endif ?>
@@ -240,7 +250,7 @@
     <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-batascepat'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261025-s09s10'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261026-final2'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if ($materi['jenis'] === 'pdf'): ?>
     <script src="<?= esc(base_url('public/assets/vendor/pdfjs/3.2.146/pdf.min.js'), 'attr') ?>" defer></script>
