@@ -29,8 +29,11 @@ $routes->get('siswa/semester/(:num)', 'SiswaPembelajaran::paket/$1', ['filter' =
 $routes->get('siswa/tp/(:num)', 'SiswaPembelajaran::tp/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/materi/(:num)', 'SiswaMateri::lihat/$1/$2', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/materi/(:num)/media', 'SiswaMateri::media/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/materi/(:num)/unduh', 'SiswaMateri::unduh/$1/$2', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/materi/(:num)/aktivitas', 'SiswaAktivitasMateri::status/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/materi/(:num)/aktivitas', 'SiswaAktivitasMateri::detak/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/materi/(:num)/mulai-media', 'SiswaCheckpointMateri::mulai/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/materi/(:num)/checkpoint', 'SiswaCheckpointMateri::kirim/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/materi/(:num)/kegiatan/(:segment)', 'SiswaKegiatanMateri::simpan/$1/$2/$3', ['filter' => 'auth:siswa']);
 // Aksi submitter tidak boleh hilang dari POST: endpoint eksplisit final/draf.
 $routes->post('siswa/tp/(:num)/materi/(:num)/kegiatan/(:segment)/(:segment)', 'SiswaKegiatanMateri::simpan/$1/$2/$3/$4', ['filter' => 'auth:siswa']);

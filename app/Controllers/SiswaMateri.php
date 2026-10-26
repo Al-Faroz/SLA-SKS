@@ -45,14 +45,26 @@ final class SiswaMateri extends BaseController
 
     public function media(int $tpId, int $materiId): ResponseInterface
     {
+        return $this->kirimBerkas($tpId, $materiId, false);
+    }
+
+    public function unduh(int $tpId, int $materiId): ResponseInterface
+    {
+        return $this->kirimBerkas($tpId, $materiId, true);
+    }
+
+    private function kirimBerkas(int $tpId, int $materiId, bool $download): ResponseInterface
+    {
         try {
-            $item = (new MateriSiswaService())->media($tpId, $materiId);
+            $layanan = new MateriSiswaService();
+            $item = $download ? $layanan->unduh($tpId, $materiId)
+                : $layanan->media($tpId, $materiId);
             $size = $item['bytes'];
             $start = 0;
             $end = $size - 1;
             $range = $this->request->getHeaderLine('Range');
             if ($range !== '') {
-                if (!in_array($item['jenis'], ['pdf', 'audio'], true)
+                if ($download || !in_array($item['jenis'], ['pdf', 'audio'], true)
                     || preg_match('/^bytes=(\\d*)-(\\d*)$/D', $range, $m) !== 1
                     || ($m[1] === '' && $m[2] === '')) {
                     return $this->tidakSahRange($size);
@@ -87,11 +99,12 @@ final class SiswaMateri extends BaseController
             $response = $this->response->setStatusCode($range === '' ? 200 : 206)
                 ->setHeader('Content-Type', $item['mime'])
                 ->setHeader('Content-Length', (string) $length)
-                ->setHeader('Content-Disposition', 'inline')
+                ->setHeader('Content-Disposition', $download
+                    ? 'attachment; filename="' . $item['unduh_nama'] . '"' : 'inline')
                 ->setHeader('Cache-Control', 'private, no-store, max-age=0')
                 ->setHeader('X-Content-Type-Options', 'nosniff')
                 ->setHeader('Content-Security-Policy', "default-src 'none'; sandbox")
-                ->setHeader('Accept-Ranges', in_array($item['jenis'], ['pdf', 'audio'], true)
+                ->setHeader('Accept-Ranges', !$download && in_array($item['jenis'], ['pdf', 'audio'], true)
                     ? 'bytes' : 'none')
                 ->setBody($data);
             if ($range !== '') {

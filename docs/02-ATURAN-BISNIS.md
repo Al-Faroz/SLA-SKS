@@ -77,3 +77,8 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 ### Revisi ketentuan durasi YouTube/audio — 26 Oktober 2026
 
 Untuk Materi wajib berbentuk YouTube/audio, **yang terpenuhi lebih dulu dinyatakan selesai**: minimum waktu Guru atau 90% durasi video/audio, mana yang **lebih singkat**. Perhitungan wajib memakai pemutaran nyata yang telah diakui heartbeat server; tidak cukup membuka halaman, menggeser posisi, menjeda atau mempercepat pemutaran. Bila durasi Guru 10 menit dan video 7 menit, batas efektif 6 menit 18 detik; bila Guru 10 menit dan video 15 menit, batas efektif 10 menit. Setelah selesai siswa dapat mengisi Resume, selanjutnya HOTS setelah Resume dikirim final. Ini **menggantikan** kebijakan lama yang mensyaratkan kedua batas sekaligus. Syarat media PDF/gambar, nilai, Diagnostik dan TP Siap tetap berlaku.
+
+
+### Keputusan final media Model B dan unduh — 26 Oktober 2026
+
+Aktivitas media siswa dihitung di browser tiap detik (memeriksa pemutaran/visibilitas), dan checkpoint ke server setiap **3 menit** atau segera jika syarat tercapai/koneksi pulih. Progres lokal offline dipertahankan sementara dan tidak direset hanya akibat putus koneksi. Server tetap memvalidasi kewajaran durasi terhadap selang jam server dan mengesahkan kelulusan media; klaim aktivitas offline bukan bukti absolut siswa membaca. **Unduh audio/gambar/PDF** hanya boleh setelah `media_selesai` resmi, terlepas dari status Resume Final; HOTS tetap harus menunggu Resume Final. Ketentuan durasi masing-masing jenis media tetap seperti Master 06. Tidak berlaku untuk timer ujian yang tetap sepenuhnya server-side.

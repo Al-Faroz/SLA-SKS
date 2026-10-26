@@ -94,3 +94,10 @@ pengamanan best-effort. Pengamanan klien dapat dilewati sehingga bukan
 bukti anti-plagiarisme; tidak ada hukuman otomatis. Validasi panjang,
 snapshot terpin, akses, final immutable dan audit tetap di server,
 sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.
+
+
+### Keamanan checkpoint pembelajaran Model B (26-10-2026)
+
+Pencatatan waktu pada browser merupakan **sinyal yang dapat dimanipulasi**, khususnya aktivitas selama offline. Penyimpanan lokal hanya angka progres kumulatif, nomor halaman, dan durasi sementara; jangan memasukkan identitas siswa, kredensial, token CSRF, jawaban Resume/HOTS, atau berkas privat. Server menerima laporan hanya dari akun siswa berhak, memeriksa snapshot dan status progres, kewajaran durasi berdasarkan waktu server yang berlalu, pembagian durasi per halaman PDF, serta transaksi dan retry idempoten. Aplikasi tidak boleh mengklaim mengetahui siswa benar-benar membaca saat jaringan terputus.
+
+Download berkas materi wajib pemeriksaan ulang hak akses/progres `media_selesai` di controller/service pada setiap request. Nama file download disanitasi, MIME whitelist dan Content-Disposition attachment, Cache-Control private no-store, nosniff. Endpoint `media` tetap terpisah karena streaming berkas diperlukan sebelum belajar selesai.

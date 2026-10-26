@@ -120,6 +120,13 @@
                 data-media-jenis="<?= esc($materi['jenis'], 'attr') ?>"
                 data-media-url="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
                     . '/materi/' . (int) $materi['id'] . '/aktivitas'), 'attr') ?>"
+                data-media-start="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                    . '/materi/' . (int) $materi['id'] . '/mulai-media'), 'attr') ?>"
+                data-media-checkpoint="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                    . '/materi/' . (int) $materi['id'] . '/checkpoint'), 'attr') ?>"
+                data-media-scope="<?= esc(hash('sha256',(string)$progres['id']
+                    . '|' . (string)$progres['versi_konten_tp_id']
+                    . '|' . (string)$materi['id']), 'attr') ?>"
                 data-csrf-name="<?= esc(csrf_token(), 'attr') ?>"
                 data-csrf-hash="<?= esc(csrf_hash(), 'attr') ?>">
                 <h3>Aktivitas belajar</h3>
@@ -133,6 +140,23 @@
             </div>
         <?php endif ?>
     </section>
+
+    <?php if (!$sukarela && in_array($materi['jenis'], ['audio','gambar','pdf'], true)): ?>
+        <section class="a-card a-jarak-atas" aria-labelledby="unduh-materi">
+            <h2 id="unduh-materi">Unduh Materi <?= (int) $materi['urutan'] ?></h2>
+            <?php if ($kegiatan['media_selesai']): ?>
+                <a class="a-btn a-btn--utama"
+                    href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                        . '/materi/' . (int) $materi['id'] . '/unduh'), 'attr') ?>"
+                    download>Unduh <?= esc(strtoupper($materi['jenis'])) ?> materi</a>
+                <p class="a-help">Waktu belajar telah disahkan server. Berkas asli tersedia untuk belajar ulang.</p>
+            <?php else: ?>
+                <p class="a-help" role="status">Unduhan terkunci sampai durasi pengamatan
+                    media selesai dan tersimpan di server. Setelah selesai, tombol muncul
+                    bersama formulir Resume.</p>
+            <?php endif ?>
+        </section>
+    <?php endif ?>
 
     <section class="a-card a-jarak-atas a-materi-kegiatan" aria-labelledby="petunjuk-kegiatan">
         <h2 id="petunjuk-kegiatan">Kegiatan Materi <?= (int) $materi['urutan'] ?></h2>
@@ -250,7 +274,7 @@
     </nav>
 </div>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-presisi2'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi-checkpoint.js?v=20261026-checkpoint180'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261026-final2'), 'attr') ?>" defer></script>

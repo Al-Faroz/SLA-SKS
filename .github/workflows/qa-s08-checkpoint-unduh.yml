@@ -1,0 +1,44 @@
+name: QA S08 Checkpoint 180s dan Unduh
+on:
+  pull_request:
+    paths:
+      - 'app/Services/CheckpointMateriSiswaService.php'
+      - 'app/Controllers/SiswaCheckpointMateri.php'
+      - 'app/Services/MateriSiswaService.php'
+      - 'app/Controllers/SiswaMateri.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/siswa/materi.php'
+      - 'public/assets/js/aktivitas-materi-checkpoint.js'
+      - 'tests/unit/MateriSiswaDatabaseTest.php'
+      - 'tests/js/aktivitas-materi-checkpoint.test.cjs'
+      - '.github/workflows/qa-s08-checkpoint-unduh.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  client-server-checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, sqlite3, pdo_sqlite
+          tools: composer
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP syntax
+        run: |
+          php -l app/Services/CheckpointMateriSiswaService.php
+          php -l app/Controllers/SiswaCheckpointMateri.php
+          php -l app/Services/MateriSiswaService.php
+          php -l app/Controllers/SiswaMateri.php
+      - name: SQLite integrated check
+        run: vendor/bin/phpunit tests/unit/MateriSiswaDatabaseTest.php
+      - name: Node browser checkpoint test
+        run: |
+          node --check public/assets/js/aktivitas-materi-checkpoint.js
+          node --test tests/js/aktivitas-materi-checkpoint.test.cjs
