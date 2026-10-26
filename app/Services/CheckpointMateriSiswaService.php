@@ -23,6 +23,7 @@ final class CheckpointMateriSiswaService
     private BaseConnection $db;
     private MateriSiswaService $materi;
     private $clock;
+    private $akun;
 
     public function __construct(?BaseConnection $db = null, ?callable $akun = null,
         ?callable $clock = null)
@@ -30,6 +31,7 @@ final class CheckpointMateriSiswaService
         $this->db = $db ?? db_connect();
         $this->materi = new MateriSiswaService($this->db, $akun);
         $this->clock = $clock ?? static fn (): int => time();
+        $this->akun = $akun;
     }
 
     private function context(int $tpId, int $materiId): array
@@ -67,7 +69,7 @@ final class CheckpointMateriSiswaService
         }
         // API lama mengunci versi/TP dan menginisiasi baris; reset tidak
         // menambah detik tersembunyi. Tidak memanggil di setiap checkpoint.
-        return (new ProgresMediaMateriSiswaService($this->db, null, $this->clock))
+        return (new ProgresMediaMateriSiswaService($this->db, $this->akun, $this->clock))
             ->detak($tpId, $materiId, true, $posisi, $durasi,
                 $halaman, $pdfTotal, true);
     }
@@ -135,11 +137,13 @@ final class CheckpointMateriSiswaService
             }
             if ($row['status'] === 'media_selesai') {
                 $this->db->transCommit();
-                return (new ProgresMediaMateriSiswaService($this->db, null, $this->clock))
+                return (new ProgresMediaMateriSiswaService($this->db, $this->akun, $this->clock))
                     ->status($tpId, $materiId);
             }
             $oldTotal = max(0, (int) $row['waktu_aktif_detik']);
-            $additional = max(0, $total - $oldTotal);
+            // Data kumulatif tidak pernah menurunkan waktu yang sudah tersimpan.
+            $total = max($total, $oldTotal);
+            $additional = $total - $oldTotal;
             // Jangan menerima total yang melampaui waktu nyata sejak anchor server.
             $last = strtotime((string) $row['heartbeat_terakhir_pada'] . ' UTC');
             if ($last === false || $now < $last) {
@@ -236,7 +240,7 @@ final class CheckpointMateriSiswaService
                 throw new RuntimeException('Penyimpanan checkpoint media gagal.');
             }
             $this->db->transCommit();
-            return (new ProgresMediaMateriSiswaService($this->db, null, $this->clock))
+            return (new ProgresMediaMateriSiswaService($this->db, $this->akun, $this->clock))
                 ->status($tpId, $materiId);
         } catch (Throwable $e) {
             $this->db->transRollback();
