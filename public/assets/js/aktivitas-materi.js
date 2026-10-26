@@ -46,26 +46,33 @@
         selesai = data.media_selesai === true;
         const secs = Math.max(0, Number(data.waktu_aktif_detik) || 0);
         const required = Math.max(1, Number(data.minimal_detik) || 1);
-        const persentase = [secs / required];
-        const waktuCukup = secs >= required ? 'Terpenuhi' : 'Belum terpenuhi';
-        let rincian = 'Waktu belajar: ' + secs + '/' + required
-            + ' detik (' + waktuCukup + ').';
+        const persentase = [];
+        let rincian = '';
 
         if (data.persen_putar_minimal) {
-            const target = Number(data.pemutaran_minimal_detik);
+            const target = Number(data.batas_efektif_detik);
             const putar = Math.max(0, Number(data.waktu_putar_detik) || 0);
-            const terjauh = Math.max(0, Number(data.posisi_terjauh_detik) || 0);
             const durasi = Number(data.durasi_media_detik);
+            const target90 = Number(data.pemutaran_minimal_detik);
             if (Number.isFinite(target) && target > 0) {
-                persentase.push(putar / target, terjauh / target);
-                rincian += ' Video/audio: durasi ' + durasi + ' detik; '
-                    + 'waktu putar diakui ' + putar + '/' + target + ' detik; '
-                    + 'posisi terjauh ' + terjauh + '/' + target
-                    + ' detik (syarat 90% durasi).';
+                persentase.push(putar / target, secs / target);
+                const asal = required <= target90
+                    ? 'waktu minimum Guru' : '90% durasi media';
+                rincian = 'Batas yang berlaku: ' + target + ' detik (' + asal
+                    + '). Waktu putar diakui: ' + putar + '/' + target
+                    + ' detik. Durasi media: ' + durasi + ' detik.'
+                    + ' Guru menetapkan ' + required
+                    + ' detik; 90% media: ' + target90 + ' detik.';
             } else {
                 persentase.push(0);
-                rincian += ' Menunggu metadata durasi video/audio untuk memeriksa syarat 90%.';
+                rincian = 'Menunggu metadata durasi video/audio'
+                    + ' agar batas yang lebih pendek dapat dihitung.';
             }
+        } else {
+            persentase.push(secs / required);
+            rincian = 'Waktu belajar: ' + secs + '/' + required
+                + ' detik (' + (secs >= required ? 'Terpenuhi' : 'Belum terpenuhi')
+                + ').';
         }
         if (jenis === 'pdf' && Number(data.halaman_total) > 0) {
             const total = Math.max(1, Number(data.halaman_total));
@@ -86,9 +93,9 @@
                 statusText('Media selesai. Membuka formulir Resume…');
                 window.location.reload();
             }
-        } else if (data.persen_putar_minimal && secs >= required) {
-            statusText('Waktu belajar sudah cukup, tetapi pemutaran 90% durasi '
-                + 'belum terpenuhi. Terus putar video/audio dari pemutar.');
+        } else if (data.persen_putar_minimal) {
+            statusText('Lanjutkan pemutaran hingga batas yang lebih cepat tercapai: '
+                + 'waktu Guru atau 90% durasi media. Jangan lompat posisi video/audio.');
         } else {
             statusText(data.pesan || 'Menunggu aktivitas media.');
         }

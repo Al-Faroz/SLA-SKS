@@ -72,3 +72,8 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 3. **Semua soal Diagnostik/Sumatif adalah PG tepat 5 opsi A–E dan satu kunci.** Template Word bersama mendukung konten kaya serta Google Drive; tidak menambah tipe soal CBT lain.
 4. Guru menggunakan Excel pemetaan TP/Materi enam semester terikat Gen–Mapel; tidak memakai delapan sheet konten lama. TP Siap terkunci, snapshot dan koreksi versi berlaku per TP.
 5. Admin CP tidak wajib mengulang metadata sumber resmi pada setiap rumusan; sumber tetap terlacak. Logo aplikasi yang diunggah pada admin/identitas digunakan pula sebagai favicon. UI halaman Admin/Profil mengikuti 12 dan 13.
+
+
+### Revisi ketentuan durasi YouTube/audio — 26 Oktober 2026
+
+Untuk Materi wajib berbentuk YouTube/audio, **yang terpenuhi lebih dulu dinyatakan selesai**: minimum waktu Guru atau 90% durasi video/audio, mana yang **lebih singkat**. Perhitungan wajib memakai pemutaran nyata yang telah diakui heartbeat server; tidak cukup membuka halaman, menggeser posisi, menjeda atau mempercepat pemutaran. Bila durasi Guru 10 menit dan video 7 menit, batas efektif 6 menit 18 detik; bila Guru 10 menit dan video 15 menit, batas efektif 10 menit. Setelah selesai siswa dapat mengisi Resume, selanjutnya HOTS setelah Resume dikirim final. Ini **menggantikan** kebijakan lama yang mensyaratkan kedua batas sekaligus. Syarat media PDF/gambar, nilai, Diagnostik dan TP Siap tetap berlaku.
