@@ -157,3 +157,13 @@ test('Endpoint final dan draf eksplisit serta controller memvalidasi aksi', () =
     assert.match(controller, /kegiatan_jenis/);
     assert.match(controller, /withInput\(\)/);
 });
+
+
+test('Konfirmasi final batal menghapus fallback aksi agar tidak terbawa submit berikutnya', () => {
+    const x = setup(false);
+    x.finish.dispatch('click');
+    assert.equal(x.form.dataset.aksi, 'kirim');
+    x.form.dispatch('submit', {submitter: x.finish, preventDefault() {}});
+    assert.equal(x.form.dataset.aksi, undefined);
+    assert.equal(x.form.dataset.mengirim, undefined);
+});

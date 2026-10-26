@@ -69,6 +69,7 @@
                 const jumlah = panjang(textarea.value);
                 if (batas === null || jumlah < batas || jumlah > 12000) {
                     event.preventDefault();
+                    delete form.dataset.aksi;
                     validasi.textContent = batas === null
                         ? 'Konfigurasi batas karakter tidak tersedia. Muat ulang halaman.'
                         : 'Belum dapat Kirim final: ' + jumlah
@@ -79,6 +80,7 @@
                 }
                 if (!window.confirm('Kirim jawaban final? Setelah dikirim tidak dapat diubah.')) {
                     event.preventDefault();
+                    delete form.dataset.aksi;
                     return;
                 }
             }

@@ -16,7 +16,8 @@ final class SiswaKegiatanMateri extends BaseController
         ?string $aksiRute = null): RedirectResponse
     {
         $tujuan = 'siswa/tp/' . $tpId . '/materi/' . $materiId;
-        $aksiForm = (string) $this->request->getPost('aksi');
+        $aksiMasuk = $this->request->getPost('aksi');
+        $aksiForm = is_string($aksiMasuk) ? $aksiMasuk : '';
         $aksi = $aksiRute ?? $aksiForm;
         // Rute adalah sumber aksi yang tegas; nilai form berbeda ditolak.
         $tujuanKembali = site_url($tujuan) . '#kegiatan-'
@@ -54,7 +55,8 @@ final class SiswaKegiatanMateri extends BaseController
                 ['error' => $e->getMessage()]);
             return redirect()->to($tujuanKembali)->withInput()
                 ->with('kegiatan_jenis', $jenis)
-                ->with('kegiatan_gagal', 'Jawaban belum tersimpan. Periksa koneksi lalu coba lagi.');
+                ->with('kegiatan_gagal', 'Jawaban ' . strtoupper($jenis) . ' belum tersimpan akibat kendala teknis.'
+                    . ' Silakan coba lagi atau hubungi pengelola jika terus gagal.');
         }
     }
 }
