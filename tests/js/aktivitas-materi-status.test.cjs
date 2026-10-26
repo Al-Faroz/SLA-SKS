@@ -5,11 +5,11 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const path=require('node:path');
 const source=fs.readFileSync(path.resolve(__dirname,'../../public/assets/js/aktivitas-materi.js'),'utf8');
-function renderStatus(payload) {
+function renderStatus(payload, jenis='youtube') {
     const status={textContent:''},waktu={textContent:''},bilah={value:0};
     let refresh=0;
     const root={
-        dataset:{mediaUrl:'/api',mediaJenis:'youtube',csrfName:'csrf',csrfHash:'tok'},
+        dataset:{mediaUrl:'/api',mediaJenis:jenis,csrfName:'csrf',csrfHash:'tok'},
         querySelector(selector) {
             return {'[data-media-status]':status,'[data-media-waktu]':waktu,
                 '[data-media-bilah]':bilah}[selector]||null;
@@ -22,9 +22,11 @@ function renderStatus(payload) {
             return null;
         },
         visibilityState:'visible',hasFocus:()=>true,
+        addEventListener() {},
         getElementById:()=>null
     };
-    const window={setInterval:()=>0,location:{reload:()=>{refresh++;}}};
+    const window={setInterval:()=>0,addEventListener() {},
+        location:{reload:()=>{refresh++;}}};
     const context={document,window,navigator:{onLine:true},
         FormData:class{append(){}},
         fetch:async()=>({ok:true,json:async()=>({ok:true,data:payload,csrf:'tok'})}),
@@ -81,4 +83,51 @@ test('video panjang menggunakan minimum Guru tanpa menunggu 90%',async()=>{
     assert.match(state.waktu,/350\/600/);
     assert.match(state.waktu,/waktu minimum Guru/);
     assert.equal(state.refresh,0);
+});
+
+
+test('gambar mencapai waktu Guru dan langsung membuka Resume',async()=>{
+    const data = {media_selesai:true,waktu_aktif_detik:65,minimal_detik:60,
+        waktu_tersisa_detik:0,persen_putar_minimal:null};
+    const state=await renderStatus(data,'gambar');
+    assert.equal(state.progress,100);
+    assert.equal(state.refresh,1);
+    assert.match(state.waktu,/65\/60/);
+});
+test('gambar belum mencapai 30 detik tidak menampilkan bilah penuh',async()=>{
+    const state=await renderStatus({
+        media_selesai:false,waktu_aktif_detik:20,minimal_detik:30,
+        waktu_tersisa_detik:10,persen_putar_minimal:null},'gambar');
+    assert.equal(state.progress,66);
+    assert.equal(state.refresh,0);
+    assert.match(state.waktu,/Sisa waktu aktif: 10 detik/);
+});
+test('PDF sudah cukup durasi tetapi masih punya halaman wajib',async()=>{
+    const state=await renderStatus({
+        media_selesai:false,waktu_aktif_detik:90,minimal_detik:60,
+        waktu_tersisa_detik:0,persen_putar_minimal:null,
+        halaman_total:3,halaman_selesai:2,
+        halaman_belum_selesai:[3]},'pdf');
+    assert.equal(state.progress,66);
+    assert.equal(state.refresh,0);
+    assert.match(state.waktu,/Halaman belum tuntas: 3/);
+});
+test('PDF seluruh halaman dan durasi sah membuka Resume via reload',async()=>{
+    const state=await renderStatus({
+        media_selesai:true,waktu_aktif_detik:70,minimal_detik:60,
+        waktu_tersisa_detik:0,persen_putar_minimal:null,
+        halaman_total:2,halaman_selesai:2,
+        halaman_belum_selesai:[]},'pdf');
+    assert.equal(state.progress,100);
+    assert.equal(state.refresh,1);
+});
+test('audio yang batas efektifnya tercapai membuka Resume tanpa menunggu Guru',async()=>{
+    const state=await renderStatus({
+        media_selesai:true,waktu_aktif_detik:380,minimal_detik:600,
+        persen_putar_minimal:90,durasi_media_detik:420,
+        pemutaran_minimal_detik:378,batas_efektif_detik:378,
+        waktu_putar_detik:380},'audio');
+    assert.equal(state.progress,100);
+    assert.equal(state.refresh,1);
+    assert.match(state.waktu,/380\/378/);
 });

@@ -271,6 +271,112 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
     }
 
+    public function testGambarWaktuSudahCukupDirekonsiliasiSaatGET(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11, 'materi_id'=>31, 'versi_konten_tp_id'=>3,
+            'jenis'=>'gambar', 'status'=>'berjalan',
+            'waktu_aktif_detik'=>40, 'waktu_putar_detik'=>0,
+        ]);
+        $svc = $this->progresMediaService(101, static fn ():int=>2000);
+        $status = $svc->status(1,31);
+        self::assertTrue($status['media_selesai']);
+        self::assertSame(30,$status['minimal_detik']);
+        self::assertSame('media_selesai',
+            $this->db->table('progres_materi')->get()->getRow('status'));
+        self::assertNotNull($this->db->table('progres_materi')
+            ->get()->getRow('media_selesai_pada'));
+        $svc->status(1,31);
+        self::assertSame(1,$this->db->table('progres_materi')->countAllResults());
+        $k = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn():array=>[
+                'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]);
+        self::assertTrue($k->status(1,31)['media_selesai']);
+    }
+
+    public function testGambarWaktuTidakCukupTetapTerkunci(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'gambar','status'=>'berjalan','waktu_aktif_detik'=>20,
+        ]);
+        $status = $this->progresMediaService(101,static fn():int=>2000)
+            ->status(1,31);
+        self::assertFalse($status['media_selesai']);
+        self::assertSame(10,$status['waktu_tersisa_detik']);
+        self::assertSame('berjalan',
+            $this->db->table('progres_materi')->get()->getRow('status'));
+    }
+
+    public function testPdfSelesaiBerdasarkanSeluruhBuktiHalamanDanWaktuGuru(): void
+    {
+        $this->db->table('progres_materi')->insert([
+            'id'=>17,'progres_tp_id'=>11,'materi_id'=>31,
+            'versi_konten_tp_id'=>3,'jenis'=>'pdf','status'=>'berjalan',
+            'waktu_aktif_detik'=>70,'halaman_total'=>2,'halaman_selesai'=>2,
+        ]);
+        foreach ([1,2] as $halaman) {
+            $this->db->table('halaman_progres_materi')->insert([
+                'progres_materi_id'=>17,'nomor_halaman'=>$halaman,
+                'waktu_aktif_detik'=>35,'selesai_pada'=>'2026-10-25 10:00:00',
+            ]);
+        }
+        $svc=$this->progresMediaService(101,static fn():int=>2000);
+        $status=$svc->status(1,31);
+        self::assertSame(2,$status['halaman_selesai']);
+        self::assertSame([], $status['halaman_belum_selesai']);
+        self::assertTrue($status['media_selesai']);
+        self::assertNotNull($this->db->table('progres_materi')
+            ->where('id',17)->get()->getRow('media_selesai_pada'));
+        self::assertTrue($svc->status(1,31)['media_selesai']);
+        self::assertSame(1,$this->db->table('progres_materi')->countAllResults());
+        self::assertTrue((new \App\Services\KegiatanMateriSiswaService(
+            $this->db,static fn():array=>[
+                'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]))->status(1,31)['media_selesai']);
+    }
+
+    public function testPdfWaktuGuruCukupTetapiHalamanBelumLengkapTetapTerkunci(): void
+    {
+        $this->db->table('progres_materi')->insert([
+            'id'=>17,'progres_tp_id'=>11,'materi_id'=>31,
+            'versi_konten_tp_id'=>3,'jenis'=>'pdf','status'=>'berjalan',
+            'waktu_aktif_detik'=>90,'halaman_total'=>2,'halaman_selesai'=>1,
+        ]);
+        $this->db->table('halaman_progres_materi')->insert([
+            'progres_materi_id'=>17,'nomor_halaman'=>1,
+            'waktu_aktif_detik'=>90,'selesai_pada'=>'2026-10-25 10:00:00',
+        ]);
+        $status=$this->progresMediaService(101,static fn():int=>2000)
+            ->status(1,31);
+        self::assertFalse($status['media_selesai']);
+        self::assertSame([2],$status['halaman_belum_selesai']);
+        self::assertSame(0,$status['waktu_tersisa_detik']);
+    }
+
+    public function testPdfSeluruhHalamanSudahDibacaTetapiWaktuGuruBelumTuntas(): void
+    {
+        $this->db->table('progres_materi')->insert([
+            'id'=>17,'progres_tp_id'=>11,'materi_id'=>31,
+            'versi_konten_tp_id'=>3,'jenis'=>'pdf','status'=>'berjalan',
+            'waktu_aktif_detik'=>50,'halaman_total'=>2,'halaman_selesai'=>2,
+        ]);
+        foreach ([1,2] as $halaman) {
+            $this->db->table('halaman_progres_materi')->insert([
+                'progres_materi_id'=>17,'nomor_halaman'=>$halaman,
+                'waktu_aktif_detik'=>25,'selesai_pada'=>'2026-10-25 10:00:00',
+            ]);
+        }
+        $status=$this->progresMediaService(101,static fn():int=>2000)
+            ->status(1,31);
+        self::assertFalse($status['media_selesai']);
+        self::assertSame(10,$status['waktu_tersisa_detik']);
+        self::assertSame([],$status['halaman_belum_selesai']);
+    }
+
     public function testPdfDuaHalamanServerDanGerbangResume(): void
     {
         $now = 1000;
