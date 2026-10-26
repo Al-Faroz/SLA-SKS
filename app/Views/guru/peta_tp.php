@@ -40,10 +40,10 @@
         </section>
 
         <?php if (session('galat')): ?>
-            <p class="a-alert a-alert--galat" role="alert"><?= esc(session('galat')) ?></p>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
         <?php endif ?>
         <?php if (session('sukses')): ?>
-            <p class="a-alert a-alert--sukses" role="status"><?= esc(session('sukses')) ?></p>
+            <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
         <?php endif ?>
 
         <?php foreach ($semester as $nomor => $data): ?>
