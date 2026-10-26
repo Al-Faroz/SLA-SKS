@@ -27,8 +27,8 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-017 | TP Siap diedit via form/API/impor | Ditolak; hanya jalur koreksi A–C |
 | E2E-018 | TP koreksi A–C disetujui | Versi baru; siswa yang mulai tetap pada versi lama |
 | E2E-019 | Koreksi kategori D | Ditolak |
-| E2E-020 | Siswa tidak lulus diagnostik | Setiap Materi wajib media → Resume final → HOTS final secara urut, kemudian Sumatif |
-| E2E-021 | Siswa lulus diagnostik | TP tuntas; materi boleh sukarela, resume/tugas resmi tidak dikirim |
+| E2E-020 | Siswa tidak lulus diagnostik | Tepat satu Materi → Resume final → HOTS final → Sumatif minimal 30 |
+| E2E-021 | Siswa lulus diagnostik | Melewati Materi/Resume/HOTS tetapi tetap mengerjakan Sumatif minimal 30 untuk menyelesaikan TP |
 | E2E-022 | Simpan draf manual | Data berubah baru tersimpan setelah klik Simpan; indikator jelas |
 | E2E-023 | Siswa menutup tab dengan draf belum disimpan | Peringatan perubahan belum disimpan; tidak mengklaim autosave |
 | E2E-024 | Siswa kirim resume/tugas final dua kali | Satu pengiriman; terkunci setelahnya |
@@ -51,7 +51,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-041 | Admin menyetujui koreksi valid | Nilai, agregat, audit berubah sekali |
 | E2E-042 | Nilai sumber berubah ketika permohonan menunggu | Optimistic conflict; tidak menimpa |
 | E2E-043 | Soal/kunci sah ternyata salah | Koreksi semua attempt sah terdampak dari snapshot; audit lengkap |
-| E2E-044 | Koreksi soal mengubah tuntas→belum | Status tuntas dihitung ulang tanpa hapus progres/attempt |
+| E2E-044 | Koreksi soal menurunkan nilai di bawah KKM | Nilai/indikator KKM dihitung ulang; status TP Selesai tetap berdasar aktivitas dan attempt sah, riwayat tidak dihapus |
 | E2E-045 | Semua TP tuntas tapi tugas menunggu nilai | Sertifikat ditahan; pesan menunggu guru |
 | E2E-046 | TTD PNG belum diunggah | Sertifikat ditahan, Admin mendapat peringatan |
 | E2E-047 | Background belum diunggah | Template bawaan dipakai; bukan kegagalan sertifikat |
@@ -73,7 +73,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-063 | Laporan XLSX dengan sel `=FORMULA` | Diamankan dari formula injection |
 | E2E-064 | Login di instalasi shared hosting | Semua rute dan rewrite root bekerja |
 | E2E-065 | Mengakses `/.env`, `/app/...`, `/vendor/...`, `/writable/...`, `/database/sql/...` | 403/404, tidak bocor konten |
-| E2E-066 | Menjalankan impor SQL final ke DB uji bersih MySQL & MariaDB | Keduanya sukses; struktur TP langsung di bawah paket; dump lokal berdata disiapkan terpisah setelah analisis |
+| E2E-066 | Menjalankan impor SQL final ke DB uji baru MySQL & MariaDB | Keduanya sukses; struktur Semester→BAB→TP dan data historis yang dipertahankan; sumber v3 tidak rusak |
 | E2E-067 | Menjalankan SQL update pada DB berisi progres | Tidak menghapus siswa/sertifikat/riwayat |
 | E2E-068 | Website kehilangan cron 5 menit | Request ujian tetap rekonsiliasi dengan waktu server |
 | E2E-069 | Backup manual dan restore di lingkungan uji | Siswa, aset historis dan sertifikat dapat dibaca |
@@ -84,7 +84,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-074 | Resume/tugas dengan nilai sementara dan bobot 0 | Tetap menunggu penilaian komponen wajib sebelum sertifikat |
 | E2E-075 | Menghapus TP draf tanpa progres, lalu mencoba menghapus TP Siap | Hanya draf aman yang boleh dihapus; data TP Siap utuh |
 
-### Skenario penerimaan tambahan v2.4
+### Skenario penerimaan historis v2.4 yang diselaraskan v2.5
 | ID | Skenario | Lulus bila |
 |---|---|---|
 | E2E-076 | Matematika Gen A dan Gen B punya Guru berbeda | Satu pengampu aktif per Gen–Mapel; keduanya hanya dapat mengakses cakupan Gen sendiri |
@@ -140,7 +140,7 @@ Fitur dinyatakan selesai bila **aturan domain + izin + data SQL + route/service 
 | E2E-111 | Logo aplikasi di admin/identitas | Validasi upload, logo di aplikasi/login dan favicon baru, fallback, versi aman |
 | E2E-112 | Profil semua role | Foto full-width atas, Identitas dan Kontak dua kolom desktop/satu mobile, tidak bocor atau membuka edit tanpa izin |
 
-### Uji kontrak SQL lokal khusus v2.4
+### Uji kontrak SQL lokal v2.5
 Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin pemilik**, periksa jumlah data terpilih, FK, nomor ATP dan referensi CP, login sah (tanpa membuka password/hash ke log), BAB operasional terpasang, TP berelasi ke BAB/paket, HOTS per Materi, kemampuan restore; **uji di MariaDB dengan jalur non-destruktif yang berbeda**. Uji ini **belum** dilakukan pada perubahan dokumen saja.
 
 ## 5. Gerbang wajib audit SQL/DB sebelum menerima fitur (25-10-2026)
@@ -184,7 +184,7 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Audio dengan waktu Guru lebih lama dari 90% durasi: putaran sah mencapai 90% => media_selesai; audio pendek mencatat heartbeat awal dan sisa detak saat `ended`, tanpa menganggap seek sebagai waktu putar.
 - Gambar dengan waktu minimum Guru 60 detik: hanya detak ketika gambar termuat, area gambar >=50% viewport, tab aktif/fokus. Waktu aktif 60 detik yang telah tercatat namun status masih berjalan direkonsiliasi oleh server tanpa menghapus hasil.
 - PDF dua halaman: keduanya minimal 15 detik; total harus mencapai waktu Guru, tidak cukup hanya membuka seluruh halaman atau mencapai total tanpa melihat salah satu halaman. Daftar halaman belum lengkap muncul di UI; sinyal perpindahan saat request sebelumnya berlangsung tidak hilang.
-- Status selesai membuka Resume via reload server, HOTS hanya setelah Resume final; siswa jalur Diagnostik tuntas dan akses Gen lain tetap ditolak untuk pengiriman resmi. Tidak ada perubahan SQL/versi TP/hasil penilaian.
+- Status media selesai membuka Resume via reload server, HOTS hanya setelah Resume final; siswa jalur Diagnostik lulus boleh melewati seluruh kegiatan ini tetapi **tetap wajib Sumatif**. Akses Gen lain dan pengiriman tidak sah ditolak.
 
 ### Uji regresi presisi Gambar/PDF (26 Oktober 2026)
 
@@ -202,7 +202,7 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 ### Regresi akses unduh Media
 
 - Siswa jalur wajib sebelum `media_selesai` tidak dapat membuka `.../unduh` sekalipun mengetik URL langsung. Setelah media_selesai, audio/gambar/PDF dapat diunduh dengan `Content-Disposition: attachment`.
-- Siswa lintas Gen, versi TP yang berbeda, atau Materi berikutnya terkunci tetap ditolak. Siswa jalur Diagnostik tuntas (belajar sukarela) tidak memperoleh tombol unduh resmi.
+- Siswa lintas Gen/versi TP ditolak. Untuk pola v2.5 tidak ada Materi kedua dalam satu TP; siswa lulus Diagnostik tidak diwajibkan mengerjakan Materi dan tetap wajib Sumatif.
 - YouTube tidak memiliki unduhan. URL file dari media yang digunakan untuk preview tetap inline, tidak menjadi jalan pintas mengunduh resmi tanpa ketuntasan.
 
 ## 6. Regresi wajib perubahan kontrak v2.5 (E2E-113 s.d. E2E-134)

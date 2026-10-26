@@ -5,7 +5,7 @@
 ## 1. Produk dan pengguna
 SLA-SKS adalah LMS tertutup untuk program pembelajaran mandiri berurutan. Siswa mempelajari mata pelajaran menurut paket semester 1–6, BAB, TP dan materi. Fokusnya ketuntasan akademik, bukan kompetisi. Empat peran: **Siswa**, **Guru**, **Admin**, **Pimpinan**. Setiap siswa hanya memiliki peran siswa; akun staf boleh merangkap maksimal dua peran yang diizinkan. Perkiraan kapasitas kecil: satu kelas khusus maksimum tiap angkatan, bukan platform publik ratusan pengguna serentak. Akses utama siswa melalui HP/laptop; sumatif dari **desktop/laptop** saja.
 
-Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru menyusun ATP/TP dan Materi berdasarkan CP resmi → Guru melengkapi dan menerbitkan TP Siap → Siswa menjalani diagnostik → jika belum tuntas: materi/resume/tugas/sumatif → Guru memberi penilaian → siswa melihat kemajuan/sertifikat → Pimpinan memantau**.
+Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru menyusun ATP/TP dan Materi berdasarkan CP resmi → Guru melengkapi dan menerbitkan TP Siap → Siswa menjalani diagnostik → jika gagal: satu materi/resume/HOTS; semua NonEsensial wajib sumatif → Guru memberi penilaian → siswa melihat kemajuan/sertifikat → Pimpinan memantau**.
 
 ## 2. Struktur belajar resmi
 Struktur utama: **Mapel → 1 CP operasional → Semester → BAB → TP**. Enam semester tetap: 1–2 VII, 3–4 VIII, 5–6 IX; satu Gen–Mapel memiliki paket semester berversi. BAB/TP bernama singkat (maksimum 35 karakter) dan berdeskripsi (maksimum 225). BAB berlanjut nomor lintas dua semester pada tingkat kelas yang sama. Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misal `BIND.8.1.1`). TP Esensial ada di ATP/sertifikat tanpa materi/nilai. TP NonEsensial wajib tepat satu Materi.
