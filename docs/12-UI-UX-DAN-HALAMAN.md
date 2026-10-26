@@ -159,3 +159,8 @@ Browser menolak paste/copy/cut dan drag/drop biasa sebagai pencegahan
 dasar; tidak menghalangi Unicode atau pengetikan normal. Kebijakan ini
 bukan bukti keaslian tulisan dan tidak bisa menjamin semua cara tempel
 dihentikan. Server tetap memeriksa final tanpa JavaScript.
+
+
+### S08 Audio / Gambar / PDF — perbaikan sinkronisasi status (26 Oktober 2026)
+
+Indikator progres harus memperlihatkan syarat yang sebenarnya: audio menampilkan waktu putar sah dan batas efektif, gambar menampilkan waktu total yang diakui server serta sisa durasi, dan PDF menampilkan waktu total, jumlah halaman selesai, daftar beberapa halaman yang belum memenuhi minimal 15 detik dan alasan belum tuntas. Bilah media tidak boleh 100% hanya karena satu syarat selesai. Begitu server menyatakan `media_selesai`, GET ulang merender Resume tanpa perlu klik tombol manual; HOTS tetap sesudah Resume Final. Gagal/tertunda heartbeat tidak boleh dinyatakan sukses palsu.

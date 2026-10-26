@@ -177,3 +177,11 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Browser mencegah paste, copy/cut, drop dan beforeinput paste biasa,
   namun pengetikan biasa/Unicode tetap berfungsi. Ini mitigasi saja,
   bukan anti-kecurangan absolut.
+
+
+### Regresi S08 non-YouTube — pencatatan batas waktu (26 Oktober 2026)
+
+- Audio dengan waktu Guru lebih lama dari 90% durasi: putaran sah mencapai 90% => media_selesai; audio pendek mencatat heartbeat awal dan sisa detak saat `ended`, tanpa menganggap seek sebagai waktu putar.
+- Gambar dengan waktu minimum Guru 60 detik: hanya detak ketika gambar termuat, area gambar >=50% viewport, tab aktif/fokus. Waktu aktif 60 detik yang telah tercatat namun status masih berjalan direkonsiliasi oleh server tanpa menghapus hasil.
+- PDF dua halaman: keduanya minimal 15 detik; total harus mencapai waktu Guru, tidak cukup hanya membuka seluruh halaman atau mencapai total tanpa melihat salah satu halaman. Daftar halaman belum lengkap muncul di UI; sinyal perpindahan saat request sebelumnya berlangsung tidak hilang.
+- Status selesai membuka Resume via reload server, HOTS hanya setelah Resume final; siswa jalur Diagnostik tuntas dan akses Gen lain tetap ditolak untuk pengiriman resmi. Tidak ada perubahan SQL/versi TP/hasil penilaian.
