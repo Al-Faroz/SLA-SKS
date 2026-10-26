@@ -175,3 +175,11 @@ Waktu gambar/PDF dibaca dari heartbeat sah 5 detik. Gambar yang tidak terlihat/f
 ### Unduh materi setelah media_selesai
 
 Pada kartu Media Audio/Gambar/PDF, tampilkan tombol `Unduh Materi` yang nonaktif dengan penjelasan ketika waktu belajar belum selesai. Setelah server menetapkan `media_selesai`, tampilkan tautan unduh asli. URL harus memiliki gerbang backend yang sama, tidak cukup kontrol tombol saja; respons attachment menggunakan nama berkas aman dan tidak membocorkan path privat.
+
+## 13. Kontrak layar pola baru v2.5 (menggantikan alur layar tanpa BAB)
+**Guru:** Peta ATP enam semester → Card BAB (nama ≤35, ringkasan ≤225) → daftar TP tiap BAB (kode, nama ≤35, deskripsi asli ≤225, badge jenis) → editor 1 Materi untuk NonEsensial → Diagnostik/Word → Resume/HOTS → Sumatif/Word → kesiapan. Esensial hanya data akademik, tidak menampilkan tombol unggah media/soal. Guru dapat mengisi langsung atau Excel setelah template diadaptasi. Nomor BAB berlanjut antarsemester berpasangan; perlihatkan kode TP contoh `BIND.8.1.1`.
+**Siswa:** Beranda → Semester (progres hanya NonEsensial) → Card BAB → TP Esensial (informasi tanpa tombol pengerjaan) atau NonEsensial (Diagnostik → gate → Materi/Resume/HOTS bila belum lulus → Sumatif wajib → remedial 1 bila perlu → Selesai walau nilai < KKM).
+**Pra-Semester:** card/halaman terkunci sebelum seluruh NonEsensial selesai; setelah selesai tampil tanggal/jam serentak Admin, belum berlangsung/berjalan/ditutup, fullscreen preflight, alasan tidak bisa mulai. Admin memiliki pengaturan jadwal dan validasi tabrakan.
+**Nilai dan ekspor:** Guru filter Gen–Mapel/Semester, tombol **Export Nilai** aktif walau baru satu nilai; kolom TP kode/nama dan Pra-Semester; tampil kosong, bukan 0, ketika nilai belum ada. Siswa tidak melihat nilai akhir semester gabungan.
+**Sertifikat:** daftar semua TP per BAB; Esensial tanpa angka, NonEsensial bernilai. Ketentuan Pra-Semester sebagai syarat terbit belum diputuskan, jangan membuat tombol gate yang diasumsikan.
+Semua layar memiliki normal/kosong/loading/sukses/gagal/locked, responsive HP dan desktop sesuai batas ujian; kontrol yang terlihat wajib berfungsi. Catatan layar implementasi v3 terdahulu di bagian lain dokumen ini adalah histori, **bukan aturan yang mengalahkan §13**.

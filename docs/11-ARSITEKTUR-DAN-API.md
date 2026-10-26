@@ -85,3 +85,13 @@ Tidak ada sistem login Google, API LMS eksternal, pembayaran, push notification,
 - `/guru/tp/{id}` mengelola Materi/media/Resume/HOTS per Materi dan checklist `TP Siap`. Domain Service minimum: `AtpService`, `ImporAtpService`, `TpService`, `MateriService`, `ImporSoalWordService`, `UjianService`, `NilaiService`, `IdentitasService`. Nama kelas boleh diselaraskan konvensi proyek tanpa mengubah kontrak bisnis.
 - `GET /admin/kurikulum-cp/ekspor`: XLSX daftar CP dan status versi sesuai filter, admin-only. `/admin/pengelola`, `/admin/siswa`, `/admin/mapel-guru` memakai paginasi server. `POST /admin/identitas/logo-aplikasi` mengunggah logo aplikasi sekaligus menghasilkan/favicon terkait.
 - Semua endpoint mutasi POST dengan CSRF, validasi role aktif di Controller **dan** Service, transaksi serta audit. Tidak menambahkan migrations/seeder, framework JS baru atau mengubah root CI4.
+
+## 10. Kontrak Service/route baru v2.5 (TARGET — BELUM DIIMPLEMENTASIKAN)
+Hierarki operasional CP → Semester → BAB → TP; kode TP dibangkitkan dari mapel/kelas/no BAB/no TP dalam BAB. `BabService` menegakkan urutan BAB antarsemester tingkat kelas sama. `TpService` membedakan Esensial (0 Materi/nilai) dan NonEsensial (1 Materi aktif). `AtpImportService` menerima editor aplikasi/Excel secara konsisten, validasi identitas Gen–Mapel, pratinjau diff, idempotensi, kesiapan TP dan snapshot.
+- Guru (rute logis, belum tetap): `/guru/bab/{id}`, `/guru/tp/{id}`, `/guru/pra-semester`, `/guru/export-nilai`. Gunakan komponen CSS kustom/JS native, bukan framework besar baru.
+- Siswa (rute logis): `/siswa/semester/{n}/bab/{id}`, `/siswa/tp/{id}`, `/siswa/pra-semester`; semua pemeriksaan izin/syarat di server.
+- Admin: pengaturan KKM default dan penjadwalan Pra-Semester, hanya terkait paket yang valid; tidak menyentuh nilai akademik Guru.
+- `NilaiTpService` menghitung 20/20/60 atau 100% Sumatif dengan remedial satu kali, membedakan **SELESAI** dari nilai ≥KKM. `ProgresSemesterService` hanya TP NonEsensial. `ExportNilaiService` selalu dapat mengekspor dari satu nilai dan tidak menghitung rata-rata nilai akhir semester.
+- `PraSemesterService` memeriksa semua TP NonEsensial selesai + waktu Admin, bank minimal 30 mencakup seluruh BAB, attempt Ketat/rehitung skor terbaik. Mesin ujian TP diperluas, tetapi status/rate limits/snapshot/jeda tetap.
+- `ProgresMediaService`: Model B hitung klien, checkpoint server 4 menit + checkpoint final. Bila offline simpan akumulasi lokal belum terkirim pada perangkat/browser yang sama, server validasi agar tidak menerima waktu tidak wajar; tombol unduh audio/gambar/PDF setelah gate sah.
+Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.env`, lokasi index root, upload privat, transaksi dan hak G1 tetap.

@@ -82,3 +82,11 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 4. Patch **nomor baru** bersifat additive; sertakan QA baca-saja sebelum/sesudah, uji DDL di MariaDB versi lokal aktual pada skema terisolasi/tersanitasi, pemeriksaan phpMyAdmin, dan rencana pemulihan berbasis backup (DDL tidak otomatis rollback).
 5. Pemilik melakukan backup database dan `writable/`, memilih target serta mengimpor patch sendiri. **Dilarang DROP/TRUNCATE/reset tanpa permintaan dan izin eksplisit**, meskipun masih XAMPP lokal. Jangan mengubah `.env`, root front controller atau URL yang sudah FIX tanpa alasan dan izin.
 6. Ketika hosting benar-benar disiapkan kelak, lakukan pemeriksaan kompatibilitas MariaDB/PHP/Apache/LiteSpeed/HTTPS dan akses privat secara terpisah sebelum upload. SOP hosting pada §3–7 adalah **rencana deployment**, bukan laporan bahwa aplikasi telah diunggah.
+
+## 9. SOP instalasi khusus `sla_sks_v4` (26 Oktober 2026)
+1. Sumber privat: dump `sla_sks_v3 (4).sql`, dibuat 26-10-2026 09:36 oleh MariaDB 10.4.32. Backup ulang `sla_sks_v3` **dan `writable/`** dahulu. Jangan hapus sumber v3.
+2. Gunakan file `sla_sks_v4_LOKAL_PRIVAT.sql` hasil rekonstruksi lokal; ia membuat DB **baru yang belum ada** bernama `sla_sks_v4`, mengimpor v3 dan menambah kontrak `V4-0001`. Bila DB v4 sudah ada, hentikan dan periksa; jangan auto-DROP.
+3. Impor melalui phpMyAdmin pada koneksi MariaDB lokal. Karena DDL implicit commit, backup dan proses pemulihan penting. Cek schema_version, CP operasional/elemen, BAB/TP, status arsip TP uji v3, tepat satu Materi aktif per TP, dan relasi ujian.
+4. **Jangan mengalihkan `.env` ke v4 selama kode MVC/Service/UI masih kontrak lama.** Sesudah penerapan kode v2.5 dan QA, pemilik dapat memilih DB v4 lokal dan menjalankan pengujian. URL `http://localhost/sla-sks/`/root index.php tidak berubah.
+5. MySQL lokal dan MariaDB hosting **perlu dua tes terpisah**; belum ada deployment hosting sehingga jangan menyatakan lolos di sana. Dump PII/backup/hash tidak dipush GitHub.
+6. File Excel ATP bermakro, generator/validator impor dan implementasi aplikasi dijadwalkan **setelah** fondasi dokumen dan DB ini.

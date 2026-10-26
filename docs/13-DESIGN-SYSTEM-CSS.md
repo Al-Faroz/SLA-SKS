@@ -328,3 +328,6 @@ konfirmasi final, umpan balik dan tombol Simpan & Berikutnya. Elemen
 .a-penilaian-* dalam app.css mengikuti tombol, form dan warna yang
 sudah ada. Halaman tidak menampilkan aksi mengubah nilai historis;
 revisi harus melalui jalur AB-33.
+
+## Kontrak desain card BAB/TP v2.5 (26 Oktober 2026)
+Gunakan token/kelas CSS kustom yang telah ada di dokumen ini, tanpa Bootstrap/Tailwind runtime. Card BAB dan TP memprioritaskan `nama_bab`/`nama_tp` maksimum **35 karakter** agar konsisten pada lebar layar HP/laptop. Deskripsi masing-masing ≤225 karakter tersedia pada detail atau ringkasan terkendali, dengan akses teks lengkap melalui interaksi yang nyata. Kode TP (contoh `BIND.8.1.1`) harus terbaca. Badges Esensial/NonEsensial hanya menjelaskan jenis, tidak menjadi klaim ketuntasan nilai. Progres semester hanya NonEsensial. Ujian Pra-Semester mengikuti UI ujian Ketat tanpa sidebar/perayaan. Komponen baru wajib dimasukkan ke galeri saat kode diimplementasikan. Contoh/galeri implementasi v3 lama tidak mengganti kontrak ini.

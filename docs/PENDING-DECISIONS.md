@@ -1,20 +1,17 @@
-# Status keputusan SLA-SKS Master v2.4 — 22 Oktober 2026
+# Status keputusan Master v2.5 — 26 Oktober 2026
 
-**Keputusan arsitektur dan ruang lingkup telah final menurut pemilik.** Tidak perlu menanyakan ulang alur Diagnostik/Resume/HOTS/Sumatif, perubahan istilah BAB, lima opsi PG, media Google Drive, atau enam revisi UI. Tidak memaksa prosedur approval/dokumen administratif yang tak diminta.
+## Keputusan final
+- CP → Semester → BAB → TP; satu CP operasional/mapel, beberapa elemen; BAB/TP 35+225, kode `MAPEL.KELAS.BAB.TP`, nomor BAB sambung 1–2/3–4/5–6.
+- TP Esensial tanpa media/ujian/nilai, tetap masuk ATP/sertifikat. TP NonEsensial tepat satu Materi.
+- Diagnostik ≥10 gate; Sumatif ≥30 wajib, bobot jalur gagal 20/20/60 atau lulus 100% Sumatif, KKM default Admin/khusus Guru, 1 remedial <KKM ambil nilai tertinggi, TP Selesai meski nilai di bawah KKM.
+- Guru isi ATP langsung/Excel lama yang akan diadaptasi; Excel bermakro dikerjakan tahap setelah Master+DB. Progres persemester hanya NonEsensial.
+- Pra-Semester pada tanggal dan jam serentak Admin setelah semua NonEsensial selesai, bank gabungan BAB, pola Sumatif, nilai berdiri sendiri. Tidak ada nilai akhir semester. Export Nilai Guru dapat dilakukan dari satu skor TP.
+- Database baru `sla_sks_v4` terpisah dari `sla_sks_v3`, sumber privat tak dikirim ke repo; semua versi/progres lama dipertahankan sebagai historis.
 
-## Keputusan terkunci
-1. **CP → ATP (urutan TP) → TP → Materi/Submateri**, satu TP banyak Materi, tanpa BAB operasional.
-2. Guru G1 per Gen–Mapel menyusun Excel peta ATP 6 semester; data identitas/CP relevan otomatis unduhan. Sumber media serta Resume/HOTS pada setiap Materi dikelola di aplikasi.
-3. Satu template Word PG lima pilihan A–E satu kunci untuk Diagnostik/Sumatif, dengan OOXML kaya (gambar, tabel bersarang, OMML) dan Drive untuk audio/video; generator mengatur jumlah soal sesuai bank.
-4. Diagnostik SKS percepatan dua tahun/ketuntasan dan nilai madrasah dipertahankan persis; skor HOTS beberapa Materi menjadi komponen rata-rata HOTS TP, bobot 20/30/50 tetap.
-5. Admin CP tanpa kewajiban metadata resmi berulang; versi/sumber tetap dapat ditelusuri. KBC terintegrasi sesuai relevansi.
-6. UI enam halaman dan pagination/export/logo/favicon/profil mengikuti dokumen 12/13.
-7. Database **masih XAMPP lokal, belum pernah deploy ke hosting**. Sebelum tiap pekerjaan SQL, pemilik mengirim **dump terbaru setelah pembaruan terakhir**. Developer memeriksa skema/versi/data sebelum patch baru. Default patch additive aman; **tidak mereset/menghapus tabel tanpa permintaan dan izin eksplisit**, bahkan di localhost.
+## Keputusan yang sengaja ditunda
+- Apakah siswa wajib menuntaskan Pra-Semester **sebelum sertifikat diterbitkan**, dan apakah nilainya perlu dicetak di daftar nilai sertifikat. Belum menjadi gate atau kolom default; menunggu pembahasan pemilik.
 
-## Data instalasi yang belum diberikan (bukan keputusan produk)
-- Dump SQL lokal terkini, versi PHP/MySQL/MariaDB nyata, data identitas sekolah/Guru/Gen/CP yang resmi.
-- Aset logo dan TTD final, host/domain hosting, akun privat; jangan memasukkan kredensial atau data siswa nyata ke repo.
-
-## Implementasi belum selesai
-- PR #13 menggunakan skema lama; jangan merge. Setelah dokumen v2.4 disetujui, kerjakan parser/importer Excel dan Word, pengalihan skema database, layanan TP/Materi, dan UI secara bertahap via PR kode.
-- Validasi akhir harus benar-benar dilaksanakan di XAMPP pengguna. Persyaratan yang belum terimplementasi bukan fitur selesai hanya karena dokumen telah diperbarui.
+## Belum dikerjakan setelah tahap dokumentasi/DB
+- File Excel ATP bermakro dengan pengaturan tambahan dan parser impor sesuai struktur baru.
+- Refactor MVC/Service, UI, ujian Pra-Semester, nilai, ekspor, progres, sertifikat dan regresi. Rincian tahap di `RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md`.
+- Pengujian MySQL/MariaDB secara eksekusi dan verifikasi XAMPP oleh pemilik.

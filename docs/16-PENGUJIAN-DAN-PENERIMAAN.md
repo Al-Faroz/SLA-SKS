@@ -204,3 +204,30 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Siswa jalur wajib sebelum `media_selesai` tidak dapat membuka `.../unduh` sekalipun mengetik URL langsung. Setelah media_selesai, audio/gambar/PDF dapat diunduh dengan `Content-Disposition: attachment`.
 - Siswa lintas Gen, versi TP yang berbeda, atau Materi berikutnya terkunci tetap ditolak. Siswa jalur Diagnostik tuntas (belajar sukarela) tidak memperoleh tombol unduh resmi.
 - YouTube tidak memiliki unduhan. URL file dari media yang digunakan untuk preview tetap inline, tidak menjadi jalan pintas mengunduh resmi tanpa ketuntasan.
+
+## 6. Regresi wajib perubahan kontrak v2.5 (E2E-113 s.d. E2E-134)
+| ID | Pemeriksaan wajib |
+|---|---|
+| 113 | Satu CP operasional per Mapel walau beberapa elemen rujukan resmi; versi dan data lama utuh |
+| 114 | Semester→BAB→TP: BAB terus bernomor antardua semester per kelas, reset pada tingkat baru |
+| 115 | Validasi nama BAB/TP ≤35, deskripsi masing-masing ≤225, kode `BIND.8.1.1` sesuai mapel/kelas/BAB/TP |
+| 116 | Guru membuat ATP Esensial dan NonEsensial langsung melalui aplikasi |
+| 117 | Impor ATP lama setelah adaptasi: preview, konfirmasi, anti-duplikat, BAB, jenis TP, kode dan konteks Gen |
+| 118 | Esensial tanpa Materi/ujian/nilai, tidak masuk progres, tetap tercantum sertifikat |
+| 119 | NonEsensial menolak nol atau lebih dari satu Materi aktif pada status Siap |
+| 120 | Diagnostik minimal 10; lulus tetap memerlukan Sumatif ≥30, tanpa Resume/HOTS |
+| 121 | Diagnostik gagal wajib 1 Materi→Resume→HOTS→Sumatif, tanpa melompat |
+| 122 | Nilai gagal diagnostik 20:20:60, lulus 100% Sumatif; skor Diagnostik bukan skor final |
+| 123 | KKM default Admin/KKM khusus Guru; remedial hanya jika skor Sumatif awal < KKM |
+| 124 | Remedial maksimal satu, skor tertinggi dari awal/remedial |
+| 125 | TP Selesai meski nilai masih di bawah KKM setelah kesempatan sah |
+| 126 | Progres hanya TP NonEsensial; TP draf belum dimulai tidak membuat progres palsu 100% |
+| 127 | Admin jadwal serentak Pra-Semester dan penolakan ujian sebelum waktu |
+| 128 | Pra-Semester hanya setelah semua NonEsensial selesai, bank ≥30 gabungan seluruh BAB |
+| 129 | Pra-Semester memakai mesin ujian ketat, jeda/insiden, remedial sekali dan nilai mandiri |
+| 130 | Tidak ada nilai akhir semester agregat di DB, UI, ekspor atau sertifikat |
+| 131 | Export Nilai semua siswa/TP/Pra-Semester dengan hanya satu skor; NULL tidak dianggap nol; batas izin Guru |
+| 132 | Sertifikat daftar Esensial tanpa nilai dan NonEsensial dengan nilai, revisi/QR historis aman |
+| 133 | Checkpoint 4 menit Model B, pulih setelah koneksi putus, gate dan download audio/gambar/PDF aman |
+| 134 | Impor v4 tidak menghapus v3/riwayat, arsip 4 Materi uji aman, data identitas dan FK terjaga |
+Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengujian migrasi SQL tidak sama dengan tes UI/Service. Template Excel bermakro diuji terpisah setelah selesai dikerjakan.
