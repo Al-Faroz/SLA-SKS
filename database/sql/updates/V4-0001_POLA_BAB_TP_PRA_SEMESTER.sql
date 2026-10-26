@@ -1,4 +1,4 @@
--- V4-0001: SKEMA POLA BARU SLA-SKS
+-- V4-0001-R2: SKEMA POLA BARU SLA-SKS (FK MariaDB diperbaiki)
 -- Diterapkan HANYA pada clone database sla_sks_v4 dari dump v3 terbaru.
 -- JANGAN jalankan pada sla_sks_v3. TIDAK berisi data pribadi.
 -- Periksa dan backup sebelum impor. Lakukan sekali; tidak idempoten.
@@ -105,14 +105,14 @@ CREATE TABLE nilai_tp (
  jalur ENUM('lulus_diagnostik','belajar_wajib') NOT NULL,
  nilai_resume DECIMAL(5,2) NULL,
  nilai_hots DECIMAL(5,2) NULL,
- nilai_sumatif DECIMAL(5,2) NOT NULL,
+ nilai_sumatif DECIMAL(5,2) NULL,
  nilai_tp DECIMAL(5,2) NULL,
  status_nilai ENUM('sementara','final') NOT NULL DEFAULT 'sementara',
  diubah_pada DATETIME NOT NULL,
  PRIMARY KEY(id),
  UNIQUE KEY uq_nilai_satu_progres(progres_tp_id),
  FOREIGN KEY(progres_tp_id) REFERENCES progres_tp(id),
- CONSTRAINT ck_ntp_nilai CHECK(nilai_sumatif BETWEEN 0 AND 100 AND (nilai_tp IS NULL OR nilai_tp BETWEEN 0 AND 100))
+ CONSTRAINT ck_ntp_nilai CHECK((nilai_sumatif IS NULL OR nilai_sumatif BETWEEN 0 AND 100) AND (nilai_tp IS NULL OR nilai_tp BETWEEN 0 AND 100))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE ujian_pra_semester (
@@ -156,6 +156,11 @@ CREATE TABLE soal_pra_semester (
  FOREIGN KEY(bab_id) REFERENCES bab(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- V4-R2: Lepaskan FK lama sebelum ubah nullability kolom MariaDB.
+ALTER TABLE percobaan_ujian
+ DROP FOREIGN KEY fk_ujian_progres,
+ DROP FOREIGN KEY fk_ujian_konten;
+
 ALTER TABLE percobaan_ujian
  MODIFY COLUMN progres_tp_id BIGINT UNSIGNED NULL,
  MODIFY COLUMN versi_konten_tp_id BIGINT UNSIGNED NULL,
@@ -170,9 +175,13 @@ ALTER TABLE percobaan_ujian
  (jenis='pra_semester' AND ujian_pra_semester_id IS NOT NULL AND siswa_id IS NOT NULL AND progres_tp_id IS NULL AND versi_konten_tp_id IS NULL)
  OR (jenis IN('diagnostik','sumatif') AND ujian_pra_semester_id IS NULL AND progres_tp_id IS NOT NULL AND versi_konten_tp_id IS NOT NULL)
  );
+ALTER TABLE percobaan_ujian
+ ADD CONSTRAINT fk_ujian_progres FOREIGN KEY(progres_tp_id) REFERENCES progres_tp(id),
+ ADD CONSTRAINT fk_ujian_konten FOREIGN KEY(versi_konten_tp_id) REFERENCES versi_konten_tp(id);
+
 ALTER TABLE butir_percobaan
  ADD COLUMN soal_pra_semester_id BIGINT UNSIGNED NULL AFTER soal_asal_id,
  ADD KEY ix_butir_pra_soal(soal_pra_semester_id),
  ADD CONSTRAINT fk_butir_pra_soal FOREIGN KEY(soal_pra_semester_id) REFERENCES soal_pra_semester(id);
 
-INSERT INTO schema_version(versi,diterapkan_pada) VALUES('V4-0001',CURRENT_TIMESTAMP());
+INSERT INTO schema_version(versi,diterapkan_pada) VALUES('V4-0001-R2',CURRENT_TIMESTAMP());
