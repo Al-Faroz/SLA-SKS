@@ -16,6 +16,7 @@
     let yt = null;
     let ytMemutar = false;
     let gambarTerlihat = false;
+    let pdfTerlihat = false;
     let resetGambar = true;
     let versiSesiGambar = 0;
     let detakGambarTertunda = false;
@@ -137,7 +138,7 @@
         }
         if (jenis === 'pdf') {
             const pdf = document.querySelector('[data-pdf-pembaca]');
-            if (!pdf || pdf.dataset.pdfReady !== 'ya') return null;
+            if (!pdf || pdf.dataset.pdfReady !== 'ya' || !pdfTerlihat) return null;
             const halaman = Number(pdf.dataset.pdfHalaman);
             const total = Number(pdf.dataset.pdfTotal);
             if (!Number.isInteger(halaman) || !Number.isInteger(total)
@@ -310,6 +311,22 @@
         });
     }
     if (jenis === 'pdf') {
+        const areaPdf = document.querySelector('[data-pdf-baca-area]');
+        if (areaPdf && 'IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                const terlihat = entries.some(entry => entry.isIntersecting
+                    && entry.intersectionRatio >= .5);
+                if (pdfTerlihat !== terlihat) {
+                    pdfTerlihat = terlihat;
+                    resetPdf = true;
+                    if (pdfTerlihat) detak();
+                }
+            }, {threshold:[0, .5, 1]});
+            observer.observe(areaPdf);
+        } else {
+            statusText('Browser tidak mendukung pemeriksaan area PDF. '
+                + 'Gunakan browser terbaru untuk mencatat waktu belajar.');
+        }
         document.addEventListener('visibilitychange', () => {
             resetPdf = true;
             if (document.visibilityState === 'visible') detak();
