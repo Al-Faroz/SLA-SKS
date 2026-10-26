@@ -1,30 +1,21 @@
-# SLA-SKS — Master Document v2.4 (Kontrak Target)
-**MTs Fase D · LMS pembelajaran mandiri · program SKS percepatan dua tahun**
+# SLA-SKS — Master Document v2.5 (Rancangan 26 Oktober 2026)
 
-Dokumen resmi proyek terdiri atas **16 Master Document** di [docs/README.md](docs/README.md). Spesifikasi v2.4 menggantikan aturan v2.3 **jika bertentangan**. PR dokumentasi ini bukan klaim kode, SQL, dan browser sudah mengimplementasikannya.
+MTs Fase D · LMS CodeIgniter 4 · Admin, Guru, Siswa, Pimpinan · 6 semester.
 
-## Urutan membaca
-1. [AGENTS.md](AGENTS.md) dan [indeks 16 dokumen](docs/README.md).
-2. [Aturan bisnis](docs/02-ATURAN-BISNIS.md), [hak akses](docs/03-PERAN-DAN-HAK-AKSES.md) dan [kurikulum](docs/04-KURIKULUM-DAN-CP.md).
-3. Modul terkait + [database](docs/10-DATABASE.md) + [API](docs/11-ARSITEKTUR-DAN-API.md) + [UI/UX](docs/12-UI-UX-DAN-HALAMAN.md) + [CSS](docs/13-DESIGN-SYSTEM-CSS.md) + [pengujian](docs/16-PENGUJIAN-DAN-PENERIMAAN.md).
+> **Status:** Master v2.5 dan SQL v4 sedang disiapkan pada branch review. **Kode aplikasi di XAMPP belum diubah ke kontrak baru**. Tidak boleh menyatakan fitur siap sampai implementasi dan tes manual selesai.
 
-## Ketentuan final v2.4
-- **CP → ATP (urutan TP) → TP → Materi/Submateri**. BAB bukan entitas akademik/aplikasi; TP adalah unit Diagnostik, Sumatif, status Siap, versi konten dan penilaian.
-- CP resmi berversi dikendalikan Admin; formulir CP tanpa metadata sumber hukum berulang yang wajib. Guru G1 satu aktif per **Gen–Mapel**, paket/TP/soal/materi **khusus Gen**.
-- Excel pemetaan **enam semester per Gen–Mapel**, identitas + CP aktif mapel/kurikulum diisi otomatis saat Guru mengunduh. Excel membentuk struktur TP/Materi setelah unggah, pratinjau dan konfirmasi; konten/media dan Resume/HOTS dibuat langsung dalam aplikasi.
-- **Setiap Materi mempunyai Resume dan HOTS**. Siswa lulus Diagnostik ≥ KKM dapat melewati kewajiban Materi/Resume/HOTS dan mendapat nilai Diagnostik; bila belum, menjalani semua Materi berurutan lalu Sumatif. KKM/penilaian/keamanan ujian tetap kebijakan internal madrasah, tidak diubah sepihak.
-- Dua unduhan Word bank soal **Diagnostik/Sumatif**, satu format **PG lima opsi wajib A–E, satu kunci ✓**. Parser wajib menjaga teks Unicode, OMML/Equation Word, gambar dan tabel termasuk tabel bersarang pada stem **dan pilihan**, plus URL audio/video Google Drive yang sah.
-- Pembelajaran Fase D mengikuti referensi CP sesuai mapel dan integrasi nilai KBC/Panca Cinta yang relevan, **tanpa hierarki BAB/KBC tambahan**.
-- UI: Admin Pengelola/Siswa form landscape atas, daftar paginasi bawah; Guru per Gen dropdown/alasan/simpan kolom terpisah + paginasi; daftar CP pagination+XLSX; identitas upload logo sekaligus favicon; profil semua role foto full-width di atas, Identitas/Kontak dua kolom di bawah.
-- SQL melalui **dump/install atau patch bernomor**, tanpa CI4 migration/seeder. Pemilik akan mengirim dump lokal untuk dianalisis; **khusus DB lokal yang ditentukan dan setelah backup**, pemilik mengosongkan tabel lalu impor dump final dengan data terpilih. Hosting/produksi **tidak** memakai reset destruktif.
-- CI4 `index.php` dan `.htaccess` berada di **root**; jangan ubah `.env`, base URL atau struktur root yang telah berfungsi. HTML/CSS custom `app.css` dan native JS; empat role Admin, Guru, Siswa, Pimpinan.
-- Satu Admin cukup; larangan menyetujui **usulan akademik diri sendiri** tetap berlaku. Riwayat nilai, soal, percobaan dan sertifikat tidak dihapus atau dicabut. Sertifikat A4 landscape, tanda tangan PNG wajib dan NISN hanya pada PDF privat.
+## Alur produk terbaru
+**Mapel (1 CP operasional) → Semester → BAB → TP**. ATP Guru dibuat melalui aplikasi atau impor template Excel yang sudah dimiliki proyek dan akan diadaptasi (termasuk macro pada tahap lanjutan). Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misalnya `BIND.8.1.1`). Nomor BAB berlanjut semester 1–2, 3–4, 5–6. Nama BAB/TP maksimal 35 karakter, deskripsi maksimal 225.
 
-## Kondisi repository dan pengerjaan berikutnya
-- PR kode terdahulu **#13** (K3B/K3C/K4A/K4B) masih memakai hierarki dan impor lama sehingga harus **dirombak di PR implementasi terpisah**, tidak boleh otomatis digabung.
-- Perubahan Master v2.4 hanya dokumentasi dan referensi; pelaksanaan SQL, generator Excel, parser DOCX serta revisi UI/UX **menunggu tahap implementasi serta pengujian XAMPP**.
-- Template kerja acuan: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` dan `docs/TEMPLATE_SOAL_SLA-SKS.docx`; aplikasi akan menghasilkan unduhan yang terkait identitas/TP aktual.
+TP **Esensial** tanpa Materi/nilai LMS, tetapi tetap masuk ATP dan daftar nilai sertifikat. TP **NonEsensial** tepat satu Materi. Diagnostik minimal 10 soal adalah gerbang: lulus boleh melewati Materi, Resume, HOTS; yang tidak lulus wajib Materi→Resume→HOTS. **Keduanya wajib Sumatif minimal 30 soal**. Nilai jalur gagal Diagnostik = 20% Resume +20% HOTS +60% Sumatif; jalur lulus = 100% Sumatif. KKM default Admin/khusus Guru; Sumatif < KKM mendapat satu remedial, skor tertinggi dipakai, TP tetap selesai walau di bawah KKM.
 
-> **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](docs/STATUS-TEMPLATE-V2.4.md).
+Progres semester hanya TP NonEsensial. **Pra-Semester** setelah seluruh TP NonEsensial selesai, mengikuti tanggal/jam serentak Admin, soal gabungan seluruh BAB satu semester, pola Sumatif. **Tidak ada nilai akhir semester.** Guru dapat ekspor semua nilai TP + Pra-Semester seluruh siswa Gen–Mapel sejak satu nilai pun tersedia.
 
-> **Status 25-10-2026:** aplikasi masih XAMPP lokal, belum pernah deploy ke hosting. Sebelum tugas SQL/DB, wajib minta dan telaah dump terbaru XAMPP sesudah update terakhir. Tanpa dump terkini jangan membuat SQL patch baru, mereset data, atau mengklaim struktur lokal sudah diverifikasi. Lihat [gerbang audit](docs/AUDIT-KONTRAK-DATABASE-LOKAL.md).
+## Dokumen dan perubahan
+- [Indeks 16 Master Document](docs/README.md)
+- [Catatan progres sebelumnya](docs/PROGRES-SEBELUM-POLA-BARU-2026-10-26.md)
+- [Rencana tahap baru](docs/RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md)
+- [Audit dump v3 dan rencana v4](docs/AUDIT-DATABASE-V3-KE-V4-2026-10-26.md)
+- [Panduan pengembang](AGENTS.md)
+
+**SQL:** `sla_sks_v4` dibuat BARU dari dump lokal terakhir; `sla_sks_v3` tidak dihapus. Dump privat berisi identitas dan hash sandi hanya dibagikan kepada pemilik, **tidak masuk GitHub**. CI4 migration/seeder dilarang. `index.php` dan `.htaccess` tetap di ROOT dan `.env` tidak diubah tanpa izin.

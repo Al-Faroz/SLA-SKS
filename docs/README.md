@@ -1,6 +1,6 @@
-# Indeks Master Document SLA-SKS v2.4
+# Indeks Master Document SLA-SKS v2.5
 
-**Satu sumber kebenaran: 16 berkas domain berikut**. Keputusan 22 Oktober 2026 di Master v2.4 mengatasi konflik dengan teks v2.3/PR #13 lama. Tidak ada entitas BAB dalam kontrak data baru.
+**Satu sumber kebenaran: 16 berkas domain berikut**. Keputusan 22 Oktober 2026 di Master v2.5 mengatasi konflik dengan teks v2.3/PR #13 lama. BAB merupakan entitas utama dalam kontrak baru.
 
 | No. | Dokumen | Cakupan |
 |---:|---|---|
@@ -22,7 +22,7 @@
 | 16 | [Pengujian](16-PENGUJIAN-DAN-PENERIMAAN.md) | Skenario E2E-001–112, acceptance |
 
 ## Template kerja resmi (dokumen non-Master)
-- `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` — master workbook enam semester setelah **pembersihan semua istilah BAB**. Identitas/CP pada hasil unduhan berasal dari database login Guru/Gen–Mapel/Kurikulum.
+- `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` — master workbook enam semester yang akan direvisi agar memuat BAB. Identitas/CP pada hasil unduhan berasal dari database login Guru/Gen–Mapel/Kurikulum.
 - `docs/TEMPLATE_SOAL_SLA-SKS.docx` — struktur Word Soal Global yang diselaraskan ke **SLA-SKS-WORD-V1**, satu tipe PG lima opsi A–E. Generator per TP/jenis ujian mengikuti ukuran bank aktual; **berkas `docs/` berisi contoh, sedangkan unduhan Guru harus menghasilkan semua slot pertanyaan/opsi/kunci kosong sesuai jumlah bank yang diatur di aplikasi**.
 - `docs/assets/galeri-komponen.html` — galeri visual CSS yang diperbarui bersama perubahan kode UI.
 - [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
@@ -30,7 +30,7 @@
 
 ## Ketentuan perubahan
 - Aturan hidup pada dokumen domain masing-masing, tanpa membuat versi alternatif. Dokumen lain merujuk domain utama.
-- **PR dokumentasi ini tidak otomatis mengubah kode atau SQL**. Branch implementasi terpisah mengacu v2.4; tiap langkah diikuti tes dan persetujuan pemilik sebelum merge.
+- **PR dokumentasi ini tidak otomatis mengubah kode atau SQL**. Branch implementasi terpisah mengacu v2.5; tiap langkah diikuti tes dan persetujuan pemilik sebelum merge.
 - **PR #13** masih implementasi berdasarkan hierarki lama; **jangan merge** sebelum selaras.
 - **Gerbang DB wajib:** pemilik mengirim dump XAMPP terbaru sebelum *setiap* pekerjaan SQL/DB; developer memverifikasi bahwa dump dibuat sesudah patch terakhir, baru menyusun perubahan additive. Tidak ada reset tanpa permintaan/izin eksplisit dan backup. Proyek belum diunggah ke hosting.
 - [Audit kontrak database dan gerbang QA lokal](AUDIT-KONTRAK-DATABASE-LOKAL.md) — pelengkap non-Master; tidak memuat dump/data pribadi.
@@ -44,6 +44,11 @@
 | Akun, G1, layout Admin dan profil | 03, 12, 13 | 10, 11, 14 | 16 |
 | SQL/hosting/backup | 10, 15 | AGENTS.md dan README | 16 |
 
-> **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.4 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](STATUS-TEMPLATE-V2.4.md).
+> **Status template biner:** Kedua berkas referensi telah berada di `docs/` pada branch v2.5 dan disetujui pemilik; pemeriksaan checksum atas hasil unduhan GitHub serta review PR tetap wajib sebelum merge. Lihat [status template](STATUS-TEMPLATE-V2.4.md).
 
 - [KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md](KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md) — keputusan teknis CRUD soal Guru, SunEditor lokal dan perlindungan edit manual dari impor ulang Word.
+
+## Kontrak perubahan 26 Oktober 2026 (v2.5)
+Struktur **Mapel → CP → Semester → BAB → TP**, Esensial tanpa Materi/nilai dan NonEsensial tepat satu Materi. Diagnostik gate, Sumatif wajib minimal 30, remedial satu jika di bawah KKM, bobot 20/20/60 atau 100% Sumatif. Pra-Semester serentak sesuai Admin setelah TP NonEsensial selesai; ekspor nilai parsial Guru tersedia; **tidak ada nilai akhir semester**. Template Excel lama tetap menjadi acuan yang akan direvisi pada tahap sesudah database, termasuk macro.
+
+Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-10-26.md), [rencana](RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md), [audit DB](AUDIT-DATABASE-V3-KE-V4-2026-10-26.md).
