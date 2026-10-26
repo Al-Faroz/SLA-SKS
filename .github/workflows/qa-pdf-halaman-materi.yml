@@ -11,6 +11,7 @@ on:
       - 'public/assets/js/aktivitas-materi.js'
       - 'public/assets/vendor/pdfjs/**'
       - 'tests/unit/MateriSiswaDatabaseTest.php'
+      - 'tests/js/aktivitas-materi-presisi.test.cjs'
       - 'tests/js/pdf-halaman-materi.test.cjs'
       - '.github/workflows/qa-pdf-halaman-materi.yml'
   workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
         run: |
           node --check public/assets/js/pembaca-pdf-materi.js
           node --check public/assets/js/aktivitas-materi.js
-          node --test tests/js/pdf-halaman-materi.test.cjs
+          node --test tests/js/pdf-halaman-materi.test.cjs tests/js/aktivitas-materi-presisi.test.cjs
       - name: PDF.js worker and license
         run: |
           test -s public/assets/vendor/pdfjs/3.2.146/pdf.min.js
