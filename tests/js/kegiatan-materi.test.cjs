@@ -141,3 +141,19 @@ test('Pengetikan manual tetap normal dan penghitung mendukung Unicode', () => {
     assert.match(x.validation.textContent, /5 karakter/);
     assert.equal(x.form.dataset.mengirim, undefined);
 });
+
+
+test('Endpoint final dan draf eksplisit serta controller memvalidasi aksi', () => {
+    const route = fs.readFileSync(path.resolve(__dirname,
+        '../../app/Config/Routes.php'), 'utf8');
+    const view = fs.readFileSync(path.resolve(__dirname,
+        '../../app/Views/siswa/materi.php'), 'utf8');
+    const controller = fs.readFileSync(path.resolve(__dirname,
+        '../../app/Controllers/SiswaKegiatanMateri.php'), 'utf8');
+    assert.match(route, /kegiatan\/\(:segment\)\/\(:segment\)/);
+    assert.match(view, /ruteKegiatan \. '\/simpan'/);
+    assert.match(view, /ruteKegiatan \. '\/kirim'/);
+    assert.match(controller, /\$aksi\s*=\s*\$aksiRute\s*\?\?\s*\$aksiForm/);
+    assert.match(controller, /kegiatan_jenis/);
+    assert.match(controller, /withInput\(\)/);
+});
