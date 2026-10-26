@@ -147,6 +147,43 @@ final class MateriSiswaDatabaseTest extends TestCase
         $this->svc()->media(1,32);
     }
 
+    public function testUnduhBerkasDitolakSebelumMediaSelesai(): void
+    {
+        $this->expectException(\DomainException::class);
+        $this->svc()->unduh(1,31);
+    }
+
+    public function testUnduhSahBilaMediaSelesaiTidakPerluResumeFinal(): void
+    {
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'pdf','status'=>'media_selesai','waktu_aktif_detik'=>60,
+            'halaman_total'=>2,'halaman_selesai'=>2,
+        ]);
+        $file=$this->svc()->unduh(1,31);
+        self::assertSame($this->file,$file['path']);
+        self::assertSame('SLA-SKS-Materi-31.pdf',$file['unduh_nama']);
+        self::assertSame('application/pdf',$file['mime']);
+        self::assertSame(0,$this->db->table('resume_materi')->countAllResults());
+        self::assertSame(0,$this->db->table('jawaban_hots_materi')->countAllResults());
+    }
+
+    public function testUnduhJalurTuntasDiagnostikTidakMembukaGerbang(): void
+    {
+        $this->expectException(\DomainException::class);
+        $this->svc(102)->unduh(1,31);
+    }
+
+    public function testUnduhTidakDapatMemakaiProgresSiswaLain(): void
+    {
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'pdf','status'=>'media_selesai',
+        ]);
+        $this->expectException(\DomainException::class);
+        $this->svc(102)->unduh(1,31);
+    }
+
     public function testBerkasPrivatMateriPertamaBisaDibaca(): void
     {
         $media = $this->svc()->media(1,31);

@@ -134,6 +134,23 @@
         <?php endif ?>
     </section>
 
+    <?php if (!$sukarela && in_array($materi['jenis'], ['audio','gambar','pdf'], true)): ?>
+        <section class="a-card a-jarak-atas" aria-labelledby="unduh-materi">
+            <h2 id="unduh-materi">Unduh Materi <?= (int) $materi['urutan'] ?></h2>
+            <?php if ($kegiatan['media_selesai']): ?>
+                <a class="a-btn a-btn--utama"
+                    href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                        . '/materi/' . (int) $materi['id'] . '/unduh'), 'attr') ?>"
+                    download>Unduh <?= esc(strtoupper($materi['jenis'])) ?> materi</a>
+                <p class="a-help">Waktu belajar telah disahkan server. Berkas asli tersedia untuk belajar ulang.</p>
+            <?php else: ?>
+                <p class="a-help" role="status">Unduhan terkunci sampai durasi pengamatan
+                    media selesai dan tersimpan di server. Setelah selesai, tombol muncul
+                    bersama formulir Resume.</p>
+            <?php endif ?>
+        </section>
+    <?php endif ?>
+
     <section class="a-card a-jarak-atas a-materi-kegiatan" aria-labelledby="petunjuk-kegiatan">
         <h2 id="petunjuk-kegiatan">Kegiatan Materi <?= (int) $materi['urutan'] ?></h2>
 

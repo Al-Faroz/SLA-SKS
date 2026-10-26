@@ -223,6 +223,45 @@ final class MateriSiswaService
         return true;
     }
 
+    /**
+     * Otorisasi download SELALU server-side dan berdasarkan progres terpin.
+     * Hanya materi resmi yang sudah memenuhi durasi, bukan endpoint /media inline.
+     * Tidak memberikan download bagi jalur diagnostik tuntas (tidak ada kegiatan).
+     */
+    public function unduh(int $tpId, int $materiId): array
+    {
+        $ctx = $this->konteks($tpId);
+        if (($ctx['progres']['status'] ?? '') !== 'belajar') {
+            throw new DomainException('Unduh resmi hanya untuk pembelajaran wajib.');
+        }
+        $m = $this->materiBerizin($ctx, $materiId);
+        if (!in_array((string) ($m['jenis'] ?? ''), ['audio', 'gambar', 'pdf'], true)) {
+            throw new DomainException('Jenis Materi ini tidak dapat diunduh.');
+        }
+        $key = [
+            'progres_tp_id' => (int) $ctx['progres']['id'],
+            'materi_id' => $materiId,
+            'versi_konten_tp_id' => (int) $ctx['progres']['versi_konten_tp_id'],
+        ];
+        $status = $this->db->table('progres_materi')
+            ->select('status')->where($key)->get()->getRowArray();
+        if (($status['status'] ?? '') !== 'media_selesai') {
+            throw new DomainException('Materi belum mencapai syarat waktu belajar.');
+        }
+        $media = $this->media($tpId, $materiId);
+        $extension = [
+            'application/pdf' => 'pdf',
+            'image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp',
+            'audio/mpeg' => 'mp3', 'audio/mp4' => 'm4a',
+        ][$media['mime']] ?? null;
+        if ($extension === null) {
+            throw new DomainException('Format berkas tidak didukung.');
+        }
+        // Nama pendek, aman untuk Content-Disposition dan berbagai browser.
+        $media['unduh_nama'] = 'SLA-SKS-Materi-' . $materiId . '.' . $extension;
+        return $media;
+    }
+
     /** Data privat untuk controller streaming; path/nama_acak tidak pernah dikirim ke view. */
     public function media(int $tpId, int $materiId): array
     {
