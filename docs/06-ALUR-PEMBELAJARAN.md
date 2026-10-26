@@ -130,3 +130,12 @@ editor yang bersangkutan, redirect kembali ke anchor Resume/HOTS dan
 mempertahankan isian gagal.
 
 Tidak ada autosave, tidak ada perubahan nilai/TP/histori atau SQL.
+
+
+### Koreksi pencatatan waktu audio, gambar dan PDF (26 Oktober 2026)
+
+Ketentuan akademik **tidak berubah**. Audio memakai batas yang tercapai lebih cepat antara minimum Guru dan 90% durasi audio dari **waktu putar sah**; sinyal awal pemutaran dan akhir audio dikirim tanpa menambah kredit waktu palsu. Untuk **gambar**, syarat tetap gambar telah termuat, area pembaca sekurang-kurangnya 50% terlihat dan fokus/tab aktif selama `max(30 detik, min_waktu_detik Guru)`. Detak pertama diproses ketika gambar benar-benar terlihat, tanpa menunggu satu putaran interval tambahan.
+
+**PDF** tetap memerlukan *setiap halaman* minimal 15 detik sah, ditambah total waktu aktif `max(jumlah_halaman × 15 detik, min_waktu_detik Guru)`. Perpindahan halaman ketika permintaan sebelumnya belum selesai tidak boleh membuang sinyal reset sesi halaman; respons status menampilkan halaman yang belum lengkap beserta sisa waktu. Zoom/resize/fullscreen tidak memberi kredit sendiri. Semua status tetap berasal dari endpoint server dan snapshot TP terpin; saat `media_selesai`, halaman reload untuk mengaktifkan Resume lalu HOTS setelah Resume final.
+
+Jika server telah merekam kredit waktu/halaman yang cukup tetapi baris masih `berjalan`, pembacaan status merekonsiliasi keadaan secara bersyarat dan idempoten. Ini tidak membuat durasi baru, tidak menghapus progres, dan tidak melewati syarat baca PDF. Tidak ada perubahan tabel atau patch SQL.

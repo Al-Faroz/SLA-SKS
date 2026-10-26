@@ -63,9 +63,10 @@
                 <p class="a-pembaca-pesan" data-pdf-pesan role="status" aria-live="polite">Memuat pembaca PDF lokal…</p>
                 <p class="a-pembaca-pesan" data-pembaca-pesan role="status"></p>
             </div>
-            <p class="a-help">Baca semua halaman setidaknya 15 detik per halaman saat tab aktif.
-                Durasi minimum dari Guru tetap berlaku. Zoom dan layar penuh hanya mengubah tampilan.
-                Jika membaca sukarela, tidak ada progres resmi.</p>
+            <p class="a-help">Baca setiap halaman minimal 15 detik dengan tab aktif,
+                serta penuhi waktu total minimum dari Guru.
+                Progres menampilkan halaman yang belum lengkap; zoom dan layar penuh
+                tidak otomatis menambah waktu.</p>
         <?php elseif ($materi['jenis'] === 'audio'): ?>
             <div class="a-materi-audio">
                 <audio controls preload="metadata" data-audio-materi
@@ -74,8 +75,9 @@
                     Browser tidak mendukung pemutar audio.
                 </audio>
             </div>
-            <p class="a-help">Durasi dihitung saat audio diputar pada halaman aktif
-                dengan kecepatan normal, tanpa menghitung lompatan posisi.</p>
+            <p class="a-help">Audio selesai saat yang lebih dulu tercapai: waktu Guru
+                atau 90% durasi audio. Hanya pemutaran sah pada kecepatan normal
+                dan tab aktif yang dihitung.</p>
         <?php elseif ($materi['jenis'] === 'gambar'): ?>
             <div class="a-materi-gambar a-pembaca-fullscreen" data-pembaca-fullscreen data-pembaca-gambar>
                 <div class="a-pembaca-toolbar">
@@ -103,8 +105,9 @@
                 </div>
                 <p class="a-pembaca-pesan" data-pembaca-pesan role="status" aria-live="polite"></p>
             </div>
-            <p class="a-help">Waktu pengamatan dihitung saat gambar tampil
-                sekurang-kurangnya 50% di layar dan tab berada di depan.</p>
+            <p class="a-help">Gambar harus tampak sekurang-kurangnya 50% pada layar
+                dengan tab aktif, selama minimal 30 detik atau waktu Guru
+                (mana yang lebih lama).</p>
         <?php endif ?>
         <?php if ($sukarela): ?>
             <div class="a-alert" role="status">
@@ -247,7 +250,7 @@
     </nav>
 </div>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-batascepat'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-media3'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261026-final2'), 'attr') ?>" defer></script>

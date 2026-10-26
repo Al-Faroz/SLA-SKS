@@ -18,6 +18,8 @@
     let gambarTerlihat = false;
     let resetPdf = true;
     let memuatUlang = false;
+    let akhirAudioTertunda = false;
+    let halamanPdfTertunda = false;
     const statusEl = root.querySelector('[data-media-status]');
     const waktuEl = root.querySelector('[data-media-waktu]');
     const bilah = root.querySelector('[data-media-bilah]');
@@ -79,6 +81,18 @@
             const sudah = Math.max(0, Number(data.halaman_selesai) || 0);
             persentase.push(sudah / total);
             rincian += ' Halaman selesai: ' + sudah + '/' + total + '.';
+            const belum = Array.isArray(data.halaman_belum_selesai)
+                ? data.halaman_belum_selesai : [];
+            if (belum.length > 0) {
+                rincian += ' Halaman belum tuntas: '
+                    + belum.slice(0, 8).join(', ')
+                    + (belum.length > 8
+                        ? ' dan ' + (belum.length - 8) + ' lainnya.' : '.');
+            }
+        }
+        if (!data.persen_putar_minimal && !selesai) {
+            const sisa = Math.max(0, Number(data.waktu_tersisa_detik) || 0);
+            rincian += ' Sisa waktu aktif: ' + sisa + ' detik.';
         }
         // Bilah menunjukkan syarat yang paling tertinggal, bukan waktu saja.
         bilah.value = selesai ? 100 : Math.min(99,
@@ -101,7 +115,7 @@
         }
     }
 
-    function sinyal() {
+    function sinyal(audioBerakhir = false) {
         if (!amanDilihat()) return null;
         if (jenis === 'gambar') {
             const image = document.querySelector('[data-gambar-materi]');
@@ -123,7 +137,8 @@
         }
         if (jenis === 'audio') {
             const player = document.querySelector('[data-audio-materi]');
-            if (!player || player.paused || player.ended || player.seeking
+            if (!player || (player.paused && !audioBerakhir)
+                || (player.ended && !audioBerakhir) || player.seeking
                 || Math.abs(player.playbackRate - 1) > .001
                 || !Number.isFinite(player.duration) || player.duration < 5) {
                 return null;
@@ -146,9 +161,14 @@
         return null;
     }
 
-    async function detak() {
-        if (selesai || sedangKirim) return;
-        const active = sinyal();
+    async function detak(audioBerakhir = false) {
+        if (selesai) return;
+        if (sedangKirim) {
+            if (jenis === 'audio' && audioBerakhir) akhirAudioTertunda = true;
+            if (jenis === 'pdf' && resetPdf) halamanPdfTertunda = true;
+            return;
+        }
+        const active = sinyal(audioBerakhir);
         if (!active) return;
         sedangKirim = true;
         try {
@@ -165,6 +185,13 @@
             statusText('Belum tersimpan: ' + err.message + ' Pastikan koneksi aktif.');
         } finally {
             sedangKirim = false;
+            if (!selesai && akhirAudioTertunda) {
+                akhirAudioTertunda = false;
+                detak(true);
+            } else if (!selesai && halamanPdfTertunda) {
+                halamanPdfTertunda = false;
+                detak();
+            }
         }
     }
 
@@ -176,13 +203,31 @@
                 // Ukur area pembaca yang terlihat, bukan rasio gambar:
                 // zoom dapat membuat gambar 300% sehingga sebagian besar
                 // pixels berada di luar viewport walau area baca aktif.
+                const sebelumnya = gambarTerlihat;
                 gambarTerlihat = entries.some(entry => entry.isIntersecting
                     && entry.intersectionRatio >= .5);
+                if (gambarTerlihat && !sebelumnya) detak();
             }, {threshold:[0, .5, 1]});
             observer.observe(viewport);
+            image.addEventListener('load', () => { if (gambarTerlihat) detak(); });
         } else if (image) {
             // Browser tanpa IntersectionObserver tidak mengklaim area dibaca.
             statusText('Browser tidak mendukung pemeriksaan tampilan gambar.');
+        }
+    }
+    if (jenis === 'audio') {
+        const player = document.querySelector('[data-audio-materi]');
+        if (player) {
+            player.addEventListener('play', () => detak());
+            player.addEventListener('playing', () => detak());
+            player.addEventListener('loadedmetadata', () => {
+                if (!player.paused) detak();
+            });
+            player.addEventListener('seeked', () => {
+                if (!player.paused) detak();
+            });
+            // Kredit interval terakhir tetap diverifikasi menggunakan jam server.
+            player.addEventListener('ended', () => detak(true));
         }
     }
     if (jenis === 'youtube') {
@@ -212,6 +257,12 @@
     }
     request('GET').then(tampil).catch(err => statusText(
         'Progres belum dapat dimuat: ' + err.message + '.'));
+    if (jenis === 'gambar' || jenis === 'audio') {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') detak();
+        });
+        window.addEventListener('focus', () => detak());
+    }
     if (jenis === 'pdf') {
         document.addEventListener('visibilitychange', () => {
             resetPdf = true;
