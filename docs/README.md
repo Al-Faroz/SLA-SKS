@@ -1,25 +1,25 @@
 # Indeks Master Document SLA-SKS v2.5
 
-**Satu sumber kebenaran: 16 berkas domain berikut**. Keputusan 22 Oktober 2026 di Master v2.5 mengatasi konflik dengan teks v2.3/PR #13 lama. BAB merupakan entitas utama dalam kontrak baru.
+**Satu sumber kebenaran: 16 berkas domain berikut**. Keputusan 26 Oktober 2026 di Master v2.5 mengatasi konflik dengan teks v2.3/PR #13 lama. BAB merupakan entitas utama dalam kontrak baru.
 
 | No. | Dokumen | Cakupan |
 |---:|---|---|
 | 01 | [Ruang lingkup](01-RUANG-LINGKUP.md) | Produk, istilah, SKS, batas fitur |
 | 02 | [Aturan bisnis](02-ATURAN-BISNIS.md) | Ketentuan lintas role, pembelajaran, ketuntasan |
 | 03 | [Peran dan hak akses](03-PERAN-DAN-HAK-AKSES.md) | Admin/Guru/Siswa/Pimpinan, G1 per Gen–Mapel |
-| 04 | [Kurikulum, CP dan ATP](04-KURIKULUM-DAN-CP.md) | CP resmi, TP/ATP enam semester, KBC |
-| 05 | [Paket TP dan impor](05-PAKET-TP-DAN-IMPOR.md) | Excel ATP, Word Diagnostik/Sumatif, TP Siap, media |
-| 06 | [Alur siswa](06-ALUR-PEMBELAJARAN.md) | Diagnostik adaptif SKS, Materi, Resume/HOTS, Sumatif |
-| 07 | [Ujian](07-MESIN-UJIAN.md) | PG lima opsi, fullscreen dan percobaan |
-| 08 | [Penilaian](08-PENILAIAN.md) | Agregasi Resume/HOTS tiap Materi, koreksi |
-| 09 | [Sertifikat dan laporan](09-SERTIFIKAT-DAN-LAPORAN.md) | PDF/QR/riwayat/versi |
-| 10 | [Database SQL](10-DATABASE.md) | Model tanpa BAB, impor ulang lokal terkontrol |
+| 04 | [Kurikulum, CP dan ATP](04-KURIKULUM-DAN-CP.md) | CP Mapel, Semester, BAB dan TP berjenis |
+| 05 | [Paket TP dan impor](05-PAKET-TP-DAN-IMPOR.md) | ATP langsung/Excel, BAB, satu Materi, Word bank soal |
+| 06 | [Alur siswa](06-ALUR-PEMBELAJARAN.md) | Diagnostik gate, Sumatif wajib, Model B checkpoint, Pra-Semester |
+| 07 | [Ujian](07-MESIN-UJIAN.md) | Diagnostik, Sumatif, Pra-Semester, remedial dan keamanan |
+| 08 | [Penilaian](08-PENILAIAN.md) | Bobot 20/20/60 atau 100% Sumatif, nilai TP dan ekspor |
+| 09 | [Sertifikat dan laporan](09-SERTIFIKAT-DAN-LAPORAN.md) | Daftar TP Esensial/NonEsensial, QR dan histori |
+| 10 | [Database SQL](10-DATABASE.md) | Database baru sla_sks_v4, BAB, CP dan relasi nilai/ujian |
 | 11 | [Arsitektur/API](11-ARSITEKTUR-DAN-API.md) | MVC/Service, endpoint, generator dan parser |
 | 12 | [UI/UX](12-UI-UX-DAN-HALAMAN.md) | Seluruh layar, enam revisi layout wajib |
 | 13 | [Design system](13-DESIGN-SYSTEM-CSS.md) | CSS `a-`, pagination, responsif, galeri |
 | 14 | [Keamanan/audit](14-KEAMANAN-DAN-AUDIT.md) | File DOCX/XLSX aman, histori, kontrol server |
 | 15 | [Instalasi/operasional](15-INSTALASI-DAN-OPERASIONAL.md) | MySQL/MariaDB, dump/backup/root CI4 |
-| 16 | [Pengujian](16-PENGUJIAN-DAN-PENERIMAAN.md) | Skenario E2E-001–112, acceptance |
+| 16 | [Pengujian](16-PENGUJIAN-DAN-PENERIMAAN.md) | E2E-001–134 (v2.5 menimpa kasus lama yang berubah) |
 
 ## Template kerja resmi (dokumen non-Master)
 - `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` — master workbook enam semester yang akan direvisi agar memuat BAB. Identitas/CP pada hasil unduhan berasal dari database login Guru/Gen–Mapel/Kurikulum.

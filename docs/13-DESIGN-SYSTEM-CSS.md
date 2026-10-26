@@ -147,6 +147,9 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - Pratinjau soal Word: tabel akademik di dalam sel pertanyaan/opsi harus tetap terbaca/responsif, gambar tidak overflow, equation dapat di-scroll apabila lebar melebihi mobile, pemutar Drive aman. Warna status/fokus mengikuti token existing `a-`.
 - Pembaruan CSS visual wajib diikuti perubahan `docs/assets/galeri-komponen.html` ketika kode implementasi UI dikerjakan; dokumen ini **tidak** mengklaim galeri runtime sudah berubah.
 
+## Riwayat implementasi v3 (non-normatif)
+Bagian catatan implementasi bertanggal 24–26 Oktober 2026 berikut adalah bukti riwayat UI **pola lama**, bukan keputusan kontrak baru. Ketentuan baru §Kontrak desain card BAB/TP v2.5 di akhir dokumen mengganti perilaku lama yang bertentangan, terutama Diagnostik yang pernah menuntaskan TP tanpa Sumatif dan beberapa Materi per TP.
+
 ## Audit tabel responsif tahap A — Admin Pengelola/Siswa dan Guru per Gen (24 Oktober 2026)
 
 - Pola `a-tbl--cards` diterapkan **secara opt-in** pada tabel yang setiap barisnya berdiri sendiri. Pada desktop tetap memakai header kolom/tabel semantik; pada lebar ≤980px, setiap baris menjadi kartu yang memiliki `data-label` di tiap sel. Jangan memasang pola ini pada tabel matriks yang perlu hubungan baris–kolom atau data komparatif kompleks; matriks tetap gunakan scroll dengan label tetap.
