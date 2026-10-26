@@ -178,7 +178,7 @@
                                     Muat ulang status kegiatan
                                 </a>
                                 <p class="a-help">Halaman ini diperbarui otomatis setelah seluruh syarat media terpenuhi.
-                                    Memuat ulang tidak melewati syarat 90% pemutaran video/audio.</p>
+                                    Memuat ulang tidak menggantikan pemutaran nyata sampai batas efektif tercapai.</p>
                             <?php endif ?>
                         </div>
                     <?php else: ?>
@@ -237,7 +237,7 @@
     </nav>
 </div>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261025-status90'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-batascepat'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261025-s09s10'), 'attr') ?>" defer></script>
