@@ -403,6 +403,59 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(2,$this->db->table('log_aktivitas')->countAllResults());
     }
 
+    public function testHotsDrafLaluFinalTersimpanDiTabelJawabanSiswa(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $this->db->table('progres_materi')->insert([
+            'progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3,
+            'jenis'=>'gambar','status'=>'media_selesai',
+        ]);
+        $this->db->table('tugas_hots_materi')->insert([
+            'materi_id'=>31,'row_uuid'=>'uji-bank','pertanyaan'=>'Tugas Guru',
+            'petunjuk'=>'Petunjuk Guru',
+        ]);
+        $svc = new \App\Services\KegiatanMateriSiswaService($this->db,
+            static fn():array=>['id'=>101,'peran_aktif'=>'siswa',
+                'status'=>'aktif','wajib_ganti_sandi'=>0]);
+        $svc->simpan(1,31,'resume','kirim',str_repeat('R',50),0);
+        $draft=$svc->simpan(1,31,'hots','simpan','Jawaban HOTS pendek',0);
+        self::assertSame('draf',$draft['status']);
+        self::assertSame(1,$draft['revisi']);
+        self::assertSame('draf',$svc->status(1,31)['hots']['status']);
+        self::assertFalse($this->svc()->lihat(1,31)['materi_berikutnya']['boleh_buka']);
+
+        try {
+            $svc->simpan(1,31,'hots','kirim','Terlalu singkat',1);
+            self::fail('HOTS pendek tidak boleh dianggap final.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('200 karakter',$e->getMessage());
+        }
+        self::assertSame('draf',$svc->status(1,31)['hots']['status']);
+
+        $finalText=str_repeat('H',205);
+        $final=$svc->simpan(1,31,'hots','kirim',$finalText,1);
+        self::assertSame('final',$final['status']);
+        self::assertSame(2,$final['revisi']);
+        $row=$this->db->table('jawaban_hots_materi')->get()->getRowArray();
+        self::assertSame('final',$row['status']);
+        self::assertSame($finalText,$row['isi']);
+        self::assertSame(11,(int)$row['progres_tp_id']);
+        self::assertSame(31,(int)$row['materi_id']);
+        self::assertSame(3,(int)$row['versi_konten_tp_id']);
+        self::assertNotNull($row['dikirim_pada']);
+        self::assertSame('final',$svc->status(1,31)['hots']['status']);
+        self::assertTrue($this->svc()->lihat(1,31)['materi_berikutnya']['boleh_buka']);
+
+        // Pengiriman ulang identik tidak menggandakan nilai/riwayat.
+        $retry=$svc->simpan(1,31,'hots','kirim',$finalText,1);
+        self::assertSame('final',$retry['status']);
+        self::assertSame(1,$this->db->table('jawaban_hots_materi')->countAllResults());
+        self::assertSame(2,$this->db->table('log_aktivitas')->countAllResults());
+        self::assertSame(1,$this->db->table('tugas_hots_materi')->countAllResults());
+        self::assertSame('Tugas Guru',
+            $this->db->table('tugas_hots_materi')->get()->getRow('pertanyaan'));
+    }
+
     public function testBatasKegiatanVersiTerpinBukanNilaiTPLive(): void
     {
         $this->jadikanMediaPertamaGambar();

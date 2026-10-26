@@ -144,3 +144,18 @@ Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyb
 ### S08B YouTube/audio — tampilan syarat tercepat (26-10-2026)
 
 S08 menampilkan durasi media, minimum Guru, 90% media, **batas efektif yang lebih pendek**, waktu pemutaran yang benar-benar diakui dan bilah kemajuan berdasarkan batas efektif (bukan hanya satu syarat lain). Penghitung media yang tersimpan dan sudah memenuhi batas langsung membuka editor Resume melalui refresh hasil verifikasi server; HOTS tetap setelah Resume final. Jika API pemutar gagal, tampilkan galat yang dapat dimengerti tanpa memberi kredit waktu palsu. Menekan link refresh tidak bypass pemeriksaan server.
+
+
+### S09/S10 — status pengiriman dan pembatasan paste (26 Oktober 2026)
+
+Editor Resume/HOTS menampilkan indikator jumlah karakter sesuai batas
+snapshot dan alasan gagal kirim final tepat di editor. Tombol Simpan draf
+dan Kirim final menggunakan form action berbeda menuju endpoint
+POST terotorisasi. Redirect hasil kiriman menuju bagian Resume/HOTS
+yang bersangkutan. Input pada POST gagal dipulihkan; final sukses
+ditampilkan sebagai jawaban terkunci sesudah reload.
+
+Browser menolak paste/copy/cut dan drag/drop biasa sebagai pencegahan
+dasar; tidak menghalangi Unicode atau pengetikan normal. Kebijakan ini
+bukan bukti keaslian tulisan dan tidak bisa menjamin semua cara tempel
+dihentikan. Server tetap memeriksa final tanpa JavaScript.

@@ -161,3 +161,19 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Guru 360 detik; video 9.968 detik; progres lama mencatat 380 detik waktu putar sah: GET status siswa merekonsiliasi ke media_selesai secara idempoten tanpa memutar ulang, kemudian form Resume dibuka dari server.
 - Hanya lompatan seek posisi jauh tetapi `waktu_putar_detik` kurang target tidak membuka Resume. Keadaan tab tersembunyi, seek, playback cepat, jeda panjang, siswa bukan pemilik progres atau jalur sukarela juga tidak boleh memberi kredit/akses.
 - Audio mengikuti keputusan sama; gambar/PDF tetap mengikuti syaratnya sendiri; tidak ada SQL baru dan progres/nilai historis tidak di-reset.
+
+
+### Regresi S09/S10 Kirim Final HOTS dan anti-paste (26 Oktober 2026)
+
+- Setelah media selesai dan Resume final, HOTS dapat Simpan draf.
+  Kirim final HOTS dengan teks minimal sesuai tugas_min snapshot harus
+  menulis final di jawaban_hots_materi dan membuka Materi berikutnya.
+- HOTS terlalu pendek ditolak dengan pesan yang terlihat di editor,
+  bukan hanya atas halaman, dan isian POST gagal tidak hilang.
+- Rute eksplisit /simpan dan /kirim tidak menggantungkan aksi pada
+  kelengkapan parameter submitter; mismatch URL/aksi ditolak.
+- POST final identik idempoten; tidak mengubah nilai/penilai dan tidak
+  membuat log ganda. Bank Guru tugas_hots_materi tetap utuh.
+- Browser mencegah paste, copy/cut, drop dan beforeinput paste biasa,
+  namun pengetikan biasa/Unicode tetap berfungsi. Ini mitigasi saja,
+  bukan anti-kecurangan absolut.

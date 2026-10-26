@@ -108,3 +108,25 @@ Waktu media resmi berakhir ketika **syarat yang lebih pendek terpenuhi terlebih 
 Waktu pemutaran dihitung melalui heartbeat 5–20 detik dari jam server, menggunakan perubahan posisi yang masuk akal; seek maju/mundur, jeda, playback bukan 1x, tab/background dan interval detak terlalu panjang tidak menambah kredit. Posisi terjauh hanya informasi diagnostik, **bukan syarat tambahan yang membatalkan batas efektif**. Tampilan menunjukkan durasi media, kedua pembanding, target yang berlaku, dan pemutaran sah. Setelah media_selesai, Resume dibuka oleh server, kemudian HOTS setelah Resume final.
 
 **Rekonsiliasi data lama:** bagi siswa yang sudah memiliki `waktu_putar_detik` dan `waktu_aktif_detik` sah setidaknya batas efektif tetapi statusnya `berjalan`, GET status siswa merekonsiliasi status menjadi `media_selesai` secara idempoten untuk progres milik siswa/versi terpin tersebut. Tidak melakukan tambah waktu palsu, menyunting snapshot, impor ulang SQL atau menghapus progres. PDF, gambar dan siswa jalur Diagnostik tuntas tidak berubah.
+
+
+### Perbaikan S09/S10 — salin/tempel dan Kirim Final HOTS (26 Oktober 2026)
+
+Editor Resume dan HOTS mencegah paste biasa, drop, copy dan cut pada area
+jawaban, termasuk pintasan Ctrl/Cmd+C/V/X dan peristiwa beforeinput
+paste. Ini **mitigasi browser**, bukan bukti jawaban benar-benar diketik
+mandiri; klien HTTP dan perangkat yang dikuasai pengguna dapat melewatinya.
+Jangan memberi vonis kecurangan otomatis berdasarkan event input.
+Pengetikan normal, aksara Arab/Unicode, perangkat sentuh, dan IME
+tetap didukung.
+
+**Simpan draf** dan **Kirim final** kini memiliki endpoint POST eksplisit
+dengan segmen aksi /simpan dan /kirim, sehingga aksi tidak bergantung
+pada parameter submitter browser. Rute lama dipertahankan; mismatch aksi
+URL dan form ditolak. Batas karakter snapshot, Resume final sebelum HOTS,
+media selesai, filter Siswa, CSRF, transaksi, revisi dan audit tetap
+divalidasi server. Hitungan karakter dan kegagalan POST ditampilkan dekat
+editor yang bersangkutan, redirect kembali ke anchor Resume/HOTS dan
+mempertahankan isian gagal.
+
+Tidak ada autosave, tidak ada perubahan nilai/TP/histori atau SQL.
