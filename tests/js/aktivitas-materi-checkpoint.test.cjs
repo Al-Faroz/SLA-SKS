@@ -102,7 +102,7 @@ test('offline tidak menghapus progres lokal, pulih mengirim waktu kumulatif',asy
   await x.tick(10);
   x.setOnline(false);
   x.events.offline();
-  await x.tick(20);
+  await x.tick(25); // Pastikan melampaui batas media 30 detik saat offline
   assert.equal(x.calls.filter(c=>c.url==='/checkpoint').length,0);
   const local=JSON.parse(x.storage.get('sla-sks-s08-v3-scoped-example'));
   assert.ok(local.total>=25);
