@@ -230,8 +230,11 @@ final class MateriSiswaService
     public function mediaUntukUnduh(int $tpId, int $materiId): array
     {
         $ctx = $this->konteks($tpId);
-        if (($ctx['progres']['status'] ?? '') !== 'belajar') {
-            throw new DomainException('Unduhan hanya tersedia pada jalur belajar wajib.');
+        // Setelah Sumatif TP bisa berstatus tuntas; unduhan yang telah
+        // dibuka tidak boleh kembali terkunci. Jalur Diagnostik tuntas
+        // tanpa rekam media_selesai tetap tidak dapat mengunduh.
+        if (!in_array($ctx['progres']['status'] ?? '', ['belajar','tuntas'], true)) {
+            throw new DomainException('Unduhan hanya tersedia untuk progres yang sah.');
         }
         $this->materiBerizin($ctx, $materiId);
         $row = $this->db->table('progres_materi')->select('status')

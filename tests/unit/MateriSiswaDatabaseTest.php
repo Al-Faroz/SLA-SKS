@@ -348,13 +348,13 @@ final class MateriSiswaDatabaseTest extends TestCase
             'jenis'=>'gambar','status'=>'media_selesai',
             'waktu_aktif_detik'=>30,
         ]);
-        // File privat pada fixture lain; gerbangnya sudah lulus bila
-        // error berikut berasal dari verifikasi metadata/berkas, bukan waktu.
-        try {
-            $svc->mediaUntukUnduh(1,31);
-        } catch (\DomainException $e) {
-            self::assertStringNotContainsString('waktu belajar',$e->getMessage());
-        }
+        $berkas = $svc->mediaUntukUnduh(1,31);
+        self::assertSame($this->file,$berkas['path']);
+        self::assertSame('application/pdf',$berkas['mime']);
+
+        // TP tuntas setelah pembelajaran tidak mencabut unduhan.
+        $this->db->table('progres_tp')->where('id',11)->update(['status'=>'tuntas']);
+        self::assertSame($this->file,$svc->mediaUntukUnduh(1,31)['path']);
     }
 
     public function testUnduhTidakDiberikanUntukJalurDiagnostikTuntas(): void
@@ -365,7 +365,7 @@ final class MateriSiswaDatabaseTest extends TestCase
             $this->svc()->mediaUntukUnduh(1,31);
             self::fail('Jalur sukarela tidak memiliki akses unduh resmi.');
         } catch (\DomainException $e) {
-            self::assertStringContainsString('jalur belajar wajib',$e->getMessage());
+            self::assertStringContainsString('waktu belajar',$e->getMessage());
         }
     }
 
