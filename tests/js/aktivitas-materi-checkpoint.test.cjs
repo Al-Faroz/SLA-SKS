@@ -41,6 +41,7 @@ function makeImage() {
     location:{reload(){reloads++;}}
   };
   function IntersectionObserver(callback){observer=callback;this.observe=()=>{};}
+  window.IntersectionObserver=IntersectionObserver;
   const FormData=class{
     constructor(){this.fields={};}
     append(name,value){this.fields[name]=value;}
