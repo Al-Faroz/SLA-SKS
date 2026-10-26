@@ -50,27 +50,37 @@ final class ProgresMediaMateriSiswaService
             && ($ctx['progres']['status'] ?? '') === 'belajar'
             && $row['status'] === 'berjalan'
             && $row['jenis'] === $ctx['materi']['jenis']
-            && in_array($row['jenis'], ['audio', 'youtube'], true)
-            && $row['durasi_media_detik'] !== null) {
-            $durasi = (int) $row['durasi_media_detik'];
+            && in_array($row['jenis'], ['gambar', 'audio', 'youtube'], true)) {
             $min = (int) $ctx['materi']['min_waktu_detik'];
-            if ($min >= 1 && $min <= 10800 && $durasi >= 5 && $durasi <= 10800
-                && AturanAktivitasMateriService::memenuhiPemutaran(
-                    $row, $min, $durasi)) {
+            $syarat = null;
+            if ($row['jenis'] === 'gambar' && $min >= 1 && $min <= 10800) {
+                $syarat = max(AturanAktivitasMateriService::GAMBAR_MINIMAL, $min);
+            } elseif ($row['jenis'] !== 'gambar'
+                && $row['durasi_media_detik'] !== null) {
+                $durasi = (int) $row['durasi_media_detik'];
+                if ($min >= 1 && $min <= 10800 && $durasi >= 5
+                    && $durasi <= 10800
+                    && AturanAktivitasMateriService::memenuhiPemutaran(
+                        $row, $min, $durasi)) {
+                    $syarat = AturanAktivitasMateriService::batasEfektif($min, $durasi);
+                }
+            }
+            if ($syarat !== null
+                && (int) $row['waktu_aktif_detik'] >= $syarat) {
                 $now = self::tanggal(($this->clock)());
-                $this->db->table('progres_materi')->where($key)
+                $update = $this->db->table('progres_materi')->where($key)
                     ->where('status', 'berjalan')
                     ->where('jenis', $row['jenis'])
-                    ->where('durasi_media_detik', $durasi)
-                    ->where('waktu_aktif_detik >=',
-                        AturanAktivitasMateriService::batasEfektif($min, $durasi))
-                    ->where('waktu_putar_detik >=',
-                        AturanAktivitasMateriService::batasEfektif($min, $durasi))
-                    ->update([
-                        'status' => 'media_selesai',
-                        'media_selesai_pada' => $now,
-                        'diubah_pada' => $now,
-                    ]);
+                    ->where('waktu_aktif_detik >=', $syarat);
+                if ($row['jenis'] !== 'gambar') {
+                    $update->where('durasi_media_detik', $durasi)
+                        ->where('waktu_putar_detik >=', $syarat);
+                }
+                $update->update([
+                    'status' => 'media_selesai',
+                    'media_selesai_pada' => $now,
+                    'diubah_pada' => $now,
+                ]);
                 $row = $this->db->table('progres_materi')->where($key)
                     ->get()->getRowArray();
             }
@@ -204,6 +214,7 @@ final class ProgresMediaMateriSiswaService
             'durasi_media_detik' => $durasi,
             'minimal_detik' => $min,
             'syarat_waktu_terpenuhi' => $aktif >= $min,
+            'waktu_tersisa_detik' => max(0, $min - $aktif),
             'pemutaran_minimal_detik' => $perluPutar ? $harusPutar : null,
             'batas_efektif_detik' => $batasEfektif,
             'syarat_efektif_terpenuhi' => $batasEfektif !== null

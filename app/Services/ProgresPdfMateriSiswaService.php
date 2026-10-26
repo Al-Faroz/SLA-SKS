@@ -35,8 +35,43 @@ final class ProgresPdfMateriSiswaService
         $key = $this->kunci($ctx, $materiId);
         $row = $this->db->table('progres_materi')->where($key)->get()->getRowArray();
         $sukarela = $ctx['sukarela'];
-        $done = (int) ($row['halaman_selesai'] ?? 0);
         $minTotal = max(15 * $total, (int) $ctx['materi']['min_waktu_detik']);
+        $done = 0;
+        $belum = range(1, $total);
+        if ($row !== null) {
+            $completePages = $this->db->table('halaman_progres_materi')
+                ->select('nomor_halaman')
+                ->where('progres_materi_id', (int) $row['id'])
+                ->where('selesai_pada IS NOT NULL', null, false)
+                ->get()->getResultArray();
+            $sudah = array_map(static fn (array $p): int =>
+                (int) $p['nomor_halaman'], $completePages);
+            $sudah = array_values(array_unique(array_filter($sudah,
+                static fn (int $p): bool => $p >= 1 && $p <= $total)));
+            $done = count($sudah);
+            $belum = array_values(array_diff(range(1, $total), $sudah));
+            // Pulihkan status progres yang memenuhi syarat tanpa mengarang waktu.
+            // Guard berpatokan progres siswa milik versi TP yang terpin.
+            if (!$sukarela && ($ctx['progres']['status'] ?? '') === 'belajar'
+                && $row['status'] === 'berjalan' && $row['jenis'] === 'pdf'
+                && (int) $row['halaman_total'] === $total
+                && $done === $total && (int) $row['waktu_aktif_detik'] >= $minTotal) {
+                $now = gmdate('Y-m-d H:i:s', ($this->clock)());
+                $this->db->table('progres_materi')->where($key)
+                    ->where('status', 'berjalan')
+                    ->where('jenis', 'pdf')
+                    ->where('halaman_total', $total)
+                    ->where('waktu_aktif_detik >=', $minTotal)
+                    ->update([
+                        'status' => 'media_selesai',
+                        'halaman_selesai' => $done,
+                        'media_selesai_pada' => $now,
+                        'diubah_pada' => $now,
+                    ]);
+                $row = $this->db->table('progres_materi')->where($key)
+                    ->get()->getRowArray();
+            }
+        }
         $finish = !$sukarela && ($row['status'] ?? '') === 'media_selesai';
         return [
             'jenis' => 'pdf',
@@ -47,15 +82,18 @@ final class ProgresPdfMateriSiswaService
             'waktu_putar_detik' => 0,
             'posisi_terjauh_detik' => (int) ($row['posisi_terjauh_detik'] ?? 0),
             'minimal_detik' => $minTotal,
+            'waktu_tersisa_detik' => max(0, $minTotal
+                - (int) ($row['waktu_aktif_detik'] ?? 0)),
             'persen_putar_minimal' => null,
             'halaman_total' => $total,
             'halaman_selesai' => $done,
+            'halaman_belum_selesai' => $belum,
             'minimal_per_halaman_detik' => 15,
             'pesan' => $sukarela
                 ? 'Belajar PDF sukarela tidak membuat progres resmi.'
                 : ($finish
                     ? 'Semua halaman PDF selesai. Lanjutkan Resume dan HOTS.'
-                    : 'Baca setiap halaman PDF sekurang-kurangnya 15 detik dengan tab aktif.'),
+                    : 'Baca setiap halaman PDF sekurang-kurangnya 15 detik dan penuhi waktu minimum Guru.'),
         ];
     }
 
