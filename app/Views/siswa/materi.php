@@ -250,14 +250,14 @@
     </nav>
 </div>
 <?php if (!$sukarela): ?>
-    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-media3'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/aktivitas-materi.js?v=20261026-presisi2'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (!$sukarela): ?>
     <script src="<?= esc(base_url('public/assets/js/kegiatan-materi.js?v=20261026-final2'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if ($materi['jenis'] === 'pdf'): ?>
     <script src="<?= esc(base_url('public/assets/vendor/pdfjs/3.2.146/pdf.min.js'), 'attr') ?>" defer></script>
-    <script src="<?= esc(base_url('public/assets/js/pembaca-pdf-materi.js?v=20261025-s08d'), 'attr') ?>" defer></script>
+    <script src="<?= esc(base_url('public/assets/js/pembaca-pdf-materi.js?v=20261026-presisi2'), 'attr') ?>" defer></script>
 <?php endif ?>
 <?php if (in_array($materi['jenis'], ['gambar', 'pdf'], true)): ?>
     <script src="<?= esc(base_url('public/assets/js/pembaca-materi.js?v=20261025-zoom2'), 'attr') ?>" defer></script>

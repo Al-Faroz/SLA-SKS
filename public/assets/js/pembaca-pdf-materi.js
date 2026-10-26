@@ -19,6 +19,7 @@
     const expected = Number(root.dataset.pdfExpected);
     let pdf = null, current = 1, zoom = 100, sequence = 0, pending = null;
     let lastRequested = 0;
+    let halamanTerakhirSiap = 0;
     const status = message => { info.textContent = message; };
     const ready = value => { root.dataset.pdfReady = value ? 'ya' : 'tidak'; };
 
@@ -80,8 +81,14 @@
             root.dataset.pdfTotal = String(pdf.numPages);
             ready(true);
             status('Halaman ' + current + ' tampil. Waktu baca dicatat saat halaman aktif.');
-            // Event ke aktivitas-materi.js untuk memulai ulang sesi halaman.
-            root.dispatchEvent(new CustomEvent('pdf-halaman-siap', {bubbles: true}));
+            // Hanya pergantian HALAMAN memulai sesi baru. Zoom dan perubahan
+            // lebar pada halaman sama tidak boleh membuang kredit waktu.
+            if (halamanTerakhirSiap !== current) {
+                halamanTerakhirSiap = current;
+                root.dispatchEvent(new CustomEvent('pdf-halaman-siap', {
+                    bubbles: true, detail: {halaman: current},
+                }));
+            }
         } catch (error) {
             if (seq !== sequence) return;
             pending = null;
