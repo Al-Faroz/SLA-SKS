@@ -9,7 +9,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 use Throwable;
 
-/** S08B: status GET baca-saja; detak POST CSRF dan filter auth:siswa. */
+/** S08B: status GET dapat merekonsiliasi status lama, detak POST CSRF dan auth:siswa. */
 final class SiswaAktivitasMateri extends BaseController
 {
     private function response(array $body, int $status = 200): ResponseInterface

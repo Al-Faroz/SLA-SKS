@@ -16,6 +16,10 @@
     let yt = null;
     let ytMemutar = false;
     let gambarTerlihat = false;
+    let pdfTerlihat = false;
+    let resetGambar = true;
+    let versiSesiGambar = 0;
+    let detakGambarTertunda = false;
     let resetPdf = true;
     let memuatUlang = false;
     let akhirAudioTertunda = false;
@@ -89,6 +93,13 @@
                     + (belum.length > 8
                         ? ' dan ' + (belum.length - 8) + ' lainnya.' : '.');
             }
+            const frame = document.querySelector('[data-pdf-pembaca]');
+            const nomor = Number(frame?.dataset.pdfHalaman);
+            if (Number.isInteger(nomor) && nomor >= 1 && nomor <= total) {
+                const detik = Number(data.waktu_per_halaman?.[nomor]) || 0;
+                rincian += ' Halaman ' + nomor + ': '
+                    + Math.max(0, detik) + '/15 detik tercatat.';
+            }
         }
         if (!data.persen_putar_minimal && !selesai) {
             const sisa = Math.max(0, Number(data.waktu_tersisa_detik) || 0);
@@ -122,11 +133,12 @@
             if (!image || !image.complete || image.naturalWidth === 0 || !gambarTerlihat) {
                 return null;
             }
-            return { aktif: 'ya', posisi: '', durasi: '' };
+            return { aktif: 'ya', posisi: '', durasi: '',
+                reset: resetGambar ? 'ya' : 'tidak' };
         }
         if (jenis === 'pdf') {
             const pdf = document.querySelector('[data-pdf-pembaca]');
-            if (!pdf || pdf.dataset.pdfReady !== 'ya') return null;
+            if (!pdf || pdf.dataset.pdfReady !== 'ya' || !pdfTerlihat) return null;
             const halaman = Number(pdf.dataset.pdfHalaman);
             const total = Number(pdf.dataset.pdfTotal);
             if (!Number.isInteger(halaman) || !Number.isInteger(total)
@@ -164,15 +176,22 @@
     async function detak(audioBerakhir = false) {
         if (selesai) return;
         if (sedangKirim) {
+            if (jenis === 'gambar') detakGambarTertunda = true;
             if (jenis === 'audio' && audioBerakhir) akhirAudioTertunda = true;
             if (jenis === 'pdf' && resetPdf) halamanPdfTertunda = true;
             return;
         }
         const active = sinyal(audioBerakhir);
         if (!active) return;
+        const versiSaatKirim = versiSesiGambar;
         sedangKirim = true;
         try {
             const result = await request('POST', active);
+            if (jenis === 'gambar' && active.reset === 'ya'
+                && versiSesiGambar === versiSaatKirim
+                && gambarTerlihat && amanDilihat()) {
+                resetGambar = false;
+            }
             if (jenis === 'pdf') {
                 const frame = document.querySelector('[data-pdf-pembaca]');
                 if (active.reset === 'ya' && frame?.dataset.pdfReady === 'ya'
@@ -185,7 +204,10 @@
             statusText('Belum tersimpan: ' + err.message + ' Pastikan koneksi aktif.');
         } finally {
             sedangKirim = false;
-            if (!selesai && akhirAudioTertunda) {
+            if (!selesai && detakGambarTertunda) {
+                detakGambarTertunda = false;
+                if (gambarTerlihat && amanDilihat()) detak();
+            } else if (!selesai && akhirAudioTertunda) {
                 akhirAudioTertunda = false;
                 detak(true);
             } else if (!selesai && halamanPdfTertunda) {
@@ -206,10 +228,19 @@
                 const sebelumnya = gambarTerlihat;
                 gambarTerlihat = entries.some(entry => entry.isIntersecting
                     && entry.intersectionRatio >= .5);
-                if (gambarTerlihat && !sebelumnya) detak();
+                if (gambarTerlihat !== sebelumnya) {
+                    // Segmen di luar viewport tidak boleh dikreditkan saat masuk lagi.
+                    resetGambar = true;
+                    versiSesiGambar++;
+                    if (gambarTerlihat) detak();
+                }
             }, {threshold:[0, .5, 1]});
             observer.observe(viewport);
-            image.addEventListener('load', () => { if (gambarTerlihat) detak(); });
+            image.addEventListener('load', () => {
+                resetGambar = true;
+                versiSesiGambar++;
+                if (gambarTerlihat) detak();
+            });
         } else if (image) {
             // Browser tanpa IntersectionObserver tidak mengklaim area dibaca.
             statusText('Browser tidak mendukung pemeriksaan tampilan gambar.');
@@ -259,11 +290,43 @@
         'Progres belum dapat dimuat: ' + err.message + '.'));
     if (jenis === 'gambar' || jenis === 'audio') {
         document.addEventListener('visibilitychange', () => {
+            if (jenis === 'gambar') {
+                resetGambar = true;
+                versiSesiGambar++;
+            }
             if (document.visibilityState === 'visible') detak();
         });
-        window.addEventListener('focus', () => detak());
+        window.addEventListener('blur', () => {
+            if (jenis === 'gambar') {
+                resetGambar = true;
+                versiSesiGambar++;
+            }
+        });
+        window.addEventListener('focus', () => {
+            if (jenis === 'gambar') {
+                resetGambar = true;
+                versiSesiGambar++;
+            }
+            detak();
+        });
     }
     if (jenis === 'pdf') {
+        const areaPdf = document.querySelector('[data-pdf-baca-area]');
+        if (areaPdf && 'IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                const terlihat = entries.some(entry => entry.isIntersecting
+                    && entry.intersectionRatio >= .5);
+                if (pdfTerlihat !== terlihat) {
+                    pdfTerlihat = terlihat;
+                    resetPdf = true;
+                    if (pdfTerlihat) detak();
+                }
+            }, {threshold:[0, .5, 1]});
+            observer.observe(areaPdf);
+        } else {
+            statusText('Browser tidak mendukung pemeriksaan area PDF. '
+                + 'Gunakan browser terbaru untuk mencatat waktu belajar.');
+        }
         document.addEventListener('visibilitychange', () => {
             resetPdf = true;
             if (document.visibilityState === 'visible') detak();
@@ -278,5 +341,7 @@
                 detak();
             });
     }
-    window.setInterval(detak, 10000);
+    // 5 detik untuk gambar/PDF membuat 15 detik per halaman benar-benar
+    // tercapai sekitar detak ketiga; YouTube/audio tidak diubah (10 detik).
+    window.setInterval(detak, ['gambar', 'pdf'].includes(jenis) ? 5000 : 10000);
 })();

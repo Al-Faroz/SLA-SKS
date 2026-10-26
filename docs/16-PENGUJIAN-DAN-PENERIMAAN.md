@@ -185,3 +185,15 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 - Gambar dengan waktu minimum Guru 60 detik: hanya detak ketika gambar termuat, area gambar >=50% viewport, tab aktif/fokus. Waktu aktif 60 detik yang telah tercatat namun status masih berjalan direkonsiliasi oleh server tanpa menghapus hasil.
 - PDF dua halaman: keduanya minimal 15 detik; total harus mencapai waktu Guru, tidak cukup hanya membuka seluruh halaman atau mencapai total tanpa melihat salah satu halaman. Daftar halaman belum lengkap muncul di UI; sinyal perpindahan saat request sebelumnya berlangsung tidak hilang.
 - Status selesai membuka Resume via reload server, HOTS hanya setelah Resume final; siswa jalur Diagnostik tuntas dan akses Gen lain tetap ditolak untuk pengiriman resmi. Tidak ada perubahan SQL/versi TP/hasil penilaian.
+
+### Uji regresi presisi Gambar/PDF (26 Oktober 2026)
+
+- Gambar selesai pada enam detak 5 detik sah ketika area pengamatan sedikitnya 50% terlihat dan tab fokus.
+- Scroll gambar ke luar viewport atau kehilangan fokus lalu kembali: reset sesi tidak boleh memberi kredit bagi waktu tersembunyi; akumulasi sebelumnya tidak hilang.
+- Detak pada 4 detik tidak dihitung dan tidak membuang baseline. Detak berikut di detik ke-6 menghitung 6 detik sah. Interval di atas 20 detik tetap nol.
+- PDF tiap halaman selesai tepat setelah 15 detik sah, bukan harus menunggu 20 atau 30 detik; halaman lain tetap perlu sesi sendiri.
+- Zoom/resize pada halaman sama tidak menyebabkan reset halaman; ganti nomor halaman, tab tersembunyi dan kehilangan fokus mereset sesi.
+- Status PDF menampilkan waktu per halaman serta daftar yang belum selesai. Resume hanya terbuka jika seluruh halaman memenuhi 15 detik serta total waktu Guru terpenuhi.
+- Tidak mengubah video YouTube/audio yang sudah FIX, tidak menambah SQL dan tidak melakukan reset data siswa. Uji akhir interaksi nyata diperlukan di XAMPP.
+
+**Regresi visibilitas PDF:** canvas PDF sudah dirender tetapi area pembaca <50% viewport ⇒ tidak ada POST heartbeat; setelah area terlihat ⇒ detak baseline tanpa kredit, berikutnya tiap 5 detik. Scroll keluar/masuk lagi harus reset dan tidak menambah durasi sembunyi. Navigasi ke halaman lain harus memakai nomor baru dan baseline baru.

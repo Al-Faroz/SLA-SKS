@@ -46,6 +46,44 @@ final class AturanAktivitasMateriTest extends TestCase
         self::assertSame(10, $s['waktu_aktif_detik']);
     }
 
+    public function testGambarKembaliTerlihatTidakMenghitungJedaTakTerlihat(): void
+    {
+        $s=Media::awal('gambar', 1000, null, null);
+        $s=Media::detak($s,'gambar',1005,null,null,30);
+        self::assertSame(5,$s['waktu_aktif_detik']);
+        // Gambar di-scroll keluar layar setelah detak lalu kembali;
+        // durasi selama tersembunyi tidak boleh ditambahkan.
+        $s=Media::detak($s,'gambar',1010,null,null,30,true);
+        self::assertSame(5,$s['waktu_aktif_detik']);
+        $s=Media::detak($s,'gambar',1015,null,null,30);
+        self::assertSame(10,$s['waktu_aktif_detik']);
+        self::assertSame('berjalan',$s['status']);
+    }
+
+    public function testHeartbeatEmpatDetikGambarTidakHanguskanInterval(): void
+    {
+        $s=Media::awal('gambar',1000,null,null);
+        $s=Media::detak($s,'gambar',1004,null,null,30);
+        self::assertSame(0,$s['waktu_aktif_detik']);
+        self::assertSame(1000,$s['heartbeat_terakhir_pada']);
+        $s=Media::detak($s,'gambar',1006,null,null,30);
+        self::assertSame(6,$s['waktu_aktif_detik']);
+        self::assertSame(1006,$s['heartbeat_terakhir_pada']);
+    }
+
+    public function testGambarTuntasPresisiPadaTigaPuluhDetikDenganDetakLimaDetik(): void
+    {
+        $s=Media::awal('gambar',1000,null,null);
+        for ($i=1;$i<=5;$i++) {
+            $s=Media::detak($s,'gambar',1000+5*$i,null,null,30);
+        }
+        self::assertSame(25,$s['waktu_aktif_detik']);
+        self::assertSame('berjalan',$s['status']);
+        $s=Media::detak($s,'gambar',1030,null,null,30);
+        self::assertSame(30,$s['waktu_aktif_detik']);
+        self::assertSame('media_selesai',$s['status']);
+    }
+
     public function testAudioMengikutiBatasYangLebihCepat(): void
     {
         $s = Media::awal('audio', 1000, 0, 100);

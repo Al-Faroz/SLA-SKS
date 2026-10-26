@@ -271,6 +271,68 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame(0,$this->db->table('progres_materi')->countAllResults());
     }
 
+    public function testResetSesiGambarMelaluiServiceTidakMenambahJedaScroll(): void
+    {
+        $this->jadikanMediaPertamaGambar();
+        $now=1000;
+        $service=$this->progresMediaService(101,
+            static function () use (&$now):int {return $now;});
+        $service->detak(1,31,true,null,null);
+        $now=1005;
+        self::assertSame(5,$service->detak(1,31,true,null,null)['waktu_aktif_detik']);
+        // Pengamatan terputus, kembali dengan reset sesi.
+        $now=1010;
+        self::assertSame(5,$service->detak(1,31,true,null,null,
+            null,null,true)['waktu_aktif_detik']);
+        $now=1015;
+        self::assertSame(10,$service->detak(1,31,true,null,null)['waktu_aktif_detik']);
+        self::assertSame('berjalan',
+            $this->db->table('progres_materi')->get()->getRow('status'));
+    }
+
+    public function testPdfDuaHalamanBisaLengkapTepat15DetikPerHalaman(): void
+    {
+        $now=1000;
+        $service=$this->progresMediaService(101,
+            static function () use (&$now):int {return $now;});
+        $service->detak(1,31,true,null,null,1,2);
+        foreach ([1005,1010,1015] as $now) {
+            $status=$service->detak(1,31,true,null,null,1,2);
+        }
+        self::assertSame(15,$status['waktu_per_halaman'][1]);
+        self::assertSame(1,$status['halaman_selesai']);
+        self::assertSame([2],$status['halaman_belum_selesai']);
+        $now=1020;
+        $service->detak(1,31,true,null,null,2,2,true);
+        foreach ([1025,1030,1035] as $now) {
+            $status=$service->detak(1,31,true,null,null,2,2);
+        }
+        self::assertSame(15,$status['waktu_per_halaman'][2]);
+        self::assertSame(2,$status['halaman_selesai']);
+        self::assertFalse($status['media_selesai']); // Guru masih min 60.
+        foreach ([1040,1045,1050,1055,1060,1065] as $now) {
+            $status=$service->detak(1,31,true,null,null,2,2);
+        }
+        self::assertTrue($status['media_selesai']);
+        self::assertSame(60,$status['waktu_aktif_detik']);
+        self::assertSame([],$status['halaman_belum_selesai']);
+    }
+
+    public function testPdfDetakTerlaluCepatTetapBisaKreditDiDetakBerikut(): void
+    {
+        $now=1000;
+        $svc=$this->progresMediaService(101,
+            static function() use (&$now):int {return $now;});
+        $svc->detak(1,31,true,null,null,1,2);
+        $now=1004;
+        self::assertSame(0,
+            $svc->detak(1,31,true,null,null,1,2)['waktu_aktif_detik']);
+        $now=1006;
+        $data=$svc->detak(1,31,true,null,null,1,2);
+        self::assertSame(6,$data['waktu_aktif_detik']);
+        self::assertSame(6,$data['waktu_per_halaman'][1]);
+    }
+
     public function testGambarWaktuSudahCukupDirekonsiliasiSaatGET(): void
     {
         $this->jadikanMediaPertamaGambar();

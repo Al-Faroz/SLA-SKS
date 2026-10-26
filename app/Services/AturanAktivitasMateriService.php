@@ -60,7 +60,7 @@ final class AturanAktivitasMateriService
 
     /** @param array<string,mixed> $awal */
     public static function detak(array $awal, string $jenis, int $now,
-        ?int $posisi, ?int $durasi, int $minimal): array
+        ?int $posisi, ?int $durasi, int $minimal, bool $resetSesi = false): array
     {
         self::validasiMedia($jenis, $posisi, $durasi);
         if ($minimal < 1 || $minimal > 10800) {
@@ -79,7 +79,8 @@ final class AturanAktivitasMateriService
         if ($jenis === 'gambar') {
             // Tidak ada cara membuktikan pandangan mata; UI hanya mengirim saat
             // gambar >=50% di viewport, tab terlihat dan browser fokus.
-            if ($dt >= self::DETAK_MINIMAL && $dt <= self::DETAK_MAKSIMAL) {
+            if (!$resetSesi && $dt >= self::DETAK_MINIMAL
+                && $dt <= self::DETAK_MAKSIMAL) {
                 $kredit = $dt;
             }
         } else {
@@ -102,7 +103,12 @@ final class AturanAktivitasMateriService
             $awal['waktu_putar_detik'] = (int) $awal['waktu_putar_detik'] + $kredit;
         }
         $awal['waktu_aktif_detik'] = (int) $awal['waktu_aktif_detik'] + $kredit;
-        $awal['heartbeat_terakhir_pada'] = $now;
+        // Gambar: heartbeat <5 detik tidak kredit dan tidak memindah
+        // baseline waktu. Sisa interval masih dapat diverifikasi.
+        if ($jenis !== 'gambar' || $resetSesi
+            || $dt >= self::DETAK_MINIMAL) {
+            $awal['heartbeat_terakhir_pada'] = $now;
+        }
         $cukup = $jenis === 'gambar'
             ? (int) $awal['waktu_aktif_detik'] >= max(self::GAMBAR_MINIMAL, $minimal)
             : self::memenuhiPemutaran($awal, $minimal, (int) $durasi);

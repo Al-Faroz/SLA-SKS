@@ -139,3 +139,15 @@ Ketentuan akademik **tidak berubah**. Audio memakai batas yang tercapai lebih ce
 **PDF** tetap memerlukan *setiap halaman* minimal 15 detik sah, ditambah total waktu aktif `max(jumlah_halaman × 15 detik, min_waktu_detik Guru)`. Perpindahan halaman ketika permintaan sebelumnya belum selesai tidak boleh membuang sinyal reset sesi halaman; respons status menampilkan halaman yang belum lengkap beserta sisa waktu. Zoom/resize/fullscreen tidak memberi kredit sendiri. Semua status tetap berasal dari endpoint server dan snapshot TP terpin; saat `media_selesai`, halaman reload untuk mengaktifkan Resume lalu HOTS setelah Resume final.
 
 Jika server telah merekam kredit waktu/halaman yang cukup tetapi baris masih `berjalan`, pembacaan status merekonsiliasi keadaan secara bersyarat dan idempoten. Ini tidak membuat durasi baru, tidak menghapus progres, dan tidak melewati syarat baca PDF. Tidak ada perubahan tabel atau patch SQL.
+
+### S08G/PDF — Penyempurnaan hitung durasi pengamatan (26 Oktober 2026)
+
+**Ambang akademik tetap:** Gambar memakai nilai lebih besar antara 30 detik dan minimum waktu Guru, hanya saat gambar berhasil dimuat, area baca sedikitnya 50% tampak, dan tab/jendela fokus. PDF wajib **15 detik per halaman** serta total minimal nilai lebih besar antara 15 × jumlah halaman dan waktu Guru.
+
+Heartbeat gambar/PDF berjalan **setiap 5 detik** (YouTube/audio tetap 10 detik), diverifikasi jam server dengan rentang sah 5–20 detik. Heartbeat terlalu dini (kurang dari 5 detik) tidak dihitung tetapi tidak menggeser baseline sehingga waktu masih dapat dikreditkan secara sah pada detak berikut. Interval panjang lebih dari 20 detik tidak diberi kredit.
+
+Ketika gambar keluar dari viewport, tab tersembunyi, atau browser blur, detak pertama saat kembali mengirim **reset sesi** yang tidak menambah waktu untuk jeda tersembunyi; akumulasi lama tetap utuh. Ini bukti aktivitas browser, bukan alat pembuktian tatapan mata.
+
+PDF memulai sesi hanya setelah halaman berhasil dirender oleh PDF.js. Reset terjadi saat **nomor halaman berpindah** atau fokus/visibilitas terputus; zoom/resize pada halaman yang sama tidak mereset waktu baca. Respons status memberikan detik baca tiap halaman yang tercatat server, halaman yang masih kurang, dan sisa minimum total. Halaman resmi selesai ketika mempunyai rekaman selesai dan waktu sah 15 detik atau lebih. Resume terbuka hanya setelah seluruh syarat server selesai, HOTS setelah Resume final. Tidak ada perubahan SQL, nilai maupun hasil historis.
+
+**Pelengkap visibilitas PDF (26 Oktober 2026):** PDF tidak mendapat kredit hanya karena canvas telah berhasil dirender. Area pembaca harus terlihat setidaknya 50% dalam viewport browser, tab aktif dan jendela fokus. Keluar area dan masuk kembali mereset baseline sesi sehingga durasi saat PDF tidak terlihat tidak terhitung, tanpa menghapus waktu halaman yang sudah dicatat.
