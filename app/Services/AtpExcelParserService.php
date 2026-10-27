@@ -125,7 +125,7 @@ final class AtpExcelParserService
      * @return array{bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,jumlah_bab:int,jumlah_tp:int}
      */
     public static function bacaBuku(Spreadsheet $buku, string $kodeMapel, int $semesterMulai,
-        string $kodeGen, array $elemenDiizinkan = []): array
+        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0): array
     {
         if ($buku->getSheetNames() !== self::SHEETS
             || (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue()
