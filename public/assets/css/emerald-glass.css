@@ -835,3 +835,119 @@ html[data-theme] .a-app--prototipe .a-atp-kelompok {
     transition:none;
   }
 }
+
+/* ==============================================================
+   RESPONSIVE QA V5 — tablet 768–980px & menu HP.
+   Perbaikan: card-table app.css menjadi putih tepat pada <=980px,
+   sedangkan override tema sebelumnya baru berlaku <=767px.
+   ============================================================== */
+/* Satu-satunya scrollbar horizontal halaman harus berada di tabel
+   yang tidak memiliki mode kartu, bukan di seluruh shell. */
+html[data-theme] .a-app--prototipe .a-main,
+html[data-theme] .a-app--prototipe .a-main__konten,
+html[data-theme] .a-app--prototipe .a-page {
+  min-width:0;
+}
+html[data-theme] .a-app--prototipe .a-page .a-tabel-gulir {
+  max-width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+}
+/* Kartu data pada tablet HARUS memakai token tema sama seperti HP. */
+@media (max-width:980px) {
+  html[data-theme] .a-app--prototipe .a-page .a-tabel-gulir:has(> .a-tbl--cards) {
+    overflow:visible;
+    background:transparent;
+    border:0;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards {
+    display:block;
+    width:100%;
+    min-width:0;
+    background:transparent;
+    border:0;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody {
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:12px;
+    width:100%;
+    min-width:0;
+    background:transparent;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody tr {
+    display:grid;
+    width:100%;
+    min-width:0;
+    padding:10px 14px;
+    background:linear-gradient(145deg,var(--eg-sheen),transparent 75%),var(--eg-table-row);
+    border:1px solid var(--eg-line);
+    border-radius:13px;
+    box-shadow:var(--eg-shadow-soft);
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody :is(th[scope="row"],td),
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody tr:nth-child(even) :is(th,td) {
+    min-width:0;
+    width:100%;
+    color:var(--e-text);
+    background:transparent;
+    border:0;
+    border-bottom:1px solid var(--eg-line-soft);
+    overflow-wrap:anywhere;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody tr > :last-child {
+    border-bottom:0;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody :is(th[scope="row"],td)::before {
+    color:var(--eg-table-label);
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody tr:hover :is(th,td) {
+    background:transparent;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards :is(input,select,textarea) {
+    max-width:100%;
+  }
+}
+/* Header dan menu mobile: kontrol jelas, area fokus tidak tertutup. */
+@media (max-width:767px) {
+  html[data-theme] .a-app--prototipe .a-header,
+  html[data-theme] .a-app--prototipe .a-header__pengguna {
+    min-width:0;
+  }
+  html[data-theme] .a-app--prototipe .a-menu-toggle {
+    flex-shrink:0;
+  }
+  html[data-theme] .a-app--prototipe .a-side {
+    height:100dvh;
+    min-height:0;
+    overscroll-behavior:contain;
+  }
+  html[data-theme] .a-app--prototipe .a-backdrop:not([hidden]) {
+    background:rgba(1,17,12,.54);
+    backdrop-filter:blur(5px);
+    -webkit-backdrop-filter:blur(5px);
+  }
+  html[data-theme="light"] .a-app--prototipe .a-backdrop:not([hidden]) {
+    background:rgba(9,36,23,.32);
+  }
+}
+html[data-theme] .a-app--prototipe .a-side__tautan:focus-visible,
+html[data-theme] .a-app--prototipe .a-menu-toggle:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:2px;
+}
+@media (max-width:420px) {
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody tr {
+    padding:9px 12px;
+  }
+  html[data-theme] .a-app--prototipe .a-page .a-tbl--cards tbody :is(th[scope="row"],td) {
+    grid-template-columns:minmax(0,1fr);
+    gap:4px;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  html[data-theme] .a-app--prototipe .a-side {
+    transition:none;
+  }
+}
