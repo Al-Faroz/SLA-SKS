@@ -198,8 +198,13 @@ final class AtpImporKonfirmasiService
                         $hasil['tetap']++;
                         continue;
                     }
-                    if ($old['status'] !== 'draf') {
-                        throw new DomainException($kode . ': TP Siap tidak boleh ditimpa.');
+                    // Lock objek final sebelum menguji kelayakan revisi.
+                    // Status yang berubah selama request tidak boleh diterobos.
+                    $terkunci = $this->db->query(
+                        'SELECT id,status FROM tp WHERE id=? FOR UPDATE', [$id]
+                    )->getRowArray();
+                    if ($terkunci === null || $terkunci['status'] !== 'draf') {
+                        throw new DomainException($kode . ': TP Siap atau berubah tidak boleh ditimpa.');
                     }
                     foreach (['materi', 'versi_konten_tp', 'progres_tp'] as $tabel) {
                         if ($this->db->table($tabel)->where('tp_id', $id)->countAllResults() !== 0) {
@@ -209,6 +214,9 @@ final class AtpImporKonfirmasiService
                     }
                     $this->db->table('tp')->where('id', $id)
                         ->where('status', 'draf')->update($data);
+                    if ($this->db->affectedRows() !== 1) {
+                        throw new DomainException($kode . ': status TP berubah saat konfirmasi.');
+                    }
                     $hasil['ubah_tp']++;
                 } else {
                     if (++$atpTerakhir[$s] > 65535) {
