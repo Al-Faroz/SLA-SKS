@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Services\AtpImporPratinjauService;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
+use App\Services\AtpStagingService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
 use Throwable;
@@ -40,6 +41,22 @@ final class GuruAtpPratinjau extends BaseController
 
         try {
             $hasil = (new AtpImporPratinjauService())->pratinjau((int) $paketId, $file->getTempName());
+            $hasil['stage_token'] = null;
+            if ($hasil['boleh_konfirmasi']) {
+                $akunStaging = (new AuthService())->penggunaSaatIni();
+                $stage = (new AtpStagingService())->buat(
+                    $file->getTempName(),
+                    (int) $akunStaging['id'],
+                    (int) $paketId,
+                    session_id(),
+                    (string) $hasil['fingerprint']
+                );
+                $hasil['stage_token'] = $stage['token'];
+                $hasil['stage_kedaluwarsa'] = $stage['kedaluwarsa'];
+            }
+            $hasil['paket_id'] = (int) $paketId;
+            $hasil['pilihan'] = $indeks;
+            $hasil['semester_asal'] = $s;
         } catch (DomainException $e) {
             return redirect()->to($kembali)->with('galat', $e->getMessage());
         } catch (Throwable $e) {

@@ -50,6 +50,8 @@ $routes->get('guru/peta-atp/semester/(:num)', 'GuruPetaTp::semester/$1', ['filte
 $routes->get('guru/peta-atp/unduh/(:num)', 'GuruAtpUnduh::unduh/$1', ['filter' => 'auth:guru']);
 // Impor ATP tahap pratinjau: POST terlindungi CSRF, tanpa mutasi basis data.
 $routes->post('guru/peta-atp/pratinjau/(:num)', 'GuruAtpPratinjau::tampil/$1', ['filter' => 'auth:guru']);
+// Setelah pratinjau dan persetujuan eksplisit; revalidasi di dalam transaksi.
+$routes->post('guru/peta-atp/konfirmasi/(:num)', 'GuruAtpKonfirmasi::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/bab/baru', 'GuruBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/baru', 'GuruTpBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/paket-semester/baru', 'GuruPaketSemester::buat', ['filter' => 'auth:guru']);

@@ -146,7 +146,7 @@ final class AtpImporPratinjauService
             if ($status === 'ubah' && $lama !== null) {
                 foreach ($tpTerdaftar as $t) {
                     if ((int) $t['bab_id'] === (int) $lama['id']
-                        && $t['status'] === 'siap') {
+                        && $t['status'] !== 'draf') {
                         $status = 'galat';
                         $catatan = 'BAB memiliki TP Siap; perubahan perlu mekanisme koreksi.';
                         break;
@@ -184,6 +184,16 @@ final class AtpImporPratinjauService
                 $status = 'galat';
                 $catatan = 'TP Siap tidak boleh diubah oleh impor biasa.';
             }
+            if ($status === 'ubah' && $lama !== null && $lama['status'] === 'draf') {
+                foreach (['materi', 'versi_konten_tp', 'progres_tp'] as $tabel) {
+                    if ($this->db->table($tabel)
+                        ->where('tp_id', (int) $lama['id'])->countAllResults() !== 0) {
+                        $status = 'galat';
+                        $catatan = 'TP sudah memiliki konten/progres; sunting melalui editor resmi.';
+                        break;
+                    }
+                }
+            }
             $daftar[] = [
                 'jenis' => 'TP', 'semester' => $s, 'baris' => $t['baris'],
                 'kode' => $t['kode'], 'nama' => $t['nama'],
@@ -192,12 +202,35 @@ final class AtpImporPratinjauService
             $jumlah[$status]++;
         }
 
+        // Simpan fingerprint semantik terhadap seluruh state lama, termasuk
+        // keterangan yang tidak ikut ditampilkan. Hilangkan pengaruh urutan SQL.
+        usort($babTerdaftar, static fn (array $a, array $b): int => (int) $a['id'] <=> (int) $b['id']);
+        usort($tpTerdaftar, static fn (array $a, array $b): int => (int) $a['id'] <=> (int) $b['id']);
+        usort($daftarPaket, static fn (array $a, array $b): int => (int) $a['id'] <=> (int) $b['id']);
+        usort($elemen, static fn (array $a, array $b): int =>
+            strcmp((string) $a['elemen'], (string) $b['elemen']));
+        $fingerprint = hash('sha256', json_encode([
+            $paket, $cp, $elemen, $daftarPaket, $babTerdaftar, $tpTerdaftar,
+            $jumlah, $daftar,
+        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        $kosong = $hasil['jumlah_bab'] === 0 && $hasil['jumlah_tp'] === 0;
         return [
             'gen' => $paket['nama_gen'], 'mapel' => $paket['nama_mapel'],
             'semester_paket' => (int) $paket['semester'],
             'jumlah' => $jumlah, 'baris' => $daftar,
-            'kosong' => $hasil['jumlah_bab'] === 0 && $hasil['jumlah_tp'] === 0,
-            'boleh_konfirmasi' => false,
+            'kosong' => $kosong,
+            'boleh_konfirmasi' => ! $kosong && $jumlah['galat'] === 0
+                && ($jumlah['baru'] + $jumlah['ubah']) > 0,
+            'fingerprint' => $fingerprint,
+            'rencana' => $hasil,
+            'paket_semester' => $paketSem,
+            'cp_mapel_id' => (int) $cp[0]['id'],
+            'konteks' => [
+                'angkatan_id' => (int) $paket['angkatan_id'],
+                'mapel_id' => (int) $paket['mapel_id'],
+                'kurikulum_id' => (int) $paket['kurikulum_id'],
+                'tahun_ajaran_id' => (int) $paket['tahun_ajaran_id'],
+            ],
         ];
     }
 }

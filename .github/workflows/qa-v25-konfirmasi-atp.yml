@@ -1,0 +1,81 @@
+name: QA Konfirmasi ATP Transaksional v2.5
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/AtpImporKonfirmasiService.php'
+      - 'app/Services/AtpImporPratinjauService.php'
+      - 'app/Services/AtpStagingService.php'
+      - 'app/Controllers/GuruAtpKonfirmasi.php'
+      - 'app/Controllers/GuruAtpPratinjau.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/guru/pratinjau_atp.php'
+      - 'tests/unit/AtpStagingServiceTest.php'
+      - 'tests/integration/AtpImporMysqlTest.php'
+      - 'tests/fixtures/atp_import_v25_mysql.sql'
+      - '.github/workflows/qa-v25-konfirmasi-atp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Lint dan staging token / parser PHP 8.2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip, mbstring, dom, xml, mysqli, gd, intl, fileinfo
+          tools: composer:v2
+          coverage: none
+      - name: Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP syntax
+        run: |
+          php -l app/Services/AtpImporKonfirmasiService.php
+          php -l app/Services/AtpImporPratinjauService.php
+          php -l app/Services/AtpStagingService.php
+          php -l app/Controllers/GuruAtpKonfirmasi.php
+          php -l app/Controllers/GuruAtpPratinjau.php
+          php -l app/Views/guru/pratinjau_atp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/AtpStagingServiceTest.php
+          php -l tests/integration/AtpImporMysqlTest.php
+      - name: PHPUnit staging dan parser
+        run: vendor/bin/phpunit --no-coverage --filter 'AtpStagingServiceTest|AtpExcelParserServiceTest'
+
+  mysql:
+    name: MySQL 8 transaction, rollback, idempotence and Gen isolation
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip, mbstring, dom, xml, mysqli, gd, intl, fileinfo
+          tools: composer:v2
+          coverage: none
+      - name: Load isolated fixture, never production database
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/atp_import_v25_mysql.sql
+      - name: Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHPUnit real CI4 Services against isolated MySQL
+        env:
+          SLA_ATP_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/AtpImporMysqlTest.php
