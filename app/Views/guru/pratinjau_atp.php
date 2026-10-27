@@ -72,8 +72,26 @@
             </table>
         </div>
         <div class="a-atp-detail__toolbar-actions">
-            <a class="a-btn a-btn--sekunder" href="<?= esc($kembali, 'attr') ?>">Kembali ke Semester</a>
+            <a class="a-btn a-btn--sekunder" href="<?= esc($kembali, 'attr') ?>">Batal / Kembali</a>
+            <?php if (! empty($hasil['boleh_konfirmasi']) && ! empty($hasil['stage_token'])): ?>
+                <form method="post"
+                    action="<?= esc(site_url('guru/peta-atp/konfirmasi/' . (int) $hasil['paket_id']), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="stage_token" value="<?= esc($hasil['stage_token'], 'attr') ?>">
+                    <input type="hidden" name="pilihan" value="<?= (int) $hasil['pilihan'] ?>">
+                    <input type="hidden" name="semester" value="<?= (int) $hasil['semester_asal'] ?>">
+                    <button class="a-btn a-btn--utama" type="submit">
+                        Konfirmasi dan Simpan BAB / TP
+                    </button>
+                </form>
+            <?php elseif (! $hasil['kosong'] && $hasil['jumlah']['galat'] === 0): ?>
+                <p class="a-proto-muted">Tidak ada perubahan baru. Impor ulang tidak menggandakan data.</p>
+            <?php endif ?>
         </div>
+        <?php if (! empty($hasil['boleh_konfirmasi'])): ?>
+            <p class="a-proto-muted">Konfirmasi berlaku 15 menit pada sesi Guru ini.
+                Sistem memeriksa kembali semua perubahan sebelum menyimpan; jika data berubah, unggah ulang.</p>
+        <?php endif ?>
     </section>
 </div>
 <?= $this->endSection() ?>
