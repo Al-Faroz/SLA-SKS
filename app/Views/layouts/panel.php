@@ -15,8 +15,16 @@ $peranAktif = $peranAktif ?? '';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= esc($judul ?? 'Panel') ?> · SLA-SKS</title>
-    <link rel="stylesheet" href="<?= esc(base_url('public/assets/css/app.css'), 'attr') ?>">
-    <script defer src="<?= esc(base_url('public/assets/js/app.js'), 'attr') ?>"></script>
+    <?php
+        // Browser harus mengambil CSS/JS baru setelah git pull.
+        // FCPATH mengarah ke root proyek (index.php berada pada root SLA-SKS).
+        $cssFile = FCPATH . 'public/assets/css/app.css';
+        $jsFile  = FCPATH . 'public/assets/js/app.js';
+        $cssVersi = is_file($cssFile) ? (string) filemtime($cssFile) : '1';
+        $jsVersi  = is_file($jsFile) ? (string) filemtime($jsFile) : '1';
+    ?>
+    <link rel="stylesheet" href="<?= esc(base_url('public/assets/css/app.css') . '?v=' . $cssVersi, 'attr') ?>">
+    <script defer src="<?= esc(base_url('public/assets/js/app.js') . '?v=' . $jsVersi, 'attr') ?>"></script>
 </head>
 <body>
 <a class="a-lewati" href="#konten-utama">Lewati ke konten</a>
