@@ -11,6 +11,10 @@ final class AtpManualTemplateTest extends TestCase
     private const BERKAS = 'docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
     private const VERSI = 'SLA-SKS-ATP-MANUAL-V25-1';
 
+    /**
+     * PhpSpreadsheet may return inline-string cells as RichText.
+     * Cast populated text to its plain string representation before assertions.
+     */
     public function testWorkbookManualSesuaiKontrak(): void
     {
         $path = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS;
@@ -22,17 +26,17 @@ final class AtpManualTemplateTest extends TestCase
                 'SEMESTER 1', 'SEMESTER 2', 'SEMESTER 3',
                 'SEMESTER 4', 'SEMESTER 5', 'SEMESTER 6', 'CONTOH MAT VII',
             ], $buku->getSheetNames());
-            self::assertSame(self::VERSI, $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue());
+            self::assertSame(self::VERSI, (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue());
             for ($n = 1; $n <= 6; ++$n) {
                 $sheet = $buku->getSheetByName('SEMESTER ' . $n);
                 self::assertNotNull($sheet);
-                self::assertSame(self::VERSI, $sheet->getCell('A2')->getValue());
-                self::assertSame('Nomor BAB', $sheet->getCell('A12')->getValue());
-                self::assertSame('Nama BAB (maks. 50)', $sheet->getCell('B12')->getValue());
-                self::assertSame('Nomor BAB', $sheet->getCell('A38')->getValue());
-                self::assertSame('Kode TP', $sheet->getCell('C38')->getValue());
-                self::assertSame('Jenis TP', $sheet->getCell('D38')->getValue());
-                self::assertSame('Judul satu Materi', $sheet->getCell('G38')->getValue());
+                self::assertSame(self::VERSI, (string) $sheet->getCell('A2')->getValue());
+                self::assertSame('Nomor BAB', (string) $sheet->getCell('A12')->getValue());
+                self::assertSame('Nama BAB (maks. 50)', (string) $sheet->getCell('B12')->getValue());
+                self::assertSame('Nomor BAB', (string) $sheet->getCell('A38')->getValue());
+                self::assertSame('Kode TP', (string) $sheet->getCell('C38')->getValue());
+                self::assertSame('Jenis TP', (string) $sheet->getCell('D38')->getValue());
+                self::assertSame('Judul satu Materi', (string) $sheet->getCell('G38')->getValue());
                 self::assertNull($sheet->getCell('A13')->getValue());
                 self::assertNull($sheet->getCell('J118')->getValue());
                 self::assertSame('D39:D118', $sheet->getDataValidation('D39')->getSqref());
