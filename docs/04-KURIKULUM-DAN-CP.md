@@ -6,8 +6,8 @@
 - MTs Fase D: semester SLA 1–2 = kelas VII, 3–4 = VIII, 5–6 = IX. Gen/angkatan, guru pengampu dan paket tetap terpisah menurut **Gen–Mapel** (G1). Kebijakan SKS dua tahun dan semester mulai siswa tidak berubah.
 - **Satu CP untuk satu Mapel** pada satu kurikulum/fase yang berlaku. CP dapat mempunyai beberapa elemen/rumusan; ini bukan beberapa CP operasional. Elemen dan versi sumber resmi lama tidak dihapus.
 - Setiap Semester terdiri dari beberapa BAB; BAB mempunyai beberapa TP; setiap TP hanya mempunyai satu jenis, **Esensial** atau **NonEsensial**.
-- **BAB:** `nama_bab` maksimal 35 karakter, `deskripsi_bab` maksimal 225 karakter, `nomor_bab` positif.
-- **TP:** `nama_tp` maksimal 35 karakter, `deskripsi_tp` maksimal 225 karakter berupa bunyi asli tujuan pembelajaran, `jenis_tp`, `kode_tp`, dan `urutan_dalam_bab`. Rumusan akademik lengkap tetap terlihat pada detail, tidak dipotong permanen oleh card.
+- **BAB:** `nama_bab` maksimal 50 karakter, `deskripsi_bab` maksimal 225 karakter, `nomor_bab` positif.
+- **TP:** `nama_tp` maksimal 50 karakter, `deskripsi_tp` maksimal 225 karakter berupa bunyi asli tujuan pembelajaran, `jenis_tp`, `kode_tp`, dan `urutan_dalam_bab`. Rumusan akademik lengkap tetap terlihat pada detail, tidak dipotong permanen oleh card.
 - **TP Esensial:** tetap wajib masuk ATP tetapi tidak memiliki materi, aktivitas siswa LMS, atau nilai.
 - **TP NonEsensial:** tepat **1 Materi** yang aktif, dengan satu media jenis YouTube/audio/gambar/PDF, satu Resume, satu HOTS, bank soal Diagnostik dan Sumatif.
 

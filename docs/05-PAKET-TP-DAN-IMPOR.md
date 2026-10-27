@@ -3,7 +3,7 @@
 > **Master v2.5 · 26 Oktober 2026.** Pengganti ketentuan v2.4 tanpa BAB dan beberapa Materi per TP.
 
 ## 1. Struktur paket
-`paket_semester (Gen–Mapel–Semester) → BAB → TP`. BAB mempunyai nama singkat (≤35), deskripsi (≤225), nomor berlanjut lintas semester berpasangan kelas sama. TP mempunyai nama singkat (≤35), deskripsi asli (≤225), kode format `KODEMAPEL.KELAS.BAB.TP`, jenis Esensial/NonEsensial, nomor urut dalam BAB. TP Siap immutable di editor biasa; versi dan snapshot lama dipertahankan.
+`paket_semester (Gen–Mapel–Semester) → BAB → TP`. BAB mempunyai nama singkat (≤50), deskripsi (≤225), nomor berlanjut lintas semester berpasangan kelas sama. TP mempunyai nama singkat (≤50), deskripsi asli (≤225), kode format `KODEMAPEL.KELAS.BAB.TP`, jenis Esensial/NonEsensial, nomor urut dalam BAB. TP Siap immutable di editor biasa; versi dan snapshot lama dipertahankan.
 
 **Esensial:** tanpa Materi, Diagnostik, Resume, HOTS, Sumatif, dan nilai di aplikasi. Tetap muncul dalam ATP dan sertifikat.
 
