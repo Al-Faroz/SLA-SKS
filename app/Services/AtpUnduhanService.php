@@ -224,6 +224,9 @@ final class AtpUnduhanService
                     DataType::TYPE_STRING);
             }
         }
+        // Samakan keluaran Excel dengan standar visual Peta Pembelajaran lama.
+        // Hanya style dan teks panduan; sel input BAB/TP tetap tidak diisi.
+        AtpDesainWorkbookService::terapkan($buku);
         $buku->setActiveSheetIndex(0);
     }
 }
