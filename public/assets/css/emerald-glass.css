@@ -559,7 +559,10 @@ html[data-theme] .a-app--prototipe .a-proto-metric::before {
   border-radius:inherit;
   background:linear-gradient(180deg,rgba(255,255,255,.13),transparent 95%);
   pointer-events:none;
-  z-index:-1;
+  z-index:0;
+}
+html[data-theme] .a-app--prototipe .a-proto-metric > * {
+  position:relative;z-index:1;
 }
 html[data-theme] .a-app--prototipe .a-proto-metric p {
   color:var(--e-text);
@@ -739,6 +742,46 @@ html[data-theme] .a-app--prototipe .a-page .a-tbl tbody tr:hover :is(th,td) {
 html[data-theme] .a-app--prototipe .a-page .a-tbl tbody :is(th,td) a {
   color:var(--e-primary);text-underline-offset:3px;
 }
+
+/* XLSX pada daftar Pengelola/Siswa memiliki selector asli __xlsx. */
+html[data-theme] .a-app--prototipe .a-page .a-admin-akun__xlsx {
+  background:linear-gradient(125deg,var(--eg-sheen),transparent 85%),var(--eg-pane-soft);
+  border:1px solid var(--eg-line);
+  border-radius:12px;
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-page .a-admin-akun__xlsx strong {
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-page .a-admin-akun__subtitle {
+  color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-page .a-admin-akun__tabel {
+  font-size:13px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-admin-akun__tabel tbody td,
+html[data-theme] .a-app--prototipe .a-page .a-admin-akun__tabel tbody th {
+  line-height:1.55;
+}
+/* CTA pada kartu ringkasan Admin berwujud tombol ber-background. */
+html[data-theme] .a-app--prototipe .a-proto-metric a {
+  min-height:32px;
+  display:inline-flex;align-items:center;
+  width:fit-content;
+  padding:5px 10px;
+  border:1px solid var(--eg-line);
+  border-radius:9px;
+  background:var(--eg-icon-bg);
+  color:var(--e-text);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+  text-decoration:none;
+}
+html[data-theme] .a-app--prototipe .a-proto-metric a:hover {
+  background:var(--eg-pane-soft);
+  border-color:var(--eg-field-line);
+  text-decoration:none;
+}
+
 /* Administrasi: toolbar impor XLSX dan badge jumlah tidak kembali putih keras. */
 html[data-theme] .a-app--prototipe .a-page .a-admin-akun__jumlah {
   background:var(--e-soft);
