@@ -66,3 +66,6 @@
 
 ### Checkpoint implementasi tahap 3A (27 Oktober 2026)
 PR sesudah generator #70 menyediakan **parser XLSX serta pratinjau diff read-only** Guru untuk enam semester. Sel sumber dan contoh tidak berubah. **Konfirmasi transaksi idempoten belum tersedia** dan tidak boleh ditafsirkan sudah selesai. Database v4 tidak diubah; penyimpanan bab/tp yang ada dan TP Siap/snapshot tetap aman. Pengujian XAMPP dan pengguna tetap diperlukan.
+
+### Checkpoint implementasi tahap 3B (27 Oktober 2026)
+Tindak lanjut setelah PR #71: konfirmasi memakai file XLSX staging privat 15 menit yang terikat akun/paket/sesi/hash; pada POST dengan CSRF melakukan locking, validasi ulang dan transaksi atomik per konteks. BAB/TP baru/ubah draf/idempoten, histori Siap/arsip tidak dihapus/ditimpa, audit tertulis. QA MySQL sintetis dan pemeriksaan XAMPP wajib sebelum penggabungan; **jangan mengasumsikan hasil staging sebagai data valid bila keadaan database sudah berubah**. Tidak ada perubahan SQL maupun nilai siswa.
