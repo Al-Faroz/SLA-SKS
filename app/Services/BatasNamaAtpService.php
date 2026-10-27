@@ -22,14 +22,15 @@ final class BatasNamaAtpService
         if ($tabel === null || ! $db->tableExists($tabel)) {
             return 35;
         }
-        foreach ($db->getFieldData($tabel) as $field) {
-            if (($field->name ?? '') === $kolom) {
-                $lebar = (int) ($field->max_length ?? 0);
-                // Jika driver tidak melaporkan kapasitas VARCHAR dengan benar,
-                // tetap konservatif agar form tidak menyebabkan truncation.
-                return $lebar > 0 ? min(50, $lebar) : 35;
-            }
-        }
-        return 35;
+        // CHARACTER_MAXIMUM_LENGTH adalah kapasitas karakter, bukan ukuran
+        // byte UTF-8 dari field metadata driver (yang dapat 4x lebih besar).
+        $baris = $db->query(
+            'SELECT CHARACTER_MAXIMUM_LENGTH AS batas FROM information_schema.COLUMNS'
+            . ' WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?',
+            [$tabel, $kolom]
+        )->getRowArray();
+        $lebar = (int) ($baris['batas'] ?? 0);
+        // Default aman untuk skema lama atau metadata yang belum tersedia.
+        return $lebar > 0 ? min(50, $lebar) : 35;
     }
 }
