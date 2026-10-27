@@ -1,23 +1,14 @@
 # 01 — Lingkup Produk, Istilah dan Peta Fitur
 
-> **Sumber acuan normatif.** SLA-SKS v2.4 · MTs · Fase D · bahasa Indonesia · zona waktu Asia/Jakarta. Seluruh keputusan aplikasi di bawah berlaku tanpa perlu membaca berkas revisi lama.
+> **Sumber acuan normatif.** SLA-SKS v2.5 · MTs · Fase D · bahasa Indonesia · zona waktu Asia/Jakarta. Seluruh keputusan aplikasi di bawah berlaku tanpa perlu membaca berkas revisi lama.
 
 ## 1. Produk dan pengguna
-SLA-SKS adalah LMS tertutup untuk program pembelajaran mandiri berurutan. Siswa mempelajari mata pelajaran menurut paket semester 1–6, TP, TP dan materi. Fokusnya ketuntasan akademik, bukan kompetisi. Empat peran: **Siswa**, **Guru**, **Admin**, **Pimpinan**. Setiap siswa hanya memiliki peran siswa; akun staf boleh merangkap maksimal dua peran yang diizinkan. Perkiraan kapasitas kecil: satu kelas khusus maksimum tiap angkatan, bukan platform publik ratusan pengguna serentak. Akses utama siswa melalui HP/laptop; sumatif dari **desktop/laptop** saja.
+SLA-SKS adalah LMS tertutup untuk program pembelajaran mandiri berurutan. Siswa mempelajari mata pelajaran menurut paket semester 1–6, BAB, TP dan materi. Fokusnya ketuntasan akademik, bukan kompetisi. Empat peran: **Siswa**, **Guru**, **Admin**, **Pimpinan**. Setiap siswa hanya memiliki peran siswa; akun staf boleh merangkap maksimal dua peran yang diizinkan. Perkiraan kapasitas kecil: satu kelas khusus maksimum tiap angkatan, bukan platform publik ratusan pengguna serentak. Akses utama siswa melalui HP/laptop; sumatif dari **desktop/laptop** saja.
 
-Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru menyusun ATP/TP dan Materi berdasarkan CP resmi → Guru melengkapi dan menerbitkan TP Siap → Siswa menjalani diagnostik → jika belum tuntas: materi/resume/tugas/sumatif → Guru memberi penilaian → siswa melihat kemajuan/sertifikat → Pimpinan memantau**.
+Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru menyusun ATP/TP dan Materi berdasarkan CP resmi → Guru melengkapi dan menerbitkan TP Siap → Siswa menjalani diagnostik → jika gagal: satu materi/resume/HOTS; semua NonEsensial wajib sumatif → Guru memberi penilaian → siswa melihat kemajuan/sertifikat → Pimpinan memantau**.
 
 ## 2. Struktur belajar resmi
-`Madrasah → Gen → Mata pelajaran → Paket semester khusus Gen (1–6) → ATP (urutan TP) → TP berurutan → Materi/Submateri berurutan`. Setiap TP memetakan satu atau lebih CP resmi yang dipublikasikan, tepat satu CP utama. MTs Fase D mencakup VII–IX; label semester SLA 1–6 **bukan periode tahun kalender**. Penugasan paket berlaku menurut kombinasi angkatan, tahun ajaran, mapel dan semester; siswa yang sudah memiliki progres dipertahankan pada paket dan versi konten asal.
-
-| Semester SLA | Kelas | Semester akademik | Fase |
-|---:|---|---|---|
-| 1 | VII | Ganjil | D |
-| 2 | VII | Genap | D |
-| 3 | VIII | Ganjil | D |
-| 4 | VIII | Genap | D |
-| 5 | IX | Ganjil | D |
-| 6 | IX | Genap | D |
+Struktur utama: **Mapel → 1 CP operasional → Semester → BAB → TP**. Enam semester tetap: 1–2 VII, 3–4 VIII, 5–6 IX; satu Gen–Mapel memiliki paket semester berversi. BAB/TP bernama singkat (maksimum 50 karakter) dan berdeskripsi (maksimum 225). BAB berlanjut nomor lintas dua semester pada tingkat kelas yang sama. Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misal `BIND.8.1.1`). TP Esensial ada di ATP/sertifikat tanpa materi/nilai. TP NonEsensial wajib tepat satu Materi.
 
 ## 3. Fungsi versi ini
 - **Akun/otorisasi:** login tertutup; menu Admin terpisah **Pengelola** (Admin/Guru/Pimpinan) dan **Siswa**, keduanya tetap memakai akun autentikasi yang sama. Impor/ekspor XLSX, reset sandi per akun, ganti sandi pertama kali, peran staf, nonaktif akun, pembatasan login.
@@ -29,10 +20,10 @@ Alur pokok: **Admin menyiapkan akun/mapel/angkatan/identitas → Guru menyusun A
 - **Admin/Pimpinan:** Admin mengelola sumber daya dan persetujuan akademik tertentu, Pimpinan hanya membaca; laporan PDF/Excel dan dasbor peran.
 - **Sertifikat:** A4 landscape, background JPG/PNG berversi, identitas siswa termasuk NISN pada PDF, QR publik tanpa NISN, penerbitan awal dan pengganti tanpa menghapus sejarah.
 
-### Akun, profil dan UI v2.4
+### Akun, profil dan UI v2.5
 - Admin mengelola Pengelola dan Siswa pada dua halaman terpisah; template, impor, ekspor, pratinjau galat dan reset sandi tersedia pada keduanya. Tidak ada registrasi publik.
 - Pengelola dapat mengubah foto, kontak pribadi dan sandinya sendiri. Nama resmi, NIP, peran dan penugasan diubah Admin. Siswa melihat profil profesional Guru pengampu Gen-nya secara terbatas, bukan data pribadi atau autentikasinya.
-- Paket, TP, TP, soal dan materi **tidak dibagi otomatis lintas Gen**. CP resmi tetap dapat dipakai bersama selama cocok.
+- Paket, BAB, TP, soal dan materi **tidak dibagi otomatis lintas Gen**. CP resmi tetap dapat dipakai bersama selama cocok.
 - UI panel modern terinspirasi TailDash dan UI publik terinspirasi UIdeck Appwind, tetapi implementasi tetap CSS kustom/JS native, bukan framework Tailwind.
 
 ## 4. Tidak menjadi fitur
@@ -47,8 +38,8 @@ Tidak ada registrasi publik, login Google, marketplace kursus, rombel sebagai pe
 | TP Siap | TP dipublikasikan dan terkunci untuk perubahan biasa |
 | TP | Tujuan pembelajaran dengan rumusan, indikator, urutan, CP dan penilaian |
 | CP | Capaian Pembelajaran resmi bersumber/berversi |
-| Jalur diagnostik | TP tuntas berdasarkan skor diagnostik ≥ KKM |
-| Jalur belajar | Materi → resume per materi → HOTS → sumatif setelah diagnostik belum tuntas |
+| Jalur diagnostik | Lulus dapat melewati Materi, Resume dan HOTS tetapi tetap wajib Sumatif |
+| Jalur belajar | Satu Materi → Resume → HOTS → Sumatif setelah Diagnostik belum lulus |
 | Ujian dibatalkan | Tidak memiliki nilai; menunggu keputusan guru |
 | Nilai sementara | Nilai belum lengkap karena komponen wajib masih menunggu penilaian guru |
 | `berlaku` | Sertifikat resmi aktif untuk siswa dan paket semester tertentu |
@@ -61,8 +52,9 @@ Tidak ada registrasi publik, login Google, marketplace kursus, rombel sebagai pe
 ## 7. Pembatasan informasi
 Aplikasi tidak mengirim data siswa ke penyedia layanan pihak ketiga kecuali memang diperlukan untuk media YouTube yang dibuka siswa. NISN adalah pengenal pribadi: ada pada PDF sertifikat privat sesuai keputusan pemilik, tetapi **tidak pernah muncul di halaman verifikasi QR publik**.
 
-## 8. Keputusan arsitektur v2.4 — 22 Oktober 2026
-- **Tidak ada entitas BAB.** ATP merupakan urutan TP per semester, dan setiap TP memiliki beberapa Materi/Submateri; Resume dan HOTS wajib per Materi bagi siswa jalur belajar.
-- Pembelajaran mandiri SKS percepatan dua tahun mempertahankan Diagnostik yang dapat menuntaskan TP, nilai/KKM/bobot, Sumatif dan aturan ujian yang sudah disahkan madrasah.
-- Perencanaan Guru memakai Excel ATP 6 semester; konten materi/HOTS dikelola langsung aplikasi; dua bank PG lima opsi A–E diimpor dari Word, dengan gambar, tabel, Equation dan tautan audio/video Google Drive.
-- Integrasi nilai Panca Cinta (KBC) sesuai relevansi tanpa tambahan modul atau hierarki kurikulum.
+## 8. Keputusan arsitektur v2.5 — 22 Oktober 2026
+- Struktur v2.4 tanpa BAB, beberapa Materi per TP, dan nilai final langsung dari Diagnostik **telah diganti**.
+- Diagnostik minimal 10 menjadi gate, Sumatif minimal 30 wajib. Nilai TP: jalur gagal Diagnostik = 20% Resume +20% HOTS +60% Sumatif, lulus = 100% Sumatif.
+- KKM default Admin/khusus Guru, remedial sekali jika skor Sumatif < KKM dan diambil nilai tertinggi; TP Selesai walau nilai masih < KKM.
+- Progres semester berdasarkan TP NonEsensial; Pra-Semester pada waktu serentak Admin setelah semua TP NonEsensial selesai. Tidak ada nilai akhir semester. Guru ekspor nilai parsial termasuk ketika baru satu TP bernilai.
+

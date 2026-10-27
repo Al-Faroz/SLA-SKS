@@ -1,4 +1,4 @@
-# 07 — Mesin Ujian Diagnostik dan Sumatif
+# 07 — Mesin Ujian Diagnostik, Sumatif dan Pra-Semester
 
 ## 1. Kebijakan perangkat dan lokasi
 **Satu profil keamanan: Ketat.** Tidak ada pilihan longgar/standar. **Sumatif diizinkan dari rumah** hanya melalui **desktop/laptop** yang mendukung fullscreen. Diagnostik boleh dari HP/tablet apabila browser benar-benar mampu masuk fullscreen; jika tidak, akses **ditolak sebelum percobaan tercipta**, dengan pesan `Perangkat/browser ini tidak mendukung fullscreen. Buka ujian di desktop/laptop yang mendukungnya.` Jika kapabilitas tidak terverifikasi, jangan memulai ujian tanpa pengecekan lagi pada saat user gesture.
@@ -6,10 +6,10 @@
 Instruksi petunjuk S05 menyampaikan bahwa membuka ujian memerlukan koneksi stabil dan fullscreen; pengawasan fisik tidak diasumsikan karena sumatif boleh dari rumah. User-Agent hanya indikasi tipe perangkat, bukan kontrol keamanan absolut.
 
 ## 2. Percobaan sah
-- Diagnostik wajib satu percobaan normal. Sumatif memiliki kuota bawaan **3 percobaan sah normal**. Percobaan yang dibatalkan karena pelanggaran/koneksi **tanpa skor**, tidak menghabiskan kuota normal; Guru menentukan tindak lanjut.
-- Soal **hanya pilihan ganda (PG) dengan tepat lima opsi A–E terisi dan satu jawaban benar**; ambil acak soal aktif dari snapshot TP yang terikat; acak urutan opsi. Kunci tidak pernah dikirim ke browser sebelum ujian sah berakhir.
-- Server menyimpan snapshot soal/opsi/kunci per percobaan yang tidak bisa diubah secara historis. `jawaban_percobaan` upsert per soal, idempoten, tak menciptakan ganda akibat refresh.
-- Skor sah hanya diterbitkan setelah submit sah/waktu habis sah. Skor sumatif tertinggi dari percobaan sah normal dipakai pada komponen sumatif; perubahan karena peninjauan soal/kunci mengikuti `08-PENILAIAN.md`.
+- Diagnostik minimal 10 soal, satu percobaan normal; skor hanya gate pembelajaran, tidak menjadi nilai final TP.
+- Sumatif minimal 30 soal, **wajib bagi semua TP NonEsensial**, satu tes awal sah. Jika nilai < KKM, **satu remedial**; nilai tertinggi tes awal/remedial menjadi skor Sumatif efektif. Kuota tiga percobaan normal v2.4 tidak berlaku lagi.
+- Pra-Semester minimal 30 soal dari semua BAB semester, ujian tersendiri (bukan TP), pola dan keamanan Sumatif, serta remedial satu kali bila skor < KKM. Admin menetapkan satu jendela waktu ujian serentak bagi siswa dalam paket. Siswa belum selesai semua TP NonEsensial ditolak sebelum attempt.
+- Ujian batal karena koneksi/pelanggaran tidak memberi skor dan tidak menghabiskan percobaan sah; Guru menangani ulang/lanjut sesuai kebijakan. Seluruh soal PG A–E satu kunci, bank/snapshot, kunci dan jawaban tetap diproses di server.
 
 ## 3. Waktu aktif dan jeda
 | Parameter | Nilai final | Aturan |
@@ -51,3 +51,6 @@ Throttler per akun dan percobaan, CSRF, session auth, anti replay, cek status se
 - Impor dari dua template Word beridentitas `SLA-SKS-WORD-V1` mengikuti [05](05-PAKET-TP-DAN-IMPOR.md). Teks, Equation Word/OMML, gambar, tabel termasuk tabel bersarang dipertahankan **pada pertanyaan maupun pilihan** dalam rendering ujian.
 - Audio/video soal via Google Drive boleh hanya jika URL sah, izin akses dan pemutaran telah lolos pratinjau; kegagalan media penting harus mencegah bank dinyatakan Siap. Ini tidak mengubah kebijakan YouTube untuk media pembelajaran.
 - Sanitasi konten DOCX, kontrol kunci dan cache aset historis wajib; sampel ujian tidak mengirim kunci ke klien sebelum sesuai kebijakan hasil.
+
+## 9. Kontrak Pra-Semester
+Menggunakan pemeriksaan fullscreen Ketat yang sama, jeda fullscreen 90 detik per kejadian/180 akumulatif, insiden ketiga batal, koneksi 20 detik/300 akumulatif. Server memeriksa waktu mulai/akhir Admin dan status seluruh TP NonEsensial sebelum membuat percobaan. Jadwal **serentak** bukan jaminan siswa yang tidak hadir dapat mengerjakan di luar jadwal.

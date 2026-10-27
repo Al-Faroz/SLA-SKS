@@ -29,27 +29,23 @@
 - Perbaikan NISN dan username login siswa harus atomik dan menjaga `siswa_id`, progres dan histori.
 
 ## 3. Keputusan final tentang pembelajaran
-- `Semester mulai = COALESCE(siswa.semester_mulai, angkatan.semester_mulai)`; semua semester sebelumnya berstatus Dilewati tanpa nilai/sertifikat.
-- TP dalam ATP berjalan berurutan. Hanya TP `siap` tersedia; TP draf selanjutnya tidak menghalangi siswa menyelesaikan TP `siap` sebelumnya.
-- Diagnostik wajib; skor ≥ KKM menuntaskan TP dengan nilai diagnostik. Siswa dapat membuka materi secara sukarela tetapi **tidak mengirim resume/tugas resmi**; tidak berdampak pada nilai.
-- Skor diagnostik di bawah KKM: siswa wajib materi berurutan, **Resume dan HOTS pada setiap Materi**, lalu Sumatif TP. Komponen resume/tugas dinilai Guru; pengerjaan siswa tidak ditahan menunggu penilaian, tetapi sertifikat menunggu nilai lengkap.
-- Kelulusan TP hanya ditentukan diagnostik atau sumatif; nilai gabungan resume/tugas/sumatif dipakai rapor dan sertifikat. Koreksi soal/kunci setelah ujian sah dapat menyebabkan hitung ulang **status ketuntasan** sesuai skor yang sudah dikoreksi.
-- Resume/tugas memakai **tombol Simpan draf manual**, data disimpan di database, kemudian tombol kirim final mengunci hasil. Tidak ada autosave wajib.
-- Nilai rapor/sertifikat ditampilkan **angka saja**, tanpa kategori huruf A/B/C/D sebagai predikat.
+- Semester sebelum semester mulai siswa tetap Dilewati. ATP per Gen–Mapel berisi BAB dan TP berurutan, disiapkan Guru di aplikasi atau impor Excel.
+- **Esensial:** tidak ada Materi, diagnostik, Resume, HOTS, Sumatif, atau nilai. **NonEsensial:** tepat satu Materi dan alur Diagnostik → (bila gagal: Materi → Resume → HOTS) → Sumatif untuk semua siswa.
+- Diagnostik min 10 adalah gate bukan nilai TP. Sumatif min 30. Nilai gagal Diagnostik 20/20/60 (Resume/HOTS/Sumatif), lulus 100% Sumatif. Admin menentukan KKM default dan Guru dapat menetapkan khusus.
+- Sumatif < KKM memperoleh satu remedial; gunakan nilai tertinggi. Setelah aktivitas dan kesempatan sah terkait selesai, **TP selesai meskipun nilai masih < KKM**. Progres semester hanya TP NonEsensial.
+- Pra-Semester dijadwalkan tanggal/jam oleh Admin secara serentak setelah semua TP NonEsensial selesai; nilai tersendiri. **Tidak ada nilai akhir semester.**
+- Resume/HOTS Simpan Draf manual, Kirim Final, penilaian Guru. TP Siap historis/snapshot tetap dilindungi.
 
 ## 4. Keputusan final tentang ujian
-- Satu **profil Ketat** untuk seluruh ujian; pengaturan longgar/standar tidak ditawarkan.
-- Sumatif dapat dilakukan **di rumah** melalui **desktop/laptop** yang mendukung fullscreen. Diagnostik boleh melalui HP hanya bila browser/perangkat benar-benar mendukung fullscreen.
-- Jika fullscreen tidak didukung, **tolak sebelum membuat percobaan** dengan pesan gunakan desktop/laptop yang mendukungnya. Pemeriksaan dilakukan di UI dan Service pada kondisi yang bisa diverifikasi, tanpa menganggap User-Agent sebagai bukti keamanan sempurna.
-- Pelanggaran fullscreen berulang: jeda maksimal 90 detik/kejadian, akumulasi 180 detik, pelanggaran ketiga membatalkan percobaan. Gangguan koneksi: deteksi 20 detik, akumulasi jeda 300 detik. Batas/keputusan rinci di `07-MESIN-UJIAN.md`.
+- Profil Ketat sama untuk Diagnostik, Sumatif dan Pra-Semester. PG lima pilihan A–E dengan satu kunci; aturan fullscreen, jeda/insiden, koneksi di dokumen 07.
+- Diagnostik minimal 10, Sumatif minimal 30, Pra-Semester minimal 30 soal gabungan seluruh BAB semester.
+- Sumatif dan Pra-Semester memberikan **satu remedial jika skor < KKM**, mengambil nilai tertinggi. Percobaan batal tanpa skor tidak menghabiskan kesempatan sah; ulang memerlukan keputusan Guru.
+- Admin mengatur jendela Pra-Semester serentak; akses siswa tanpa seluruh TP NonEsensial selesai ditolak.
 
 ## 5. Keputusan final tentang sertifikat
-- Awal: sistem otomatis menerbitkan ketika paket tuntas dan semua nilai wajib final, menggunakan template global A4 landscape aktif atau **template bawaan aplikasi** jika Admin belum mengunggah background.
-- **PNG tanda tangan wajib tersedia**; tanpa PNG penandatangan valid, terbitan ditahan dan Admin diberi peringatan.
-- Koreksi nilai yang mengubah isi akademik tercetak menghasilkan **nomor/QR baru** dan sertifikat lama `digantikan`; jika cetakan tidak berubah, hanya audit dan nilai internal yang berubah.
-- Koreksi biodata siswa **langsung dikelola Admin**; sertifikat terdampak diganti **satu per satu**. Tidak mewajibkan Admin kedua untuk edit biodata biasa.
-- Saat revisi sertifikat, background tetap versi yang dipakai sertifikat lama, tetapi **identitas penandatangan dan gambar tanda tangan memakai yang aktif saat revisi**.
-- NISN **ditampilkan pada PDF sertifikat**, tidak tampil di halaman verifikasi publik. Tidak ada fitur mencabut atau menghapus sertifikat.
+- Daftar nilai sertifikat berisi seluruh TP: Esensial tanpa nilai, NonEsensial dengan nilai; **tidak ada rata-rata nilai akhir semester**.
+- Syarat apakah Pra-Semester wajib selesai sebelum sertifikat terbit masih **menunggu keputusan**, tidak boleh ditetapkan otomatis.
+- Sertifikat A4 landscape, template background global berversi, TTD PNG wajib, NISN hanya PDF privat, QR publik aman. Koreksi cetakan berubah menghasilkan sertifikat pengganti nomor/QR baru, lama Digantikan; cetakan sama cukup audit. Tidak ada pencabutan/hapus.
 
 ## 6. Status standar
 | Domain | Nilai status | Makna |
@@ -66,14 +62,9 @@
 ## 7. Prinsip pembacaan dokumen
 Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya karena contoh sebelumnya pernah menyebutnya. Persyaratan verifikasi harus **cukup aman, sederhana, dan sesuai keputusan akhir**. Rincian operasional hosting dan data pengaturan sekolah diisi melalui UI saat pemasangan.
 
-## 8. Keputusan lintas modul v2.4
-1. Struktur tunggal **CP → ATP (urutan TP) → TP → Materi/Submateri**; tidak menyimpan status/progres kelompok BAB tersendiri.
-2. Setiap Materi dalam jalur belajar memiliki Resume dan HOTS sendiri. Tugas wajib dikirim final sebelum membuka Materi berikutnya tanpa menunggu nilai Guru; seluruh tugas wajib tetap dinilai untuk sertifikat. Kelulusan Diagnostik/Sumatif, KKM dan bobot tetap kebijakan akademik madrasah untuk SKS percepatan dua tahun.
-3. **Semua soal Diagnostik/Sumatif adalah PG tepat 5 opsi A–E dan satu kunci.** Template Word bersama mendukung konten kaya serta Google Drive; tidak menambah tipe soal CBT lain.
-4. Guru menggunakan Excel pemetaan TP/Materi enam semester terikat Gen–Mapel; tidak memakai delapan sheet konten lama. TP Siap terkunci, snapshot dan koreksi versi berlaku per TP.
-5. Admin CP tidak wajib mengulang metadata sumber resmi pada setiap rumusan; sumber tetap terlacak. Logo aplikasi yang diunggah pada admin/identitas digunakan pula sebagai favicon. UI halaman Admin/Profil mengikuti 12 dan 13.
+## 8. Keputusan lintas modul v2.5
+1. CP operasional satu Mapel → Semester → BAB → TP, nomor BAB berlanjut antardua semester kelas sama. Nama singkat 50, deskripsi 225, kode `KODEMAPEL.KELAS.BAB.TP`.
+2. TP Esensial tanpa Materi/nilai, TP NonEsensial satu Materi; Diagnostik gate dan Sumatif wajib 30.
+3. Pra-Semester tanggal serentak Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
+4. Excel ATP **manual** tanpa macro dan tanpa tombol Proses sudah dipilih; penyusunan BAB/TP dilakukan melalui isian langsung pada workbook atau aplikasi, serta divalidasi server saat impor. KBC, izin Gen–Mapel, Word PG A–E tetap.
 
-
-### Revisi ketentuan durasi YouTube/audio — 26 Oktober 2026
-
-Untuk Materi wajib berbentuk YouTube/audio, **yang terpenuhi lebih dulu dinyatakan selesai**: minimum waktu Guru atau 90% durasi video/audio, mana yang **lebih singkat**. Perhitungan wajib memakai pemutaran nyata yang telah diakui heartbeat server; tidak cukup membuka halaman, menggeser posisi, menjeda atau mempercepat pemutaran. Bila durasi Guru 10 menit dan video 7 menit, batas efektif 6 menit 18 detik; bila Guru 10 menit dan video 15 menit, batas efektif 10 menit. Setelah selesai siswa dapat mengisi Resume, selanjutnya HOTS setelah Resume dikirim final. Ini **menggantikan** kebijakan lama yang mensyaratkan kedua batas sekaligus. Syarat media PDF/gambar, nilai, Diagnostik dan TP Siap tetap berlaku.

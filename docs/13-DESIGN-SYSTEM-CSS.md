@@ -147,6 +147,9 @@ Label form dan pesan galat; fokus keyboard; kontras WCAG; aksi disabled; empty s
 - Pratinjau soal Word: tabel akademik di dalam sel pertanyaan/opsi harus tetap terbaca/responsif, gambar tidak overflow, equation dapat di-scroll apabila lebar melebihi mobile, pemutar Drive aman. Warna status/fokus mengikuti token existing `a-`.
 - Pembaruan CSS visual wajib diikuti perubahan `docs/assets/galeri-komponen.html` ketika kode implementasi UI dikerjakan; dokumen ini **tidak** mengklaim galeri runtime sudah berubah.
 
+## Riwayat implementasi v3 (non-normatif)
+Bagian catatan implementasi bertanggal 24–26 Oktober 2026 berikut adalah bukti riwayat UI **pola lama**, bukan keputusan kontrak baru. Ketentuan baru §Kontrak desain card BAB/TP v2.5 di akhir dokumen mengganti perilaku lama yang bertentangan, terutama Diagnostik yang pernah menuntaskan TP tanpa Sumatif dan beberapa Materi per TP.
+
 ## Audit tabel responsif tahap A — Admin Pengelola/Siswa dan Guru per Gen (24 Oktober 2026)
 
 - Pola `a-tbl--cards` diterapkan **secara opt-in** pada tabel yang setiap barisnya berdiri sendiri. Pada desktop tetap memakai header kolom/tabel semantik; pada lebar ≤980px, setiap baris menjadi kartu yang memiliki `data-label` di tiap sel. Jangan memasang pola ini pada tabel matriks yang perlu hubungan baris–kolom atau data komparatif kompleks; matriks tetap gunakan scroll dengan label tetap.
@@ -328,3 +331,20 @@ konfirmasi final, umpan balik dan tombol Simpan & Berikutnya. Elemen
 .a-penilaian-* dalam app.css mengikuti tombol, form dan warna yang
 sudah ada. Halaman tidak menampilkan aksi mengubah nilai historis;
 revisi harus melalui jalur AB-33.
+
+## Kontrak desain card BAB/TP v2.5 (26 Oktober 2026)
+Gunakan token/kelas CSS kustom yang telah ada di dokumen ini, tanpa Bootstrap/Tailwind runtime. Card BAB dan TP memprioritaskan `nama_bab`/`nama_tp` maksimum **50 karakter** agar konsisten pada lebar layar HP/laptop. Deskripsi masing-masing ≤225 karakter tersedia pada detail atau ringkasan terkendali, dengan akses teks lengkap melalui interaksi yang nyata. Kode TP (contoh `BIND.8.1.1`) harus terbaca. Badges Esensial/NonEsensial hanya menjelaskan jenis, tidak menjadi klaim ketuntasan nilai. Progres semester hanya NonEsensial. Ujian Pra-Semester mengikuti UI ujian Ketat tanpa sidebar/perayaan. Komponen baru wajib dimasukkan ke galeri saat kode diimplementasikan. Contoh/galeri implementasi v3 lama tidak mengganti kontrak ini.
+
+
+### G03 — Modal native untuk tambah BAB/TP (27 Oktober 2026)
+Gunakan `.a-modal` yang sudah ada dengan `<dialog>`, judul `aria-labelledby`, `showModal()` untuk trap fokus native, tombol Tutup/Batal serta `Escape`. Perluas dengan `.a-modal--atp`, header/aksi flex serta batas tinggi area viewport untuk smartphone; jangan menambah Bootstrap/React/Vue. Nama BAB/TP dapat sepanjang **50** karakter tanpa memotong teks yang disimpan; deskripsi tetap 225. Contoh modal ke galeri komponen, JS native `app.js`, validasi server dan CSRF tetap wajib.
+
+
+### G03 — Kartu semester dan kartu BAB (27 Oktober 2026)
+Peta ATP memakai dua kelompok grid: Semester 1–3 dan Semester 4–6. Enam kartu mempunyai palet background khusus lembut (`.a-atp-warna-1`–`.a-atp-warna-6`) dan border aksen, dengan hover/fokus terlihat, informasi status paket, angka BAB, angka TP dan kategori TP. Gunakan kartu `<a>` sebagai tautan semantik; navigasi tetap bisa digunakan tanpa JavaScript.
+
+Halaman detail `guru/semester_atp.php` menampilkan header dan toolbar kontekstual, lalu `.a-atp-bab-card` untuk setiap BAB dengan warna bergantian dan tabel TP yang tetap semantik dan responsif. Tombol Tambah BAB dan Tambah TP hanya muncul pada konteks yang diizinkan, membuka komponen native `<dialog class="a-modal a-modal--atp">` dengan JS native `app.js`. Tidak membuat layout kartu untuk HTML tombol palsu. Responsive: 3 kolom pada desktop lebar, 2 tablet, 1 HP; tabel BAB dapat digulir; dialog tinggi maksimum mengikuti viewport. Pelihara status kosong dan pesan penguncian. Galeri komponen diperbarui bersama implementasi.
+
+
+### Penyegaran aset setelah Pull Git (QA 27 Oktober 2026)
+Layout panel `app/Views/layouts/panel.php` **wajib memberi versi pada URL** `public/assets/css/app.css` dan `public/assets/js/app.js`, mengikuti waktu modifikasi file (`filemtime`) pada `FCPATH`. Ini diperlukan karena browser dapat menyimpan CSS lama sementara HTML/View sudah diperbarui: tautan ringkasan Peta ATP akan tampak sebagai teks menyambung dan kartu BAB kehilangan warna. Jangan menambah CSS inline sebagai jalan pintas; perbaiki pemuatan satu stylesheet design system dan gunakan token yang benar-benar didefinisikan di `:root`. Pemeriksaan setelah `git pull`: URL stylesheet mengandung parameter versi berbeda jika berkas berubah; mode 3/2/1 kolom dan enam warna kartu terlihat. Pengujian visual tidak dapat diganti hanya dengan PHP lint.

@@ -40,7 +40,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G01 | Beranda | Antrean penilaian, siswa perlu bantuan, TP yang perlu media, kesiapan mapel, ujian berjalan |
 | G02 | Semester saya | **Pilih Gen–Mapel yang diampu aktif**, lalu semester 1–6 dan paket khusus Gen |
 | G03 | Paket/ATP enam semester | Unduh/unggah Excel pemetaan TP/Materi, pratinjau diff, daftar TP urut dan status |
-| G04 | Editor TP/CP | TP draf, rumusan/indikator/kode/urutan ATP dan CP utama/resmi, daftar Materi |
+| G04 | Editor TP/CP | TP draf, BAB, CP operasional, kode TP, jenis Esensial/NonEsensial, satu Materi jika NonEsensial |
 | G05 | Impor Peta ATP | Unduh Excel 6 semester terpersonalisasi, unggah, pratinjau/galat/diff, konfirmasi draf |
 | G06 | Pengaturan TP | KKM/bobot, jumlah/durasi soal, syarat karakter, pengaturan bawaan |
 | G07 | Materi/berkas | PDF/YouTube/audio/gambar, upload, pratinjau dan status tersedia |
@@ -137,7 +137,7 @@ Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyb
 
 ## 12. UI penyusunan Guru v2.4
 - Kartu konteks Gen–Mapel/Kurikulum, tombol **Unduh Excel ATP enam semester** dan Unggah Peta, pratinjau dengan validasi daftar CP resmi sesuai mapel saja.
-- Setiap TP mempunyai status draf/perlu dilengkapi/Siap, Materi berurutan dan tugas Resume/HOTS **per Materi**, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
+- Setiap TP mempunyai status draf/perlu dilengkapi/Siap; TP NonEsensial memiliki tepat satu Materi dan tugas Resume/HOTS terkait, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
 - Preview soal menampilkan konten kaya Word **pada pertanyaan dan A–E**, tabel di dalam tabel, Equation, gambar, pemutar audio/video Google Drive bila valid; soal/catatan yang gagal tidak dapat dikonfirmasi.
 
 
@@ -175,3 +175,30 @@ Waktu gambar/PDF dibaca dari heartbeat sah 5 detik. Gambar yang tidak terlihat/f
 ### Unduh materi setelah media_selesai
 
 Pada kartu Media Audio/Gambar/PDF, tampilkan tombol `Unduh Materi` yang nonaktif dengan penjelasan ketika waktu belajar belum selesai. Setelah server menetapkan `media_selesai`, tampilkan tautan unduh asli. URL harus memiliki gerbang backend yang sama, tidak cukup kontrol tombol saja; respons attachment menggunakan nama berkas aman dan tidak membocorkan path privat.
+
+## 13. Kontrak layar pola baru v2.5 (menggantikan alur layar tanpa BAB)
+**Guru:** Peta ATP enam semester → Card BAB (nama ≤50, ringkasan ≤225) → daftar TP tiap BAB (kode, nama ≤50, deskripsi asli ≤225, badge jenis) → editor 1 Materi untuk NonEsensial → Diagnostik/Word → Resume/HOTS → Sumatif/Word → kesiapan. Esensial hanya data akademik, tidak menampilkan tombol unggah media/soal. Guru dapat mengisi langsung atau Excel setelah template diadaptasi. Nomor BAB berlanjut antarsemester berpasangan; perlihatkan kode TP contoh `BIND.8.1.1`.
+**Siswa:** Beranda → Semester (progres hanya NonEsensial) → Card BAB → TP Esensial (informasi tanpa tombol pengerjaan) atau NonEsensial (Diagnostik → gate → Materi/Resume/HOTS bila belum lulus → Sumatif wajib → remedial 1 bila perlu → Selesai walau nilai < KKM).
+**Pra-Semester:** card/halaman terkunci sebelum seluruh NonEsensial selesai; setelah selesai tampil tanggal/jam serentak Admin, belum berlangsung/berjalan/ditutup, fullscreen preflight, alasan tidak bisa mulai. Admin memiliki pengaturan jadwal dan validasi tabrakan.
+**Nilai dan ekspor:** Guru filter Gen–Mapel/Semester, tombol **Export Nilai** aktif walau baru satu nilai; kolom TP kode/nama dan Pra-Semester; tampil kosong, bukan 0, ketika nilai belum ada. Siswa tidak melihat nilai akhir semester gabungan.
+**Sertifikat:** daftar semua TP per BAB; Esensial tanpa angka, NonEsensial bernilai. Ketentuan Pra-Semester sebagai syarat terbit belum diputuskan, jangan membuat tombol gate yang diasumsikan.
+Semua layar memiliki normal/kosong/loading/sukses/gagal/locked, responsive HP dan desktop sesuai batas ujian; kontrol yang terlihat wajib berfungsi. Catatan layar implementasi v3 terdahulu di bagian lain dokumen ini adalah histori, **bukan aturan yang mengalahkan §13**.
+
+
+### G03 — Dialog tambah BAB dan TP (revisi 27 Oktober 2026)
+- Tombol **Tambah BAB** di setiap semester yang boleh diisi membuka modal `<dialog>` fokus ke Nama BAB; tombol **Tambah TP** pada setiap BAB membuka modal tersendiri berisi konteks BAB, Nama TP, Deskripsi TP, dan jenis Esensial/NonEsensial.
+- Tombol **Batal/Tutup**, tombol `Escape` serta penutupan modal memulihkan fokus ke pemicu; form tetap memakai POST, CSRF dan otorisasi G1 serta tidak menyimpan tanpa menekan **Simpan**.
+- Nama BAB/TP maksimal **50** karakter; Deskripsi BAB/TP tetap **225** karakter. Wajib divalidasi di HTML dan Service. Dialog memiliki judul aksesibel, fokus keyboard, scroll di HP, status loading di tombol saat submit, dan pesan sukses/galat setelah redirect.
+- Daftar BAB/TP tetap berupa tabel/kartu pada halaman Peta ATP; formulir tidak memperpanjang keenam semester secara permanen.
+
+
+### G03 — Arsitektur Peta ATP dua tingkat (27 Oktober 2026)
+**Halaman Peta ATP** hanya menampilkan pemilih Gen–Mapel G1 dan **enam kartu navigasi semester** dalam dua kelompok visual: Semester 1–3 dan Semester 4–6 (masing-masing tiga kartu pada desktop). Urutan semester tetap 1–6; warna latar enam kartu berbeda tetapi tetap memakai palet lembut dengan kontras teks dan fokus keyboard. Seluruh kartu menjadi tautan langsung ke `guru/peta-atp/semester/{1..6}?pilihan={indeks G1}`, bukan tautan semu. Statistik dari database terotorisasi: jumlah BAB, jumlah TP, jumlah Esensial/NonEsensial, status paket (belum ada/draf/aktif/arsip); tidak boleh dipalsukan atau mencampur Gen.
+
+**Halaman detail semester** merupakan tempat Guru menyusun ATP. Bagian atas memuat identitas Gen–Mapel, kelas, semester, status, statistik BAB/TP, petunjuk pengisian, serta tombol modal **Tambah BAB** (atau **Buat Paket Draf** bila belum ada paket dan CP memenuhi prasyarat). Di bawahnya setiap BAB ditampilkan sebagai kartu terpisah dengan warna background bergantian, nomor, nama (≤50), deskripsi (≤225), jumlah TP, tabel TP di dalam BAB, dan tombol modal **Tambah TP** yang hanya tersedia jika paket sah/tidak arsip dan semester diizinkan. Kartu BAB tanpa TP menampilkan empty state; data TP historis yang tidak memiliki BAB tetap dipertahankan dan hanya dapat dilihat, tidak dipindah otomatis.
+
+**Aturan interaksi:** Semester yang dilewati karena Gen mulai lebih akhir tetap dapat dibuka untuk melihat keadaan tetapi tidak menyediakan aksi tambah. Tambah BAB/TP menggunakan modal native aksesibel dengan Escape/Batal, fokus, CSRF, POST Service G1, pencegahan submit ganda; setelah POST kembali ke halaman semester yang sama. Tidak mengubah model akademik ataupun status draf/siap. Formulir tidak ditampilkan memanjang pada halaman peta. Pada desktop tiga kartu per baris; tablet dua; HP satu. Tiap halaman harus menangani normal, kosong, draf, arsip, galat, terkunci, dan sukses.
+
+
+### Pola UI untuk modul selanjutnya
+Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola **halaman ringkasan card sebagai navigasi → halaman rincian satu kelompok → toolbar tindakan di bagian atas → card/tabulasi data per subkelompok → modal native untuk tambah data sederhana**. Terapkan hanya pada modul yang cocok (misalnya semester/BAB/TP), tanpa memaksakan modal untuk editor materi, ujian, impor atau form kompleks yang memerlukan halaman khusus. Pertahankan konteks filter, breadcrumb, hak akses, status kosong/terkunci, warna lembut yang bermakna dan validasi server. Pola ini menjadi rujukan komposisi UI berikutnya tanpa menambah fitur bisnis.

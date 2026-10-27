@@ -1,70 +1,29 @@
-# 09 — Sertifikat, Revisi, Verifikasi dan Laporan
+# 09 — Sertifikat, Daftar Nilai, Revisi dan Laporan
 
-## 1. Syarat penerbitan sertifikat pertama
-`SertifikatService::periksaPenerbitan()` menerbitkan satu sertifikat per **siswa + paket semester** apabila semua TP yang direncanakan telah Siap dan tuntas dan seluruh resume/tugas **yang wajib di jalur belajar** telah dinilai, tanpa nilai sementara. TP diagnostik tuntas tidak mewajibkan kiriman dari jalur yang dilewati. Semester `Dilewati` tidak mendapat sertifikat. Nilai akhir = rata-rata nilai TP, pembulatan tampilan konsisten sesuai template. Penerbitan terkoordinasi transaksi dan idempoten.
+> **Master v2.5 · 26 Oktober 2026.** Daftar nilai berbasis TP Esensial/NonEsensial, tanpa nilai akhir semester. Aturan apakah Pra-Semester menjadi syarat sertifikat **belum diputuskan**.
 
-## 2. Isi PDF dan template
-| Komponen | Aturan |
-|---|---|
-| Kertas | **A4 landscape** 297×210 mm |
-| Background | **JPG/PNG unggahan Admin**; tepat satu template global aktif, versi sebelumnya tidak dihapus |
-| Fallback | Jika belum ada background unggahan, gunakan **template bawaan** berupa desain sederhana aplikasi |
-| Identitas | Logo/nama madrasah sesuai snapshot, **nama siswa dan NISN**, mapel, semester, nilai akhir |
-| Penerbitan | Kota, tanggal, nomor unik format `SLA/{tahun}/{urut 4 digit}` |
-| Penandatangan | Nama/NIP dan **gambar tanda tangan PNG** kepala madrasah yang aktif ketika terbit |
-| Verifikasi | QR dan kode verifikasi unik 32 karakter heksadesimal dari generator kriptografis |
-| Sumber render | Data snapshot sertifikat, **bukan data siswa/profil sekolah yang terus berubah** |
+## 1. Daftar nilai sertifikat
+Sertifikat siswa satu Mapel/Semester menampilkan **semua BAB/TP menurut ATP semester**: TP **Esensial** ditampilkan tanpa nilai, TP **NonEsensial** disertai nilai TP. Sertifikat **tidak** menampilkan nilai akhir semester hasil rerata TP/Pra-Semester, karena nilai agregat tersebut tidak ada. Nilai Pra-Semester berdiri sendiri pada laporan/ekspor; pencantuman pada sertifikat tidak ditetapkan dalam diskusi ini, sehingga jangan diam-diam menambah kolom.
 
-**Tanda tangan PNG wajib.** Bila gambar belum tersedia/valid, sistem menahan penerbitan, menampilkan peringatan Admin dan keterangan pada halaman siswa. PNG yang ditempel **bukan TTE tersertifikasi/kriptografis**; jangan memberi cap/klaim seolah-olah memakai sertifikat digital otoritas eksternal.
+Penerbitan awal mensyaratkan TP NonEsensial selesai dan seluruh penilaian wajib sudah final, serta kesiapan data sertifikat/TTD. Keputusan apakah ujian Pra-Semester perlu selesai sebelum sertifikat diterbitkan **ditunda**; tidak boleh dijadikan gate otomatis sebelum keputusan pemilik.
 
-**Admin → Template Sertifikat:** upload dan validasi JPG/PNG saat **unggah** (MIME sungguhan, ukuran file, orientasi, rasio dan dimensi), pilih preset penempatan terbatas, lihat pratinjau A4, `Aktifkan`. Pengaturan rasio/ukuran harus divalidasi sebelum disimpan; tidak ada editor bebas. Template dan berkas digunakan dalam bentuk immutable. Tidak otomatis memaksa resolusi gambar materi ke background sertifikat.
+## 2. PDF dan identitas
+Kertas **A4 landscape 297×210 mm**. Background JPG/PNG unggahan Admin, hanya satu versi aktif global, versi historis tersimpan; fallback template bawaan bila belum ada. Identitas sekolah, nama siswa dan **NISN privat**, Mapel, Semester, daftar TP per BAB, nomor/kode QR, kota/tanggal, kepala madrasah/NIP dan **gambar tanda tangan PNG wajib**. Tidak mengklaim PNG sebagai TTE bersertifikasi eksternal. Preview wajib sebelum aktivasi template.
 
-## 3. Versi template dan tanda tangan
-- Saat pertama terbit, simpan `template_sertifikat_versi_id` atau penanda `template_bawaan`, aset logo yang digunakan, `ttd_png_versi_id`, dan snapshot nama/NIP penandatangan.
-- Jika template global berubah kemudian, sertifikat terbit **tidak diubah**.
-- Saat revisi nilai atau identitas, **background tetap template versi sertifikat sebelumnya**, tetapi **nama/NIP penandatangan dan gambar tanda tangan memakai data/PNG terbaru yang aktif saat revisi** (pilihan pemilik K11=B).
-- Jika background historis tidak tersedia, jangan diam-diam gunakan background terbaru; beri galat dan lakukan pemulihan dari arsip/backup. Untuk fallback bawaan, gunakan versi desain bawaan yang sama.
+## 3. Versi dan revisi
+Sertifikat awal terbit menyimpan snapshot isi, template background/logo/TTD dan data penandatangan. Template baru tidak mengubah terbitan lama. Saat revisi: background historis sama; nama/NIP dan tanda tangan mengikuti versi aktif terbaru. Jika penandatangan/PNG belum valid, penerbitan ditahan secara eksplisit.
+- Koreksi resmi nilai/identitas yang mengubah isi tercetak menghasilkan nomor dan QR baru, versi terdahulu menjadi **digantikan** tanpa dihapus. Jika data cetak sama, perubahan internal cukup audit, tidak perlu PDF baru.
+- Koreksi biodata dilakukan langsung oleh Admin, sertifikat terdampak diganti satu per satu; persetujuan Admin kedua tidak diwajibkan untuk koreksi biodata normal.
+- Larangan self-approval tetap khusus permohonan akademik Guru+Admin akun sama.
+- Tidak ada pencabutan, penghapusan sertifikat, atau dua sertifikat berlaku untuk siswa/paket sama.
 
-## 4. Revisi karena koreksi nilai — AB-39a
-1. Usulan koreksi akademik sah diputus oleh Admin sesuai `08-PENILAIAN.md`; tidak diperlukan persetujuan penerbitan ulang tambahan.
-2. Hitung calon nilai TP dan rata-rata semester tanpa mengubah data resmi; bandingkan **seluruh isi akademik yang benar-benar tercetak** (format angka, pembulatan, dsb.) dengan PDF/snapshot berlaku. Nomor/QR/tanggal baru **bukan** alasan memaksa revisi.
-3. Jika konten cetak tak berubah: terapkan koreksi nilai dan audit, sertifikat dan PDF lama tetap `berlaku`.
-4. Jika konten cetak berubah: siapkan snapshot, nomor/QR baru, background versi lama, **TTD/penandatangan aktif terbaru**, lalu render PDF kandidat; periksa berkas/QR/checksum.
-5. Aktivasi dalam transaksi: terapkan nilai dan agregat, ubah sertifikat awal `berlaku → digantikan`, aktifkan revisi baru, ubah pointer `sertifikat_aktif`, audit dan notifikasi setelah commit. **Jangan membiarkan dua sertifikat berlaku.**
-6. Bila render atau aktivasi gagal: pertahankan sertifikat/nilai lama, catat job gagal dapat diulang, jangan publish kandidat. Retry idempoten.
+## 4. Verifikasi publik
+`GET /verifikasi/{kode}` berbasis token acak dan pembatasan permintaan. Publik hanya melihat nomor, nama, Mapel, Semester, daftar nilai yang boleh dibuka, status berlaku/digantikan dan tanggal terbit; **NISN, kontak, alasan koreksi, audit dan PDF privat tidak tampil**. QR historis masih valid dengan status digantikan dan rujukan versi aktif.
 
-## 5. Koreksi biodata — AB-39b
-- **Admin mengoreksi nama/NISN siswa langsung melalui menu biodata**, tanpa memaksa dua Admin atau workflow persetujuan untuk pekerjaan administrasi normal. Simpan sebelum/sesudah, alasan, identitas Admin, waktu dan sumber pendukung bila digunakan.
-- NISN perlu cek keunikan, format dan hubungan dengan username login. Perubahan NISN memperbarui username secara aman tanpa membuat `siswa_id` baru/menghapus progres/attempt/sertifikat.
-- Sertifikat yang isi cetaknya terdampak diganti **satu per satu** sesuai pilihan pemilik, dari panel sertifikat siswa/mapel/semester; tidak otomatis *batch* seluruh sertifikat siswa. Setiap penggantian baru punya nomor dan QR baru; sebelumnya `digantikan`, tetap tersimpan.
-- Pada setiap penggantian gunakan background historis sertifikat itu dan penandatangan aktif terbaru. Jika file gagal, tidak boleh menyebabkan dua sertifikat berlaku.
-- Kesalahan identitas penerbit (nama/NIP sekolah) dapat diperbaiki Admin melalui layanan revisi administratif berversi, tanpa menghapus sertifikat lama.
+## 5. Laporan
+- **Export Nilai Guru (prioritas)**: Gen–Mapel–Semester, semua siswa, kolom setiap TP (Esensial tanpa nilai; NonEsensial nilai) dan Pra-Semester; file dapat diunduh walaupun baru satu nilai TP tersedia, kosong ≠ 0.
+- Rapor per siswa: daftar TP/kode/jenis, jalur diagnostik, Resume/HOTS bila wajib, Sumatif awal/remedial, nilai TP, nilai Pra-Semester terpisah.
+- Progres per semester: persentase selesai TP NonEsensial, bukan rata-rata nilai.
+- Log ujian, aktivitas, persetujuan, revisi, dan pengumuman tetap berizin sesuai peran, audit, dan privasi.
 
-## 6. Tidak ada pencabutan dan penghapusan
-Hanya status publik **`berlaku`** dan **`digantikan`**; status internal `menyiapkan_revisi` tidak menjadi PDF sah. Tidak membuat tombol/API `cabut`. Data siswa dan seluruh versi sertifikat tidak memiliki penghapusan permanen pada fitur aplikasi. Akun siswa lulusan dapat memperoleh akses **arsip baca-saja**; petugas memantau tanpa memutasi data akademik.
-
-## 7. Konflik ketuntasan setelah koreksi soal
-Koreksi soal/kunci yang sah dapat menghitung ulang TP dari tuntas menjadi belum tuntas. Sistem harus mencatat nilai/status baru dan kebutuhan siswa melanjutkan belajar. Karena **pencabutan sertifikat dilarang**, jangan secara diam-diam menghapus atau membatalkan sertifikat lama. Tampilan internal memperlihatkan kondisi akademik yang memerlukan penyelesaian ulang, dan tidak membuat sertifikat baru yang menyatakan ketuntasan sampai prasyarat terpenuhi. Riwayat verifikasi lama tetap jujur dan tersedia. Implementasi peristiwa ini wajib diuji end-to-end sebelum rilis.
-
-## 8. Verifikasi publik
-`GET /verifikasi/{kode}` tanpa login, token acak sulit ditebak, rate limit. Tampilkan **nomor, nama, mapel, semester, nilai akhir tercetak pada versi yang ditanyakan, tanggal terbit, status, dan tautan versi terbaru bila digantikan**. **Jangan tampilkan NISN, HP, tanggal lahir, alasan koreksi atau audit.** QR lama tetap bisa diakses dengan label `Digantikan — bukan versi terbaru`. Kode tidak ada: `Sertifikat tidak ditemukan`. Akses PDF asli hanya untuk pemilik dan peran berwenang; halaman publik bukan endpoint download PDF.
-
-**Laporan dan sertifikat per Gen (v2.4):** setiap sertifikat/rapor mengacu pada snapshot siswa, Gen, mapel, paket semester dan versi konten historis yang benar. Paket antargen terpisah meskipun kode TP atau CP serupa; filter laporan Guru selalu membatasi Gen–Mapel penugasan aktif. Nomor/QR dan versi sertifikat tetap unik, sertifikat lama tidak berubah ketika Guru atau data Gen lainnya diganti. Pada ekspor akun R9, data Pengelola dan Siswa dapat diunduh terpisah sesuai filter, tanpa sandi/hash/token, disanitasi dari formula injection.
-
-## 9. Daftar laporan resmi
-| Kode | Laporan | Format/isi |
-|---|---|---|
-| R1 | Rapor satu siswa/mapel/semester | PDF + Excel; TP, cara tuntas, resume, HOTS, sumatif, nilai TP dan nilai akhir |
-| R2 | Rekap nilai mapel | Excel; siswa × TP, rata-rata, status sementara |
-| R3 | Progres siswa | Excel; status TP, jalur tuntas, tanggal, TP menunggu |
-| R4 | Log ujian | Excel; status dan insiden, tanpa skor pada percobaan batal |
-| R5 | Sertifikat | Excel; nomor/versi/status, siswa, mapel, nilai, tanggal |
-| R6 | Kesiapan TP | Excel/PDF; TP siap/rencana, kekurangan materi, target dan kebutuhan Gen |
-| R7 | Ringkasan progres program | Excel/PDF sesuai dasbor |
-| R8 | Aktivitas penilaian guru | Excel; antrean, jumlah/umur item, durasi penilaian |
-| R9 | Daftar akun | Excel; identitas/status/role/login, **tanpa password** |
-
-Rapor siswa dapat dilihat siswa pemilik; Guru hanya siswa dan paket **Gen–Mapel yang aktif ditugaskan**; Admin seluruhnya; Pimpinan baca-saja. Excel dinetralkan dari formula injection (`=`, `+`, `-`, `@`), nilai sementara **wajib dilabel**, laporan besar dapat dibatasi filter dengan pesan jelas. PDF laporan A4 portrait kecuali sertifikat A4 landscape.
-
-### Kontrak agregasi v2.4
-Progres/nilai/laporan/sertifikat menggunakan **TP** sebagai unit akademik; tidak menyimpan hasil atau prasyarat kelompok BAB. Resume dan HOTS per Materi dinilai seluruhnya bagi siswa jalur belajar sebelum sertifikat. Jalur lulus Diagnostik tetap bernilai Diagnostik sebagaimana kebijakan madrasah. Laporan kesiapan menggunakan status **TP Siap**, bukan kesiapan BAB. Histori sertifikat dan perlindungan revisi tidak berubah.
+Semua tampilan termasuk Pimpinan dibatasi pembacaan yang diizinkan; data nilai antargen tidak tercampur.
