@@ -1,5 +1,23 @@
 # 12 — Spesifikasi UI/UX, Peta Halaman dan Status Layar
 
+
+## 0. KEPUTUSAN UI/UX GLOBAL — EMERALD GLASS ACADEMIC UI (27 Oktober 2026)
+
+**Disetujui pemilik dan didahulukan sebelum pengembangan fitur baru.** Bagian ini menjadi kontrak visual terkini; ketentuan desain terang historis yang bertentangan diganti. Aturan akademik v2.5, akses, database, layanan, dan navigasi Peta ATP/Halaman Semester yang FIX tidak berubah.
+
+1. **Tema**: Dark default, gradasi hijau tua forest–emerald (bukan hitam pekat); Light tersedia. Tema aktif tetap konsisten antarhalaman dan pilihan disimpan lokal di browser jika diizinkan. Tanpa JavaScript, dark tetap tampil sebagai default yang dapat digunakan.
+2. **Soft glassmorphism** pada shell/hero/sidebar/header dan kartu ringkasan; permukaan kartu semi-solid dengan gradasi, border tipis, blur dan shadow ringan. Tabel, form, konten soal, materi PDF, editor, serta ujian harus lebih solid agar mudah dibaca.
+3. **Sidebar**: desktop expanded sekitar 240px dan collapsed sekitar 72px dengan ikon lokal serta label aksesibel; mobile berupa drawer. Tidak mengubah rute, peran, menu atau hak akses server.
+4. **Tombol**: SEMUA tombol tindakan, termasuk secondary, danger, soft dan icon button, memiliki latar jelas. Link teks dan badge tidak boleh tampak sebagai tombol; satu kartu semester clickable tetap satu link utuh tanpa elemen klik bersarang.
+5. **Enam kartu gradient resmi**: Emerald, Teal, Blue Emerald, Violet, Amber Olive, Rose Plum untuk semester 1–6. Warna boleh dipakai ulang pada kartu lain. Gradasi berbeda tiap semester wajib jelas tetapi teks tetap kontras.
+6. **Warna huruf beragam dan fungsional**: teks netral utama, mint untuk positif, coral/merah untuk penekanan/perhatian, amber untuk menunggu, biru untuk informasi, violet untuk variasi akademik. Status wajib punya teks, tidak bergantung warna saja. Kontras normal minimum 4.5:1 (WCAG AA) pada latar aktual.
+7. **Ikon**: SVG subset Lucide di-host lokal, tanpa CDN atau ketergantungan frontend besar; animasi halus 120–200ms, hormati prefers-reduced-motion.
+8. **Satu sistem UI untuk empat peran**: variasi konten sesuai tugas Admin, Guru, Siswa, Pimpinan. Layar ujian standalone tanpa sidebar dan dekorasi mengganggu tetap dipertahankan.
+9. **Kontrak G03 yang terkunci**: Peta ATP enam semester dalam dua kelompok 1–3/4–6, kartu 3/2/1 responsif dengan data aktual dan filter Gen–Mapel; halaman semester tetap header, kartu per BAB, tabel TP dan dialog native untuk tambah BAB/TP/Paket. Perubahan hanya visual, tidak mengubah tujuan GET/POST, CSRF, otorisasi, isi data.
+10. **Tahapan dan QA**: mulai token, tema, shell, galeri, G03; lanjut bertahap ke tabel/form dan tiap role setelah pemeriksaan XAMPP. Uji mode dark/light, expanded/collapsed, 360/390/768/1100 px, kosong/loading/galat, keyboard, fokus, kontras dan kinerja. Fitur tidak disebut FIX tanpa uji pemilik.
+
+Rincian palet, token dan komponen berada di Master Document 13. Ketentuan lama di bawah tetap berlaku sepanjang tidak bertentangan dengan v2.5 dan kontrak UI ini.
+
 ## 1. Prinsip wajib
 UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol utama tunggal per layar, status dan alasan terkunci, pesan galat memberi solusi, *loading/success/empty/error/permission-denied*, konfirmasi untuk aksi permanen, *breadcrumbs* pada halaman dalam, dan tidak ada tombol yang tidak punya endpoint. Desain mobile-first untuk siswa, desktop-first untuk editor kompleks Guru/Admin, responsif sampai 360 px. Siswa diberi pengalaman pembelajaran yang menarik, ruang ujian tenang; tidak ada papan peringkat/streak/poin. Empat dashboard tidak berarti empat sistem CSS berbeda.
 
