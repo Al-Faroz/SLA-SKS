@@ -970,6 +970,8 @@ html[data-theme="dark"] {
   --eg-pager-active:#235B4A;
 }
 html[data-theme="light"] {
+  /* Batas input Light >=3:1 terhadap bidang input putih. */
+  --eg-field-line:#6C8A76;
   --eg-state-positive:#14664D;
   --eg-state-caution:#805300;
   --eg-state-danger:#A72C47;
