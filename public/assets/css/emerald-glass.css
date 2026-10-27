@@ -8,6 +8,10 @@ html[data-theme="dark"] {
   --e-surface:#102E25; --e-surface-2:#163C30; --e-input:#0D2921;
   --e-text:#F0F8F3; --e-muted:#B3CFC0; --e-border:#426556;
   --e-primary:#50DEAC; --e-danger:#FF888D; --e-warning:#FFD166;
+  --eg-cta-gradient:linear-gradient(112deg,#3448B2 0%,#4056C2 44%,#6743BF 100%);
+  --eg-cta-hover:linear-gradient(112deg,#293A97 0%,#384AAE 45%,#56369D 100%);
+  --eg-cta-border:rgba(189,178,255,.55);
+  --eg-cta-shadow:0 8px 20px rgba(36,30,102,.28),inset 0 1px 0 rgba(255,255,255,.18);
   --e-info:#A5CDFF; --e-violet:#E0BEFF; --e-soft:#153E31; --e-soft-hover:#205442;
   --e-g1:linear-gradient(135deg,#123D2F,#165D48); --e-g2:linear-gradient(135deg,#123943,#175D68);
   --e-g3:linear-gradient(135deg,#1B3155,#294D83); --e-g4:linear-gradient(135deg,#382850,#60417B);
@@ -22,6 +26,10 @@ html[data-theme="light"] {
   --e-surface:#FFFFFF; --e-surface-2:#F4FAF6; --e-input:#FFFFFF;
   --e-text:#19382D; --e-muted:#526E61; --e-border:#CCDDD3;
   --e-primary:#126B50; --e-danger:#A52B3A; --e-warning:#805400;
+  --eg-cta-gradient:linear-gradient(112deg,#3448B2 0%,#3D50B5 44%,#6041B5 100%);
+  --eg-cta-hover:linear-gradient(112deg,#293A97 0%,#32449B 45%,#4E37A9 100%);
+  --eg-cta-border:rgba(67,51,148,.45);
+  --eg-cta-shadow:0 8px 20px rgba(57,55,121,.16),inset 0 1px 0 rgba(255,255,255,.17);
   --e-info:#285D9B; --e-violet:#65419A; --e-soft:#E8F4EC; --e-soft-hover:#D6E9DB;
   --e-g1:linear-gradient(135deg,#DDF3E5,#C6E8D5); --e-g2:linear-gradient(135deg,#DEF3F3,#BCE6E4);
   --e-g3:linear-gradient(135deg,#E4EFFC,#C8DCF6); --e-g4:linear-gradient(135deg,#F1E9FA,#DECFF2);
@@ -99,11 +107,11 @@ html[data-theme] .a-btn:hover:not(:disabled) {
 }
 html[data-theme] .a-btn--utama,html[data-theme] .a-publik--prototipe .a-btn--utama,
 html[data-theme] .a-app--prototipe .a-btn--utama {
-  color:#FFFFFF;background:linear-gradient(112deg,#0A4C39,#126C51,#147858);
-  border-color:#17835B;box-shadow:0 6px 16px rgba(0,45,27,.15);
+  color:#FFFFFF;background:var(--eg-cta-gradient);
+  border-color:var(--eg-cta-border);box-shadow:var(--eg-cta-shadow);
 }
 html[data-theme] .a-btn--utama:hover:not(:disabled) {
-  background:linear-gradient(112deg,#0B583F,#11734E,#148A62);color:#FFFFFF;
+  background:var(--eg-cta-hover);color:#FFFFFF;
 }
 html[data-theme] .a-btn--sekunder { background:var(--e-soft);color:var(--e-text); }
 html[data-theme] .a-btn--bahaya {
@@ -238,12 +246,12 @@ html[data-theme] {
 html[data-theme] .a-glass-gallery { margin-block:16px; }
 html[data-theme] .a-glass-gallery .a-card { min-height:88px; }
 
-/* Kontras tulisan putih pada seluruh titik gradient tombol utama >= WCAG AA. */
+/* Tombol utama: aksen indigo–violet kontras dengan dasar Emerald Glass. */
 html[data-theme] .a-btn--utama:hover:not(:disabled),
 html[data-theme] .a-publik--prototipe .a-btn--utama:hover:not(:disabled),
 html[data-theme] .a-app--prototipe .a-btn--utama:hover:not(:disabled) {
-  color:#FFFFFF;background:linear-gradient(112deg,#093E30,#105D44,#126C4E);
-  border-color:#126C4E;
+  color:#FFFFFF;background:var(--eg-cta-hover);
+  border-color:var(--eg-cta-border);
 }
 
 
@@ -374,15 +382,14 @@ html[data-theme] .a-publik--prototipe .a-btn--tema {
 }
 html[data-theme] .a-app--prototipe .a-btn--utama,
 html[data-theme] .a-publik--prototipe .a-btn--utama {
-  background:linear-gradient(180deg,rgba(255,255,255,.045),transparent 65%),
-    linear-gradient(112deg,#0A4C39,#126C51,#147858);
+  background:var(--eg-cta-gradient);
   color:#FFFFFF;
-  border-color:rgba(113,238,183,.26);
-  box-shadow:0 8px 19px rgba(2,43,28,.24),inset 0 1px 0 rgba(255,255,255,.13);
+  border-color:var(--eg-cta-border);
+  box-shadow:var(--eg-cta-shadow);
 }
 html[data-theme] .a-app--prototipe .a-btn--utama:hover:not(:disabled),
 html[data-theme] .a-publik--prototipe .a-btn--utama:hover:not(:disabled) {
-  background:linear-gradient(112deg,#093E30,#105D44,#126C4E);
+  background:var(--eg-cta-hover);
   color:#FFFFFF;
 }
 /* Warna enam semester TETAP berbeda; highlight transparan tidak menimpa gradien. */
