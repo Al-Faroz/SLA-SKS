@@ -1467,8 +1467,21 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 
 
 /* G03 v2.5 — Ringkasan ATP (2 kelompok x 3 semester) dan detail per BAB. */
-.a-atp-kelompok { margin-top: var(--a-ruang-6); }
-.a-atp-kelompok__heading { margin-bottom: var(--a-ruang-4); }
+.a-atp-kelompok {
+    margin-top: var(--a-ruang-5);
+    padding: clamp(16px, 2vw, 24px);
+    background: var(--a-permukaan);
+    border: 1px solid var(--a-garis);
+    border-radius: 16px;
+    box-shadow: 0 3px 12px rgb(19 37 28 / .035);
+}
+.a-atp-kelompok__heading {
+    display: flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 6px 20px;
+    padding-bottom: var(--a-ruang-3);
+    border-bottom: 1px solid var(--a-garis);
+    margin-bottom: var(--a-ruang-4);
+}
 .a-atp-kelompok__heading h2 { margin: 0 0 4px; font-size: 1.24rem; }
 .a-atp-kelompok__heading p { margin: 0; }
 .a-atp-pilihan { max-width: 760px; }
@@ -1495,9 +1508,23 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-atp-kartu__atas { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--a-atp-aksen); font-weight: 750; }
 .a-atp-kartu__indeks { font-size: .77rem; letter-spacing: .065em; }
 .a-atp-kartu__judul { font-size: clamp(1.35rem, 2vw, 1.8rem); line-height: 1.16; }
-.a-atp-kartu__status { font-size: .84rem; color: var(--a-atp-aksen); font-weight: 650; }
+.a-atp-kartu__status {
+    justify-self: start;
+    display: inline-block;
+    font-size: .81rem;
+    color: var(--a-atp-aksen);
+    font-weight: 700;
+    padding: 5px 9px;
+    border: 1px solid var(--a-atp-tepi);
+    background: rgb(255 255 255 / .58);
+    border-radius: 99px;
+}
 .a-atp-kartu__angka { display: flex; flex-wrap: wrap; gap: clamp(16px, 2.4vw, 32px); }
-.a-atp-kartu__angka > span { display: grid; gap: 0; }
+.a-atp-kartu__angka > span {
+    display: grid; gap: 0;
+    min-width: 76px;
+    padding: 5px 0;
+}
 .a-atp-kartu__angka strong { font-size: 1.8rem; line-height: 1.25; }
 .a-atp-kartu__angka small { font-size: .8rem; color: var(--a-redup); }
 .a-atp-kartu__rincian { margin-top: auto; border-top: 1px solid var(--a-atp-tepi); padding-top: var(--a-ruang-3); font-size: .82rem; overflow-wrap: anywhere; }
@@ -1510,7 +1537,15 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-atp-detail__header h1 { margin: 5px 0 9px; line-height: 1.2; }
 .a-atp-detail__header h1 small { font-size: .6em; font-weight: 600; }
 .a-atp-detail__eyebrow { color: var(--a-atp-aksen); margin: 0; font-weight: 750; }
-.a-atp-detail__status { color: var(--a-atp-aksen); font-weight: 650; }
+.a-atp-detail__status {
+    display: inline-block;
+    color: var(--a-atp-aksen);
+    font-weight: 700;
+    padding: 5px 10px;
+    background: rgb(255 255 255 / .58);
+    border: 1px solid var(--a-atp-tepi);
+    border-radius: 99px;
+}
 .a-atp-detail__metrik { display: flex; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; }
 .a-atp-detail__metrik span { display: grid; min-width: 55px; text-align: center; font-size: .78rem; }
 .a-atp-detail__metrik strong { font-size: 1.5rem; }
@@ -1525,14 +1560,23 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-atp-bab-card__header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; padding: clamp(16px, 2.2vw, 24px); border-bottom: 1px solid var(--a-atp-tepi); }
 .a-atp-bab-card__header > div:first-child { flex: 1 1 320px; min-width: 0; }
 .a-atp-bab-card__nomor { margin: 0 0 8px; color: var(--a-atp-aksen); font-size: .81rem; font-weight: 750; letter-spacing: .04em; }
-.a-atp-bab-card__header h3 { margin: 0 0 8px; font-size: 1.18rem; overflow-wrap: anywhere; }
+.a-atp-bab-card__header h3 { margin: 0 0 8px; font-size: 1.18rem; line-height: 1.35; overflow-wrap: anywhere; }
+.a-atp-bab-card__header .a-btn { white-space: nowrap; }
 .a-atp-bab-card__deskripsi { margin: 0; line-height: 1.55; overflow-wrap: anywhere; }
 .a-atp-bab-card__aksi { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.a-atp-bab-card__tabel { padding: var(--a-ruang-3); }
+.a-atp-bab-card__tabel {
+    padding: var(--a-ruang-3);
+    background: rgb(255 255 255 / .43);
+}
 .a-atp-bab-card__tabel .a-tbl { background: #fff; border: 1px solid var(--a-atp-tepi); border-radius: 7px; }
 .a-atp-bab-card__kosong { padding: var(--a-ruang-4); font-size: .91rem; color: var(--a-redup); }
 @media (max-width: 1100px) { .a-atp-kartu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) {
+    .a-atp-kartu { transition: none; }
+    .a-atp-kartu:hover { transform: none; }
+}
 @media (max-width: 650px) {
+    .a-atp-kelompok { padding: 14px; }
     .a-atp-kartu-grid { grid-template-columns: 1fr; }
     .a-atp-kartu { min-height: 0; }
     .a-atp-detail__header { align-items: stretch; }
