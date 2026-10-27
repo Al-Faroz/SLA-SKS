@@ -56,4 +56,38 @@ final class AturanBabService
 
         return $berikutnya;
     }
+    /**
+     * Tandai kesempatan tambah BAB pada enam semester. Array kosong adalah
+     * keadaan sah saat Guru belum memiliki penugasan G1.
+     *
+     * @param array<int,array<string,mixed>> $semester
+     * @return array<int,array<string,mixed>>
+     */
+    public static function denganStatusForm(array $semester, int $semesterMulai): array
+    {
+        if ($semester === []) {
+            return [];
+        }
+        if ($semesterMulai < 1 || $semesterMulai > 6) {
+            throw new DomainException('Semester mulai Gen tidak valid.');
+        }
+        for ($nomor = 1; $nomor <= 6; $nomor++) {
+            if (! isset($semester[$nomor]['bab']) || ! is_array($semester[$nomor]['bab'])) {
+                throw new DomainException('Data peta enam semester belum lengkap.');
+            }
+        }
+
+        for ($nomor = 1; $nomor <= 6; $nomor++) {
+            $pasangan = $nomor % 2 === 0 ? $nomor - 1 : $nomor + 1;
+            $babPasangan = $semester[$pasangan]['bab'];
+            $semester[$nomor]['boleh_tambah_bab'] = $nomor >= $semesterMulai && (
+                $nomor % 2 === 0
+                    ? ($babPasangan !== [] || $semesterMulai === $nomor)
+                    : $babPasangan === []
+            );
+        }
+
+        return $semester;
+    }
+
 }

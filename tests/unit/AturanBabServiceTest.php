@@ -81,4 +81,44 @@ final class AturanBabServiceTest extends TestCase
         $this->expectException(DomainException::class);
         AturanBabService::nomorBerikutnya(7, []);
     }
+    public function testPetaKosongSaatBelumAdaPenugasan(): void
+    {
+        self::assertSame([], AturanBabService::denganStatusForm([], 1));
+    }
+
+    public function testFormGenMulaiSemesterEmpatTidakMengharuskanSemesterTiga(): void
+    {
+        $semester = [];
+        for ($n = 1; $n <= 6; $n++) {
+            $semester[$n] = ['bab' => [], 'paket' => []];
+        }
+        $hasil = AturanBabService::denganStatusForm($semester, 4);
+        self::assertFalse($hasil[3]['boleh_tambah_bab']);
+        self::assertTrue($hasil[4]['boleh_tambah_bab']);
+        self::assertTrue($hasil[5]['boleh_tambah_bab']);
+    }
+
+    public function testFormGenMulaiSemesterSatuHarusMenyusunBABGanjilDulu(): void
+    {
+        $semester = [];
+        for ($n = 1; $n <= 6; $n++) {
+            $semester[$n] = ['bab' => [], 'paket' => []];
+        }
+        $hasil = AturanBabService::denganStatusForm($semester, 1);
+        self::assertTrue($hasil[1]['boleh_tambah_bab']);
+        self::assertFalse($hasil[2]['boleh_tambah_bab']);
+        $semester[1]['bab'][] = ['nomor_bab' => 1];
+        $hasil = AturanBabService::denganStatusForm($semester, 1);
+        self::assertTrue($hasil[2]['boleh_tambah_bab']);
+        $semester[2]['bab'][] = ['nomor_bab' => 2];
+        $hasil = AturanBabService::denganStatusForm($semester, 1);
+        self::assertFalse($hasil[1]['boleh_tambah_bab']);
+    }
+
+    public function testPetaSemesterTidakLengkapDitolak(): void
+    {
+        $this->expectException(DomainException::class);
+        AturanBabService::denganStatusForm([1 => ['bab' => []]], 1);
+    }
+
 }

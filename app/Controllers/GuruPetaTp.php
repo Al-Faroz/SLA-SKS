@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Services\AturanBabService;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
 use App\Services\PetaTpService;
@@ -32,19 +33,10 @@ final class GuruPetaTp extends BaseController
                         $nomor
                     );
                 }
-                // Hanya hitung kontrol tambah BAB bila Guru punya penugasan.
-                // Tanpa pilihan, daftar $semester kosong dan tidak boleh
-                // mengakses $semester[$pasangan] yang belum ada.
-                $semesterMulai = (int) ($dipilih['semester_mulai'] ?? 1);
-                for ($nomor = 1; $nomor <= 6; $nomor++) {
-                    $pasangan = $nomor % 2 === 0 ? $nomor - 1 : $nomor + 1;
-                    $babPasangan = $semester[$pasangan]['bab'];
-                    $semester[$nomor]['boleh_tambah_bab'] = $nomor >= $semesterMulai && (
-                        $nomor % 2 === 0
-                            ? ($babPasangan !== [] || $semesterMulai === $nomor)
-                            : $babPasangan === []
-                    );
-                }
+                $semester = AturanBabService::denganStatusForm(
+                    $semester,
+                    (int) ($dipilih['semester_mulai'] ?? 1)
+                );
             }
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru'))->with('galat', $e->getMessage());
