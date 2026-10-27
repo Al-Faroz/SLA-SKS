@@ -10,7 +10,7 @@ use App\Services\PetaTpService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
 
-/** Peta ATP baca-saja per enam semester; hanya pasangan Gen–Mapel yang diampu. */
+/** Peta ATP per enam semester; aksi tambah BAB diperiksa ulang oleh Service G1. */
 final class GuruPetaTp extends BaseController
 {
     protected $helpers = ['url', 'form'];
@@ -32,18 +32,19 @@ final class GuruPetaTp extends BaseController
                         $nomor
                     );
                 }
-            }
-            // Tampilkan alasan terkunci sebelum form diisi; Service tetap
-            // melakukan validasi ulang di dalam transaksi saat menyimpan.
-            $semesterMulai = (int) ($dipilih['semester_mulai'] ?? 1);
-            for ($nomor = 1; $nomor <= 6; $nomor++) {
-                $pasangan = $nomor % 2 === 0 ? $nomor - 1 : $nomor + 1;
-                $babPasangan = $semester[$pasangan]['bab'];
-                $semester[$nomor]['boleh_tambah_bab'] = $nomor >= $semesterMulai && (
-                    $nomor % 2 === 0
-                        ? ($babPasangan !== [] || $semesterMulai === $nomor)
-                        : $babPasangan === []
-                );
+                // Hanya hitung kontrol tambah BAB bila Guru punya penugasan.
+                // Tanpa pilihan, daftar $semester kosong dan tidak boleh
+                // mengakses $semester[$pasangan] yang belum ada.
+                $semesterMulai = (int) ($dipilih['semester_mulai'] ?? 1);
+                for ($nomor = 1; $nomor <= 6; $nomor++) {
+                    $pasangan = $nomor % 2 === 0 ? $nomor - 1 : $nomor + 1;
+                    $babPasangan = $semester[$pasangan]['bab'];
+                    $semester[$nomor]['boleh_tambah_bab'] = $nomor >= $semesterMulai && (
+                        $nomor % 2 === 0
+                            ? ($babPasangan !== [] || $semesterMulai === $nomor)
+                            : $babPasangan === []
+                    );
+                }
             }
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru'))->with('galat', $e->getMessage());
