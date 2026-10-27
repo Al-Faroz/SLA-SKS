@@ -225,3 +225,57 @@
         });
     });
 })();
+
+/* G03 — Modal BAB/TP berbasis dialog native, fokus dan Escape bawaan browser. */
+(() => {
+    'use strict';
+    const openButtons = document.querySelectorAll('[data-atp-dialog-open]');
+    if (!openButtons.length) return;
+
+    for (const trigger of openButtons) {
+        trigger.addEventListener('click', () => {
+            const dialog = document.getElementById(trigger.dataset.atpDialogOpen || '');
+            if (!(dialog instanceof HTMLDialogElement) || typeof dialog.showModal !== 'function') return;
+            if (dialog.open) return;
+            dialog.showModal();
+            const first = dialog.querySelector('[name="nama_bab"],[name="nama_tp"]');
+            first?.focus();
+        });
+    }
+    document.querySelectorAll('.a-modal--atp').forEach((dialog) => {
+        dialog.querySelectorAll('[data-atp-dialog-close]').forEach((button) => {
+            button.addEventListener('click', () => dialog.close());
+        });
+        dialog.addEventListener('click', (event) => {
+            if (event.target === dialog) dialog.close(); // Klik bidang backdrop.
+        });
+        dialog.querySelectorAll('[data-atp-dialog-form]').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                if (form.dataset.sedangKirim === '1') {
+                    event.preventDefault();
+                    return;
+                }
+                if (!form.reportValidity()) {
+                    event.preventDefault();
+                    return;
+                }
+                form.dataset.sedangKirim = '1';
+                const submit = form.querySelector('[type="submit"]');
+                if (submit) {
+                    submit.disabled = true;
+                    submit.textContent = 'Menyimpan…';
+                }
+            });
+        });
+    });
+    window.addEventListener('pageshow', () => {
+        document.querySelectorAll('[data-atp-dialog-form][data-sedang-kirim="1"]').forEach((form) => {
+            delete form.dataset.sedangKirim;
+            const submit = form.querySelector('[type="submit"]');
+            if (submit) {
+                submit.disabled = false;
+                submit.textContent = submit.closest('dialog')?.id.startsWith('dialog-bab-') ? 'Simpan BAB' : 'Simpan TP Draf';
+            }
+        });
+    });
+})();

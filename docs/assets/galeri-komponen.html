@@ -386,6 +386,68 @@
       <div class="a-penilaian-aksi"><span class="a-btn a-btn--utama">Simpan nilai</span>
       <span class="a-btn a-btn--sekunder">Simpan &amp; berikutnya</span></div>
   </section>
+
+  <section class="a-card" id="galeri-modal-atp" aria-labelledby="galeri-modal-atp-title">
+      <h2 id="galeri-modal-atp-title">G03 · Tambah BAB dan TP melalui modal</h2>
+      <p class="a-help">Contoh tampilan statis: aplikasi membuka dialog dengan tombol, fokus otomatis, Escape atau Batal untuk menutup.</p>
+      <div class="a-modal a-modal--atp" role="group" aria-labelledby="galeri-judul-modal">
+          <div class="a-modal-atp__header">
+              <h3 id="galeri-judul-modal">Tambah TP — BAB 1</h3>
+              <span class="a-btn a-btn--sekunder" aria-hidden="true">✕</span>
+          </div>
+          <div class="a-field">
+              <label class="a-label" for="contoh-modal-nama-tp">Nama TP (maks. 50 karakter)</label>
+              <input id="contoh-modal-nama-tp" type="text" maxlength="50" value="Perkembangan Peradaban Islam" readonly>
+          </div>
+          <div class="a-field">
+              <label class="a-label" for="contoh-modal-deskripsi-tp">Deskripsi TP (maks. 225 karakter)</label>
+              <textarea id="contoh-modal-deskripsi-tp" maxlength="225" readonly>Rumusan tujuan pembelajaran asli tetap dapat dibaca utuh.</textarea>
+          </div>
+          <div class="a-field">
+              <label class="a-label" for="contoh-modal-jenis-tp">Jenis TP</label>
+              <select id="contoh-modal-jenis-tp" disabled><option>NonEsensial</option></select>
+          </div>
+          <div class="a-modal-atp__actions">
+              <span class="a-btn a-btn--sekunder">Batal</span>
+              <span class="a-btn a-btn--utama">Simpan TP Draf</span>
+          </div>
+      </div>
+  </section>
+
+  <section class="a-card" aria-labelledby="galeri-atp-kartu">
+      <h2 id="galeri-atp-kartu">G03 · Ringkasan semester — dua kelompok kartu</h2>
+      <p class="a-help">Pratinjau statis dua kelompok, tiga kartu per kelompok pada desktop. Angka di galeri hanya ilustrasi, bukan data akademik aplikasi.</p>
+      <div class="a-atp-kelompok">
+          <div class="a-atp-kelompok__heading"><h3>Semester 1–3</h3></div>
+          <div class="a-atp-kartu-grid">
+              <div class="a-atp-kartu a-atp-warna-1"><span class="a-atp-kartu__atas">SEMESTER 1</span><strong class="a-atp-kartu__judul">Kelas VII</strong><span>Belum ada paket</span><span class="a-atp-kartu__angka"><span><strong>0</strong><small>BAB</small></span><span><strong>0</strong><small>TP</small></span></span></div>
+              <div class="a-atp-kartu a-atp-warna-2"><span class="a-atp-kartu__atas">SEMESTER 2</span><strong class="a-atp-kartu__judul">Kelas VII</strong><span>Belum ada paket</span><span class="a-atp-kartu__angka"><span><strong>0</strong><small>BAB</small></span><span><strong>0</strong><small>TP</small></span></span></div>
+              <div class="a-atp-kartu a-atp-warna-3"><span class="a-atp-kartu__atas">SEMESTER 3</span><strong class="a-atp-kartu__judul">Kelas VIII</strong><span>Belum ada paket</span><span class="a-atp-kartu__angka"><span><strong>0</strong><small>BAB</small></span><span><strong>0</strong><small>TP</small></span></span></div>
+          </div>
+      </div>
+      <div class="a-atp-kelompok">
+          <div class="a-atp-kelompok__heading"><h3>Semester 4–6</h3></div>
+          <div class="a-atp-kartu-grid">
+              <div class="a-atp-kartu a-atp-warna-4"><span class="a-atp-kartu__atas">SEMESTER 4</span><strong class="a-atp-kartu__judul">Kelas VIII</strong><span>Paket aktif</span><span class="a-atp-kartu__angka"><span><strong>1</strong><small>BAB</small></span><span><strong>1</strong><small>TP</small></span></span><span class="a-atp-kartu__rincian">0 Esensial · 1 NonEsensial</span></div>
+              <div class="a-atp-kartu a-atp-warna-5"><span class="a-atp-kartu__atas">SEMESTER 5</span><strong class="a-atp-kartu__judul">Kelas IX</strong><span>Belum ada paket</span><span class="a-atp-kartu__angka"><span><strong>0</strong><small>BAB</small></span><span><strong>0</strong><small>TP</small></span></span></div>
+              <div class="a-atp-kartu a-atp-warna-6"><span class="a-atp-kartu__atas">SEMESTER 6</span><strong class="a-atp-kartu__judul">Kelas IX</strong><span>Belum ada paket</span><span class="a-atp-kartu__angka"><span><strong>0</strong><small>BAB</small></span><span><strong>0</strong><small>TP</small></span></span></div>
+          </div>
+      </div>
+  </section>
+  <section class="a-card" aria-labelledby="galeri-atp-bab">
+      <h2 id="galeri-atp-bab">G03 · Detail semester dan kartu BAB</h2>
+      <div class="a-atp-detail__toolbar">
+          <div><h3>Semester 4 · Kelas VIII</h3><p>Susun BAB dan TP di halaman khusus.</p></div>
+          <span class="a-btn a-btn--utama">+ Tambah BAB</span>
+      </div>
+      <div class="a-atp-bab-card a-atp-warna-1" style="margin-top:20px">
+          <div class="a-atp-bab-card__header">
+              <div><p class="a-atp-bab-card__nomor">BAB 1</p><h3>Periode Klasik</h3><p>Deskripsi BAB utuh ditampilkan di kartu.</p></div>
+              <div class="a-atp-bab-card__aksi"><span class="a-badge">1 TP</span><span class="a-btn a-btn--sekunder">+ Tambah TP</span></div>
+          </div>
+          <div class="a-atp-bab-card__tabel"><table class="a-tbl"><thead><tr><th>Kode TP</th><th>Nama TP</th><th>Jenis</th></tr></thead><tbody><tr><td>SKI.8.1.1</td><td>Perkembangan Daulah</td><td>NonEsensial</td></tr></tbody></table></div>
+      </div>
+  </section>
 </main>
 </body>
 </html>
