@@ -44,6 +44,20 @@ final class AturanBabServiceTest extends TestCase
         ]));
     }
 
+    public function testGenDimulaiSemesterEmpatDapatMembuatBabSatu(): void
+    {
+        self::assertSame(1, AturanBabService::nomorBerikutnya(4, [], 4));
+        self::assertSame(2, AturanBabService::nomorBerikutnya(4, [
+            ['semester' => 4, 'nomor_bab' => 1],
+        ], 4));
+    }
+
+    public function testSemesterSebelumMulaiGenDitolak(): void
+    {
+        $this->expectException(DomainException::class);
+        AturanBabService::nomorBerikutnya(3, [], 4);
+    }
+
     public function testNomorGandaDitolak(): void
     {
         $this->expectException(DomainException::class);

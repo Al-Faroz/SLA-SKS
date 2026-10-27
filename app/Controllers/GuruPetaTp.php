@@ -35,13 +35,15 @@ final class GuruPetaTp extends BaseController
             }
             // Tampilkan alasan terkunci sebelum form diisi; Service tetap
             // melakukan validasi ulang di dalam transaksi saat menyimpan.
+            $semesterMulai = (int) ($dipilih['semester_mulai'] ?? 1);
             for ($nomor = 1; $nomor <= 6; $nomor++) {
-                $sebelumnya = $semester[$nomor]['bab'];
                 $pasangan = $nomor % 2 === 0 ? $nomor - 1 : $nomor + 1;
                 $babPasangan = $semester[$pasangan]['bab'];
-                $semester[$nomor]['boleh_tambah_bab'] = $nomor % 2 === 0
-                    ? $babPasangan !== []
-                    : $babPasangan === [];
+                $semester[$nomor]['boleh_tambah_bab'] = $nomor >= $semesterMulai && (
+                    $nomor % 2 === 0
+                        ? ($babPasangan !== [] || $semesterMulai === $nomor)
+                        : $babPasangan === []
+                );
             }
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru'))->with('galat', $e->getMessage());

@@ -55,6 +55,17 @@ final class BabService
             }
 
             $semester = (int) $paket['semester'];
+            $dataGen = $this->db->table('ref_angkatan')
+                ->select('semester_mulai')
+                ->where('id', $paket['angkatan_id'])
+                ->get()->getRowArray();
+            if ($dataGen === null) {
+                throw new DomainException('Data semester mulai Gen tidak ditemukan.');
+            }
+            $semesterMulai = (int) $dataGen['semester_mulai'];
+            if ($semester < $semesterMulai) {
+                throw new DomainException('Semester sebelum semester mulai Gen dilewati dan tidak dapat diisi BAB.');
+            }
             $referensiSemester = $this->db->table('ref_semester')->select('kelas_id')
                 ->where('id', $semester)->get()->getRowArray();
             if ($referensiSemester === null) {
@@ -80,7 +91,7 @@ final class BabService
                 ->where('b.tahun_ajaran_id', $paket['tahun_ajaran_id'])
                 ->where('b.kelas_id', $kelasId)
                 ->get()->getResultArray();
-            $nomor = AturanBabService::nomorBerikutnya($semester, $terdaftar);
+            $nomor = AturanBabService::nomorBerikutnya($semester, $terdaftar, $semesterMulai);
 
             $this->db->table('bab')->insert([
                 'paket_semester_id' => $paketId,

@@ -71,7 +71,7 @@ final class PetaTpService
         $guruId = $this->guruId();
 
         return $this->db->table('penugasan_guru_gen g')
-            ->select('g.angkatan_id, g.mapel_id, a.kode AS kode_gen, a.nama AS nama_gen, m.kode AS kode_mapel, m.nama AS nama_mapel')
+            ->select('g.angkatan_id, g.mapel_id, a.semester_mulai, a.kode AS kode_gen, a.nama AS nama_gen, m.kode AS kode_mapel, m.nama AS nama_mapel')
             ->join('ref_angkatan a', 'a.id = g.angkatan_id')
             ->join('ref_mapel m', 'm.id = g.mapel_id')
             ->where('g.guru_id', $guruId)

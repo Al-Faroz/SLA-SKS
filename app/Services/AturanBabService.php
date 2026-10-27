@@ -10,9 +10,9 @@ use DomainException;
 final class AturanBabService
 {
     /** @param list<array<string,mixed>> $babTerdaftar */
-    public static function nomorBerikutnya(int $semester, array $babTerdaftar): int
+    public static function nomorBerikutnya(int $semester, array $babTerdaftar, int $semesterMulai = 1): int
     {
-        if ($semester < 1 || $semester > 6) {
+        if ($semester < 1 || $semester > 6 || $semesterMulai < 1 || $semesterMulai > 6 || $semester < $semesterMulai) {
             throw new DomainException('Semester harus berada antara 1 sampai 6.');
         }
 
@@ -34,7 +34,9 @@ final class AturanBabService
             }
         }
 
-        if ($semester % 2 === 0 && ! $adaSemesterGanjil) {
+        // Gen yang mulai langsung dari semester genap (mis. Gen2025 mulai S4)
+        // tidak mempunyai kewajiban BAB semester ganjil yang dilewati.
+        if ($semester % 2 === 0 && ! $adaSemesterGanjil && $semesterMulai !== $semester) {
             throw new DomainException('Buat BAB pada semester ganjil di kelas yang sama terlebih dahulu agar nomor BAB berlanjut.');
         }
 
