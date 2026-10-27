@@ -146,7 +146,7 @@ final class AtpImporPratinjauService
             if ($status === 'ubah' && $lama !== null) {
                 foreach ($tpTerdaftar as $t) {
                     if ((int) $t['bab_id'] === (int) $lama['id']
-                        && $t['status'] === 'siap') {
+                        && $t['status'] !== 'draf') {
                         $status = 'galat';
                         $catatan = 'BAB memiliki TP Siap; perubahan perlu mekanisme koreksi.';
                         break;
@@ -183,6 +183,16 @@ final class AtpImporPratinjauService
             } elseif ($lama !== null && $lama['status'] === 'siap' && $status === 'ubah') {
                 $status = 'galat';
                 $catatan = 'TP Siap tidak boleh diubah oleh impor biasa.';
+            }
+            if ($status === 'ubah' && $lama !== null && $lama['status'] === 'draf') {
+                foreach (['materi', 'versi_konten_tp', 'progres_tp'] as $tabel) {
+                    if ($this->db->table($tabel)
+                        ->where('tp_id', (int) $lama['id'])->countAllResults() !== 0) {
+                        $status = 'galat';
+                        $catatan = 'TP sudah memiliki konten/progres; sunting melalui editor resmi.';
+                        break;
+                    }
+                }
             }
             $daftar[] = [
                 'jenis' => 'TP', 'semester' => $s, 'baris' => $t['baris'],
