@@ -35,6 +35,13 @@
     </header>
 
     <?php $galat = session()->getFlashdata('galat'); $sukses = session()->getFlashdata('sukses'); ?>
+    <?php if ($batasNamaBab < 50 || $batasNamaTp < 50): ?>
+        <div class="a-alert a-alert--info" role="status">
+            Database saat ini membatasi nama BAB hingga <?= (int) $batasNamaBab ?> dan nama TP hingga
+            <?= (int) $batasNamaTp ?> karakter. Target 50 karakter akan aktif setelah patch pelebaran kolom diimpor.
+            Data BAB dan TP yang sudah ada tetap dipertahankan.
+        </div>
+    <?php endif ?>
     <?php if ($galat): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div><?php endif ?>
     <?php if ($sukses): ?><div class="a-alert" role="status"><?= esc($sukses) ?></div><?php endif ?>
 
@@ -42,7 +49,7 @@
         <div>
             <h2 id="panduan-atp">Susun BAB dan TP</h2>
             <p class="a-proto-muted">Mulai dengan BAB sesuai ATP. Nomor BAB dan kode TP dibuat server; TP baru disimpan sebagai draf.
-                Nama maksimal 50 karakter dan deskripsi maksimal 225 karakter. Pilih jenis TP sesuai tujuan pembelajaran.</p>
+                Batas nama mengikuti kapasitas database terpasang; deskripsi maksimal 225 karakter. Pilih jenis TP sesuai tujuan pembelajaran.</p>
             <?php if ($belumMulai): ?>
                 <p class="a-atp-pesan-terkunci">Semester ini dilewati karena Gen mulai dari Semester <?= (int) $dipilih['semester_mulai'] ?>. Data tetap dapat dilihat.</p>
             <?php elseif ($paketAktif !== null && ! $bolehTambahBab): ?>
@@ -77,8 +84,8 @@
                 <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
                 <input type="hidden" name="semester" value="<?= (int) $nomorSemester ?>">
                 <div class="a-field">
-                    <label class="a-label" for="nama-bab-semester">Nama BAB (maks. 50 karakter)</label>
-                    <input id="nama-bab-semester" name="nama_bab" maxlength="50" required autocomplete="off" autofocus>
+                    <label class="a-label" for="nama-bab-semester">Nama BAB (maks. <?= (int) $batasNamaBab ?> karakter)</label>
+                    <input id="nama-bab-semester" name="nama_bab" maxlength="<?= (int) $batasNamaBab ?>" required autocomplete="off" autofocus>
                 </div>
                 <div class="a-field">
                     <label class="a-label" for="deskripsi-bab-semester">Deskripsi BAB (maks. 225 karakter)</label>
@@ -210,8 +217,8 @@
                             <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
                             <input type="hidden" name="semester" value="<?= (int) $nomorSemester ?>">
                             <div class="a-field">
-                                <label class="a-label" for="nama-tp-<?= (int) $bab['id'] ?>">Nama TP (maks. 50 karakter)</label>
-                                <input id="nama-tp-<?= (int) $bab['id'] ?>" name="nama_tp" maxlength="50" autocomplete="off" required autofocus>
+                                <label class="a-label" for="nama-tp-<?= (int) $bab['id'] ?>">Nama TP (maks. <?= (int) $batasNamaTp ?> karakter)</label>
+                                <input id="nama-tp-<?= (int) $bab['id'] ?>" name="nama_tp" maxlength="<?= (int) $batasNamaTp ?>" autocomplete="off" required autofocus>
                             </div>
                             <div class="a-field">
                                 <label class="a-label" for="deskripsi-tp-<?= (int) $bab['id'] ?>">Deskripsi TP (maks. 225 karakter)</label>

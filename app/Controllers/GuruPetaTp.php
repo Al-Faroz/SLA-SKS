@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AturanBabService;
+use App\Services\BatasNamaAtpService;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
 use App\Services\PaketSemesterGuruService;
@@ -108,6 +109,8 @@ final class GuruPetaTp extends BaseController
             'semester' => $semester,
             'opsiPaket' => $opsiPaket,
             'ringkasan' => RingkasanSemesterAtpService::dariPeta($semester),
+            'batasNamaBab' => BatasNamaAtpService::aktual(db_connect(), 'bab'),
+            'batasNamaTp' => BatasNamaAtpService::aktual(db_connect(), 'tp'),
         ]);
     }
 

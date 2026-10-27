@@ -50,6 +50,11 @@ final class BabService
         if (! $this->db->tableExists('bab')) {
             throw new DomainException('Database pola baru belum terpasang. Hubungi Admin.');
         }
+        $batasKolom = BatasNamaAtpService::aktual($this->db, 'bab');
+        if (mb_strlen($nama) > $batasKolom) {
+            throw new DomainException('Nama BAB maksimal ' . $batasKolom
+                . ' karakter pada database terpasang. Pelebaran ke 50 memerlukan patch SQL.');
+        }
 
         $guruId = (int) $akun['id'];
         $this->db->transBegin();

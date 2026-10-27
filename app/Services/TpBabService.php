@@ -57,6 +57,11 @@ final class TpBabService
         if (! $this->db->tableExists('bab') || ! $this->db->tableExists('cp_mapel')) {
             throw new DomainException('Database SLA-SKS v4 belum terpasang.');
         }
+        $batasKolom = BatasNamaAtpService::aktual($this->db, 'tp');
+        if (mb_strlen($nama) > $batasKolom) {
+            throw new DomainException('Nama TP maksimal ' . $batasKolom
+                . ' karakter pada database terpasang. Pelebaran ke 50 memerlukan patch SQL.');
+        }
 
         $this->db->transBegin();
         try {
