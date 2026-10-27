@@ -60,6 +60,12 @@
             <?php endif ?>
         </div>
         <div class="a-atp-detail__toolbar-actions">
+            <?php if ($paketAktif !== null && ! $belumMulai): ?>
+                <a class="a-btn a-btn--sekunder"
+                    href="<?= esc(site_url('guru/peta-atp/unduh/' . (int) $paketAktif['id']), 'attr') ?>">
+                    Unduh Template ATP Excel
+                </a>
+            <?php endif ?>
             <?php if ($bolehTambahBab): ?>
                 <button class="a-btn a-btn--utama" type="button" data-atp-dialog-open="dialog-bab-semester"
                     aria-haspopup="dialog" aria-controls="dialog-bab-semester">+ Tambah BAB</button>

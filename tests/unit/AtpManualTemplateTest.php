@@ -50,6 +50,34 @@ final class AtpManualTemplateTest extends TestCase
         }
     }
 
+    /** Kejelasan workbook adalah kontrak QA, bukan sekadar estetika web. */
+    public function testKontrakTampilanTemplateExcel(): void
+    {
+        $buku = IOFactory::load(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS);
+        try {
+            for ($n = 1; $n <= 6; ++$n) {
+                $sheet = $buku->getSheetByName('SEMESTER ' . $n);
+                self::assertFalse($sheet->getShowGridLines());
+                self::assertContains('A1:J1', $sheet->getMergeCells());
+                self::assertGreaterThanOrEqual(44.0, (float) $sheet->getRowDimension(1)->getRowHeight());
+                self::assertGreaterThanOrEqual(44.0, (float) $sheet->getRowDimension(38)->getRowHeight());
+                self::assertSame('DFF1E8', $sheet->getStyle('A1')->getFill()->getStartColor()->getRGB());
+                self::assertSame('183F35', $sheet->getStyle('A38')->getFill()->getStartColor()->getRGB());
+                self::assertSame('E2F1EA', $sheet->getStyle('D39')->getFill()->getStartColor()->getRGB());
+                self::assertSame('EDF4FF', $sheet->getStyle('G39')->getFill()->getStartColor()->getRGB());
+                self::assertTrue($sheet->getStyle('C38')->getAlignment()->getWrapText());
+            }
+            self::assertFalse($buku->getSheetByName('MULAI DI SINI')->getShowGridLines());
+            self::assertFalse($buku->getSheetByName('RINGKASAN')->getShowGridLines());
+            self::assertNull($buku->getSheetByName('RINGKASAN')->getCell('B5')->getValue(),
+                'Template repository tidak boleh membawa identitas Gen nyata.');
+            self::assertNull($buku->getSheetByName('REFERENSI CP')->getCell('A7')->getValue(),
+                'Referensi CP diisi oleh generator dari server.');
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
     public function testTidakAdaMacroDanReferensiEksternal(): void
     {
         $zip = new ZipArchive();

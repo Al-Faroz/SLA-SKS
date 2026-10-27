@@ -92,7 +92,8 @@ INSERT INTO pengguna (id,nama,status,wajib_ganti_sandi,versi_sesi) VALUES
 (1,'Guru Penguji A','aktif',0,1),(2,'Guru Penguji B','aktif',0,1),(3,'Admin Penguji','aktif',0,1),(4,'Guru Wajib Ganti Sandi','aktif',1,1),
 (5,'Guru Tanpa G1','aktif',0,1),(6,'Guru Nonaktif','nonaktif',0,1);
 INSERT INTO pengguna_peran (pengguna_id,peran) VALUES (1,'guru'),(2,'guru'),(3,'admin'),(4,'guru'),(5,'guru'),(6,'guru');
-INSERT INTO ref_angkatan VALUES (1,'GEN-UJI-A','Gen Uji A'),(2,'GEN-UJI-B','Gen Uji B');
+INSERT INTO ref_angkatan (id,kode,nama,semester_mulai) VALUES
+(1,'GEN-UJI-A','Gen Uji A',4),(2,'GEN-UJI-B','Gen Uji B',4);
 INSERT INTO ref_mapel VALUES (1,'MAP-UJI','Mapel Uji');
 INSERT INTO penugasan_guru_gen VALUES (1,1,1,1),(2,2,1,2);
 INSERT INTO paket_semester VALUES (1,1,1,4,1,1,1,'draf'),(2,2,1,4,1,1,1,'draf');

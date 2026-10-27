@@ -46,6 +46,8 @@ $routes->get('siswa/tp/(:num)/diagnostik/media/(:segment)/(:segment)/(:segment)'
 $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp/semester/(:num)', 'GuruPetaTp::semester/$1', ['filter' => 'auth:guru']);
+// Generator template ATP v2.5: paket harus milik G1 Guru, divalidasi lagi di Service.
+$routes->get('guru/peta-atp/unduh/(:num)', 'GuruAtpUnduh::unduh/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/bab/baru', 'GuruBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/baru', 'GuruTpBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/paket-semester/baru', 'GuruPaketSemester::buat', ['filter' => 'auth:guru']);
