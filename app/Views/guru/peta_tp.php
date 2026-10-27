@@ -52,20 +52,36 @@
                 <?php if ($data['paket'] !== [] && ($data['pola_bab'] ?? false)): ?>
                     <?php $paketUntukBab = null; foreach ($data['paket'] as $candidate) { if ($candidate['status'] !== 'arsip') { $paketUntukBab = $candidate; break; } } ?>
                     <?php if ($paketUntukBab !== null && ($data['boleh_tambah_bab'] ?? true)): ?>
-                        <form class="a-form a-jarak-atas" method="post" action="<?= esc(site_url('guru/bab/baru'), 'attr') ?>">
+                        <button class="a-btn a-btn--utama a-jarak-atas" type="button"
+                            data-atp-dialog-open="dialog-bab-<?= (int) $nomor ?>"
+                            aria-haspopup="dialog" aria-controls="dialog-bab-<?= (int) $nomor ?>">+ Tambah BAB</button>
+                        <dialog class="a-modal a-modal--atp" id="dialog-bab-<?= (int) $nomor ?>"
+                            aria-labelledby="judul-dialog-bab-<?= (int) $nomor ?>">
+                            <div class="a-modal-atp__header">
+                                <h3 id="judul-dialog-bab-<?= (int) $nomor ?>">Tambah BAB — Semester <?= (int) $nomor ?></h3>
+                                <button type="button" class="a-btn a-btn--sekunder"
+                                    data-atp-dialog-close aria-label="Tutup dialog tambah BAB">✕</button>
+                            </div>
+                            <p class="a-proto-muted">Nomor BAB ditentukan server secara otomatis. Isian akan menjadi bagian ATP.</p>
+                            <form class="a-form" method="post" action="<?= esc(site_url('guru/bab/baru'), 'attr') ?>"
+                                data-atp-dialog-form>
                             <?= csrf_field() ?>
                             <input type="hidden" name="paket_id" value="<?= (int) $paketUntukBab['id'] ?>">
                             <input type="hidden" name="pilihan" value="<?= (int) array_search($dipilih, $pilihan, true) ?>">
                             <div class="a-field">
-                                <label class="a-label" for="nama-bab-<?= (int) $nomor ?>">Nama BAB (maks. 35 karakter)</label>
-                                <input id="nama-bab-<?= (int) $nomor ?>" name="nama_bab" maxlength="35" required>
+                                <label class="a-label" for="nama-bab-<?= (int) $nomor ?>">Nama BAB (maks. 50 karakter)</label>
+                                <input id="nama-bab-<?= (int) $nomor ?>" name="nama_bab" maxlength="50" autocomplete="off" required autofocus>
                             </div>
                             <div class="a-field">
                                 <label class="a-label" for="deskripsi-bab-<?= (int) $nomor ?>">Deskripsi BAB (maks. 225 karakter)</label>
                                 <textarea id="deskripsi-bab-<?= (int) $nomor ?>" name="deskripsi_bab" maxlength="225" rows="2" required></textarea>
                             </div>
-                            <button class="a-btn a-btn--utama" type="submit">Tambah BAB Semester <?= (int) $nomor ?></button>
-                        </form>
+                            <div class="a-modal-atp__actions">
+                                <button class="a-btn a-btn--sekunder" type="button" data-atp-dialog-close>Batal</button>
+                                <button class="a-btn a-btn--utama" type="submit">Simpan BAB</button>
+                            </div>
+                            </form>
+                        </dialog>
                     <?php elseif ($paketUntukBab !== null && ! ($data['boleh_tambah_bab'] ?? true)): ?>
                         <div class="a-alert" role="status">
                             <?= $nomor % 2 === 0
@@ -91,15 +107,27 @@
 
                         <?php foreach ($data['bab'] as $bab): ?>
                             <?php if ($paketUntukBab === null || (int) $bab['paket_semester_id'] !== (int) $paketUntukBab['id']) { continue; } ?>
-                            <details class="a-jarak-atas">
-                                <summary>Tambah TP pada BAB <?= (int) $bab['nomor_bab'] ?> — <?= esc($bab['nama_bab']) ?></summary>
-                                <form method="post" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/tp/baru'), 'attr') ?>">
+                            <div class="a-jarak-atas">
+                                <button class="a-btn a-btn--sekunder" type="button"
+                                    data-atp-dialog-open="dialog-tp-bab-<?= (int) $bab['id'] ?>"
+                                    aria-haspopup="dialog" aria-controls="dialog-tp-bab-<?= (int) $bab['id'] ?>">+ Tambah TP — BAB <?= (int) $bab['nomor_bab'] ?></button>
+                            </div>
+                            <dialog class="a-modal a-modal--atp" id="dialog-tp-bab-<?= (int) $bab['id'] ?>"
+                                aria-labelledby="judul-dialog-tp-<?= (int) $bab['id'] ?>">
+                                <div class="a-modal-atp__header">
+                                    <h3 id="judul-dialog-tp-<?= (int) $bab['id'] ?>">Tambah TP — BAB <?= (int) $bab['nomor_bab'] ?></h3>
+                                    <button type="button" class="a-btn a-btn--sekunder" data-atp-dialog-close
+                                        aria-label="Tutup dialog tambah TP">✕</button>
+                                </div>
+                                <p class="a-proto-muted"><?= esc($bab['nama_bab']) ?> · Kode TP dibuat otomatis oleh server.</p>
+                                <form method="post" class="a-form" action="<?= esc(site_url('guru/tp/baru'), 'attr') ?>"
+                                    data-atp-dialog-form>
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="bab_id" value="<?= (int) $bab['id'] ?>">
                                     <input type="hidden" name="pilihan" value="<?= (int) array_search($dipilih, $pilihan, true) ?>">
                                     <div class="a-field">
-                                        <label class="a-label" for="nama-tp-bab-<?= (int) $bab['id'] ?>">Nama TP (maks. 35 karakter)</label>
-                                        <input id="nama-tp-bab-<?= (int) $bab['id'] ?>" name="nama_tp" maxlength="35" required>
+                                        <label class="a-label" for="nama-tp-bab-<?= (int) $bab['id'] ?>">Nama TP (maks. 50 karakter)</label>
+                                        <input id="nama-tp-bab-<?= (int) $bab['id'] ?>" name="nama_tp" maxlength="50" autocomplete="off" required autofocus>
                                     </div>
                                     <div class="a-field">
                                         <label class="a-label" for="deskripsi-tp-bab-<?= (int) $bab['id'] ?>">Deskripsi TP (maks. 225 karakter)</label>
@@ -113,9 +141,12 @@
                                         </select>
                                     </div>
                                     <p class="a-proto-muted">Kode dan urutan TP dibuat otomatis oleh server. TP baru berstatus draf.</p>
-                                    <button class="a-btn a-btn--utama" type="submit">Simpan TP Draf</button>
+                                    <div class="a-modal-atp__actions">
+                                        <button class="a-btn a-btn--sekunder" type="button" data-atp-dialog-close>Batal</button>
+                                        <button class="a-btn a-btn--utama" type="submit">Simpan TP Draf</button>
+                                    </div>
                                 </form>
-                            </details>
+                            </dialog>
                         <?php endforeach ?>
                     <?php else: ?>
                         <p class="a-proto-muted a-jarak-atas">Belum ada BAB pada semester ini.</p>

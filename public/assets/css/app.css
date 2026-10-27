@@ -1437,3 +1437,30 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-penilaian-aksi .a-btn { width:100%; justify-content:center; }
     .a-penilaian-tabel td { overflow-wrap:anywhere; }
 }
+
+/* G03 — Dialog akademik BAB/TP, responsive, mengikuti modal design system. */
+.a-modal--atp {
+    width: min(calc(100% - 24px), 620px);
+    max-height: min(88dvh, 760px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    box-shadow: 0 22px 60px rgb(0 0 0 / .22);
+}
+.a-modal-atp__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--a-ruang-3);
+}
+.a-modal-atp__header h3 { margin: 0; overflow-wrap: anywhere; }
+.a-modal-atp__actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--a-ruang-3);
+    margin-top: var(--a-ruang-4);
+}
+@media (max-width: 600px) {
+    .a-modal--atp { padding: var(--a-ruang-4); max-height: 92dvh; }
+    .a-modal-atp__actions .a-btn { flex: 1 1 130px; justify-content: center; }
+}

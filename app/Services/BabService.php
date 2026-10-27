@@ -22,14 +22,25 @@ final class BabService
         $this->akunAktif = $akunAktif ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
     }
 
-    public function buat(int $paketId, string $nama, string $deskripsi): int
+
+    /** @return array{nama:string,deskripsi:string} */
+    public static function validasiInput(int $paketId, string $nama, string $deskripsi): array
     {
         $nama = trim($nama);
         $deskripsi = trim($deskripsi);
-        if ($paketId < 1 || $nama === '' || mb_strlen($nama) > 35
+        if ($paketId < 1 || $nama === '' || mb_strlen($nama) > 50
             || $deskripsi === '' || mb_strlen($deskripsi) > 225) {
-            throw new DomainException('Nama BAB wajib 1–35 karakter dan deskripsi wajib 1–225 karakter.');
+            throw new DomainException('Nama BAB wajib 1–50 karakter dan deskripsi wajib 1–225 karakter.');
         }
+
+        return ['nama' => $nama, 'deskripsi' => $deskripsi];
+    }
+
+    public function buat(int $paketId, string $nama, string $deskripsi): int
+    {
+        $data = self::validasiInput($paketId, $nama, $deskripsi);
+        $nama = $data['nama'];
+        $deskripsi = $data['deskripsi'];
         $akun = ($this->akunAktif)();
         if ($akun === null || ($akun['peran_aktif'] ?? '') !== 'guru'
             || ($akun['status'] ?? '') !== 'aktif'

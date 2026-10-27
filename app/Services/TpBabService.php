@@ -32,10 +32,10 @@ final class TpBabService
     {
         $nama = trim($nama);
         $deskripsi = trim($deskripsi);
-        if ($babId < 1 || $nama === '' || mb_strlen($nama) > 35
+        if ($babId < 1 || $nama === '' || mb_strlen($nama) > 50
             || $deskripsi === '' || mb_strlen($deskripsi) > 225
             || ! in_array($jenis, ['esensial', 'non_esensial'], true)) {
-            throw new DomainException('Isi nama TP (1–35 karakter), deskripsi (1–225 karakter), dan pilih jenis TP yang sah.');
+            throw new DomainException('Isi nama TP (1–50 karakter), deskripsi (1–225 karakter), dan pilih jenis TP yang sah.');
         }
         return ['nama' => $nama, 'deskripsi' => $deskripsi, 'jenis' => $jenis];
     }

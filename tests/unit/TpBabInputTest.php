@@ -18,10 +18,22 @@ final class TpBabInputTest extends TestCase
             'Pecahan', 'Menyelesaikan masalah', 'non_esensial')['jenis']);
     }
 
-    public function testNamaLebihDari35Ditolak(): void
+    public function testNamaLebihDari50Ditolak(): void
     {
         $this->expectException(DomainException::class);
-        TpBabService::validasiInput(1, str_repeat('A', 36), 'Deskripsi', 'esensial');
+        TpBabService::validasiInput(1, str_repeat('A', 51), 'Deskripsi', 'esensial');
+    }
+
+    public function testNama50KarakterDiterima(): void
+    {
+        self::assertSame(str_repeat('A', 50),
+            TpBabService::validasiInput(1, str_repeat('A', 50), 'Deskripsi', 'esensial')['nama']);
+    }
+
+    public function testDeskripsi225KarakterDiterima(): void
+    {
+        self::assertSame(225, mb_strlen(
+            TpBabService::validasiInput(1, 'Nama', str_repeat('x', 225), 'esensial')['deskripsi']));
     }
 
     public function testDeskripsiLebihDari225Ditolak(): void
