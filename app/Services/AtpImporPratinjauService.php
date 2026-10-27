@@ -77,7 +77,7 @@ final class AtpImporPratinjauService
 
         $hasil = AtpExcelParserService::baca($file, (string) $paket['kode_mapel'],
             (int) $paket['semester_mulai'], (string) $paket['kode_gen'],
-            array_column($elemen, 'elemen'));
+            array_column($elemen, 'elemen'), (int) $cp[0]['id']);
 
         // Paket yang dibandingkan harus identik Gen–Mapel–TA–Kurikulum, bukan seluruh G1.
         $daftarPaket = $this->db->table('paket_semester')
