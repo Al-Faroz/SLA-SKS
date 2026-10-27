@@ -42,6 +42,16 @@ final class AtpUnduhanServiceTest extends TestCase
             self::assertNull($buku->getSheetByName('SEMESTER 4')->getCell('A13')->getValue());
             self::assertNull($buku->getSheetByName('SEMESTER 4')->getCell('A39')->getValue());
             self::assertSame('D39:D118', $buku->getSheetByName('SEMESTER 4')->getDataValidation('D39')->getSqref());
+            // Kualitas tampilan output harus mengikuti desain Peta Pembelajaran lama.
+            $semester = $buku->getSheetByName('SEMESTER 4');
+            self::assertSame('12364A', $semester->getStyle('A1')->getFill()->getStartColor()->getRGB());
+            self::assertSame('FFFFFF', $semester->getStyle('A1')->getFont()->getColor()->getRGB());
+            self::assertSame('078783', $semester->getStyle('A12')->getFill()->getStartColor()->getRGB());
+            self::assertSame('E4F3FC', $semester->getStyle('A13')->getFill()->getStartColor()->getRGB());
+            self::assertSame('DAF2E7', $semester->getStyle('D39')->getFill()->getStartColor()->getRGB());
+            self::assertFalse($semester->getShowGridLines());
+            self::assertSame(AtpUnduhanService::VERSI, (string) $semester->getCell('A2')->getValue());
+            self::assertSame('H39:H118', $semester->getDataValidation('H39')->getSqref());
 
             $temp = tempnam(sys_get_temp_dir(), 'uji_atp_');
             self::assertNotFalse($temp);
