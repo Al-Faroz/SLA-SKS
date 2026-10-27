@@ -52,3 +52,7 @@
 Struktur **Mapel → CP → Semester → BAB → TP**, Esensial tanpa Materi/nilai dan NonEsensial tepat satu Materi. Diagnostik gate, Sumatif wajib minimal 30, remedial satu jika di bawah KKM, bobot 20/20/60 atau 100% Sumatif. Pra-Semester serentak sesuai Admin setelah TP NonEsensial selesai; ekspor nilai parsial Guru tersedia; **tidak ada nilai akhir semester**. **Keputusan terakhir:** gunakan Excel ATP manual `.xlsx` tanpa macro dan tanpa pembentukan otomatis. File pengganti perlu ditambahkan ke repository setelah review struktur sel.
 
 Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-10-26.md), [rencana](RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md), [audit DB](AUDIT-DATABASE-V3-KE-V4-2026-10-26.md).
+
+
+## Checkpoint terkini
+- [Checkpoint 27 Oktober 2026 — ATP UI/UX FIX & arah diskusi redesain](CHECKPOINT-PENGEMBANGAN-2026-10-27-ATP-UI-FIX.md). Catatan serah-terima status nyata, QA, PR bertingkat, batas DB 35→50 dan baseline desain yang disetujui; **bukan pernyataan seluruh fitur v2.5 selesai**.
