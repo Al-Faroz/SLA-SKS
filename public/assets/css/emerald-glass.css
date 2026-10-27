@@ -99,7 +99,7 @@ html[data-theme] .a-btn:hover:not(:disabled) {
 }
 html[data-theme] .a-btn--utama,html[data-theme] .a-publik--prototipe .a-btn--utama,
 html[data-theme] .a-app--prototipe .a-btn--utama {
-  color:#FFFFFF;background:linear-gradient(112deg,#0D674A,#14885E,#1AA97B);
+  color:#FFFFFF;background:linear-gradient(112deg,#0A4C39,#126C51,#147858);
   border-color:#17835B;box-shadow:0 6px 16px rgba(0,45,27,.15);
 }
 html[data-theme] .a-btn--utama:hover:not(:disabled) {
@@ -237,3 +237,11 @@ html[data-theme] {
 }
 html[data-theme] .a-glass-gallery { margin-block:16px; }
 html[data-theme] .a-glass-gallery .a-card { min-height:88px; }
+
+/* Kontras tulisan putih pada seluruh titik gradient tombol utama >= WCAG AA. */
+html[data-theme] .a-btn--utama:hover:not(:disabled),
+html[data-theme] .a-publik--prototipe .a-btn--utama:hover:not(:disabled),
+html[data-theme] .a-app--prototipe .a-btn--utama:hover:not(:disabled) {
+  color:#FFFFFF;background:linear-gradient(112deg,#093E30,#105D44,#126C4E);
+  border-color:#126C4E;
+}
