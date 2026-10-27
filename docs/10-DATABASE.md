@@ -8,7 +8,7 @@
 ## 2. Kelompok tabel logis
 **Audit v3 lokal per dump 26-10-2026:** 52 tabel, 37 pengguna, 17 siswa, 20 mapel, 3 `ref_cp`, 1 paket, 1 TP aktif lama, empat Materi pada TP itu, 40 soal dan dua attempt Diagnostik. Ini adalah basis **privat** dan bukan data yang boleh di-push.
 
-**Kontrak v4:** `cp_mapel` (satu CP operasional per mapel/kurikulum/fase), `cp_mapel_elemen` (rujukan multi-elemen/versi `ref_cp` lama), `bab` (paket, nomor, kelas, nama35, deskripsi225; keunikan lintas semester berpasangan), `tp` (BAB, CP operasional, jenis esensial/non_esensial, nama35, deskripsi225, nomor urut BAB, kkm_khusus), `materi` maksimal satu aktif per TP, `nilai_tp` (nilai mandiri per TP), `ujian_pra_semester` dan `soal_pra_semester` (bank lintas BAB dan jadwal Admin), `percobaan_ujian` generik dengan tahap normal/remedial, serta checkpoint pada `progres_materi`.
+**Kontrak v4:** `cp_mapel` (satu CP operasional per mapel/kurikulum/fase), `cp_mapel_elemen` (rujukan multi-elemen/versi `ref_cp` lama), `bab` (paket, nomor, kelas, nama50, deskripsi225; keunikan lintas semester berpasangan), `tp` (BAB, CP operasional, jenis esensial/non_esensial, nama50, deskripsi225, nomor urut BAB, kkm_khusus), `materi` maksimal satu aktif per TP, `nilai_tp` (nilai mandiri per TP), `ujian_pra_semester` dan `soal_pra_semester` (bank lintas BAB dan jadwal Admin), `percobaan_ujian` generik dengan tahap normal/remedial, serta checkpoint pada `progres_materi`.
 
 **Data lama penting tetap ada:** pengguna, peran, siswa, mapel, kurikulum, referensi, Gen, penugasan guru, identitas, materi/soal/percobaan/snapshot. TP uji v3 yang memiliki **4 Materi** diarsipkan dan materi lamanya dinonaktifkan **hanya pada salinan v4** untuk menghindari pelanggaran ketentuan satu Materi aktif per TP. Tidak mengubah progres/percobaan historis. File fisik di `writable/` perlu backup terpisah.
 
@@ -65,3 +65,7 @@ memakai SQL 0018 yang additive dan hanya diimpor jika diperlukan.
 - `jawaban_hots_materi`: pengumpulan HOTS siswa, status final/draf, nilai, identitas penilai; terpisah dari `resume_materi`.
 - Belum selaras: `KesiapanTpService` saat ini hanya memeriksa `petunjuk_hots`, belum ada pengecekan baris bank Guru. Master 05 mewajibkan satu tugas HOTS per Materi. **Jangan mengubah kebijakan, memutasi TP Siap atau menambah tugas otomatis** sebelum dump terbaru dan implikasi snapshot dinilai.
 - Koreksi struktur historis harus memakai patch baru dan uji kegagalan impor sebagian, tidak menamai ulang atau membuat ulang tabel yang sudah ada.
+
+
+### Revisi nama BAB/TP 27 Oktober 2026
+Batas nama akademik `bab.nama_bab` dan `tp.nama_tp` berubah dari `VARCHAR(35)` menjadi **`VARCHAR(50)`** tanpa perubahan `deskripsi_bab`/`deskripsi_tp` (`VARCHAR(225)`). Database v4 R2 yang telah dipasang tidak boleh diimpor ulang atau direset; gunakan hanya patch additive/pelebaran kolom **bernomor baru**, setelah backup serta pemeriksaan dump XAMPP terkini. TP draf dan BAB yang sudah tersimpan tetap dipertahankan.

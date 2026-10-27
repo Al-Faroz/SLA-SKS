@@ -1,7 +1,7 @@
 # Status keputusan Master v2.5 — 26 Oktober 2026
 
 ## Keputusan final
-- CP → Semester → BAB → TP; satu CP operasional/mapel, beberapa elemen; BAB/TP 35+225, kode `MAPEL.KELAS.BAB.TP`, nomor BAB sambung 1–2/3–4/5–6.
+- CP → Semester → BAB → TP; satu CP operasional/mapel, beberapa elemen; BAB/TP 50+225, kode `MAPEL.KELAS.BAB.TP`, nomor BAB sambung 1–2/3–4/5–6.
 - TP Esensial tanpa media/ujian/nilai, tetap masuk ATP/sertifikat. TP NonEsensial tepat satu Materi.
 - Diagnostik ≥10 gate; Sumatif ≥30 wajib, bobot jalur gagal 20/20/60 atau lulus 100% Sumatif, KKM default Admin/khusus Guru, 1 remedial <KKM ambil nilai tertinggi, TP Selesai meski nilai di bawah KKM.
 - Guru isi ATP langsung atau Excel ATP manual `.xlsx` tanpa macro dan tanpa tombol Proses; file adaptasi lokal sudah dibuat, integrasi generator/impor aplikasi masih belum dikerjakan. Progres persemester hanya NonEsensial.

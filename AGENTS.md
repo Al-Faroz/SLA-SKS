@@ -1,7 +1,7 @@
 # Instruksi Coding Assistant — SLA-SKS Master v2.5
 
 1. Baca `README.md`, `docs/README.md`, dokumen domain 01–16 terkait dan `docs/PENDING-DECISIONS.md` sebelum mengubah kode.
-2. **Kontrak akademik v2.5:** 1 Mapel → 1 CP operasional → Semester → BAB → TP. Esensial tanpa materi/nilai, NonEsensial tepat satu Materi. Kode `MAPEL.KELAS.BAB.TP`, nama ≤35, deskripsi ≤225, BAB berlanjut semester berpasangan.
+2. **Kontrak akademik v2.5:** 1 Mapel → 1 CP operasional → Semester → BAB → TP. Esensial tanpa materi/nilai, NonEsensial tepat satu Materi. Kode `MAPEL.KELAS.BAB.TP`, nama ≤50, deskripsi ≤225, BAB berlanjut semester berpasangan.
 3. Fase D dan KBC/Panca Cinta tetap relevan. **Aturan akademik v2.5:** Diagnostik ≥10 soal hanya menjadi gerbang; siswa lulus boleh melewati Materi/Resume/HOTS, tetapi tetap WAJIB Sumatif ≥30 soal. Siswa tidak lulus menjalani tepat satu Materi → Resume → HOTS → Sumatif. Nilai jalur gagal 20/20/60, jalur lulus 100% Sumatif; remedial hanya sekali bila Sumatif di bawah KKM, skor tertinggi dipakai. TP Selesai tidak mensyaratkan skor ≥KKM. Tidak ada nilai akhir semester.
 4. **G1 per Gen–Mapel**; paket/TP/materi/soal Gen A tidak dipakai otomatis untuk Gen B. Cek hak di Controller DAN Service; satu Admin cukup, usulan akademik tidak self-approved.
 5. **Keputusan final Excel:** pengguna memilih template ATP **MANUAL tanpa macro** (.xlsx), tanpa tombol Proses dan tanpa file .bas. Template 10 sheet (MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII) sudah dihasilkan lokal dan perlu direview/ditambahkan sebagai file resmi ke docs/ sebelum pengembangan generator/impor. Kode TP diisi manual dan DIVALIDASI SERVER terhadap konteks Gen–Mapel/Kelas/BAB/urutan. Guru juga dapat mengisi ATP langsung dalam aplikasi.
