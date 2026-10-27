@@ -22,7 +22,7 @@
 | 16 | [Pengujian](16-PENGUJIAN-DAN-PENERIMAAN.md) | E2E-001–134 (v2.5 menimpa kasus lama yang berubah) |
 
 ## Template kerja resmi (dokumen non-Master)
-- `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` — berkas lama di repository; template pengganti manual tanpa macro disiapkan dalam percakapan dan perlu ditambahkan ke repository sebagai acuan resmi. Identitas/CP pada hasil unduhan berasal dari database login Guru/Gen–Mapel/Kurikulum.
+- **`docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx` — template resmi ATP v2.5**, sepuluh sheet dan tanpa macro/VBA. Kontrak tetap: [KONTRAK-TEMPLATE-ATP-MANUAL-V25.md](KONTRAK-TEMPLATE-ATP-MANUAL-V25.md). `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` adalah referensi lama, bukan format impor v2.5. Generator unduhan kontekstual dan parser masih tahap berikut.
 - `docs/TEMPLATE_SOAL_SLA-SKS.docx` — struktur Word Soal Global yang diselaraskan ke **SLA-SKS-WORD-V1**, satu tipe PG lima opsi A–E. Generator per TP/jenis ujian mengikuti ukuran bank aktual; **berkas `docs/` berisi contoh, sedangkan unduhan Guru harus menghasilkan semua slot pertanyaan/opsi/kunci kosong sesuai jumlah bank yang diatur di aplikasi**.
 - `docs/assets/galeri-komponen.html` — galeri visual CSS yang diperbarui bersama perubahan kode UI.
 - [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
@@ -49,7 +49,7 @@
 - [KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md](KEPUTUSAN-EDITOR-DAN-KELOLA-SOAL-GURU.md) — keputusan teknis CRUD soal Guru, SunEditor lokal dan perlindungan edit manual dari impor ulang Word.
 
 ## Kontrak perubahan 26 Oktober 2026 (v2.5)
-Struktur **Mapel → CP → Semester → BAB → TP**, Esensial tanpa Materi/nilai dan NonEsensial tepat satu Materi. Diagnostik gate, Sumatif wajib minimal 30, remedial satu jika di bawah KKM, bobot 20/20/60 atau 100% Sumatif. Pra-Semester serentak sesuai Admin setelah TP NonEsensial selesai; ekspor nilai parsial Guru tersedia; **tidak ada nilai akhir semester**. **Keputusan terakhir:** gunakan Excel ATP manual `.xlsx` tanpa macro dan tanpa pembentukan otomatis. File pengganti perlu ditambahkan ke repository setelah review struktur sel.
+Struktur **Mapel → CP → Semester → BAB → TP**, Esensial tanpa Materi/nilai dan NonEsensial tepat satu Materi. Diagnostik gate, Sumatif wajib minimal 30, remedial satu jika di bawah KKM, bobot 20/20/60 atau 100% Sumatif. Pra-Semester serentak sesuai Admin setelah TP NonEsensial selesai; ekspor nilai parsial Guru tersedia; **tidak ada nilai akhir semester**. **Keputusan terakhir:** gunakan Excel ATP manual `.xlsx` tanpa macro dan tanpa pembentukan otomatis. Template manual resmi telah masuk `docs/` pada branch fitur v2.5 (PR bertingkat setelah #68); generator dan impor belum terimplementasi.
 
 Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-10-26.md), [rencana](RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md), [audit DB](AUDIT-DATABASE-V3-KE-V4-2026-10-26.md).
 
