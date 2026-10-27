@@ -59,8 +59,9 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
         $hasil->assertOK();
         $html = $hasil->getJSON() ?? $hasil->getBody();
         self::assertStringContainsString('Peta ATP enam semester', $html);
-        self::assertStringContainsString('TP untuk Guru A', $html);
-        self::assertStringNotContainsString('TP untuk Guru B', $html);
+        // G03 v2.5 menampilkan ringkasan semester; judul TP ada di detail semester.
+        self::assertStringContainsString('GEN-UJI-A', $html);
+        self::assertStringNotContainsString('GEN-UJI-B', $html);
         foreach (range(1, 6) as $semester) {
             self::assertStringContainsString('Semester ' . $semester, $html);
         }
@@ -71,8 +72,8 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
         $hasil = $this->withSession($this->sesi(2))->get('guru/peta-atp');
         $hasil->assertOK();
         $html = $hasil->getBody();
-        self::assertStringContainsString('TP untuk Guru B', $html);
-        self::assertStringNotContainsString('TP untuk Guru A', $html);
+        self::assertStringContainsString('GEN-UJI-B', $html);
+        self::assertStringNotContainsString('GEN-UJI-A', $html);
     }
 
     public function testIndeksPenugasanTidakSahDialihkan(): void
@@ -92,7 +93,7 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
         $hasil = $this->withSession($this->sesi(5))->get('guru/peta-atp');
         $hasil->assertOK();
         self::assertStringContainsString('Belum ada penugasan Guru', $hasil->getBody());
-        self::assertStringNotContainsString('TP untuk Guru A', $hasil->getBody());
+        self::assertStringNotContainsString('GEN-UJI-A', $hasil->getBody());
     }
 
     public function testParameterPilihanBukanAngkaDitolak(): void
