@@ -5,11 +5,11 @@
 
 ## A. Kondisi yang telah diverifikasi
 1. **Repository:** `main` saat pemeriksaan masih memuat kode/aturan model v2.4, tanpa BAB; revisi dokumen v2.5 ada di **PR #65 (DRAFT, belum merge)**. Implementasi CI4 yang sudah berjalan tidak otomatis mengikuti SQL v4.
-2. **Database:** pemilik melaporkan `sla_sks_v4_LOKAL_PRIVAT_DIPERBAIKI_R2.sql` berhasil diimpor dengan **268 kueri**. Keberhasilan impor tersebut belum termasuk bukti QA lengkap tabel/FK/versi; **jangan mengubah `.env` atau menyatakan DB v4 FIX** sebelum QA baca-saja terbukti.
+2. **Database:** pemilik melaporkan `sla_sks_v4_LOKAL_PRIVAT_DIPERBAIKI_R2.sql` berhasil diimpor dengan **268 kueri**. **QA baca-saja 27 Oktober 2026 telah PASS pada indikator awal:** 58 tabel, 126 foreign key, penanda `V4-0001-R2`, 37 pengguna, 17 siswa, 20 mapel, 0 BAB (belum diisi), 4 Materi dan 2 percobaan historis. QA ini belum menggantikan uji seluruh fungsi aplikasi; `.env` pengguna tidak diubah otomatis.
 3. **Excel:** `TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx` sudah dibuat berdasarkan workbook lama. Memiliki **10 sheet** (MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII); 20 baris BAB dan 80 baris TP kosong per semester; **tanpa macro, tombol Proses, rumus pembentukan otomatis**. Tidak ada tugas menanam VBA, meminta pengguna memasang `.bas`, atau membuat `.xlsm`.
 4. **Data historis:** salinan v4 menyimpan pengguna, siswa, CP, soal, media, snapshot dan ujian lama. TP lama memiliki 4 materi sehingga tidak boleh otomatis dianggap TP NonEsensial aktif dalam kontrak satu materi.
 5. **Komponen aplikasi yang bisa dipakai kembali:** `PetaTpService`, `DetailTpService`, `KesiapanTpService`, `ProgresTpSiswaService`, `ProgresMediaMateriSiswaService`, `SiswaUjian` dan rute terkait. Ini titik refaktor, bukan bukti siap untuk v4.
-6. **Hal yang harus diperbaiki pada PR dokumen:** teks AGENTS.md tentang Diagnostik yang langsung menuntaskan TP sudah diperbarui pada branch, seperti juga referensi Excel bermakro. Patch SQL publik V4-0001 di PR masih perlu diselaraskan/ditinjau dengan paket **R2** yang benar-benar diimpor; **jangan menjalankan patch lama di v4**.
+6. **Hal yang harus diperbaiki pada PR dokumen:** teks AGENTS.md tentang Diagnostik yang langsung menuntaskan TP sudah diperbarui pada branch, seperti juga referensi Excel bermakro. Patch SQL publik di PR sudah diperbarui untuk revisi inti **R2** (FK/nullability/penanda versi); **jangan jalankan patch tersebut pada v4 yang sudah berhasil diimpor**. Pemeriksaan sumber versus data historis untuk setiap relasi tetap diperlukan saat modul diaktifkan.
 
 ## B. Kontrak inti yang tidak boleh berubah
 - **Mapel → satu CP operasional (boleh banyak elemen/versi) → Semester → BAB → TP**; enam semester Fase D, nomor BAB berlanjut S1–S2 untuk VII, S3–S4 untuk VIII, S5–S6 untuk IX; kembali BAB 1 pada kelas baru.
@@ -62,4 +62,4 @@
 6. **Belum diputuskan** apakah Pra-Semester harus selesai sebelum sertifikat diterbitkan dan apakah nilainya dicetak; jangan membuat kebijakan tersembunyi.
 
 ## F. Titik mulai yang direkomendasikan
-**Kerjakan Tahap 0 lebih dulu:** QA database v4 R2 dan sinkronisasi patch publik (patch repo sebelumnya belum konsisten), lalu tandai Master v2.5 siap ditinjau. **Tahap 1** menempatkan workbook manual resmi di repository; sesudah itu **Tahap 2–3** mengimplementasikan editor BAB–TP dan impor Excel secara nyata. Jangan melompat ke Pra-Semester/sertifikat sebelum siswa dan nilai TP bekerja.
+**Tahap 0: QA awal database v4 R2 sudah PASS dan patch publik sudah diperbarui; PR #65 masih perlu review serta persetujuan merge.** **Tahap 1** menempatkan workbook manual resmi di repository; sesudah itu **Tahap 2–3** mengimplementasikan editor BAB–TP dan impor Excel secara nyata. Jangan melompat ke Pra-Semester/sertifikat sebelum siswa dan nilai TP bekerja.

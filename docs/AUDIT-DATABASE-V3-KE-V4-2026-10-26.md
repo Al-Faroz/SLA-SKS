@@ -41,3 +41,8 @@ Pemeriksaan teks SQL **bukan bukti impor berhasil**. SQL DDL dapat melakukan imp
 
 ## Langkah setelah dokumen/DB
 Adaptasi Excel ATP bermakro (tahap berikutnya), kemudian refactor CI4 MVC/Service/UI mengikuti [rencana](RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md).
+
+## Hasil QA impor lokal — 27 Oktober 2026
+Pemilik berhasil mengimpor berkas privat **R2** ke `sla_sks_v4` dengan **268 kueri**, lalu menjalankan SQL baca-saja pada phpMyAdmin. Hasilnya: `jumlah_tabel=58`, `jumlah_fk=126`, `versi_database=V4-0001-R2`, `pengguna=37`, `siswa=17`, `mapel=20`, `bab=0`, `materi_historis=4`, dan `percobaan_historis=2`.
+
+**Status:** QA struktur awal dan retensi jumlah inti **PASS**. Belum membuktikan seluruh query/Controller CI4, retensi isi per baris, atau alur E2E; pengujian tahap aplikasi masih diperlukan. Tidak ada dump privat/identitas siswa yang boleh di-commit.
