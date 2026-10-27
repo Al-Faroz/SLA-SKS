@@ -21,7 +21,7 @@ final class PenilaianGuruDatabaseTest extends TestCase
             'failover'=>[],
         ], false);
         foreach ([
-            'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
+            'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT,semester_mulai INTEGER NOT NULL DEFAULT 1)',
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
             'CREATE TABLE pengguna(id INTEGER PRIMARY KEY,nama TEXT)',
             'CREATE TABLE siswa(id INTEGER PRIMARY KEY,pengguna_id INTEGER,angkatan_id INTEGER)',
