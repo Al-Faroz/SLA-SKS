@@ -30,7 +30,8 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Tema didefinisikan oleh html[data-theme="dark"|"light"]; default markup dark, penyimpanan browser key sla-sks-tema. Inisialisasi tema sebelum stylesheet untuk menghindari flicker.
 - Sidebar layout panel desktop 240px expanded / 72px collapsed menggunakan tombol berlatar dan label aria; key preferensi sla-sks-sidebar. Mobile selalu drawer dengan Escape, fokus dan backdrop.
 - Ikon SVG lokal dari subset Lucide, menggunakan sprite di public/assets/icons/lucide-sla.svg; tanpa font icon/CDN wajib. Lisensi dan atribusi lokal dipertahankan.
-- Tombol: primary emerald gradient, secondary dan soft tinted penuh, danger tinted merah, icon button penuh; tidak ada tombol tanpa background. Link teks/badge bukan tombol.
+- Tombol: **primary Indigo–Violet** (bukan gradient hijau, agar kontras dengan latar Emerald Glass), secondary dan soft tinted penuh, danger tinted merah, icon button penuh; tidak ada tombol tanpa background. Link teks/badge bukan tombol. Warna kartu semester tidak berubah.
+- Token Primary Dark: `--eg-cta-gradient: #3448B2 → #4056C2 → #6743BF`; Light: `#3448B2 → #3D50B5 → #6041B5`. Teks putih, hover lebih gelap, border violet lembut; gunakan token `--eg-cta-gradient`, `--eg-cta-hover`, `--eg-cta-border`, dan `--eg-cta-shadow`. Warna ini hanya untuk aksi primer, bukan mengganti token `--e-primary` yang dipakai teks/status emerald.
 - Form, tabel, dialog native, breadcrumb, pager, status dan fokus tetap mengacu kelas a- yang telah ada; tema tidak boleh mengubah otorisasi, nilai, media, route, CSRF atau layanan.
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
