@@ -38,7 +38,7 @@
         <?php else: ?>
             <div class="a-alert a-alert--info" role="status">
                 Struktur dan baris yang dibaca tidak mengandung masalah terdeteksi.
-                Tahap konfirmasi transaksi impor belum diaktifkan.
+                Setelah diperiksa, perubahan dapat disimpan melalui konfirmasi eksplisit di bawah.
             </div>
         <?php endif ?>
         <p class="a-proto-muted">Rencana judul/media Materi pada Excel bukan unggah berkas dan tidak mengubah materi siswa.</p>
