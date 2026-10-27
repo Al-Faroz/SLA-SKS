@@ -26,3 +26,12 @@ Berkas di `docs/` adalah **kerangka master tanpa identitas akun**. Generator und
 **Status setelah PR generator:** Template fisik dan generator unduhan kontekstual Guru → Paket telah dibuat. Tombol unduh muncul pada detail semester dengan paket non-arsip, memverifikasi hak G1 pada Service, mengambil kurikulum/tahun dan CP aktif dari server, mengisi RINGKASAN dan REFERENSI CP, dan menjaga enam sheet input BAB/TP tetap kosong. **Parser, pratinjau dan transaksi impor belum dibuat**. UI tetap menggunakan komponen Emerald Glass yang sudah ada. Tidak ada patch SQL. Unduhan memerlukan paket semester yang sudah dibuat dan CP aktif Fase D; paket lintas Gen maupun arsip ditolak.
 
 **QA:** `php vendor/phpunit/phpunit/phpunit --filter AtpManualTemplateTest`; cek file dapat dibuka Excel/LibreOffice, sheet dan header sesuai, dropdown jenis TP di D39:D118. Pengujian ini tidak menggantikan uji manual upload/otorisasi pada tahap berikutnya.
+
+## Kontrak tampilan workbook (revisi visual)
+- Judul setiap sheet terbaca: teks forest di pita mint terang, tipografi tegas, tinggi baris cukup.
+- Petunjuk ringkas, Bagian A/B dipisahkan, header kontras tinggi; area input BAB/TP bergaris halus dan zebra row. Gridline Excel disembunyikan.
+- Kolom Jenis TP (D39:D118) diberi hijau muda; Judul satu Materi (G39:G118) diberi biru muda. Dropdown D39:D118 dan H39:H118 dipertahankan.
+- Ringkasan berformat label/nilai; referensi CP luas dan dapat membungkus teks; CONTOH MAT VII tetap sekadar ilustrasi, tidak diimpor.
+- Tidak berubah: **10 nama sheet**, versi B4, header BAB A12:C12, header TP A38:J38, **20 BAB + 80 TP** tiap semester, otorisasi G1, larangan macro/VBA/formula, dan semua aturan akademik. UI Emerald Glass pada aplikasi tidak diubah.
+
+Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP. Fungsi parser/impor merupakan tahap berikutnya.
