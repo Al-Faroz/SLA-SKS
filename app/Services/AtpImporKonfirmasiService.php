@@ -45,6 +45,10 @@ final class AtpImporKonfirmasiService
             throw new DomainException('Database v4 R2 diperlukan untuk impor ATP.');
         }
 
+        // Setiap konfirmasi adalah kelompok transaksi independen. Mode strict
+        // CI4 menyimpan flag kegagalan untuk transaksi berikutnya pada koneksi
+        // yang sama, meskipun rollback telah berhasil.
+        $this->db->transStrict(false);
         $this->db->transBegin();
         try {
             // Penugasan merupakan satu-satunya sumber hak akses; FOR UPDATE
