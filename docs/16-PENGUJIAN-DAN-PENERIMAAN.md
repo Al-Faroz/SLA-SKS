@@ -210,7 +210,7 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 |---|---|
 | 113 | Satu CP operasional per Mapel walau beberapa elemen rujukan resmi; versi dan data lama utuh |
 | 114 | Semester→BAB→TP: BAB terus bernomor antardua semester per kelas, reset pada tingkat baru |
-| 115 | Validasi nama BAB/TP ≤35, deskripsi masing-masing ≤225, kode `BIND.8.1.1` sesuai mapel/kelas/BAB/TP |
+| 115 | Validasi nama BAB/TP ≤50, deskripsi masing-masing ≤225, kode `BIND.8.1.1` sesuai mapel/kelas/BAB/TP |
 | 116 | Guru membuat ATP Esensial dan NonEsensial langsung melalui aplikasi |
 | 117 | Impor ATP lama setelah adaptasi: preview, konfirmasi, anti-duplikat, BAB, jenis TP, kode dan konteks Gen |
 | 118 | Esensial tanpa Materi/ujian/nilai, tidak masuk progres, tetap tercantum sertifikat |
