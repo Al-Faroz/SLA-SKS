@@ -951,3 +951,181 @@ html[data-theme] .a-app--prototipe .a-menu-toggle:focus-visible {
     transition:none;
   }
 }
+
+
+/* =========================================================
+   LIGHT MODE & ADMIN-GURU COMPONENT AUDIT V6
+   Scoped corrections for live Admin/Guru classes left hardcoded
+   in app.css. No layout, routes, forms or academic changes.
+   ========================================================= */
+html[data-theme="dark"] {
+  --eg-state-positive:#6AEFC2;
+  --eg-state-caution:#FFD166;
+  --eg-state-danger:#FF9BA6;
+  --eg-state-neutral:#D4EADF;
+  --eg-state-bg:rgba(9,59,43,.67);
+  --eg-state-border:rgba(161,242,200,.24);
+  --eg-detail-bg:rgba(13,54,41,.76);
+  --eg-widget-bg:rgba(17,61,46,.70);
+  --eg-pager-active:#235B4A;
+}
+html[data-theme="light"] {
+  --eg-state-positive:#14664D;
+  --eg-state-caution:#805300;
+  --eg-state-danger:#A72C47;
+  --eg-state-neutral:#314A3D;
+  --eg-state-bg:#EAF5ED;
+  --eg-state-border:#B8D8C5;
+  --eg-detail-bg:#F8FCFA;
+  --eg-widget-bg:#EDF7F0;
+  --eg-pager-active:#175D49;
+}
+/* Pager: compact action controls, distinct selected page, visible focus.
+   Original .a-pager__tombol used fixed light-mode green text. */
+html[data-theme] .a-app--prototipe .a-pager__tombol,
+html[data-theme] .a-app--prototipe a.a-pager__tombol {
+  min-width:40px;
+  min-height:40px;
+  padding:8px 11px;
+  border:1px solid var(--eg-field-line);
+  border-radius:9px;
+  background:var(--e-soft);
+  color:var(--e-text);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+  text-decoration:none;
+}
+html[data-theme] .a-app--prototipe a.a-pager__tombol:hover {
+  background:var(--e-soft-hover);
+  color:var(--e-text);
+  border-color:var(--eg-focus);
+}
+html[data-theme] .a-app--prototipe .a-pager__tombol.is-aktif {
+  background:var(--eg-pager-active);
+  color:#FFFFFF;
+  border-color:var(--eg-state-border);
+  font-weight:750;
+}
+html[data-theme] .a-app--prototipe .a-pager__tombol.is-nonaktif {
+  opacity:.66;
+  cursor:not-allowed;
+}
+html[data-theme] .a-app--prototipe a.a-pager__tombol:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:2px;
+}
+html[data-theme] .a-app--prototipe .a-pager__elipsis {
+  color:var(--e-muted);
+}
+/* Unified non-clickable states for Guru's Bank Soal and TP Siap.
+   Keep label text; do not communicate status by color alone. */
+html[data-theme] .a-app--prototipe .a-soal-status-badge,
+html[data-theme] .a-app--prototipe .a-tp-status {
+  background:var(--eg-state-bg);
+  color:var(--eg-state-neutral);
+  border:1px solid var(--eg-state-border);
+  border-radius:999px;
+  font-weight:700;
+}
+html[data-theme] .a-app--prototipe .a-soal-status-badge.is-aktif,
+html[data-theme] .a-app--prototipe .a-tp-status.is-lengkap {
+  color:var(--eg-state-positive);
+}
+html[data-theme] .a-app--prototipe .a-tp-status.is-kurang {
+  color:var(--eg-state-caution);
+}
+/* Common status badges in Admin/Guru: translucent yet readable. */
+html[data-theme] .a-app--prototipe .a-page .a-badge {
+  background:var(--eg-state-bg);
+  border:1px solid var(--eg-state-border);
+  color:var(--eg-state-neutral);
+}
+html[data-theme] .a-app--prototipe .a-page .a-badge--siap {
+  color:var(--eg-state-positive);
+}
+html[data-theme] .a-app--prototipe .a-page .a-badge--tunggu {
+  color:var(--eg-state-caution);
+}
+html[data-theme] .a-app--prototipe .a-page .a-badge--bahaya {
+  color:var(--eg-state-danger);
+}
+/* Kesiapan TP formerly used a permanently pale surface (#f2f8f5). */
+html[data-theme] .a-app--prototipe .a-kesiapan-ringkasan > div {
+  background:linear-gradient(145deg,var(--eg-sheen),transparent 78%),var(--eg-widget-bg);
+  color:var(--e-text);
+  border:1px solid var(--eg-line);
+  border-radius:12px;
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-kesiapan-ringkasan strong {
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-kesiapan-ringkasan span {
+  color:var(--e-muted);
+}
+/* Native details/summary retained; only light/dark surface and focus. */
+html[data-theme] .a-app--prototipe .a-cp__details {
+  background:var(--eg-detail-bg);
+  border:1px solid var(--eg-line);
+  border-radius:12px;
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-cp__details > summary {
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-cp__details[open] > summary {
+  border-bottom-color:var(--eg-line-soft);
+}
+html[data-theme] .a-app--prototipe .a-cp__details > summary:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:3px;
+  border-radius:8px;
+}
+/* Section jump links are actual clickable navigation: full backgrounds. */
+html[data-theme] .a-app--prototipe .a-page__jumps {
+  background:var(--eg-pane-soft);
+  border:1px solid var(--eg-line);
+  border-radius:12px;
+}
+html[data-theme] .a-app--prototipe .a-page__jumps a {
+  background:var(--e-soft);
+  border:1px solid var(--eg-line-soft);
+  border-radius:9px;
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-page__jumps a:hover {
+  background:var(--e-soft-hover);
+  border-color:var(--eg-field-line);
+}
+html[data-theme] .a-app--prototipe .a-page__jumps a:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:2px;
+}
+/* Native invalid states: danger wins over normal field border/focus. */
+html[data-theme] .a-app--prototipe .a-page :is(.a-field .a-input,.a-field input,.a-field select,.a-field textarea)[aria-invalid="true"] {
+  border-color:var(--eg-state-danger);
+  box-shadow:0 0 0 1px var(--eg-state-danger);
+}
+html[data-theme] .a-app--prototipe .a-page :is(.a-field .a-input,.a-field input,.a-field select,.a-field textarea)[aria-invalid="true"]:focus-visible {
+  outline:2px solid var(--eg-state-danger);
+  outline-offset:2px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-error {
+  color:var(--eg-state-danger);
+}
+/* Consistent field outside .a-field wrappers (Guru filters + editor). */
+html[data-theme] .a-app--prototipe .a-page .a-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  color:var(--e-text);
+  background:var(--eg-field-bg);
+  border:1px solid var(--eg-field-line);
+  border-radius:10px;
+  min-height:44px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-input:focus-visible {
+  outline:2px solid var(--eg-focus);
+  outline-offset:2px;
+}
+@media(prefers-reduced-motion:reduce) {
+  html[data-theme] .a-app--prototipe :is(.a-page__jumps a,.a-pager__tombol) {
+    transition:none;
+  }
+}
