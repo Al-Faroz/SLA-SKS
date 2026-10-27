@@ -56,3 +56,4 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 
 ## Checkpoint terkini
 - [Checkpoint 27 Oktober 2026 — ATP UI/UX FIX & arah diskusi redesain](CHECKPOINT-PENGEMBANGAN-2026-10-27-ATP-UI-FIX.md). Catatan serah-terima status nyata, QA, PR bertingkat, batas DB 35→50 dan baseline desain yang disetujui; **bukan pernyataan seluruh fitur v2.5 selesai**.
+- **[Checkpoint penutupan Emerald Glass UI — 27 Oktober 2026](CHECKPOINT-PENUTUPAN-UI-EMERALD-GLASS-2026-10-27.md)**. Baseline visual diterima dan lingkup redesain ditutup; PR #68 tetap Draft/tidak di-merge. Ringkasan QA yang benar-benar diketahui, status PR #65–#68, batas SQL, kekurangan template Excel ATP v2.5, dan instruksi kembali ke pengembangan fitur.
