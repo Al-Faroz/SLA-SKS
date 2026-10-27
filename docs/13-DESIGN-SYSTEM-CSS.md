@@ -36,6 +36,16 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
 
+### Audit halaman bersama: Profil dan status publik (27 Oktober 2026)
+
+Tahap V8 memperbaiki ketidaksesuaian layout `app/Views/akun/profil.php`: staf **Foto Profil dahulu, satu kartu selebar kontainer**, kemudian **Identitas Akun** dan **Kontak Pribadi** masing-masing setengah lebar pada desktop; keduanya bertumpuk pada HP. Urutan elemen fisik markup diubah agar urutan baca keyboard dan pembaca layar sesuai urutan visual. Untuk Siswa, foto unggah pribadi tetap tidak tersedia sesuai otorisasi aplikasi sekarang; Identitas Siswa menempati seluruh lebar. Profil Guru Gen bagi siswa tetap hanya data profesional yang diperbolehkan.
+
+- Komponen `.a-profil__grid`, foto, galeri, rincian identitas, kontak, pilihan peran dan kartu Guru diberi permukaan Emerald Glass berbatas jelas untuk Dark/Light. Foto disetujui dan foto menunggu tetap tampil melalui rute privasi lama; tidak ada penyimpanan/unggah/permohonan tambahan.
+- Halaman publik yang memakai `.a-card.a-baca` (Ganti Sandi, 403, 404, gangguan sistem, dan Kebijakan Privasi) diberi kartu semi-solid, tipografi, kontras teks/border/fokus input konsisten. **Form POST/CSRF, aksi keluar, redirect dan kebijakan autentikasi tidak berubah.**
+- Tombol **Primary Indigo–Violet**, secondary soft glass, danger lembut; tidak menggunakan palet Colorion oranye/cyan.
+- QA wajib: Profil staf foto aktif/menunggu/kosong, unggah foto, simpan kontak, layar HP; Profil Siswa (identitas full width dan Guru pengampu), akun multi-peran; Ganti Sandi wajib pada login pertama, salah sandi/galat validasi, sukses, tombol keluar; halaman publik 403/404/galat/Kebijakan Privasi. Periksa Dark/Light, 390/820/desktop, urutan Tab, ukuran foto dan tanpa horizontal scroll. **Lulus statis bukan pengganti uji browser XAMPP.**
+- Halaman Pimpinan khusus **belum memiliki View/controller tersendiri dalam repo** dan tidak dibuat pada audit visual ini; implementasi Pimpinan masuk pekerjaan fitur akademik tersendiri berdasarkan Master Document.
+
 ### Audit UI siswa: katalog, media dan aktivitas (27 Oktober 2026)
 
 Implementasi **V7** `public/assets/css/emerald-glass.css` melanjutkan fondasi Dark/Light ke view Siswa yang saat ini tersedia: `siswa/mapel.php`, `siswa/semester.php`, `siswa/daftar_tp.php`, `siswa/rincian_tp.php`, dan `siswa/materi.php`. Ini **perubahan presentasi sementara**, bukan pernyataan seluruh kontrak bisnis siswa v2.5 telah diimplementasikan.
