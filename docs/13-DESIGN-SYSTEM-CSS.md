@@ -34,6 +34,18 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Form, tabel, dialog native, breadcrumb, pager, status dan fokus tetap mengacu kelas a- yang telah ada; tema tidak boleh mengubah otorisasi, nilai, media, route, CSRF atau layanan.
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
+### Penghalusan glass berdasarkan contoh CSS CodeFronts (27-10-2026)
+
+Contoh `.stp-05` milik CodeFronts dipelajari sebagai inspirasi **teknik visual**, bukan sebagai komponen onboarding untuk SLA-SKS. Implementasi tahap penyesuaian memakai `public/assets/css/emerald-glass.css`:
+- Dua atau tiga radial-gradient beropacity rendah disusun pada **container utama `.a-app--prototipe` dan latar publik**, bukan hanya `body`, supaya glow tidak tertutup background shell.
+- Shell/header/sidebar serta panel pembungkus memakai tinted glass semi-pekat, border translucent dan inset highlight; `backdrop-filter` hanya di komponen pilihan. Fallback solid disediakan jika blur tidak didukung.
+- Enam gradient kartu Semester 1–6 **tetap identitas tersendiri**; lapisan sheen transparan tidak mengganti gradient ataupun statistik/tautannya.
+- Form, input, tabel, pembaca materi dan editor tetap memakai bidang padat. Khusus tabel TP dalam BAB, warna kepala tabel, sel kode dan baris diatur konsisten pada Dark dan Light untuk menghindari area putih terang yang kurang terbaca.
+- Modal memakai native `<dialog>`, border tipis, backdrop redup/blur halus, tanpa perubahan submit/validasi/CSRF/fokus bawaan.
+- Jangan menyalin aturan `.stp-05 * { margin:0; padding:0; }` secara global: aturan tersebut akan merusak spacing komponen aplikasi. Jangan menyalin animasi `stp-05-bob` tak berujung, karena siswa membutuhkan layar yang tenang. Warna `--muted` contoh juga tidak langsung digunakan sebagai teks akibat risiko kontras.
+- Semua tombol tetap tampak sebagai tombol dengan latar jelas, termasuk ikon, sekunder, dan tombol di dialog.
+- Tahap glass ini **belum dinyatakan visual QA PASS** sampai pengujian melalui XAMPP pada login, Guru, G03, dark/light, sidebar expanded/collapsed, mobile dan interaksi modal selesai.
+
 ### Tahap implementasi
 Fase pertama mengubah token/shell/galeri dan baseline G03 saja, dipisahkan dalam PR Draft berbasis branch PR #67 (PR #65 -> #66 -> #67 tetap belum merge). QA statis bukan pengganti lint PHP, browser XAMPP, keyboard, dan pemeriksaan visual 360/390/768/1100px serta semua tema. CSS historis memiliki warna hardcoded yang harus diaudit tiap modul sebelum rollout dianggap selesai.
 
