@@ -1468,7 +1468,7 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 
 /* G03 v2.5 — Ringkasan ATP (2 kelompok x 3 semester) dan detail per BAB. */
 .a-atp-kelompok {
-    margin-top: var(--a-ruang-5);
+    margin-top: var(--a-ruang-6);
     padding: clamp(16px, 2vw, 24px);
     background: var(--a-permukaan);
     border: 1px solid var(--a-garis);
@@ -1549,7 +1549,7 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-atp-detail__metrik { display: flex; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; }
 .a-atp-detail__metrik span { display: grid; min-width: 55px; text-align: center; font-size: .78rem; }
 .a-atp-detail__metrik strong { font-size: 1.5rem; }
-.a-atp-detail__toolbar { display: flex; justify-content: space-between; align-items: center; gap: var(--a-ruang-5); flex-wrap: wrap; }
+.a-atp-detail__toolbar { display: flex; justify-content: space-between; align-items: center; gap: var(--a-ruang-6); flex-wrap: wrap; }
 .a-atp-detail__toolbar > div:first-child { flex: 1 1 320px; }
 .a-atp-detail__toolbar h2 { margin: 0 0 8px; }
 .a-atp-detail__toolbar p { margin: 0; max-width: 870px; }
