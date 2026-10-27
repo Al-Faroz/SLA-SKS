@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Services\AturanBabService;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
+use App\Services\PaketSemesterGuruService;
 use App\Services\PetaTpService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
@@ -25,7 +26,11 @@ final class GuruPetaTp extends BaseController
             $dipilih = PetaTpService::pilihPenugasan($pilihan, $nomorPilihan);
 
             $semester = [];
+            $opsiPaket = ['tahun' => [], 'kurikulum' => []];
             if ($dipilih !== null) {
+                $opsiPaket = (new PaketSemesterGuruService())->referensi(
+                    (int) $dipilih['angkatan_id'], (int) $dipilih['mapel_id']
+                );
                 for ($nomor = 1; $nomor <= 6; $nomor++) {
                     $semester[$nomor] = $service->petaSemester(
                         (int) $dipilih['angkatan_id'],
@@ -51,6 +56,7 @@ final class GuruPetaTp extends BaseController
             'pilihan' => $pilihan,
             'dipilih' => $dipilih,
             'semester' => $semester,
+            'opsiPaket' => $opsiPaket,
         ]);
     }
 

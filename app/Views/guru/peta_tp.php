@@ -10,7 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Guru · Pembelajaran</p>
             <h1>Peta ATP enam semester</h1>
-            <p class="a-proto-muted">Susun BAB per semester sesuai Gen–Mapel. Nomor BAB diatur server dan berlanjut antardua semester pada kelas yang sama. TP dan impor Excel dilanjutkan pada tahap berikutnya.</p>
+            <p class="a-proto-muted">Buat paket draf bila semester belum memiliki paket, lalu susun BAB dan TP per Gen–Mapel. Kode TP serta nomor BAB dibuat oleh server. Impor Excel manual dikerjakan pada tahap berikutnya.</p>
         </div>
     </header>
 
@@ -123,6 +123,38 @@
                 <?php endif ?>
                 <?php if ($data['paket'] === []): ?>
                     <div class="a-empty" role="status"><p>Belum ada paket pembelajaran pada semester ini.</p></div>
+                    <?php if ($nomor >= (int) ($dipilih['semester_mulai'] ?? 1)
+                        && ($opsiPaket['tahun'] ?? []) !== [] && ($opsiPaket['kurikulum'] ?? []) !== []): ?>
+                        <form method="post" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/paket-semester/baru'), 'attr') ?>">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="pilihan" value="<?= (int) array_search($dipilih, $pilihan, true) ?>">
+                            <input type="hidden" name="gen_id" value="<?= (int) $dipilih['angkatan_id'] ?>">
+                            <input type="hidden" name="mapel_id" value="<?= (int) $dipilih['mapel_id'] ?>">
+                            <input type="hidden" name="semester" value="<?= (int) $nomor ?>">
+                            <div class="a-field">
+                                <label class="a-label" for="tahun-paket-<?= (int) $nomor ?>">Tahun ajaran</label>
+                                <select id="tahun-paket-<?= (int) $nomor ?>" name="tahun_id" required>
+                                    <option value="">Pilih tahun ajaran</option>
+                                    <?php foreach ($opsiPaket['tahun'] as $tahun): ?>
+                                        <option value="<?= (int) $tahun['id'] ?>"><?= esc($tahun['nama']) ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <div class="a-field">
+                                <label class="a-label" for="kurikulum-paket-<?= (int) $nomor ?>">Kurikulum</label>
+                                <select id="kurikulum-paket-<?= (int) $nomor ?>" name="kurikulum_id" required>
+                                    <option value="">Pilih kurikulum</option>
+                                    <?php foreach ($opsiPaket['kurikulum'] as $kurikulum): ?>
+                                        <option value="<?= (int) $kurikulum['id'] ?>"><?= esc($kurikulum['nama'] . ' — ' . $kurikulum['versi']) ?></option>
+                                    <?php endforeach ?>
+                                </select>
+                            </div>
+                            <p class="a-proto-muted">Paket baru hanya disimpan sebagai draf. Siswa belum dapat mengaksesnya.</p>
+                            <button type="submit" class="a-btn a-btn--utama">Buat Paket Draf Semester <?= (int) $nomor ?></button>
+                        </form>
+                    <?php elseif ($nomor >= (int) ($dipilih['semester_mulai'] ?? 1)): ?>
+                        <div class="a-alert" role="status">Tahun ajaran atau kurikulum belum tersedia. Hubungi Admin untuk melengkapi referensi.</div>
+                    <?php endif ?>
                 <?php elseif ($data['tp'] === []): ?>
                     <div class="a-empty" role="status"><p>Paket telah dibuat, tetapi belum memiliki TP.</p></div>
                 <?php else: ?>
