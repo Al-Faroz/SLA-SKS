@@ -36,6 +36,19 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
 
+### Audit Light Mode dan komponen Admin/Guru (27 Oktober 2026)
+
+Audit terhadap `public/assets/css/app.css`, `emerald-glass.css` dan view Admin/Guru menunjukkan beberapa komponen lama belum ber-token: `.a-pager__tombol` memakai foreground hijau gelap pada Dark Mode, `.a-soal-status-badge`, `.a-tp-status`, dan `.a-kesiapan-ringkasan` memakai pastel terang, `.a-cp__details` tetap `#f9fcfa`, serta `.a-page__jumps a:hover` masih hardcode. Komponen ini diperbaiki lewat lapisan **V6** di `emerald-glass.css` dengan selector yang dibatasi ke shell Admin/Guru.
+
+- Pager: background pada setiap kontrol, state aktif tetap hijau gelap dengan tulisan putih, focus-visible dan disabled dibedakan. Navigasi dan nomor halaman bukan diubah.
+- Status: token `--eg-state-*` untuk siap/aktif, menunggu, bahaya, normal; badge status tetap berupa teks dan tidak menjadi tombol. Status Bank Soal dan Kesiapan TP memakai label yang diberikan server.
+- Ringkasan Kesiapan TP dan native `<details><summary>` CP: panel tinted glass Dark/Light dengan teks warna tema; keyboard focus outline tetap ada.
+- Link loncat ke subbagian (`.a-page__jumps`) memperoleh latar tombol yang nyata sesuai keputusan desain, tanpa mengganti href.
+- Field `.a-input` lepas dari wrapper dan `[aria-invalid=true]` menggunakan border/focus error kontras. Checkbox/radio/file tetap memakai native control; pemrosesan POST, `required`, `maxlength`, dan validasi server tidak berubah.
+- Pratinjau di `docs/assets/galeri-komponen.html` adalah contoh tanpa data nyata. Warna tombol tetap hasil keputusan rollback **Indigo–Violet Primary, Secondary soft glass, Danger muted**; tidak ada Colorion oranye/cyan.
+- QA wajib XAMPP: Admin Beranda/Pengelola/Kurikulum CP, Guru Bank Soal/Kesiapan TP/Antrean Penilaian/Peta ATP; Dark/Light pada 390px, 820px dan desktop; penanda aktif pager, `summary` dibuka/ditutup, status/badge, field invalid, focus ring dan seluruh tombol yang memicu navigasi POST. Jangan menyatakan selesai hanya berdasarkan pemeriksaan CSS.
+- Setelah modul yang sama dinyatakan FIX, lakukan konsolidasi lapisan `emerald-glass.css` yang masih memakai beberapa override bertingkat; dokumentasi ini bukan izin mengubah aturan atau struktur akademik.
+
 ### QA responsif tablet dan drawer HP (27-10-2026)
 
 **Audit sumber aktual:** `app.css` mengganti `.a-tbl--cards` menjadi mode kartu pada lebar <=980px, sementara override Dark/Light di `emerald-glass.css` sebelumnya berlaku <=767px. Akibatnya kartu tabel pada 768–980px masih dapat memakai `background: #fff` milik CSS historis. Penanganan sementara tahap ini: komponen kartu tabel pada **seluruh <=980px** memakai token permukaan, border, label `data-label`, zebra/hover aman, tata letak <=420px satu kolom, dan tombol/form dalam sel tidak terpotong. Tabel padat non-kartu tetap boleh digulir **di dalam kontainer tabel**, tanpa scrollbar menyeluruh.
