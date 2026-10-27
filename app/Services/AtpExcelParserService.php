@@ -100,7 +100,7 @@ final class AtpExcelParserService
      * @return array{bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,jumlah_bab:int,jumlah_tp:int}
      */
     public static function baca(string $path, string $kodeMapel, int $semesterMulai,
-        string $kodeGen, array $elemenDiizinkan = []): array
+        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0): array
     {
         if ($semesterMulai < 1 || $semesterMulai > 6 || $kodeGen === '') {
             throw new DomainException('Konteks Gen tidak valid.');
@@ -112,7 +112,7 @@ final class AtpExcelParserService
             throw new DomainException('File Excel ATP gagal dibaca. Gunakan template resmi .xlsx.', 0, $e);
         }
         try {
-            return self::bacaBuku($buku, $kodeMapel, $semesterMulai, $kodeGen, $elemenDiizinkan);
+            return self::bacaBuku($buku, $kodeMapel, $semesterMulai, $kodeGen, $elemenDiizinkan, $cpId);
         } finally {
             $buku->disconnectWorksheets();
         }
@@ -135,8 +135,9 @@ final class AtpExcelParserService
         // Identitas berkas sekadar pengecekan konsistensi, bukan sumber otorisasi.
         $ringkasan = $buku->getSheetByName('RINGKASAN');
         if (self::nilai($ringkasan, 'B5') !== $kodeGen
-            || self::nilai($ringkasan, 'B9') !== $kodeMapel) {
-            throw new DomainException('Identitas Gen/Mapel pada file tidak sesuai penugasan yang dipilih.');
+            || self::nilai($ringkasan, 'B9') !== $kodeMapel
+            || ($cpId > 0 && self::nilai($ringkasan, 'B14') !== (string) $cpId)) {
+            throw new DomainException('Identitas Gen/Mapel/CP pada file tidak sesuai penugasan yang dipilih.');
         }
         foreach ($buku->getAllSheets() as $sheet) {
             // Formula tersembunyi pada sheet panduan, CP atau di luar area tabel juga ditolak.
@@ -154,6 +155,15 @@ final class AtpExcelParserService
         $tp = [];
         for ($s = 1; $s <= 6; $s++) {
             $sheet = $buku->getSheetByName('SEMESTER ' . $s);
+            if (self::nilai($sheet, 'A2') !== AtpUnduhanService::VERSI) {
+                throw new DomainException('SEMESTER ' . $s . '!A2: versi sheet tidak sah.');
+            }
+            if ($sheet->getHighestDataRow() > 118
+                || self::nilai($sheet, 'A33') !== ''
+                || self::nilai($sheet, 'B33') !== ''
+                || self::nilai($sheet, 'C33') !== '') {
+                throw new DomainException('SEMESTER ' . $s . ': data di luar rentang input BAB/TP resmi.');
+            }
             foreach (self::HEADER_BAB as $idx => $judul) {
                 $kolom = chr(65 + $idx) . '12';
                 if (self::nilai($sheet, $kolom) !== $judul) {
@@ -260,12 +270,18 @@ final class AtpExcelParserService
             if ($nomor === []) {
                 continue;
             }
-            sort($nomor, SORT_NUMERIC);
+            // Pembacaan mengikuti semester lalu baris: BAB S genap tidak boleh
+            // mendahului/mengulang BAB semester ganjil sekelas.
             foreach ($nomor as $i => $n) {
                 if ($n !== $i + 1) {
                     throw new DomainException('Kelas semester ' . $awal . '–' . ($awal + 1)
-                        . ': nomor BAB harus berurutan mulai 1 tanpa ganda.');
+                        . ': nomor BAB harus berurutan mulai 1 tanpa ganda dan sesuai urutan semester.');
                 }
+            }
+            if ($nomor !== [] && isset($babSem[$awal + 1]) && ! isset($babSem[$awal])
+                && $semesterMulai !== $awal + 1) {
+                throw new DomainException('Semester ' . ($awal + 1)
+                    . ': susun BAB semester ganjil pada kelas yang sama terlebih dahulu.');
             }
         }
         foreach ($tpSem as $s => $perBab) {
