@@ -1,4 +1,5 @@
-/* Navigasi panel responsif. Tidak memproses hak akses atau menyimpan data. */
+/* Navigasi panel HP: drawer fokus-terjaga, Escape, backdrop & scroll lock.
+   Tidak memodifikasi rute/peran/menu yang disiapkan server. */
 (() => {
     'use strict';
 
@@ -8,34 +9,79 @@
     const toggle = shell.querySelector('[data-menu-toggle]');
     const backdrop = shell.querySelector('[data-menu-close]');
     const side = shell.querySelector('.a-side');
-    if (!toggle || !backdrop || !side) return;
+    const main = shell.querySelector('.a-main');
+    if (!toggle || !backdrop || !side || !main) return;
 
     const mobile = window.matchMedia('(max-width: 767px)');
+    let locked = false;
+    let previousOverflow = '';
+
+    const focusableMenu = () => [...side.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )].filter((element) => !element.hidden && element.getClientRects().length > 0);
 
     function setOpen(open, restoreFocus = false) {
-        const shouldOpen = open && mobile.matches;
+        const shouldOpen = Boolean(open && mobile.matches);
+        const wasOpen = shell.classList.contains('is-menu-open');
+
+        if (shouldOpen && !locked) {
+            previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            locked = true;
+        }
+        if (!shouldOpen && locked) {
+            document.body.style.overflow = previousOverflow;
+            locked = false;
+        }
+
         shell.classList.toggle('is-menu-open', shouldOpen);
         toggle.setAttribute('aria-expanded', String(shouldOpen));
+        toggle.setAttribute('aria-label', shouldOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
         backdrop.hidden = !shouldOpen;
-        if (restoreFocus && !shouldOpen) toggle.focus();
-        if (shouldOpen) {
-            const firstLink = side.querySelector('a');
-            if (firstLink) firstLink.focus();
+
+        // Inert mencegah Tab dan pembaca layar masuk ke konten di balik drawer.
+        // Pastikan dilepas sebelum fokus dikembalikan ke toggle.
+        main.inert = shouldOpen;
+        if (shouldOpen && !wasOpen) {
+            const first = focusableMenu()[0];
+            if (first) first.focus();
+        } else if (!shouldOpen && restoreFocus && mobile.matches) {
+            toggle.focus();
         }
     }
 
-    toggle.addEventListener('click', () => {
-        setOpen(!shell.classList.contains('is-menu-open'));
-    });
+    toggle.addEventListener('click', () => setOpen(!shell.classList.contains('is-menu-open')));
     backdrop.addEventListener('click', () => setOpen(false, true));
     side.addEventListener('click', (event) => {
-        if (event.target.closest('a')) setOpen(false);
+        if (event.target.closest('a[href]')) setOpen(false, false);
     });
+
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && shell.classList.contains('is-menu-open')) {
+        if (!shell.classList.contains('is-menu-open')) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
             setOpen(false, true);
+            return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const elements = focusableMenu();
+        if (!elements.length) {
+            event.preventDefault();
+            return;
+        }
+
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (event.shiftKey && (document.activeElement === first || !side.contains(document.activeElement))) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && (document.activeElement === last || !side.contains(document.activeElement))) {
+            event.preventDefault();
+            first.focus();
         }
     });
+
     mobile.addEventListener('change', () => setOpen(false));
 })();
 
