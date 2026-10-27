@@ -24,6 +24,13 @@ final class GuruTpBab extends BaseController
         $nomor = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) <= 6
             ? (int) $pilihan : 0;
         $tujuan = site_url('guru/peta-atp') . '?pilihan=' . $nomor;
+        // Redirect ke semester asal modal; nomor hanya dipakai untuk navigasi.
+        // ID objek dan hak G1 tetap divalidasi ulang oleh Service.
+        $semesterPost = $this->request->getPost('semester');
+        if (is_string($semesterPost) && ctype_digit($semesterPost)
+            && (int) $semesterPost >= 1 && (int) $semesterPost <= 6) {
+            $tujuan = site_url('guru/peta-atp/semester/' . (int) $semesterPost) . '?pilihan=' . $nomor;
+        }
 
         if (! is_string($bab) || ! ctype_digit($bab) || strlen($bab) > 18
             || ! is_string($nama) || ! is_string($deskripsi) || ! is_string($jenis)) {
