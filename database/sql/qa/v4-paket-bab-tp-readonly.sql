@@ -12,6 +12,9 @@ SELECT
  (SELECT COUNT(*) FROM ref_semester) AS jumlah_semester,
  (SELECT COUNT(*) FROM ref_kelas WHERE nama IN ('VII','VIII','IX')) AS jumlah_kelas_fase_d,
  (SELECT COUNT(*) FROM cp_mapel) AS jumlah_cp_operasional,
+ (SELECT COUNT(DISTINCT e.cp_mapel_id)
+    FROM cp_mapel_elemen e
+    JOIN ref_cp_versi v ON v.id=e.cp_versi_id AND v.status='aktif') AS cp_operasional_punya_elemen_aktif,
  (SELECT COUNT(*) FROM paket_semester) AS jumlah_paket,
  (SELECT COUNT(*) FROM bab) AS jumlah_bab,
  (SELECT COUNT(*) FROM tp WHERE status = 'draf') AS jumlah_tp_draf,
@@ -19,9 +22,12 @@ SELECT
 
 -- Hanya mapel/kode referensi dan ketersediaan CP; tanpa data siswa.
 SELECT m.id AS mapel_id, m.kode AS kode_mapel,
-       COUNT(DISTINCT cm.id) AS jumlah_cp_mapel
+       COUNT(DISTINCT cm.id) AS jumlah_cp_mapel,
+       COUNT(DISTINCT CASE WHEN v.status='aktif' THEN cm.id END) AS cp_dengan_elemen_aktif
 FROM ref_mapel m
 LEFT JOIN cp_mapel cm ON cm.mapel_id = m.id
+LEFT JOIN cp_mapel_elemen e ON e.cp_mapel_id=cm.id
+LEFT JOIN ref_cp_versi v ON v.id=e.cp_versi_id
 GROUP BY m.id, m.kode
 ORDER BY m.kode;
 
