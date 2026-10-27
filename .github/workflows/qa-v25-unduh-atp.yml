@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'app/Services/AtpUnduhanService.php'
+      - 'app/Services/AtpDesainWorkbookService.php'
       - 'app/Controllers/GuruAtpUnduh.php'
       - 'app/Views/guru/semester_atp.php'
       - 'app/Config/Routes.php'
@@ -33,6 +34,7 @@ jobs:
       - name: Lint PHP modul ATP
         run: |
           php -l app/Services/AtpUnduhanService.php
+          php -l app/Services/AtpDesainWorkbookService.php
           php -l app/Controllers/GuruAtpUnduh.php
           php -l app/Views/guru/semester_atp.php
           php -l app/Config/Routes.php
