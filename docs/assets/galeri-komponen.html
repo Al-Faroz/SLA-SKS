@@ -386,6 +386,33 @@
       <div class="a-penilaian-aksi"><span class="a-btn a-btn--utama">Simpan nilai</span>
       <span class="a-btn a-btn--sekunder">Simpan &amp; berikutnya</span></div>
   </section>
+
+  <section class="a-card" id="galeri-modal-atp" aria-labelledby="galeri-modal-atp-title">
+      <h2 id="galeri-modal-atp-title">G03 · Tambah BAB dan TP melalui modal</h2>
+      <p class="a-help">Contoh tampilan statis: aplikasi membuka dialog dengan tombol, fokus otomatis, Escape atau Batal untuk menutup.</p>
+      <div class="a-modal a-modal--atp" role="group" aria-labelledby="galeri-judul-modal">
+          <div class="a-modal-atp__header">
+              <h3 id="galeri-judul-modal">Tambah TP — BAB 1</h3>
+              <span class="a-btn a-btn--sekunder" aria-hidden="true">✕</span>
+          </div>
+          <div class="a-field">
+              <label class="a-label" for="contoh-modal-nama-tp">Nama TP (maks. 50 karakter)</label>
+              <input id="contoh-modal-nama-tp" type="text" maxlength="50" value="Perkembangan Peradaban Islam" readonly>
+          </div>
+          <div class="a-field">
+              <label class="a-label" for="contoh-modal-deskripsi-tp">Deskripsi TP (maks. 225 karakter)</label>
+              <textarea id="contoh-modal-deskripsi-tp" maxlength="225" readonly>Rumusan tujuan pembelajaran asli tetap dapat dibaca utuh.</textarea>
+          </div>
+          <div class="a-field">
+              <label class="a-label" for="contoh-modal-jenis-tp">Jenis TP</label>
+              <select id="contoh-modal-jenis-tp" disabled><option>NonEsensial</option></select>
+          </div>
+          <div class="a-modal-atp__actions">
+              <span class="a-btn a-btn--sekunder">Batal</span>
+              <span class="a-btn a-btn--utama">Simpan TP Draf</span>
+          </div>
+      </div>
+  </section>
 </main>
 </body>
 </html>
