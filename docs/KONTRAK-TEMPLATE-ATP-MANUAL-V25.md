@@ -35,3 +35,11 @@ Berkas di `docs/` adalah **kerangka master tanpa identitas akun**. Generator und
 - Tidak berubah: **10 nama sheet**, versi B4, header BAB A12:C12, header TP A38:J38, **20 BAB + 80 TP** tiap semester, otorisasi G1, larangan macro/VBA/formula, dan semua aturan akademik. UI Emerald Glass pada aplikasi tidak diubah.
 
 Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP. Fungsi parser/impor merupakan tahap berikutnya.
+
+## Pratinjau impor ATP — tahap 3A, tanpa perubahan data
+- Guru mengunggah `.xlsx` dari halaman detail semester yang memiliki paket sah. Route `POST guru/peta-atp/pratinjau/{paketId}` memakai `auth:guru`, CSRF, dan pemeriksaan penugasan G1 dalam Service.
+- Parser membaca **keenam** sheet SEMESTER 1–6, memvalidasi nama kolom, versi, kode TP, jenis TP, nomor BAB yang berlanjut lintas pasangan semester, urutan TP per BAB, elemen CP aktif, panjang nama/deskripsi, larangan rumus/macro/koneksi, serta batas ZIP 5 MB terkompresi / 25 MB isi. Sheet CONTOH MAT VII tidak diimpor.
+- Pratinjau mengambil konteks Gen–Mapel–Kurikulum–Tahun Ajaran–CP dari **server**, lalu membandingkan dengan BAB/TP tersimpan. Hasil per baris: **Baru / Berubah / Tetap / Galat**, disertai nomor semester dan baris sumber. Baris yang tidak tercantum **bukan perintah hapus**.
+- Perubahan TP Siap, TP arsip, BAB yang berisi TP Siap, nama melebihi batas kolom database terpasang, dan data untuk semester tanpa paket nonarsip diperingatkan sebagai **Galat**.
+- **Tidak ada staging persisten, konfirmasi, INSERT, UPDATE, DELETE, atau impor otomatis** pada tahap 3A. Berkas unggahan sementara dibuang oleh PHP setelah request. Setelah konfirmasi transaksi aman pada tahap berikutnya, data harus divalidasi ulang, termasuk otorisasi, diff, urutan, dan perlindungan histori.
+- UI menggunakan komponen Emerald Glass final dan tidak mengubah desain workbook yang sudah disetujui.

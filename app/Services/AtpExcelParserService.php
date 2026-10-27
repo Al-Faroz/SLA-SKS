@@ -1,0 +1,301 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use DomainException;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use RuntimeException;
+use ZipArchive;
+
+/**
+ * Parser ATP manual v2.5: murni baca, tanpa query maupun mutasi database.
+ * Semua enam semester diproses; CONTOH MAT VII sama sekali tidak menjadi data.
+ */
+final class AtpExcelParserService
+{
+    private const SHEETS = [
+        'MULAI DI SINI', 'RINGKASAN', 'REFERENSI CP',
+        'SEMESTER 1', 'SEMESTER 2', 'SEMESTER 3',
+        'SEMESTER 4', 'SEMESTER 5', 'SEMESTER 6', 'CONTOH MAT VII',
+    ];
+    private const HEADER_BAB = ['Nomor BAB', 'Nama BAB (maks. 50)', 'Deskripsi BAB (maks. 225)'];
+    private const HEADER_TP = [
+        'Nomor BAB', 'Urutan TP', 'Kode TP', 'Jenis TP', 'Nama TP (maks. 50)',
+        'Deskripsi TP (maks. 225)', 'Judul satu Materi', 'Jenis media (rencana)',
+        'Elemen CP (rujukan)', 'Catatan',
+    ];
+
+    /** Periksa ZIP sebelum PhpSpreadsheet memproses XML. */
+    private static function periksaZip(string $path): void
+    {
+        if (! is_file($path) || filesize($path) === false || filesize($path) > 5 * 1024 * 1024) {
+            throw new DomainException('File ATP harus XLSX berukuran paling besar 5 MB.');
+        }
+        $head = file_get_contents($path, false, null, 0, 4);
+        if ($head === false || substr($head, 0, 2) !== 'PK') {
+            throw new DomainException('Berkas bukan XLSX yang sah.');
+        }
+        $zip = new ZipArchive();
+        if ($zip->open($path, ZipArchive::CHECKCONS) !== true) {
+            throw new DomainException('Struktur XLSX tidak dapat dibaca.');
+        }
+        try {
+            if ($zip->numFiles < 6 || $zip->numFiles > 300) {
+                throw new DomainException('Jumlah berkas di dalam XLSX tidak wajar.');
+            }
+            $total = 0;
+            $nama = [];
+            for ($i = 0; $i < $zip->numFiles; $i++) {
+                $info = $zip->statIndex($i);
+                $file = (string) ($info['name'] ?? '');
+                $key = strtolower(str_replace('\\', '/', $file));
+                if ($file === '' || str_contains($key, '../') || str_starts_with($key, '/')
+                    || isset($nama[$key])) {
+                    throw new DomainException('Struktur berkas XLSX tidak aman.');
+                }
+                $nama[$key] = true;
+                $total += (int) ($info['size'] ?? 0);
+                if ($total > 25 * 1024 * 1024 || (int) ($info['size'] ?? 0) > 12 * 1024 * 1024) {
+                    throw new DomainException('Isi XLSX terlalu besar untuk diproses.');
+                }
+                foreach (['vba', 'externallinks', 'connections', 'querytables', 'activex',
+                          'embeddings/', 'customxml/', 'webextensions/'] as $dilarang) {
+                    if (str_contains($key, $dilarang)) {
+                        throw new DomainException('File ATP tidak boleh berisi macro atau koneksi eksternal.');
+                    }
+                }
+            }
+            if (! isset($nama['xl/workbook.xml']) || ! isset($nama['[content_types].xml'])) {
+                throw new DomainException('Struktur workbook XLSX tidak lengkap.');
+            }
+        } finally {
+            $zip->close();
+        }
+    }
+
+    private static function nilai(Worksheet $sheet, string $alamat): string
+    {
+        $sel = $sheet->getCell($alamat);
+        if ($sel->getDataType() === DataType::TYPE_FORMULA) {
+            throw new DomainException('Rumus Excel tidak diizinkan: ' . $sheet->getTitle() . '!' . $alamat . '.');
+        }
+        return trim((string) ($sel->getValue() ?? ''));
+    }
+
+    private static function nomor(string $teks, string $lokasi): int
+    {
+        if (! preg_match('/\A[1-9][0-9]{0,3}\z/D', $teks)) {
+            throw new DomainException($lokasi . ': nomor wajib bilangan bulat positif.');
+        }
+        return (int) $teks;
+    }
+
+    /**
+     * @param list<string> $elemenDiizinkan Nama elemen CP aktif dari SERVER, bukan metadata file.
+     * @return array{bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,jumlah_bab:int,jumlah_tp:int}
+     */
+    public static function baca(string $path, string $kodeMapel, int $semesterMulai,
+        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0): array
+    {
+        if ($semesterMulai < 1 || $semesterMulai > 6 || $kodeGen === '') {
+            throw new DomainException('Konteks Gen tidak valid.');
+        }
+        self::periksaZip($path);
+        try {
+            $buku = IOFactory::load($path);
+        } catch (\Throwable $e) {
+            throw new DomainException('File Excel ATP gagal dibaca. Gunakan template resmi .xlsx.', 0, $e);
+        }
+        try {
+            return self::bacaBuku($buku, $kodeMapel, $semesterMulai, $kodeGen, $elemenDiizinkan, $cpId);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
+    /**
+     * Metode terpisah untuk pengujian workbook sintetis tanpa IO dan tanpa DB.
+     *
+     * @param list<string> $elemenDiizinkan
+     * @return array{bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,jumlah_bab:int,jumlah_tp:int}
+     */
+    public static function bacaBuku(Spreadsheet $buku, string $kodeMapel, int $semesterMulai,
+        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0): array
+    {
+        if ($buku->getSheetNames() !== self::SHEETS
+            || (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue()
+                !== AtpUnduhanService::VERSI) {
+            throw new DomainException('Versi atau susunan 10 sheet ATP tidak sesuai template resmi.');
+        }
+        // Identitas berkas sekadar pengecekan konsistensi, bukan sumber otorisasi.
+        $ringkasan = $buku->getSheetByName('RINGKASAN');
+        if (self::nilai($ringkasan, 'B5') !== $kodeGen
+            || self::nilai($ringkasan, 'B9') !== $kodeMapel
+            || ($cpId > 0 && self::nilai($ringkasan, 'B14') !== (string) $cpId)) {
+            throw new DomainException('Identitas Gen/Mapel/CP pada file tidak sesuai penugasan yang dipilih.');
+        }
+        foreach ($buku->getAllSheets() as $sheet) {
+            // Formula tersembunyi pada sheet panduan, CP atau di luar area tabel juga ditolak.
+            foreach ($sheet->getCellCollection()->getCoordinates() as $alamat) {
+                if ($sheet->getCell($alamat)->getDataType() === DataType::TYPE_FORMULA) {
+                    throw new DomainException('Rumus tidak diizinkan pada ' . $sheet->getTitle()
+                        . '!' . $alamat . '.');
+                }
+            }
+        }
+
+        $babSem = [];
+        $tpSem = [];
+        $bab = [];
+        $tp = [];
+        for ($s = 1; $s <= 6; $s++) {
+            $sheet = $buku->getSheetByName('SEMESTER ' . $s);
+            if (self::nilai($sheet, 'A2') !== AtpUnduhanService::VERSI) {
+                throw new DomainException('SEMESTER ' . $s . '!A2: versi sheet tidak sah.');
+            }
+            if ($sheet->getHighestDataRow() > 118
+                || self::nilai($sheet, 'A33') !== ''
+                || self::nilai($sheet, 'B33') !== ''
+                || self::nilai($sheet, 'C33') !== '') {
+                throw new DomainException('SEMESTER ' . $s . ': data di luar rentang input BAB/TP resmi.');
+            }
+            foreach (self::HEADER_BAB as $idx => $judul) {
+                $kolom = chr(65 + $idx) . '12';
+                if (self::nilai($sheet, $kolom) !== $judul) {
+                    throw new DomainException('SEMESTER ' . $s . '!' . $kolom . ': header BAB berubah.');
+                }
+            }
+            foreach (self::HEADER_TP as $idx => $judul) {
+                $kolom = chr(65 + $idx) . '38';
+                if (self::nilai($sheet, $kolom) !== $judul) {
+                    throw new DomainException('SEMESTER ' . $s . '!' . $kolom . ': header TP berubah.');
+                }
+            }
+
+            for ($row = 13; $row <= 32; $row++) {
+                $kolom = [];
+                foreach (['A','B','C'] as $k) {
+                    $kolom[] = self::nilai($sheet, $k . $row);
+                }
+                if ($kolom === ['', '', '']) {
+                    continue;
+                }
+                $lokasi = 'SEMESTER ' . $s . ' baris ' . $row;
+                if ($s < $semesterMulai) {
+                    throw new DomainException($lokasi . ': Gen ini belum dimulai pada semester tersebut.');
+                }
+                $nomor = self::nomor($kolom[0], $lokasi . ' kolom A');
+                if ($nomor > 999 || $kolom[1] === '' || mb_strlen($kolom[1]) > 50
+                    || $kolom[2] === '' || mb_strlen($kolom[2]) > 225) {
+                    throw new DomainException($lokasi . ': nama BAB wajib 1–50 dan deskripsi 1–225 karakter.');
+                }
+                if (isset($babSem[$s][$nomor])) {
+                    throw new DomainException($lokasi . ': nomor BAB ganda.');
+                }
+                $babSem[$s][$nomor] = true;
+                $bab[] = [
+                    'semester' => $s, 'baris' => $row, 'nomor' => $nomor,
+                    'nama' => $kolom[1], 'deskripsi' => $kolom[2],
+                ];
+            }
+            for ($row = 39; $row <= 118; $row++) {
+                $kolom = [];
+                foreach (range('A', 'J') as $k) {
+                    $kolom[] = self::nilai($sheet, $k . $row);
+                }
+                if (count(array_filter($kolom, static fn (string $v): bool => $v !== '')) === 0) {
+                    continue;
+                }
+                $lokasi = 'SEMESTER ' . $s . ' baris ' . $row;
+                if ($s < $semesterMulai) {
+                    throw new DomainException($lokasi . ': Gen ini belum dimulai pada semester tersebut.');
+                }
+                $nomorBab = self::nomor($kolom[0], $lokasi . ' kolom A');
+                $urutan = self::nomor($kolom[1], $lokasi . ' kolom B');
+                if (! isset($babSem[$s][$nomorBab])) {
+                    throw new DomainException($lokasi . ': nomor BAB tidak ada di Bagian A semester ini.');
+                }
+                $kelas = $s <= 2 ? 7 : ($s <= 4 ? 8 : 9);
+                if (! KodeTpService::cocok($kolom[2], $kodeMapel, $kelas, $nomorBab, $urutan)) {
+                    throw new DomainException($lokasi . ': kode TP tidak sesuai KODEMAPEL.KELAS.BAB.TP.');
+                }
+                $jenis = match ($kolom[3]) {
+                    'Esensial' => 'esensial',
+                    'NonEsensial' => 'non_esensial',
+                    default => throw new DomainException($lokasi . ': jenis TP wajib Esensial/NonEsensial.'),
+                };
+                if ($kolom[4] === '' || mb_strlen($kolom[4]) > 50
+                    || $kolom[5] === '' || mb_strlen($kolom[5]) > 225
+                    || mb_strlen($kolom[6]) > 180 || mb_strlen($kolom[8]) > 150
+                    || mb_strlen($kolom[9]) > 225) {
+                    throw new DomainException($lokasi . ': nama/deskripsi TP wajib dan batas panjang kolom terlampaui.');
+                }
+                if ($jenis === 'esensial' && ($kolom[6] !== '' || $kolom[7] !== '')) {
+                    throw new DomainException($lokasi . ': TP Esensial tidak boleh memiliki rencana Materi/media.');
+                }
+                if ($kolom[7] !== '' && ! in_array($kolom[7], ['YouTube','PDF','Audio','Gambar'], true)) {
+                    throw new DomainException($lokasi . ': jenis media tidak dikenal.');
+                }
+                if ($kolom[8] !== '' && $elemenDiizinkan !== []
+                    && ! in_array($kolom[8], $elemenDiizinkan, true)) {
+                    throw new DomainException($lokasi . ': elemen CP bukan elemen aktif milik Mapel.');
+                }
+                if (isset($tpSem[$s][$nomorBab][$urutan])) {
+                    throw new DomainException($lokasi . ': urutan TP ganda dalam BAB.');
+                }
+                $tpSem[$s][$nomorBab][$urutan] = true;
+                $tp[] = [
+                    'semester' => $s, 'baris' => $row, 'nomor_bab' => $nomorBab,
+                    'urutan' => $urutan, 'kode' => $kolom[2], 'jenis' => $jenis,
+                    'nama' => $kolom[4], 'deskripsi' => $kolom[5],
+                    'materi' => $kolom[6], 'media' => $kolom[7],
+                    'cp_elemen' => $kolom[8], 'catatan' => $kolom[9],
+                ];
+            }
+        }
+
+        // BAB berlanjut pada semester yang sekelas (1-2/3-4/5-6), reset di kelas baru.
+        for ($awal = 1; $awal <= 5; $awal += 2) {
+            $nomor = [];
+            foreach ($bab as $b) {
+                if ($b['semester'] === $awal || $b['semester'] === $awal + 1) {
+                    $nomor[] = $b['nomor'];
+                }
+            }
+            if ($nomor === []) {
+                continue;
+            }
+            // Pembacaan mengikuti semester lalu baris: BAB S genap tidak boleh
+            // mendahului/mengulang BAB semester ganjil sekelas.
+            foreach ($nomor as $i => $n) {
+                if ($n !== $i + 1) {
+                    throw new DomainException('Kelas semester ' . $awal . '–' . ($awal + 1)
+                        . ': nomor BAB harus berurutan mulai 1 tanpa ganda dan sesuai urutan semester.');
+                }
+            }
+            if ($nomor !== [] && isset($babSem[$awal + 1]) && ! isset($babSem[$awal])
+                && $semesterMulai !== $awal + 1) {
+                throw new DomainException('Semester ' . ($awal + 1)
+                    . ': susun BAB semester ganjil pada kelas yang sama terlebih dahulu.');
+            }
+        }
+        foreach ($tpSem as $s => $perBab) {
+            foreach ($perBab as $n => $urutan) {
+                $k = array_keys($urutan);
+                sort($k, SORT_NUMERIC);
+                foreach ($k as $i => $no) {
+                    if ($no !== $i + 1) {
+                        throw new DomainException('SEMESTER ' . $s . ' BAB ' . $n
+                            . ': urutan TP harus mulai 1 dan tanpa jeda.');
+                    }
+                }
+            }
+        }
+        return ['bab' => $bab, 'tp' => $tp, 'jumlah_bab' => count($bab), 'jumlah_tp' => count($tp)];
+    }
+}
