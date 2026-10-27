@@ -1464,3 +1464,81 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-modal--atp { padding: var(--a-ruang-4); max-height: 92dvh; }
     .a-modal-atp__actions .a-btn { flex: 1 1 130px; justify-content: center; }
 }
+
+
+/* G03 v2.5 — Ringkasan ATP (2 kelompok x 3 semester) dan detail per BAB. */
+.a-atp-kelompok { margin-top: var(--a-ruang-6); }
+.a-atp-kelompok__heading { margin-bottom: var(--a-ruang-4); }
+.a-atp-kelompok__heading h2 { margin: 0 0 4px; font-size: 1.24rem; }
+.a-atp-kelompok__heading p { margin: 0; }
+.a-atp-pilihan { max-width: 760px; }
+.a-atp-pilihan .a-field { flex: 1 1 320px; }
+.a-atp-kartu-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--a-ruang-4); }
+.a-atp-warna-1 { --a-atp-warna: #e8f5ed; --a-atp-aksen: #187449; --a-atp-tepi: #bcdeca; }
+.a-atp-warna-2 { --a-atp-warna: #eaf2fc; --a-atp-aksen: #275da2; --a-atp-tepi: #c4d8f1; }
+.a-atp-warna-3 { --a-atp-warna: #fff4df; --a-atp-aksen: #865817; --a-atp-tepi: #efd7a9; }
+.a-atp-warna-4 { --a-atp-warna: #f1ebfa; --a-atp-aksen: #674499; --a-atp-tepi: #d8c7eb; }
+.a-atp-warna-5 { --a-atp-warna: #e6f5f3; --a-atp-aksen: #146c67; --a-atp-tepi: #bee3db; }
+.a-atp-warna-6 { --a-atp-warna: #fcecf0; --a-atp-aksen: #97516a; --a-atp-tepi: #efc8d4; }
+.a-atp-kartu {
+    display: grid; align-content: start; gap: var(--a-ruang-3); min-width: 0;
+    padding: clamp(18px, 2.4vw, 26px); min-height: 220px;
+    border: 1px solid var(--a-atp-tepi); border-radius: 16px;
+    border-top: 5px solid var(--a-atp-aksen);
+    background: var(--a-atp-warna); color: var(--a-teks);
+    text-decoration: none; box-shadow: 0 3px 12px rgb(17 37 26 / .055);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+.a-atp-kartu:hover { transform: translateY(-3px); box-shadow: 0 9px 24px rgb(17 37 26 / .14); }
+.a-atp-kartu:focus-visible { outline: 3px solid var(--a-atp-aksen); outline-offset: 3px; }
+.a-atp-kartu.is-dilewati { opacity: .78; }
+.a-atp-kartu__atas { display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--a-atp-aksen); font-weight: 750; }
+.a-atp-kartu__indeks { font-size: .77rem; letter-spacing: .065em; }
+.a-atp-kartu__judul { font-size: clamp(1.35rem, 2vw, 1.8rem); line-height: 1.16; }
+.a-atp-kartu__status { font-size: .84rem; color: var(--a-atp-aksen); font-weight: 650; }
+.a-atp-kartu__angka { display: flex; flex-wrap: wrap; gap: clamp(16px, 2.4vw, 32px); }
+.a-atp-kartu__angka > span { display: grid; gap: 0; }
+.a-atp-kartu__angka strong { font-size: 1.8rem; line-height: 1.25; }
+.a-atp-kartu__angka small { font-size: .8rem; color: var(--a-redup); }
+.a-atp-kartu__rincian { margin-top: auto; border-top: 1px solid var(--a-atp-tepi); padding-top: var(--a-ruang-3); font-size: .82rem; overflow-wrap: anywhere; }
+.a-atp-detail__header {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+    gap: var(--a-ruang-4); padding: clamp(18px, 3vw, 30px); margin-bottom: var(--a-ruang-4);
+    border: 1px solid var(--a-atp-tepi); border-inline-start: 6px solid var(--a-atp-aksen);
+    border-radius: 16px; background: var(--a-atp-warna);
+}
+.a-atp-detail__header h1 { margin: 5px 0 9px; line-height: 1.2; }
+.a-atp-detail__header h1 small { font-size: .6em; font-weight: 600; }
+.a-atp-detail__eyebrow { color: var(--a-atp-aksen); margin: 0; font-weight: 750; }
+.a-atp-detail__status { color: var(--a-atp-aksen); font-weight: 650; }
+.a-atp-detail__metrik { display: flex; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; }
+.a-atp-detail__metrik span { display: grid; min-width: 55px; text-align: center; font-size: .78rem; }
+.a-atp-detail__metrik strong { font-size: 1.5rem; }
+.a-atp-detail__toolbar { display: flex; justify-content: space-between; align-items: center; gap: var(--a-ruang-5); flex-wrap: wrap; }
+.a-atp-detail__toolbar > div:first-child { flex: 1 1 320px; }
+.a-atp-detail__toolbar h2 { margin: 0 0 8px; }
+.a-atp-detail__toolbar p { margin: 0; max-width: 870px; }
+.a-atp-detail__toolbar-actions { display: flex; align-items: center; }
+.a-atp-pesan-terkunci { color: #775014; background: #fff7e6; border-radius: 8px; padding: 9px 12px; margin-top: 12px !important; }
+.a-atp-bab-list { margin-top: var(--a-ruang-6); }
+.a-atp-bab-card { margin-bottom: var(--a-ruang-4); border: 1px solid var(--a-atp-tepi); border-radius: 15px; overflow: hidden; background: var(--a-atp-warna); }
+.a-atp-bab-card__header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; padding: clamp(16px, 2.2vw, 24px); border-bottom: 1px solid var(--a-atp-tepi); }
+.a-atp-bab-card__header > div:first-child { flex: 1 1 320px; min-width: 0; }
+.a-atp-bab-card__nomor { margin: 0 0 8px; color: var(--a-atp-aksen); font-size: .81rem; font-weight: 750; letter-spacing: .04em; }
+.a-atp-bab-card__header h3 { margin: 0 0 8px; font-size: 1.18rem; overflow-wrap: anywhere; }
+.a-atp-bab-card__deskripsi { margin: 0; line-height: 1.55; overflow-wrap: anywhere; }
+.a-atp-bab-card__aksi { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.a-atp-bab-card__tabel { padding: var(--a-ruang-3); }
+.a-atp-bab-card__tabel .a-tbl { background: #fff; border: 1px solid var(--a-atp-tepi); border-radius: 7px; }
+.a-atp-bab-card__kosong { padding: var(--a-ruang-4); font-size: .91rem; color: var(--a-redup); }
+@media (max-width: 1100px) { .a-atp-kartu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) {
+    .a-atp-kartu-grid { grid-template-columns: 1fr; }
+    .a-atp-kartu { min-height: 0; }
+    .a-atp-detail__header { align-items: stretch; }
+    .a-atp-detail__metrik { width: 100%; justify-content: flex-start; }
+    .a-atp-detail__metrik span { text-align: left; }
+    .a-atp-detail__toolbar-actions { width: 100%; }
+    .a-atp-detail__toolbar-actions .a-btn { flex: 1; justify-content: center; }
+    .a-atp-bab-card__aksi { width: 100%; }
+}
