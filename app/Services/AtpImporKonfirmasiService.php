@@ -263,6 +263,9 @@ final class AtpImporKonfirmasiService
             return $hasil;
         } catch (Throwable $e) {
             $this->db->transRollback();
+            // Mode manual transBegin/transRollback tidak menjalankan reset flag
+            // dari transComplete(). CI4 >=4.6 menyediakan resetTransStatus().
+            $this->db->resetTransStatus();
             throw $e;
         }
     }
