@@ -34,6 +34,20 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Form, tabel, dialog native, breadcrumb, pager, status dan fokus tetap mengacu kelas a- yang telah ada; tema tidak boleh mengubah otorisasi, nilai, media, route, CSRF atau layanan.
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
+
+### Audit lanjutan komponen UI (screenshot XAMPP 27 Oktober 2026)
+
+Temuan visual: gradasi wallpaper dan sidebar sudah mendekati Emerald Glass, tetapi masih terdapat konflik `app.css` dengan lapisan tema pada card, breadcrumb, tabel, input, ikon kartu KPI dan toolbar Excel. Penyesuaian V3 dilakukan **hanya pada CSS** dengan mempertahankan HTML dan seluruh fungsi.
+
+- **Card**: panel pengelolaan dan ATP memakai glass semi-pekat dengan border, shadow lembut dan highlight terkontrol. Kartu KPI tetap empat warna dari enam gradient resmi. Ikon KPI dan shortcut SVG yang sudah ada menggunakan holder tinted dengan border; hindari holder putih besar pada Dark.
+- **Breadcrumb**: tiap tautan berupa tombol navigasi kecil berlatar yang kontras, `[aria-current="page"]` adalah penanda lokasi (bukan tombol), dengan perbedaan state dan fokus yang tegas. Tidak mengubah target link.
+- **Tabel**: seluruh `.a-page .a-tbl` memperoleh token tabel Dark/Light. Header, `th[scope=row]`, isi, zebra, dan hover harus harmonis, dan ada styling khusus untuk `.a-tbl--cards` pada <=767px; label `data-label` tetap terlihat dan tabel yang butuh gulir tetap bisa digulir. Perbaiki putih bawaan `#f4f7f8` dan `#fff` tanpa mengubah isi, pagination atau urutan data.
+- **Form input**: input text, password, textarea, select punya minimum tinggi 44px, border jelas, focus ring, validasi native tetap berlaku; selector mengecualikan checkbox, radio, hidden dan file untuk menjaga perilaku aslinya. Disabled dipisah secara visual. Tidak membuat input custom yang mengubah mekanisme submit.
+- **Pengelola / Siswa**: panel Excel memakai kelas nyata `.a-admin-akun__xlsx`; harus bertema gelap/terang dan tombol Unduh/Impor/Ekspor tetap ber-background. Nama pengguna, keterangan sandi dan status tetap terbaca.
+- **Kartu KPI**: tautan aksi dalam kartu sengaja diberi latar sebagai CTA, berbeda dari deskripsi teks. Ikon inline SVG yang sudah ada tidak diganti secara berlebihan, cukup diberi container yang konsisten.
+- **Perf & aksesibilitas**: glow dekoratif tidak boleh menimbulkan horizontal scrollbar, proses blur hanya di panel, `prefers-reduced-motion` dipertahankan, teks di atas area solid diverifikasi kontras, media/ujian tidak diberi efek yang mengganggu.
+- **QA**: Perubahan ini belum boleh dianggap FIX sebelum screenshot Dark/Light dari Admin Dashboard, Admin Pengelola (toolbar XLSX + tabel), Guru Peta ATP enam kartu, Semester 4 (tabel BAB/TP dan modal), serta pemeriksaan mobile 360px dan 768px dilakukan pada XAMPP. Nilai/database/otorisasi bukan bagian dari revisi ini.
+
 ### Penghalusan glass berdasarkan contoh CSS CodeFronts (27-10-2026)
 
 Contoh `.stp-05` milik CodeFronts dipelajari sebagai inspirasi **teknik visual**, bukan sebagai komponen onboarding untuk SLA-SKS. Implementasi tahap penyesuaian memakai `public/assets/css/emerald-glass.css`:
