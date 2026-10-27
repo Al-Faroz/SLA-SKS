@@ -90,7 +90,7 @@
                         </div>
 
                         <?php foreach ($data['bab'] as $bab): ?>
-                            <?php if ((int) $bab['paket_semester_id'] !== (int) $paketUntukBab['id']) { continue; } ?>
+                            <?php if ($paketUntukBab === null || (int) $bab['paket_semester_id'] !== (int) $paketUntukBab['id']) { continue; } ?>
                             <details class="a-jarak-atas">
                                 <summary>Tambah TP pada BAB <?= (int) $bab['nomor_bab'] ?> — <?= esc($bab['nama_bab']) ?></summary>
                                 <form method="post" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/tp/baru'), 'attr') ?>">
