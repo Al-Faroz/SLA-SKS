@@ -1,17 +1,20 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Galeri Komponen SLA-SKS v2.3</title>
+    <title>Galeri Komponen SLA-SKS · Emerald Glass v2.5</title>
+    <script src="../../public/assets/js/theme-init.js"></script>
+    <script defer src="../../public/assets/js/app.js"></script>
     <link rel="stylesheet" href="../../public/assets/css/app.css">
+    <link rel="stylesheet" href="../../public/assets/css/emerald-glass.css">
 </head>
 <body>
 <main class="a-main__konten">
     <header>
-        <p class="a-kicker">Dokumentasi desain · Prototipe UI v2.3</p>
+        <p class="a-kicker">Dokumentasi desain · Emerald Glass UI v2.5</p>
         <h1>Galeri Komponen SLA-SKS</h1>
-        <p class="a-help">Contoh visual statis, bukan layar aplikasi. Semua kelas menggunakan stylesheet yang sama: <code>public/assets/css/app.css</code>. Tombol contoh tidak disajikan sebagai aksi aplikasi.</p>
+        <p class="a-help">Contoh visual statis, bukan layar aplikasi. Galeri memuat <code>app.css</code> dan <code>emerald-glass.css</code>; pemeriksaan layout panel sebenarnya tetap dilakukan di XAMPP. Tombol contoh tidak disajikan sebagai aksi aplikasi.</p>
     </header>
     <div class="a-galeri-grid">
         <section class="a-card">
@@ -39,7 +42,7 @@
         </section>
         <section class="a-card">
             <h2>Tabel adaptif: desktop menjadi kartu di HP</h2>
-            <p class="a-help">Contoh komponen <code>a-tbl--cards</code>; header kolom tetap semantik, sedangkan setiap sel mempunyai label yang muncul pada layar sempit.</p>
+            <p class="a-help">Contoh komponen <code>a-tbl--cards</code>; header kolom tetap semantik, sedangkan setiap sel mempunyai label. Periksa pada lebar 980, 820, 768, 420 dan 360px dalam Dark/Light Mode; uji final menggunakan halaman Pengelola/Bank Soal XAMPP.</p>
             <div class="a-tabel-gulir">
                 <table class="a-tbl a-tbl--cards">
                     <thead><tr><th scope="col">Nama</th><th scope="col">Gen</th><th scope="col">Status</th><th scope="col">Tindakan</th></tr></thead>
@@ -447,6 +450,150 @@
           </div>
           <div class="a-atp-bab-card__tabel"><table class="a-tbl"><thead><tr><th>Kode TP</th><th>Nama TP</th><th>Jenis</th></tr></thead><tbody><tr><td>SKI.8.1.1</td><td>Perkembangan Daulah</td><td>NonEsensial</td></tr></tbody></table></div>
       </div>
+  </section>
+  <section class="a-card" id="galeri-light-admin" aria-labelledby="galeri-light-admin-title">
+      <h2 id="galeri-light-admin-title">Audit komponen Admin/Guru · Dark dan Light</h2>
+      <p class="a-help">Contoh tampilan tanpa data akademik. Ganti tema di galeri, lalu bandingkan pager, status, rincian CP, dan validasi input. Tautan serta form asli tetap diuji melalui XAMPP.</p>
+      <div class="a-app a-app--prototipe" style="display:block;min-height:auto;background:transparent;margin-top:16px">
+          <div class="a-page" style="display:grid;gap:16px">
+              <div class="a-card">
+                  <h3>Status Guru</h3>
+                  <p style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px">
+                      <span class="a-soal-status-badge is-aktif">Soal aktif</span>
+                      <span class="a-soal-status-badge">Draf</span>
+                      <span class="a-tp-status is-lengkap">Lengkap</span>
+                      <span class="a-tp-status is-kurang">Perlu dilengkapi</span>
+                      <span class="a-badge a-badge--tunggu">Menunggu</span>
+                  </p>
+                  <div class="a-kesiapan-ringkasan" style="margin-top:12px">
+                      <div><strong>4</strong><span>Contoh TP</span></div>
+                      <div><strong>2</strong><span>Contoh BAB</span></div>
+                  </div>
+              </div>
+              <div class="a-card">
+                  <h3>Pagination dan rincian CP</h3>
+                  <div class="a-pager" style="justify-content:flex-start;margin:12px 0">
+                      <span class="a-pager__tombol is-aktif" aria-current="page">1</span>
+                      <span class="a-pager__tombol">2</span>
+                      <span class="a-pager__tombol is-nonaktif">Berikutnya</span>
+                  </div>
+                  <details class="a-cp__details">
+                      <summary>Contoh rincian Capaian Pembelajaran</summary>
+                      <p style="padding:12px 14px">Panel ini tetap dapat dibuka melalui keyboard, tanpa perubahan proses akademik.</p>
+                  </details>
+              </div>
+              <div class="a-card">
+                  <h3>Validasi input</h3>
+                  <div class="a-field" style="margin-top:12px">
+                      <label class="a-label" for="galeri-input-invalid">Nama BAB (contoh galat)</label>
+                      <input id="galeri-input-invalid" class="a-input" type="text" aria-invalid="true" aria-describedby="galeri-error" value="">
+                      <span class="a-error" id="galeri-error">Nama BAB wajib diisi.</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  <section class="a-card" aria-labelledby="galeri-siswa-v7">
+    <h2 id="galeri-siswa-v7">Siswa · Katalog dan ruang belajar (Dark / Light)</h2>
+    <p class="a-help">Demo CSS saja, tanpa data siswa atau pencatatan waktu. Fungsi materi dan checkpoint tetap diuji di aplikasi XAMPP.</p>
+    <div class="a-app a-app--prototipe" style="display:block;min-height:auto;background:transparent;margin-top:16px">
+      <div class="a-page">
+        <div class="a-siswa-kartu-grid">
+          <article class="a-siswa-kartu">
+            <p class="a-proto-eyebrow">Semester 1</p>
+            <h3>Tujuan Pembelajaran Contoh</h3>
+            <span class="a-siswa-status pratinjau">Dapat dibuka</span>
+            <span class="a-btn a-btn--sekunder" aria-hidden="true">Lihat rincian TP</span>
+          </article>
+          <article class="a-siswa-kartu">
+            <p class="a-proto-eyebrow">Semester 2</p>
+            <h3>Pembelajaran berikutnya</h3>
+            <span class="a-siswa-status terkunci">Terkunci</span>
+            <p class="a-help">Selesaikan langkah sebelumnya terlebih dahulu.</p>
+          </article>
+        </div>
+        <div class="a-siswa-aktivasi" style="margin-top:16px">
+          <h3>Status pembelajaran TP</h3>
+          <p class="a-help">Panel status visual; tidak menjalankan aktivasi TP.</p>
+        </div>
+        <div class="a-siswa-media-progres" style="margin-top:16px">
+          <h3>Aktivitas belajar</h3>
+          <p role="status">Contoh tampilan progres — bukan waktu belajar nyata.</p>
+          <progress value="40" max="100" aria-label="Contoh progres tampilan media"></progress>
+          <p class="a-help">Waktu aktif tersimpan harus berasal dari server aplikasi.</p>
+        </div>
+        <div class="a-pembaca-fullscreen" style="margin-top:16px">
+          <div class="a-pembaca-toolbar">
+            <strong class="a-pembaca-toolbar__judul">Pembaca PDF · contoh tampilan</strong>
+            <div class="a-pdf-controls"><span class="a-btn a-btn--sekunder">Sebelumnya</span><output>2 / 5</output><span class="a-btn a-btn--sekunder">Berikutnya</span></div>
+          </div>
+          <div class="a-pembaca-gambar-frame" style="height:120px;min-height:0;display:grid;place-items:center">
+            <p class="a-help">Area baca gambar / PDF — contoh tanpa media.</p>
+          </div>
+        </div>
+        <div class="a-kegiatan-editor" style="margin-top:16px">
+          <h3>Resume Materi</h3>
+          <label class="a-label" for="galeri-siswa-resume">Jawaban (contoh tanpa penyimpanan)</label>
+          <textarea id="galeri-siswa-resume" class="a-kegiatan-teks" rows="4" readonly>Contoh tipografi ruang menulis yang nyaman dan kontras.</textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="a-card" aria-labelledby="galeri-halaman-bersama">
+    <h2 id="galeri-halaman-bersama">Halaman bersama · Profil dan status publik</h2>
+    <p class="a-help">Contoh visual tanpa data akun. Foto teratas full-width, Identitas dan Kontak berdampingan di desktop, bertumpuk di HP. Form dan tombol hanya untuk pratinjau.</p>
+    <div class="a-app a-app--prototipe" style="display:block;min-height:auto;background:transparent;margin-top:16px">
+      <div class="a-profil a-page">
+        <div class="a-profil__grid">
+          <section class="a-card a-profil__foto" aria-labelledby="galeri-foto-heading">
+            <h3 id="galeri-foto-heading">Foto profil</h3>
+            <div class="a-profil__galeri">
+              <div class="a-profil__avatar-kosong" role="img" aria-label="Contoh foto belum ada">Belum ada foto</div>
+              <div>
+                <p class="a-help">Unggah baru memerlukan persetujuan Admin.</p>
+                <span class="a-btn a-btn--utama" aria-hidden="true">Unggah foto</span>
+              </div>
+            </div>
+          </section>
+          <section class="a-card a-profil__identitas" aria-labelledby="galeri-identitas-heading">
+            <h3 id="galeri-identitas-heading">Identitas akun</h3>
+            <dl class="a-rincian">
+              <dt>Nama resmi</dt><dd>Pengguna contoh</dd>
+              <dt>Peran</dt><dd>Guru</dd>
+            </dl>
+          </section>
+          <section class="a-card a-profil__privat" aria-labelledby="galeri-kontak-heading">
+            <h3 id="galeri-kontak-heading">Kontak pribadi</h3>
+            <div class="a-field">
+              <label class="a-label" for="galeri-kontak-demo">Telepon (contoh)</label>
+              <input type="tel" id="galeri-kontak-demo" value="" readonly placeholder="+62...">
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <div class="a-publik a-publik--prototipe" style="min-height:auto;background:transparent;margin-top:16px">
+      <section class="a-card a-baca" aria-labelledby="galeri-publik-status">
+        <span class="a-badge a-badge--bahaya">403</span>
+        <h3 id="galeri-publik-status">Akses ditolak · contoh status</h3>
+        <p>Akun ini tidak memiliki izin untuk halaman tersebut. Pesan sebenarnya mengikuti hasil pemeriksaan server.</p>
+        <span class="a-btn a-btn--sekunder" aria-hidden="true">Kembali</span>
+      </section>
+    </div>
+  </section>
+  <section class="a-card" aria-labelledby="galeri-emerald">
+      <h2 id="galeri-emerald">Emerald Glass · Dark/Light dan enam gradient</h2>
+      <p class="a-help">Contoh visual. Tombol tema mengubah tampilan galeri saja; data aplikasi tidak berubah.</p>
+      <button type="button" class="a-btn a-btn--sekunder" data-theme-toggle aria-label="Aktifkan tema terang">Ganti tema Dark / Light</button>
+      <div class="a-galeri-grid a-glass-gallery">
+          <div class="a-card a-grad-card--1">Semester 1 · Emerald</div>
+          <div class="a-card a-grad-card--2">Semester 2 · Teal</div>
+          <div class="a-card a-grad-card--3">Semester 3 · Blue Emerald</div>
+          <div class="a-card a-grad-card--4">Semester 4 · Violet</div>
+          <div class="a-card a-grad-card--5">Semester 5 · Amber Olive</div>
+          <div class="a-card a-grad-card--6">Semester 6 · Rose Plum</div>
+      </div>
+      <p class="a-help">Seluruh tombol tindakan memiliki background; status teks dan badge bukan tombol.</p>
   </section>
 </main>
 </body>

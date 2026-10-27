@@ -20,6 +20,39 @@
     <?php endif ?>
 
     <div class="a-profil__grid">
+        <?php if (! $siswa): ?>
+        <section class="a-card a-profil__foto" aria-labelledby="judul-foto">
+            <h2 id="judul-foto">Foto profil</h2>
+            <div class="a-profil__galeri">
+                <?php if ($profil['foto_aktif_id'] !== null): ?>
+                    <figure>
+                        <img loading="lazy" src="<?= esc(site_url('profil/foto/' . (int) $profil['foto_aktif_id']), 'attr') ?>"
+                             alt="Foto profil aktif Anda" width="128" height="128">
+                        <figcaption>Foto disetujui</figcaption>
+                    </figure>
+                <?php else: ?>
+                    <div class="a-profil__avatar-kosong" role="img" aria-label="Foto profil belum tersedia">Belum ada foto aktif</div>
+                <?php endif ?>
+                <?php if ($profil['foto_menunggu_id'] !== null): ?>
+                    <figure>
+                        <img loading="lazy" src="<?= esc(site_url('profil/foto/' . (int) $profil['foto_menunggu_id']), 'attr') ?>"
+                             alt="Foto profil menunggu persetujuan" width="128" height="128">
+                        <figcaption>Menunggu persetujuan Admin</figcaption>
+                    </figure>
+                <?php endif ?>
+            </div>
+            <p class="a-help">Unggah JPG/PNG, maksimal 2 MB, ukuran 100–1600 piksel per sisi. Foto baru baru tampil pada profil profesional setelah Admin menyetujui. Foto lama tetap tersedia selama proses tinjauan.</p>
+            <form method="post" enctype="multipart/form-data" action="<?= esc(site_url('profil/foto'), 'attr') ?>" class="a-form">
+                <?= csrf_field() ?>
+                <div class="a-field">
+                    <label class="a-label" for="foto">Pilih foto JPG/PNG</label>
+                    <input type="file" id="foto" name="foto" required
+                        accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+                </div>
+                <button type="submit" class="a-btn a-btn--utama">Unggah foto untuk persetujuan</button>
+            </form>
+        </section>
+        <?php endif ?>
         <section class="a-card a-profil__identitas" aria-labelledby="judul-identitas">
             <h2 id="judul-identitas">Identitas akun</h2>
             <dl class="a-rincian">
@@ -50,37 +83,6 @@
                         placeholder="Contoh: +62 812 3456 7890">
                 </div>
                 <button type="submit" class="a-btn a-btn--utama">Simpan kontak pribadi</button>
-            </form>
-        </section>
-        <section class="a-card a-profil__foto" aria-labelledby="judul-foto">
-            <h2 id="judul-foto">Foto profil</h2>
-            <div class="a-profil__galeri">
-                <?php if ($profil['foto_aktif_id'] !== null): ?>
-                    <figure>
-                        <img loading="lazy" src="<?= esc(site_url('profil/foto/' . (int) $profil['foto_aktif_id']), 'attr') ?>"
-                             alt="Foto profil aktif Anda" width="128" height="128">
-                        <figcaption>Foto disetujui</figcaption>
-                    </figure>
-                <?php else: ?>
-                    <div class="a-profil__avatar-kosong" role="img" aria-label="Foto profil belum tersedia">Belum ada foto aktif</div>
-                <?php endif ?>
-                <?php if ($profil['foto_menunggu_id'] !== null): ?>
-                    <figure>
-                        <img loading="lazy" src="<?= esc(site_url('profil/foto/' . (int) $profil['foto_menunggu_id']), 'attr') ?>"
-                             alt="Foto profil menunggu persetujuan" width="128" height="128">
-                        <figcaption>Menunggu persetujuan Admin</figcaption>
-                    </figure>
-                <?php endif ?>
-            </div>
-            <p class="a-help">Unggah JPG/PNG, maksimal 2 MB, ukuran 100–1600 piksel per sisi. Foto baru baru tampil pada profil profesional setelah Admin menyetujui. Foto lama tetap tersedia selama proses tinjauan.</p>
-            <form method="post" enctype="multipart/form-data" action="<?= esc(site_url('profil/foto'), 'attr') ?>" class="a-form">
-                <?= csrf_field() ?>
-                <div class="a-field">
-                    <label class="a-label" for="foto">Pilih foto JPG/PNG</label>
-                    <input type="file" id="foto" name="foto" required
-                        accept=".jpg,.jpeg,.png,image/jpeg,image/png">
-                </div>
-                <button type="submit" class="a-btn a-btn--utama">Unggah foto untuk persetujuan</button>
             </form>
         </section>
         <?php endif ?>

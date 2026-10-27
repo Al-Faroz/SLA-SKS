@@ -2,6 +2,111 @@
 
 > **Dokumen pengikat semua halaman.** Implementasi CSS utama `public/assets/css/app.css` sebagai **satu stylesheet hasil akhir**; boleh dipisah selama pengembangan lalu digabungkan, tetapi tidak membuat stylesheet liar per role. Tidak memakai Bootstrap/Tailwind/Materialize sebagai framework wajib, tidak memakai icon font.
 
+
+## 0. KONTRAK DESAIN FINAL UNTUK IMPLEMENTASI UI — 27 Oktober 2026
+
+Nama: **Emerald Glass Academic UI**. Default DARK, LIGHT opsional, CSS kustom + JS native, empat peran satu shell. Master 12 mengatur perilaku; bagian ini supersede palet default terang pada bagian historis berikutnya. Tidak boleh mengubah hierarki Mapel–CP–Semester–BAB–TP.
+
+### Token tema
+- Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
+- Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.
+- Permukaan: background glass dipakai terbatas pada shell/sidebar/header/hero; card memiliki warna lebih padat; tabel, form, editor, materi dan ujian solid. Blur hemat dan CSS fallback tanpa backdrop-filter tetap harus dapat digunakan.
+- Semantik: text success/attention/warning/info/accent diatur token terpisah; latar akhir harus diuji WCAG AA dengan rasio teks >=4,5:1, termasuk keadaan hover/disabled.
+- Spacing 4/8/12/16/20/24/32/40px; card radius 14–16px; button/input radius 9–10px dan tinggi minimum 44px; micro-motion 120–200ms dan prefers-reduced-motion.
+
+### Enam gradient utama (Dark)
+| Varian | Nama | Gradient | Aksen |
+|---|---|---|---|
+| 1 | Emerald | #123D2F ke #165D48 | #A7F3D0 |
+| 2 | Teal | #123943 ke #175D68 | #A5F3FC |
+| 3 | Blue Emerald | #1B3155 ke #294D83 | #B9D9FF |
+| 4 | Violet | #382850 ke #60417B | #E0C3FF |
+| 5 | Amber Olive | #44371F ke #675329 | #FFE0A3 |
+| 6 | Rose Plum | #452B3A ke #75435A | #FFCEDF |
+
+Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki padanan pastel mode Light. Digunakan wajib pada Peta ATP 1–6; boleh dipakai ulang untuk kartu ringkasan dan BAB. Enam kartu adalah tautan yang memelihara URL Gen–Mapel, bukan dekorasi statis.
+
+### Komponen dan shell
+- Tema didefinisikan oleh html[data-theme="dark"|"light"]; default markup dark, penyimpanan browser key sla-sks-tema. Inisialisasi tema sebelum stylesheet untuk menghindari flicker.
+- Sidebar layout panel desktop 240px expanded / 72px collapsed menggunakan tombol berlatar dan label aria; key preferensi sla-sks-sidebar. Mobile selalu drawer dengan Escape, fokus dan backdrop.
+- Ikon SVG lokal dari subset Lucide, menggunakan sprite di public/assets/icons/lucide-sla.svg; tanpa font icon/CDN wajib. Lisensi dan atribusi lokal dipertahankan.
+- Tombol: **primary Indigo–Violet** (bukan gradient hijau, agar kontras dengan latar Emerald Glass), secondary dan soft tinted penuh, danger tinted merah, icon button penuh; tidak ada tombol tanpa background. Link teks/badge bukan tombol. Warna kartu semester tidak berubah.
+- Token Primary Dark: `--eg-cta-gradient: #3448B2 → #4056C2 → #6743BF`; Light: `#3448B2 → #3D50B5 → #6041B5`. Teks putih, hover lebih gelap, border violet lembut; gunakan token `--eg-cta-gradient`, `--eg-cta-hover`, `--eg-cta-border`, dan `--eg-cta-shadow`. Warna ini hanya untuk aksi primer, bukan mengganti token `--e-primary` yang dipakai teks/status emerald.
+- Form, tabel, dialog native, breadcrumb, pager, status dan fokus tetap mengacu kelas a- yang telah ada; tema tidak boleh mengubah otorisasi, nilai, media, route, CSRF atau layanan.
+- Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
+
+
+### Audit halaman bersama: Profil dan status publik (27 Oktober 2026)
+
+Tahap V8 memperbaiki ketidaksesuaian layout `app/Views/akun/profil.php`: staf **Foto Profil dahulu, satu kartu selebar kontainer**, kemudian **Identitas Akun** dan **Kontak Pribadi** masing-masing setengah lebar pada desktop; keduanya bertumpuk pada HP. Urutan elemen fisik markup diubah agar urutan baca keyboard dan pembaca layar sesuai urutan visual. Untuk Siswa, foto unggah pribadi tetap tidak tersedia sesuai otorisasi aplikasi sekarang; Identitas Siswa menempati seluruh lebar. Profil Guru Gen bagi siswa tetap hanya data profesional yang diperbolehkan.
+
+- Komponen `.a-profil__grid`, foto, galeri, rincian identitas, kontak, pilihan peran dan kartu Guru diberi permukaan Emerald Glass berbatas jelas untuk Dark/Light. Foto disetujui dan foto menunggu tetap tampil melalui rute privasi lama; tidak ada penyimpanan/unggah/permohonan tambahan.
+- Halaman publik yang memakai `.a-card.a-baca` (Ganti Sandi, 403, 404, gangguan sistem, dan Kebijakan Privasi) diberi kartu semi-solid, tipografi, kontras teks/border/fokus input konsisten. **Form POST/CSRF, aksi keluar, redirect dan kebijakan autentikasi tidak berubah.**
+- Tombol **Primary Indigo–Violet**, secondary soft glass, danger lembut; tidak menggunakan palet Colorion oranye/cyan.
+- QA wajib: Profil staf foto aktif/menunggu/kosong, unggah foto, simpan kontak, layar HP; Profil Siswa (identitas full width dan Guru pengampu), akun multi-peran; Ganti Sandi wajib pada login pertama, salah sandi/galat validasi, sukses, tombol keluar; halaman publik 403/404/galat/Kebijakan Privasi. Periksa Dark/Light, 390/820/desktop, urutan Tab, ukuran foto dan tanpa horizontal scroll. **Lulus statis bukan pengganti uji browser XAMPP.**
+- Halaman Pimpinan khusus **belum memiliki View/controller tersendiri dalam repo** dan tidak dibuat pada audit visual ini; implementasi Pimpinan masuk pekerjaan fitur akademik tersendiri berdasarkan Master Document.
+
+### Audit UI siswa: katalog, media dan aktivitas (27 Oktober 2026)
+
+Implementasi **V7** `public/assets/css/emerald-glass.css` melanjutkan fondasi Dark/Light ke view Siswa yang saat ini tersedia: `siswa/mapel.php`, `siswa/semester.php`, `siswa/daftar_tp.php`, `siswa/rincian_tp.php`, dan `siswa/materi.php`. Ini **perubahan presentasi sementara**, bukan pernyataan seluruh kontrak bisnis siswa v2.5 telah diimplementasikan.
+
+- `.a-siswa-kartu` menggunakan bidang emerald glass yang cukup pekat, border, teks dan tombol yang konsisten. Grid dan informasi dari server tidak diubah. `.a-siswa-status` memiliki warna semantik Dark/Light untuk normal, menunggu, selesai, pratinjau dan terkunci/dilewati, dengan label teks sebagai sumber makna.
+- `.a-siswa-aktivasi` (status TP), daftar Materi, panel progres media, serta tombol kembali/lanjut memiliki latar dan hierarki yang jelas, termasuk pada HP. Status progres dan alasan belum dapat membuka materi tidak dipalsukan.
+- **Pembaca materi bukan glass tipis:** PDF dan gambar menggunakan area membaca lebih solid dan toolbar bertema dengan teks kontras; kanvas PDF, kontrol zoom/halaman, pemutar audio/video, fullscreen, scroll dan penghitungan durasi **tidak diubah**. Fullscreen mempertahankan ukuran ruang baca. `progress` mempertahankan `value/max` serta label ARIA milik markup asli.
+- Editor Resume/HOTS `.a-kegiatan-teks` menggunakan latar solid, line-height 1.75 dan focus-ring; petunjuk/jawaban final tetap terbaca; tombol Simpan draf/Kirim final, `formaction`, CSRF dan validasi server tidak diubah.
+- **Kontrak v2.5 yang dilindungi:** per Gen–Mapel, Semester → BAB → TP, TP Esensial tanpa nilai LMS, NonEsensial tepat satu Materi, Diagnostik sebagai gerbang dan Sumatif wajib, checkpoint Model B setiap 4 menit serta unduh setelah syarat. Penerapan visual ini tidak mengeklaim view siswa historis sudah sepenuhnya terkonversi ke kontrak v2.5.
+- **QA lokal wajib:** Siswa → Mata Pelajaran → Semester → Daftar TP → Rincian TP → Materi; status kosong/terkunci/bisa dibuka; PDF (toolbar, pindah halaman, zoom, fullscreen), gambar zoom, YouTube, audio, status durasi tersimpan, tombol unduh sesudah syarat, Resume/HOTS draf/final, navigasi Materi Selanjutnya bila tersedia. Uji Dark/Light pada desktop, tablet 820px dan HP 390px. Tidak menyatakan PASS browser/fitur hanya berdasarkan CSS atau galeri.
+- Warna tombol tetap hasil rollback: **Primary Indigo–Violet**, Secondary soft glass, Danger merah lembut. Tidak ada perubahan SQL, peran, izin, service, controller, atau data siswa.
+
+### Audit Light Mode dan komponen Admin/Guru (27 Oktober 2026)
+
+Audit terhadap `public/assets/css/app.css`, `emerald-glass.css` dan view Admin/Guru menunjukkan beberapa komponen lama belum ber-token: `.a-pager__tombol` memakai foreground hijau gelap pada Dark Mode, `.a-soal-status-badge`, `.a-tp-status`, dan `.a-kesiapan-ringkasan` memakai pastel terang, `.a-cp__details` tetap `#f9fcfa`, serta `.a-page__jumps a:hover` masih hardcode. Komponen ini diperbaiki lewat lapisan **V6** di `emerald-glass.css` dengan selector yang dibatasi ke shell Admin/Guru.
+
+- Pager: background pada setiap kontrol, state aktif tetap hijau gelap dengan tulisan putih, focus-visible dan disabled dibedakan. Navigasi dan nomor halaman bukan diubah.
+- Status: token `--eg-state-*` untuk siap/aktif, menunggu, bahaya, normal; badge status tetap berupa teks dan tidak menjadi tombol. Status Bank Soal dan Kesiapan TP memakai label yang diberikan server.
+- Ringkasan Kesiapan TP dan native `<details><summary>` CP: panel tinted glass Dark/Light dengan teks warna tema; keyboard focus outline tetap ada.
+- Link loncat ke subbagian (`.a-page__jumps`) memperoleh latar tombol yang nyata sesuai keputusan desain, tanpa mengganti href.
+- Field `.a-input` lepas dari wrapper dan `[aria-invalid=true]` menggunakan border/focus error kontras. Pada Light, `--eg-field-line: #6C8A76` memberi batas input kontras sekitar 3,79:1 terhadap putih, bukan pastel samar. Checkbox/radio/file tetap memakai native control; pemrosesan POST, `required`, `maxlength`, dan validasi server tidak berubah.
+- Pratinjau di `docs/assets/galeri-komponen.html` adalah contoh tanpa data nyata. Warna tombol tetap hasil keputusan rollback **Indigo–Violet Primary, Secondary soft glass, Danger muted**; tidak ada Colorion oranye/cyan.
+- QA wajib XAMPP: Admin Beranda/Pengelola/Kurikulum CP, Guru Bank Soal/Kesiapan TP/Antrean Penilaian/Peta ATP; Dark/Light pada 390px, 820px dan desktop; penanda aktif pager, `summary` dibuka/ditutup, status/badge, field invalid, focus ring dan seluruh tombol yang memicu navigasi POST. Jangan menyatakan selesai hanya berdasarkan pemeriksaan CSS.
+- Setelah modul yang sama dinyatakan FIX, lakukan konsolidasi lapisan `emerald-glass.css` yang masih memakai beberapa override bertingkat; dokumentasi ini bukan izin mengubah aturan atau struktur akademik.
+
+### QA responsif tablet dan drawer HP (27-10-2026)
+
+**Audit sumber aktual:** `app.css` mengganti `.a-tbl--cards` menjadi mode kartu pada lebar <=980px, sementara override Dark/Light di `emerald-glass.css` sebelumnya berlaku <=767px. Akibatnya kartu tabel pada 768–980px masih dapat memakai `background: #fff` milik CSS historis. Penanganan sementara tahap ini: komponen kartu tabel pada **seluruh <=980px** memakai token permukaan, border, label `data-label`, zebra/hover aman, tata letak <=420px satu kolom, dan tombol/form dalam sel tidak terpotong. Tabel padat non-kartu tetap boleh digulir **di dalam kontainer tabel**, tanpa scrollbar menyeluruh.
+
+**Drawer HP:** `public/assets/js/app.js` membatasi tab keyboard di sidebar saat drawer dibuka, menonaktifkan interaksi area `.a-main` menggunakan `inert`, mengunci scroll latar sementara, mengembalikan fokus ke tombol Menu ketika ditutup dengan Escape/backdrop, dan melepas kunci saat breakpoint kembali desktop. Menu tetap bersumber dari server; link, role, dan route tidak berubah. CSS menampilkan `100dvh` dengan fallback lama, backdrop blur sederhana, dan focus ring pada tombol Menu/link.
+
+**Kriteria QA wajib sebelum FIX:** uji tablet 768/820/980px dan HP 360/390/420px untuk Pengelola, Siswa, Bank Soal, Peta ATP, halaman Semester; buka menu, Tab/Shift+Tab berulang, Escape, klik backdrop, klik tautan, ubah lebar browser saat menu terbuka; pastikan halaman tidak ber-scroll horizontal kecuali pada kontainer tabel yang memang membutuhkan scroll. Uji Dark dan Light. Jangan mengklaim QA lokal dari pemeriksaan sumber statis.
+
+### Audit lanjutan komponen UI (screenshot XAMPP 27 Oktober 2026)
+
+Temuan visual: gradasi wallpaper dan sidebar sudah mendekati Emerald Glass, tetapi masih terdapat konflik `app.css` dengan lapisan tema pada card, breadcrumb, tabel, input, ikon kartu KPI dan toolbar Excel. Penyesuaian V3 dilakukan **hanya pada CSS** dengan mempertahankan HTML dan seluruh fungsi.
+
+- **Card**: panel pengelolaan dan ATP memakai glass semi-pekat dengan border, shadow lembut dan highlight terkontrol. Kartu KPI tetap empat warna dari enam gradient resmi. Ikon KPI dan shortcut SVG yang sudah ada menggunakan holder tinted dengan border; hindari holder putih besar pada Dark.
+- **Breadcrumb**: tiap tautan berupa tombol navigasi kecil berlatar yang kontras, `[aria-current="page"]` adalah penanda lokasi (bukan tombol), dengan perbedaan state dan fokus yang tegas. Tidak mengubah target link.
+- **Tabel**: seluruh `.a-page .a-tbl` memperoleh token tabel Dark/Light. Header, `th[scope=row]`, isi, zebra, dan hover harus harmonis, dan ada styling khusus untuk `.a-tbl--cards` pada <=767px; label `data-label` tetap terlihat dan tabel yang butuh gulir tetap bisa digulir. Perbaiki putih bawaan `#f4f7f8` dan `#fff` tanpa mengubah isi, pagination atau urutan data.
+- **Form input**: input text, password, textarea, select punya minimum tinggi 44px, border jelas, focus ring, validasi native tetap berlaku; selector mengecualikan checkbox, radio, hidden dan file untuk menjaga perilaku aslinya. Disabled dipisah secara visual. Tidak membuat input custom yang mengubah mekanisme submit.
+- **Pengelola / Siswa**: panel Excel memakai kelas nyata `.a-admin-akun__xlsx`; harus bertema gelap/terang dan tombol Unduh/Impor/Ekspor tetap ber-background. Nama pengguna, keterangan sandi dan status tetap terbaca.
+- **Kartu KPI**: tautan aksi dalam kartu sengaja diberi latar sebagai CTA, berbeda dari deskripsi teks. Ikon inline SVG yang sudah ada tidak diganti secara berlebihan, cukup diberi container yang konsisten.
+- **Perf & aksesibilitas**: glow dekoratif tidak boleh menimbulkan horizontal scrollbar, proses blur hanya di panel, `prefers-reduced-motion` dipertahankan, teks di atas area solid diverifikasi kontras, media/ujian tidak diberi efek yang mengganggu.
+- **QA**: Perubahan ini belum boleh dianggap FIX sebelum screenshot Dark/Light dari Admin Dashboard, Admin Pengelola (toolbar XLSX + tabel), Guru Peta ATP enam kartu, Semester 4 (tabel BAB/TP dan modal), serta pemeriksaan mobile 360px dan 768px dilakukan pada XAMPP. Nilai/database/otorisasi bukan bagian dari revisi ini.
+
+### Penghalusan glass berdasarkan contoh CSS CodeFronts (27-10-2026)
+
+Contoh `.stp-05` milik CodeFronts dipelajari sebagai inspirasi **teknik visual**, bukan sebagai komponen onboarding untuk SLA-SKS. Implementasi tahap penyesuaian memakai `public/assets/css/emerald-glass.css`:
+- Dua atau tiga radial-gradient beropacity rendah disusun pada **container utama `.a-app--prototipe` dan latar publik**, bukan hanya `body`, supaya glow tidak tertutup background shell.
+- Shell/header/sidebar serta panel pembungkus memakai tinted glass semi-pekat, border translucent dan inset highlight; `backdrop-filter` hanya di komponen pilihan. Fallback solid disediakan jika blur tidak didukung.
+- Enam gradient kartu Semester 1–6 **tetap identitas tersendiri**; lapisan sheen transparan tidak mengganti gradient ataupun statistik/tautannya.
+- Form, input, tabel, pembaca materi dan editor tetap memakai bidang padat. Khusus tabel TP dalam BAB, warna kepala tabel, sel kode dan baris diatur konsisten pada Dark dan Light untuk menghindari area putih terang yang kurang terbaca.
+- Modal memakai native `<dialog>`, border tipis, backdrop redup/blur halus, tanpa perubahan submit/validasi/CSRF/fokus bawaan.
+- Jangan menyalin aturan `.stp-05 * { margin:0; padding:0; }` secara global: aturan tersebut akan merusak spacing komponen aplikasi. Jangan menyalin animasi `stp-05-bob` tak berujung, karena siswa membutuhkan layar yang tenang. Warna `--muted` contoh juga tidak langsung digunakan sebagai teks akibat risiko kontras.
+- Semua tombol tetap tampak sebagai tombol dengan latar jelas, termasuk ikon, sekunder, dan tombol di dialog.
+- Tahap glass ini **belum dinyatakan visual QA PASS** sampai pengujian melalui XAMPP pada login, Guru, G03, dark/light, sidebar expanded/collapsed, mobile dan interaksi modal selesai.
+
+### Tahap implementasi
+Fase pertama mengubah token/shell/galeri dan baseline G03 saja, dipisahkan dalam PR Draft berbasis branch PR #67 (PR #65 -> #66 -> #67 tetap belum merge). QA statis bukan pengganti lint PHP, browser XAMPP, keyboard, dan pemeriksaan visual 360/390/768/1100px serta semua tema. CSS historis memiliki warna hardcoded yang harus diaudit tiap modul sebelum rollout dianggap selesai.
+
 ## 1. Karakter visual
 Gaya LMS/kelas daring modern dengan **hijau muda** sebagai identitas, sidebar hijau lebih gelap, bidang putih/abu netral, kartu ringkas berjarak terukur, navigasi jelas, dan sedikit ornamen. Siswa mendapat bilah progres/lencana yang hangat, Guru dashboard aksi, Admin dashboard kontrol, Pimpinan dashboard analitik. **Satu sistem token dan satu library komponen** digunakan semua role. Tidak mengikat desain ke merek antarmuka pihak ketiga.
 
