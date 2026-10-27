@@ -229,3 +229,11 @@ html[data-theme] .a-grad-card--6 { background:var(--e-g6); }
 @media(prefers-reduced-motion:reduce) {
  html[data-theme] .a-btn,html[data-theme] .a-side__tautan { transition:none; }
 }
+
+/* Token publik design system dan galeri yang memakai palet semester */
+html[data-theme] {
+  --a-grad-1:var(--e-g1);--a-grad-2:var(--e-g2);--a-grad-3:var(--e-g3);
+  --a-grad-4:var(--e-g4);--a-grad-5:var(--e-g5);--a-grad-6:var(--e-g6);
+}
+html[data-theme] .a-glass-gallery { margin-block:16px; }
+html[data-theme] .a-glass-gallery .a-card { min-height:88px; }
