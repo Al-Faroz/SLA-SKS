@@ -36,6 +36,18 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
 
+### Audit UI siswa: katalog, media dan aktivitas (27 Oktober 2026)
+
+Implementasi **V7** `public/assets/css/emerald-glass.css` melanjutkan fondasi Dark/Light ke view Siswa yang saat ini tersedia: `siswa/mapel.php`, `siswa/semester.php`, `siswa/daftar_tp.php`, `siswa/rincian_tp.php`, dan `siswa/materi.php`. Ini **perubahan presentasi sementara**, bukan pernyataan seluruh kontrak bisnis siswa v2.5 telah diimplementasikan.
+
+- `.a-siswa-kartu` menggunakan bidang emerald glass yang cukup pekat, border, teks dan tombol yang konsisten. Grid dan informasi dari server tidak diubah. `.a-siswa-status` memiliki warna semantik Dark/Light untuk normal, menunggu, selesai, pratinjau dan terkunci/dilewati, dengan label teks sebagai sumber makna.
+- `.a-siswa-aktivasi` (status TP), daftar Materi, panel progres media, serta tombol kembali/lanjut memiliki latar dan hierarki yang jelas, termasuk pada HP. Status progres dan alasan belum dapat membuka materi tidak dipalsukan.
+- **Pembaca materi bukan glass tipis:** PDF dan gambar menggunakan area membaca lebih solid dan toolbar bertema dengan teks kontras; kanvas PDF, kontrol zoom/halaman, pemutar audio/video, fullscreen, scroll dan penghitungan durasi **tidak diubah**. Fullscreen mempertahankan ukuran ruang baca. `progress` mempertahankan `value/max` serta label ARIA milik markup asli.
+- Editor Resume/HOTS `.a-kegiatan-teks` menggunakan latar solid, line-height 1.75 dan focus-ring; petunjuk/jawaban final tetap terbaca; tombol Simpan draf/Kirim final, `formaction`, CSRF dan validasi server tidak diubah.
+- **Kontrak v2.5 yang dilindungi:** per Gen–Mapel, Semester → BAB → TP, TP Esensial tanpa nilai LMS, NonEsensial tepat satu Materi, Diagnostik sebagai gerbang dan Sumatif wajib, checkpoint Model B setiap 4 menit serta unduh setelah syarat. Penerapan visual ini tidak mengeklaim view siswa historis sudah sepenuhnya terkonversi ke kontrak v2.5.
+- **QA lokal wajib:** Siswa → Mata Pelajaran → Semester → Daftar TP → Rincian TP → Materi; status kosong/terkunci/bisa dibuka; PDF (toolbar, pindah halaman, zoom, fullscreen), gambar zoom, YouTube, audio, status durasi tersimpan, tombol unduh sesudah syarat, Resume/HOTS draf/final, navigasi Materi Selanjutnya bila tersedia. Uji Dark/Light pada desktop, tablet 820px dan HP 390px. Tidak menyatakan PASS browser/fitur hanya berdasarkan CSS atau galeri.
+- Warna tombol tetap hasil rollback: **Primary Indigo–Violet**, Secondary soft glass, Danger merah lembut. Tidak ada perubahan SQL, peran, izin, service, controller, atau data siswa.
+
 ### Audit Light Mode dan komponen Admin/Guru (27 Oktober 2026)
 
 Audit terhadap `public/assets/css/app.css`, `emerald-glass.css` dan view Admin/Guru menunjukkan beberapa komponen lama belum ber-token: `.a-pager__tombol` memakai foreground hijau gelap pada Dark Mode, `.a-soal-status-badge`, `.a-tp-status`, dan `.a-kesiapan-ringkasan` memakai pastel terang, `.a-cp__details` tetap `#f9fcfa`, serta `.a-page__jumps a:hover` masih hardcode. Komponen ini diperbaiki lewat lapisan **V6** di `emerald-glass.css` dengan selector yang dibatasi ke shell Admin/Guru.
