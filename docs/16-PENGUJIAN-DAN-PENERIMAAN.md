@@ -236,3 +236,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 | 135 | Tambah BAB dan TP menggunakan modal yang dapat dibuka/ditutup lewat tombol, Escape, dan keyboard; fokus kembali; di HP modal dapat di-scroll | 
 | 136 | Nama BAB/TP sepanjang 50 karakter diterima, 51 ditolak (Client dan Service), deskripsi 225 diterima dan 226 ditolak; data 35 karakter lama tetap sama setelah patch SQL baru | 
 | 137 | Modal simpan POST mengirim CSRF, mencegah double-submit, hasil sukses/galat terlihat setelah redirect, dan tombol Batal tidak mengubah database | 
+
+
+### QA tambahan G03 — Ringkasan dan halaman semester (27 Oktober 2026)
+- E2E-138: Dua kelompok Peta ATP (Semester 1–3 / 4–6), keenam kartu memiliki latar berbeda, 3/2/1 kolom pada desktop/tablet/HP, seluruh kartu dapat dibuka lewat mouse/keyboard.
+- E2E-139: Statistik kartu berasal dari DB Gen–Mapel Guru saat ini; jumlah BAB/TP Esensial/NonEsensial aktual. Ganti filter Gen–Mapel tidak membocorkan penugasan Guru lain.
+- E2E-140: Halaman detail semester terotorisasi G1; breadcrumb kembali ke Peta ATP dengan filter tetap; header status dan angka benar; belum punya paket/semester sebelum Gen mulai/peran salah ditangani aman.
+- E2E-141: Tombol Tambah BAB di bagian atas membuka modal; simpan kembali ke semester yang sama, nomor BAB lanjut tanpa duplikat. Tiap kartu BAB menampilkan nomor, nama, deskripsi dan tabel TP nyata; tombol Tambah TP hanya di BAB dalam paket yang dapat diedit.
+- E2E-142: Modal BAB/TP Batal/Escape tidak menyimpan, CSRF wajib, cegah klik Simpan ganda, fokus dialog dan responsif; uji nama 50 diterima **hanya sesudah patch pelebaran kolom DB**, dan 51 ditolak.

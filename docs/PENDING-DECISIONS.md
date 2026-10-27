@@ -15,3 +15,5 @@
 - Menambahkan template Excel manual pengganti yang sudah dibuat ke repository dan menyesuaikan generator/parser impor sesuai struktur BAB–TP.
 - Refactor MVC/Service, UI, ujian Pra-Semester, nilai, ekspor, progres, sertifikat dan regresi. Rincian tahap di `RENCANA-IMPLEMENTASI-POLA-BARU-2026-10-26.md`.
 - Pengujian MySQL/MariaDB secara eksekusi dan verifikasi XAMPP oleh pemilik.
+
+- **UI ATP (27-10-2026):** Peta ATP hanya ringkasan dua kelompok tiga kartu semester; buka halaman semester untuk mengelola daftar BAB dalam kartu warna berbeda dan tabel TP; tambah BAB/TP via modal native. Data tetap berdasar G1 Gen–Mapel, status paket, dan batas nama 50/deskripsi 225. Tidak mengubah alur akademik.
