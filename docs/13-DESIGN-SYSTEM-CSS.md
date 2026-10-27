@@ -338,3 +338,9 @@ Gunakan token/kelas CSS kustom yang telah ada di dokumen ini, tanpa Bootstrap/Ta
 
 ### G03 — Modal native untuk tambah BAB/TP (27 Oktober 2026)
 Gunakan `.a-modal` yang sudah ada dengan `<dialog>`, judul `aria-labelledby`, `showModal()` untuk trap fokus native, tombol Tutup/Batal serta `Escape`. Perluas dengan `.a-modal--atp`, header/aksi flex serta batas tinggi area viewport untuk smartphone; jangan menambah Bootstrap/React/Vue. Nama BAB/TP dapat sepanjang **50** karakter tanpa memotong teks yang disimpan; deskripsi tetap 225. Contoh modal ke galeri komponen, JS native `app.js`, validasi server dan CSRF tetap wajib.
+
+
+### G03 — Kartu semester dan kartu BAB (27 Oktober 2026)
+Peta ATP memakai dua kelompok grid: Semester 1–3 dan Semester 4–6. Enam kartu mempunyai palet background khusus lembut (`.a-atp-warna-1`–`.a-atp-warna-6`) dan border aksen, dengan hover/fokus terlihat, informasi status paket, angka BAB, angka TP dan kategori TP. Gunakan kartu `<a>` sebagai tautan semantik; navigasi tetap bisa digunakan tanpa JavaScript.
+
+Halaman detail `guru/semester_atp.php` menampilkan header dan toolbar kontekstual, lalu `.a-atp-bab-card` untuk setiap BAB dengan warna bergantian dan tabel TP yang tetap semantik dan responsif. Tombol Tambah BAB dan Tambah TP hanya muncul pada konteks yang diizinkan, membuka komponen native `<dialog class="a-modal a-modal--atp">` dengan JS native `app.js`. Tidak membuat layout kartu untuk HTML tombol palsu. Responsive: 3 kolom pada desktop lebar, 2 tablet, 1 HP; tabel BAB dapat digulir; dialog tinggi maksimum mengikuti viewport. Pelihara status kosong dan pesan penguncian. Galeri komponen diperbarui bersama implementasi.
