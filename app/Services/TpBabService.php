@@ -95,6 +95,12 @@ final class TpBabService
             if (count($cp) !== 1) {
                 throw new DomainException('CP operasional mapel belum tersedia. Admin perlu melengkapinya sebelum Guru menambah TP.');
             }
+            if ($this->db->table('cp_mapel_elemen e')
+                ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+                ->where('e.cp_mapel_id', (int) $cp[0]['id'])
+                ->where('v.status', 'aktif')->countAllResults() < 1) {
+                throw new DomainException('CP mapel belum mempunyai elemen versi aktif yang disetujui Admin.');
+            }
             $urutan = $this->db->table('tp')
                 ->select('urutan_dalam_bab')
                 ->where('bab_id', $babId)

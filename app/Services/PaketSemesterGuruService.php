@@ -74,8 +74,11 @@ final class PaketSemesterGuruService
                 ->distinct()->select('k.id,k.nama,k.versi')
                 ->join('cp_mapel c', 'c.kurikulum_id=k.id')
                 ->join('ref_fase f', 'f.id=c.fase_id')
+                ->join('cp_mapel_elemen e', 'e.cp_mapel_id=c.id')
+                ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
                 ->where('c.mapel_id', $mapelId)
                 ->where('f.kode', 'D')
+                ->where('v.status', 'aktif')
                 ->orderBy('k.id', 'DESC')->get()->getResultArray(),
         ];
     }
@@ -128,12 +131,16 @@ final class PaketSemesterGuruService
             }
 
             // Pilihan form bukan izin: ulangi validasi CP di transaksi.
-            if ($this->db->table('cp_mapel')->where([
+            $cpMapel = $this->db->table('cp_mapel')->select('id')->where([
                 'kurikulum_id' => $kurikulumId,
                 'mapel_id' => $mapelId,
                 'fase_id' => (int) $refSemester['fase_id'],
-            ])->countAllResults() !== 1) {
-                throw new DomainException('CP operasional untuk kurikulum dan mapel ini belum tersedia. Minta Admin melengkapi CP.');
+            ])->get()->getRowArray();
+            if ($cpMapel === null || $this->db->table('cp_mapel_elemen e')
+                ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+                ->where('e.cp_mapel_id', (int) $cpMapel['id'])
+                ->where('v.status', 'aktif')->countAllResults() < 1) {
+                throw new DomainException('CP operasional dengan elemen aktif belum tersedia untuk kurikulum dan mapel ini. Hubungi Admin.');
             }
 
             // Tanpa fitur revisi paket pada tahap ini: cegah versi ganda,

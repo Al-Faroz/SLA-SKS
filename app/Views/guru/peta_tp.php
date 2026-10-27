@@ -153,7 +153,11 @@
                             <button type="submit" class="a-btn a-btn--utama">Buat Paket Draf Semester <?= (int) $nomor ?></button>
                         </form>
                     <?php elseif ($nomor >= (int) ($dipilih['semester_mulai'] ?? 1)): ?>
-                        <div class="a-alert" role="status">Tahun ajaran atau kurikulum belum tersedia. Hubungi Admin untuk melengkapi referensi.</div>
+                        <?php if (! ($data['pola_bab'] ?? false)): ?>
+                            <div class="a-alert" role="status">Pembentukan paket BAB–TP memerlukan database SLA-SKS v4 R2. Database v3 tetap dibaca tanpa mengubah datanya.</div>
+                        <?php else: ?>
+                            <div class="a-alert" role="status">Tahun ajaran atau kurikulum dengan CP operasional aktif belum tersedia. Hubungi Admin untuk melengkapi referensi CP.</div>
+                        <?php endif ?>
                     <?php endif ?>
                 <?php elseif ($data['tp'] === []): ?>
                     <div class="a-empty" role="status"><p>Paket telah dibuat, tetapi belum memiliki TP.</p></div>
