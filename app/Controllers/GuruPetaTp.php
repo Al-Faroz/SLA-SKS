@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Services\AturanBabService;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
 use App\Services\PetaTpService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
 
-/** Peta ATP baca-saja per enam semester; hanya pasangan Gen–Mapel yang diampu. */
+/** Peta ATP per enam semester; aksi tambah BAB diperiksa ulang oleh Service G1. */
 final class GuruPetaTp extends BaseController
 {
     protected $helpers = ['url', 'form'];
@@ -32,6 +33,10 @@ final class GuruPetaTp extends BaseController
                         $nomor
                     );
                 }
+                $semester = AturanBabService::denganStatusForm(
+                    $semester,
+                    (int) ($dipilih['semester_mulai'] ?? 1)
+                );
             }
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru'))->with('galat', $e->getMessage());
