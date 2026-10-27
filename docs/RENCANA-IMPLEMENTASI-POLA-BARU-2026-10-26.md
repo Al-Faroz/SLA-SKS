@@ -63,3 +63,6 @@
 
 ## F. Titik mulai yang direkomendasikan
 **Tahap 0: QA awal database v4 R2 sudah PASS dan patch publik sudah diperbarui; PR #65 masih perlu review serta persetujuan merge.** **Tahap 1** menempatkan workbook manual resmi di repository (telah diajukan untuk review); sesudah itu **Tahap 2–3** mengimplementasikan editor BAB–TP dan impor Excel secara nyata. Jangan melompat ke Pra-Semester/sertifikat sebelum siswa dan nilai TP bekerja.
+
+### Checkpoint implementasi tahap 3A (27 Oktober 2026)
+PR sesudah generator #70 menyediakan **parser XLSX serta pratinjau diff read-only** Guru untuk enam semester. Sel sumber dan contoh tidak berubah. **Konfirmasi transaksi idempoten belum tersedia** dan tidak boleh ditafsirkan sudah selesai. Database v4 tidak diubah; penyimpanan bab/tp yang ada dan TP Siap/snapshot tetap aman. Pengujian XAMPP dan pengguna tetap diperlukan.
