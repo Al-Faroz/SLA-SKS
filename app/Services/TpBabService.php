@@ -25,8 +25,10 @@ final class TpBabService
         $this->akunAktif = $akunAktif ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
     }
 
-    /** @return array{id:int,kode_tp:string} */
-    public function buat(int $babId, string $nama, string $deskripsi, string $jenis): array
+    /**
+     * @return array{nama:string,deskripsi:string,jenis:string}
+     */
+    public static function validasiInput(int $babId, string $nama, string $deskripsi, string $jenis): array
     {
         $nama = trim($nama);
         $deskripsi = trim($deskripsi);
@@ -35,6 +37,16 @@ final class TpBabService
             || ! in_array($jenis, ['esensial', 'non_esensial'], true)) {
             throw new DomainException('Isi nama TP (1–35 karakter), deskripsi (1–225 karakter), dan pilih jenis TP yang sah.');
         }
+        return ['nama' => $nama, 'deskripsi' => $deskripsi, 'jenis' => $jenis];
+    }
+
+    /** @return array{id:int,kode_tp:string} */
+    public function buat(int $babId, string $nama, string $deskripsi, string $jenis): array
+    {
+        $data = self::validasiInput($babId, $nama, $deskripsi, $jenis);
+        $nama = $data['nama'];
+        $deskripsi = $data['deskripsi'];
+        $jenis = $data['jenis'];
 
         $akun = ($this->akunAktif)();
         if ($akun === null || ($akun['peran_aktif'] ?? '') !== 'guru'

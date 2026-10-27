@@ -88,6 +88,35 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <?php foreach ($data['bab'] as $bab): ?>
+                            <?php if ((int) $bab['paket_semester_id'] !== (int) $paketUntukBab['id']) { continue; } ?>
+                            <details class="a-jarak-atas">
+                                <summary>Tambah TP pada BAB <?= (int) $bab['nomor_bab'] ?> — <?= esc($bab['nama_bab']) ?></summary>
+                                <form method="post" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/tp/baru'), 'attr') ?>">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="bab_id" value="<?= (int) $bab['id'] ?>">
+                                    <input type="hidden" name="pilihan" value="<?= (int) array_search($dipilih, $pilihan, true) ?>">
+                                    <div class="a-field">
+                                        <label class="a-label" for="nama-tp-bab-<?= (int) $bab['id'] ?>">Nama TP (maks. 35 karakter)</label>
+                                        <input id="nama-tp-bab-<?= (int) $bab['id'] ?>" name="nama_tp" maxlength="35" required>
+                                    </div>
+                                    <div class="a-field">
+                                        <label class="a-label" for="deskripsi-tp-bab-<?= (int) $bab['id'] ?>">Deskripsi TP (maks. 225 karakter)</label>
+                                        <textarea id="deskripsi-tp-bab-<?= (int) $bab['id'] ?>" name="deskripsi_tp" maxlength="225" rows="3" required></textarea>
+                                    </div>
+                                    <div class="a-field">
+                                        <label class="a-label" for="jenis-tp-bab-<?= (int) $bab['id'] ?>">Jenis TP</label>
+                                        <select id="jenis-tp-bab-<?= (int) $bab['id'] ?>" name="jenis_tp" required>
+                                            <option value="esensial">Esensial — tidak ada Materi dan nilai</option>
+                                            <option value="non_esensial">NonEsensial — satu Materi, Diagnostik dan Sumatif</option>
+                                        </select>
+                                    </div>
+                                    <p class="a-proto-muted">Kode dan urutan TP dibuat otomatis oleh server. TP baru berstatus draf.</p>
+                                    <button class="a-btn a-btn--utama" type="submit">Simpan TP Draf</button>
+                                </form>
+                            </details>
+                        <?php endforeach ?>
                     <?php else: ?>
                         <p class="a-proto-muted a-jarak-atas">Belum ada BAB pada semester ini.</p>
                     <?php endif ?>
@@ -99,7 +128,7 @@
                 <?php else: ?>
                     <div class="a-tabel-gulir">
                         <table class="a-tbl a-tbl--cards a-tbl--peta-atp">
-                            <thead><tr><th scope="col">BAB</th><th scope="col">Kode TP</th><th scope="col">Nama TP</th><th scope="col">Jenis</th><th scope="col">Versi paket</th><th scope="col">Status TP</th></tr></thead>
+                            <thead><tr><th scope="col">BAB</th><th scope="col">Kode TP</th><th scope="col">Nama TP</th><th scope="col">Deskripsi</th><th scope="col">Jenis</th><th scope="col">Versi paket</th><th scope="col">Status TP</th></tr></thead>
                             <tbody>
                             <?php foreach ($data['tp'] as $tp): ?>
                                 <?php $paketTp = null; foreach ($data['paket'] as $p) { if ((int) $p['id'] === (int) $tp['paket_semester_id']) { $paketTp = $p; break; } } ?>
@@ -107,7 +136,14 @@
                                 <tr>
                                     <th scope="row" data-label="BAB"><?= esc($labelBab) ?></th>
                                     <td data-label="Kode TP"><?= esc($tp['kode_tp']) ?></td>
-                                    <td data-label="Nama TP" class="a-tbl--peta-atp__judul"><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc(($tp['nama_tp'] ?? '') !== '' ? $tp['nama_tp'] : $tp['judul']) ?></a></td>
+                                    <td data-label="Nama TP" class="a-tbl--peta-atp__judul">
+                                        <?php if ((int) ($tp['bab_id'] ?? 0) > 0): ?>
+                                            <?= esc(($tp['nama_tp'] ?? '') !== '' ? $tp['nama_tp'] : $tp['judul']) ?>
+                                        <?php else: ?>
+                                            <a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"><?= esc($tp['judul']) ?></a>
+                                        <?php endif ?>
+                                    </td>
+                                    <td data-label="Deskripsi"><?= esc($tp['deskripsi_tp'] ?? '—') ?></td>
                                     <td data-label="Jenis"><?= esc(isset($tp['jenis_tp']) ? ($tp['jenis_tp'] === 'non_esensial' ? 'NonEsensial' : 'Esensial') : 'Lama') ?></td>
                                     <td data-label="Versi paket"><?= $paketTp === null ? '—' : (int) $paketTp['nomor_versi'] ?></td>
                                     <td data-label="Status TP"><span class="a-badge"><?= esc($tp['status']) ?></span></td>
