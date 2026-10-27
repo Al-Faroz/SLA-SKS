@@ -1,0 +1,219 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Integration;
+
+use App\Services\AtpImporKonfirmasiService;
+use App\Services\AtpImporPratinjauService;
+use Config\Database;
+use DomainException;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Menguji Service asli terhadap database QA sintetis MySQL 8, bukan DB lokal.
+ * Kasus: G1, insert idempoten, revisi draf, konflik, rollback atomik.
+ */
+final class AtpImporMysqlTest extends TestCase
+{
+    private static $db;
+    private array $temporary = [];
+
+    public static function setUpBeforeClass(): void
+    {
+        if (getenv('SLA_ATP_QA_DB') !== 'sla_sks_qa') {
+            self::markTestSkipped('Hanya berjalan pada fixture anonim sla_sks_qa.');
+        }
+        self::$db = Database::connect([
+            'DSN' => '', 'hostname' => '127.0.0.1',
+            'username' => 'root', 'password' => '',
+            'database' => 'sla_sks_qa', 'DBDriver' => 'MySQLi',
+            'DBPrefix' => '', 'pConnect' => false, 'DBDebug' => true,
+            'charset' => 'utf8mb4', 'DBCollat' => 'utf8mb4_unicode_ci',
+            'failover' => [], 'port' => 3306,
+        ], false);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        foreach (['log_aktivitas', 'progres_tp', 'versi_konten_tp',
+                  'materi', 'tp', 'bab'] as $table) {
+            self::$db->table($table)->emptyTable();
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->temporary as $path) {
+            @unlink($path);
+        }
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$db !== null) {
+            self::$db->close();
+        }
+    }
+
+    private function guru(int $id = 101): callable
+    {
+        return static fn (): array => [
+            'id' => $id, 'nama' => 'Guru Penguji',
+            'peran_aktif' => 'guru', 'status' => 'aktif',
+            'wajib_ganti_sandi' => 0,
+        ];
+    }
+
+    private function preview(string $file, int $guru = 101): array
+    {
+        return (new AtpImporPratinjauService(self::$db, $this->guru($guru)))
+            ->pratinjau(11, $file);
+    }
+
+    private function confirm(string $file, string $fingerprint, int $guru = 101): array
+    {
+        return (new AtpImporKonfirmasiService(self::$db, $this->guru($guru)))
+            ->simpan(11, $file, $fingerprint);
+    }
+
+    private function workbook(string $tpName = 'Menganalisis Peristiwa',
+        string $babName = 'Sejarah Awal'): string
+    {
+        $source = dirname(__DIR__, 2) . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
+        $buku = IOFactory::load($source);
+        try {
+            $sum = $buku->getSheetByName('RINGKASAN');
+            $sum->setCellValue('B5', 'GEN2025');
+            $sum->setCellValue('B9', 'SKI');
+            $sum->setCellValue('B14', '1');
+            $sh = $buku->getSheetByName('SEMESTER 4');
+            $sh->setCellValue('A13', 1);
+            $sh->setCellValue('B13', $babName);
+            $sh->setCellValue('C13', 'Sejarah, latar belakang dan perkembangan');
+            $sh->setCellValue('A39', 1);
+            $sh->setCellValue('B39', 1);
+            $sh->setCellValue('C39', 'SKI.8.1.1');
+            $sh->setCellValue('D39', 'NonEsensial');
+            $sh->setCellValue('E39', $tpName);
+            $sh->setCellValue('F39', 'Menganalisis hubungan sebab akibat');
+            $sh->setCellValue('I39', 'Pemahaman Konsep');
+            $tmp = tempnam(sys_get_temp_dir(), 'uji_atp_imp_');
+            self::assertIsString($tmp);
+            (new Xlsx($buku))->save($tmp);
+            $this->temporary[] = $tmp;
+            return $tmp;
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testSatuKonfirmasiMembuatBabTpDanLog(): void
+    {
+        $file = $this->workbook();
+        $p = $this->preview($file);
+        self::assertSame(['baru' => 2, 'ubah' => 0, 'tetap' => 0, 'galat' => 0],
+            $p['jumlah']);
+        self::assertTrue($p['boleh_konfirmasi']);
+        $r = $this->confirm($file, $p['fingerprint']);
+        self::assertSame(1, $r['baru_bab']);
+        self::assertSame(1, $r['baru_tp']);
+        self::assertSame(1, self::$db->table('bab')->countAllResults());
+        self::assertSame(1, self::$db->table('tp')->countAllResults());
+        self::assertSame('draf', self::$db->table('tp')->get()->getRow('status'));
+        self::assertSame('SKI.8.1.1', self::$db->table('tp')->get()->getRow('kode_tp'));
+        self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+        self::assertSame(0, self::$db->table('materi')->countAllResults());
+    }
+
+    public function testImporUlangTidakGandakanDanBisaPerbaruiDraf(): void
+    {
+        $f = $this->workbook();
+        $p = $this->preview($f);
+        $this->confirm($f, $p['fingerprint']);
+        $ulang = $this->preview($f);
+        self::assertSame(['baru' => 0, 'ubah' => 0, 'tetap' => 2, 'galat' => 0],
+            $ulang['jumlah']);
+        self::assertFalse($ulang['boleh_konfirmasi']);
+
+        $g = $this->workbook('Mengurai Sejarah Baru', 'Sejarah Diperbarui');
+        $ubah = $this->preview($g);
+        self::assertSame(2, $ubah['jumlah']['ubah']);
+        $r = $this->confirm($g, $ubah['fingerprint']);
+        self::assertSame(1, $r['ubah_bab']);
+        self::assertSame(1, $r['ubah_tp']);
+        self::assertSame(1, self::$db->table('tp')->countAllResults());
+        self::assertSame('Mengurai Sejarah Baru',
+            self::$db->table('tp')->get()->getRow('nama_tp'));
+        self::assertSame(2, self::$db->table('log_aktivitas')->countAllResults());
+    }
+
+    public function testKonteksLintasGenDitolak(): void
+    {
+        $f = $this->workbook();
+        try {
+            $this->preview($f, 102);
+            self::fail('Guru Gen B berhasil melihat paket Gen A.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('penugasan', $e->getMessage());
+        }
+        self::assertSame(0, self::$db->table('tp')->countAllResults());
+    }
+
+    public function testKonfirmasiKedaluarsaAkibatPerubahanDbDitolak(): void
+    {
+        $f = $this->workbook();
+        $p = $this->preview($f);
+        self::$db->table('bab')->insert([
+            'paket_semester_id' => 11, 'angkatan_id' => 1, 'mapel_id' => 5,
+            'kurikulum_id' => 1, 'tahun_ajaran_id' => 1, 'kelas_id' => 2,
+            'nomor_bab' => 1, 'nama_bab' => 'Konkurensi',
+            'deskripsi_bab' => 'Berubah sesudah preview',
+            'dibuat_pada' => '2026-10-27 00:00:00',
+        ]);
+        $this->expectExceptionMessage('Data akademik berubah setelah pratinjau');
+        $this->confirm($f, $p['fingerprint']);
+    }
+
+    public function testGagalInsertTpMenggulungSeluruhTransaksi(): void
+    {
+        $f = $this->workbook('GAGAL-SENGAJA');
+        $p = $this->preview($f);
+        self::assertTrue($p['boleh_konfirmasi']);
+        try {
+            $this->confirm($f, $p['fingerprint']);
+            self::fail('Constraint sintetis seharusnya menggagalkan TP.');
+        } catch (\Throwable $e) {
+            self::assertSame(0, self::$db->table('bab')->countAllResults(),
+                'BAB harus rollback bila INSERT TP gagal.');
+            self::assertSame(0, self::$db->table('tp')->countAllResults());
+            self::assertSame(0, self::$db->table('log_aktivitas')->countAllResults());
+        }
+    }
+
+    public function testTpSiapTidakDiubahOlehImpor(): void
+    {
+        $f = $this->workbook();
+        $p = $this->preview($f);
+        $this->confirm($f, $p['fingerprint']);
+        self::$db->table('tp')->update(['status' => 'siap']);
+        $baru = $this->workbook('Nama berbeda');
+        $review = $this->preview($baru);
+        self::assertGreaterThan(0, $review['jumlah']['galat']);
+        self::assertFalse($review['boleh_konfirmasi']);
+        self::assertSame('Menganalisis Peristiwa',
+            self::$db->table('tp')->get()->getRow('nama_tp'));
+    }
+
+    public function testIsiNamaLebih35KarakterDitolakPadaR2(): void
+    {
+        $f = $this->workbook(str_repeat('T', 37));
+        $p = $this->preview($f);
+        self::assertGreaterThan(0, $p['jumlah']['galat']);
+        self::assertFalse($p['boleh_konfirmasi']);
+    }
+}
