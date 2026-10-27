@@ -36,6 +36,19 @@ final class PaketSemesterGuruService
         return (int) $akun['id'];
     }
 
+    /**
+     * Jangan membuka fitur paket v2.5 pada DB v3 atau instalasi v4 parsial.
+     * Hanya membaca versi/struktur; tidak mengganti koneksi dari .env.
+     */
+    public function skemaV4Siap(): bool
+    {
+        return $this->db->tableExists('bab')
+            && $this->db->tableExists('cp_mapel')
+            && $this->db->tableExists('schema_version')
+            && $this->db->table('schema_version')
+                ->where('versi', 'V4-0001-R2')->countAllResults() === 1;
+    }
+
     /** @return array{tahun:list<array<string,mixed>>,kurikulum:list<array<string,mixed>>} */
     public function referensi(int $genId, int $mapelId): array
     {
@@ -48,11 +61,22 @@ final class PaketSemesterGuruService
             ])->countAllResults() !== 1) {
             throw new DomainException('Penugasan Gen–Mapel tidak ditemukan.');
         }
+        if (! $this->skemaV4Siap()) {
+            return ['tahun' => [], 'kurikulum' => []];
+        }
+
+        // Hanya tampilkan kurikulum yang memiliki CP Fase D untuk mapel ini.
+        // Guru tidak diarahkan membuat paket yang tidak mungkin diisi TP.
         return [
             'tahun' => $this->db->table('ref_tahun_ajaran')
                 ->select('id,nama')->orderBy('id', 'DESC')->get()->getResultArray(),
-            'kurikulum' => $this->db->table('ref_kurikulum')
-                ->select('id,nama,versi')->orderBy('id', 'DESC')->get()->getResultArray(),
+            'kurikulum' => $this->db->table('ref_kurikulum k')
+                ->distinct()->select('k.id,k.nama,k.versi')
+                ->join('cp_mapel c', 'c.kurikulum_id=k.id')
+                ->join('ref_fase f', 'f.id=c.fase_id')
+                ->where('c.mapel_id', $mapelId)
+                ->where('f.kode', 'D')
+                ->orderBy('k.id', 'DESC')->get()->getResultArray(),
         ];
     }
 
@@ -73,6 +97,9 @@ final class PaketSemesterGuruService
     {
         self::validasiInput($genId, $mapelId, $semester, $tahunId, $kurikulumId);
         $guruId = $this->guruId();
+        if (! $this->skemaV4Siap()) {
+            throw new DomainException('Pembuatan paket memerlukan database v4 R2 yang sudah terverifikasi.');
+        }
 
         $this->db->transBegin();
         try {
@@ -90,10 +117,23 @@ final class PaketSemesterGuruService
                 throw new DomainException('Semester ini berada sebelum semester mulai Gen.');
             }
 
-            if ($this->db->table('ref_semester')->where('id', $semester)->countAllResults() !== 1
+            $refSemester = $this->db->table('ref_semester s')
+                ->select('k.fase_id')
+                ->join('ref_kelas k', 'k.id=s.kelas_id')
+                ->where('s.id', $semester)->get()->getRowArray();
+            if ($refSemester === null
                 || $this->db->table('ref_tahun_ajaran')->where('id', $tahunId)->countAllResults() !== 1
                 || $this->db->table('ref_kurikulum')->where('id', $kurikulumId)->countAllResults() !== 1) {
                 throw new DomainException('Semester, tahun ajaran, atau kurikulum belum terdaftar.');
+            }
+
+            // Pilihan form bukan izin: ulangi validasi CP di transaksi.
+            if ($this->db->table('cp_mapel')->where([
+                'kurikulum_id' => $kurikulumId,
+                'mapel_id' => $mapelId,
+                'fase_id' => (int) $refSemester['fase_id'],
+            ])->countAllResults() !== 1) {
+                throw new DomainException('CP operasional untuk kurikulum dan mapel ini belum tersedia. Minta Admin melengkapi CP.');
             }
 
             // Tanpa fitur revisi paket pada tahap ini: cegah versi ganda,
