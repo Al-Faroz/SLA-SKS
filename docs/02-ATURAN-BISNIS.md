@@ -63,7 +63,7 @@
 Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya karena contoh sebelumnya pernah menyebutnya. Persyaratan verifikasi harus **cukup aman, sederhana, dan sesuai keputusan akhir**. Rincian operasional hosting dan data pengaturan sekolah diisi melalui UI saat pemasangan.
 
 ## 8. Keputusan lintas modul v2.5
-1. CP operasional satu Mapel → Semester → BAB → TP, nomor BAB berlanjut antardua semester kelas sama. Nama singkat 35, deskripsi 225, kode `KODEMAPEL.KELAS.BAB.TP`.
+1. CP operasional satu Mapel → Semester → BAB → TP, nomor BAB berlanjut antardua semester kelas sama. Nama singkat 50, deskripsi 225, kode `KODEMAPEL.KELAS.BAB.TP`.
 2. TP Esensial tanpa Materi/nilai, TP NonEsensial satu Materi; Diagnostik gate dan Sumatif wajib 30.
 3. Pra-Semester tanggal serentak Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
 4. Excel ATP **manual** tanpa macro dan tanpa tombol Proses sudah dipilih; penyusunan BAB/TP dilakukan melalui isian langsung pada workbook atau aplikasi, serta divalidasi server saat impor. KBC, izin Gen–Mapel, Word PG A–E tetap.
