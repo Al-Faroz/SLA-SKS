@@ -2,6 +2,41 @@
 
 > **Dokumen pengikat semua halaman.** Implementasi CSS utama `public/assets/css/app.css` sebagai **satu stylesheet hasil akhir**; boleh dipisah selama pengembangan lalu digabungkan, tetapi tidak membuat stylesheet liar per role. Tidak memakai Bootstrap/Tailwind/Materialize sebagai framework wajib, tidak memakai icon font.
 
+
+## 0. KONTRAK DESAIN FINAL UNTUK IMPLEMENTASI UI — 27 Oktober 2026
+
+Nama: **Emerald Glass Academic UI**. Default DARK, LIGHT opsional, CSS kustom + JS native, empat peran satu shell. Master 12 mengatur perilaku; bagian ini supersede palet default terang pada bagian historis berikutnya. Tidak boleh mengubah hierarki Mapel–CP–Semester–BAB–TP.
+
+### Token tema
+- Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
+- Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.
+- Permukaan: background glass dipakai terbatas pada shell/sidebar/header/hero; card memiliki warna lebih padat; tabel, form, editor, materi dan ujian solid. Blur hemat dan CSS fallback tanpa backdrop-filter tetap harus dapat digunakan.
+- Semantik: text success/attention/warning/info/accent diatur token terpisah; latar akhir harus diuji WCAG AA dengan rasio teks >=4,5:1, termasuk keadaan hover/disabled.
+- Spacing 4/8/12/16/20/24/32/40px; card radius 14–16px; button/input radius 9–10px dan tinggi minimum 44px; micro-motion 120–200ms dan prefers-reduced-motion.
+
+### Enam gradient utama (Dark)
+| Varian | Nama | Gradient | Aksen |
+|---|---|---|---|
+| 1 | Emerald | #123D2F ke #165D48 | #A7F3D0 |
+| 2 | Teal | #123943 ke #175D68 | #A5F3FC |
+| 3 | Blue Emerald | #1B3155 ke #294D83 | #B9D9FF |
+| 4 | Violet | #382850 ke #60417B | #E0C3FF |
+| 5 | Amber Olive | #44371F ke #675329 | #FFE0A3 |
+| 6 | Rose Plum | #452B3A ke #75435A | #FFCEDF |
+
+Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki padanan pastel mode Light. Digunakan wajib pada Peta ATP 1–6; boleh dipakai ulang untuk kartu ringkasan dan BAB. Enam kartu adalah tautan yang memelihara URL Gen–Mapel, bukan dekorasi statis.
+
+### Komponen dan shell
+- Tema didefinisikan oleh html[data-theme="dark"|"light"]; default markup dark, penyimpanan browser key sla-sks-tema. Inisialisasi tema sebelum stylesheet untuk menghindari flicker.
+- Sidebar layout panel desktop 240px expanded / 72px collapsed menggunakan tombol berlatar dan label aria; key preferensi sla-sks-sidebar. Mobile selalu drawer dengan Escape, fokus dan backdrop.
+- Ikon SVG lokal dari subset Lucide, menggunakan sprite di public/assets/icons/lucide-sla.svg; tanpa font icon/CDN wajib. Lisensi dan atribusi lokal dipertahankan.
+- Tombol: primary emerald gradient, secondary dan soft tinted penuh, danger tinted merah, icon button penuh; tidak ada tombol tanpa background. Link teks/badge bukan tombol.
+- Form, tabel, dialog native, breadcrumb, pager, status dan fokus tetap mengacu kelas a- yang telah ada; tema tidak boleh mengubah otorisasi, nilai, media, route, CSRF atau layanan.
+- Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
+
+### Tahap implementasi
+Fase pertama mengubah token/shell/galeri dan baseline G03 saja, dipisahkan dalam PR Draft berbasis branch PR #67 (PR #65 -> #66 -> #67 tetap belum merge). QA statis bukan pengganti lint PHP, browser XAMPP, keyboard, dan pemeriksaan visual 360/390/768/1100px serta semua tema. CSS historis memiliki warna hardcoded yang harus diaudit tiap modul sebelum rollout dianggap selesai.
+
 ## 1. Karakter visual
 Gaya LMS/kelas daring modern dengan **hijau muda** sebagai identitas, sidebar hijau lebih gelap, bidang putih/abu netral, kartu ringkas berjarak terukur, navigasi jelas, dan sedikit ornamen. Siswa mendapat bilah progres/lencana yang hangat, Guru dashboard aksi, Admin dashboard kontrol, Pimpinan dashboard analitik. **Satu sistem token dan satu library komponen** digunakan semua role. Tidak mengikat desain ke merek antarmuka pihak ketiga.
 
