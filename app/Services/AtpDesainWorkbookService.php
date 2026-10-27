@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -25,6 +26,19 @@ final class AtpDesainWorkbookService
 
     private static function merge(Worksheet $sheet, string $range, string $text): void
     {
+        [$start, $end] = Coordinate::rangeBoundaries($range);
+        // Templat resmi sudah memiliki beberapa merge lama A:G atau A:C.
+        // Lepaskan hanya merge yang berpotongan dengan area desain baru.
+        foreach ($sheet->getMergeCells() as $merged) {
+            if ($merged === $range) {
+                continue;
+            }
+            [$mStart, $mEnd] = Coordinate::rangeBoundaries($merged);
+            if ($start[0] <= $mEnd[0] && $end[0] >= $mStart[0]
+                && $start[1] <= $mEnd[1] && $end[1] >= $mStart[1]) {
+                $sheet->unmergeCells($merged);
+            }
+        }
         if (! in_array($range, $sheet->getMergeCells(), true)) {
             $sheet->mergeCells($range);
         }
