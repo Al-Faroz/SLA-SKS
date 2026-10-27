@@ -245,3 +245,261 @@ html[data-theme] .a-app--prototipe .a-btn--utama:hover:not(:disabled) {
   color:#FFFFFF;background:linear-gradient(112deg,#093E30,#105D44,#126C4E);
   border-color:#126C4E;
 }
+
+
+/* =============================================================
+   GLASS LAYER V2 — CodeFronts-inspired, disesuaikan untuk LMS CI4
+   - Gradien radial hidup DI CONTAINER, bukan hanya body.
+   - Glass hanya shell/panel; tabel & editor lebih padat.
+   - Tidak ada reset global, infinite bob, atau perubahan fungsi.
+   ============================================================= */
+html[data-theme="dark"] {
+  --eg-wallpaper:
+    radial-gradient(ellipse 850px 680px at 17% 19%,rgba(16,185,129,.20),transparent 70%),
+    radial-gradient(ellipse 660px 530px at 86% 10%,rgba(20,184,166,.14),transparent 72%),
+    radial-gradient(ellipse 710px 660px at 79% 81%,rgba(112,86,170,.11),transparent 74%),
+    var(--e-bg);
+  --eg-pane:rgba(10,43,34,.74);
+  --eg-pane-strong:rgba(8,35,28,.87);
+  --eg-pane-soft:rgba(11,50,40,.58);
+  --eg-navbar:rgba(8,37,29,.81);
+  --eg-sidebar:linear-gradient(167deg,rgba(10,53,41,.88),rgba(4,27,21,.91));
+  --eg-line:rgba(191,251,223,.20);
+  --eg-line-soft:rgba(191,251,223,.12);
+  --eg-sheen:rgba(255,255,255,.07);
+  --eg-shadow:0 20px 44px rgba(0,8,6,.19),inset 0 1px 0 rgba(255,255,255,.09);
+  --eg-shadow-soft:0 10px 26px rgba(0,8,6,.13),inset 0 1px 0 rgba(255,255,255,.06);
+  --eg-table:#0B2B23;
+  --eg-table-head:#1B4738;
+  --eg-table-stripe:rgba(255,255,255,.025);
+  --eg-illustration:linear-gradient(130deg,rgba(14,67,50,.92),rgba(11,66,77,.84));
+  --eg-illustration-paper:#D9F5E8;
+}
+html[data-theme="light"] {
+  --eg-wallpaper:
+    radial-gradient(ellipse 840px 660px at 14% 15%,rgba(35,179,115,.14),transparent 70%),
+    radial-gradient(ellipse 660px 560px at 87% 8%,rgba(54,158,176,.09),transparent 73%),
+    radial-gradient(ellipse 670px 570px at 76% 82%,rgba(125,108,179,.06),transparent 74%),
+    var(--e-bg);
+  --eg-pane:rgba(255,255,255,.76);
+  --eg-pane-strong:rgba(255,255,255,.89);
+  --eg-pane-soft:rgba(248,255,251,.67);
+  --eg-navbar:rgba(255,255,255,.76);
+  --eg-sidebar:linear-gradient(165deg,rgba(9,66,49,.94),rgba(14,93,67,.94));
+  --eg-line:rgba(19,93,62,.17);
+  --eg-line-soft:rgba(19,93,62,.10);
+  --eg-sheen:rgba(255,255,255,.42);
+  --eg-shadow:0 20px 44px rgba(24,66,44,.11),inset 0 1px 0 rgba(255,255,255,.75);
+  --eg-shadow-soft:0 10px 26px rgba(24,66,44,.07),inset 0 1px 0 rgba(255,255,255,.65);
+  --eg-table:#FFFFFF;
+  --eg-table-head:#E6F2EA;
+  --eg-table-stripe:#F4FAF6;
+  --eg-illustration:linear-gradient(130deg,#E6F6ED,#E5F3F5);
+  --eg-illustration-paper:#FFFFFF;
+}
+/* Wallpaper harus berada PADA shell yang sebelumnya menutupi body. */
+html[data-theme] body.a-publik--prototipe,
+html[data-theme] .a-app--prototipe {
+  background:var(--eg-wallpaper);
+}
+html[data-theme] .a-app--prototipe .a-side {
+  background:var(--eg-sidebar);
+  border-right:1px solid rgba(201,255,230,.16);
+  box-shadow:12px 0 32px rgba(0,12,8,.10);
+  backdrop-filter:blur(12px) saturate(115%);
+  -webkit-backdrop-filter:blur(12px) saturate(115%);
+}
+html[data-theme] .a-app--prototipe .a-header,
+html[data-theme] .a-publik--prototipe .a-kepala-publik,
+html[data-theme] .a-publik--prototipe .a-kaki-publik {
+  background:var(--eg-navbar);
+  border-color:var(--eg-line-soft);
+  backdrop-filter:blur(12px) saturate(120%);
+  -webkit-backdrop-filter:blur(12px) saturate(120%);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+/* Permukaan kaca yang hanya membingkai pekerjaan, bukan seluruh editor. */
+html[data-theme] .a-publik--prototipe .a-proto-login-card,
+html[data-theme] .a-app--prototipe .a-page > .a-card:not(.a-siswa-media),
+html[data-theme] .a-app--prototipe .a-proto-panel,
+html[data-theme] .a-app--prototipe .a-atp-kelompok,
+html[data-theme] .a-app--prototipe .a-siswa-kartu {
+  background:linear-gradient(150deg,var(--eg-sheen),transparent 58%),var(--eg-pane);
+  border:1px solid var(--eg-line);
+  border-radius:18px;
+  box-shadow:var(--eg-shadow);
+  backdrop-filter:blur(12px) saturate(118%);
+  -webkit-backdrop-filter:blur(12px) saturate(118%);
+}
+/* Lingkar cahaya seperti ::before pada panel CodeFronts;
+   dibuat noninteraktif, tanpa menciptakan stacking context berbahaya. */
+html[data-theme] .a-publik--prototipe .a-proto-login-card,
+html[data-theme] .a-app--prototipe .a-atp-kelompok,
+html[data-theme] .a-app--prototipe .a-page > .a-card:not(.a-siswa-media) {
+  position:relative;
+}
+html[data-theme] .a-publik--prototipe .a-proto-login-card::before,
+html[data-theme] .a-app--prototipe .a-atp-kelompok::before,
+html[data-theme] .a-app--prototipe .a-page > .a-card:not(.a-siswa-media)::before {
+  content:"";
+  position:absolute;
+  top:-115px;right:-95px;width:275px;height:275px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(68,228,167,.10),transparent 70%);
+  pointer-events:none;
+}
+html[data-theme] .a-app--prototipe .a-side__tautan {
+  border:1px solid transparent;
+  background:rgba(255,255,255,.025);
+  transition:background-color .17s ease,border-color .17s ease,box-shadow .17s ease;
+}
+html[data-theme] .a-app--prototipe .a-side__tautan:hover {
+  background:rgba(106,235,181,.13);
+  border-color:rgba(153,255,208,.13);
+}
+html[data-theme] .a-app--prototipe .a-side__tautan.is-aktif {
+  background:linear-gradient(110deg,rgba(16,185,129,.29),rgba(20,184,166,.13));
+  border-color:rgba(144,244,199,.27);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(16,185,129,.09);
+}
+/* Tombol tetap berbackground, tidak menyalin 'ghost button'. */
+html[data-theme] .a-app--prototipe .a-btn--sekunder,
+html[data-theme] .a-publik--prototipe .a-btn--sekunder,
+html[data-theme] .a-app--prototipe .a-btn--tema,
+html[data-theme] .a-publik--prototipe .a-btn--tema {
+  background:var(--eg-pane-soft);
+  border-color:var(--eg-line);
+  color:var(--e-text);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-btn--utama,
+html[data-theme] .a-publik--prototipe .a-btn--utama {
+  background:linear-gradient(180deg,rgba(255,255,255,.045),transparent 65%),
+    linear-gradient(112deg,#0A4C39,#126C51,#147858);
+  color:#FFFFFF;
+  border-color:rgba(113,238,183,.26);
+  box-shadow:0 8px 19px rgba(2,43,28,.24),inset 0 1px 0 rgba(255,255,255,.13);
+}
+html[data-theme] .a-app--prototipe .a-btn--utama:hover:not(:disabled),
+html[data-theme] .a-publik--prototipe .a-btn--utama:hover:not(:disabled) {
+  background:linear-gradient(112deg,#093E30,#105D44,#126C4E);
+  color:#FFFFFF;
+}
+/* Warna enam semester TETAP berbeda; highlight transparan tidak menimpa gradien. */
+html[data-theme] :is(.a-atp-kartu,.a-atp-detail__header,.a-atp-bab-card) {
+  position:relative;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,0) 48%),var(--a-atp-warna);
+  border-color:var(--a-atp-tepi);
+  box-shadow:0 15px 34px rgba(0,10,8,.15),inset 0 1px 0 rgba(255,255,255,.10);
+}
+html[data-theme] :is(.a-atp-kartu,.a-atp-detail__header,.a-atp-bab-card)::before {
+  content:"";
+  position:absolute;inset:0 0 auto 0;height:42%;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);
+  pointer-events:none;
+}
+html[data-theme] .a-atp-kartu { transition:transform .16s ease,box-shadow .16s ease; }
+html[data-theme] .a-atp-kartu:hover {
+  transform:translateY(-2px);
+  box-shadow:0 21px 40px rgba(0,10,8,.19),inset 0 1px 0 rgba(255,255,255,.12);
+}
+/* Status dilewati tetap dibedakan oleh label, tidak meredupkan semua teks. */
+html[data-theme] .a-atp-kartu.is-dilewati { opacity:1; }
+html[data-theme] :is(.a-atp-kartu__status,.a-atp-detail__status) {
+  border:1px solid var(--eg-line);
+  background:var(--eg-pane-soft);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+/* TABEL DAN INPUT sengaja solid: memperbaiki garis putih pada screenshot G03. */
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel {
+  background:var(--eg-pane-soft);
+  border-top:1px solid var(--eg-line-soft);
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl {
+  background:var(--eg-table);
+  border:1px solid var(--eg-line);
+  border-radius:10px;
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl thead th {
+  background:var(--eg-table-head);
+  color:var(--e-text);
+  border-color:var(--eg-line-soft);
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl tbody tr {
+  background:var(--eg-table);
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl tbody td {
+  background:var(--eg-table);
+  color:var(--e-text);
+  border-color:var(--eg-line-soft);
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl tbody tr:hover td {
+  background:var(--eg-table-stripe);
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl tbody td:first-child {
+  color:var(--e-primary);
+  font-weight:650;
+}
+html[data-theme] .a-app--prototipe .a-atp-bab-card__tabel .a-tbl :is(th,td) {
+  overflow-wrap:anywhere;
+}
+html[data-theme] .a-modal {
+  background:linear-gradient(165deg,var(--eg-sheen),transparent 55%),var(--eg-pane-strong);
+  border:1px solid var(--eg-line);
+  border-radius:18px;
+  box-shadow:0 26px 64px rgba(0,8,6,.33),inset 0 1px 0 var(--eg-sheen);
+  backdrop-filter:blur(14px) saturate(120%);
+  -webkit-backdrop-filter:blur(14px) saturate(120%);
+}
+/* Backdrop cukup gelap untuk fokus, tetapi memberi konteks visual halaman. */
+html[data-theme] .a-modal::backdrop {
+  background:rgba(0,12,9,.52);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+html[data-theme="light"] .a-modal::backdrop { background:rgba(12,37,28,.32); }
+html[data-theme] .a-modal .a-field :is(input,textarea,select),
+html[data-theme] .a-publik--prototipe .a-proto-login-form .a-field input {
+  background:var(--e-input);
+  color:var(--e-text);
+  border-color:var(--eg-line);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+/* Input autofill tetap memakai kontras yang konsisten. */
+html[data-theme="dark"] input:-webkit-autofill {
+  -webkit-text-fill-color:var(--e-text);
+  box-shadow:0 0 0 1000px var(--e-input) inset;
+}
+html[data-theme] .a-atp-pesan-terkunci {
+  background:var(--eg-pane-soft);
+  border:1px solid var(--eg-line-soft);
+  color:var(--e-warning);
+}
+/* Hero ilustrasi login tidak lagi tampak sebagai bidang putih keras. */
+html[data-theme] .a-proto-login-illustration {
+  background:var(--eg-illustration);
+  border:1px solid var(--eg-line);
+  box-shadow:var(--eg-shadow-soft);
+}
+html[data-theme] .a-proto-illustration-card--main,
+html[data-theme] .a-proto-illustration-satellite {
+  background:var(--eg-illustration-paper);
+}
+html[data-theme="dark"] .a-proto-orbit { border-color:rgba(137,245,197,.22); }
+html[data-theme] .a-proto-login-help,html[data-theme] .a-proto-login-foot {
+  color:var(--e-muted);
+}
+/* Pola CodeFronts memberi animasi, LMS hanya memakai motion sekali per aksi. */
+@media (prefers-reduced-motion:reduce) {
+  html[data-theme] .a-atp-kartu:hover { transform:none; }
+  html[data-theme] .a-app--prototipe .a-side__tautan,
+  html[data-theme] .a-atp-kartu { transition:none; }
+}
+/* Tidak semua perangkat mendukung blur GPU; latar tetap pekat jika tidak didukung. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  html[data-theme] .a-publik--prototipe .a-proto-login-card,
+  html[data-theme] .a-app--prototipe .a-page > .a-card:not(.a-siswa-media),
+  html[data-theme] .a-app--prototipe .a-atp-kelompok {
+    background:var(--eg-pane-strong);
+  }
+}
