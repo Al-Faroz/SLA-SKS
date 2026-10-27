@@ -77,6 +77,30 @@
         </div>
     </section>
 
+    <?php if ($paketAktif !== null && ! $belumMulai): ?>
+        <section class="a-card" aria-labelledby="judul-impor-atp">
+            <h2 id="judul-impor-atp">Pratinjau impor ATP Excel</h2>
+            <p class="a-proto-muted">Unggah file .xlsx dari template resmi (maksimal 5 MB).
+                Sistem membaca BAB/TP dari enam semester dan menampilkan hasil pemeriksaan terlebih dahulu.
+                <strong>Belum ada perubahan database.</strong></p>
+            <form class="a-form" method="post" enctype="multipart/form-data"
+                action="<?= esc(site_url('guru/peta-atp/pratinjau/' . (int) $paketAktif['id']), 'attr') ?>">
+                <?= csrf_field() ?>
+                <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
+                <input type="hidden" name="semester" value="<?= (int) $nomorSemester ?>">
+                <div class="a-field">
+                    <label class="a-label" for="atp-excel-pratinjau">File Excel ATP (.xlsx)</label>
+                    <input id="atp-excel-pratinjau" name="atp_excel" type="file"
+                        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        required>
+                </div>
+                <div class="a-atp-detail__toolbar-actions">
+                    <button class="a-btn a-btn--sekunder" type="submit">Periksa &amp; Pratinjau Excel</button>
+                </div>
+            </form>
+        </section>
+    <?php endif ?>
+
     <?php if ($bolehTambahBab): ?>
         <dialog id="dialog-bab-semester" class="a-modal a-modal--atp" aria-labelledby="judul-dialog-bab">
             <div class="a-modal-atp__header">
