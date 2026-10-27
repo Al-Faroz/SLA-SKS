@@ -51,7 +51,7 @@
                 <h2 id="judul-semester-<?= (int) $nomor ?>">Semester <?= (int) $nomor ?></h2>
                 <?php if ($data['paket'] !== [] && ($data['pola_bab'] ?? false)): ?>
                     <?php $paketUntukBab = null; foreach ($data['paket'] as $candidate) { if ($candidate['status'] !== 'arsip') { $paketUntukBab = $candidate; break; } } ?>
-                    <?php if ($paketUntukBab !== null): ?>
+                    <?php if ($paketUntukBab !== null && ($data['boleh_tambah_bab'] ?? true)): ?>
                         <form class="a-form a-jarak-atas" method="post" action="<?= esc(site_url('guru/bab/baru'), 'attr') ?>">
                             <?= csrf_field() ?>
                             <input type="hidden" name="paket_id" value="<?= (int) $paketUntukBab['id'] ?>">
@@ -66,6 +66,12 @@
                             </div>
                             <button class="a-btn a-btn--utama" type="submit">Tambah BAB Semester <?= (int) $nomor ?></button>
                         </form>
+                    <?php elseif ($paketUntukBab !== null && ! ($data['boleh_tambah_bab'] ?? true)): ?>
+                        <div class="a-alert" role="status">
+                            <?= $nomor % 2 === 0
+                                ? 'Lengkapi BAB pada semester ganjil di kelas yang sama terlebih dahulu, agar nomor BAB tetap berurutan.'
+                                : 'Semester genap di kelas yang sama telah memiliki BAB. Tidak dapat menyisipkan BAB baru di semester ganjil tanpa peninjauan urutan.' ?>
+                        </div>
                     <?php endif ?>
                     <?php if ($data['bab'] !== []): ?>
                         <div class="a-tabel-gulir a-jarak-atas">

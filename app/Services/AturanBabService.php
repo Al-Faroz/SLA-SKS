@@ -18,6 +18,7 @@ final class AturanBabService
 
         $nomor = [];
         $adaSemesterGenap = false;
+        $adaSemesterGanjil = false;
         foreach ($babTerdaftar as $bab) {
             $keSemester = (int) ($bab['semester'] ?? 0);
             $keNomor = (int) ($bab['nomor_bab'] ?? 0);
@@ -28,7 +29,13 @@ final class AturanBabService
             $nomor[$keNomor] = true;
             if ($keSemester % 2 === 0) {
                 $adaSemesterGenap = true;
+            } else {
+                $adaSemesterGanjil = true;
             }
+        }
+
+        if ($semester % 2 === 0 && ! $adaSemesterGanjil) {
+            throw new DomainException('Buat BAB pada semester ganjil di kelas yang sama terlebih dahulu agar nomor BAB berlanjut.');
         }
 
         if ($semester % 2 === 1 && $adaSemesterGenap) {
