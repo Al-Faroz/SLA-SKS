@@ -14,6 +14,7 @@ $peranAktif = $peranAktif ?? '';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
     <title><?= esc($judul ?? 'Panel') ?> · SLA-SKS</title>
     <?php
         // Browser harus mengambil CSS/JS baru setelah git pull.
