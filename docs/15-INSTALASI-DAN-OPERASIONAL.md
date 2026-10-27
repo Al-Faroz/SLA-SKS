@@ -85,8 +85,8 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 
 ## 9. SOP instalasi khusus `sla_sks_v4` (26 Oktober 2026)
 1. Sumber privat: dump `sla_sks_v3 (4).sql`, dibuat 26-10-2026 09:36 oleh MariaDB 10.4.32. Backup ulang `sla_sks_v3` **dan `writable/`** dahulu. Jangan hapus sumber v3.
-2. Gunakan file `sla_sks_v4_LOKAL_PRIVAT.sql` hasil rekonstruksi lokal; ia membuat DB **baru yang belum ada** bernama `sla_sks_v4`, mengimpor v3 dan menambah kontrak `V4-0001`. Bila DB v4 sudah ada, hentikan dan periksa; jangan auto-DROP.
-3. Impor melalui phpMyAdmin pada koneksi MariaDB lokal. Karena DDL implicit commit, backup dan proses pemulihan penting. Cek schema_version, CP operasional/elemen, BAB/TP, status arsip TP uji v3, tepat satu Materi aktif per TP, dan relasi ujian.
+2. **Berkas lama `sla_sks_v4_LOKAL_PRIVAT.sql` digantikan R2.** Pemilik telah mengimpor `sla_sks_v4_LOKAL_PRIVAT_DIPERBAIKI_R2.sql` ke DB baru `sla_sks_v4` menggunakan phpMyAdmin dengan 268 kueri. Penanda final `V4-0001-R2`. Jangan mengimpor ulang file lama, R2, atau patch SQL repo pada database v4 yang sudah terpasang; sebelum update berikutnya lakukan backup dan gunakan patch bernomor BARU. DB `sla_sks_v3` tetap tidak disentuh.
+3. **QA awal lokal 27-10-2026 PASS:** 58 tabel, 126 FK, penanda `V4-0001-R2`, 37 pengguna, 17 siswa, 20 mapel, 0 BAB, 4 Materi historis, 2 percobaan historis. Ini hanya QA struktur/jumlah awal, bukan bukti seluruh relasi dan alur UI. Untuk perubahan berikutnya tetap jalankan QA baca-saja plus pengujian CI4.
 4. **Jangan mengalihkan `.env` ke v4 selama kode MVC/Service/UI masih kontrak lama.** Sesudah penerapan kode v2.5 dan QA, pemilik dapat memilih DB v4 lokal dan menjalankan pengujian. URL `http://localhost/sla-sks/`/root index.php tidak berubah.
 5. MySQL lokal dan MariaDB hosting **perlu dua tes terpisah**; belum ada deployment hosting sehingga jangan menyatakan lolos di sana. Dump PII/backup/hash tidak dipush GitHub.
-6. File Excel ATP bermakro, generator/validator impor dan implementasi aplikasi dijadwalkan **setelah** fondasi dokumen dan DB ini.
+6. Template ATP Excel **manual tanpa macro** sudah dibuat sebagai berkas lokal; pemasukan template ke `docs/`, generator/validator impor, dan implementasi aplikasi dijadwalkan setelah fondasi dokumen/DB ini.
