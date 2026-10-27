@@ -36,6 +36,14 @@ Implementasi: variabel CSS --a-grad-1 ... --a-grad-6, masing-masing memiliki pad
 - Layar ujian tidak menggunakan animasi/glass dekoratif; semua kontrol ujian dan timer tetap dengan server sebagai sumber kebenaran.
 
 
+### QA responsif tablet dan drawer HP (27-10-2026)
+
+**Audit sumber aktual:** `app.css` mengganti `.a-tbl--cards` menjadi mode kartu pada lebar <=980px, sementara override Dark/Light di `emerald-glass.css` sebelumnya berlaku <=767px. Akibatnya kartu tabel pada 768–980px masih dapat memakai `background: #fff` milik CSS historis. Penanganan sementara tahap ini: komponen kartu tabel pada **seluruh <=980px** memakai token permukaan, border, label `data-label`, zebra/hover aman, tata letak <=420px satu kolom, dan tombol/form dalam sel tidak terpotong. Tabel padat non-kartu tetap boleh digulir **di dalam kontainer tabel**, tanpa scrollbar menyeluruh.
+
+**Drawer HP:** `public/assets/js/app.js` membatasi tab keyboard di sidebar saat drawer dibuka, menonaktifkan interaksi area `.a-main` menggunakan `inert`, mengunci scroll latar sementara, mengembalikan fokus ke tombol Menu ketika ditutup dengan Escape/backdrop, dan melepas kunci saat breakpoint kembali desktop. Menu tetap bersumber dari server; link, role, dan route tidak berubah. CSS menampilkan `100dvh` dengan fallback lama, backdrop blur sederhana, dan focus ring pada tombol Menu/link.
+
+**Kriteria QA wajib sebelum FIX:** uji tablet 768/820/980px dan HP 360/390/420px untuk Pengelola, Siswa, Bank Soal, Peta ATP, halaman Semester; buka menu, Tab/Shift+Tab berulang, Escape, klik backdrop, klik tautan, ubah lebar browser saat menu terbuka; pastikan halaman tidak ber-scroll horizontal kecuali pada kontainer tabel yang memang membutuhkan scroll. Uji Dark dan Light. Jangan mengklaim QA lokal dari pemeriksaan sumber statis.
+
 ### Audit lanjutan komponen UI (screenshot XAMPP 27 Oktober 2026)
 
 Temuan visual: gradasi wallpaper dan sidebar sudah mendekati Emerald Glass, tetapi masih terdapat konflik `app.css` dengan lapisan tema pada card, breadcrumb, tabel, input, ikon kartu KPI dan toolbar Excel. Penyesuaian V3 dilakukan **hanya pada CSS** dengan mempertahankan HTML dan seluruh fungsi.
