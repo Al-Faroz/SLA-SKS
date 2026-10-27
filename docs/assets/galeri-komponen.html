@@ -451,6 +451,48 @@
           <div class="a-atp-bab-card__tabel"><table class="a-tbl"><thead><tr><th>Kode TP</th><th>Nama TP</th><th>Jenis</th></tr></thead><tbody><tr><td>SKI.8.1.1</td><td>Perkembangan Daulah</td><td>NonEsensial</td></tr></tbody></table></div>
       </div>
   </section>
+  <section class="a-card" id="galeri-light-admin" aria-labelledby="galeri-light-admin-title">
+      <h2 id="galeri-light-admin-title">Audit komponen Admin/Guru · Dark dan Light</h2>
+      <p class="a-help">Contoh tampilan tanpa data akademik. Ganti tema di galeri, lalu bandingkan pager, status, rincian CP, dan validasi input. Tautan serta form asli tetap diuji melalui XAMPP.</p>
+      <div class="a-app a-app--prototipe" style="display:block;min-height:auto;background:transparent;margin-top:16px">
+          <div class="a-page" style="display:grid;gap:16px">
+              <div class="a-card">
+                  <h3>Status Guru</h3>
+                  <p style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px">
+                      <span class="a-soal-status-badge is-aktif">Soal aktif</span>
+                      <span class="a-soal-status-badge">Draf</span>
+                      <span class="a-tp-status is-lengkap">Lengkap</span>
+                      <span class="a-tp-status is-kurang">Perlu dilengkapi</span>
+                      <span class="a-badge a-badge--tunggu">Menunggu</span>
+                  </p>
+                  <div class="a-kesiapan-ringkasan" style="margin-top:12px">
+                      <div><strong>4</strong><span>Contoh TP</span></div>
+                      <div><strong>2</strong><span>Contoh BAB</span></div>
+                  </div>
+              </div>
+              <div class="a-card">
+                  <h3>Pagination dan rincian CP</h3>
+                  <div class="a-pager" style="justify-content:flex-start;margin:12px 0">
+                      <span class="a-pager__tombol is-aktif" aria-current="page">1</span>
+                      <span class="a-pager__tombol">2</span>
+                      <span class="a-pager__tombol is-nonaktif">Berikutnya</span>
+                  </div>
+                  <details class="a-cp__details">
+                      <summary>Contoh rincian Capaian Pembelajaran</summary>
+                      <p style="padding:12px 14px">Panel ini tetap dapat dibuka melalui keyboard, tanpa perubahan proses akademik.</p>
+                  </details>
+              </div>
+              <div class="a-card">
+                  <h3>Validasi input</h3>
+                  <div class="a-field" style="margin-top:12px">
+                      <label class="a-label" for="galeri-input-invalid">Nama BAB (contoh galat)</label>
+                      <input id="galeri-input-invalid" class="a-input" type="text" aria-invalid="true" aria-describedby="galeri-error" value="">
+                      <span class="a-error" id="galeri-error">Nama BAB wajib diisi.</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
   <section class="a-card" aria-labelledby="galeri-emerald">
       <h2 id="galeri-emerald">Emerald Glass · Dark/Light dan enam gradient</h2>
       <p class="a-help">Contoh visual. Tombol tema mengubah tampilan galeri saja; data aplikasi tidak berubah.</p>
