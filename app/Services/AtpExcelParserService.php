@@ -307,18 +307,15 @@ final class AtpExcelParserService
             if ($nomor === []) {
                 continue;
             }
-            // Pembacaan mengikuti semester lalu baris: BAB S genap tidak boleh
-            // mendahului/mengulang BAB semester ganjil sekelas.
+            // Parser hanya memeriksa berurutan dalam file. Angka awal
+            // dapat lebih dari 1 untuk impor parsial semester genap saat
+            // semester ganjil sudah dibuat lewat aplikasi. Service pratinjau
+            // memvalidasi gabungan dengan seluruh BAB di DB.
             foreach ($nomor as $i => $n) {
-                if ($n !== $i + 1) {
+                if ($n !== $nomor[0] + $i) {
                     throw new DomainException('Kelas semester ' . $awal . '–' . ($awal + 1)
-                        . ': nomor BAB harus berurutan mulai 1 tanpa ganda dan sesuai urutan semester.');
+                        . ': nomor BAB Excel tidak berurutan.');
                 }
-            }
-            if ($nomor !== [] && isset($babSem[$awal + 1]) && ! isset($babSem[$awal])
-                && $semesterMulai !== $awal + 1) {
-                throw new DomainException('Semester ' . ($awal + 1)
-                    . ': susun BAB semester ganjil pada kelas yang sama terlebih dahulu.');
             }
         }
         foreach ($tpSem as $s => $perBab) {
