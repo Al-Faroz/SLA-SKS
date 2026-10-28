@@ -100,7 +100,8 @@ final class AtpExcelParserService
      * @return array{bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,jumlah_bab:int,jumlah_tp:int}
      */
     public static function baca(string $path, string $kodeMapel, int $semesterMulai,
-        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0): array
+        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0,
+        array $referensiCpAktif = []): array
     {
         if ($semesterMulai < 1 || $semesterMulai > 6 || $kodeGen === '') {
             throw new DomainException('Konteks Gen tidak valid.');
@@ -112,7 +113,8 @@ final class AtpExcelParserService
             throw new DomainException('File Excel ATP gagal dibaca. Gunakan template resmi .xlsx.', 0, $e);
         }
         try {
-            return self::bacaBuku($buku, $kodeMapel, $semesterMulai, $kodeGen, $elemenDiizinkan, $cpId);
+            return self::bacaBuku($buku, $kodeMapel, $semesterMulai,
+                $kodeGen, $elemenDiizinkan, $cpId, $referensiCpAktif);
         } finally {
             $buku->disconnectWorksheets();
         }
@@ -125,7 +127,8 @@ final class AtpExcelParserService
      * @return array{bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,jumlah_bab:int,jumlah_tp:int}
      */
     public static function bacaBuku(Spreadsheet $buku, string $kodeMapel, int $semesterMulai,
-        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0): array
+        string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0,
+        array $referensiCpAktif = []): array
     {
         if ($buku->getSheetNames() !== self::SHEETS
             || (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue()
@@ -139,6 +142,40 @@ final class AtpExcelParserService
             || ($cpId > 0 && self::nilai($ringkasan, 'B14') !== (string) $cpId)) {
             throw new DomainException('Identitas Gen/Mapel/CP pada file tidak sesuai penugasan yang dipilih.');
         }
+        // V2.5: stale Excel hasil unduhan sebelum revisi CP wajib ditolak.
+        // A7:E... di sheet referensi harus identik dengan versi/teks server.
+        // Baris CP bukan isian Guru; cek ulang sebelum membandingkan BAB/TP.
+        if ($referensiCpAktif !== []) {
+            $cpSheet = $buku->getSheetByName('REFERENSI CP');
+            $cpRows = [];
+            foreach ($referensiCpAktif as $cpRow) {
+                $cpRows[] = [
+                    (string) $cpRow['id'],
+                    (string) $cpRow['elemen'],
+                    (string) $cpRow['rumusan'],
+                    'D',
+                    (string) $cpRow['nomor_versi'],
+                ];
+            }
+            if (count($cpRows) > 100) {
+                throw new DomainException('Referensi CP aktif melebihi kapasitas Excel.');
+            }
+            foreach ($cpRows as $i => $values) {
+                $baris = $i + 7;
+                foreach (['A','B','C','D','E'] as $j => $kolom) {
+                    if (self::nilai($cpSheet, $kolom . $baris) !== trim($values[$j])) {
+                        throw new DomainException('REFERENSI CP!'. $kolom . $baris
+                            . ': daftar/rumusan CP sudah berubah. Unduh ulang ATP Excel.');
+                    }
+                }
+            }
+            $last = count($cpRows) + 7;
+            if (self::nilai($cpSheet, 'A' . $last) !== '') {
+                throw new DomainException(
+                    'REFERENSI CP: terdapat CP lama/ekstra. Unduh ulang ATP Excel.');
+            }
+        }
+
         foreach ($buku->getAllSheets() as $sheet) {
             // Formula tersembunyi pada sheet panduan, CP atau di luar area tabel juga ditolak.
             foreach ($sheet->getCellCollection()->getCoordinates() as $alamat) {
