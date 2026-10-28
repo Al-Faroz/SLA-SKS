@@ -79,139 +79,213 @@ final class AtpImporPratinjauService
             (int) $paket['semester_mulai'], (string) $paket['kode_gen'],
             array_column($elemen, 'elemen'), (int) $cp[0]['id'], $elemen);
 
-        // Paket yang dibandingkan harus identik Gen–Mapel–TA–Kurikulum, bukan seluruh G1.
+        // Workbook berisi enam semester. Tahun Ajaran WAJIB diambil dari
+        // paket semester masing-masing; tidak boleh menyalin TA paket acuan.
         $daftarPaket = $this->db->table('paket_semester')
-            ->select('id,semester,status')
-            ->where('angkatan_id', $paket['angkatan_id'])
-            ->where('mapel_id', $paket['mapel_id'])
-            ->where('kurikulum_id', $paket['kurikulum_id'])
-            ->where('tahun_ajaran_id', $paket['tahun_ajaran_id'])
+            ->select('id,semester,status,kurikulum_id,tahun_ajaran_id')
+            ->where('angkatan_id', (int) $paket['angkatan_id'])
+            ->where('mapel_id', (int) $paket['mapel_id'])
             ->where('status !=', 'arsip')
+            ->orderBy('semester', 'ASC')->orderBy('id', 'ASC')
             ->get()->getResultArray();
         $paketSem = [];
+        $tahunSem = [];
+        $statusSem = [];
+        $bukanKurikulum = [];
         foreach ($daftarPaket as $p) {
             $s = (int) $p['semester'];
-            if (isset($paketSem[$s])) {
-                throw new DomainException('Paket semester aktif ganda. Hubungi Admin.');
+            // Dua paket aktif satu semester ambigu, meskipun beda tahun/kurikulum.
+            if (isset($paketSem[$s]) || isset($bukanKurikulum[$s])) {
+                throw new DomainException('Semester ' . $s
+                    . ' memiliki lebih dari satu paket nonarsip. Hubungi Admin.');
+            }
+            if ((int) $p['kurikulum_id'] !== (int) $paket['kurikulum_id']) {
+                $bukanKurikulum[$s] = true;
+                continue;
             }
             $paketSem[$s] = (int) $p['id'];
+            $tahunSem[$s] = (int) $p['tahun_ajaran_id'];
+            $statusSem[$s] = (string) $p['status'];
         }
 
         $babTerdaftar = [];
         $tpTerdaftar = [];
         if ($paketSem !== []) {
-            $babTerdaftar = $this->db->table('bab b')
-                ->select('b.id,b.paket_semester_id,b.nomor_bab,b.nama_bab,b.deskripsi_bab')
-                ->whereIn('b.paket_semester_id', array_values($paketSem))
+            $babTerdaftar = $this->db->table('bab')
+                ->select('id,paket_semester_id,nomor_bab,nama_bab,deskripsi_bab')
+                ->whereIn('paket_semester_id', array_values($paketSem))
                 ->get()->getResultArray();
-            $tpTerdaftar = $this->db->table('tp t')
-                ->select('t.id,t.paket_semester_id,t.bab_id,t.kode_tp,t.jenis_tp,'
-                    . 't.nama_tp,t.deskripsi_tp,t.status')
-                ->whereIn('t.paket_semester_id', array_values($paketSem))
+            $tpTerdaftar = $this->db->table('tp')
+                ->select('id,paket_semester_id,bab_id,kode_tp,jenis_tp,'
+                    . 'nama_tp,deskripsi_tp,status')
+                ->whereIn('paket_semester_id', array_values($paketSem))
                 ->get()->getResultArray();
         }
         $semesterDariPaket = array_flip($paketSem);
         $babIndeks = [];
         $babId = [];
+        $babDbSem = [];
         foreach ($babTerdaftar as $b) {
             $s = (int) ($semesterDariPaket[(int) $b['paket_semester_id']] ?? 0);
             $n = (int) $b['nomor_bab'];
             $babIndeks[$s][$n] = $b;
+            $babDbSem[$s][] = $b;
             $babId[(int) $b['id']] = [$s, $n];
         }
         $tpIndeks = [];
+        $tpDbSem = [];
         foreach ($tpTerdaftar as $t) {
             $s = (int) ($semesterDariPaket[(int) $t['paket_semester_id']] ?? 0);
             $tpIndeks[$s][(string) $t['kode_tp']] = $t;
+            $tpDbSem[$s][] = $t;
+        }
+
+        $babExcelSem = [];
+        $tpExcelSem = [];
+        foreach ($hasil['bab'] as $b) {
+            $babExcelSem[(int) $b['semester']][] = $b;
+        }
+        foreach ($hasil['tp'] as $t) {
+            $tpExcelSem[(int) $t['semester']][] = $t;
         }
 
         $batasBab = BatasNamaAtpService::aktual($this->db, 'bab');
         $batasTp = BatasNamaAtpService::aktual($this->db, 'tp');
         $daftar = [];
         $jumlah = ['baru' => 0, 'ubah' => 0, 'tetap' => 0, 'galat' => 0];
-        foreach ($hasil['bab'] as $b) {
-            $s = $b['semester'];
-            $lama = $babIndeks[$s][$b['nomor']] ?? null;
-            $status = $lama === null ? 'baru'
-                : (($lama['nama_bab'] === $b['nama']
-                    && $lama['deskripsi_bab'] === $b['deskripsi']) ? 'tetap' : 'ubah');
-            $catatan = '';
-            if (! isset($paketSem[$s])) {
-                $status = 'galat';
-                $catatan = 'Paket draf semester ini belum dibuat atau sudah diarsipkan.';
-            } elseif (mb_strlen($b['nama']) > $batasBab) {
-                $status = 'galat';
-                $catatan = 'Database saat ini membatasi nama BAB hingga ' . $batasBab . ' karakter.';
+        $modeSem = [];
+        $catatanSem = [];
+        for ($s = 1; $s <= 6; ++$s) {
+            $eb = $babExcelSem[$s] ?? [];
+            $et = $tpExcelSem[$s] ?? [];
+            if ($eb === [] && $et === []) {
+                continue; // Tidak ada isi Excel: bukan perintah hapus atau update.
             }
-            if ($status === 'ubah' && $lama !== null) {
-                foreach ($tpTerdaftar as $t) {
-                    if ((int) $t['bab_id'] === (int) $lama['id']
-                        && $t['status'] !== 'draf') {
-                        $status = 'galat';
-                        $catatan = 'BAB memiliki TP Siap; perubahan perlu mekanisme koreksi.';
+            $dbBab = $babDbSem[$s] ?? [];
+            $dbTp = $tpDbSem[$s] ?? [];
+            $pesan = '';
+            if (isset($bukanKurikulum[$s])) {
+                $pesan = 'Paket semester menggunakan kurikulum berbeda. Pilih konteks Excel yang sesuai.';
+            } elseif (! isset($paketSem[$s])) {
+                $pesan = 'Paket semester belum ada. Buat paket dengan Tahun Ajaran benar pada halaman semester.';
+            } elseif ($eb === [] || $et === []) {
+                $pesan = 'Setiap semester sasaran wajib berisi BAB dan sekurangnya satu TP.';
+            } elseif (array_filter($eb, static fn (array $b): bool => mb_strlen($b['nama']) > $batasBab)) {
+                $pesan = 'Nama BAB melebihi batas kolom database (' . $batasBab . ' karakter).';
+            } elseif (array_filter($et, static fn (array $t): bool => mb_strlen($t['nama']) > $batasTp)) {
+                $pesan = 'Nama TP melebihi batas kolom database (' . $batasTp . ' karakter).';
+            }
+
+            if ($pesan !== '') {
+                $modeSem[$s] = 'galat';
+                $catatanSem[$s] = $pesan;
+                continue;
+            }
+
+            if ($dbBab === [] && $dbTp === []) {
+                $modeSem[$s] = 'baru';
+                continue;
+            }
+
+            // Semester yang sudah diisi *hanya* boleh muncul sebagai status
+            // Tetap bila SEMUA baris Excel identik dengan DB. Perbedaan sekecil
+            // apa pun => GALAT; tidak ada UPDATE ataupun INSERT tambahan.
+            $sama = count($dbBab) === count($eb)
+                && count($dbTp) === count($et);
+            if ($sama) {
+                foreach ($eb as $b) {
+                    $old = $babIndeks[$s][(int) $b['nomor']] ?? null;
+                    if ($old === null || $old['nama_bab'] !== $b['nama']
+                        || $old['deskripsi_bab'] !== $b['deskripsi']) {
+                        $sama = false;
                         break;
                     }
                 }
             }
+            if ($sama) {
+                foreach ($et as $t) {
+                    $old = $tpIndeks[$s][(string) $t['kode']] ?? null;
+                    if ($old === null
+                        || $old['nama_tp'] !== $t['nama']
+                        || $old['deskripsi_tp'] !== $t['deskripsi']
+                        || $old['jenis_tp'] !== $t['jenis']
+                        || ($babId[(int) $old['bab_id']] ?? null)
+                            !== [$s, (int) $t['nomor_bab']]) {
+                        $sama = false;
+                        break;
+                    }
+                }
+            }
+            $modeSem[$s] = $sama ? 'tetap' : 'galat';
+            if (! $sama) {
+                $catatanSem[$s] = 'Semester sudah memiliki BAB/TP. '
+                    . 'Impor tidak boleh menambah atau mengubah data manual/draf. '
+                    . 'Sunting melalui aplikasi.';
+            }
+        }
+
+        // Setelah gabungan semester lama + baru, urutan BAB dalam tiap
+        // kelas harus selalu 1,2,3,... termasuk di pasangan lintas TA.
+        for ($awal = 1; $awal <= 5; $awal += 2) {
+            $gabungan = [];
+            for ($s = $awal; $s <= $awal + 1; ++$s) {
+                if (($modeSem[$s] ?? '') === 'baru') {
+                    foreach ($babExcelSem[$s] ?? [] as $b) {
+                        $gabungan[] = (int) $b['nomor'];
+                    }
+                } else {
+                    $rows = $babDbSem[$s] ?? [];
+                    usort($rows, static fn (array $a, array $b): int =>
+                        (int) $a['nomor_bab'] <=> (int) $b['nomor_bab']);
+                    foreach ($rows as $b) {
+                        $gabungan[] = (int) $b['nomor_bab'];
+                    }
+                }
+            }
+            foreach ($gabungan as $i => $n) {
+                if ($n !== $i + 1) {
+                    for ($s = $awal; $s <= $awal + 1; ++$s) {
+                        if (($modeSem[$s] ?? '') === 'baru') {
+                            $modeSem[$s] = 'galat';
+                            $catatanSem[$s] = 'Nomor BAB harus berurutan di Semester '
+                                . $awal . '–' . ($awal + 1)
+                                . ', termasuk BAB yang sudah ada di aplikasi.';
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        foreach ($hasil['bab'] as $b) {
+            $s = (int) $b['semester'];
+            $status = $modeSem[$s] ?? 'galat';
             $daftar[] = [
                 'jenis' => 'BAB', 'semester' => $s, 'baris' => $b['baris'],
                 'kode' => 'BAB ' . $b['nomor'], 'nama' => $b['nama'],
-                'status' => $status, 'catatan' => $catatan,
+                'status' => $status, 'catatan' => $catatanSem[$s] ?? '',
             ];
             $jumlah[$status]++;
         }
         foreach ($hasil['tp'] as $t) {
-            $s = $t['semester'];
-            $lama = $tpIndeks[$s][$t['kode']] ?? null;
-            $status = $lama === null ? 'baru'
-                : (($lama['nama_tp'] === $t['nama']
-                    && $lama['deskripsi_tp'] === $t['deskripsi']
-                    && $lama['jenis_tp'] === $t['jenis']
-                    && isset($babId[(int) $lama['bab_id']])
-                    && $babId[(int) $lama['bab_id']] === [$s, $t['nomor_bab']])
-                    ? 'tetap' : 'ubah');
-            $catatan = '';
-            if (! isset($paketSem[$s])) {
-                $status = 'galat';
-                $catatan = 'Paket semester ini belum dibuat atau sudah diarsipkan.';
-            } elseif (mb_strlen($t['nama']) > $batasTp) {
-                $status = 'galat';
-                $catatan = 'Database membatasi nama TP hingga ' . $batasTp . ' karakter.';
-            } elseif ($lama !== null && $lama['status'] === 'arsip') {
-                $status = 'galat';
-                $catatan = 'Kode TP sudah dipakai pada TP arsip; tidak boleh ditimpa.';
-            } elseif ($lama !== null && $lama['status'] === 'siap' && $status === 'ubah') {
-                $status = 'galat';
-                $catatan = 'TP Siap tidak boleh diubah oleh impor biasa.';
-            }
-            if ($status === 'ubah' && $lama !== null && $lama['status'] === 'draf') {
-                foreach (['materi', 'versi_konten_tp', 'progres_tp'] as $tabel) {
-                    if ($this->db->table($tabel)
-                        ->where('tp_id', (int) $lama['id'])->countAllResults() !== 0) {
-                        $status = 'galat';
-                        $catatan = 'TP sudah memiliki konten/progres; sunting melalui editor resmi.';
-                        break;
-                    }
-                }
-            }
+            $s = (int) $t['semester'];
+            $status = $modeSem[$s] ?? 'galat';
             $daftar[] = [
                 'jenis' => 'TP', 'semester' => $s, 'baris' => $t['baris'],
                 'kode' => $t['kode'], 'nama' => $t['nama'],
-                'status' => $status, 'catatan' => $catatan,
+                'status' => $status, 'catatan' => $catatanSem[$s] ?? '',
             ];
             $jumlah[$status]++;
         }
 
-        // Simpan fingerprint semantik terhadap seluruh state lama, termasuk
-        // keterangan yang tidak ikut ditampilkan. Hilangkan pengaruh urutan SQL.
         usort($babTerdaftar, static fn (array $a, array $b): int => (int) $a['id'] <=> (int) $b['id']);
         usort($tpTerdaftar, static fn (array $a, array $b): int => (int) $a['id'] <=> (int) $b['id']);
         usort($daftarPaket, static fn (array $a, array $b): int => (int) $a['id'] <=> (int) $b['id']);
         usort($elemen, static fn (array $a, array $b): int =>
             strcmp((string) $a['elemen'], (string) $b['elemen']));
         $fingerprint = hash('sha256', json_encode([
-            $paket, $cp, $elemen, $daftarPaket, $babTerdaftar, $tpTerdaftar,
-            $jumlah, $daftar,
+            $paket, $cp, $elemen, $daftarPaket, $babTerdaftar,
+            $tpTerdaftar, $jumlah, $daftar, $modeSem, $tahunSem,
         ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
         $kosong = $hasil['jumlah_bab'] === 0 && $hasil['jumlah_tp'] === 0;
         return [
@@ -220,16 +294,17 @@ final class AtpImporPratinjauService
             'jumlah' => $jumlah, 'baris' => $daftar,
             'kosong' => $kosong,
             'boleh_konfirmasi' => ! $kosong && $jumlah['galat'] === 0
-                && ($jumlah['baru'] + $jumlah['ubah']) > 0,
+                && $jumlah['baru'] > 0,
             'fingerprint' => $fingerprint,
             'rencana' => $hasil,
+            'mode_semester' => $modeSem,
             'paket_semester' => $paketSem,
+            'tahun_semester' => $tahunSem,
             'cp_mapel_id' => (int) $cp[0]['id'],
             'konteks' => [
                 'angkatan_id' => (int) $paket['angkatan_id'],
                 'mapel_id' => (int) $paket['mapel_id'],
                 'kurikulum_id' => (int) $paket['kurikulum_id'],
-                'tahun_ajaran_id' => (int) $paket['tahun_ajaran_id'],
             ],
         ];
     }
