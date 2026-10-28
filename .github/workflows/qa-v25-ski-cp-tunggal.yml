@@ -1,0 +1,81 @@
+name: QA SKI CP Tunggal V4-0003
+
+on:
+  pull_request:
+    paths:
+      - 'database/sql/updates/V4-0003_SKI_SATU_ELEMEN_CP_AKTIF.sql'
+      - 'database/sql/qa/V4-0003_SKI_SATU_ELEMEN_VERIFIKASI_READONLY.sql'
+      - 'app/Services/CpReferensiService.php'
+      - 'app/Services/CpOperasionalService.php'
+      - 'app/Services/AtpDesainWorkbookService.php'
+      - 'tests/unit/CpSkiTunggalTest.php'
+      - '.github/workflows/qa-v25-ski-cp-tunggal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP lint and SKI CP publication guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, zip, dom, xml, gd, mysqli
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Services/CpReferensiService.php
+          php -l app/Services/CpOperasionalService.php
+          php -l app/Services/AtpDesainWorkbookService.php
+          php -l tests/unit/CpSkiTunggalTest.php
+      - run: vendor/bin/phpunit --no-coverage --filter 'CpSkiTunggalTest|AtpExcelParserServiceTest|AtpUnduhanServiceTest'
+
+  sql:
+    name: MariaDB 10.11 one active element, history and replay
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
+          MARIADB_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq mariadb-client
+      - name: Synthetic fixture, then both versioned SQL patches
+        run: |
+          mariadb --protocol=tcp -h 127.0.0.1 -uroot sla_sks_qa < tests/fixtures/cp_ski_v4_qa.sql
+          mariadb --protocol=tcp -h 127.0.0.1 -uroot sla_sks_qa < database/sql/updates/V4-0002_CP_OPERASIONAL_SKI_PK.sql
+          mariadb --protocol=tcp -h 127.0.0.1 -uroot sla_sks_qa < database/sql/updates/V4-0003_SKI_SATU_ELEMEN_CP_AKTIF.sql
+      - name: Only PK active; KP and past TP reference preserved
+        run: |
+          SQL="mariadb --protocol=tcp -h 127.0.0.1 -uroot -N -s sla_sks_qa"
+          test "$($SQL -e "SELECT COUNT(*) FROM schema_version WHERE versi='V4-0003-SKI-CP-TUNGGAL'")" = "1"
+          test "$($SQL -e "SELECT COUNT(*) FROM cp_mapel_elemen ce JOIN ref_cp_versi v ON v.id=ce.cp_versi_id WHERE ce.cp_mapel_id=1 AND v.status='aktif'")" = "1"
+          test "$($SQL -e "SELECT COUNT(*) FROM cp_mapel_elemen ce JOIN ref_cp_versi v ON v.id=ce.cp_versi_id JOIN ref_cp r ON r.id=v.cp_id WHERE ce.cp_mapel_id=1 AND r.kode='KBC25-SKI-D-PK' AND v.elemen='Pemahaman Konsep' AND v.status='aktif'")" = "1"
+          test "$($SQL -e "SELECT COUNT(*) FROM ref_cp_versi WHERE id=3 AND elemen='Keterampilan Proses' AND status='diarsipkan'")" = "1"
+          test "$($SQL -e "SELECT COUNT(*) FROM tp_cp WHERE id=1 AND tp_id=1 AND cp_versi_id=2")" = "1"
+          test "$($SQL -e "SELECT COUNT(*) FROM cp_mapel_elemen WHERE cp_mapel_id=1")" = "3"
+          test "$($SQL -e "SELECT COUNT(*) FROM log_aktivitas WHERE peristiwa='cp_ski_elemen_dinonaktifkan'")" = "1"
+      - name: Reimport of V4-0003 must fail without duplicate audit
+        run: |
+          if mariadb --protocol=tcp -h 127.0.0.1 -uroot sla_sks_qa < database/sql/updates/V4-0003_SKI_SATU_ELEMEN_CP_AKTIF.sql; then
+            echo "ERROR: V4-0003 unexpectedly accepted repeated execution"
+            exit 1
+          fi
+          test "$(mariadb --protocol=tcp -h 127.0.0.1 -uroot -N -s sla_sks_qa -e "SELECT COUNT(*) FROM log_aktivitas WHERE peristiwa='cp_ski_elemen_dinonaktifkan'")" = "1"
