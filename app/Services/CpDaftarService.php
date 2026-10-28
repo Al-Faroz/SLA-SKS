@@ -73,14 +73,28 @@ final class CpDaftarService
     }
 
     /** @param array{cari:string,mapel:int,kurikulum:int,status:string} $filter */
+    /** Satu baris satu CP operasional; sumber/elemen boleh lebih dari satu. */
     private function builder(array $filter): BaseBuilder
     {
-        $q = $this->db->table('ref_cp c')
+        $aktif = "(SELECT ce.cp_mapel_id,"
+            . " COUNT(DISTINCT CASE WHEN v.status='aktif' THEN v.id ELSE NULL END) AS jumlah_aktif,"
+            . " GROUP_CONCAT(DISTINCT CASE WHEN v.status='aktif' THEN v.elemen ELSE NULL END"
+            . " ORDER BY v.elemen SEPARATOR ' | ') AS elemen_aktif"
+            . " FROM cp_mapel_elemen ce JOIN ref_cp_versi v ON v.id=ce.cp_versi_id"
+            . " GROUP BY ce.cp_mapel_id) a";
+        $sumber = "(SELECT rc.kurikulum_id,rc.mapel_id,rc.fase_id,"
+            . " COUNT(DISTINCT CASE WHEN rv.status='draf' THEN rv.id ELSE NULL END) AS jumlah_draf,"
+            . " COUNT(DISTINCT rc.id) AS jumlah_sumber"
+            . " FROM ref_cp rc LEFT JOIN ref_cp_versi rv ON rv.cp_id=rc.id"
+            . " GROUP BY rc.kurikulum_id,rc.mapel_id,rc.fase_id) d";
+        $q = $this->db->table('cp_mapel c')
             ->join('ref_mapel m', 'm.id=c.mapel_id')
             ->join('ref_kurikulum k', 'k.id=c.kurikulum_id')
             ->join('ref_fase f', 'f.id=c.fase_id')
-            ->join('ref_cp_versi a', "a.cp_id=c.id AND a.status='aktif'", 'left')
-            ->join('ref_cp_versi d', "d.cp_id=c.id AND d.status='draf'", 'left');
+            ->join($aktif, 'a.cp_mapel_id=c.id', 'left', false)
+            ->join($sumber, 'd.kurikulum_id=c.kurikulum_id'
+                . ' AND d.mapel_id=c.mapel_id AND d.fase_id=c.fase_id', 'left', false)
+            ->where('f.kode', 'D');
         if ($filter['mapel'] > 0) {
             $q->where('c.mapel_id', $filter['mapel']);
         }
@@ -88,19 +102,18 @@ final class CpDaftarService
             $q->where('c.kurikulum_id', $filter['kurikulum']);
         }
         if ($filter['status'] === 'aktif') {
-            $q->where('a.id IS NOT NULL', null, false);
+            $q->where('COALESCE(a.jumlah_aktif,0) > 0', null, false);
         } elseif ($filter['status'] === 'draf') {
-            $q->where('d.id IS NOT NULL', null, false);
+            $q->where('COALESCE(d.jumlah_draf,0) > 0', null, false);
         } elseif ($filter['status'] === 'belum') {
-            $q->where('a.id IS NULL', null, false);
+            $q->where('COALESCE(a.jumlah_aktif,0) = 0', null, false);
         }
         if ($filter['cari'] !== '') {
             $q->groupStart()
-                ->like('c.kode', $filter['cari'])
+                ->like('m.kode', $filter['cari'])
                 ->orLike('m.nama', $filter['cari'])
                 ->orLike('k.nama', $filter['cari'])
-                ->orLike('a.elemen', $filter['cari'])
-                ->orLike('d.elemen', $filter['cari'])
+                ->orLike('a.elemen_aktif', $filter['cari'])
                 ->groupEnd();
         }
         return $q;
@@ -108,12 +121,15 @@ final class CpDaftarService
 
     private static function kolom(): string
     {
-        return 'c.id,c.kode,m.nama AS mapel_nama,k.nama AS kurikulum_nama,' .
-            'k.versi AS kurikulum_versi,f.kode AS fase,' .
-            'a.id AS versi_aktif_id,a.nomor_versi AS versi_aktif,' .
-            'd.id AS versi_draf_id,d.nomor_versi AS versi_draf,' .
-            'COALESCE(a.elemen,d.elemen) AS elemen,' .
-            'COALESCE(a.tanggal_berlaku,d.tanggal_berlaku) AS tanggal_berlaku';
+        return "c.id, CONCAT('CP-',m.kode,'-',f.kode) AS kode,"
+            . "m.nama AS mapel_nama,k.nama AS kurikulum_nama,"
+            . "k.versi AS kurikulum_versi,f.kode AS fase,"
+            . "COALESCE(a.jumlah_aktif,0) AS jumlah_elemen_aktif,"
+            . "COALESCE(d.jumlah_draf,0) AS jumlah_elemen_draf,"
+            . "COALESCE(d.jumlah_sumber,0) AS jumlah_sumber,"
+            . "COALESCE(a.elemen_aktif,'') AS elemen,"
+            . "CASE WHEN COALESCE(a.jumlah_aktif,0)>0 THEN 'Aktif'"
+            . " WHEN COALESCE(d.jumlah_draf,0)>0 THEN 'Draf' ELSE 'Belum terbit' END AS status_cp";
     }
 
     /** @param array{cari:string,mapel:int,kurikulum:int,status:string} $filter */
@@ -157,20 +173,23 @@ final class CpDaftarService
         try {
             $sheet = $xlsx->getActiveSheet();
             $sheet->setTitle('Daftar CP');
-            $labels = ['Kode CP', 'Mata Pelajaran', 'Kurikulum', 'Edisi', 'Fase', 'Elemen CP',
-                'Versi Aktif', 'Versi Draf', 'Status', 'Tanggal Berlaku'];
+            $labels = ['CP Operasional', 'Mata Pelajaran', 'Kurikulum', 'Edisi', 'Fase',
+                'Elemen CP Aktif', 'Jumlah Elemen Aktif', 'Draf Elemen', 'Status', 'Jumlah Sumber CP'];
             foreach ($labels as $i => $label) {
                 $sheet->setCellValueExplicit([$i + 1, 1], $label, DataType::TYPE_STRING);
             }
             foreach ($rows as $index => $row) {
-                $state = $row['versi_aktif_id'] !== null ? 'Aktif'
-                    : ($row['versi_draf_id'] !== null ? 'Draf' : 'Belum terbit');
+                $aktif = (int) ($row['jumlah_elemen_aktif']
+                    ?? (! empty($row['versi_aktif_id']) ? 1 : 0));
+                $draf = (int) ($row['jumlah_elemen_draf']
+                    ?? (! empty($row['versi_draf_id']) ? 1 : 0));
+                $state = $row['status_cp'] ??
+                    ($aktif > 0 ? 'Aktif' : ($draf > 0 ? 'Draf' : 'Belum terbit'));
                 $values = [
                     $row['kode'], $row['mapel_nama'], $row['kurikulum_nama'],
                     $row['kurikulum_versi'], $row['fase'], $row['elemen'] ?? '',
-                    $row['versi_aktif_id'] === null ? '' : 'v' . $row['versi_aktif'],
-                    $row['versi_draf_id'] === null ? '' : 'v' . $row['versi_draf'],
-                    $state, $row['tanggal_berlaku'] ?? '',
+                    (string) $aktif, (string) $draf, $state,
+                    (string) ($row['jumlah_sumber'] ?? ''),
                 ];
                 foreach ($values as $i => $value) {
                     // Sel teks eksplisit mencegah formula injection pada ekspor XLSX.
