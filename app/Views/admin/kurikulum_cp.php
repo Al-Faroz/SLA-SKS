@@ -62,8 +62,8 @@
         </section>
     </div>
     <section class="a-card" id="cp-tambah" aria-labelledby="judul-cp-baru">
-        <h2 id="judul-cp-baru">Buat CP Fase D (draf pertama)</h2>
-        <p class="a-help">Pilih kurikulum dan mapel yang tepat. Draf belum dapat digunakan dalam TP sampai diterbitkan Admin.</p>
+        <h2 id="judul-cp-baru">Tambah referensi elemen CP Fase D (draf)</h2>
+        <p class="a-help">Pilih Kurikulum–Mapel–Fase yang tepat. Elemen baru atau revisinya akan terhubung ke satu CP operasional setelah diterbitkan Admin. Draf belum dapat digunakan.</p>
         <?php if ($kurikulum === [] || $mapel === []): ?>
             <div class="a-alert a-alert--info" role="status">Tambahkan kurikulum serta mapel pada menu terkait terlebih dahulu.</div>
         <?php else: ?>
@@ -109,8 +109,62 @@
             </details>
         <?php endif ?>
     </section>
+    <section class="a-card" id="cp-operasional" aria-labelledby="judul-cp-operasional">
+        <h2 id="judul-cp-operasional">CP Operasional per Mata Pelajaran · Fase</h2>
+        <p class="a-help">Master v2.5: <strong>satu CP operasional untuk setiap kombinasi
+            Kurikulum–Mapel–Fase</strong>, yang dapat mempunyai beberapa elemen aktif.
+            Kode dan riwayat tiap elemen tetap dikelola sebagai referensi berversi.</p>
+        <?php if (empty($cpOperasional)): ?>
+            <div class="a-empty" role="status">
+                <strong>Belum ada CP operasional.</strong>
+                <p>Buat dan terbitkan referensi elemen CP pada formulir di atas.</p>
+            </div>
+        <?php else: ?>
+            <div class="a-tabel-gulir">
+                <table class="a-tbl a-tbl--cards a-cp__tabel">
+                    <thead><tr>
+                        <th scope="col">Mapel / Fase</th>
+                        <th scope="col">Kurikulum</th>
+                        <th scope="col">Elemen CP aktif</th>
+                        <th scope="col">Jumlah</th>
+                    </tr></thead>
+                    <tbody>
+                    <?php foreach ($cpOperasional as $operasional): ?>
+                        <tr>
+                            <th scope="row" data-label="Mapel / Fase">
+                                <?= esc($operasional['kode_mapel']) ?> ·
+                                <?= esc($operasional['nama_mapel']) ?>
+                                <small class="a-cp__detail">Fase <?= esc($operasional['fase']) ?></small>
+                            </th>
+                            <td data-label="Kurikulum">
+                                <?= esc($operasional['kurikulum']) ?>
+                                <small class="a-cp__detail"><?= esc($operasional['versi_kurikulum']) ?></small>
+                            </td>
+                            <td data-label="Elemen CP aktif">
+                                <?php if ($operasional['elemen_aktif'] === []): ?>
+                                    <span class="a-badge a-badge--tunggu">Belum terbit</span>
+                                <?php else: ?>
+                                    <?php foreach ($operasional['elemen_aktif'] as $elemen): ?>
+                                        <p>
+                                            <a href="<?= esc(site_url('admin/kurikulum-cp/' . $elemen['referensi_id']), 'attr') ?>">
+                                                <?= esc($elemen['nama']) ?>
+                                            </a>
+                                            <small class="a-cp__detail"><?= esc($elemen['kode']) ?></small>
+                                        </p>
+                                    <?php endforeach ?>
+                                <?php endif ?>
+                            </td>
+                            <td data-label="Jumlah"><?= count($operasional['elemen_aktif']) ?> aktif</td>
+                        </tr>
+                    <?php endforeach ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif ?>
+    </section>
+
     <section class="a-card" id="cp-daftar" aria-labelledby="judul-cp-daftar">
-        <h2 id="judul-cp-daftar">Daftar CP dan status versinya</h2>
+        <h2 id="judul-cp-daftar">Referensi elemen CP dan riwayat versi</h2>
         <?php if (!empty($cpFilterGalat)): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($cpFilterGalat) ?></div>
         <?php endif ?>
