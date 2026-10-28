@@ -70,6 +70,23 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
+    public function testNomorBabSemesterGenapBolehMelanjutkanYangAdaDiDb(): void
+    {
+        // Parser tidak mengetahui DB: BAB 2 dalam sheet Semester 4
+        // valid secara struktur. Service impor memverifikasi BAB 1 yang
+        // sudah dibuat di Semester 3 sebelum memberi izin commit.
+        $buku = $this->buku();
+        try {
+            $this->bab($buku, 4, 13, 2);
+            $this->tp($buku, 4, 'SKI.8.2.1', 'NonEsensial', 1, 2);
+            $r = AtpExcelParserService::bacaBuku($buku, 'SKI', 3, 'GEN2025');
+            self::assertSame(2, $r['bab'][0]['nomor']);
+            self::assertSame(1, $r['jumlah_tp']);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
     public function testKodeTpSalahDitolakDenganLokasi(): void
     {
         $buku = $this->buku();
