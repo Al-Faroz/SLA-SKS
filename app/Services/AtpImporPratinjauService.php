@@ -66,18 +66,18 @@ final class AtpImporPratinjauService
             throw new DomainException('CP operasional Fase D tidak valid.');
         }
         $elemen = $this->db->table('cp_mapel_elemen ce')
-            ->select('v.elemen')
+            ->select('v.id,v.elemen,v.rumusan,v.nomor_versi')
             ->join('ref_cp_versi v', 'v.id=ce.cp_versi_id')
             ->where('ce.cp_mapel_id', (int) $cp[0]['id'])
             ->where('v.status', 'aktif')
-            ->get()->getResultArray();
+            ->orderBy('v.id', 'ASC')->get()->getResultArray();
         if ($elemen === []) {
             throw new DomainException('Belum tersedia referensi elemen CP aktif.');
         }
 
         $hasil = AtpExcelParserService::baca($file, (string) $paket['kode_mapel'],
             (int) $paket['semester_mulai'], (string) $paket['kode_gen'],
-            array_column($elemen, 'elemen'), (int) $cp[0]['id']);
+            array_column($elemen, 'elemen'), (int) $cp[0]['id'], $elemen);
 
         // Paket yang dibandingkan harus identik Gen–Mapel–TA–Kurikulum, bukan seluruh G1.
         $daftarPaket = $this->db->table('paket_semester')
