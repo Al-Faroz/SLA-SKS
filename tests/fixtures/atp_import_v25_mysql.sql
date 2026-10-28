@@ -26,7 +26,8 @@ CREATE TABLE cp_mapel (
  id BIGINT UNSIGNED PRIMARY KEY,kurikulum_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,fase_id TINYINT UNSIGNED
 );
 CREATE TABLE ref_cp_versi (
- id BIGINT UNSIGNED PRIMARY KEY,elemen VARCHAR(150),status ENUM('aktif','draf') NOT NULL
+ id BIGINT UNSIGNED PRIMARY KEY,elemen VARCHAR(150),rumusan TEXT,
+ nomor_versi SMALLINT UNSIGNED NOT NULL DEFAULT 1,status ENUM('aktif','draf') NOT NULL
 );
 CREATE TABLE cp_mapel_elemen (
  id BIGINT UNSIGNED PRIMARY KEY,cp_mapel_id BIGINT UNSIGNED,cp_versi_id BIGINT UNSIGNED,
@@ -81,5 +82,5 @@ INSERT INTO ref_semester VALUES (1,1),(2,1),(3,2),(4,2),(5,3),(6,3);
 INSERT INTO penugasan_guru_gen VALUES (1,101,1,5),(2,102,2,5);
 INSERT INTO paket_semester VALUES (11,1,5,4,1,1,1,'draf'),(22,2,5,4,1,1,1,'draf');
 INSERT INTO cp_mapel VALUES (1,1,5,1);
-INSERT INTO ref_cp_versi VALUES (51,'Pemahaman Konsep','aktif');
+INSERT INTO ref_cp_versi VALUES (51,'Pemahaman Konsep','Contoh rumusan CP SKI sintetis',1,'aktif');
 INSERT INTO cp_mapel_elemen VALUES (1,1,51);
