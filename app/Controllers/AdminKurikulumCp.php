@@ -117,7 +117,7 @@ final class AdminKurikulumCp extends BaseController
                 $this->versiInput()
             );
             return redirect()->to(site_url('admin/kurikulum-cp/' . $id))
-                ->with('sukses', 'Draf CP berhasil dibuat. Periksa sumber lalu terbitkan jika sudah sesuai.');
+                ->with('sukses', 'Draf elemen CP tersimpan pada CP Mapel yang sama. Tinjau sumber lalu terbitkan.');
         } catch (DomainException $e) {
             return $this->gagal($e, 'admin/kurikulum-cp');
         }
