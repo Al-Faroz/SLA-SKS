@@ -1,0 +1,77 @@
+name: QA CP Operasional Fase D v2.5
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/CpDaftarService.php'
+      - 'app/Services/CpReferensiService.php'
+      - 'app/Services/CpMapelOperasionalService.php'
+      - 'app/Controllers/AdminKurikulumCp.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/admin/cp_operasional.php'
+      - 'app/Views/admin/kurikulum_cp.php'
+      - 'tests/integration/CpOperasionalMysqlTest.php'
+      - 'tests/fixtures/cp_v25_mysql.sql'
+      - 'tests/unit/CpDaftarResponsifTest.php'
+      - '.github/workflows/qa-cp-operasional-v25.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: PHP 8.2 lint and CP unit regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip, mbstring, dom, xml, gd, mysqli, intl
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Syntax
+        run: |
+          php -l app/Services/CpDaftarService.php
+          php -l app/Services/CpReferensiService.php
+          php -l app/Services/CpMapelOperasionalService.php
+          php -l app/Controllers/AdminKurikulumCp.php
+          php -l app/Views/admin/kurikulum_cp.php
+          php -l app/Views/admin/cp_operasional.php
+          php -l app/Config/Routes.php
+          php -l tests/integration/CpOperasionalMysqlTest.php
+      - name: Existing CP unit and UI contract regression
+        run: vendor/bin/phpunit --no-coverage --filter 'K3AKurikulumCpTest|CpDaftarResponsifTest|K3AAksesCpTest'
+  mysql:
+    name: MySQL 8 multi-element CP and legacy compatibility
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip, mbstring, dom, xml, gd, mysqli, intl
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Import anonymous QA fixture only
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/cp_v25_mysql.sql
+      - name: Run CI4 Services against MySQL QA
+        env:
+          SLA_CP_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/CpOperasionalMysqlTest.php
