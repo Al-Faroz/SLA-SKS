@@ -1,0 +1,89 @@
+name: QA ATP Global Initial Only v2.5
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/AtpImporPratinjauService.php'
+      - 'app/Services/AtpImporKonfirmasiService.php'
+      - 'app/Services/AtpExcelParserService.php'
+      - 'app/Services/AtpUnduhanService.php'
+      - 'app/Controllers/GuruAtpImpor.php'
+      - 'app/Controllers/GuruAtpUnduh.php'
+      - 'app/Controllers/GuruAtpPratinjau.php'
+      - 'app/Controllers/GuruAtpKonfirmasi.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/guru/impor_atp.php'
+      - 'app/Views/guru/peta_tp.php'
+      - 'app/Views/guru/semester_atp.php'
+      - 'tests/integration/AtpImporMysqlTest.php'
+      - 'tests/fixtures/atp_import_v25_mysql.sql'
+      - 'tests/unit/GuruAtpImporGlobalUiTest.php'
+      - '.github/workflows/qa-v25-atp-global-initial-only.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP 8.2 lint, G05 UI contract and XLSX parser
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, zip, dom, xml, mysqli, gd, intl, fileinfo
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Syntax check
+        run: |
+          php -l app/Controllers/GuruAtpImpor.php
+          php -l app/Controllers/GuruAtpUnduh.php
+          php -l app/Controllers/GuruAtpPratinjau.php
+          php -l app/Controllers/GuruAtpKonfirmasi.php
+          php -l app/Services/AtpImporPratinjauService.php
+          php -l app/Services/AtpImporKonfirmasiService.php
+          php -l app/Services/AtpExcelParserService.php
+          php -l app/Services/AtpUnduhanService.php
+          php -l app/Views/guru/impor_atp.php
+          php -l app/Views/guru/peta_tp.php
+          php -l app/Views/guru/semester_atp.php
+          php -l app/Config/Routes.php
+          php -l tests/integration/AtpImporMysqlTest.php
+          php -l tests/unit/GuruAtpImporGlobalUiTest.php
+      - name: PHPUnit
+        run: vendor/bin/phpunit --no-coverage --filter 'GuruAtpImporGlobalUiTest|AtpExcelParserServiceTest|AtpUnduhanServiceTest'
+
+  mysql:
+    name: MySQL 8: first-import only, cross-year, idempotence and atomic rollback
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: sla_sks_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, zip, dom, xml, mysqli, gd, intl, fileinfo
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Load isolated synthetic fixture
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa < tests/fixtures/atp_import_v25_mysql.sql
+      - name: Real Service integration tests, no production database
+        env:
+          SLA_ATP_QA_DB: sla_sks_qa
+        run: vendor/bin/phpunit --no-coverage tests/integration/AtpImporMysqlTest.php
