@@ -70,7 +70,9 @@ final class CpDaftarResponsifTest extends TestCase
         self::assertStringContainsString('a-tbl--cards a-cp__tabel', $cp);
         self::assertStringContainsString("view('components/pager'", $cp);
         self::assertStringContainsString('admin/kurikulum-cp/ekspor', $cp);
-        self::assertStringContainsString('data-label="Kode CP"', $cp);
+        self::assertStringContainsString('data-label="CP Operasional"', $cp);
+        self::assertStringContainsString('data-label="Elemen aktif"', $cp);
+        self::assertStringContainsString('admin/kurikulum-cp/mapel/', $cp);
         self::assertStringContainsString('data-label="Aksi"', $cp);
         // G03 v2.5 final: ringkasan enam kartu (bukan tabel TP lama).
         self::assertStringContainsString('a-atp-kartu-grid', $atp);
