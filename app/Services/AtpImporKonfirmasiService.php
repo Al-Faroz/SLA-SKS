@@ -117,6 +117,20 @@ final class AtpImporKonfirmasiService
             // Inilah pembatas tegas jalur Excel vs editor manual.
 
             // Bagian A: INSERT hanya semester kosong, tanpa UPDATE lama.
+            // Verifikasi sekali per paket sebelum mulai INSERT batch; jangan
+            // memeriksa ulang setelah BAB pertama karena batch ini sendiri.
+            foreach ($preview['mode_semester'] as $semester => $mode) {
+                if ($mode !== 'baru') {
+                    continue;
+                }
+                $pid = $paketSem[$semester] ?? null;
+                if ($pid === null
+                    || $this->db->table('bab')->where('paket_semester_id', $pid)->countAllResults() !== 0
+                    || $this->db->table('tp')->where('paket_semester_id', $pid)->countAllResults() !== 0) {
+                    throw new DomainException('Semester ' . $semester
+                        . ' sudah memiliki BAB/TP. Impor dibatalkan.');
+                }
+            }
             $babId = [];
             foreach ($preview['rencana']['bab'] as $b) {
                 $s = (int) $b['semester'];
@@ -128,13 +142,6 @@ final class AtpImporKonfirmasiService
                 if (($preview['mode_semester'][$s] ?? '') !== 'baru'
                     || ! isset($paketSem[$s], $kelas[$s], $preview['tahun_semester'][$s])) {
                     throw new DomainException('SEMESTER ' . $s . ': konteks paket tidak valid.');
-                }
-                // Defense-in-depth setelah locking; paket wajib masih kosong.
-                if ($this->db->table('bab')->where('paket_semester_id', $paketSem[$s])
-                    ->countAllResults() !== 0
-                    || $this->db->table('tp')->where('paket_semester_id', $paketSem[$s])
-                    ->countAllResults() !== 0) {
-                    throw new DomainException('Semester ' . $s . ' sudah diisi di aplikasi. Impor dibatalkan.');
                 }
                 $this->db->table('bab')->insert([
                     'paket_semester_id' => (int) $paketSem[$s],
