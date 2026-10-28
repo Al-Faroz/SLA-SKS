@@ -58,6 +58,7 @@
                 <table class="a-tbl">
                     <thead><tr>
                         <th scope="col">Semester</th>
+                        <th scope="col">Paket / Tahun Ajaran</th>
                         <th scope="col">BAB</th>
                         <th scope="col">TP</th>
                         <th scope="col">Status</th>
@@ -68,6 +69,17 @@
                         <?php $st = $statusSemester[$n] ?? ['bab'=>0,'tp'=>0,'paket'=>0]; ?>
                         <tr>
                             <th scope="row">Semester <?= $n ?></th>
+                            <td>
+                                <?php if (($st['tahun_ids'] ?? []) === []): ?>
+                                    —
+                                <?php else: ?>
+                                    <?= esc(implode(', ', array_map(
+                                        static fn (int $id): string =>
+                                            (string) ($namaTahun[$id] ?? 'Tahun Ajaran #' . $id),
+                                        $st['tahun_ids']
+                                    ))) ?>
+                                <?php endif ?>
+                            </td>
                             <td><?= (int) $st['bab'] ?></td>
                             <td><?= (int) $st['tp'] ?></td>
                             <td>
