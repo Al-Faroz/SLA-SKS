@@ -333,6 +333,21 @@ final class CpReferensiService
             if ($identitas === null || $dataBaru === null) {
                 throw new DomainException('Identitas CP tidak tersedia.');
             }
+            $refKode = $this->db->table('ref_cp')->select('kode')
+                ->where('id', $cpId)->get()->getRow('kode');
+            $mapelKode = $this->db->table('ref_mapel')->select('kode')
+                ->where('id', $identitas['mapel_id'])->get()->getRow('kode');
+            $faseKode = $this->db->table('ref_fase')->select('kode')
+                ->where('id', $identitas['fase_id'])->get()->getRow('kode');
+            $kurikulumNama = $this->db->table('ref_kurikulum')->select('nama')
+                ->where('id', $identitas['kurikulum_id'])->get()->getRow('nama');
+            if (! CpOperasionalService::bolehTerbit(
+                (string) $mapelKode, (string) $faseKode, (string) $kurikulumNama,
+                (string) $refKode, (string) $dataBaru['elemen']
+            )) {
+                throw new DomainException('SKI KBC Fase D hanya menggunakan CP '
+                    . 'KBC25-SKI-D-PK (Pemahaman Konsep). Referensi lain tetap arsip.');
+            }
             $operasional = $this->db->table('cp_mapel')
                 ->select('id')
                 ->where('kurikulum_id', $identitas['kurikulum_id'])
@@ -355,8 +370,11 @@ final class CpReferensiService
             $this->db->query('SELECT id FROM cp_mapel WHERE id=? FOR UPDATE',
                 [$cpMapelId])->getRowArray();
 
-            // Versi dengan elemen yang sama (termasuk kode ref_cp lama) diarsipkan,
-            // tanpa menyentuh elemen yang berbeda ataupun baris historis tp_cp.
+            // SKI KBC Fase D punya satu elemen aktif saja; mapel lain
+            // tetap memakai kebijakan per-elemen. Relasi historis tidak dihapus.
+            $skiTunggal = strtoupper((string) $mapelKode) === 'SKI'
+                && strtoupper((string) $faseKode) === 'D'
+                && (string) $kurikulumNama === 'Kurikulum Berbasis Cinta (KBC)';
             $terkait = $this->db->table('cp_mapel_elemen e')
                 ->select('v.id,v.elemen')
                 ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
@@ -364,8 +382,8 @@ final class CpReferensiService
                 ->where('v.status', 'aktif')->get()->getResultArray();
             foreach ($terkait as $lama) {
                 if ((int) $lama['id'] !== $id
-                    && mb_strtolower(trim((string) $lama['elemen']))
-                        === mb_strtolower(trim((string) $dataBaru['elemen']))) {
+                    && ($skiTunggal || mb_strtolower(trim((string) $lama['elemen']))
+                        === mb_strtolower(trim((string) $dataBaru['elemen'])))) {
                     $this->db->table('ref_cp_versi')->where('id', (int) $lama['id'])
                         ->where('status', 'aktif')->update(['status' => 'diarsipkan']);
                 }
