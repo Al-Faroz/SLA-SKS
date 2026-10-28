@@ -19,9 +19,15 @@ final class CpDaftarService
 {
     private BaseConnection $db;
 
-    public function __construct(?BaseConnection $db = null)
+    /** @var callable():?array */
+    private $akunAktif;
+
+    /** @param (callable():?array)|null $akunAktif */
+    public function __construct(?BaseConnection $db = null, ?callable $akunAktif = null)
     {
         $this->db = $db ?? db_connect();
+        $this->akunAktif = $akunAktif
+            ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
     }
 
     /** @return array{cari:string,mapel:int,kurikulum:int,status:string} */
@@ -65,7 +71,7 @@ final class CpDaftarService
 
     private function admin(): void
     {
-        $akun = (new AuthService($this->db))->penggunaSaatIni();
+        $akun = ($this->akunAktif)();
         if ($akun === null || ($akun['peran_aktif'] ?? '') !== 'admin'
             || (int) ($akun['wajib_ganti_sandi'] ?? 1) !== 0) {
             throw new DomainException('Hanya Admin aktif yang boleh melihat daftar CP.');
