@@ -20,7 +20,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-010 | Guru usul CP; Admin memutus | Publikasi versi CP baru tanpa reviewer Guru lain |
 | E2E-011 | Admin+Guru menyetujui usulan CP sendiri | Ditolak bila benar-benar permohonan akademik diri sendiri |
 | E2E-012 | Download Excel peta ATP enam semester | Sheet panduan, RINGKASAN, REFERENSI CP, SEMESTER 1–6 dan contoh; hanya CP aktif mapel/kurikulum terkait |
-| E2E-013 | Impor XLSX valid diulang | Upsert idempoten, bukan baris ganda |
+| E2E-013 | Impor XLSX ATP valid diulang | Satu semester kosong ditambah sekali; file sama menghasilkan Tetap (0 tulis); file berbeda untuk semester terisi ditolak, tidak ada UPDATE |
 | E2E-014 | Impor versi struktur salah | Ditolak, tampil sheet/baris/kolom/penjelasan |
 | E2E-015 | Excel menghilangkan baris lama | Tidak menghapus otomatis |
 | E2E-016 | Media/HOTS Materi belum lengkap | Excel hanya membentuk struktur; checklist TP Siap menolak materi tanpa media/Resume/HOTS |
