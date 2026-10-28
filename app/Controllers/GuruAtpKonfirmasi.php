@@ -21,12 +21,8 @@ final class GuruAtpKonfirmasi extends BaseController
         $pilihan = $this->request->getPost('pilihan');
         $indeks = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) < 6
             ? (int) $pilihan : 0;
-        $semester = $this->request->getPost('semester');
-        $s = is_string($semester) && ctype_digit($semester)
-            && (int) $semester >= 1 && (int) $semester <= 6 ? (int) $semester : 0;
-        $kembali = $s > 0
-            ? site_url('guru/peta-atp/semester/' . $s) . '?pilihan=' . $indeks
-            : site_url('guru/peta-atp') . '?pilihan=' . $indeks;
+        $kembali = site_url('guru/peta-atp/impor') . '?pilihan=' . $indeks
+            . '&paket_id=' . (ctype_digit($paketId) ? (int) $paketId : 0);
         $token = $this->request->getPost('stage_token');
         if (! ctype_digit($paketId) || strlen($paketId) > 15 || (int) $paketId < 1
             || ! is_string($token) || ! AtpStagingService::validasiToken($token)) {
