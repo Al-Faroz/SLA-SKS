@@ -230,6 +230,25 @@ final class AtpDesainWorkbookService
         self::strip($sheet, 'A6:E6', self::TEAL, self::WHITE, 11);
         self::height($sheet, [6=>46]);
         self::alternating($sheet, 'A', 'E', 7, 106);
+        // Rumusan CP dapat memuat banyak butir panjang (SKI: 10 butir).
+        // Berikan ruang baca, bukan baris setinggi 28 pt yang memotong teks.
+        // Excel membatasi tinggi maksimum baris sekitar 409 pt.
+        for ($row = 7; $row <= 106; ++$row) {
+            $rumusan = (string) ($sheet->getCell('C' . $row)->getValue() ?? '');
+            if ($rumusan === '') {
+                continue;
+            }
+            $lines = preg_split('/\\r\\n|\\r|\\n/u', $rumusan) ?: [];
+            $estimated = 0;
+            foreach ($lines as $line) {
+                $estimated += max(1, (int) ceil(mb_strlen($line) / 74));
+            }
+            $height = min(400.0, max(58.0, (float) ($estimated * 16 + 18)));
+            $sheet->getRowDimension($row)->setRowHeight($height);
+            $sheet->getStyle('A' . $row . ':E' . $row)
+                ->getAlignment()->setVertical('top');
+            $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
+        }
     }
 
     private static function panduan(Worksheet $sheet): void
