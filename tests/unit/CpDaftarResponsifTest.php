@@ -78,6 +78,11 @@ final class CpDaftarResponsifTest extends TestCase
         // Tabel TP dan tombol dialog BAB/TP ada di halaman detail semester.
         self::assertStringContainsString('a-atp-bab-list', $semester);
         self::assertStringContainsString('data-atp-dialog-open="dialog-bab-semester"', $semester);
-        self::assertStringContainsString('Unduh Template ATP Excel', $semester);
+        // G05 yang disetujui: XLSX hanya di halaman khusus, bukan semester.
+        $excel = file_get_contents($root . '/app/Views/guru/impor_atp.php');
+        self::assertIsString($excel);
+        self::assertStringContainsString('guru/peta-atp/impor', $atp);
+        self::assertStringContainsString('Unduh Template ATP 6 Semester', $excel);
+        self::assertStringNotContainsString('Unduh Template ATP Excel', $semester);
     }
 }
