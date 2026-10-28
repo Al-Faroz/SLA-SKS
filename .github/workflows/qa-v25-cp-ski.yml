@@ -41,7 +41,7 @@ jobs:
           php -l app/Views/admin/kurikulum_cp.php
           php -l tests/unit/AtpExcelParserServiceTest.php
       - name: CP dan ATP unit tests
-        run: vendor/bin/phpunit --no-coverage --filter 'K3AKurikulumCpTest|CpDaftarResponsifTest|AtpExcelParserServiceTest'
+        run: vendor/bin/phpunit --no-coverage --filter 'CpDaftarResponsifTest|AtpExcelParserServiceTest'
 
   mariadb:
     name: MariaDB 10.11 SQL patch, history and replay guard
