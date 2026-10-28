@@ -234,7 +234,7 @@ final class AdminKurikulumCp extends BaseController
             $versi = $this->service()->detailVersi($id);
             $this->service()->terbitkan($id);
             return redirect()->to(site_url('admin/kurikulum-cp/' . (int) $versi['cp_id']))
-                ->with('sukses', 'CP versi resmi diterbitkan; versi sebelumnya tetap tercatat dalam riwayat.');
+                ->with('sukses', 'Elemen CP resmi telah ditautkan ke CP operasional Mapel; riwayat versi tetap terjaga.');
         } catch (DomainException $e) {
             return $this->gagal($e, 'admin/kurikulum-cp');
         } catch (Throwable $e) {
