@@ -76,11 +76,11 @@ INSERT INTO ref_angkatan VALUES (1,'GEN2025','Gen 2025',4),(2,'GEN2026','Gen 202
 INSERT INTO ref_mapel VALUES (5,'SKI','Sejarah Kebudayaan Islam');
 INSERT INTO ref_fase VALUES (1,'D');
 INSERT INTO ref_kurikulum VALUES (1,'Kurikulum Merdeka','2026');
-INSERT INTO ref_tahun_ajaran VALUES (1,'2026/2027');
+INSERT INTO ref_tahun_ajaran VALUES (1,'2026/2027'),(2,'2027/2028');
 INSERT INTO ref_kelas VALUES (1,'VII',1),(2,'VIII',1),(3,'IX',1);
 INSERT INTO ref_semester VALUES (1,1),(2,1),(3,2),(4,2),(5,3),(6,3);
 INSERT INTO penugasan_guru_gen VALUES (1,101,1,5),(2,102,2,5);
-INSERT INTO paket_semester VALUES (11,1,5,4,1,1,1,'draf'),(22,2,5,4,1,1,1,'draf');
+INSERT INTO paket_semester VALUES (11,1,5,4,1,1,1,'draf'),(12,1,5,5,2,1,1,'draf'),(22,2,5,4,1,1,1,'draf');
 INSERT INTO cp_mapel VALUES (1,1,5,1);
 INSERT INTO ref_cp_versi VALUES (51,'Pemahaman Konsep','Contoh rumusan CP SKI sintetis',1,'aktif');
 INSERT INTO cp_mapel_elemen VALUES (1,1,51);

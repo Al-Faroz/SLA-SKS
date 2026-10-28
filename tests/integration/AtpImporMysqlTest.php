@@ -82,7 +82,7 @@ final class AtpImporMysqlTest extends TestCase
     }
 
     private function workbook(string $tpName = 'Menganalisis Peristiwa',
-        string $babName = 'Sejarah Awal'): string
+        string $babName = 'Sejarah Awal', bool $tambahanSemester5 = false): string
     {
         $source = dirname(__DIR__, 2) . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
         $buku = IOFactory::load($source);
@@ -110,6 +110,19 @@ final class AtpImporMysqlTest extends TestCase
             $sh->setCellValue('E39', $tpName);
             $sh->setCellValue('F39', 'Menganalisis hubungan sebab akibat');
             $sh->setCellValue('I39', 'Pemahaman Konsep');
+            if ($tambahanSemester5) {
+                $s5 = $buku->getSheetByName('SEMESTER 5');
+                foreach ([
+                    'A13'=>1, 'B13'=>'Tokoh Muslim Nusantara',
+                    'C13'=>'Menelaah perkembangan dan keteladanan tokoh',
+                    'A39'=>1, 'B39'=>1, 'C39'=>'SKI.9.1.1',
+                    'D39'=>'NonEsensial', 'E39'=>'Perjalanan Islam',
+                    'F39'=>'Menganalisis penyebaran Islam di Indonesia',
+                    'I39'=>'Pemahaman Konsep',
+                ] as $cell => $value) {
+                    $s5->setCellValue($cell, $value);
+                }
+            }
             $tmp = tempnam(sys_get_temp_dir(), 'uji_atp_imp_');
             self::assertIsString($tmp);
             (new Xlsx($buku))->save($tmp);
@@ -138,7 +151,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(0, self::$db->table('materi')->countAllResults());
     }
 
-    public function testImporUlangTidakGandakanDanBisaPerbaruiDraf(): void
+    public function testImporUlangIdentikTanpaDuplikasiDanPerbedaanDitolak(): void
     {
         $f = $this->workbook();
         $p = $this->preview($f);
@@ -150,14 +163,91 @@ final class AtpImporMysqlTest extends TestCase
 
         $g = $this->workbook('Mengurai Sejarah Baru', 'Sejarah Diperbarui');
         $ubah = $this->preview($g);
-        self::assertSame(2, $ubah['jumlah']['ubah']);
-        $r = $this->confirm($g, $ubah['fingerprint']);
-        self::assertSame(1, $r['ubah_bab']);
-        self::assertSame(1, $r['ubah_tp']);
+        self::assertSame(2, $ubah['jumlah']['galat']);
+        self::assertFalse($ubah['boleh_konfirmasi']);
         self::assertSame(1, self::$db->table('tp')->countAllResults());
-        self::assertSame('Mengurai Sejarah Baru',
+        self::assertSame('Menganalisis Peristiwa',
             self::$db->table('tp')->get()->getRow('nama_tp'));
-        self::assertSame(2, self::$db->table('log_aktivitas')->countAllResults());
+        self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+    }
+
+    public function testDuaSemesterBedaTahunAjaranTetapTransaksional(): void
+    {
+        $file = $this->workbook('Menganalisis Peristiwa', 'Sejarah Awal', true);
+        $preview = $this->preview($file);
+        self::assertSame(4, $preview['jumlah']['baru']);
+        self::assertSame(0, $preview['jumlah']['galat']);
+        $hasil = $this->confirm($file, $preview['fingerprint']);
+        self::assertSame(2, $hasil['baru_bab']);
+        self::assertSame(2, $hasil['baru_tp']);
+        $bab4 = self::$db->table('bab')->where('paket_semester_id', 11)->get()->getRowArray();
+        $bab5 = self::$db->table('bab')->where('paket_semester_id', 12)->get()->getRowArray();
+        self::assertSame(1, (int) $bab4['tahun_ajaran_id']);
+        self::assertSame(2, (int) $bab5['tahun_ajaran_id']);
+        self::assertSame(1, self::$db->table('tp')->where('paket_semester_id', 12)->countAllResults());
+    }
+
+    public function testSemesterManualYangSudahPunyaBabTanpaTpDitolak(): void
+    {
+        self::$db->table('bab')->insert([
+            'paket_semester_id' => 11, 'angkatan_id' => 1, 'mapel_id' => 5,
+            'kurikulum_id' => 1, 'tahun_ajaran_id' => 1, 'kelas_id' => 2,
+            'nomor_bab' => 1, 'nama_bab' => 'Sejarah Awal',
+            'deskripsi_bab' => 'Sejarah, latar belakang dan perkembangan',
+            'dibuat_pada' => '2026-10-27 00:00:00',
+        ]);
+        $p = $this->preview($this->workbook());
+        self::assertGreaterThan(0, $p['jumlah']['galat']);
+        self::assertFalse($p['boleh_konfirmasi']);
+        self::assertSame(0, self::$db->table('tp')->countAllResults());
+    }
+
+    public function testSemesterIdentikBolehDilewatiSaatSemesterLainBaru(): void
+    {
+        $file = $this->workbook();
+        $p = $this->preview($file);
+        $this->confirm($file, $p['fingerprint']);
+        $dua = $this->workbook('Menganalisis Peristiwa', 'Sejarah Awal', true);
+        $p2 = $this->preview($dua);
+        self::assertSame(2, $p2['jumlah']['tetap']);
+        self::assertSame(2, $p2['jumlah']['baru']);
+        self::assertTrue($p2['boleh_konfirmasi']);
+        $hasil = $this->confirm($dua, $p2['fingerprint']);
+        self::assertSame(1, $hasil['baru_bab']);
+        self::assertSame(1, $hasil['baru_tp']);
+        self::assertSame(2, $hasil['tetap']);
+        self::assertSame(2, self::$db->table('bab')->countAllResults());
+        self::assertSame(2, self::$db->table('tp')->countAllResults());
+    }
+
+    public function testDuaBabDiSemesterKosongBerhasilDalamSatuBatch(): void
+    {
+        $file = $this->workbook();
+        $book = IOFactory::load($file);
+        try {
+            $sh = $book->getSheetByName('SEMESTER 4');
+            foreach ([
+                'A14'=>2, 'B14'=>'Tokoh Islam',
+                'C14'=>'Mempelajari tokoh dan keteladanannya',
+                'A40'=>2, 'B40'=>1, 'C40'=>'SKI.8.2.1',
+                'D40'=>'Esensial', 'E40'=>'Meneladani Tokoh',
+                'F40'=>'Mengapresiasi perjuangan tokoh Islam',
+                'I40'=>'Pemahaman Konsep',
+            ] as $c => $v) {
+                $sh->setCellValue($c, $v);
+            }
+            (new Xlsx($book))->save($file);
+        } finally {
+            $book->disconnectWorksheets();
+        }
+        $preview = $this->preview($file);
+        self::assertSame(4, $preview['jumlah']['baru']);
+        self::assertTrue($preview['boleh_konfirmasi']);
+        $r = $this->confirm($file, $preview['fingerprint']);
+        self::assertSame(2, $r['baru_bab']);
+        self::assertSame(2, $r['baru_tp']);
+        self::assertSame(2, self::$db->table('bab')->countAllResults());
+        self::assertSame(2, self::$db->table('tp')->countAllResults());
     }
 
     public function testKonteksLintasGenDitolak(): void

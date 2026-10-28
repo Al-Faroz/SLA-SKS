@@ -60,12 +60,6 @@
             <?php endif ?>
         </div>
         <div class="a-atp-detail__toolbar-actions">
-            <?php if ($paketAktif !== null && ! $belumMulai): ?>
-                <a class="a-btn a-btn--sekunder"
-                    href="<?= esc(site_url('guru/peta-atp/unduh/' . (int) $paketAktif['id']), 'attr') ?>">
-                    Unduh Template ATP Excel
-                </a>
-            <?php endif ?>
             <?php if ($bolehTambahBab): ?>
                 <button class="a-btn a-btn--utama" type="button" data-atp-dialog-open="dialog-bab-semester"
                     aria-haspopup="dialog" aria-controls="dialog-bab-semester">+ Tambah BAB</button>
@@ -76,30 +70,6 @@
             <?php endif ?>
         </div>
     </section>
-
-    <?php if ($paketAktif !== null && ! $belumMulai): ?>
-        <section class="a-card" aria-labelledby="judul-impor-atp">
-            <h2 id="judul-impor-atp">Pratinjau impor ATP Excel</h2>
-            <p class="a-proto-muted">Unggah file .xlsx dari template resmi (maksimal 5 MB).
-                Sistem membaca BAB/TP dari enam semester dan menampilkan hasil pemeriksaan terlebih dahulu.
-                <strong>Belum ada perubahan database.</strong></p>
-            <form class="a-form" method="post" enctype="multipart/form-data"
-                action="<?= esc(site_url('guru/peta-atp/pratinjau/' . (int) $paketAktif['id']), 'attr') ?>">
-                <?= csrf_field() ?>
-                <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
-                <input type="hidden" name="semester" value="<?= (int) $nomorSemester ?>">
-                <div class="a-field">
-                    <label class="a-label" for="atp-excel-pratinjau">File Excel ATP (.xlsx)</label>
-                    <input id="atp-excel-pratinjau" name="atp_excel" type="file"
-                        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                        required>
-                </div>
-                <div class="a-atp-detail__toolbar-actions">
-                    <button class="a-btn a-btn--sekunder" type="submit">Periksa &amp; Pratinjau Excel</button>
-                </div>
-            </form>
-        </section>
-    <?php endif ?>
 
     <?php if ($bolehTambahBab): ?>
         <dialog id="dialog-bab-semester" class="a-modal a-modal--atp" aria-labelledby="judul-dialog-bab">

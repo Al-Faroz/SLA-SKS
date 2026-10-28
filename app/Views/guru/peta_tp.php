@@ -39,6 +39,17 @@
                 <button class="a-btn a-btn--utama" type="submit">Tampilkan peta</button>
             </form>
         </section>
+        <section class="a-card" aria-labelledby="judul-atp-excel">
+            <h2 id="judul-atp-excel">Kelola ATP Excel · enam semester</h2>
+            <p class="a-proto-muted">Unduh template, unggah, periksa kesesuaian tiap semester,
+                lalu konfirmasi penyusunan awal. BAB/TP yang sudah dikerjakan
+                tidak dapat diubah lewat Excel.</p>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/peta-atp/impor')
+                    . '?pilihan=' . (int) $nomorPilihan, 'attr') ?>">
+                Buka Kelola ATP Excel
+            </a>
+        </section>
         <?php foreach ([['judul' => 'Semester 1–3', 'nomor' => [1, 2, 3]], ['judul' => 'Semester 4–6', 'nomor' => [4, 5, 6]]] as $kelompok): ?>
             <section class="a-atp-kelompok" aria-label="<?= esc($kelompok['judul'], 'attr') ?>">
                 <div class="a-atp-kelompok__heading">

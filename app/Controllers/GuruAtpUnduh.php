@@ -18,16 +18,16 @@ final class GuruAtpUnduh extends BaseController
     public function unduh(string $paketId): DownloadResponse|RedirectResponse
     {
         if (! ctype_digit($paketId) || strlen($paketId) > 15 || (int) $paketId < 1) {
-            return redirect()->to(site_url('guru/peta-atp'))
+            return redirect()->to(site_url('guru/peta-atp/impor'))
                 ->with('galat', 'Paket ATP tidak valid.');
         }
         try {
             $hasil = (new AtpUnduhanService())->unduh((int) $paketId);
         } catch (DomainException $e) {
-            return redirect()->to(site_url('guru/peta-atp'))->with('galat', $e->getMessage());
+            return redirect()->to(site_url('guru/peta-atp/impor'))->with('galat', $e->getMessage());
         } catch (Throwable $e) {
             log_message('error', 'Unduh ATP v2.5 gagal: {kelas}', ['kelas' => get_class($e)]);
-            return redirect()->to(site_url('guru/peta-atp'))
+            return redirect()->to(site_url('guru/peta-atp/impor'))
                 ->with('galat', 'Template ATP tidak dapat dibuat. Periksa berkas docs dan folder writable.');
         }
 

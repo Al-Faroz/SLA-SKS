@@ -111,7 +111,7 @@ final class AtpUnduhanService
                 'kode_mapel' => (string) $paket['kode_mapel'],
                 'nama_mapel' => (string) $paket['nama_mapel'],
                 'kurikulum' => (string) $paket['nama_kurikulum'] . ' — ' . (string) $paket['versi_kurikulum'],
-                'tahun_ajaran' => (string) $paket['nama_tahun'],
+                'tahun_ajaran' => (string) $paket['nama_tahun'] . ' (paket acuan; paket tiap semester di aplikasi)',
                 'cp_id' => (string) $cp[0]['id'],
                 'semester_mulai' => (int) $paket['semester_mulai'],
                 'semester_paket' => (int) $paket['semester'],
@@ -142,7 +142,7 @@ final class AtpUnduhanService
         $namaGen = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $paket['kode_gen']) ?: 'gen';
         $kodeMapel = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $paket['kode_mapel']) ?: 'mapel';
         return [
-            'nama' => 'ATP-v2.5-' . $namaGen . '-' . $kodeMapel . '-S' . (int) $paket['semester'] . '.xlsx',
+            'nama' => 'ATP-v2.5-' . $namaGen . '-' . $kodeMapel . '-6-SEMESTER.xlsx',
             'isi' => $isi,
         ];
     }
