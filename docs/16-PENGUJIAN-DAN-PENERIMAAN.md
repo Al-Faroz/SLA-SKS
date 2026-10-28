@@ -118,9 +118,9 @@ Fitur dinyatakan selesai bila **aturan domain + izin + data SQL + route/service 
 | E2E-089 | Guru ditugasi dua Gen/Mapel mengunduh ATP berbeda | RINGKASAN berisi Guru/Gen/Mapel/Kurikulum sesuai pilihan sah; file tidak saling tertukar |
 | E2E-090 | Excel referensi CP otomatis | Hanya CP aktif sesuai Mapel/Fase D/Kurikulum, tanpa mapel lain; semua pilihan CP valid |
 | E2E-091 | Excel enam semester revisi pemilik | Tidak ada istilah BAB operasional, enam sheet semester dan contoh; identitas tidak bisa diklaim oleh Gen lain |
-| E2E-092 | Impor Excel satu semester saja | Struktur TP dan Materi terbentuk tanpa input ulang, semester lain tidak dihapus |
-| E2E-093 | Impor Excel sama dua kali | Idempoten tanpa TP/Materi duplikat; baris hilang bukan delete |
-| E2E-094 | ATP mencoba mengubah TP Siap | Ditolak sebelum commit; data historis tetap |
+| E2E-092 | Impor Excel satu semester saja | BAB/TP draf terbentuk hanya pada semester kosong dengan paket sah; Materi tidak dibuat otomatis; semester lain tidak dihapus |
+| E2E-093 | Impor Excel sama dua kali | File sama menghasilkan Tetap tanpa penulisan; semester berisi BAB manual/TP draf yang berbeda ditolak total, tidak ada DELETE/UPDATE |
+| E2E-094 | ATP mencoba mengubah BAB/TP manual/draf/Siap lewat Excel | Ditolak sebelum commit, bahkan jika draf; data historis tetap |
 | E2E-095 | TP NonEsensial dengan satu Materi | Tidak boleh ada lebih dari satu Materi aktif; Esensial tanpa Materi |
 | E2E-096 | Diagnostik lulus sesuai SKS | Bebas Materi/Resume/HOTS tetapi Sumatif minimal 30 tetap wajib; bukan tuntas dari Diagnostik |
 | E2E-097 | Diagnostik gagal | Tepat satu Materi → Resume final → HOTS final → Sumatif; tidak ada Materi kedua |
@@ -244,3 +244,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - E2E-140: Halaman detail semester terotorisasi G1; breadcrumb kembali ke Peta ATP dengan filter tetap; header status dan angka benar; belum punya paket/semester sebelum Gen mulai/peran salah ditangani aman.
 - E2E-141: Tombol Tambah BAB di bagian atas membuka modal; simpan kembali ke semester yang sama, nomor BAB lanjut tanpa duplikat. Tiap kartu BAB menampilkan nomor, nama, deskripsi dan tabel TP nyata; tombol Tambah TP hanya di BAB dalam paket yang dapat diedit.
 - E2E-142: Modal BAB/TP Batal/Escape tidak menyimpan, CSRF wajib, cegah klik Simpan ganda, fokus dialog dan responsif; uji nama 50 diterima **hanya sesudah patch pelebaran kolom DB**, dan 51 ditolak.
+
+## QA G05 final — Kelola ATP Excel global (28 Oktober 2026)
+- E2E-142: Tautan **Kelola ATP Excel** hanya di `/guru/peta-atp`; tampilan detail semester tidak memiliki form unduh/impor XLSX. Browser back/breadcrumb kembali ke Peta ATP dengan pilihan Gen–Mapel yang sama.
+- E2E-143: Halaman `/guru/peta-atp/impor` memperlihatkan enam semester, Tahun Ajaran tiap paket, kurikulum dan status kosong/terisi; unduh menghasilkan sepuluh sheet dengan data CP terbaru.
+- E2E-144: Semester yang memiliki sekurangnya satu BAB atau TP manual menolak impor yang berbeda, tanpa INSERT/UPDATE; file identik tidak membuat transaksi.
+- E2E-145: Satu workbook berisi Semester 4 dan 5 dengan Tahun Ajaran berbeda diimpor satu kali; `bab.tahun_ajaran_id` masing-masing sesuai `paket_semester` yang benar.
+- E2E-146: Semester tanpa paket, kurikulum lain, paket ganda, nomer BAB lintas kelas salah atau file CP usang menolak seluruh konfirmasi tanpa perubahan separuh.
+- E2E-147: Dua kali konfirmasi bersamaan atau keadaan BAB/TP berubah setelah pratinjau -> revalidasi dan rollback; tidak ada duplikasi, data siswa/TP Siap tetap.
