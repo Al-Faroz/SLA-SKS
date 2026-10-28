@@ -34,7 +34,7 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET,POST | `/siswa/materi/{id}/hots` | Draf manual/kirim |
 | GET | `/siswa/nilai`, `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Hanya miliknya |
 | GET,POST | `/guru/tp/{id}/...` | G1 aktif **Gen–Mapel objek** + hanya draf kecuali koreksi khusus |
-| GET,POST | `/guru/peta-atp/unduh`, `/guru/peta-atp/impor`, `/guru/peta-atp/impor/{id}/konfirmasi` | Workbook enam semester terikat Gen–Mapel/Kurikulum, pratinjau, transaksi |
+| GET,POST | `GET /guru/peta-atp/impor`, `GET /guru/peta-atp/unduh/{paketId}`, `POST /guru/peta-atp/pratinjau/{paketId}`, `POST /guru/peta-atp/konfirmasi/{paketId}` | G05: workbook enam semester, konteks G1/CP, pratinjau dan konfirmasi INSERT awal semester kosong, satu transaksi |
 | GET,POST | `/guru/penilaian/...`, `/guru/ujian/{id}/keputusan` | Guru hanya untuk Gen–Mapel siswa/ujian terkait |
 | GET,POST | `/guru/koreksi-tp/...`, `/guru/koreksi-nilai/...` | Pengajuan akademik berversi |
 | GET,POST | `/admin/pengelola/...`, `/admin/siswa/...` | Dua ruang Admin dengan akun bersama; tambah/ubah/nonaktif/reset per akun, audit |
@@ -95,3 +95,11 @@ Hierarki operasional CP → Semester → BAB → TP; kode TP dibangkitkan dari m
 - `PraSemesterService` memeriksa semua TP NonEsensial selesai + waktu Admin, bank minimal 30 mencakup seluruh BAB, attempt Ketat/rehitung skor terbaik. Mesin ujian TP diperluas, tetapi status/rate limits/snapshot/jeda tetap.
 - `ProgresMediaService`: Model B hitung klien, checkpoint server 4 menit + checkpoint final. Bila offline simpan akumulasi lokal belum terkirim pada perangkat/browser yang sama, server validasi agar tidak menerima waktu tidak wajar; tombol unduh audio/gambar/PDF setelah gate sah.
 Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.env`, lokasi index root, upload privat, transaksi dan hak G1 tetap.
+
+## 11. Implementasi G05 ATP Excel enam semester — keputusan final 28 Oktober 2026
+- `GET /guru/peta-atp`: pemilih Gen–Mapel dan enam kartu semester; satu tautan ke `GET /guru/peta-atp/impor?pilihan=N`, bukan enam formulir impor.
+- `GET /guru/peta-atp/impor`: tampilkan paket nonarsip dan Tahun Ajaran per semester dari server; `paket_id` adalah paket acuan CP/Kurikulum, **bukan sumber Tahun Ajaran semua semester**. Paket yang tidak ada wajib dibuat lewat layar semester, tidak dibuat diam-diam.
+- `GET /guru/peta-atp/unduh/{paketId}`: mengirim XLSX resmi 6 semester dengan identitas penugasan G1 dan CP aktif. File tidak berisi perubahan BAB/TP otomatis.
+- `POST /guru/peta-atp/pratinjau/{paketId}`: otorisasi Guru, CSRF, parser XLSX, validasi semua sheet/CP, perbandingan per semester. Sasaran INSERT hanyalah semester dengan paket sah dan **BAB=0, TP=0**; semester yang sudah berisi satu saja ditolak bila file berbeda, tetapi file seluruhnya identik ditandai Tetap tanpa modifikasi. Satu konflik memblokir konfirmasi semua semester.
+- `POST /guru/peta-atp/konfirmasi/{paketId}`: staging privat terikat sesi/akun/paket/checksum maksimal 15 menit, locking G1/paket, fingerprint dan validasi ulang, **INSERT BAB/TP saja** pada paket tiap semester dengan `tahun_ajaran_id` yang diambil dari paket itu. Tidak ada UPDATE/DELETE, tidak membuat Materi/soal/aktivitas siswa. Commit satu transaksi lengkap atau rollback; audit dicatat.
+- Proses penyuntingan setelah impor hanya melalui editor BAB/TP atau prosedur koreksi akademik. SQL/migration/seeder tidak diperlukan untuk memindahkan halaman/aturan ini.
