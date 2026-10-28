@@ -22,12 +22,8 @@ final class GuruAtpPratinjau extends BaseController
         $pilihan = $this->request->getPost('pilihan');
         $indeks = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) <= 5
             ? (int) $pilihan : 0;
-        $semester = $this->request->getPost('semester');
-        $s = is_string($semester) && ctype_digit($semester)
-            && (int) $semester >= 1 && (int) $semester <= 6 ? (int) $semester : 0;
-        $kembali = $s !== 0
-            ? site_url('guru/peta-atp/semester/' . $s) . '?pilihan=' . $indeks
-            : site_url('guru/peta-atp') . '?pilihan=' . $indeks;
+        $kembali = site_url('guru/peta-atp/impor') . '?pilihan=' . $indeks
+            . '&paket_id=' . (ctype_digit($paketId) ? (int) $paketId : 0);
 
         if (! ctype_digit($paketId) || strlen($paketId) > 15 || (int) $paketId < 1) {
             return redirect()->to($kembali)->with('galat', 'Paket ATP tidak valid.');
@@ -56,7 +52,7 @@ final class GuruAtpPratinjau extends BaseController
             }
             $hasil['paket_id'] = (int) $paketId;
             $hasil['pilihan'] = $indeks;
-            $hasil['semester_asal'] = $s;
+            $hasil['semester_asal'] = 0;
         } catch (DomainException $e) {
             return redirect()->to($kembali)->with('galat', $e->getMessage());
         } catch (Throwable $e) {
