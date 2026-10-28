@@ -20,6 +20,22 @@ final class CpOperasionalService
         $this->db = $db ?? db_connect();
     }
 
+    /**
+     * Ketentuan khusus SKI KBC Fase D (keputusan pemilik 28-10-2026):
+     * HANYA referensi KBC25-SKI-D-PK / Pemahaman Konsep boleh aktif.
+     * Mapel lain boleh mempunyai lebih dari satu elemen.
+     */
+    public static function bolehTerbit(string $kodeMapel, string $kodeFase,
+        string $namaKurikulum, string $kodeCp, string $elemen): bool
+    {
+        if (strtoupper(trim($kodeMapel)) !== 'SKI' || strtoupper(trim($kodeFase)) !== 'D'
+            || trim($namaKurikulum) !== 'Kurikulum Berbasis Cinta (KBC)') {
+            return true;
+        }
+        return trim($kodeCp) === 'KBC25-SKI-D-PK'
+            && trim($elemen) === 'Pemahaman Konsep';
+    }
+
     /** @return list<array<string,mixed>> */
     public function daftar(): array
     {
