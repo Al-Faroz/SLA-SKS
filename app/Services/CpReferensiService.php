@@ -10,7 +10,7 @@ use RuntimeException;
 use Throwable;
 
 /**
- * K3A — Referensi kurikulum dan CP resmi v2.3.
+ * K3A — Referensi sumber CP historis dan CP operasional v2.5.
  * Rumusan/metadata versi terbit tidak dapat diubah; riwayat tidak dihapus.
  * Admin mengelola referensi, bukan materi/soal/nilai milik Guru.
  */
@@ -49,6 +49,35 @@ final class CpReferensiService
             $this->db->transRollback();
             throw $e;
         }
+    }
+
+    /**
+     * Identitas CP operasional tidak diduplikasi per elemen.
+     * Dipanggil di dalam transaksi setelah baris Mapel terkunci.
+     */
+    private function cpMapelTunggal(int $kurikulumId, int $mapelId, int $faseId): int
+    {
+        if (! $this->db->tableExists('cp_mapel')
+            || ! $this->db->tableExists('cp_mapel_elemen')) {
+            throw new DomainException('Kelola CP v2.5 memerlukan database v4 R2.');
+        }
+        $ada = $this->db->table('cp_mapel')
+            ->select('id')->where('kurikulum_id', $kurikulumId)
+            ->where('mapel_id', $mapelId)->where('fase_id', $faseId)
+            ->get()->getResultArray();
+        if (count($ada) > 1) {
+            throw new DomainException('Ada lebih dari satu CP operasional pada Mapel/Fase yang sama.');
+        }
+        if ($ada !== []) {
+            return (int) $ada[0]['id'];
+        }
+        $this->db->table('cp_mapel')->insert([
+            'kurikulum_id' => $kurikulumId,
+            'mapel_id' => $mapelId,
+            'fase_id' => $faseId,
+            'dibuat_pada' => gmdate('Y-m-d H:i:s'),
+        ]);
+        return (int) $this->db->insertID();
     }
 
     private function audit(int $admin, string $peristiwa, int $objekId): void
@@ -221,16 +250,25 @@ final class CpReferensiService
                 || $this->db->table('ref_mapel')->where('id', $mapelId)->countAllResults() !== 1) {
                 throw new DomainException('Kurikulum atau mapel tidak ditemukan.');
             }
-            $this->db->query('SELECT id FROM ref_fase WHERE id=1 FOR UPDATE');
+            // Fase D dicari dengan kode; ID numerik tidak dipakai sebagai aturan akademik.
+            $fase = $this->db->table('ref_fase')->select('id')
+                ->where('kode', 'D')->get()->getRowArray();
+            if ($fase === null) {
+                throw new DomainException('Referensi Fase D belum tersedia.');
+            }
+            $faseId = (int) $fase['id'];
+            // Serialisasi penambahan elemen untuk Mapel yang sama.
+            $this->db->query('SELECT id FROM ref_mapel WHERE id=? FOR UPDATE', [$mapelId]);
+            $this->cpMapelTunggal($kurikulumId, $mapelId, $faseId);
             if ($this->db->table('ref_cp')->where('kurikulum_id', $kurikulumId)
-                ->where('mapel_id', $mapelId)->where('fase_id', 1)
+                ->where('mapel_id', $mapelId)->where('fase_id', $faseId)
                 ->where('kode', $kode)->countAllResults() !== 0) {
                 throw new DomainException('Kode CP sudah ada untuk kurikulum, mapel, dan Fase D.');
             }
 
             $this->db->table('ref_cp')->insert([
                 'kurikulum_id' => $kurikulumId, 'mapel_id' => $mapelId,
-                'fase_id' => 1, 'kode' => $kode,
+                'fase_id' => $faseId, 'kode' => $kode,
                 'dibuat_oleh' => $admin, 'dibuat_pada' => gmdate('Y-m-d H:i:s'),
             ]);
             $id = (int) $this->db->insertID();
@@ -330,6 +368,28 @@ final class CpReferensiService
                 'status' => 'aktif', 'diterbitkan_oleh' => $admin,
                 'diterbitkan_pada' => gmdate('Y-m-d H:i:s'),
             ]);
+            // CP operasional bertahan; perubahan versi satu elemen tidak
+            // menonaktifkan elemen lain dalam CP Mapel yang sama.
+            $sumber = $this->db->table('ref_cp')
+                ->select('kurikulum_id,mapel_id,fase_id')
+                ->where('id', $cpId)->get()->getRowArray();
+            if ($sumber === null) {
+                throw new DomainException('Referensi elemen CP tidak ditemukan.');
+            }
+            $this->db->query('SELECT id FROM ref_mapel WHERE id=? FOR UPDATE',
+                [(int) $sumber['mapel_id']]);
+            $cpMapel = $this->cpMapelTunggal(
+                (int) $sumber['kurikulum_id'],
+                (int) $sumber['mapel_id'],
+                (int) $sumber['fase_id']
+            );
+            if ($this->db->table('cp_mapel_elemen')
+                ->where('cp_mapel_id', $cpMapel)
+                ->where('cp_versi_id', $id)->countAllResults() === 0) {
+                $this->db->table('cp_mapel_elemen')->insert([
+                    'cp_mapel_id' => $cpMapel, 'cp_versi_id' => $id,
+                ]);
+            }
             $this->audit($admin, 'cp_versi_diterbitkan', $id);
         });
     }
