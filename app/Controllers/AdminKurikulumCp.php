@@ -123,6 +123,19 @@ final class AdminKurikulumCp extends BaseController
         }
     }
 
+    /** Detail CP operasional Mapel–Kurikulum–Fase, bukan rincian satu kode sumber. */
+    public function detailOperasional(int $id): string|RedirectResponse
+    {
+        try {
+            $data = (new \App\Services\CpMapelOperasionalService())->detail($id);
+            return view('admin/cp_operasional', array_merge(
+                $this->layout('CP operasional per Mapel'), $data
+            ));
+        } catch (DomainException $e) {
+            return $this->gagal($e, 'admin/kurikulum-cp');
+        }
+    }
+
     public function detail(int $id): string|RedirectResponse
     {
         try {
