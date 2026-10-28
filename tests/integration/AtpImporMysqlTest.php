@@ -91,6 +91,14 @@ final class AtpImporMysqlTest extends TestCase
             $sum->setCellValue('B5', 'GEN2025');
             $sum->setCellValue('B9', 'SKI');
             $sum->setCellValue('B14', '1');
+            // REF CP diunduh dari server: fixture menyimpan satu elemen aktif
+            // dengan identitas/versi/teks yang harus cocok saat konfirmasi.
+            $referensi = $buku->getSheetByName('REFERENSI CP');
+            foreach (['A'=>'51', 'B'=>'Pemahaman Konsep',
+                      'C'=>'Contoh rumusan CP SKI sintetis',
+                      'D'=>'D', 'E'=>'1'] as $col => $value) {
+                $referensi->setCellValue($col . '7', $value);
+            }
             $sh = $buku->getSheetByName('SEMESTER 4');
             $sh->setCellValue('A13', 1);
             $sh->setCellValue('B13', $babName);

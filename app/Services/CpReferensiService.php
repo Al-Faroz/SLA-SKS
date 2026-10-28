@@ -323,13 +323,68 @@ final class CpReferensiService
                 throw new DomainException('Hanya draf CP yang dapat diterbitkan.');
             }
 
-            // Isi versi terbit dan referensi historis tetap; hanya status siklus hidup berubah.
+            // V2.5: satu CP operasional per Mapel–Kurikulum–Fase.
+            // ref_cp tetap identitas historis setiap elemen/kode CP.
+            $identitas = $this->db->table('ref_cp')
+                ->select('kurikulum_id,mapel_id,fase_id')
+                ->where('id', $cpId)->get()->getRowArray();
+            $dataBaru = $this->db->table('ref_cp_versi')
+                ->select('elemen')->where('id', $id)->get()->getRowArray();
+            if ($identitas === null || $dataBaru === null) {
+                throw new DomainException('Identitas CP tidak tersedia.');
+            }
+            $operasional = $this->db->table('cp_mapel')
+                ->select('id')
+                ->where('kurikulum_id', $identitas['kurikulum_id'])
+                ->where('mapel_id', $identitas['mapel_id'])
+                ->where('fase_id', $identitas['fase_id'])
+                ->get()->getRowArray();
+            if ($operasional === null) {
+                $this->db->table('cp_mapel')->insert([
+                    'kurikulum_id' => (int) $identitas['kurikulum_id'],
+                    'mapel_id' => (int) $identitas['mapel_id'],
+                    'fase_id' => (int) $identitas['fase_id'],
+                    'dibuat_pada' => gmdate('Y-m-d H:i:s'),
+                ]);
+                $cpMapelId = (int) $this->db->insertID();
+            } else {
+                $cpMapelId = (int) $operasional['id'];
+            }
+            // Mengunci CP operasional, bukan cuma ref_cp; agar dua publikasi
+            // elemen bernama sama tidak sama-sama berstatus aktif.
+            $this->db->query('SELECT id FROM cp_mapel WHERE id=? FOR UPDATE',
+                [$cpMapelId])->getRowArray();
+
+            // Versi dengan elemen yang sama (termasuk kode ref_cp lama) diarsipkan,
+            // tanpa menyentuh elemen yang berbeda ataupun baris historis tp_cp.
+            $terkait = $this->db->table('cp_mapel_elemen e')
+                ->select('v.id,v.elemen')
+                ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+                ->where('e.cp_mapel_id', $cpMapelId)
+                ->where('v.status', 'aktif')->get()->getResultArray();
+            foreach ($terkait as $lama) {
+                if ((int) $lama['id'] !== $id
+                    && mb_strtolower(trim((string) $lama['elemen']))
+                        === mb_strtolower(trim((string) $dataBaru['elemen']))) {
+                    $this->db->table('ref_cp_versi')->where('id', (int) $lama['id'])
+                        ->where('status', 'aktif')->update(['status' => 'diarsipkan']);
+                }
+            }
+            // Pertahankan pemeriksaan status dari siklus versi ref_cp yang sama.
             $this->db->table('ref_cp_versi')->where('cp_id', $cpId)
                 ->where('status', 'aktif')->update(['status' => 'diarsipkan']);
             $this->db->table('ref_cp_versi')->where('id', $id)->update([
                 'status' => 'aktif', 'diterbitkan_oleh' => $admin,
                 'diterbitkan_pada' => gmdate('Y-m-d H:i:s'),
             ]);
+            if ($this->db->table('cp_mapel_elemen')
+                ->where('cp_mapel_id', $cpMapelId)
+                ->where('cp_versi_id', $id)->countAllResults() === 0) {
+                $this->db->table('cp_mapel_elemen')->insert([
+                    'cp_mapel_id' => $cpMapelId,
+                    'cp_versi_id' => $id,
+                ]);
+            }
             $this->audit($admin, 'cp_versi_diterbitkan', $id);
         });
     }

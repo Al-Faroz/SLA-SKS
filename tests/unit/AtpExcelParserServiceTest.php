@@ -194,4 +194,53 @@ final class AtpExcelParserServiceTest extends TestCase
             @unlink($path);
         }
     }
+
+    public function testReferensiCpBerversiSamaDenganServer(): void
+    {
+        $buku = $this->buku();
+        try {
+            $ref = $buku->getSheetByName('REFERENSI CP');
+            foreach (['A' => '44', 'B' => 'Pemahaman Konsep',
+                      'C' => 'Rumusan baru Fase D yang tepat', 'D' => 'D',
+                      'E' => '1'] as $kolom => $teks) {
+                $ref->setCellValue($kolom . '7', $teks);
+            }
+            $rows = [[
+                'id' => 44, 'elemen' => 'Pemahaman Konsep',
+                'rumusan' => 'Rumusan baru Fase D yang tepat', 'nomor_versi' => 1,
+            ]];
+            $r = AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025',
+                ['Pemahaman Konsep'], 0, $rows);
+            self::assertSame(0, $r['jumlah_tp']);
+
+            $rows[0]['rumusan'] = 'Rumusan terbaru yang menggantikan unduhan lama';
+            $this->expectExceptionMessage('Unduh ulang ATP Excel');
+            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025',
+                ['Pemahaman Konsep'], 0, $rows);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testReferensiCpLamaLebihBanyakDitolak(): void
+    {
+        $buku = $this->buku();
+        try {
+            $ref = $buku->getSheetByName('REFERENSI CP');
+            foreach (['A' => '44', 'B' => 'Pemahaman Konsep',
+                      'C' => 'CP terbaru', 'D' => 'D', 'E' => '1'] as $kolom => $teks) {
+                $ref->setCellValue($kolom . '7', $teks);
+            }
+            $ref->setCellValue('A8', '99');
+            $this->expectExceptionMessage('CP lama/ekstra');
+            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025',
+                ['Pemahaman Konsep'], 0, [[
+                    'id' => 44, 'elemen' => 'Pemahaman Konsep',
+                    'rumusan' => 'CP terbaru', 'nomor_versi' => 1,
+                ]]);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
 }

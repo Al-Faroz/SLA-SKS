@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Services\AuthService;
 use App\Services\CpReferensiService;
 use App\Services\CpDaftarService;
+use App\Services\CpOperasionalService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
@@ -69,7 +70,8 @@ final class AdminKurikulumCp extends BaseController
             $this->layout('Referensi Kurikulum dan CP'),
             $this->service()->daftar(false),
             (new CpDaftarService())->halaman($filter, $page),
-            ['cpFilterGalat' => $filterGalat]
+            ['cpFilterGalat' => $filterGalat,
+             'cpOperasional' => (new CpOperasionalService())->daftar()]
         ));
     }
 
