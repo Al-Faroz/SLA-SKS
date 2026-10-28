@@ -54,7 +54,7 @@ final class AtpImporKonfirmasiService
             // Penugasan merupakan satu-satunya sumber hak akses; FOR UPDATE
             // menyerialkan pergantian pengampu dan dua konfirmasi bersamaan.
             $g1 = $this->db->query(
-                'SELECT g.id,p.angkatan_id,p.mapel_id,p.kurikulum_id,p.tahun_ajaran_id'
+                'SELECT g.id,p.angkatan_id,p.mapel_id,p.kurikulum_id'
                 . ' FROM paket_semester p'
                 . ' JOIN penugasan_guru_gen g ON g.angkatan_id=p.angkatan_id'
                 . ' AND g.mapel_id=p.mapel_id'
@@ -65,11 +65,11 @@ final class AtpImporKonfirmasiService
                 throw new DomainException('Paket/penugasan Guru sudah berubah. Ulangi pratinjau.');
             }
             $paketTerkunci = $this->db->query(
-                'SELECT id,semester FROM paket_semester'
+                'SELECT id,semester,tahun_ajaran_id FROM paket_semester'
                 . ' WHERE angkatan_id=? AND mapel_id=? AND kurikulum_id=?'
-                . ' AND tahun_ajaran_id=? AND status<>? ORDER BY id FOR UPDATE',
+                . ' AND status<>? ORDER BY id FOR UPDATE',
                 [(int) $g1['angkatan_id'], (int) $g1['mapel_id'],
-                 (int) $g1['kurikulum_id'], (int) $g1['tahun_ajaran_id'], 'arsip']
+                 (int) $g1['kurikulum_id'], 'arsip']
             )->getResultArray();
 
             // Periksa ulang seluruh file dan state di dalam transaksi, sehingga
@@ -86,6 +86,20 @@ final class AtpImporKonfirmasiService
             if (count($paketTerkunci) !== count($paketSem)) {
                 throw new DomainException('Paket semester berubah saat konfirmasi.');
             }
+            foreach ($paketTerkunci as $p) {
+                $n = (int) $p['semester'];
+                if (($paketSem[$n] ?? null) !== (int) $p['id']
+                    || ($preview['tahun_semester'][$n] ?? null) !== (int) $p['tahun_ajaran_id']) {
+                    throw new DomainException('Paket/Tahun Ajaran semester berubah. Unggah ulang ATP.');
+                }
+            }
+            // Konfirmasi hanya menulis semester yang 100% kosong pada
+            // pratinjau terbaru. Semester lain "tetap" dilewati, tak ditimpa.
+            foreach ($preview['mode_semester'] as $mode) {
+                if (! in_array($mode, ['baru', 'tetap'], true)) {
+                    throw new DomainException('Semester tidak memenuhi aturan impor awal.');
+                }
+            }
             $hasil = [
                 'baru_bab' => 0, 'ubah_bab' => 0,
                 'baru_tp' => 0, 'ubah_tp' => 0, 'tetap' => 0,
@@ -98,69 +112,47 @@ final class AtpImporKonfirmasiService
                 $kelas[(int) $r['id']] = (int) $r['kelas_id'];
             }
 
-            // Peta ulang BAB dan TP lama di bawah kunci paket transaksi.
-            $babLama = [];
-            $tpLama = [];
-            foreach ($paketSem as $s => $pid) {
-                $oldBab = $this->db->table('bab')
-                    ->select('id,nomor_bab,nama_bab,deskripsi_bab')
-                    ->where('paket_semester_id', $pid)->get()->getResultArray();
-                foreach ($oldBab as $row) {
-                    $babLama[$s][(int) $row['nomor_bab']] = $row;
-                }
-                $oldTp = $this->db->table('tp')
-                    ->select('id,bab_id,kode_tp,nama_tp,deskripsi_tp,jenis_tp,status')
-                    ->where('paket_semester_id', $pid)->get()->getResultArray();
-                foreach ($oldTp as $row) {
-                    $tpLama[$s][$row['kode_tp']] = $row;
-                }
-            }
+            // Semua baris existing hanya boleh muncul sebagai "tetap" dan
+            // sama sekali tidak dapat dijadikan sasaran UPDATE dari Excel.
+            // Inilah pembatas tegas jalur Excel vs editor manual.
 
-            // Bagian A dilakukan dahulu agar FK BAB tersedia untuk TP baru.
+            // Bagian A: INSERT hanya semester kosong, tanpa UPDATE lama.
             $babId = [];
             foreach ($preview['rencana']['bab'] as $b) {
                 $s = (int) $b['semester'];
                 $n = (int) $b['nomor'];
-                if (! isset($paketSem[$s], $kelas[$s])) {
-                    throw new DomainException('SEMESTER ' . $s . ': paket atau kelas tidak terdaftar.');
+                if (($preview['mode_semester'][$s] ?? '') === 'tetap') {
+                    $hasil['tetap']++;
+                    continue;
                 }
-                $old = $babLama[$s][$n] ?? null;
-                if ($old !== null) {
-                    $id = (int) $old['id'];
-                    if ($old['nama_bab'] !== $b['nama'] || $old['deskripsi_bab'] !== $b['deskripsi']) {
-                        // Jangan ubah BAB yang sudah membawahi TP Siap/snapshot.
-                        $cek = $this->db->table('tp')
-                            ->where('bab_id', $id)->where('status !=', 'draf')
-                            ->countAllResults();
-                        if ($cek > 0) {
-                            throw new DomainException('BAB ' . $n . ' sudah mempunyai TP terkunci.');
-                        }
-                        $this->db->table('bab')->where('id', $id)->update([
-                            'nama_bab' => $b['nama'], 'deskripsi_bab' => $b['deskripsi'],
-                        ]);
-                        $hasil['ubah_bab']++;
-                    } else {
-                        $hasil['tetap']++;
-                    }
-                } else {
-                    $this->db->table('bab')->insert([
-                        'paket_semester_id' => (int) $paketSem[$s],
-                        'angkatan_id' => (int) $g1['angkatan_id'],
-                        'mapel_id' => (int) $g1['mapel_id'],
-                        'kurikulum_id' => (int) $g1['kurikulum_id'],
-                        'tahun_ajaran_id' => (int) $g1['tahun_ajaran_id'],
-                        'kelas_id' => $kelas[$s],
-                        'nomor_bab' => $n,
-                        'nama_bab' => $b['nama'],
-                        'deskripsi_bab' => $b['deskripsi'],
-                        'dibuat_pada' => date('Y-m-d H:i:s'),
-                    ]);
-                    $id = (int) $this->db->insertID();
-                    if ($id < 1) {
-                        throw new RuntimeException('Gagal membuat BAB baru.');
-                    }
-                    $hasil['baru_bab']++;
+                if (($preview['mode_semester'][$s] ?? '') !== 'baru'
+                    || ! isset($paketSem[$s], $kelas[$s], $preview['tahun_semester'][$s])) {
+                    throw new DomainException('SEMESTER ' . $s . ': konteks paket tidak valid.');
                 }
+                // Defense-in-depth setelah locking; paket wajib masih kosong.
+                if ($this->db->table('bab')->where('paket_semester_id', $paketSem[$s])
+                    ->countAllResults() !== 0
+                    || $this->db->table('tp')->where('paket_semester_id', $paketSem[$s])
+                    ->countAllResults() !== 0) {
+                    throw new DomainException('Semester ' . $s . ' sudah diisi di aplikasi. Impor dibatalkan.');
+                }
+                $this->db->table('bab')->insert([
+                    'paket_semester_id' => (int) $paketSem[$s],
+                    'angkatan_id' => (int) $g1['angkatan_id'],
+                    'mapel_id' => (int) $g1['mapel_id'],
+                    'kurikulum_id' => (int) $g1['kurikulum_id'],
+                    'tahun_ajaran_id' => (int) $preview['tahun_semester'][$s],
+                    'kelas_id' => $kelas[$s],
+                    'nomor_bab' => $n,
+                    'nama_bab' => $b['nama'],
+                    'deskripsi_bab' => $b['deskripsi'],
+                    'dibuat_pada' => date('Y-m-d H:i:s'),
+                ]);
+                $id = (int) $this->db->insertID();
+                if ($this->db->transStatus() === false || $id < 1) {
+                    throw new RuntimeException('Gagal membuat BAB baru.');
+                }
+                $hasil['baru_bab']++;
                 $babId[$s][$n] = $id;
             }
 
@@ -174,73 +166,44 @@ final class AtpImporKonfirmasiService
                 $s = (int) $t['semester'];
                 $n = (int) $t['nomor_bab'];
                 $kode = (string) $t['kode'];
-                if (! isset($paketSem[$s], $babId[$s][$n])) {
-                    throw new DomainException('SEMESTER ' . $s . ' baris ' . $t['baris']
-                        . ': BAB sasaran tidak tersedia.');
+                if (($preview['mode_semester'][$s] ?? '') === 'tetap') {
+                    $hasil['tetap']++;
+                    continue;
                 }
-                $old = $tpLama[$s][$kode] ?? null;
-                $data = [
+                if (($preview['mode_semester'][$s] ?? '') !== 'baru'
+                    || ! isset($paketSem[$s], $babId[$s][$n])) {
+                    throw new DomainException('SEMESTER ' . $s . ' baris ' . $t['baris']
+                        . ': BAB atau paket sasaran tidak tersedia.');
+                }
+                if (++$atpTerakhir[$s] > 65535) {
+                    throw new DomainException('Urutan ATP paket sudah mencapai batas.');
+                }
+                $this->db->table('tp')->insert([
                     'jenis_tp' => $t['jenis'],
                     'nama_tp' => $t['nama'],
                     'deskripsi_tp' => $t['deskripsi'],
                     'judul' => $t['nama'],
                     'rumusan' => $t['deskripsi'],
-                ];
-                if ($old !== null) {
-                    $id = (int) $old['id'];
-                    if ($old['status'] === 'arsip'
-                        || (int) $old['bab_id'] !== $babId[$s][$n]) {
-                        throw new DomainException($kode . ': TP arsip atau relasi BAB berbeda.');
-                    }
-                    if ($old['jenis_tp'] === $t['jenis']
-                        && $old['nama_tp'] === $t['nama']
-                        && $old['deskripsi_tp'] === $t['deskripsi']) {
-                        $hasil['tetap']++;
-                        continue;
-                    }
-                    // Lock objek final sebelum menguji kelayakan revisi.
-                    // Status yang berubah selama request tidak boleh diterobos.
-                    $terkunci = $this->db->query(
-                        'SELECT id,status FROM tp WHERE id=? FOR UPDATE', [$id]
-                    )->getRowArray();
-                    if ($terkunci === null || $terkunci['status'] !== 'draf') {
-                        throw new DomainException($kode . ': TP Siap atau berubah tidak boleh ditimpa.');
-                    }
-                    foreach (['materi', 'versi_konten_tp', 'progres_tp'] as $tabel) {
-                        if ($this->db->table($tabel)->where('tp_id', $id)->countAllResults() !== 0) {
-                            throw new DomainException($kode
-                                . ': TP sudah mempunyai materi/snapshot/progres; ubah melalui editor resmi.');
-                        }
-                    }
-                    $this->db->table('tp')->where('id', $id)
-                        ->where('status', 'draf')->update($data);
-                    if ($this->db->affectedRows() !== 1) {
-                        throw new DomainException($kode . ': status TP berubah saat konfirmasi.');
-                    }
-                    $hasil['ubah_tp']++;
-                } else {
-                    if (++$atpTerakhir[$s] > 65535) {
-                        throw new DomainException('Urutan ATP paket sudah mencapai batas.');
-                    }
-                    $this->db->table('tp')->insert($data + [
-                        'paket_semester_id' => (int) $paketSem[$s],
-                        'bab_id' => $babId[$s][$n],
-                        'cp_mapel_id' => (int) $preview['cp_mapel_id'],
-                        'urutan_dalam_bab' => (int) $t['urutan'],
-                        'kode_tp' => $kode,
-                        'indikator' => '',
-                        'urutan_atp' => $atpTerakhir[$s],
-                        'status' => 'draf',
-                        'struktur_versi' => 1,
-                        'bobot_resume' => 20,
-                        'bobot_tugas' => 20,
-                        'bobot_sumatif' => 60,
-                        'diag_tayang' => 10,
-                        'sum_tayang' => 30,
-                        'sum_maks_percobaan' => 2,
-                    ]);
-                    $hasil['baru_tp']++;
+                    'paket_semester_id' => (int) $paketSem[$s],
+                    'bab_id' => $babId[$s][$n],
+                    'cp_mapel_id' => (int) $preview['cp_mapel_id'],
+                    'urutan_dalam_bab' => (int) $t['urutan'],
+                    'kode_tp' => $kode,
+                    'indikator' => '',
+                    'urutan_atp' => $atpTerakhir[$s],
+                    'status' => 'draf',
+                    'struktur_versi' => 1,
+                    'bobot_resume' => 20,
+                    'bobot_tugas' => 20,
+                    'bobot_sumatif' => 60,
+                    'diag_tayang' => 10,
+                    'sum_tayang' => 30,
+                    'sum_maks_percobaan' => 2,
+                ]);
+                if ($this->db->transStatus() === false || $this->db->affectedRows() !== 1) {
+                    throw new RuntimeException('Gagal membuat TP baru.');
                 }
+                $hasil['baru_tp']++;
             }
 
             if ($this->db->transStatus() === false) {
@@ -250,7 +213,7 @@ final class AtpImporKonfirmasiService
                 'pengguna_id' => (int) $akun['id'],
                 'peran_aktif' => 'guru',
                 'peristiwa' => 'impor_atp_excel_konfirmasi',
-                'catatan' => 'Paket=' . $paketId . '; BAB baru=' . $hasil['baru_bab']
+                'catatan' => 'ATP awal; paket acuan=' . $paketId . '; BAB baru=' . $hasil['baru_bab']
                     . ', ubah=' . $hasil['ubah_bab'] . '; TP baru=' . $hasil['baru_tp']
                     . ', ubah=' . $hasil['ubah_tp'] . '; checksum preview='
                     . substr($fingerprint, 0, 16),
