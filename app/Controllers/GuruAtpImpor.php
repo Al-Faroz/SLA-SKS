@@ -40,13 +40,14 @@ final class GuruAtpImpor extends BaseController
                     );
                     $status[$n] = [
                         'bab' => count($semester['bab']), 'tp' => count($semester['tp']),
-                        'paket' => 0,
+                        'paket' => 0, 'tahun_ids' => [],
                     ];
                     foreach ($semester['paket'] as $paket) {
                         if ($paket['status'] === 'arsip' || $n < (int) $dipilih['semester_mulai']) {
                             continue;
                         }
                         $status[$n]['paket']++;
+                        $status[$n]['tahun_ids'][] = (int) $paket['tahun_ajaran_id'];
                         $opsi[] = $paket;
                     }
                 }
@@ -64,8 +65,10 @@ final class GuruAtpImpor extends BaseController
             if ($opsi !== []) {
                 $tahun = array_column(db_connect()->table('ref_tahun_ajaran')
                     ->select('nama,id')->get()->getResultArray(), 'nama', 'id');
-                $kurikulum = array_column(db_connect()->table('ref_kurikulum')
-                    ->select('nama,versi,id')->get()->getResultArray(), 'nama', 'id');
+                foreach (db_connect()->table('ref_kurikulum')
+                    ->select('id,nama,versi')->get()->getResultArray() as $k) {
+                    $kurikulum[(int) $k['id']] = $k['nama'] . ' — ' . $k['versi'];
+                }
             }
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru/peta-atp'))
