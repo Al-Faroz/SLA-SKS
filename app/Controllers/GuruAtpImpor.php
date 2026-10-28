@@ -39,16 +39,30 @@ final class GuruAtpImpor extends BaseController
                         (int) $dipilih['angkatan_id'], (int) $dipilih['mapel_id'], $n
                     );
                     $status[$n] = [
-                        'bab' => count($semester['bab']), 'tp' => count($semester['tp']),
+                        'bab' => 0, 'tp' => 0,
                         'paket' => 0, 'tahun_ids' => [],
                     ];
+                    $idsPaketNonarsip = [];
                     foreach ($semester['paket'] as $paket) {
                         if ($paket['status'] === 'arsip' || $n < (int) $dipilih['semester_mulai']) {
                             continue;
                         }
                         $status[$n]['paket']++;
+                        $idsPaketNonarsip[] = (int) $paket['id'];
                         $status[$n]['tahun_ids'][] = (int) $paket['tahun_ajaran_id'];
                         $opsi[] = $paket;
+                    }
+                    // Statistik konsisten dengan domain paket yang bisa diimpor.
+                    // Paket arsip tidak boleh membuat paket aktif kosong tampak terkunci.
+                    foreach ($semester['bab'] as $bab) {
+                        if (in_array((int) $bab['paket_semester_id'], $idsPaketNonarsip, true)) {
+                            $status[$n]['bab']++;
+                        }
+                    }
+                    foreach ($semester['tp'] as $tp) {
+                        if (in_array((int) $tp['paket_semester_id'], $idsPaketNonarsip, true)) {
+                            $status[$n]['tp']++;
+                        }
                     }
                 }
             }
