@@ -27,3 +27,41 @@
 ## Status uji
 - GitHub Actions melakukan PHP lint, tes parser, dan simulasi SQL MariaDB dengan fixture sintetis anonim.
 - Belum dinyatakan FIX sebelum uji nyata MySQL/MariaDB XAMPP oleh pemilik. Dump privat tidak disimpan dalam GitHub.
+
+## Koreksi keputusan pemilik — 28 Oktober 2026, setelah uji Excel
+**Versi V4-0002 telah diimpor pengguna dan bukti Excel masih menunjukkan dua elemen aktif.**
+Pemilik menetapkan khusus untuk **SKI KBC Fase D hanya satu CP aktif**:
+`KBC25-SKI-D-PK` dengan elemen `Pemahaman Konsep`, berisi 10 butir rumusan
+yang sudah dipasang pada V4-0002. Elemen `Keterampilan Proses` **tidak aktif lagi**.
+
+Patch incremental **`database/sql/updates/V4-0003_SKI_SATU_ELEMEN_CP_AKTIF.sql`**
+mengubah status versi lama `FD-SKI-02` menjadi `diarsipkan` tanpa
+menghapus ref_cp, ref_cp_versi atau cp_mapel_elemen. Versi CP baru tetap
+aktif dan tidak digandakan. **Jangan impor ulang V4-0002.**
+Service penerbitan CP Admin kini menolak penerbitan SKI KBC Fase D
+selain `KBC25-SKI-D-PK / Pemahaman Konsep`. Mapel lain tetap bisa
+memiliki banyak elemen sesuai Master Document.
+
+Dalam dump audit, **TP SKI id=1 sudah berstatus arsip**, tetapi memiliki
+`progres_tp` untuk 2 siswa, satu `versi_konten_tp` dan berbagai
+soal/materi/jawaban/ujian. Meskipun pengguna memperbolehkan penghapusan
+TP lama, **tidak ada penghapusan otomatis**, sebab penghapusan TP ini
+akan membutuhkan penghapusan progres serta riwayat yang ditautkan banyak FK.
+Pakai mekanisme TP baru v2.5; histori tetap terpelihara dan TP arsip
+tidak boleh diedit/diaktifkan lagi. Pemeriksaan detail tersedia sebagai
+SQL baca-saja `database/sql/qa/V4-0003_SKI_SATU_ELEMEN_VERIFIKASI_READONLY.sql`.
+
+### Petunjuk penerapan
+1. Cadangkan `sla_sks_v4` dan direktori writable/; pilih database `sla_sks_v4`.
+2. Pastikan marker `V4-0002-CP-SKI-PK` sudah ada, dan marker
+   `V4-0003-SKI-CP-TUNGGAL` belum ada.
+3. Impor **sekali** `V4-0003_SKI_SATU_ELEMEN_CP_AKTIF.sql`
+   melalui phpMyAdmin. Bila ada error, hentikan, jangan jalankan ulang.
+4. Jalankan QA baca-saja; hasil: **tepat 1 aktif** (`Pemahaman Konsep`),
+   KP diarsipkan, TP/progres historis tetap terpasang.
+5. Ambil branch CP tunggal, login Guru SKI, unduh **ulang** Excel ATP.
+   Sheet REFERENSI CP hanya boleh berisi satu baris CP aktif.
+   Excel unduhan lama dengan dua CP ditolak saat impor.
+
+Perubahan ini mengoreksi kebijakan khusus SKI saja dan
+tidak mengubah desain template ATP atau kebijakan CP mapel lain.
