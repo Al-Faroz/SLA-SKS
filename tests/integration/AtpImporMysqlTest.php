@@ -220,6 +220,36 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(2, self::$db->table('tp')->countAllResults());
     }
 
+    public function testDuaBabDiSemesterKosongBerhasilDalamSatuBatch(): void
+    {
+        $file = $this->workbook();
+        $book = IOFactory::load($file);
+        try {
+            $sh = $book->getSheetByName('SEMESTER 4');
+            foreach ([
+                'A14'=>2, 'B14'=>'Tokoh Islam',
+                'C14'=>'Mempelajari tokoh dan keteladanannya',
+                'A40'=>2, 'B40'=>1, 'C40'=>'SKI.8.2.1',
+                'D40'=>'Esensial', 'E40'=>'Meneladani Tokoh',
+                'F40'=>'Mengapresiasi perjuangan tokoh Islam',
+                'I40'=>'Pemahaman Konsep',
+            ] as $c => $v) {
+                $sh->setCellValue($c, $v);
+            }
+            (new Xlsx($book))->save($file);
+        } finally {
+            $book->disconnectWorksheets();
+        }
+        $preview = $this->preview($file);
+        self::assertSame(4, $preview['jumlah']['baru']);
+        self::assertTrue($preview['boleh_konfirmasi']);
+        $r = $this->confirm($file, $preview['fingerprint']);
+        self::assertSame(2, $r['baru_bab']);
+        self::assertSame(2, $r['baru_tp']);
+        self::assertSame(2, self::$db->table('bab')->countAllResults());
+        self::assertSame(2, self::$db->table('tp')->countAllResults());
+    }
+
     public function testKonteksLintasGenDitolak(): void
     {
         $f = $this->workbook();
