@@ -132,10 +132,10 @@
                 <div class="a-atp-detail__toolbar-actions">
                     <a class="a-btn a-btn--sekunder"
                         href="<?= esc(site_url('guru/peta-atp/unduh/' . (int) $paketId), 'attr') ?>">
-                        Unduh Template ATP 6 Semester
+                        Unduh Template ATP V25-2 · 6 Semester
                     </a>
                 </div>
-                <p class="a-proto-muted">Isi hanya semester sasaran yang masih kosong. Workbook sama
+                <p class="a-proto-muted">Template versi V25-2 menggunakan delapan kolom TP tanpa Kode TP dan Elemen CP. Jika file bernama tanpa penanda V25-2, jangan digunakan. Isi hanya semester sasaran yang masih kosong. Workbook sama
                     boleh diunggah ulang untuk pemeriksaan, tetapi tidak akan menulis data duplikat.</p>
                 <form class="a-form" method="post" enctype="multipart/form-data"
                     action="<?= esc(site_url('guru/peta-atp/pratinjau/' . (int) $paketId), 'attr') ?>">
