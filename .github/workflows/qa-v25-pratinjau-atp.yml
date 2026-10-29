@@ -14,6 +14,10 @@ on:
       - 'app/Views/guru/semester_atp.php'
       - 'app/Config/Routes.php'
       - 'tests/unit/AtpExcelParserServiceTest.php'
+      - 'tests/unit/AtpPratinjauFeedbackTest.php'
+      - 'app/Views/guru/impor_atp.php'
+      - 'app/Controllers/GuruAtpKonfirmasi.php'
+      - 'public/assets/js/atp-upload.js'
       - '.github/workflows/qa-v25-pratinjau-atp.yml'
   workflow_dispatch:
 
@@ -45,5 +49,8 @@ jobs:
           php -l app/Views/guru/semester_atp.php
           php -l app/Config/Routes.php
           php -l tests/unit/AtpExcelParserServiceTest.php
+          php -l tests/unit/AtpPratinjauFeedbackTest.php
+          php -l app/Views/guru/impor_atp.php
+          php -l app/Controllers/GuruAtpKonfirmasi.php
       - name: Unit parser and workbook regression
-        run: vendor/bin/phpunit --no-coverage --filter 'AtpUnggahPratinjauRoundTripTest|AtpExcelParserServiceTest|AtpManualTemplateTest|AtpUnduhanServiceTest'
+        run: vendor/bin/phpunit --no-coverage --filter 'AtpPratinjauFeedbackTest|AtpUnggahPratinjauRoundTripTest|AtpExcelParserServiceTest|AtpManualTemplateTest|AtpUnduhanServiceTest'

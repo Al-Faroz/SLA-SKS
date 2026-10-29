@@ -22,7 +22,8 @@ final class GuruAtpKonfirmasi extends BaseController
         $indeks = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) < 6
             ? (int) $pilihan : 0;
         $kembali = site_url('guru/peta-atp/impor') . '?pilihan=' . $indeks
-            . '&paket_id=' . (ctype_digit($paketId) ? (int) $paketId : 0);
+            . '&paket_id=' . (ctype_digit($paketId) ? (int) $paketId : 0)
+            . '#atp-upload-area';
         $token = $this->request->getPost('stage_token');
         if (! ctype_digit($paketId) || strlen($paketId) > 15 || (int) $paketId < 1
             || ! is_string($token) || ! AtpStagingService::validasiToken($token)) {
