@@ -6,6 +6,8 @@ namespace Tests\Integration;
 
 use App\Services\AtpImporKonfirmasiService;
 use App\Services\AtpImporPratinjauService;
+use App\Services\AtpStagingService;
+use App\Services\AtpValidasiUnggahService;
 use App\Services\AtpTemplateLayoutService;
 use Config\Database;
 use DomainException;
@@ -148,6 +150,39 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame('SKI.8.1.1', self::$db->table('tp')->get()->getRow('kode_tp'));
         self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
         self::assertSame(0, self::$db->table('materi')->countAllResults());
+    }
+
+    public function testPipelineUploadPreviewStagingCommitMenghasilkanBabTp(): void
+    {
+        $file = $this->workbook();
+        AtpValidasiUnggahService::periksa(
+            $file, 'ATP-V25-2-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file)
+        );
+        $pra = $this->preview($file);
+        self::assertSame(['baru' => 2, 'ubah' => 0, 'tetap' => 0, 'galat' => 0],
+            $pra['jumlah']);
+        self::assertSame('SKI.8.1.1', $pra['rencana']['tp'][0]['kode']);
+        $dir = sys_get_temp_dir() . '/atp_import_sesi_' . bin2hex(random_bytes(8));
+        $stage = new AtpStagingService($dir);
+        try {
+            $data = $stage->buat($file, 101, 11, 'sesi_guru_qa', $pra['fingerprint']);
+            $filePrivat = $stage->ambil($data['token'], 101, 11, 'sesi_guru_qa');
+            $hasil = $this->confirm($filePrivat['file'], $filePrivat['fingerprint']);
+            self::assertSame(1, $hasil['baru_bab']);
+            self::assertSame(1, $hasil['baru_tp']);
+            self::assertSame('SKI.8.1.1',
+                self::$db->table('tp')->get()->getRow('kode_tp'));
+            self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+            $stage->hapus($data['token']);
+            $this->expectException(\DomainException::class);
+            $stage->ambil($data['token'], 101, 11, 'sesi_guru_qa');
+        } finally {
+            foreach (glob($dir . '/*') ?: [] as $sisa) {
+                @unlink($sisa);
+            }
+            @unlink($dir . '/.htaccess');
+            @rmdir($dir);
+        }
     }
 
     public function testImporUlangIdentikTanpaDuplikasiDanPerbedaanDitolak(): void
