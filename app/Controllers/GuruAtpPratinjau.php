@@ -23,8 +23,11 @@ final class GuruAtpPratinjau extends BaseController
         $pilihan = $this->request->getPost('pilihan');
         $indeks = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) <= 5
             ? (int) $pilihan : 0;
+        // Fragment memastikan pesan pasca-redirect tampil di area form,
+        // bukan di atas layar yang sudah tidak terlihat.
         $kembali = site_url('guru/peta-atp/impor') . '?pilihan=' . $indeks
-            . '&paket_id=' . (ctype_digit($paketId) ? (int) $paketId : 0);
+            . '&paket_id=' . (ctype_digit($paketId) ? (int) $paketId : 0)
+            . '#atp-upload-area';
 
         if (! ctype_digit($paketId) || strlen($paketId) > 15 || (int) $paketId < 1) {
             return redirect()->to($kembali)->with('galat', 'Paket ATP tidak valid.');
@@ -37,15 +40,18 @@ final class GuruAtpPratinjau extends BaseController
             );
         }
 
+        $tahap = 'berkas';
         try {
             AtpValidasiUnggahService::periksa(
                 $file->getTempName(),
                 $file->getClientName(),
                 (int) $file->getSize()
             );
+            $tahap = 'aturan-akademik';
             $hasil = (new AtpImporPratinjauService())->pratinjau((int) $paketId, $file->getTempName());
             $hasil['stage_token'] = null;
             if ($hasil['boleh_konfirmasi']) {
+                $tahap = 'berkas-sementara';
                 $akunStaging = (new AuthService())->penggunaSaatIni();
                 $stage = (new AtpStagingService())->buat(
                     $file->getTempName(),
@@ -61,14 +67,19 @@ final class GuruAtpPratinjau extends BaseController
             $hasil['pilihan'] = $indeks;
             $hasil['semester_asal'] = 0;
         } catch (DomainException $e) {
+            log_message('notice', 'Pratinjau ATP ditolak pada tahap {tahap}; paket={paket}', [
+                'tahap' => $tahap, 'paket' => (int) $paketId,
+            ]);
             return redirect()->to($kembali)->with('galat', $e->getMessage());
         } catch (Throwable $e) {
-            log_message('error', 'Pratinjau impor ATP gagal: {kelas}', [
+            log_message('error', 'Pratinjau ATP gagal pada tahap {tahap}; paket={paket}; kelas={kelas}', [
+                'tahap' => $tahap, 'paket' => (int) $paketId,
                 'kelas' => get_class($e),
             ]);
             return redirect()->to($kembali)->with('galat',
-                'Excel belum dapat dipratinjau. Periksa isian dan unggah kembali'
-                . ' template ATP V25-2 yang baru diunduh.');
+                'Pemeriksaan Excel terhenti pada tahap ' . $tahap
+                . '. Tidak ada BAB/TP yang disimpan. '
+                . 'Periksa file dan coba unggah kembali; bila berulang, periksa log CI4.');
         }
 
         $akun = (new AuthService())->penggunaSaatIni();
