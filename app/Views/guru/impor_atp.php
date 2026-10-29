@@ -187,5 +187,7 @@
         </section>
     <?php endif ?>
 </div>
-<script src="<?= esc(base_url('public/assets/js/atp-upload.js'), 'attr') ?>" defer></script>
+<?php $atpJsPath = FCPATH . 'public/assets/js/atp-upload.js'; ?>
+<script src="<?= esc(base_url('public/assets/js/atp-upload.js')
+    . '?v=' . (is_file($atpJsPath) ? (string) filemtime($atpJsPath) : '1'), 'attr') ?>" defer></script>
 <?= $this->endSection() ?>
