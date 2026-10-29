@@ -74,7 +74,12 @@ final class AtpTemplateLayoutService
             $sh->getDataValidation('D39')->setType('none');
             $sh->getDataValidation('H39')->setType('none');
             $sh->getDataValidation('C39')->setType('list')
+                ->setSqref('C39:C118')
                 ->setFormula1('"Esensial,NonEsensial"')
+                ->setAllowBlank(true)->setShowDropDown(true);
+            $sh->getDataValidation('G39')->setType('list')
+                ->setSqref('G39:G118')
+                ->setFormula1('"YouTube,PDF,Audio,Gambar"')
                 ->setAllowBlank(true)->setShowDropDown(true);
             $sh->setCellValue('A35', '02  —  HUBUNGKAN TIAP TP KE NOMOR BAB BAGIAN A.');
             $sh->setCellValue('A36', 'Isi jenis TP di kolom C dan judul Materi '
