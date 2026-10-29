@@ -53,16 +53,17 @@
             <?php if ($dipilih !== null): ?>
                 <p class="a-proto-muted">Gen: <strong><?= esc($dipilih['nama_gen']) ?></strong> ·
                     Mapel: <strong><?= esc($dipilih['nama_mapel']) ?></strong> ·
-                    Mulai Semester <?= (int) $dipilih['semester_mulai'] ?>.
-                    Tahun Ajaran selalu mengikuti paket masing-masing semester.</p>
+                    Akses siswa mulai Semester <?= (int) $dipilih['semester_mulai'] ?>.
+                    Guru boleh menyusun ATP Semester 1–6; Tahun Ajaran mengikuti paket tiap semester.</p>
             <?php endif ?>
         </section>
 
         <section class="a-card" aria-labelledby="judul-paket-atp">
             <h2 id="judul-paket-atp">2. Kesiapan enam semester</h2>
-            <p class="a-proto-muted">Paket semester harus sudah dibuat lebih dahulu melalui halaman
-                Semester. Semester yang belum memiliki paket tidak dapat menjadi sasaran impor.
-                Paket acuan digunakan hanya untuk memastikan Kurikulum dan CP workbook.</p>
+            <p class="a-proto-muted">Semua semester 1–6 dapat disusun Guru, termasuk semester
+                sebelum awal belajar Gen. Untuk penyimpanan, setiap semester memerlukan paket draf
+                dengan Tahun Ajaran yang Anda tentukan. Paket tidak dibuat otomatis dari Excel
+                agar tidak salah kurikulum atau tahun. Paket acuan hanya untuk verifikasi CP.</p>
             <div class="a-tabel-gulir">
                 <table class="a-tbl">
                     <thead><tr>
@@ -92,9 +93,7 @@
                             <td><?= (int) $st['bab'] ?></td>
                             <td><?= (int) $st['tp'] ?></td>
                             <td>
-                                <?php if ($dipilih !== null && $n < (int) $dipilih['semester_mulai']): ?>
-                                    Dilewati Gen
-                                <?php elseif ($st['paket'] === 0): ?>
+                                <?php if ($st['paket'] === 0): ?>
                                     Belum ada paket
                                 <?php elseif ($st['paket'] > 1): ?>
                                     Paket ganda — perlu diperiksa
@@ -111,6 +110,69 @@
                     </tbody>
                 </table>
             </div>
+            <?php
+            $tanpaPaket = [];
+            for ($n = 1; $n <= 6; $n++) {
+                if (($statusSemester[$n]['paket'] ?? 0) === 0) {
+                    $tanpaPaket[] = $n;
+                }
+            }
+            ?>
+            <?php if ($tanpaPaket !== [] && $dipilih !== null
+                && $opsiTahunPaket !== [] && $opsiKurikulumPaket !== []): ?>
+                <div class="a-atp-detail__paket-persiapan">
+                    <h3>Siapkan paket semester yang belum ada</h3>
+                    <p class="a-proto-muted">Pilih semester dan Tahun Ajaran yang benar.
+                        Paket disimpan sebagai <strong>draf</strong> dan tidak membuka akses siswa.
+                        Ulangi untuk setiap semester yang akan Anda impor.</p>
+                    <form class="a-form" method="post"
+                        action="<?= esc(site_url('guru/paket-semester/baru'), 'attr') ?>">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="kembali_atp" value="1">
+                        <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
+                        <input type="hidden" name="gen_id" value="<?= (int) $dipilih['angkatan_id'] ?>">
+                        <input type="hidden" name="mapel_id" value="<?= (int) $dipilih['mapel_id'] ?>">
+                        <div class="a-field">
+                            <label class="a-label" for="atp-paket-semester">Semester</label>
+                            <select id="atp-paket-semester" name="semester" required>
+                                <option value="">Pilih semester tanpa paket</option>
+                                <?php foreach ($tanpaPaket as $semesterBaru): ?>
+                                    <option value="<?= (int) $semesterBaru ?>">
+                                        Semester <?= (int) $semesterBaru ?>
+                                    </option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="a-field">
+                            <label class="a-label" for="atp-paket-tahun">Tahun Ajaran</label>
+                            <select id="atp-paket-tahun" name="tahun_id" required>
+                                <option value="">Pilih Tahun Ajaran</option>
+                                <?php foreach ($opsiTahunPaket as $tahunBaru): ?>
+                                    <option value="<?= (int) $tahunBaru['id'] ?>">
+                                        <?= esc($tahunBaru['nama']) ?>
+                                    </option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="a-field">
+                            <label class="a-label" for="atp-paket-kurikulum">Kurikulum</label>
+                            <select id="atp-paket-kurikulum" name="kurikulum_id" required>
+                                <option value="">Pilih kurikulum sesuai paket acuan</option>
+                                <?php foreach ($opsiKurikulumPaket as $kbaru): ?>
+                                    <option value="<?= (int) $kbaru['id'] ?>">
+                                        <?= esc($kbaru['nama'] . ' — ' . $kbaru['versi']) ?>
+                                    </option>
+                                <?php endforeach ?>
+                            </select>
+                        </div>
+                        <div class="a-atp-detail__toolbar-actions">
+                            <button class="a-btn a-btn--sekunder" type="submit">
+                                + Buat Paket Draf Semester
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            <?php endif ?>
         </section>
 
         <section class="a-card" aria-labelledby="judul-atp-file" id="atp-upload-area">
@@ -151,7 +213,7 @@
                         Unduh Template ATP V25-2 · 6 Semester
                     </a>
                 </div>
-                <p class="a-proto-muted">Template versi V25-2 menggunakan delapan kolom TP tanpa Kode TP dan Elemen CP. Jika file bernama tanpa penanda V25-2, jangan digunakan. Isi hanya semester sasaran yang masih kosong. Workbook sama
+                <p class="a-proto-muted">Template versi V25-2 menggunakan delapan kolom TP tanpa Kode TP dan Elemen CP. Jika file bernama tanpa penanda V25-2, jangan digunakan. Guru boleh mengisi enam semester sekaligus; pastikan paket dan Tahun Ajaran tersedia. Isi semester yang masih kosong. Workbook sama
                     boleh diunggah ulang untuk pemeriksaan, tetapi tidak akan menulis data duplikat.</p>
                 <form class="a-form" method="post" enctype="multipart/form-data"
                     data-atp-upload-form

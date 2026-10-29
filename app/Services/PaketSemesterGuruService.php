@@ -108,18 +108,13 @@ final class PaketSemesterGuruService
         try {
             // Lock G1 menyerialkan dua request pembuatan paket pada konteks sama.
             $penugasan = $this->db->query(
-                'SELECT g.id,a.semester_mulai FROM penugasan_guru_gen g'
-                . ' JOIN ref_angkatan a ON a.id=g.angkatan_id'
+                'SELECT g.id FROM penugasan_guru_gen g'
                 . ' WHERE g.angkatan_id=? AND g.mapel_id=? AND g.guru_id=? FOR UPDATE',
                 [$genId, $mapelId, $guruId]
             )->getRowArray();
             if ($penugasan === null) {
                 throw new DomainException('Anda tidak ditugaskan pada Gen–Mapel yang dipilih.');
             }
-            if ($semester < (int) $penugasan['semester_mulai']) {
-                throw new DomainException('Semester ini berada sebelum semester mulai Gen.');
-            }
-
             $refSemester = $this->db->table('ref_semester s')
                 ->select('k.fase_id')
                 ->join('ref_kelas k', 'k.id=s.kelas_id')

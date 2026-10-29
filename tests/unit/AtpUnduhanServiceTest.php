@@ -101,16 +101,17 @@ final class AtpUnduhanServiceTest extends TestCase
         }
     }
 
-    public function testSemesterSebelumGenDitolak(): void
+    public function testSemesterSebelumGenBolehMenjadiPaketAcuanUnduhanGuru(): void
     {
         $buku = $this->buku();
         try {
             $konteks = $this->konteks();
             $konteks['semester_paket'] = 3;
-            $this->expectException(DomainException::class);
             AtpUnduhanService::isiBuku($buku, $konteks, [
                 ['id' => 1, 'elemen' => 'Sejarah', 'rumusan' => 'Rumusan', 'nomor_versi' => 1],
             ]);
+            self::assertSame(AtpUnduhanService::VERSI,
+                (string) $buku->getSheetByName('SEMESTER 1')->getCell('A2')->getValue());
         } finally {
             $buku->disconnectWorksheets();
         }

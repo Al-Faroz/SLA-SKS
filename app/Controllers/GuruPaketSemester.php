@@ -18,11 +18,14 @@ final class GuruPaketSemester extends BaseController
         $pilihan = $this->request->getPost('pilihan');
         $nomor = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) <= 6
             ? (int) $pilihan : 0;
-        $tujuan = site_url('guru/peta-atp') . '?pilihan=' . $nomor;
+        $kembaliAtp = $this->request->getPost('kembali_atp') === '1';
+        $tujuan = $kembaliAtp
+            ? site_url('guru/peta-atp/impor') . '?pilihan=' . $nomor . '#judul-paket-atp'
+            : site_url('guru/peta-atp') . '?pilihan=' . $nomor;
         // Redirect ke semester asal modal; nomor hanya dipakai untuk navigasi.
         // ID objek dan hak G1 tetap divalidasi ulang oleh Service.
         $semesterPost = $this->request->getPost('semester');
-        if (is_string($semesterPost) && ctype_digit($semesterPost)
+        if (! $kembaliAtp && is_string($semesterPost) && ctype_digit($semesterPost)
             && (int) $semesterPost >= 1 && (int) $semesterPost <= 6) {
             $tujuan = site_url('guru/peta-atp/semester/' . (int) $semesterPost) . '?pilihan=' . $nomor;
         }

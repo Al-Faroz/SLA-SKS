@@ -12,7 +12,7 @@ final class AturanBabService
     /** @param list<array<string,mixed>> $babTerdaftar */
     public static function nomorBerikutnya(int $semester, array $babTerdaftar, int $semesterMulai = 1): int
     {
-        if ($semester < 1 || $semester > 6 || $semesterMulai < 1 || $semesterMulai > 6 || $semester < $semesterMulai) {
+        if ($semester < 1 || $semester > 6 || $semesterMulai < 1 || $semesterMulai > 6) {
             throw new DomainException('Semester harus berada antara 1 sampai 6.');
         }
 
@@ -80,7 +80,7 @@ final class AturanBabService
         for ($nomor = 1; $nomor <= 6; $nomor++) {
             $pasangan = $nomor % 2 === 0 ? $nomor - 1 : $nomor + 1;
             $babPasangan = $semester[$pasangan]['bab'];
-            $semester[$nomor]['boleh_tambah_bab'] = $nomor >= $semesterMulai && (
+            $semester[$nomor]['boleh_tambah_bab'] = (
                 $nomor % 2 === 0
                     ? ($babPasangan !== [] || $semesterMulai === $nomor)
                     : $babPasangan === []

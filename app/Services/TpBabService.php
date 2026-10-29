@@ -83,9 +83,6 @@ final class TpBabService
             if ($objek === null || $objek['status_paket'] === 'arsip') {
                 throw new DomainException('BAB tidak ditemukan atau bukan bagian dari penugasan Anda.');
             }
-            if ((int) $objek['semester'] < (int) $objek['semester_mulai']) {
-                throw new DomainException('Semester sebelum semester mulai Gen tidak boleh diisi TP.');
-            }
 
             // Kunci seluruh paket agar urutan_atp tetap unik antar-BAB dalam paket sama.
             $this->db->query('SELECT id FROM paket_semester WHERE id=? FOR UPDATE',

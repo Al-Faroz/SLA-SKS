@@ -33,3 +33,10 @@ TP Esensial tidak memerlukan materi/bank soal; identitas BAB/TP dan keanggotaan 
 Detail: [05](05-PAKET-TP-DAN-IMPOR.md), [06](06-ALUR-PEMBELAJARAN.md), [10](10-DATABASE.md).
 
 **Keputusan final 29-10-2026:** Guru mengisi Nomor BAB, Urutan TP, Jenis, Nama, Deskripsi, rencana Materi/media, dan Catatan. Kode TP dibangkitkan `KodeTpService`; kolom Elemen CP dihapus dari input Excel. Sheet REFERENSI CP tetap wajib. Format V25-1 tidak diterima lagi setelah V25-2.
+
+
+## Keputusan terbaru — ATP Guru enam semester tidak dibatasi semester mulai Gen (29 Oktober 2026)
+- **Guru berpenugasan G1 sah boleh menyusun dan mengimpor ATP Semester 1–6**, termasuk semester yang lebih awal daripada `ref_angkatan.semester_mulai`. Nilai semester mulai Gen **bukan** batas izin authoring Guru.
+- Batas semester yang boleh **dipelajari siswa** tetap ada di Service siswa berdasarkan Gen dan `siswa.semester_mulai` efektif; paket draf tidak otomatis terbit ke siswa.
+- Penyimpanan ATP tetap menggunakan `paket_semester` sah **per Gen–Mapel–Semester–Tahun Ajaran–Kurikulum**, karena identitas dan Tahun Ajaran tidak boleh ditebak dari workbook. Guru memilih Tahun Ajaran dan membuat paket draf pada halaman G05 sebelum konfirmasi impor semester yang belum berpakat.
+- Tidak ada perubahan aturan nomor BAB berlanjut dalam kelas, urutan TP dalam BAB, referensi CP, proteksi semester yang sudah berisi BAB/TP, atau transaksi atomik.

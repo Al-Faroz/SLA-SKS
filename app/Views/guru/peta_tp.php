@@ -60,13 +60,12 @@
                     <?php foreach ($kelompok['nomor'] as $n): ?>
                         <?php
                             $r = $ringkasanSemester[$n];
-                            $belumMulai = $n < (int) $dipilih['semester_mulai'];
-                            $status = $belumMulai ? 'Dilewati oleh Gen' : match ($r['status']) {
+                            $status = match ($r['status']) {
                                 'aktif' => 'Paket aktif', 'draf' => 'Paket draf',
                                 'arsip' => 'Paket arsip', default => 'Belum ada paket',
                             };
                         ?>
-                        <a class="a-atp-kartu a-atp-warna-<?= (int) $n ?><?= $belumMulai ? ' is-dilewati' : '' ?>"
+                        <a class="a-atp-kartu a-atp-warna-<?= (int) $n ?>"
                             href="<?= esc(site_url('guru/peta-atp/semester/' . $n) . '?pilihan=' . (int) $nomorPilihan, 'attr') ?>"
                             aria-label="Semester <?= $n ?>, Kelas <?= esc(match ($n) {1,2 => 'VII',3,4 => 'VIII',default => 'IX'}) ?>, <?= esc($status) ?>, <?= (int) $r['bab'] ?> BAB, <?= (int) $r['tp'] ?> TP. Buka semester">
                             <span class="a-atp-kartu__atas">

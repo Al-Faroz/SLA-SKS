@@ -29,3 +29,7 @@
 
 ## Keputusan final baru (26 Oktober 2026)
 Ketentuan v2.5 **mencabut** kontrak v2.4 tanpa BAB, banyak materi dalam satu TP, diagnostik sebagai nilai final, bobot 20:30:50, tiga percobaan normal sumatif, dan rata-rata akhir semester. Status implementasi historis dalam dokumen tidak mengubah kontrak baru. Export nilai Guru harus tersedia walau baru satu skor TP.
+
+
+### Keputusan 29 Oktober 2026 — persiapan ATP enam semester
+Guru pengampu G1 dapat mengisi/unggah ATP **semua Semester 1–6**, termasuk di bawah `ref_angkatan.semester_mulai`. **Jangan memakai semester mulai Gen sebagai gerbang input Guru.** Gerbang akses siswa tetap pada Service siswa menggunakan semester mulai efektif. Untuk INSERT BAB/TP tetap mensyaratkan paket semester draf/aktif yang sah dengan Tahun Ajaran per semester dipilih secara eksplisit; tidak otomatis membuat paket dari file Excel dan tidak mengubah paket yang sudah berisi data. G05 menyediakan persiapan paket draf tanpa membuka akses siswa. Semua operasi tetap terotorisasi, transaksional, idempoten dan melindungi data lama.

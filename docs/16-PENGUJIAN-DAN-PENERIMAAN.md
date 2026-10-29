@@ -252,3 +252,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - E2E-145: Satu workbook berisi Semester 4 dan 5 dengan Tahun Ajaran berbeda diimpor satu kali; `bab.tahun_ajaran_id` masing-masing sesuai `paket_semester` yang benar.
 - E2E-146: Semester tanpa paket, kurikulum lain, paket ganda, nomer BAB lintas kelas salah atau file CP usang menolak seluruh konfirmasi tanpa perubahan separuh.
 - E2E-147: Dua kali konfirmasi bersamaan atau keadaan BAB/TP berubah setelah pratinjau -> revalidasi dan rollback; tidak ada duplikasi, data siswa/TP Siap tetap.
+
+
+## G05 — tambahan E2E 29 Oktober 2026
+- E2E-148: Login Guru G1 Gen2025 (mulai Semester 4), unggah V25-2 dengan BAB/TP Semester 1–6: parser tidak menolak Semester 1/2/3 hanya karena semester mulai. Pratinjau dapat menampilkan semua semester.
+- E2E-149: Semester 1 sebelum awal Gen tanpa paket → pratinjau menunjukkan “Paket belum ada” dan tidak menyimpan apa pun; Guru memilih Tahun Ajaran dan membuat paket draf melalui G05, lalu unggah ulang dapat menunjukkan BAB/TP baru.
+- E2E-150: Dengan seluruh enam paket sah dan data Excel valid, enam semester baru tersimpan atomik memakai Tahun Ajaran masing-masing; unggah ulang identik tidak menduplikasi, revisi ke semester berisi konten ditolak.
+- E2E-151: Setelah paket dan TP draf Semester 1 dibuat untuk Gen2025, siswa yang mulai Semester 4 **tetap** mendapat status Dilewati/403 pada Semester 1–3. Hak akses Guru Gen lain tetap ditolak.
+- E2E-152: Tahun Ajaran wajib dipilih untuk pembuatan paket draf dan tidak ditebak dari paket acuan; satu konflik atau CP tidak cocok membatalkan seluruh batch.

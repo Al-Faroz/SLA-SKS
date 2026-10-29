@@ -126,13 +126,36 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
-    public function testSemesterSebelumMulaiGenDitolak(): void
+    public function testGuruBolehMengisiSemesterSebelumMulaiGen(): void
     {
         $buku = $this->buku();
         try {
+            $this->bab($buku, 1, 13, 1);
+            $this->tp($buku, 1, '', 'NonEsensial');
             $this->bab($buku, 3, 13, 1);
-            $this->expectExceptionMessage('Gen ini belum dimulai');
-            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            $r = AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            self::assertSame(2, $r['jumlah_bab']);
+            self::assertSame(1, $r['jumlah_tp']);
+            self::assertSame('SKI.7.1.1', $r['tp'][0]['kode']);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testGuruGenSemesterEmpatDapatMengunggahEnamSemesterPenuh(): void
+    {
+        $buku = $this->buku();
+        try {
+            for ($n = 1; $n <= 6; ++$n) {
+                $nomorBab = $n % 2 === 0 ? 2 : 1;
+                $this->bab($buku, $n, 13, $nomorBab);
+                $this->tp($buku, $n, '', 'NonEsensial', 1, $nomorBab);
+            }
+            $r = AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            self::assertSame(6, $r['jumlah_bab']);
+            self::assertSame(6, $r['jumlah_tp']);
+            self::assertSame('SKI.7.1.1', $r['tp'][0]['kode']);
+            self::assertSame('SKI.9.2.1', $r['tp'][5]['kode']);
         } finally {
             $buku->disconnectWorksheets();
         }

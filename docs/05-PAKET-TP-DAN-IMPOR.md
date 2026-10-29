@@ -34,3 +34,10 @@
 - TP Siap/versi historis, koreksi kategori A/B/C dengan persetujuan Admin, penolakan kategori D, audit dan larangan self-approval tetap. Jangan mereset nilai/progres ketika mengubah Master.
 
 **Format final V25-2 (29 Oktober 2026):** sheet Semester 1–6 memiliki tepat **8 kolom input TP**, yaitu Nomor BAB, Urutan TP, Jenis TP, Nama TP, Deskripsi TP, Judul satu Materi, Jenis media (rencana), Catatan. Kolom Kode TP dan Elemen CP tidak ada dalam input. Kode TP dibuat/diperiksa server; seluruh TP tetap mengacu `cp_mapel_id` dari penugasan G1/kurikulum/fase. Referensi CP aktif hanya dibaca dari sheet REFERENSI CP dan diperiksa terhadap database. Tidak ada alasan membuat SQL untuk penyederhanaan dua kolom tersebut.
+
+
+## Revisi 29 Oktober 2026 — impor tanpa gerbang semester mulai Gen
+- `AtpExcelParserService` membaca baris BAB/TP dari **semua sheet Semester 1–6**, termasuk semester sebelum `ref_angkatan.semester_mulai`; Semester 1–3 bukan otomatis galat hanya karena Gen mulai Semester 4.
+- Halaman `/guru/peta-atp/impor` menampilkan keenam paket beserta status dan menyediakan pembuatan paket **draf** secara eksplisit dengan pilihan Tahun Ajaran dan kurikulum yang valid. Tidak ada pembuatan paket diam-diam dari Excel, karena satu paket bisa memiliki Tahun Ajaran berbeda.
+- Konfirmasi hanya INSERT BAB/TP setelah semua paket yang diisi valid, urutan BAB/TP benar, semester sasaran kosong, CP cocok, dan otorisasi Guru G1 sah. Satu galat memblokir seluruh batch.
+- Akses siswa tetap dibatasi pada `KatalogPembelajaranSiswaService` dan Service pembelajaran/ujian; pembuatan draf ATP tidak mengubah semester efektif siswa maupun penugasan paket siswa.
