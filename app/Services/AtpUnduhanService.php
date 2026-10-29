@@ -18,7 +18,7 @@ use RuntimeException;
  */
 final class AtpUnduhanService
 {
-    public const VERSI = 'SLA-SKS-ATP-MANUAL-V25-1';
+    public const VERSI = AtpTemplateLayoutService::BARU;
     private const TEMPLATE = 'docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
 
     private BaseConnection $db;
@@ -165,6 +165,9 @@ final class AtpUnduhanService
      */
     public static function isiBuku(Spreadsheet $buku, array $konteks, array $elemen): void
     {
+        // Toleransi template dasar V25-1 yang masih berada dalam paket CI:
+        // hasil unduhan selalu V25-2 dan parser hanya menerima V25-2.
+        AtpTemplateLayoutService::terapkan($buku);
         $namaSheet = [
             'MULAI DI SINI', 'RINGKASAN', 'REFERENSI CP',
             'SEMESTER 1', 'SEMESTER 2', 'SEMESTER 3',
