@@ -72,4 +72,10 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Nilai `ref_angkatan.semester_mulai` adalah **gerbang akses/pembelajaran siswa**, BUKAN batas sheet yang boleh diisi Guru. Guru pemegang otorisasi Gen–Mapel dapat menyusun ATP Semester 1–6, meski siswa Gen itu mulai pada Semester 4.
 - Parser/unduh/pratinjau ATP **tidak menolak** data Semester 1–3 hanya karena Gen mulai Semester 4. Hak Guru Gen–Mapel dan Kurikulum tetap diperiksa oleh server.
 - **Penyimpanan** memerlukan `paket_semester` nonarsip yang sah untuk masing-masing semester, berikut Tahun Ajaran dan kurikulum yang benar. Jika paket belum ada, pratinjau memberi Galat per semester dan konfirmasi seluruh file ditolak (tidak menyimpan sebagian); jangan membuat paket dengan Tahun Ajaran rekaan atau merusak data siswa.
-- Aturan Nomor BAB per kelas, Urutan TP dalam BAB, Jenis TP, Esensial tanpa Materi, CP aktif, dan perlindungan semester yang telah diisi tetap berlaku. Sistem siswa tidak diubah pada pekerjaan ini.
+- Aturan Nomor BAB per kelas, Urutan TP dalam BAB, Jenis TP, setiap TP wajib memiliki Materi, CP aktif, dan perlindungan semester yang telah diisi tetap berlaku. Sistem siswa tidak diubah pada pekerjaan ini.
+
+## Koreksi final 29 Oktober 2026 — Materi berlaku untuk kedua jenis TP
+- **Guru harus mengisi tepat satu judul Materi (F) dan satu jenis media rencana (G) untuk setiap TP**, termasuk TP Esensial. Nilai Jenis TP `Esensial`/`NonEsensial` **bukan** sakelar yang meniadakan kewajiban penyiapan Materi.
+- Saat impor, parser memvalidasi judul dan jenis media untuk semua TP; Excel tidak mengunggah file fisik atau memberikan akses siswa. Setelah struktur disimpan, Guru melengkapi satu Materi aktual per TP melalui editor dan checklist Siap memeriksa kelengkapannya.
+- Alur siswa tetap terpisah: otorisasi siswa, kegiatan yang wajib/boleh/tidak dijalani, akses media, progres, dan penilaian diputuskan oleh Service siswa, bukan oleh kosong/tidaknya kolom Materi di Excel.
+- Header/versi template **tetap V25-2** (A:H). Isi workbook lama yang mengikuti format ini tidak perlu diunduh ulang hanya karena koreksi validator; jika kolom F atau G kosong, Guru mengisinya sebagaimana ketentuan.
