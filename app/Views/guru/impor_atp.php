@@ -138,6 +138,7 @@
                 <p class="a-proto-muted">Template versi V25-2 menggunakan delapan kolom TP tanpa Kode TP dan Elemen CP. Jika file bernama tanpa penanda V25-2, jangan digunakan. Isi hanya semester sasaran yang masih kosong. Workbook sama
                     boleh diunggah ulang untuk pemeriksaan, tetapi tidak akan menulis data duplikat.</p>
                 <form class="a-form" method="post" enctype="multipart/form-data"
+                    data-atp-upload-form
                     action="<?= esc(site_url('guru/peta-atp/pratinjau/' . (int) $paketId), 'attr') ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
@@ -145,9 +146,14 @@
                         <label class="a-label" for="atp-excel-pratinjau">File ATP resmi (.xlsx, maksimal 5 MB)</label>
                         <input id="atp-excel-pratinjau" name="atp_excel" type="file"
                             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
+                        <p class="a-proto-muted" data-atp-upload-status role="status" aria-live="polite">
+                            Pilih file Excel ATP V25-2 (.xlsx). Pratinjau tidak menyimpan data.
+                        </p>
                     </div>
                     <div class="a-atp-detail__toolbar-actions">
-                        <button class="a-btn a-btn--utama" type="submit">Periksa &amp; Pratinjau Excel</button>
+                        <button class="a-btn a-btn--utama" type="submit" data-atp-upload-submit>
+                            Periksa &amp; Pratinjau Excel
+                        </button>
                     </div>
                 </form>
             <?php endif ?>
@@ -165,4 +171,5 @@
         </section>
     <?php endif ?>
 </div>
+<script src="<?= esc(base_url('public/assets/js/atp-upload.js'), 'attr') ?>" defer></script>
 <?= $this->endSection() ?>

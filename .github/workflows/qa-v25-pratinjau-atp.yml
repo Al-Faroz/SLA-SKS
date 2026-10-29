@@ -6,6 +6,10 @@ on:
       - 'app/Services/AtpExcelParserService.php'
       - 'app/Services/AtpImporPratinjauService.php'
       - 'app/Controllers/GuruAtpPratinjau.php'
+      - 'app/Services/AtpValidasiUnggahService.php'
+      - 'public/assets/js/atp-upload.js'
+      - 'public/assets/js/atp-konfirmasi.js'
+      - 'tests/unit/AtpUnggahPratinjauRoundTripTest.php'
       - 'app/Views/guru/pratinjau_atp.php'
       - 'app/Views/guru/semester_atp.php'
       - 'app/Config/Routes.php'
@@ -35,9 +39,11 @@ jobs:
           php -l app/Services/AtpExcelParserService.php
           php -l app/Services/AtpImporPratinjauService.php
           php -l app/Controllers/GuruAtpPratinjau.php
+          php -l app/Services/AtpValidasiUnggahService.php
+          php -l tests/unit/AtpUnggahPratinjauRoundTripTest.php
           php -l app/Views/guru/pratinjau_atp.php
           php -l app/Views/guru/semester_atp.php
           php -l app/Config/Routes.php
           php -l tests/unit/AtpExcelParserServiceTest.php
       - name: Unit parser and workbook regression
-        run: vendor/bin/phpunit --no-coverage --filter 'AtpExcelParserServiceTest|AtpManualTemplateTest|AtpUnduhanServiceTest'
+        run: vendor/bin/phpunit --no-coverage --filter 'AtpUnggahPratinjauRoundTripTest|AtpExcelParserServiceTest|AtpManualTemplateTest|AtpUnduhanServiceTest'

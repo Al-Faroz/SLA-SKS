@@ -126,10 +126,16 @@ final class AtpExcelParserService
         string $kodeGen, array $elemenDiizinkan = [], int $cpId = 0,
         array $referensiCpAktif = []): array
     {
-        if ($buku->getSheetNames() !== self::SHEETS
-            || (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue()
-                !== AtpUnduhanService::VERSI) {
-            throw new DomainException('Versi atau susunan 10 sheet ATP tidak sesuai template resmi.');
+        if ($buku->getSheetNames() !== self::SHEETS) {
+            throw new DomainException('Susunan sheet Excel tidak sesuai 10 sheet resmi.'
+                . ' Unduh ulang template ATP V25-2, jangan mengubah nama/urutan sheet.');
+        }
+        $versiBerkas = self::nilai($buku->getSheetByName('RINGKASAN'), 'B4');
+        if ($versiBerkas !== AtpUnduhanService::VERSI) {
+            throw new DomainException(
+                'Versi Excel tidak sesuai (diperoleh: ' . mb_substr($versiBerkas, 0, 45)
+                . '). Unduh ulang ATP V25-2 dari halaman Kelola ATP Excel.'
+            );
         }
         // Identitas berkas sekadar pengecekan konsistensi, bukan sumber otorisasi.
         $ringkasan = $buku->getSheetByName('RINGKASAN');

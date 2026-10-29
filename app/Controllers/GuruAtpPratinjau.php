@@ -8,6 +8,7 @@ use App\Services\AtpImporPratinjauService;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
 use App\Services\AtpStagingService;
+use App\Services\AtpValidasiUnggahService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
 use Throwable;
@@ -29,13 +30,19 @@ final class GuruAtpPratinjau extends BaseController
             return redirect()->to($kembali)->with('galat', 'Paket ATP tidak valid.');
         }
         $file = $this->request->getFile('atp_excel');
-        if ($file === null || ! $file->isValid() || strtolower($file->getClientExtension()) !== 'xlsx'
-            || $file->getSize() === 0 || $file->getSize() > 5 * 1024 * 1024) {
-            return redirect()->to($kembali)
-                ->with('galat', 'Pilih file Excel .xlsx resmi dengan ukuran maksimal 5 MB.');
+        if ($file === null || ! $file->isValid()) {
+            return redirect()->to($kembali)->with(
+                'galat', 'Unggah Excel gagal. Pilih file ATP V25-2 (.xlsx, maksimal 5 MB).'
+                . ' Pastikan ukuran unggahan PHP pada XAMPP mengizinkan file tersebut.'
+            );
         }
 
         try {
+            AtpValidasiUnggahService::periksa(
+                $file->getTempName(),
+                $file->getClientName(),
+                (int) $file->getSize()
+            );
             $hasil = (new AtpImporPratinjauService())->pratinjau((int) $paketId, $file->getTempName());
             $hasil['stage_token'] = null;
             if ($hasil['boleh_konfirmasi']) {
@@ -60,7 +67,8 @@ final class GuruAtpPratinjau extends BaseController
                 'kelas' => get_class($e),
             ]);
             return redirect()->to($kembali)->with('galat',
-                'Berkas ATP gagal diperiksa. Gunakan template yang baru diunduh.');
+                'Excel belum dapat dipratinjau. Periksa isian dan unggah kembali'
+                . ' template ATP V25-2 yang baru diunduh.');
         }
 
         $akun = (new AuthService())->penggunaSaatIni();
