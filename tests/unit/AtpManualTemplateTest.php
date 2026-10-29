@@ -61,10 +61,10 @@ final class AtpManualTemplateTest extends TestCase
                 self::assertContains('A1:J1', $sheet->getMergeCells());
                 self::assertGreaterThanOrEqual(44.0, (float) $sheet->getRowDimension(1)->getRowHeight());
                 self::assertGreaterThanOrEqual(44.0, (float) $sheet->getRowDimension(38)->getRowHeight());
-                self::assertSame('DFF1E8', $sheet->getStyle('A1')->getFill()->getStartColor()->getRGB());
-                self::assertSame('183F35', $sheet->getStyle('A38')->getFill()->getStartColor()->getRGB());
-                self::assertSame('E2F1EA', $sheet->getStyle('C39')->getFill()->getStartColor()->getRGB());
-                self::assertSame('EDF4FF', $sheet->getStyle('F39')->getFill()->getStartColor()->getRGB());
+                self::assertSame('12364A', $sheet->getStyle('A1')->getFill()->getStartColor()->getRGB());
+                self::assertSame('078783', $sheet->getStyle('A38')->getFill()->getStartColor()->getRGB());
+                self::assertSame('DAF2E7', $sheet->getStyle('C39')->getFill()->getStartColor()->getRGB());
+                self::assertSame('E0ECFC', $sheet->getStyle('F39')->getFill()->getStartColor()->getRGB());
                 self::assertTrue($sheet->getStyle('C38')->getAlignment()->getWrapText());
             }
             self::assertFalse($buku->getSheetByName('MULAI DI SINI')->getShowGridLines());
