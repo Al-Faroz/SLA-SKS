@@ -33,7 +33,7 @@ final class AtpPratinjauFeedbackTest extends TestCase
         $confirm = $this->baca('app/Controllers/GuruAtpKonfirmasi.php');
         self::assertStringContainsString(" . '#atp-upload-area'", $preview);
         self::assertStringContainsString(" . '#atp-upload-area'", $confirm);
-        self::assertStringContainsString("'galat', $e->getMessage()", $preview);
+        self::assertStringContainsString("'galat', \$e->getMessage()", $preview);
         self::assertStringContainsString('POST pratinjau ATP diterima', $preview);
     }
 
