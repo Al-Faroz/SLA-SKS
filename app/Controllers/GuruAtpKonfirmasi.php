@@ -29,6 +29,11 @@ final class GuruAtpKonfirmasi extends BaseController
             return redirect()->to($kembali)->with('galat', 'Konfirmasi ATP tidak valid.');
         }
 
+        if ($this->request->getPost('periksa_rencana') !== '1') {
+            return redirect()->to($kembali)->with('galat',
+                'Periksa ringkasan semester dan centang persetujuan sebelum menyimpan ATP.');
+        }
+
         try {
             $akun = (new AuthService())->penggunaSaatIni();
             if ($akun === null) {
@@ -42,11 +47,9 @@ final class GuruAtpKonfirmasi extends BaseController
             // Token sekali pakai hanya dihapus setelah transaksi commit sukses.
             $stage->hapus($token);
             return redirect()->to($kembali)->with('sukses',
-                'Impor ATP berhasil: ' . $jumlah['baru_bab'] . ' BAB baru, '
-                . $jumlah['ubah_bab'] . ' BAB diperbarui, '
-                . $jumlah['baru_tp'] . ' TP baru, '
-                . $jumlah['ubah_tp'] . ' TP diperbarui; '
-                . $jumlah['tetap'] . ' data tetap.');
+                'Impor ATP berhasil: ' . $jumlah['baru_bab'] . ' BAB baru dan '
+                . $jumlah['baru_tp'] . ' TP baru. '
+                . $jumlah['tetap'] . ' data tetap; tidak ada BAB/TP lama yang diubah.');
         } catch (DomainException $e) {
             return redirect()->to($kembali)->with('galat', $e->getMessage());
         } catch (Throwable $e) {
