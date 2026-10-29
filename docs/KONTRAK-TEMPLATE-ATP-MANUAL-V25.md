@@ -67,3 +67,9 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Validator `AtpExcelParserService` harus membandingkan **isi akademik yang persis sama setelah hanya menyamakan karakter akhir baris** CRLF/CR/LF menjadi LF khusus kolom rumusan `REFERENSI CP!C7:C...`. Tidak boleh melonggarkan identitas `A`, elemen `B`, fase `D`, versi `E`, perubahan huruf/angka/kata pada rumusan, atau menonaktifkan pemeriksaan CP aktif.
 - Pengguna tidak perlu mengunduh ulang Excel yang sama untuk galat akibat CRLF/LF; cukup perbarui kode aplikasi. Tidak ada SQL/ubah CP atau data siswa.
 - Data di luar Semester aktif Gen dan nomor BAB/TP yang tidak konsisten tetap ditolak; pembetulan newline bukan pengecualian aturan akademik.
+
+## Revisi 29 Oktober 2026 — kebebasan Guru merencanakan enam semester
+- Nilai `ref_angkatan.semester_mulai` adalah **gerbang akses/pembelajaran siswa**, BUKAN batas sheet yang boleh diisi Guru. Guru pemegang otorisasi Gen–Mapel dapat menyusun ATP Semester 1–6, meski siswa Gen itu mulai pada Semester 4.
+- Parser/unduh/pratinjau ATP **tidak menolak** data Semester 1–3 hanya karena Gen mulai Semester 4. Hak Guru Gen–Mapel dan Kurikulum tetap diperiksa oleh server.
+- **Penyimpanan** memerlukan `paket_semester` nonarsip yang sah untuk masing-masing semester, berikut Tahun Ajaran dan kurikulum yang benar. Jika paket belum ada, pratinjau memberi Galat per semester dan konfirmasi seluruh file ditolak (tidak menyimpan sebagian); jangan membuat paket dengan Tahun Ajaran rekaan atau merusak data siswa.
+- Aturan Nomor BAB per kelas, Urutan TP dalam BAB, Jenis TP, Esensial tanpa Materi, CP aktif, dan perlindungan semester yang telah diisi tetap berlaku. Sistem siswa tidak diubah pada pekerjaan ini.
