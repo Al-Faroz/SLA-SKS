@@ -90,9 +90,9 @@ final class BabService
             // Kunci paket dua semester pada kelas sama agar nomor tidak berlomba.
             $this->db->query(
                 'SELECT id FROM paket_semester WHERE angkatan_id=? AND mapel_id=? '
-                . 'AND kurikulum_id=? AND tahun_ajaran_id=? AND semester IN (?,?) ORDER BY id FOR UPDATE',
+                . 'AND kurikulum_id=? AND semester IN (?,?) ORDER BY id FOR UPDATE',
                 [(int) $paket['angkatan_id'], (int) $paket['mapel_id'],
-                    (int) $paket['kurikulum_id'], (int) $paket['tahun_ajaran_id'], $awal, $awal + 1]
+                    (int) $paket['kurikulum_id'], $awal, $awal + 1]
             )->getResultArray();
 
             $terdaftar = $this->db->table('bab b')
@@ -101,7 +101,8 @@ final class BabService
                 ->where('b.angkatan_id', $paket['angkatan_id'])
                 ->where('b.mapel_id', $paket['mapel_id'])
                 ->where('b.kurikulum_id', $paket['kurikulum_id'])
-                ->where('b.tahun_ajaran_id', $paket['tahun_ajaran_id'])
+                // BAB pada pasangan semester satu kelas tetap berurutan
+                // meskipun paket S ganjil/genap berbeda Tahun Ajaran.
                 ->where('b.kelas_id', $kelasId)
                 ->get()->getResultArray();
             $nomor = AturanBabService::nomorBerikutnya($semester, $terdaftar, $semesterMulai);
