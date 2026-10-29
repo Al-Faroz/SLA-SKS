@@ -121,7 +121,7 @@ Fitur dinyatakan selesai bila **aturan domain + izin + data SQL + route/service 
 | E2E-092 | Impor Excel satu semester saja | BAB/TP draf terbentuk hanya pada semester kosong dengan paket sah; Materi tidak dibuat otomatis; semester lain tidak dihapus |
 | E2E-093 | Impor Excel sama dua kali | File sama menghasilkan Tetap tanpa penulisan; semester berisi BAB manual/TP draf yang berbeda ditolak total, tidak ada DELETE/UPDATE |
 | E2E-094 | ATP mencoba mengubah BAB/TP manual/draf/Siap lewat Excel | Ditolak sebelum commit, bahkan jika draf; data historis tetap |
-| E2E-095 | TP NonEsensial dengan satu Materi | Tidak boleh ada lebih dari satu Materi aktif; Esensial tanpa Materi |
+| E2E-095 | TP Esensial maupun NonEsensial dengan satu Materi | Kedua jenis wajib tepat satu Materi aktif saat Siap; aktivitas/progres siswa diuji terpisah |
 | E2E-096 | Diagnostik lulus sesuai SKS | Bebas Materi/Resume/HOTS tetapi Sumatif minimal 30 tetap wajib; bukan tuntas dari Diagnostik |
 | E2E-097 | Diagnostik gagal | Tepat satu Materi → Resume final → HOTS final → Sumatif; tidak ada Materi kedua |
 | E2E-098 | Komponen nilai jalur gagal | Resume 20%, HOTS 20%, Sumatif terbaik 60%, bukan rata-rata banyak Materi |
@@ -213,8 +213,8 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 | 115 | Validasi nama BAB/TP ≤50, deskripsi masing-masing ≤225, kode `BIND.8.1.1` sesuai mapel/kelas/BAB/TP |
 | 116 | Guru membuat ATP Esensial dan NonEsensial langsung melalui aplikasi |
 | 117 | Impor ATP lama setelah adaptasi: preview, konfirmasi, anti-duplikat, BAB, jenis TP, kode dan konteks Gen |
-| 118 | Esensial tanpa Materi/ujian/nilai, tidak masuk progres, tetap tercantum sertifikat |
-| 119 | NonEsensial menolak nol atau lebih dari satu Materi aktif pada status Siap |
+| 118 | Esensial memiliki satu Materi Guru tetapi tanpa aktivitas/nilai wajib siswa sesuai alur saat ini; tidak masuk progres, tetap tercantum sertifikat |
+| 119 | Esensial dan NonEsensial sama-sama menolak nol atau lebih dari satu Materi aktif pada status Siap |
 | 120 | Diagnostik minimal 10; lulus tetap memerlukan Sumatif ≥30, tanpa Resume/HOTS |
 | 121 | Diagnostik gagal wajib 1 Materi→Resume→HOTS→Sumatif, tanpa melompat |
 | 122 | Nilai gagal diagnostik 20:20:60, lulus 100% Sumatif; skor Diagnostik bukan skor final |
@@ -252,3 +252,8 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - E2E-145: Satu workbook berisi Semester 4 dan 5 dengan Tahun Ajaran berbeda diimpor satu kali; `bab.tahun_ajaran_id` masing-masing sesuai `paket_semester` yang benar.
 - E2E-146: Semester tanpa paket, kurikulum lain, paket ganda, nomer BAB lintas kelas salah atau file CP usang menolak seluruh konfirmasi tanpa perubahan separuh.
 - E2E-147: Dua kali konfirmasi bersamaan atau keadaan BAB/TP berubah setelah pratinjau -> revalidasi dan rollback; tidak ada duplikasi, data siswa/TP Siap tetap.
+
+### E2E-148–150 — Kelengkapan Materi kedua jenis TP (29 Oktober 2026)
+- **E2E-148:** XLSX V25-2 berisi TP Esensial dengan judul satu Materi di F39 dan jenis media di G39 — parser menerima dan menampilkan rencana dalam pratinjau tanpa membuka akses siswa.
+- **E2E-149:** Esensial maupun NonEsensial yang kolom F/G-nya kosong ditolak dengan lokasi kolom yang jelas; pemeriksaan isi CP, penomoran BAB/TP, hak G1 dan transaksi tetap aktif.
+- **E2E-150:** Guru dapat mengisi satu Materi lengkap pada TP kedua jenis melalui editor; cek Siap memerlukan tepat satu Materi. Layanan siswa/URL media tetap memeriksa hak, alur, status, dan progres serta tidak memberi aktivitas Esensial secara otomatis. Impor Excel hanya menyimpan struktur BAB/TP sampai Guru menambahkan media nyata dalam aplikasi.
