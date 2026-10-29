@@ -98,7 +98,7 @@ sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.
 ## 11. Audit v4, Excel manual, Pra-Semester dan ekspor (26 Oktober 2026)
 - Dump v3/v4 lokal mengandung NISN, nama, hash sandi, sesi dan jawaban siswa: **lokal PRIVAT saja, dilarang commit/push/PR**. File aset `writable/` backup terpisah; `.env` tidak diubah tanpa izin.
 - Excel ATP final **manual `.xlsx` tanpa macro atau tombol Proses**. Tolak file `.xlsm` dan konten VBA/eksternal, hanya baca/validasi sel yang disepakati; cek ZIP/container, ukuran, ekstensi, MIME, formula dan referensi eksternal. Unduhan/unggahan tetap terikat konteks Gen–Mapel dan CSRF.
-- Nomor/kode BAB/TP server-side, validasi lintas dua semester dan hak guru. Esensial tidak boleh menciptakan progres atau nilai; NonEsensial harus tepat satu Materi aktif dan snapshot historis tidak dihapus.
+- Nomor/kode BAB/TP server-side, validasi lintas dua semester dan hak guru. Jenis TP tidak boleh digunakan untuk menolak pembuatan Materi Guru; kedua jenis TP wajib memiliki tepat satu Materi lengkap. Pembatasan progres/nilai siswa untuk Esensial tetap diawasi di Service siswa; snapshot historis tidak dihapus.
 - Checkpoint klien 4 menit tidak memberi kepercayaan penuh pada waktu browser; Service membatasi delta sah dan memerlukan bukti tersimpan sebelum membuka Resume/HOTS/download. Simpan waktu lokal offline hanya sementara pada perangkat sama.
 - Pra-Semester: Admin jadwal, belum selesai TP/di luar jendela waktu ditolak, izin Guru hanya Gen–Mapel, jawaban/snapshot/insiden ujian anonim bagi pihak tak berhak.
 - Export Nilai Guru tersedia saat satu skor ada tetapi tetap membatasi semua baris ke Gen–Mapel pengampu, tanpa hash/token/sesi, mitigasi formula-injection, respons file tidak boleh terindeks/cache publik.
