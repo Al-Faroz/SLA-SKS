@@ -87,7 +87,7 @@ Tidak ada sistem login Google, API LMS eksternal, pembayaran, push notification,
 - Semua endpoint mutasi POST dengan CSRF, validasi role aktif di Controller **dan** Service, transaksi serta audit. Tidak menambahkan migrations/seeder, framework JS baru atau mengubah root CI4.
 
 ## 10. Kontrak Service/route baru v2.5 (TARGET — BELUM DIIMPLEMENTASIKAN)
-Hierarki operasional CP → Semester → BAB → TP; kode TP dibangkitkan dari mapel/kelas/no BAB/no TP dalam BAB. `BabService` menegakkan urutan BAB antarsemester tingkat kelas sama. `TpService` membedakan Esensial (0 Materi/nilai) dan NonEsensial (1 Materi aktif). `AtpImportService` menerima editor aplikasi/Excel secara konsisten, validasi identitas Gen–Mapel, pratinjau diff, idempotensi, kesiapan TP dan snapshot.
+Hierarki operasional CP → Semester → BAB → TP; kode TP dibangkitkan dari mapel/kelas/no BAB/no TP dalam BAB. `BabService` menegakkan urutan BAB antarsemester tingkat kelas sama. `TpService` mewajibkan tepat satu Materi pada kedua jenis TP; pembatasan akses/aktivitas/nilai siswa berdasarkan jenis TP dilakukan di Service siswa, bukan Service penyiapan Guru. `AtpImportService` menerima editor aplikasi/Excel secara konsisten, validasi identitas Gen–Mapel, pratinjau diff, idempotensi, kesiapan TP dan snapshot.
 - Guru (rute logis, belum tetap): `/guru/bab/{id}`, `/guru/tp/{id}`, `/guru/pra-semester`, `/guru/export-nilai`. Gunakan komponen CSS kustom/JS native, bukan framework besar baru.
 - Siswa (rute logis): `/siswa/semester/{n}/bab/{id}`, `/siswa/tp/{id}`, `/siswa/pra-semester`; semua pemeriksaan izin/syarat di server.
 - Admin: pengaturan KKM default dan penjadwalan Pra-Semester, hanya terkait paket yang valid; tidak menyentuh nilai akademik Guru.
