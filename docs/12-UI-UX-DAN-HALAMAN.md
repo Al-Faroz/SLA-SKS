@@ -58,7 +58,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G01 | Beranda | Antrean penilaian, siswa perlu bantuan, TP yang perlu media, kesiapan mapel, ujian berjalan |
 | G02 | Semester saya | **Pilih Gen–Mapel yang diampu aktif**, lalu semester 1–6 dan paket khusus Gen |
 | G03 | Paket/ATP enam semester | Unduh/unggah Excel pemetaan TP/Materi, pratinjau diff, daftar TP urut dan status |
-| G04 | Editor TP/CP | TP draf, BAB, CP operasional, kode TP, jenis Esensial/NonEsensial, satu Materi jika NonEsensial |
+| G04 | Editor TP/CP | TP draf, BAB, CP operasional, kode TP, jenis Esensial/NonEsensial, satu Materi untuk kedua jenis TP |
 | G05 | Kelola ATP Excel | Halaman khusus `/guru/peta-atp/impor` diakses dari Peta ATP, memilih Gen–Mapel/paket acuan, melihat status enam semester, unduh/unggah XLSX, pratinjau/galat, konfirmasi impor awal tanpa mengubah semester berisi BAB/TP |
 | G06 | Pengaturan TP | KKM/bobot, jumlah/durasi soal, syarat karakter, pengaturan bawaan |
 | G07 | Materi/berkas | PDF/YouTube/audio/gambar, upload, pratinjau dan status tersedia |
