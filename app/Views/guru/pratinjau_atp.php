@@ -48,7 +48,7 @@
                     <th scope="col">Sheet</th>
                     <th scope="col">Baris</th>
                     <th scope="col">Jenis</th>
-                    <th scope="col">Kode / Nomor</th>
+                    <th scope="col">Kode TP otomatis / Nomor BAB</th>
                     <th scope="col">Nama</th>
                     <th scope="col">Hasil</th>
                     <th scope="col">Keterangan</th>
