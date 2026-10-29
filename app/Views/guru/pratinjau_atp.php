@@ -15,7 +15,6 @@
         </div>
         <div class="a-atp-detail__metrik" aria-label="Jumlah hasil perbandingan">
             <span><strong><?= (int) $hasil['jumlah']['baru'] ?></strong> Baru</span>
-            <span><strong><?= (int) $hasil['jumlah']['ubah'] ?></strong> Berubah</span>
             <span><strong><?= (int) $hasil['jumlah']['tetap'] ?></strong> Tetap</span>
             <span><strong><?= (int) $hasil['jumlah']['galat'] ?></strong> Galat</span>
         </div>
@@ -41,7 +40,47 @@
                 Setelah diperiksa, perubahan dapat disimpan melalui konfirmasi eksplisit di bawah.
             </div>
         <?php endif ?>
-        <p class="a-proto-muted">Rencana judul/media Materi pada Excel bukan unggah berkas dan tidak mengubah materi siswa.</p>
+        <p class="a-proto-muted">Rencana judul/media Materi pada Excel bukan unggah berkas dan tidak mengubah materi siswa.
+            Kode TP pada daftar berikut dibentuk otomatis oleh sistem, bukan dibaca dari kolom Excel.</p>
+        <?php
+        $ringkasanSemester = [];
+        for ($semesterKe = 1; $semesterKe <= 6; $semesterKe++) {
+            $ringkasanSemester[$semesterKe] = ['BAB' => 0, 'TP' => 0];
+        }
+        foreach ($hasil['baris'] as $item) {
+            $semesterKe = (int) $item['semester'];
+            if (isset($ringkasanSemester[$semesterKe][$item['jenis']])) {
+                $ringkasanSemester[$semesterKe][$item['jenis']]++;
+            }
+        }
+        ?>
+        <h3>Ringkasan semester pada file</h3>
+        <div class="a-tabel-gulir">
+            <table class="a-tbl">
+                <thead><tr>
+                    <th scope="col">Semester</th>
+                    <th scope="col">Jumlah BAB</th>
+                    <th scope="col">Jumlah TP</th>
+                    <th scope="col">Keputusan</th>
+                </tr></thead>
+                <tbody>
+                <?php for ($semesterKe = 1; $semesterKe <= 6; $semesterKe++): ?>
+                    <?php $mode = $hasil['mode_semester'][$semesterKe] ?? ''; ?>
+                    <tr>
+                        <th scope="row">Semester <?= $semesterKe ?></th>
+                        <td><?= (int) $ringkasanSemester[$semesterKe]['BAB'] ?></td>
+                        <td><?= (int) $ringkasanSemester[$semesterKe]['TP'] ?></td>
+                        <td><?= esc(match ($mode) {
+                            'baru' => 'Akan ditambahkan',
+                            'tetap' => 'Sudah sesuai — tanpa perubahan',
+                            'galat' => 'Ditolak — periksa rincian',
+                            default => 'Tidak diisi di Excel',
+                        }) ?></td>
+                    </tr>
+                <?php endfor ?>
+                </tbody>
+            </table>
+        </div>
         <div class="a-tabel-gulir">
             <table class="a-tbl">
                 <thead><tr>
@@ -74,18 +113,24 @@
         <div class="a-atp-detail__toolbar-actions">
             <a class="a-btn a-btn--sekunder" href="<?= esc($kembali, 'attr') ?>">Batal / Kembali</a>
             <?php if (! empty($hasil['boleh_konfirmasi']) && ! empty($hasil['stage_token'])): ?>
-                <form method="post"
+                <form method="post" data-atp-confirm-form
                     action="<?= esc(site_url('guru/peta-atp/konfirmasi/' . (int) $hasil['paket_id']), 'attr') ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="stage_token" value="<?= esc($hasil['stage_token'], 'attr') ?>">
                     <input type="hidden" name="pilihan" value="<?= (int) $hasil['pilihan'] ?>">
                     <input type="hidden" name="semester" value="<?= (int) $hasil['semester_asal'] ?>">
-                    <button class="a-btn a-btn--utama" type="submit">
+                    <label class="a-proto-muted">
+                        <input type="checkbox" name="periksa_rencana" value="1" required>
+                        Saya telah memeriksa semua semester dan memahami bahwa hanya BAB/TP
+                        baru pada semester kosong yang akan disimpan.
+                    </label>
+                    <button class="a-btn a-btn--utama" type="submit" data-atp-confirm-submit>
                         Konfirmasi dan Simpan BAB / TP
                     </button>
+                    <p class="a-proto-muted" data-atp-confirm-status role="status" aria-live="polite"></p>
                 </form>
             <?php elseif (! $hasil['kosong'] && $hasil['jumlah']['galat'] === 0): ?>
-                <p class="a-proto-muted">Tidak ada perubahan baru. Impor ulang tidak menggandakan data.</p>
+                <p class="a-proto-muted">Seluruh baris yang diisi sudah sesuai database. Tidak ada BAB/TP baru untuk disimpan; unggahan ulang tidak menggandakan data.</p>
             <?php endif ?>
         </div>
         <?php if (! empty($hasil['boleh_konfirmasi'])): ?>
@@ -94,4 +139,5 @@
         <?php endif ?>
     </section>
 </div>
+<script src="<?= esc(base_url('public/assets/js/atp-konfirmasi.js'), 'attr') ?>" defer></script>
 <?= $this->endSection() ?>
