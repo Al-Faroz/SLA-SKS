@@ -70,7 +70,7 @@ Pemeriksaan izin dilakukan di Controller **dan** Service: `peran_aktif`, status 
 
 ## 7. Hak akses tambahan pola BAB–TP v2.5
 - **Admin:** mengelola KKM default, tanggal/jam ujian Pra-Semester serentak, identitas referensi kurikulum/CP; tidak mengubah nilai Guru secara langsung.
-- **Guru:** G1 per Gen–Mapel tetap; boleh mengisi ATP lewat aplikasi/Excel, mengelola BAB dan TP Esensial/NonEsensial, tepat satu Materi NonEsensial, bank soal TP dan Pra-Semester, penilaian, dan **Export Nilai** seluruh siswa Gen–Mapel termasuk hasil parsial.
+- **Guru:** G1 per Gen–Mapel tetap; boleh mengisi ATP lewat aplikasi/Excel, mengelola BAB dan TP Esensial/NonEsensial, tepat satu Materi untuk setiap TP Esensial dan NonEsensial, bank soal TP dan Pra-Semester, penilaian, dan **Export Nilai** seluruh siswa Gen–Mapel termasuk hasil parsial.
 - **Siswa:** mengakses BAB/TP sesuai Gen/semester; hanya TP NonEsensial memerlukan Diagnostik, Materi jika gagal, Resume/HOTS jika wajib, Sumatif dan remedial. Pra-Semester dibuka oleh jadwal Admin setelah semua TP NonEsensial selesai.
 - **Pimpinan:** melihat progres semester/hasil TP dan Pra-Semester secara baca-saja, tidak mengatur jadwal atau nilai.
 Seluruh layanan menegakkan Gen–Mapel dan peran aktif di Controller **dan Service**, termasuk file ekspor agar Guru lain tidak dapat mengambil rekap siswa.
