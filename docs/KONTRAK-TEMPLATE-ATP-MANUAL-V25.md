@@ -67,3 +67,7 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Validator `AtpExcelParserService` harus membandingkan **isi akademik yang persis sama setelah hanya menyamakan karakter akhir baris** CRLF/CR/LF menjadi LF khusus kolom rumusan `REFERENSI CP!C7:C...`. Tidak boleh melonggarkan identitas `A`, elemen `B`, fase `D`, versi `E`, perubahan huruf/angka/kata pada rumusan, atau menonaktifkan pemeriksaan CP aktif.
 - Pengguna tidak perlu mengunduh ulang Excel yang sama untuk galat akibat CRLF/LF; cukup perbarui kode aplikasi. Tidak ada SQL/ubah CP atau data siswa.
 - Data di luar Semester aktif Gen dan nomor BAB/TP yang tidak konsisten tetap ditolak; pembetulan newline bukan pengecualian aturan akademik.
+
+
+## Kontrak authoring Semester 1–6 (29 Oktober 2026)
+Semua sheet Semester 1–6 boleh diisi Guru tanpa memperhatikan semester mulai Gen. Akses siswa bukan dasar penolakan workbook Guru dan tetap diputuskan server di Service siswa. Isi BAB/TP sah dari setiap semester hanya dapat disimpan pada paket sah yang memiliki Tahun Ajaran eksplisit; G05 menyediakan pembuatan paket draf bila belum ada, bukan membuat otomatis saat impor. Delapan kolom TP A:H, nomor BAB antarsemester sekelas, CP aktif, dan larangan overwrite tetap berlaku.
