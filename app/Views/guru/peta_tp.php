@@ -60,7 +60,6 @@
                     <?php foreach ($kelompok['nomor'] as $n): ?>
                         <?php
                             $r = $ringkasanSemester[$n];
-                            $belumMulai = $n < (int) $dipilih['semester_mulai'];
                             $status = match ($r['status']) {
                                 'aktif' => 'Paket aktif', 'draf' => 'Paket draf',
                                 'arsip' => 'Paket arsip', default => 'Belum ada paket',
