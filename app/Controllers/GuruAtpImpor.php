@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Services\AuthService;
 use App\Services\NavigasiService;
 use App\Services\PetaTpService;
+use App\Services\PaketSemesterGuruService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
 
@@ -76,6 +77,15 @@ final class GuruAtpImpor extends BaseController
             $paketId = $paketRaw === null ? ($ids[0] ?? 0) : (int) $paketRaw;
             $tahun = [];
             $kurikulum = [];
+            $opsiTahun = [];
+            $opsiKurikulum = [];
+            if ($dipilih !== null) {
+                $refs = (new PaketSemesterGuruService())->referensi(
+                    (int) $dipilih['angkatan_id'], (int) $dipilih['mapel_id']
+                );
+                $opsiTahun = $refs['tahun'];
+                $opsiKurikulum = $refs['kurikulum'];
+            }
             if ($opsi !== []) {
                 $tahun = array_column(db_connect()->table('ref_tahun_ajaran')
                     ->select('nama,id')->get()->getResultArray(), 'nama', 'id');
@@ -102,6 +112,8 @@ final class GuruAtpImpor extends BaseController
             'statusSemester' => $status,
             'namaTahun' => $tahun,
             'namaKurikulum' => $kurikulum,
+            'opsiTahunPaket' => $opsiTahun,
+            'opsiKurikulumPaket' => $opsiKurikulum,
         ]);
     }
 }
