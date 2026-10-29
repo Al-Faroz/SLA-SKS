@@ -172,8 +172,11 @@ final class KesiapanTpService
             'Setiap CP harus aktif, Fase D, sesuai Mapel/Kurikulum, dengan tepat satu CP utama.',
             'guru/peta-atp');
 
-        self::tambahCek($hasil, 'materi', 'Minimal satu Materi', count($materi) >= 1,
-            'TP wajib memiliki paling sedikit satu Materi.', $detail . '#daftar-materi');
+        // Kesiapan akademik Guru tidak dibedakan menurut jenis TP.
+        // Siswa tetap mengikuti gerbang akses/progres pada Service siswa.
+        self::tambahCek($hasil, 'materi', 'Tepat satu Materi per TP', count($materi) === 1,
+            'TP Esensial maupun NonEsensial wajib memiliki tepat satu Materi lengkap.',
+            $detail . '#daftar-materi');
         foreach ($materi as $idx => $m) {
             $nomor = $idx + 1;
             $benar = (int) ($m['urutan'] ?? 0) === $nomor
