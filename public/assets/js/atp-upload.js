@@ -40,6 +40,9 @@
     }
 
     input.addEventListener('change', validate);
+    input.addEventListener('invalid', function () {
+        setStatus(input.validationMessage || 'Pilih file Excel ATP V25-2 terlebih dahulu.');
+    });
     form.addEventListener('submit', function (event) {
         if (!validate()) {
             event.preventDefault();
@@ -52,15 +55,29 @@
         }
         form.dataset.atpSending = 'true';
         form.setAttribute('aria-busy', 'true');
-        button.disabled = true;
+        // Jangan disable tombol submit ketika event submit belum selesai.
+        // Di beberapa browser hal itu dapat menghentikan pengiriman form
+        // native. Dataset di atas sudah menolak percobaan submit kedua.
+        button.setAttribute('aria-disabled', 'true');
         button.textContent = 'Mengunggah & memeriksa Excel…';
         setStatus('File sedang diunggah dan diperiksa. Belum ada BAB/TP yang disimpan.');
     });
-    // Mengembalikan keadaan jika browser memulihkan halaman melalui back/forward cache.
-    window.addEventListener('pageshow', function () {
+    // CSRF CI4 memakai token sesi yang diregenerasi setelah POST.
+    // Ketika browser menghidupkan kembali halaman lama dari BFCache, form
+    // dapat membawa token lama; muat ulang form GET untuk mengambil token baru.
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+            return;
+        }
         form.dataset.atpSending = 'false';
         form.removeAttribute('aria-busy');
-        button.disabled = false;
+        button.removeAttribute('aria-disabled');
         button.textContent = 'Periksa & Pratinjau Excel';
+        var alert = document.querySelector('[data-atp-flash-error]');
+        if (alert) {
+            alert.scrollIntoView({ block: 'center' });
+            alert.focus({ preventScroll: true });
+        }
     });
 })();
