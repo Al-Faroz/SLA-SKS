@@ -16,9 +16,18 @@
         </div>
     </header>
 
-    <?php $galat = session()->getFlashdata('galat'); $sukses = session()->getFlashdata('sukses'); ?>
-    <?php if ($galat): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div><?php endif ?>
-    <?php if ($sukses): ?><div class="a-alert" role="status"><?= esc($sukses) ?></div><?php endif ?>
+    <?php
+        // CSRF CI4 menggunakan key "error", Service akademik memakai "galat".
+        // Keduanya WAJIB terlihat; sebelumnya penolakan CSRF diam-diam hilang.
+        $galat = session()->getFlashdata('galat') ?: session()->getFlashdata('error');
+        $sukses = session()->getFlashdata('sukses');
+    ?>
+    <?php if ($galat && $pilihan === []): ?>
+        <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>
+    <?php endif ?>
+    <?php if ($sukses && $pilihan === []): ?>
+        <div class="a-alert" role="status"><?= esc($sukses) ?></div>
+    <?php endif ?>
 
     <?php if ($pilihan === []): ?>
         <section class="a-card"><div class="a-empty" role="status">
@@ -104,8 +113,15 @@
             </div>
         </section>
 
-        <section class="a-card" aria-labelledby="judul-atp-file">
+        <section class="a-card" aria-labelledby="judul-atp-file" id="atp-upload-area">
             <h2 id="judul-atp-file">3. Unduh dan pratinjau ATP</h2>
+            <?php if ($galat): ?>
+                <div class="a-alert a-alert--bahaya" role="alert"
+                    data-atp-flash-error tabindex="-1"><?= esc($galat) ?></div>
+            <?php endif ?>
+            <?php if ($sukses): ?>
+                <div class="a-alert" role="status" data-atp-flash-success><?= esc($sukses) ?></div>
+            <?php endif ?>
             <?php if ($opsiPaket === []): ?>
                 <div class="a-empty" role="status">
                     <h3>Belum tersedia paket sebagai acuan</h3>
