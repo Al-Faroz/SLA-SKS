@@ -117,6 +117,11 @@ final class AtpUnduhanService
                 'semester_paket' => (int) $paket['semester'],
             ], $elemen);
 
+            // Pemeriksaan final V25-2 sebelum workbook dikirim. Jika
+            // template/konversi terlewat, jangan pernah mengirim ulang format
+            // lama yang masih memiliki kolom Kode TP atau Elemen CP.
+            self::periksaTemplateV25Dua($buku);
+
             $temp = tempnam(WRITEPATH, 'atp_unduh_');
             if ($temp === false) {
                 throw new RuntimeException('Berkas sementara ATP tidak dapat dibuat.');
@@ -142,9 +147,42 @@ final class AtpUnduhanService
         $namaGen = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $paket['kode_gen']) ?: 'gen';
         $kodeMapel = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) $paket['kode_mapel']) ?: 'mapel';
         return [
-            'nama' => 'ATP-v2.5-' . $namaGen . '-' . $kodeMapel . '-6-SEMESTER.xlsx',
+            'nama' => 'ATP-V25-2-' . $namaGen . '-' . $kodeMapel . '-6-SEMESTER.xlsx',
             'isi' => $isi,
         ];
+    }
+
+
+    /**
+     * Guard kontrak unduhan: enam sheet menggunakan delapan kolom input TP.
+     * Dijalankan sebelum serialize XLSX sehingga kegagalan tidak diam-diam
+     * menghasilkan file V25-1 dengan nama V25-2.
+     */
+    public static function periksaTemplateV25Dua(Spreadsheet $buku): void
+    {
+        $summary = $buku->getSheetByName('RINGKASAN');
+        if ($summary === null
+            || (string) $summary->getCell('B4')->getValue() !== self::VERSI) {
+            throw new RuntimeException('Versi template ATP tidak sesuai V25-2.');
+        }
+        for ($n = 1; $n <= 6; ++$n) {
+            $sheet = $buku->getSheetByName('SEMESTER ' . $n);
+            if ($sheet === null
+                || (string) $sheet->getCell('A2')->getValue() !== self::VERSI) {
+                throw new RuntimeException('Marker semester ATP tidak sesuai V25-2.');
+            }
+            foreach (AtpTemplateLayoutService::HEADER_TP as $i => $header) {
+                $cell = chr(65 + $i) . '38';
+                if ((string) $sheet->getCell($cell)->getValue() !== $header) {
+                    throw new RuntimeException('Header ATP V25-2 tidak sesuai pada Semester ' . $n . '.');
+                }
+            }
+            foreach (['I38', 'J38'] as $cell) {
+                if (trim((string) ($sheet->getCell($cell)->getValue() ?? '')) !== '') {
+                    throw new RuntimeException('Kolom TP lama masih ada pada Semester ' . $n . '.');
+                }
+            }
+        }
     }
 
     /** Hilangkan kontrol XML dan awal formula dari data referensi sekalipun ditulis sebagai STRING. */
