@@ -103,3 +103,7 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 - `POST /guru/peta-atp/pratinjau/{paketId}`: otorisasi Guru, CSRF, parser XLSX, validasi semua sheet/CP, perbandingan per semester. Sasaran INSERT hanyalah semester dengan paket sah dan **BAB=0, TP=0**; semester yang sudah berisi satu saja ditolak bila file berbeda, tetapi file seluruhnya identik ditandai Tetap tanpa modifikasi. Satu konflik memblokir konfirmasi semua semester.
 - `POST /guru/peta-atp/konfirmasi/{paketId}`: staging privat terikat sesi/akun/paket/checksum maksimal 15 menit, locking G1/paket, fingerprint dan validasi ulang, **INSERT BAB/TP saja** pada paket tiap semester dengan `tahun_ajaran_id` yang diambil dari paket itu. Tidak ada UPDATE/DELETE, tidak membuat Materi/soal/aktivitas siswa. Commit satu transaksi lengkap atau rollback; audit dicatat.
 - Proses penyuntingan setelah impor hanya melalui editor BAB/TP atau prosedur koreksi akademik. SQL/migration/seeder tidak diperlukan untuk memindahkan halaman/aturan ini.
+
+
+### Revisi G05 — 29 Oktober 2026
+`ref_angkatan.semester_mulai` tidak boleh menjadi syarat menolak akses **Guru** ke `peta-atp/unduh`, `peta-atp/pratinjau`, pembuatan `paket_semester` draf, atau editor BAB/TP. Nilai tersebut tetap digunakan **siswa** untuk gerbang semester efektif. Form G05 menggunakan `POST /guru/paket-semester/baru` yang sudah tersedia untuk membuat paket **atas pilihan eksplisit Tahun Ajaran** sebelum impor. Konfirmasi tetap satu transaksi INSERT tanpa pembuatan paket otomatis/UPDATE konten lama.
