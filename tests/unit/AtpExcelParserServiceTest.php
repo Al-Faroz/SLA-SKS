@@ -126,13 +126,16 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
-    public function testSemesterSebelumMulaiGenDitolak(): void
+    public function testGuruBolehIsiSemesterSebelumSemesterMulaiGen(): void
     {
         $buku = $this->buku();
         try {
             $this->bab($buku, 3, 13, 1);
-            $this->expectExceptionMessage('Gen ini belum dimulai');
-            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            $this->tp($buku, 3, 'SKI.8.1.1');
+            $hasil = AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            self::assertSame(1, $hasil['jumlah_bab']);
+            self::assertSame(1, $hasil['jumlah_tp']);
+            self::assertSame(3, $hasil['tp'][0]['semester']);
         } finally {
             $buku->disconnectWorksheets();
         }
