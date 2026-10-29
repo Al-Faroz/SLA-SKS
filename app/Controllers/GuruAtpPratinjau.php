@@ -32,6 +32,11 @@ final class GuruAtpPratinjau extends BaseController
         if (! ctype_digit($paketId) || strlen($paketId) > 15 || (int) $paketId < 1) {
             return redirect()->to($kembali)->with('galat', 'Paket ATP tidak valid.');
         }
+        // Penanda aman untuk membedakan form tidak terkirim/CSRF (tanpa
+        // log ini) dari error yang terjadi sesudah Controller menerima POST.
+        log_message('info', 'POST pratinjau ATP diterima; paket={paket}', [
+            'paket' => (int) $paketId,
+        ]);
         $file = $this->request->getFile('atp_excel');
         if ($file === null || ! $file->isValid()) {
             return redirect()->to($kembali)->with(
