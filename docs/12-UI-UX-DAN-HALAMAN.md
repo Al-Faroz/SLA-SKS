@@ -155,7 +155,7 @@ Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyb
 
 ## 12. UI penyusunan Guru v2.4
 - Kartu konteks Gen–Mapel/Kurikulum, tombol **Unduh Excel ATP enam semester** dan Unggah Peta, pratinjau dengan validasi daftar CP resmi sesuai mapel saja.
-- Setiap TP mempunyai status draf/perlu dilengkapi/Siap; TP NonEsensial memiliki tepat satu Materi dan tugas Resume/HOTS terkait, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
+- Setiap TP mempunyai status draf/perlu dilengkapi/Siap; TP Esensial maupun NonEsensial masing-masing memiliki tepat satu Materi lengkap; kewajiban Resume/HOTS untuk siswa ditentukan oleh alur siswa, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
 - Preview soal menampilkan konten kaya Word **pada pertanyaan dan A–E**, tabel di dalam tabel, Equation, gambar, pemutar audio/video Google Drive bila valid; soal/catatan yang gagal tidak dapat dikonfirmasi.
 
 
