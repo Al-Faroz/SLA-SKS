@@ -112,6 +112,8 @@ final class AtpImporMysqlTest extends TestCase
             $sh->setCellValue('C39', 'NonEsensial');
             $sh->setCellValue('D39', $tpName);
             $sh->setCellValue('E39', 'Menganalisis hubungan sebab akibat');
+            $sh->setCellValue('F39', 'Materi peristiwa sejarah');
+            $sh->setCellValue('G39', 'PDF');
             if ($tambahanSemester5) {
                 $s5 = $buku->getSheetByName('SEMESTER 5');
                 foreach ([
@@ -120,6 +122,7 @@ final class AtpImporMysqlTest extends TestCase
                     'A39'=>1, 'B39'=>1, 'C39'=>'NonEsensial',
                     'D39'=>'Perjalanan Islam',
                     'E39'=>'Menganalisis penyebaran Islam di Indonesia',
+                    'F39'=>'Materi perkembangan Islam', 'G39'=>'PDF',
                 ] as $cell => $value) {
                     $s5->setCellValue($cell, $value);
                 }
@@ -266,6 +269,7 @@ final class AtpImporMysqlTest extends TestCase
                 'A40'=>2, 'B40'=>1, 'C40'=>'Esensial',
                 'D40'=>'Meneladani Tokoh',
                 'E40'=>'Mengapresiasi perjuangan tokoh Islam',
+                'F40'=>'Materi keteladanan tokoh', 'G40'=>'PDF',
             ] as $c => $v) {
                 $sh->setCellValue($c, $v);
             }
