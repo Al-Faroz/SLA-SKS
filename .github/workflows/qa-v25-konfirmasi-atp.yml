@@ -14,6 +14,10 @@ on:
       - 'tests/unit/GuruAtpImporGlobalUiTest.php'
       - 'tests/unit/CpDaftarResponsifTest.php'
       - 'app/Controllers/GuruAtpPratinjau.php'
+      - 'app/Services/AtpValidasiUnggahService.php'
+      - 'public/assets/js/atp-upload.js'
+      - 'public/assets/js/atp-konfirmasi.js'
+      - 'tests/unit/AtpUnggahPratinjauRoundTripTest.php'
       - 'app/Config/Routes.php'
       - 'app/Views/guru/pratinjau_atp.php'
       - 'tests/unit/AtpStagingServiceTest.php'
@@ -50,12 +54,14 @@ jobs:
           php -l app/Views/guru/peta_tp.php
           php -l app/Views/guru/semester_atp.php
           php -l app/Controllers/GuruAtpPratinjau.php
+          php -l app/Services/AtpValidasiUnggahService.php
+          php -l tests/unit/AtpUnggahPratinjauRoundTripTest.php
           php -l app/Views/guru/pratinjau_atp.php
           php -l app/Config/Routes.php
           php -l tests/unit/AtpStagingServiceTest.php
           php -l tests/integration/AtpImporMysqlTest.php
       - name: PHPUnit staging dan parser
-        run: vendor/bin/phpunit --no-coverage --filter 'AtpStagingServiceTest|AtpExcelParserServiceTest|GuruAtpImporGlobalUiTest|CpDaftarResponsifTest|AtpUnduhanServiceTest'
+        run: vendor/bin/phpunit --no-coverage --filter 'AtpUnggahPratinjauRoundTripTest|AtpStagingServiceTest|AtpExcelParserServiceTest|GuruAtpImporGlobalUiTest|CpDaftarResponsifTest|AtpUnduhanServiceTest'
 
   mysql:
     name: MySQL 8 transaction, rollback, idempotence and Gen isolation
