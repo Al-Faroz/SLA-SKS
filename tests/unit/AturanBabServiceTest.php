@@ -52,10 +52,10 @@ final class AturanBabServiceTest extends TestCase
         ], 4));
     }
 
-    public function testSemesterSebelumMulaiGenDitolak(): void
+    public function testSemesterSebelumMulaiGenBolehDibuatGuru(): void
     {
-        $this->expectException(DomainException::class);
-        AturanBabService::nomorBerikutnya(3, [], 4);
+        self::assertSame(1, AturanBabService::nomorBerikutnya(1, [], 4));
+        self::assertSame(1, AturanBabService::nomorBerikutnya(3, [], 4));
     }
 
     public function testNomorGandaDitolak(): void
@@ -93,7 +93,7 @@ final class AturanBabServiceTest extends TestCase
             $semester[$n] = ['bab' => [], 'paket' => []];
         }
         $hasil = AturanBabService::denganStatusForm($semester, 4);
-        self::assertFalse($hasil[3]['boleh_tambah_bab']);
+        self::assertTrue($hasil[3]['boleh_tambah_bab']);
         self::assertTrue($hasil[4]['boleh_tambah_bab']);
         self::assertTrue($hasil[5]['boleh_tambah_bab']);
     }
