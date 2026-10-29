@@ -13,9 +13,9 @@
             if ($paket['status'] !== 'arsip') { $paketAktif = $paket; break; }
         }
         $belumMulai = $nomorSemester < (int) $dipilih['semester_mulai'];
-        $bolehTambahBab = ! $belumMulai && $paketAktif !== null
+        $bolehTambahBab = $paketAktif !== null
             && ($semester['pola_bab'] ?? false) && ($semester['boleh_tambah_bab'] ?? false);
-        $status = $belumMulai ? 'Semester sebelum awal Gen' : match ($ringkasan['status']) {
+        $status = match ($ringkasan['status']) {
             'aktif' => 'Paket aktif', 'draf' => 'Paket draf',
             'arsip' => 'Paket arsip', default => 'Belum ada paket',
         };
@@ -35,6 +35,13 @@
     </header>
 
     <?php $galat = session()->getFlashdata('galat'); $sukses = session()->getFlashdata('sukses'); ?>
+    <?php if ($belumMulai): ?>
+        <div class="a-alert a-alert--info" role="status">
+            Semester <?= (int) $nomorSemester ?> boleh disusun Guru. Akses siswa
+            untuk Gen ini tetap mengikuti semester mulai
+            <?= (int) $dipilih['semester_mulai'] ?> dan pemeriksaan hak di server.
+        </div>
+    <?php endif ?>
     <?php if ($batasNamaBab < 50 || $batasNamaTp < 50): ?>
         <div class="a-alert a-alert--info" role="status">
             Database saat ini membatasi nama BAB hingga <?= (int) $batasNamaBab ?> dan nama TP hingga
@@ -50,9 +57,7 @@
             <h2 id="panduan-atp">Susun BAB dan TP</h2>
             <p class="a-proto-muted">Mulai dengan BAB sesuai ATP. Nomor BAB dan kode TP dibuat server; TP baru disimpan sebagai draf.
                 Batas nama mengikuti kapasitas database terpasang; deskripsi maksimal 225 karakter. Pilih jenis TP sesuai tujuan pembelajaran.</p>
-            <?php if ($belumMulai): ?>
-                <p class="a-atp-pesan-terkunci">Semester ini dilewati karena Gen mulai dari Semester <?= (int) $dipilih['semester_mulai'] ?>. Data tetap dapat dilihat.</p>
-            <?php elseif ($paketAktif !== null && ! $bolehTambahBab): ?>
+            <?php if ($paketAktif !== null && ! $bolehTambahBab): ?>
                 <p class="a-atp-pesan-terkunci">Penambahan BAB saat ini terkunci oleh aturan nomor antarsemester.
                     Periksa urutan BAB semester ganjil/genap pada kelas yang sama.</p>
             <?php elseif (! ($semester['pola_bab'] ?? false)): ?>
@@ -63,7 +68,7 @@
             <?php if ($bolehTambahBab): ?>
                 <button class="a-btn a-btn--utama" type="button" data-atp-dialog-open="dialog-bab-semester"
                     aria-haspopup="dialog" aria-controls="dialog-bab-semester">+ Tambah BAB</button>
-            <?php elseif (! $belumMulai && $paketAktif === null
+            <?php elseif ($paketAktif === null
                 && ($opsiPaket['tahun'] ?? []) !== [] && ($opsiPaket['kurikulum'] ?? []) !== []): ?>
                 <button class="a-btn a-btn--utama" type="button" data-atp-dialog-open="dialog-paket-semester"
                     aria-haspopup="dialog" aria-controls="dialog-paket-semester">+ Buat Paket Draf</button>
@@ -99,7 +104,7 @@
         </dialog>
     <?php endif ?>
 
-    <?php if (! $belumMulai && $paketAktif === null
+    <?php if ($paketAktif === null
         && ($opsiPaket['tahun'] ?? []) !== [] && ($opsiPaket['kurikulum'] ?? []) !== []): ?>
         <dialog id="dialog-paket-semester" class="a-modal a-modal--atp" aria-labelledby="judul-dialog-paket">
             <div class="a-modal-atp__header">
@@ -147,16 +152,15 @@
         <?php if ($semester['bab'] === []): ?>
             <div class="a-card"><div class="a-empty" role="status">
                 <h3>Belum ada BAB</h3>
-                <p><?= $belumMulai ? 'Semester ini belum dapat diisi untuk Gen tersebut.' :
-                    ($paketAktif === null ? 'Buat paket draf terlebih dahulu sebelum menambahkan BAB.' :
-                    'Gunakan tombol Tambah BAB di atas untuk mulai menyusun ATP.') ?></p>
+                <p><?= $paketAktif === null ? 'Buat paket draf terlebih dahulu sebelum menambahkan BAB.'
+                    : 'Gunakan tombol Tambah BAB di atas untuk mulai menyusun ATP.' ?></p>
             </div></div>
         <?php else: ?>
             <?php foreach ($semester['bab'] as $index => $bab): ?>
                 <?php
                     $tpDalamBab = array_values(array_filter($semester['tp'],
                         static fn (array $tp): bool => (int) ($tp['bab_id'] ?? 0) === (int) $bab['id']));
-                    $bolehTp = $paketAktif !== null && ! $belumMulai
+                    $bolehTp = $paketAktif !== null
                         && (int) $bab['paket_semester_id'] === (int) $paketAktif['id'];
                     $warna = ((int) $index % 6) + 1;
                 ?>
