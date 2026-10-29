@@ -92,7 +92,7 @@ final class AtpExcelParserService
      */
     private static function rumusanCpKanonik(string $teks): string
     {
-        return str_replace(["\\r\\n", "\\r"], "\\n", trim($teks));
+        return str_replace(["\r\n", "\r"], "\n", trim($teks));
     }
 
     private static function nomor(string $teks, string $lokasi): int
