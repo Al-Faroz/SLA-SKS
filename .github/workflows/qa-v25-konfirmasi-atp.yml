@@ -5,6 +5,11 @@ on:
     paths:
       - 'app/Services/AtpImporKonfirmasiService.php'
       - 'app/Services/AtpImporPratinjauService.php'
+      - 'app/Services/PaketSemesterGuruService.php'
+      - 'app/Services/BabService.php'
+      - 'app/Services/TpBabService.php'
+      - 'app/Services/AturanBabService.php'
+      - 'tests/unit/AturanBabServiceTest.php'
       - 'app/Services/AtpStagingService.php'
       - 'app/Controllers/GuruAtpKonfirmasi.php'
       - 'app/Controllers/GuruAtpImpor.php'
@@ -47,6 +52,11 @@ jobs:
         run: |
           php -l app/Services/AtpImporKonfirmasiService.php
           php -l app/Services/AtpImporPratinjauService.php
+          php -l app/Services/PaketSemesterGuruService.php
+          php -l app/Services/BabService.php
+          php -l app/Services/TpBabService.php
+          php -l app/Services/AturanBabService.php
+          php -l tests/unit/AturanBabServiceTest.php
           php -l app/Services/AtpStagingService.php
           php -l app/Controllers/GuruAtpKonfirmasi.php
           php -l app/Controllers/GuruAtpImpor.php
@@ -61,7 +71,7 @@ jobs:
           php -l tests/unit/AtpStagingServiceTest.php
           php -l tests/integration/AtpImporMysqlTest.php
       - name: PHPUnit staging dan parser
-        run: vendor/bin/phpunit --no-coverage --filter 'AtpUnggahPratinjauRoundTripTest|AtpStagingServiceTest|AtpExcelParserServiceTest|GuruAtpImporGlobalUiTest|CpDaftarResponsifTest|AtpUnduhanServiceTest'
+        run: vendor/bin/phpunit --no-coverage --filter 'AtpUnggahPratinjauRoundTripTest|AturanBabServiceTest|AtpStagingServiceTest|AtpExcelParserServiceTest|GuruAtpImporGlobalUiTest|CpDaftarResponsifTest|AtpUnduhanServiceTest'
 
   mysql:
     name: MySQL 8 transaction, rollback, idempotence and Gen isolation
