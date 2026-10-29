@@ -101,16 +101,17 @@ final class AtpUnduhanServiceTest extends TestCase
         }
     }
 
-    public function testSemesterSebelumGenDitolak(): void
+    public function testUnduhanTetapBolehUntukSemesterSebelumMulaiGen(): void
     {
         $buku = $this->buku();
         try {
             $konteks = $this->konteks();
             $konteks['semester_paket'] = 3;
-            $this->expectException(DomainException::class);
             AtpUnduhanService::isiBuku($buku, $konteks, [
                 ['id' => 1, 'elemen' => 'Sejarah', 'rumusan' => 'Rumusan', 'nomor_versi' => 1],
             ]);
+            self::assertSame('SLA-SKS-ATP-MANUAL-V25-2',
+                (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue());
         } finally {
             $buku->disconnectWorksheets();
         }
