@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 final class AtpManualTemplateTest extends TestCase
 {
     private const BERKAS = 'docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
-    private const VERSI = 'SLA-SKS-ATP-MANUAL-V25-1';
+    private const VERSI = 'SLA-SKS-ATP-MANUAL-V25-2';
 
     /**
      * PhpSpreadsheet may return inline-string cells as RichText.
@@ -34,12 +34,16 @@ final class AtpManualTemplateTest extends TestCase
                 self::assertSame('Nomor BAB', (string) $sheet->getCell('A12')->getValue());
                 self::assertSame('Nama BAB (maks. 50)', (string) $sheet->getCell('B12')->getValue());
                 self::assertSame('Nomor BAB', (string) $sheet->getCell('A38')->getValue());
-                self::assertSame('Kode TP', (string) $sheet->getCell('C38')->getValue());
-                self::assertSame('Jenis TP', (string) $sheet->getCell('D38')->getValue());
-                self::assertSame('Judul satu Materi', (string) $sheet->getCell('G38')->getValue());
+                self::assertSame('Jenis TP', (string) $sheet->getCell('C38')->getValue());
+                self::assertSame('Nama TP (maks. 50)', (string) $sheet->getCell('D38')->getValue());
+                self::assertSame('Judul satu Materi', (string) $sheet->getCell('F38')->getValue());
                 self::assertNull($sheet->getCell('A13')->getValue());
                 self::assertNull($sheet->getCell('J118')->getValue());
-                self::assertSame('D39:D118', $sheet->getDataValidation('D39')->getSqref());
+                self::assertSame('C39:C118', $sheet->getDataValidation('C39')->getSqref());
+                self::assertSame('G39:G118', $sheet->getDataValidation('G39')->getSqref());
+                self::assertSame('Catatan', (string) $sheet->getCell('H38')->getValue());
+                self::assertSame('', (string) $sheet->getCell('I38')->getValue());
+                self::assertSame('', (string) $sheet->getCell('J38')->getValue());
                 foreach ($sheet->getCellCollection()->getCoordinates() as $coord) {
                     self::assertNotSame(DataType::TYPE_FORMULA, $sheet->getCell($coord)->getDataType(),
                         'Dilarang formula di ' . $sheet->getTitle() . '!' . $coord);
@@ -61,10 +65,10 @@ final class AtpManualTemplateTest extends TestCase
                 self::assertContains('A1:J1', $sheet->getMergeCells());
                 self::assertGreaterThanOrEqual(44.0, (float) $sheet->getRowDimension(1)->getRowHeight());
                 self::assertGreaterThanOrEqual(44.0, (float) $sheet->getRowDimension(38)->getRowHeight());
-                self::assertSame('DFF1E8', $sheet->getStyle('A1')->getFill()->getStartColor()->getRGB());
-                self::assertSame('183F35', $sheet->getStyle('A38')->getFill()->getStartColor()->getRGB());
-                self::assertSame('E2F1EA', $sheet->getStyle('D39')->getFill()->getStartColor()->getRGB());
-                self::assertSame('EDF4FF', $sheet->getStyle('G39')->getFill()->getStartColor()->getRGB());
+                self::assertSame('12364A', $sheet->getStyle('A1')->getFill()->getStartColor()->getRGB());
+                self::assertSame('078783', $sheet->getStyle('A38')->getFill()->getStartColor()->getRGB());
+                self::assertSame('DAF2E7', $sheet->getStyle('C39')->getFill()->getStartColor()->getRGB());
+                self::assertSame('E0ECFC', $sheet->getStyle('F39')->getFill()->getStartColor()->getRGB());
                 self::assertTrue($sheet->getStyle('C38')->getAlignment()->getWrapText());
             }
             self::assertFalse($buku->getSheetByName('MULAI DI SINI')->getShowGridLines());

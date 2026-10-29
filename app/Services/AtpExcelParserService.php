@@ -24,11 +24,7 @@ final class AtpExcelParserService
         'SEMESTER 4', 'SEMESTER 5', 'SEMESTER 6', 'CONTOH MAT VII',
     ];
     private const HEADER_BAB = ['Nomor BAB', 'Nama BAB (maks. 50)', 'Deskripsi BAB (maks. 225)'];
-    private const HEADER_TP = [
-        'Nomor BAB', 'Urutan TP', 'Kode TP', 'Jenis TP', 'Nama TP (maks. 50)',
-        'Deskripsi TP (maks. 225)', 'Judul satu Materi', 'Jenis media (rencana)',
-        'Elemen CP (rujukan)', 'Catatan',
-    ];
+    private const HEADER_TP = AtpTemplateLayoutService::HEADER_TP;
 
     /** Periksa ZIP sebelum PhpSpreadsheet memproses XML. */
     private static function periksaZip(string $path): void
@@ -213,6 +209,10 @@ final class AtpExcelParserService
                     throw new DomainException('SEMESTER ' . $s . '!' . $kolom . ': header TP berubah.');
                 }
             }
+            if (self::nilai($sheet, 'I38') !== '' || self::nilai($sheet, 'J38') !== '') {
+                throw new DomainException('SEMESTER ' . $s
+                    . ': kolom I/J bukan area input; unduh template V25-2 yang baru.');
+            }
 
             for ($row = 13; $row <= 32; $row++) {
                 $kolom = [];
@@ -242,8 +242,15 @@ final class AtpExcelParserService
             }
             for ($row = 39; $row <= 118; $row++) {
                 $kolom = [];
-                foreach (range('A', 'J') as $k) {
+                foreach (range('A', 'H') as $k) {
                     $kolom[] = self::nilai($sheet, $k . $row);
+                }
+                // Jangan diam-diam mengabaikan masukan tersembunyi atau kolom
+                // format lama yang masih diisi oleh Guru.
+                if (self::nilai($sheet, 'I' . $row) !== ''
+                    || self::nilai($sheet, 'J' . $row) !== '') {
+                    throw new DomainException('SEMESTER ' . $s . ' baris ' . $row
+                        . ': kolom I/J tidak digunakan. Unduh template ATP terbaru.');
                 }
                 if (count(array_filter($kolom, static fn (string $v): bool => $v !== '')) === 0) {
                     continue;
@@ -258,29 +265,24 @@ final class AtpExcelParserService
                     throw new DomainException($lokasi . ': nomor BAB tidak ada di Bagian A semester ini.');
                 }
                 $kelas = $s <= 2 ? 7 : ($s <= 4 ? 8 : 9);
-                if (! KodeTpService::cocok($kolom[2], $kodeMapel, $kelas, $nomorBab, $urutan)) {
-                    throw new DomainException($lokasi . ': kode TP tidak sesuai KODEMAPEL.KELAS.BAB.TP.');
-                }
-                $jenis = match ($kolom[3]) {
+                // Identitas TP dibangkitkan server, tidak dibaca dari
+                // sel Excel dan tidak bergantung pada formula/macro.
+                $kodeTp = KodeTpService::bentuk($kodeMapel, $kelas, $nomorBab, $urutan);
+                $jenis = match ($kolom[2]) {
                     'Esensial' => 'esensial',
                     'NonEsensial' => 'non_esensial',
                     default => throw new DomainException($lokasi . ': jenis TP wajib Esensial/NonEsensial.'),
                 };
-                if ($kolom[4] === '' || mb_strlen($kolom[4]) > 50
-                    || $kolom[5] === '' || mb_strlen($kolom[5]) > 225
-                    || mb_strlen($kolom[6]) > 180 || mb_strlen($kolom[8]) > 150
-                    || mb_strlen($kolom[9]) > 225) {
+                if ($kolom[3] === '' || mb_strlen($kolom[3]) > 50
+                    || $kolom[4] === '' || mb_strlen($kolom[4]) > 225
+                    || mb_strlen($kolom[5]) > 180 || mb_strlen($kolom[7]) > 225) {
                     throw new DomainException($lokasi . ': nama/deskripsi TP wajib dan batas panjang kolom terlampaui.');
                 }
-                if ($jenis === 'esensial' && ($kolom[6] !== '' || $kolom[7] !== '')) {
+                if ($jenis === 'esensial' && ($kolom[5] !== '' || $kolom[6] !== '')) {
                     throw new DomainException($lokasi . ': TP Esensial tidak boleh memiliki rencana Materi/media.');
                 }
-                if ($kolom[7] !== '' && ! in_array($kolom[7], ['YouTube','PDF','Audio','Gambar'], true)) {
+                if ($kolom[6] !== '' && ! in_array($kolom[6], ['YouTube','PDF','Audio','Gambar'], true)) {
                     throw new DomainException($lokasi . ': jenis media tidak dikenal.');
-                }
-                if ($kolom[8] !== '' && $elemenDiizinkan !== []
-                    && ! in_array($kolom[8], $elemenDiizinkan, true)) {
-                    throw new DomainException($lokasi . ': elemen CP bukan elemen aktif milik Mapel.');
                 }
                 if (isset($tpSem[$s][$nomorBab][$urutan])) {
                     throw new DomainException($lokasi . ': urutan TP ganda dalam BAB.');
@@ -288,10 +290,10 @@ final class AtpExcelParserService
                 $tpSem[$s][$nomorBab][$urutan] = true;
                 $tp[] = [
                     'semester' => $s, 'baris' => $row, 'nomor_bab' => $nomorBab,
-                    'urutan' => $urutan, 'kode' => $kolom[2], 'jenis' => $jenis,
-                    'nama' => $kolom[4], 'deskripsi' => $kolom[5],
-                    'materi' => $kolom[6], 'media' => $kolom[7],
-                    'cp_elemen' => $kolom[8], 'catatan' => $kolom[9],
+                    'urutan' => $urutan, 'kode' => $kodeTp, 'jenis' => $jenis,
+                    'nama' => $kolom[3], 'deskripsi' => $kolom[4],
+                    'materi' => $kolom[5], 'media' => $kolom[6],
+                    'catatan' => $kolom[7],
                 ];
             }
         }

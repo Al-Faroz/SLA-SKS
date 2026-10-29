@@ -6,6 +6,7 @@ namespace Tests\Integration;
 
 use App\Services\AtpImporKonfirmasiService;
 use App\Services\AtpImporPratinjauService;
+use App\Services\AtpTemplateLayoutService;
 use Config\Database;
 use DomainException;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -86,6 +87,7 @@ final class AtpImporMysqlTest extends TestCase
     {
         $source = dirname(__DIR__, 2) . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
         $buku = IOFactory::load($source);
+        AtpTemplateLayoutService::terapkan($buku);
         try {
             $sum = $buku->getSheetByName('RINGKASAN');
             $sum->setCellValue('B5', 'GEN2025');
@@ -105,20 +107,17 @@ final class AtpImporMysqlTest extends TestCase
             $sh->setCellValue('C13', 'Sejarah, latar belakang dan perkembangan');
             $sh->setCellValue('A39', 1);
             $sh->setCellValue('B39', 1);
-            $sh->setCellValue('C39', 'SKI.8.1.1');
-            $sh->setCellValue('D39', 'NonEsensial');
-            $sh->setCellValue('E39', $tpName);
-            $sh->setCellValue('F39', 'Menganalisis hubungan sebab akibat');
-            $sh->setCellValue('I39', 'Pemahaman Konsep');
+            $sh->setCellValue('C39', 'NonEsensial');
+            $sh->setCellValue('D39', $tpName);
+            $sh->setCellValue('E39', 'Menganalisis hubungan sebab akibat');
             if ($tambahanSemester5) {
                 $s5 = $buku->getSheetByName('SEMESTER 5');
                 foreach ([
                     'A13'=>1, 'B13'=>'Tokoh Muslim Nusantara',
                     'C13'=>'Menelaah perkembangan dan keteladanan tokoh',
-                    'A39'=>1, 'B39'=>1, 'C39'=>'SKI.9.1.1',
-                    'D39'=>'NonEsensial', 'E39'=>'Perjalanan Islam',
-                    'F39'=>'Menganalisis penyebaran Islam di Indonesia',
-                    'I39'=>'Pemahaman Konsep',
+                    'A39'=>1, 'B39'=>1, 'C39'=>'NonEsensial',
+                    'D39'=>'Perjalanan Islam',
+                    'E39'=>'Menganalisis penyebaran Islam di Indonesia',
                 ] as $cell => $value) {
                     $s5->setCellValue($cell, $value);
                 }
@@ -229,10 +228,9 @@ final class AtpImporMysqlTest extends TestCase
             foreach ([
                 'A14'=>2, 'B14'=>'Tokoh Islam',
                 'C14'=>'Mempelajari tokoh dan keteladanannya',
-                'A40'=>2, 'B40'=>1, 'C40'=>'SKI.8.2.1',
-                'D40'=>'Esensial', 'E40'=>'Meneladani Tokoh',
-                'F40'=>'Mengapresiasi perjuangan tokoh Islam',
-                'I40'=>'Pemahaman Konsep',
+                'A40'=>2, 'B40'=>1, 'C40'=>'Esensial',
+                'D40'=>'Meneladani Tokoh',
+                'E40'=>'Mengapresiasi perjuangan tokoh Islam',
             ] as $c => $v) {
                 $sh->setCellValue($c, $v);
             }

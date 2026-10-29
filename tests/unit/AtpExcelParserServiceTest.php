@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Services\AtpExcelParserService;
+use App\Services\AtpTemplateLayoutService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PHPUnit\Framework\TestCase;
@@ -13,6 +14,7 @@ final class AtpExcelParserServiceTest extends TestCase
     {
         $buku = IOFactory::load(dirname(__DIR__, 2)
             . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx');
+        AtpTemplateLayoutService::terapkan($buku);
         $s = $buku->getSheetByName('RINGKASAN');
         $s->setCellValue('B5', 'GEN2025');
         $s->setCellValue('B9', 'SKI');
@@ -33,11 +35,9 @@ final class AtpExcelParserServiceTest extends TestCase
         $s = $buku->getSheetByName('SEMESTER ' . $semester);
         $s->setCellValue('A39', $nomorBab);
         $s->setCellValue('B39', $urutan);
-        $s->setCellValue('C39', $kode);
-        $s->setCellValue('D39', $jenis);
-        $s->setCellValue('E39', 'Menganalisis peristiwa');
-        $s->setCellValue('F39', 'Mengenali sebab dan akibat peristiwa penting');
-        $s->setCellValue('I39', 'Pemahaman Konsep');
+        $s->setCellValue('C39', $jenis);
+        $s->setCellValue('D39', 'Menganalisis peristiwa');
+        $s->setCellValue('E39', 'Mengenali sebab dan akibat peristiwa penting');
     }
 
     public function testWorkbookKosongMemilikiHasilNol(): void
@@ -87,14 +87,15 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
-    public function testKodeTpSalahDitolakDenganLokasi(): void
+    public function testKodeTpSelaluDibentukServerWalaupunGuruTidakMengisinya(): void
     {
         $buku = $this->buku();
         try {
             $this->bab($buku, 4, 13, 1);
-            $this->tp($buku, 4, 'SKI.9.1.1');
-            $this->expectExceptionMessage('SEMESTER 4 baris 39');
-            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            $this->tp($buku, 4, 'TIDAK-DIGUNAKAN');
+            $result = AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            self::assertSame('SKI.8.1.1', $result['tp'][0]['kode']);
+            self::assertSame('Menganalisis peristiwa', $result['tp'][0]['nama']);
         } finally {
             $buku->disconnectWorksheets();
         }
@@ -178,7 +179,7 @@ final class AtpExcelParserServiceTest extends TestCase
         try {
             $this->bab($buku, 4, 13, 1);
             $this->tp($buku, 4, 'SKI.8.1.1', 'Esensial');
-            $buku->getSheetByName('SEMESTER 4')->setCellValue('G39', 'Materi yang dilarang');
+            $buku->getSheetByName('SEMESTER 4')->setCellValue('F39', 'Materi yang dilarang');
             $this->expectExceptionMessage('Esensial');
             AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
         } finally {
@@ -186,14 +187,15 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
-    public function testElemenCpAsingDitolak(): void
+    public function testKolomElemenCpLamaYangTersembunyiDitolak(): void
     {
         $buku = $this->buku();
         try {
             $this->bab($buku, 4, 13, 1);
             $this->tp($buku, 4, 'SKI.8.1.1');
-            $this->expectExceptionMessage('elemen CP bukan elemen aktif');
-            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025', ['Keterampilan Proses']);
+            $buku->getSheetByName('SEMESTER 4')->setCellValue('I39', 'Keterampilan Proses');
+            $this->expectExceptionMessage('kolom I/J tidak digunakan');
+            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
         } finally {
             $buku->disconnectWorksheets();
         }
