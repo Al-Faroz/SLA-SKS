@@ -69,10 +69,6 @@ final class AtpUnduhanService
         if ($paket === null) {
             throw new DomainException('Paket tidak ditemukan dalam penugasan Gen–Mapel Anda.');
         }
-        if ((int) $paket['semester'] < (int) $paket['semester_mulai']) {
-            throw new DomainException('Semester paket berada sebelum semester mulai Gen.');
-        }
-
         // Hanya CP operasional tunggal Fase D dan versi elemen yang sudah aktif.
         $cp = $this->db->table('cp_mapel c')
             ->select('c.id')
@@ -228,7 +224,7 @@ final class AtpUnduhanService
         }
         if (! isset($konteks['semester_mulai'], $konteks['semester_paket'])
             || (int) $konteks['semester_mulai'] < 1 || (int) $konteks['semester_mulai'] > 6
-            || (int) $konteks['semester_paket'] < (int) $konteks['semester_mulai']
+            || (int) $konteks['semester_paket'] < 1
             || (int) $konteks['semester_paket'] > 6 || $elemen === []) {
             throw new DomainException('Semester atau referensi CP untuk ATP tidak valid.');
         }
@@ -240,8 +236,9 @@ final class AtpUnduhanService
         }
         $ringkasan->setCellValueExplicit('B12', 'D', DataType::TYPE_STRING);
         $ringkasan->setCellValueExplicit('B15',
-            'Semester 1–6; mulai Gen S' . (int) $konteks['semester_mulai']
-            . '; konteks paket S' . (int) $konteks['semester_paket'], DataType::TYPE_STRING);
+            'ATP Guru Semester 1–6; akses siswa mengikuti semester mulai Gen S'
+            . (int) $konteks['semester_mulai']
+            . '; paket acuan S' . (int) $konteks['semester_paket'], DataType::TYPE_STRING);
 
         $cp = $buku->getSheetByName('REFERENSI CP');
         foreach ($elemen as $i => $baris) {
