@@ -16,7 +16,7 @@
 1. Username, NISN unik; FK Gen–Mapel, siswa, CP, paket dan versi wajib dijaga. Pengguna Gen A tidak memperoleh data Gen B.
 2. `cp_mapel` unik (kurikulum,mapel,fase); satu CP operasional dapat mengacu ke beberapa `ref_cp_versi` sebagai elemen, bukan data hilang.
 3. BAB per paket memiliki nomor; nomor BAB **unik dan berlanjut antarsemester kelas yang sama** pada Gen–Mapel–TahunAjaran–Kurikulum. Kode TP server `KODEMAPEL.KELAS.BAB.TP`; status Siap hanya jika kode, BAB dan relasi valid.
-4. TP Esensial **0 Materi aktif** dan tanpa nilai; TP NonEsensial **tepat 1 Materi aktif**. DB menegakkan maksimum satu aktif, Service menegakkan jenis dan minimum satu saat siap.
+4. TP Esensial maupun NonEsensial **wajib tepat 1 Materi aktif ketika Siap**. DB membatasi maksimum satu Materi aktif; Service Kesiapan menegakkan tepat satu untuk kedua jenis. Akses/progres/nilai siswa ditentukan secara terpisah oleh aturan siswa; Esensial tetap tidak dihitung nilai sesuai alur saat ini.
 5. Nilai TP 20/20/60 atau 100% Sumatif. Percobaan remedial satu jika skor awal Sumatif < KKM; ambil skor tertinggi. TP selesai tidak menuntut skor >=KKM. Tidak membuat nilai akhir semester agregat.
 6. Pra-Semester hanya dapat dibuka pada jadwal Admin bagi siswa yang seluruh TP NonEsensial selesai, menggunakan engine ujian dan audit yang sama; bank minimal 30 dan mencakup seluruh BAB semester. Cegah 2 attempt berjalan sekaligus.
 7. Nilai ekspor parsial Guru NULL ≠ 0; hak Gen–Mapel di server, output terhindar formula injection dan sandi.

@@ -58,7 +58,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G01 | Beranda | Antrean penilaian, siswa perlu bantuan, TP yang perlu media, kesiapan mapel, ujian berjalan |
 | G02 | Semester saya | **Pilih Gen–Mapel yang diampu aktif**, lalu semester 1–6 dan paket khusus Gen |
 | G03 | Paket/ATP enam semester | Unduh/unggah Excel pemetaan TP/Materi, pratinjau diff, daftar TP urut dan status |
-| G04 | Editor TP/CP | TP draf, BAB, CP operasional, kode TP, jenis Esensial/NonEsensial, satu Materi jika NonEsensial |
+| G04 | Editor TP/CP | TP draf, BAB, CP operasional, kode TP, jenis Esensial/NonEsensial, satu Materi untuk kedua jenis TP |
 | G05 | Kelola ATP Excel | Halaman khusus `/guru/peta-atp/impor` diakses dari Peta ATP, memilih Gen–Mapel/paket acuan, melihat status enam semester, unduh/unggah XLSX, pratinjau/galat, konfirmasi impor awal tanpa mengubah semester berisi BAB/TP |
 | G06 | Pengaturan TP | KKM/bobot, jumlah/durasi soal, syarat karakter, pengaturan bawaan |
 | G07 | Materi/berkas | PDF/YouTube/audio/gambar, upload, pratinjau dan status tersedia |
@@ -155,7 +155,7 @@ Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyb
 
 ## 12. UI penyusunan Guru v2.4
 - Kartu konteks Gen–Mapel/Kurikulum, tombol **Unduh Excel ATP enam semester** dan Unggah Peta, pratinjau dengan validasi daftar CP resmi sesuai mapel saja.
-- Setiap TP mempunyai status draf/perlu dilengkapi/Siap; TP NonEsensial memiliki tepat satu Materi dan tugas Resume/HOTS terkait, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
+- Setiap TP mempunyai status draf/perlu dilengkapi/Siap; TP Esensial maupun NonEsensial masing-masing memiliki tepat satu Materi lengkap; kewajiban Resume/HOTS untuk siswa ditentukan oleh alur siswa, bank Word Diagnostik dan Sumatif **per TP** dengan unduhan terpisah tetapi struktur sama.
 - Preview soal menampilkan konten kaya Word **pada pertanyaan dan A–E**, tabel di dalam tabel, Equation, gambar, pemutar audio/video Google Drive bila valid; soal/catatan yang gagal tidak dapat dikonfirmasi.
 
 

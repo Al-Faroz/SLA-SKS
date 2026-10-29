@@ -5,15 +5,15 @@
 ## 1. Struktur paket
 `paket_semester (Gen–Mapel–Semester) → BAB → TP`. BAB mempunyai nama singkat (≤50), deskripsi (≤225), nomor berlanjut lintas semester berpasangan kelas sama. TP mempunyai nama singkat (≤50), deskripsi asli (≤225), kode format `KODEMAPEL.KELAS.BAB.TP`, jenis Esensial/NonEsensial, nomor urut dalam BAB. TP Siap immutable di editor biasa; versi dan snapshot lama dipertahankan.
 
-**Esensial:** tanpa Materi, Diagnostik, Resume, HOTS, Sumatif, dan nilai di aplikasi. Tetap muncul dalam ATP dan sertifikat.
+**Esensial:** **wajib disiapkan satu Materi/media oleh Guru**, sama seperti NonEsensial. Kebijakan siswa saat ini tidak mewajibkan aktivitas/ujian/nilai Esensial; pelaksanaannya dikendalikan di alur/otorisasi siswa, bukan dengan mengosongkan Materi.
 
-**NonEsensial:** wajib tepat **satu Materi aktif** (bukan banyak materi atau submateri), berjenis YouTube, PDF, audio, atau gambar, disertai petunjuk Resume, satu HOTS, dan bank ujian TP.
+**NonEsensial:** juga wajib tepat **satu Materi aktif** (bukan banyak materi atau submateri), berjenis YouTube, PDF, audio, atau gambar, disertai petunjuk Resume, satu HOTS, dan bank ujian TP sesuai alur siswa.
 
 ## 2. ATP Excel dan editor aplikasi
 - Guru dapat **mengisi ATP langsung di aplikasi ataupun mengimpor Excel khusus untuk susunan awal semester kosong**. Setelah BAB/TP tersimpan, semester menjadi milik editor aplikasi dan Excel tidak boleh memperbarui/menyisipkan BAB/TP pada semester tersebut. Otorisasi G1 Gen–Mapel diperiksa saat pratinjau dan commit.
-- Basis template yang sudah ada: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx`; adaptasi tahap berikutnya harus memuat identitas Gen–Mapel/Kurikulum, CP tunggal Mapel (boleh multi-elemen), Semester 1–6, Nomor BAB, Nama/Deskripsi BAB, Kode TP, Nama/Deskripsi TP, Jenis TP, dan keterkaitan satu Materi untuk NonEsensial.
+- Basis template yang sudah ada: `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx`; adaptasi tahap berikutnya harus memuat identitas Gen–Mapel/Kurikulum, CP tunggal Mapel (boleh multi-elemen), Semester 1–6, Nomor BAB, Nama/Deskripsi BAB, Kode TP, Nama/Deskripsi TP, Jenis TP, dan keterkaitan satu Materi untuk **setiap TP**, Esensial maupun NonEsensial.
 - Kode TP diturunkan dari konteks dan nomor BAB/urutan TP, diverifikasi saat impor. BAB semester genap melanjutkan nomor BAB semester ganjil pada kelas sama.
-- **Keputusan final 26 Oktober 2026:** gunakan template Excel ATP **manual** berformat `.xlsx`, tanpa macro, tanpa tombol Proses dan tanpa tabel pembentukan BAB/TP otomatis. Template yang dibuat dari contoh awal memiliki 10 sheet: MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII. Guru mengisi Nomor/Nama/Deskripsi BAB dan Nomor BAB/Urut TP/Jenis/Nama/Deskripsi TP serta satu judul materi untuk TP NonEsensial secara manual. Kapasitas fisik template saat ini: 20 baris BAB dan 80 baris TP per semester, **bukan batas akademik aplikasi**. Referensi/identitas hasil unduhan diisi server. Impor membaca hanya struktur yang diizinkan, menolak file `.xlsm`/makro dan struktur data TP yang tidak sesuai. Contoh MAT VII **tidak pernah diimpor**.
+- **Keputusan final 26 Oktober 2026:** gunakan template Excel ATP **manual** berformat `.xlsx`, tanpa macro, tanpa tombol Proses dan tanpa tabel pembentukan BAB/TP otomatis. Template yang dibuat dari contoh awal memiliki 10 sheet: MULAI DI SINI, RINGKASAN, REFERENSI CP, SEMESTER 1–6, CONTOH MAT VII. Guru mengisi Nomor/Nama/Deskripsi BAB dan Nomor BAB/Urut TP/Jenis/Nama/Deskripsi TP serta satu judul Materi dan jenis media untuk **setiap TP** secara manual. Kapasitas fisik template saat ini: 20 baris BAB dan 80 baris TP per semester, **bukan batas akademik aplikasi**. Referensi/identitas hasil unduhan diisi server. Impor membaca hanya struktur yang diizinkan, menolak file `.xlsm`/makro dan struktur data TP yang tidak sesuai. Contoh MAT VII **tidak pernah diimpor**.
 - Excel untuk **peta akademik**, bukan upload media/soal. Guru mengelola satu file/link media Materi dan Resume/HOTS melalui aplikasi. Baris hilang tidak berarti delete. Unggah → validasi → pratinjau diff → konfirmasi atomik → audit.
 
 ## 3. Bank soal
@@ -23,14 +23,17 @@
 - **Pra-Semester** memiliki bank tersendiri di tingkat semester yang menggabungkan BAB semester tersebut, minimal 30 soal, menggunakan mesin keamanan dan pola Sumatif. Bukan TP tambahan.
 
 ## 4. Materi dan media
-- Satu TP NonEsensial tepat satu media Materi aktif; riwayat Materi lama tidak boleh dihapus. Empat media yang dahulu berada dalam satu TP lama merupakan **data uji v3** dan tidak boleh otomatis dipilih sebagai materi v4 yang aktif.
+- Setiap TP, Esensial maupun NonEsensial, tepat satu media Materi aktif; riwayat Materi lama tidak boleh dihapus. Empat media yang dahulu berada dalam satu TP lama merupakan **data uji v3** dan tidak boleh otomatis dipilih sebagai materi v4 yang aktif.
 - PDF bawaan maksimal **15 MB/40 halaman** tanpa menolak PDF normal hanya karena metadata atau revisi inkremental. Audio mp3/m4a ≤10 MB bawaan; gambar JPG/PNG/WebP, video menggunakan URL YouTube. Berkas privat, pratinjau Guru, validasi ukuran/MIME/akses mengikuti [dokumen keputusan PDF](KEPUTUSAN-VALIDASI-PDF-MATERI.md).
 - Pembelajaran YouTube/audio selesai pada batas **lebih dahulu** antara waktu minimum Guru dan 90% durasi sah; gambar/PDF memenuhi waktu aktif dan halaman yang diwajibkan. Model penghitungan waktu klien dengan checkpoint server empat menit disepakati; unduh audio/gambar/PDF dibuka setelah syarat media selesai, bersamaan dengan akses Resume/HOTS.
 
 ## 5. Kesiapan dan penguncian
-- BAB siap ditampilkan sebagai kelompok TP; status siap tetap pada TP. Validasi kode, nomor, tipe TP, CP, materi (hanya NonEsensial), bank, KKM, waktu/durasi, media, snapshot dan otorisasi dilakukan di Service.
+- BAB siap ditampilkan sebagai kelompok TP; status siap tetap pada TP. Validasi kode, nomor, tipe TP, CP, materi (kedua jenis TP), bank, KKM, waktu/durasi, media, snapshot dan otorisasi dilakukan di Service.
 - Admin menentukan KKM default (misalnya 80) dan Guru dapat menentukan KKM khusus. KKM efektif = khusus jika diatur, selain itu default Admin. Jangan menyisipkan KKM 75 sebagai kebijakan baru hanya karena nilai historis v3.
 - Bobot **jalur tidak lulus Diagnostik 20% Resume + 20% HOTS + 60% Sumatif**. Jalur lulus Diagnostik **100% Sumatif**. Nilai Diagnostik tidak menjadi nilai akhir. Ujian Sumatif di bawah KKM mendapat satu remedial; skor tertinggi digunakan.
 - TP Siap/versi historis, koreksi kategori A/B/C dengan persetujuan Admin, penolakan kategori D, audit dan larangan self-approval tetap. Jangan mereset nilai/progres ketika mengubah Master.
 
 **Format final V25-2 (29 Oktober 2026):** sheet Semester 1–6 memiliki tepat **8 kolom input TP**, yaitu Nomor BAB, Urutan TP, Jenis TP, Nama TP, Deskripsi TP, Judul satu Materi, Jenis media (rencana), Catatan. Kolom Kode TP dan Elemen CP tidak ada dalam input. Kode TP dibuat/diperiksa server; seluruh TP tetap mengacu `cp_mapel_id` dari penugasan G1/kurikulum/fase. Referensi CP aktif hanya dibaca dari sheet REFERENSI CP dan diperiksa terhadap database. Tidak ada alasan membuat SQL untuk penyederhanaan dua kolom tersebut.
+
+## Keputusan mengikat 28–29 Oktober 2026 — Penyiapan Guru vs akses siswa
+Guru wajib mengisi **tepat satu judul Materi dan satu jenis media** untuk **setiap** TP Esensial maupun NonEsensial pada ATP V25-2 (kolom F dan G). Tidak boleh menolak atau mengosongkan Materi Esensial. Setelah impor, Materi/media aktual dilengkapi Guru di aplikasi sebelum TP dinyatakan Siap; Excel bukan proses mengunggah berkas. Jenis TP **tidak mengubah kewajiban Guru menyiapkan konten**, melainkan digunakan Service siswa untuk menegakkan akses/kewajiban aktivitas dan progres sesuai aturan yang berlaku. Data/progres/nilai siswa tidak diubah oleh perbaikan validasi impor.

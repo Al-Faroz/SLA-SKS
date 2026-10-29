@@ -298,10 +298,16 @@ final class AtpExcelParserService
                     || mb_strlen($kolom[5]) > 180 || mb_strlen($kolom[7]) > 225) {
                     throw new DomainException($lokasi . ': nama/deskripsi TP wajib dan batas panjang kolom terlampaui.');
                 }
-                if ($jenis === 'esensial' && ($kolom[5] !== '' || $kolom[6] !== '')) {
-                    throw new DomainException($lokasi . ': TP Esensial tidak boleh memiliki rencana Materi/media.');
+                // Keputusan final: Guru wajib merencanakan SATU Materi
+                // untuk SETIAP TP, baik Esensial maupun NonEsensial.
+                // Jenis TP hanya dipakai oleh Service akses/progres siswa,
+                // bukan alasan membuang rencana Materi dari ATP Guru.
+                if ($kolom[5] === '' || $kolom[6] === '') {
+                    throw new DomainException($lokasi
+                        . ': judul satu Materi (F) dan jenis media (G) wajib diisi'
+                        . ' untuk TP Esensial maupun NonEsensial.');
                 }
-                if ($kolom[6] !== '' && ! in_array($kolom[6], ['YouTube','PDF','Audio','Gambar'], true)) {
+                if (! in_array($kolom[6], ['YouTube','PDF','Audio','Gambar'], true)) {
                     throw new DomainException($lokasi . ': jenis media tidak dikenal.');
                 }
                 if (isset($tpSem[$s][$nomorBab][$urutan])) {

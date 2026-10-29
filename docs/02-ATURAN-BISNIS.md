@@ -30,7 +30,7 @@
 
 ## 3. Keputusan final tentang pembelajaran
 - Semester sebelum semester mulai siswa tetap Dilewati. ATP per Gen–Mapel berisi BAB dan TP berurutan, disiapkan Guru di aplikasi atau impor Excel.
-- **Esensial:** tidak ada Materi, diagnostik, Resume, HOTS, Sumatif, atau nilai. **NonEsensial:** tepat satu Materi dan alur Diagnostik → (bila gagal: Materi → Resume → HOTS) → Sumatif untuk semua siswa.
+- **Penyiapan Guru:** TP **Esensial maupun NonEsensial sama-sama wajib memiliki tepat satu Materi/media yang lengkap**. **Alur siswa:** Jenis TP hanya menentukan akses dan kewajiban aktivitas di sisi siswa. Pada alur siswa saat ini Esensial tidak memiliki aktivitas/penilaian wajib; NonEsensial menjalankan Diagnostik → (bila gagal: Materi → Resume → HOTS) → Sumatif. Materi Esensial tidak boleh dihapus hanya karena tidak diakses siswa.
 - Diagnostik min 10 adalah gate bukan nilai TP. Sumatif min 30. Nilai gagal Diagnostik 20/20/60 (Resume/HOTS/Sumatif), lulus 100% Sumatif. Admin menentukan KKM default dan Guru dapat menetapkan khusus.
 - Sumatif < KKM memperoleh satu remedial; gunakan nilai tertinggi. Setelah aktivitas dan kesempatan sah terkait selesai, **TP selesai meskipun nilai masih < KKM**. Progres semester hanya TP NonEsensial.
 - Pra-Semester dijadwalkan tanggal/jam oleh Admin secara serentak setelah semua TP NonEsensial selesai; nilai tersendiri. **Tidak ada nilai akhir semester.**
@@ -64,7 +64,7 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 
 ## 8. Keputusan lintas modul v2.5
 1. CP operasional satu Mapel → Semester → BAB → TP, nomor BAB berlanjut antardua semester kelas sama. Nama singkat 50, deskripsi 225, kode `KODEMAPEL.KELAS.BAB.TP`.
-2. TP Esensial tanpa Materi/nilai, TP NonEsensial satu Materi; Diagnostik gate dan Sumatif wajib 30.
+2. Esensial dan NonEsensial keduanya mempunyai **satu Materi** yang disiapkan Guru; Esensial tanpa nilai siswa sesuai alur saat ini. Diagnostik menjadi gate dan Sumatif wajib 30 untuk jalur NonEsensial.
 3. Pra-Semester tanggal serentak Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
 4. Excel ATP **manual** tanpa macro dan tanpa tombol Proses sudah dipilih; penyusunan BAB/TP dilakukan melalui isian langsung pada workbook atau aplikasi, serta divalidasi server saat impor. KBC, izin Gen–Mapel, Word PG A–E tetap.
 

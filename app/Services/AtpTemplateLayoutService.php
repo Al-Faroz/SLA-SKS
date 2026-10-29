@@ -32,6 +32,16 @@ final class AtpTemplateLayoutService
         }
         $versi = (string) $ringkasan->getCell('B4')->getValue();
         if ($versi === self::BARU) {
+            // Workbook statis lama V25-2 dapat memuat petunjuk yang keliru.
+            // Selaraskan tanpa menghapus isian Guru atau merevisi versi file.
+            $panduan = $buku->getSheetByName('MULAI DI SINI');
+            if ($panduan !== null) {
+                $panduan->setCellValue('A7', '4. Setiap TP, Esensial maupun NonEsensial,'
+                    . ' wajib punya satu judul Materi dan jenis media dalam rencana ATP.'
+                    . ' Kode TP dibuat otomatis saat impor.');
+                $panduan->setCellValue('A8', '5. Baca CP resmi pada REFERENSI CP.'
+                    . ' Aturan akses/pembelajaran siswa ditetapkan di aplikasi.');
+            }
             return;
         }
         if ($versi !== self::LAMA) {
@@ -82,8 +92,8 @@ final class AtpTemplateLayoutService
                 ->setFormula1('"YouTube,PDF,Audio,Gambar"')
                 ->setAllowBlank(true)->setShowDropDown(true);
             $sh->setCellValue('A35', '02  —  HUBUNGKAN TIAP TP KE NOMOR BAB BAGIAN A.');
-            $sh->setCellValue('A36', 'Isi jenis TP di kolom C dan judul Materi '
-                . 'NonEsensial di kolom F; Kode TP dibuat server.');
+            $sh->setCellValue('A36', 'Semua TP wajib punya Materi: judul F, jenis media G.'
+                . ' Kode TP dibuat otomatis oleh server.');
             $sh->setCellValue('A37', 'Urutan TP tiap BAB dimulai dari 1. '
                 . 'Kode TP dibangkitkan server dari Mapel–Kelas–BAB–Urutan.');
         }
