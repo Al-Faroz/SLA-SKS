@@ -109,7 +109,7 @@ final class PaketSemesterGuruService
             // Lock G1 menyerialkan dua request pembuatan paket pada konteks sama.
             $penugasan = $this->db->query(
                 'SELECT g.id FROM penugasan_guru_gen g'
-                                . ' WHERE g.angkatan_id=? AND g.mapel_id=? AND g.guru_id=? FOR UPDATE',
+                . ' WHERE g.angkatan_id=? AND g.mapel_id=? AND g.guru_id=? FOR UPDATE',
                 [$genId, $mapelId, $guruId]
             )->getRowArray();
             if ($penugasan === null) {
