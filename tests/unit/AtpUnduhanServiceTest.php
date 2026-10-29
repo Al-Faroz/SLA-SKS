@@ -48,10 +48,10 @@ final class AtpUnduhanServiceTest extends TestCase
             self::assertSame('FFFFFF', $semester->getStyle('A1')->getFont()->getColor()->getRGB());
             self::assertSame('078783', $semester->getStyle('A12')->getFill()->getStartColor()->getRGB());
             self::assertSame('E4F3FC', $semester->getStyle('A13')->getFill()->getStartColor()->getRGB());
-            self::assertSame('DAF2E7', $semester->getStyle('D39')->getFill()->getStartColor()->getRGB());
+            self::assertSame('DAF2E7', $semester->getStyle('C39')->getFill()->getStartColor()->getRGB());
             self::assertFalse($semester->getShowGridLines());
             self::assertSame(AtpUnduhanService::VERSI, (string) $semester->getCell('A2')->getValue());
-            self::assertSame('H39:H118', $semester->getDataValidation('H39')->getSqref());
+            self::assertSame('G39:G118', $semester->getDataValidation('G39')->getSqref());
 
             $temp = tempnam(sys_get_temp_dir(), 'uji_atp_');
             self::assertNotFalse($temp);
