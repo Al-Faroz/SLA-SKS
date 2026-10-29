@@ -56,3 +56,8 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - **Keluarkan Kode TP dan Elemen CP dari input Excel**. Guru tetap mengisi Nomor BAB dan Urutan TP. Server membuat Kode TP pada pratinjau dan ulangi validasi saat konfirmasi. CP operasional sudah terikat ke TP melalui `cp_mapel_id`; referensi CP aktif tetap ada di sheet REFERENSI CP.
 - Struktur input TP **A38:H38 / A39:H118**; C = Jenis TP dengan dropdown, F = Judul satu Materi, G = Jenis media dengan dropdown, H = Catatan. I:J tidak dipakai dan harus kosong.
 - Versi baru **SLA-SKS-ATP-MANUAL-V25-2** menggantikan V25-1; Excel V25-1 wajib diunduh ulang dan ditolak parser. Sheet tetap 10; tidak ada macro/formula, SQL, penghapusan CP atau perubahan UI aplikasi di luar pesan pratinjau.
+
+## Anti-unduh template lama (29 Oktober 2026)
+- Unduhan XLSX sekarang bernama `ATP-V25-2-<GEN>-<MAPEL>-6-SEMESTER.xlsx` agar tidak tertukar dengan unduhan V25-1.
+- Sebelum mengirim file, `AtpUnduhanService::periksaTemplateV25Dua()` memverifikasi versi RINGKASAN, marker keenam semester, **8 header A:H** dan I/J kosong. Jika tidak memenuhi kontrak, file **ditolak untuk diunduh** daripada mengirim format lama dengan nama baru.
+- Pada halaman G05 tombol unduh diberi label **V25-2**. Di komputer pengguna, pastikan branch `feature/v25-atp-tanpa-kode-elemen-20261029` aktif dan unduh ulang, jangan pakai file lama `ATP-v2.5-...`.
