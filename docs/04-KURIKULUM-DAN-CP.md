@@ -8,8 +8,8 @@
 - Setiap Semester terdiri dari beberapa BAB; BAB mempunyai beberapa TP; setiap TP hanya mempunyai satu jenis, **Esensial** atau **NonEsensial**.
 - **BAB:** `nama_bab` maksimal 50 karakter, `deskripsi_bab` maksimal 225 karakter, `nomor_bab` positif.
 - **TP:** `nama_tp` maksimal 50 karakter, `deskripsi_tp` maksimal 225 karakter berupa bunyi asli tujuan pembelajaran, `jenis_tp`, `kode_tp`, dan `urutan_dalam_bab`. Rumusan akademik lengkap tetap terlihat pada detail, tidak dipotong permanen oleh card.
-- **TP Esensial:** tetap wajib masuk ATP tetapi tidak memiliki materi, aktivitas siswa LMS, atau nilai.
-- **TP NonEsensial:** tepat **1 Materi** yang aktif, dengan satu media jenis YouTube/audio/gambar/PDF, satu Resume, satu HOTS, bank soal Diagnostik dan Sumatif.
+- **TP Esensial:** tetap wajib masuk ATP dan memiliki **satu Materi lengkap** sebagai konten akademik Guru; pemakaian/aktivitas serta nilai siswa mengikuti alur siswa (saat ini tidak dihitung progres/nilai).
+- **TP NonEsensial:** juga tepat **1 Materi** lengkap dengan satu media jenis YouTube/audio/gambar/PDF, Resume, HOTS dan bank soal Diagnostik/Sumatif sesuai alur siswa.
 
 ## 2. Kode dan penomoran
 Kode TP: `KODEMAPEL.KELAS.NOMOR_BAB.NOMOR_TP_DALAM_BAB`, misalnya `BIND.8.1.1`. Dibangkitkan/validasi server dari konteks mapel, tingkat kelas, nomor BAB dan urutan TP dalam BAB; guru tidak mengetik kode yang bertentangan dengan konteks.
@@ -24,11 +24,11 @@ Admin mengelola CP resmi, sumber dan versi menurut Mapel/Fase/Kurikulum. Versi r
 ## 4. Paket, Gen dan ATP Guru
 Satu `paket_semester` per Gen–Mapel–Semester–Tahun Ajaran/Kurikulum/versi. Guru aktif G1 menyusun **semua BAB dan TP, baik Esensial maupun NonEsensial**, langsung di aplikasi **atau impor dari template Excel ATP yang sudah ada dan akan direvisi**. Impor dilakukan dari halaman khusus Guru **Peta ATP → Kelola ATP Excel** (G05), untuk workbook enam semester yang boleh berisi sebagian semester. **Hanya semester dengan paket sah dan tanpa BAB/TP apa pun yang boleh menerima penambahan**. Semester terisi tidak pernah diperbarui dari Excel; unggah ulang identik dibaca sebagai *Tetap* tanpa penulisan. Baris hilang tidak menghapus data. Pratinjau dan konfirmasi atomik tetap wajib.
 - Template awal `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` sudah dipakai sebagai acuan desain. **Keputusan terbaru: Excel ATP manual (.xlsx), tanpa macro dan tombol Proses.** File manual `.xlsx` telah diajukan sebagai template resmi pada branch fitur sesudah PR #68, dengan kontrak rentang sel di `KONTRAK-TEMPLATE-ATP-MANUAL-V25.md`. Guru mengisi BAB dan TP pada 6 sheet semester; Kode TP **tidak diisi Guru** dan selalu dibentuk oleh server saat pratinjau/konfirmasi impor berdasarkan Mapel, Kelas, Nomor BAB, Urutan TP. Generator unduhan akan menambahkan konteks Gen–Mapel/CP dari server.
-- Guru mengelola BAB, TP, materi tunggal NonEsensial, petunjuk Resume/HOTS dan bank soal; TP Siap/riwayat snapshot serta koreksi A/B/C mengikuti aturan lama yang kompatibel.
+- Guru mengelola BAB, TP, materi tunggal setiap TP, petunjuk Resume/HOTS dan bank soal; TP Siap/riwayat snapshot serta koreksi A/B/C mengikuti aturan lama yang kompatibel.
 - Paket, konten, soal dan nilai antargen tidak otomatis dibagikan, walaupun kode TP dapat serupa.
 
 ## 5. Validasi publikasi
-TP Esensial tidak memerlukan materi/bank soal; identitas BAB/TP dan keanggotaan ATP wajib valid. TP NonEsensial perlu tepat satu materi aktif, petunjuk Resume/HOTS, bank Diagnostik minimal 10 soal, bank Sumatif minimal 30 soal, KKM efektif, media sah, dan snapshot versi. TP lama dengan beberapa materi harus diaudit/diarsip, bukan diam-diam ditetapkan aktif.
+**Seluruh TP**, tanpa membedakan Esensial dan NonEsensial, wajib mempunyai tepat satu Materi lengkap dan media sah saat disiapkan. Pembatasan akses siswa/penilaian berada di Service siswa, bukan pada izin membuat/menyimpan Materi Guru. Kesiapan akademik, versi, dan snapshot tetap diaudit. TP lama dengan beberapa materi harus diaudit/diarsip, bukan diam-diam ditetapkan aktif.
 
 Detail: [05](05-PAKET-TP-DAN-IMPOR.md), [06](06-ALUR-PEMBELAJARAN.md), [10](10-DATABASE.md).
 
