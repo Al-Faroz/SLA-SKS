@@ -164,7 +164,7 @@ final class AtpDesainWorkbookService
             '02  —  HUBUNGKAN SETIAP TP KE NOMOR BAB PADA BAGIAN A.',
             self::YELLOW, self::NAVY, 11, 34);
         self::banner($sheet, 'A36:J36',
-            'Jenis TP dipilih di kolom C; judul satu Materi NonEsensial ditulis di kolom F.',
+            'Semua TP wajib memiliki satu Materi: isi judul di F dan jenis media di G, termasuk Esensial.',
             self::PALE, self::TEXT, 11, 34);
         self::banner($sheet, 'A37:J37',
             'Urutan TP tiap BAB: 1, 2, 3, ...; Kode TP otomatis dari MAPEL.KELAS.BAB.TP.',
