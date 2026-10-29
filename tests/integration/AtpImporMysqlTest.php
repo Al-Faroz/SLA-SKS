@@ -185,6 +185,81 @@ final class AtpImporMysqlTest extends TestCase
         }
     }
 
+    public function testImportSemesterSatuKetikaGenMulaiSemesterEmpat(): void
+    {
+        // Paket S1 dibuat sengaja oleh Guru dengan tahun ajaran eksplisit;
+        // impor tidak boleh menebak Tahun Ajaran atau membuat paket diam-diam.
+        self::$db->table('paket_semester')->insert([
+            'id' => 13, 'angkatan_id' => 1, 'mapel_id' => 5,
+            'semester' => 1, 'tahun_ajaran_id' => 1,
+            'kurikulum_id' => 1, 'nomor_versi' => 1, 'status' => 'draf',
+        ]);
+        try {
+            $file = $this->workbook();
+            $buku = IOFactory::load($file);
+            try {
+                $satu = $buku->getSheetByName('SEMESTER 1');
+                foreach ([
+                    'A13' => 1, 'B13' => 'Perjalanan Rasulullah',
+                    'C13' => 'Meneladani dakwah Rasulullah',
+                    'A39' => 1, 'B39' => 1, 'C39' => 'NonEsensial',
+                    'D39' => 'Mengenali sejarah Islam',
+                    'E39' => 'Menguraikan peristiwa penting',
+                ] as $cell => $value) {
+                    $satu->setCellValue($cell, $value);
+                }
+                (new Xlsx($buku))->save($file);
+            } finally {
+                $buku->disconnectWorksheets();
+            }
+            $pratinjau = $this->preview($file);
+            self::assertSame(4, $pratinjau['jumlah']['baru']);
+            self::assertSame(0, $pratinjau['jumlah']['galat']);
+            self::assertSame('baru', $pratinjau['mode_semester'][1]);
+            self::assertTrue($pratinjau['boleh_konfirmasi']);
+            $hasil = $this->confirm($file, $pratinjau['fingerprint']);
+            self::assertSame(2, $hasil['baru_bab']);
+            self::assertSame(2, $hasil['baru_tp']);
+            self::assertSame('SKI.7.1.1',
+                (string) self::$db->table('tp')->where('paket_semester_id', 13)
+                    ->get()->getRow('kode_tp'));
+            self::assertSame(1,
+                (int) self::$db->table('bab')->where('paket_semester_id', 13)
+                    ->get()->getRow('tahun_ajaran_id'));
+        } finally {
+            self::$db->table('tp')->where('paket_semester_id', 13)->delete();
+            self::$db->table('bab')->where('paket_semester_id', 13)->delete();
+            self::$db->table('paket_semester')->where('id', 13)->delete();
+        }
+    }
+
+    public function testSemesterSebelumGenTanpaPaketDitolakSaatSimpanBukanSaatBacaExcel(): void
+    {
+        $file = $this->workbook();
+        $buku = IOFactory::load($file);
+        try {
+            $satu = $buku->getSheetByName('SEMESTER 1');
+            foreach ([
+                'A13' => 1, 'B13' => 'Dakwah Awal',
+                'C13' => 'Memahami awal Islam',
+                'A39' => 1, 'B39' => 1, 'C39' => 'NonEsensial',
+                'D39' => 'Memahami peristiwa',
+                'E39' => 'Menjelaskan perjalanan dakwah',
+            ] as $cell => $value) {
+                $satu->setCellValue($cell, $value);
+            }
+            (new Xlsx($buku))->save($file);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+        $preview = $this->preview($file);
+        self::assertSame('galat', $preview['mode_semester'][1]);
+        self::assertStringContainsString('Paket semester belum ada',
+            $preview['baris'][0]['catatan']);
+        self::assertFalse($preview['boleh_konfirmasi']);
+        self::assertSame(0, self::$db->table('bab')->countAllResults());
+    }
+
     public function testImporUlangIdentikTanpaDuplikasiDanPerbedaanDitolak(): void
     {
         $f = $this->workbook();
