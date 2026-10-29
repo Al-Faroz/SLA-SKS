@@ -249,9 +249,6 @@ final class AtpExcelParserService
                     continue;
                 }
                 $lokasi = 'SEMESTER ' . $s . ' baris ' . $row;
-                if ($s < $semesterMulai) {
-                    throw new DomainException($lokasi . ': Gen ini belum dimulai pada semester tersebut.');
-                }
                 $nomor = self::nomor($kolom[0], $lokasi . ' kolom A');
                 if ($nomor > 999 || $kolom[1] === '' || mb_strlen($kolom[1]) > 50
                     || $kolom[2] === '' || mb_strlen($kolom[2]) > 225) {
@@ -282,9 +279,6 @@ final class AtpExcelParserService
                     continue;
                 }
                 $lokasi = 'SEMESTER ' . $s . ' baris ' . $row;
-                if ($s < $semesterMulai) {
-                    throw new DomainException($lokasi . ': Gen ini belum dimulai pada semester tersebut.');
-                }
                 $nomorBab = self::nomor($kolom[0], $lokasi . ' kolom A');
                 $urutan = self::nomor($kolom[1], $lokasi . ' kolom B');
                 if (! isset($babSem[$s][$nomorBab])) {
