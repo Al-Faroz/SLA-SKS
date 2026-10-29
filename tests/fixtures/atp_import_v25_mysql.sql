@@ -17,9 +17,10 @@ CREATE TABLE penugasan_guru_gen (
  UNIQUE KEY uq_g1(angkatan_id,mapel_id)
 );
 CREATE TABLE paket_semester (
- id BIGINT UNSIGNED PRIMARY KEY, angkatan_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, angkatan_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,
  semester TINYINT UNSIGNED,tahun_ajaran_id BIGINT UNSIGNED,kurikulum_id BIGINT UNSIGNED,
  nomor_versi INT UNSIGNED NOT NULL DEFAULT 1,status ENUM('draf','aktif','arsip') NOT NULL DEFAULT 'draf',
+ dibuat_oleh BIGINT UNSIGNED NOT NULL DEFAULT 101, dibuat_pada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  UNIQUE KEY uq_pkg(angkatan_id,mapel_id,semester,tahun_ajaran_id)
 );
 CREATE TABLE cp_mapel (
