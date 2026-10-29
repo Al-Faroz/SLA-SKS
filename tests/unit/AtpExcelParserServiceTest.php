@@ -38,6 +38,8 @@ final class AtpExcelParserServiceTest extends TestCase
         $s->setCellValue('C39', $jenis);
         $s->setCellValue('D39', 'Menganalisis peristiwa');
         $s->setCellValue('E39', 'Mengenali sebab dan akibat peristiwa penting');
+        $s->setCellValue('F39', 'Materi pembelajaran lengkap');
+        $s->setCellValue('G39', 'PDF');
     }
 
     public function testWorkbookKosongMemilikiHasilNol(): void
@@ -176,17 +178,59 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
-    public function testTpEsensialDenganMateriDitolak(): void
+    public function testTpEsensialDenganRencanaMateriDanMediaDiterima(): void
     {
         $buku = $this->buku();
         try {
             $this->bab($buku, 4, 13, 1);
             $this->tp($buku, 4, 'SKI.8.1.1', 'Esensial');
-            $buku->getSheetByName('SEMESTER 4')->setCellValue('F39', 'Materi yang dilarang');
-            $this->expectExceptionMessage('Esensial');
-            AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            $hasil = AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            self::assertSame(1, $hasil['jumlah_tp']);
+            self::assertSame('esensial', $hasil['tp'][0]['jenis']);
+            self::assertSame('Materi pembelajaran lengkap', $hasil['tp'][0]['materi']);
+            self::assertSame('PDF', $hasil['tp'][0]['media']);
         } finally {
             $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testSemuaJenisTpTanpaJudulMateriDitolak(): void
+    {
+        foreach (['Esensial', 'NonEsensial'] as $jenis) {
+            $buku = $this->buku();
+            try {
+                $this->bab($buku, 4, 13, 1);
+                $this->tp($buku, 4, 'SKI.8.1.1', $jenis);
+                $buku->getSheetByName('SEMESTER 4')->setCellValue('F39', null);
+                try {
+                    AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+                    self::fail('Judul Materi kosong harus ditolak: ' . $jenis);
+                } catch (\DomainException $e) {
+                    self::assertStringContainsString('judul satu Materi (F)', $e->getMessage());
+                }
+            } finally {
+                $buku->disconnectWorksheets();
+            }
+        }
+    }
+
+    public function testSemuaJenisTpTanpaJenisMediaDitolak(): void
+    {
+        foreach (['Esensial', 'NonEsensial'] as $jenis) {
+            $buku = $this->buku();
+            try {
+                $this->bab($buku, 4, 13, 1);
+                $this->tp($buku, 4, 'SKI.8.1.1', $jenis);
+                $buku->getSheetByName('SEMESTER 4')->setCellValue('G39', null);
+                try {
+                    AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+                    self::fail('Jenis media kosong harus ditolak: ' . $jenis);
+                } catch (\DomainException $e) {
+                    self::assertStringContainsString('jenis media (G)', $e->getMessage());
+                }
+            } finally {
+                $buku->disconnectWorksheets();
+            }
         }
     }
 
