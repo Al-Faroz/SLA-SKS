@@ -61,3 +61,9 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Unduhan XLSX sekarang bernama `ATP-V25-2-<GEN>-<MAPEL>-6-SEMESTER.xlsx` agar tidak tertukar dengan unduhan V25-1.
 - Sebelum mengirim file, `AtpUnduhanService::periksaTemplateV25Dua()` memverifikasi versi RINGKASAN, marker keenam semester, **8 header A:H** dan I/J kosong. Jika tidak memenuhi kontrak, file **ditolak untuk diunduh** daripada mengirim format lama dengan nama baru.
 - Pada halaman G05 tombol unduh diberi label **V25-2**. Di komputer pengguna, pastikan branch `feature/v25-atp-tanpa-kode-elemen-20261029` aktif dan unduh ulang, jangan pakai file lama `ATP-v2.5-...`.
+
+## QA koreksi perbandingan rumusan CP multiline — 29 Oktober 2026
+- File XLSX hasil unduhan valid V25-2 dapat menyimpan akhir baris dengan LF (`\\n`), sedangkan database MariaDB menyimpan rumusan CP dengan CRLF (`\\r\\n`).
+- Validator `AtpExcelParserService` harus membandingkan **isi akademik yang persis sama setelah hanya menyamakan karakter akhir baris** CRLF/CR/LF menjadi LF khusus kolom rumusan `REFERENSI CP!C7:C...`. Tidak boleh melonggarkan identitas `A`, elemen `B`, fase `D`, versi `E`, perubahan huruf/angka/kata pada rumusan, atau menonaktifkan pemeriksaan CP aktif.
+- Pengguna tidak perlu mengunduh ulang Excel yang sama untuk galat akibat CRLF/LF; cukup perbarui kode aplikasi. Tidak ada SQL/ubah CP atau data siswa.
+- Data di luar Semester aktif Gen dan nomor BAB/TP yang tidak konsisten tetap ditolak; pembetulan newline bukan pengecualian aturan akademik.

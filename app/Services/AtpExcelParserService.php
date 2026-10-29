@@ -83,6 +83,18 @@ final class AtpExcelParserService
         return trim((string) ($sel->getValue() ?? ''));
     }
 
+    /**
+     * MariaDB menyimpan teks CP dengan CRLF, sedangkan Excel/PhpSpreadsheet
+     * dapat menuliskannya sebagai LF. Kedua representasi adalah rumusan
+     * akademik yang sama; tidak mengizinkan perubahan satu huruf pun.
+     *
+     * Hanya untuk kolom rumusan CP (C7 dst), bukan identitas/versi/kode.
+     */
+    private static function rumusanCpKanonik(string $teks): string
+    {
+        return str_replace(["\r\n", "\r"], "\n", trim($teks));
+    }
+
     private static function nomor(string $teks, string $lokasi): int
     {
         if (! preg_match('/\A[1-9][0-9]{0,3}\z/D', $teks)) {
@@ -165,7 +177,15 @@ final class AtpExcelParserService
             foreach ($cpRows as $i => $values) {
                 $baris = $i + 7;
                 foreach (['A','B','C','D','E'] as $j => $kolom) {
-                    if (self::nilai($cpSheet, $kolom . $baris) !== trim($values[$j])) {
+                    $nilaiExcel = self::nilai($cpSheet, $kolom . $baris);
+                    $nilaiServer = trim($values[$j]);
+                    // C berisi rumusan multi-baris: line ending CRLF dari DB
+                    // dan LF dari Excel setara, isi teks tetap harus identik.
+                    if ($kolom === 'C') {
+                        $nilaiExcel = self::rumusanCpKanonik($nilaiExcel);
+                        $nilaiServer = self::rumusanCpKanonik($nilaiServer);
+                    }
+                    if ($nilaiExcel !== $nilaiServer) {
                         throw new DomainException('REFERENSI CP!'. $kolom . $baris
                             . ': daftar/rumusan CP sudah berubah. Unduh ulang ATP Excel.');
                     }

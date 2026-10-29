@@ -262,4 +262,79 @@ final class AtpExcelParserServiceTest extends TestCase
         }
     }
 
+
+    public function testRumusanCpSamaTetapValidSaatDatabaseCrLfDanExcelLf(): void
+    {
+        $buku = $this->buku();
+        try {
+            // Sintetis, tanpa menyalin CP atau data privat dari dump.
+            $butir = [
+                'Pada akhir Fase D, murid mampu :',
+                '1. Merefleksikan sejarah dan keteladanan;',
+                '2. Menganalisis perkembangan peradaban;',
+                "3. Memahami nilai rahmatan lil 'alamin.",
+            ];
+            $nilaiExcel = implode("\n", $butir);
+            $nilaiServer = implode("\r\n", $butir);
+            $referensi = $buku->getSheetByName('REFERENSI CP');
+            foreach ([
+                'A7' => 4,
+                'B7' => 'Pemahaman Konsep',
+                'C7' => $nilaiExcel,
+                'D7' => 'D',
+                'E7' => 1,
+            ] as $sel => $nilai) {
+                $referensi->setCellValue($sel, $nilai);
+            }
+            $rows = [[
+                'id' => 4, 'elemen' => 'Pemahaman Konsep',
+                'rumusan' => $nilaiServer, 'nomor_versi' => 1,
+            ]];
+
+            $hasil = AtpExcelParserService::bacaBuku(
+                $buku, 'SKI', 4, 'GEN2025', ['Pemahaman Konsep'], 0, $rows
+            );
+            self::assertSame(0, $hasil['jumlah_tp']);
+            self::assertSame(0, $hasil['jumlah_bab']);
+
+            // Perubahan isi akademik TETAP ditolak meskipun newline berbeda.
+            $rows[0]['rumusan'] = str_replace(
+                'keteladanan', 'perjuangan', $nilaiServer
+            );
+            $this->expectExceptionMessage(
+                'REFERENSI CP!C7: daftar/rumusan CP sudah berubah'
+            );
+            AtpExcelParserService::bacaBuku(
+                $buku, 'SKI', 4, 'GEN2025', ['Pemahaman Konsep'], 0, $rows
+            );
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testPerbedaanVersiCpTetapDitolakWalauBarisSama(): void
+    {
+        $buku = $this->buku();
+        try {
+            $ref = $buku->getSheetByName('REFERENSI CP');
+            foreach ([
+                'A7' => 4, 'B7' => 'Pemahaman Konsep',
+                'C7' => "CP baris satu\nCP baris dua",
+                'D7' => 'D', 'E7' => 1,
+            ] as $cell => $value) {
+                $ref->setCellValue($cell, $value);
+            }
+            $this->expectExceptionMessage('REFERENSI CP!E7');
+            AtpExcelParserService::bacaBuku(
+                $buku, 'SKI', 4, 'GEN2025', ['Pemahaman Konsep'], 0, [[
+                    'id' => 4, 'elemen' => 'Pemahaman Konsep',
+                    'rumusan' => "CP baris satu\r\nCP baris dua",
+                    'nomor_versi' => 2,
+                ]]
+            );
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
 }
