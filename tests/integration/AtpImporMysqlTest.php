@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use App\Services\AtpImporKonfirmasiService;
+use App\Services\PaketSemesterGuruService;
+use App\Services\BabService;
 use App\Services\AtpImporPratinjauService;
 use App\Services\AtpStagingService;
 use App\Services\AtpValidasiUnggahService;
@@ -258,6 +260,56 @@ final class AtpImporMysqlTest extends TestCase
             $preview['baris'][0]['catatan']);
         self::assertFalse($preview['boleh_konfirmasi']);
         self::assertSame(0, self::$db->table('bab')->countAllResults());
+    }
+
+    public function testBuatPaketGuruSebelumSemesterMulaiGenTetapDraf(): void
+    {
+        $service = new PaketSemesterGuruService(self::$db, $this->guru());
+        $id = $service->buat(1, 5, 1, 1, 1);
+        try {
+            self::assertGreaterThan(0, $id);
+            $paket = self::$db->table('paket_semester')->where('id', $id)
+                ->get()->getRowArray();
+            self::assertSame('draf', $paket['status']);
+            self::assertSame(1, (int) $paket['semester']);
+            self::assertSame(1, (int) $paket['tahun_ajaran_id']);
+        } finally {
+            self::$db->table('paket_semester')->where('id', $id)->delete();
+        }
+    }
+
+    public function testGuruTidakBolehMembuatPaketGenLain(): void
+    {
+        $service = new PaketSemesterGuruService(self::$db, $this->guru(102));
+        $this->expectExceptionMessage('tidak ditugaskan');
+        $service->buat(1, 5, 1, 1, 1);
+    }
+
+    public function testBABAntarSemesterKelasSamaBerurutanWalauTahunAjaranBeda(): void
+    {
+        $paketId = (new PaketSemesterGuruService(self::$db, $this->guru()))
+            ->buat(1, 5, 3, 2, 1);
+        try {
+            // S3 tahun ajaran 2, S4 paket 11 tahun ajaran 1.
+            // Query BAB harus melintasi batas TA dalam pasangan kelas VIII.
+            self::$db->table('bab')->insert([
+                'paket_semester_id' => $paketId,
+                'angkatan_id' => 1, 'mapel_id' => 5,
+                'kurikulum_id' => 1, 'tahun_ajaran_id' => 2,
+                'kelas_id' => 2, 'nomor_bab' => 1,
+                'nama_bab' => 'Sejarah Awal',
+                'deskripsi_bab' => 'BAB ganjil sebelum semester genap',
+                'dibuat_pada' => '2026-10-29 09:00:00',
+            ]);
+            $babId = (new BabService(self::$db, $this->guru()))
+                ->buat(11, 'Tokoh Sejarah', 'BAB semester genap yang berlanjut');
+            self::assertSame(2,
+                (int) self::$db->table('bab')->where('id', $babId)
+                    ->get()->getRow('nomor_bab'));
+        } finally {
+            self::$db->table('bab')->where('paket_semester_id', $paketId)->delete();
+            self::$db->table('paket_semester')->where('id', $paketId)->delete();
+        }
     }
 
     public function testImporUlangIdentikTanpaDuplikasiDanPerbedaanDitolak(): void
