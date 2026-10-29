@@ -44,7 +44,7 @@ final class GuruAtpImpor extends BaseController
                     ];
                     $idsPaketNonarsip = [];
                     foreach ($semester['paket'] as $paket) {
-                        if ($paket['status'] === 'arsip' || $n < (int) $dipilih['semester_mulai']) {
+                        if ($paket['status'] === 'arsip') {
                             continue;
                         }
                         $status[$n]['paket']++;

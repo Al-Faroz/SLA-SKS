@@ -51,7 +51,7 @@ final class AtpImporPratinjauService
             ->where('p.status !=', 'arsip')
             ->where('g.guru_id', (int) $akun['id'])
             ->get()->getRowArray();
-        if ($paket === null || (int) $paket['semester'] < (int) $paket['semester_mulai']) {
+        if ($paket === null) {
             throw new DomainException('Paket di luar penugasan Gen–Mapel atau semester mulai Guru.');
         }
 

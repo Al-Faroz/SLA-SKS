@@ -53,7 +53,8 @@
             <?php if ($dipilih !== null): ?>
                 <p class="a-proto-muted">Gen: <strong><?= esc($dipilih['nama_gen']) ?></strong> ·
                     Mapel: <strong><?= esc($dipilih['nama_mapel']) ?></strong> ·
-                    Mulai Semester <?= (int) $dipilih['semester_mulai'] ?>.
+                    Siswa Gen ini mulai belajar pada Semester <?= (int) $dipilih['semester_mulai'] ?>.
+                    Guru tetap dapat menyiapkan ATP Semester 1–6.
                     Tahun Ajaran selalu mengikuti paket masing-masing semester.</p>
             <?php endif ?>
         </section>
@@ -125,7 +126,7 @@
             <?php if ($opsiPaket === []): ?>
                 <div class="a-empty" role="status">
                     <h3>Belum tersedia paket sebagai acuan</h3>
-                    <p>Buat paket draf pada salah satu semester yang dapat diisi,
+                    <p>Buat paket pada salah satu semester,
                         kemudian kembali ke halaman ini.</p>
                 </div>
             <?php else: ?>
