@@ -79,9 +79,6 @@ final class BabService
                 throw new DomainException('Data semester mulai Gen tidak ditemukan.');
             }
             $semesterMulai = (int) $dataGen['semester_mulai'];
-            if ($semester < $semesterMulai) {
-                throw new DomainException('Semester sebelum semester mulai Gen dilewati dan tidak dapat diisi BAB.');
-            }
             $referensiSemester = $this->db->table('ref_semester')->select('kelas_id')
                 ->where('id', $semester)->get()->getRowArray();
             if ($referensiSemester === null) {
