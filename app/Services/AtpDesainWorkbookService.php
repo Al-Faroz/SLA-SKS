@@ -101,8 +101,8 @@ final class AtpDesainWorkbookService
     {
         $kelas = $nomor <= 2 ? 'VII' : ($nomor <= 4 ? 'VIII' : 'IX');
         $sheet->setShowGridLines(false);
-        self::width($sheet, ['A'=>16,'B'=>32,'C'=>43,'D'=>22,'E'=>38,
-            'F'=>53,'G'=>34,'H'=>27,'I'=>32,'J'=>31]);
+        self::width($sheet, ['A'=>16,'B'=>16,'C'=>20,'D'=>43,'E'=>58,
+            'F'=>39,'G'=>25,'H'=>38,'I'=>13,'J'=>13]);
 
         // A2 sengaja dipertahankan: marker versi workbook dibaca parser.
         self::banner($sheet, 'A1:J1', 'PETA PEMBELAJARAN  —  SEMESTER ' . $nomor,
@@ -116,7 +116,7 @@ final class AtpDesainWorkbookService
             'PANDUAN  |  Isi BAGIAN A (BAB), kemudian BAGIAN B (TP). Sel biru muda adalah area input Guru.',
             self::PALE, self::TEXT, 11, 38);
         self::banner($sheet, 'A5:J5',
-            'PENTING  |  Nomor BAB berurutan; kode TP diverifikasi server. Jangan mengubah header atau posisi sel.',
+            'PENTING  |  Nomor BAB berurutan; Kode TP dibuat server. Jangan mengubah header/posisi.',
             self::YELLOW, self::TEXT, 11, 38);
 
         self::banner($sheet, 'A6:C6', '20 BARIS BAB TERSEDIA', self::MINT, '086E58', 11, 40);
@@ -164,17 +164,19 @@ final class AtpDesainWorkbookService
             '02  —  HUBUNGKAN SETIAP TP KE NOMOR BAB PADA BAGIAN A.',
             self::YELLOW, self::NAVY, 11, 34);
         self::banner($sheet, 'A36:J36',
-            'Jenis TP dipilih lewat dropdown kolom D; judul satu Materi NonEsensial ditulis di kolom G.',
+            'Jenis TP dipilih di kolom C; judul satu Materi NonEsensial ditulis di kolom F.',
             self::PALE, self::TEXT, 11, 34);
         self::banner($sheet, 'A37:J37',
-            'Setiap BAB memiliki urutan TP sendiri: 1, 2, 3, ...; kode: MAPEL.KELAS.BAB.TP.',
+            'Urutan TP tiap BAB: 1, 2, 3, ...; Kode TP otomatis dari MAPEL.KELAS.BAB.TP.',
             self::SKY, self::NAVY, 10, 34);
 
-        self::strip($sheet, 'A38:J38', self::TEAL, self::WHITE, 11);
+        self::strip($sheet, 'A38:H38', self::TEAL, self::WHITE, 11);
+        self::strip($sheet, 'I38:J38', self::NAVY_DARK, self::WHITE, 10);
         self::height($sheet, [38=>58]);
-        self::alternating($sheet, 'A', 'J', 39, 118);
-        self::strip($sheet, 'D39:D118', self::MINT, '125441', 10, false);
-        self::strip($sheet, 'G39:G118', 'E0ECFC', self::TEXT, 10, false);
+        self::alternating($sheet, 'A', 'H', 39, 118);
+        self::strip($sheet, 'C39:C118', self::MINT, '125441', 10, false);
+        self::strip($sheet, 'F39:F118', 'E0ECFC', self::TEXT, 10, false);
+        self::strip($sheet, 'I39:J118', self::PALE, self::TEXT, 10, false);
         // Dropdown D39:D118/H39:H118 dibiarkan utuh.
     }
 
