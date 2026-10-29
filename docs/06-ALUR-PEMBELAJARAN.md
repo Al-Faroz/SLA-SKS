@@ -3,7 +3,7 @@
 > **Master v2.5 · Keputusan 26 Oktober 2026.** Mengganti langsung kontrak v2.4 ketika Diagnostik lulus membuat TP tuntas tanpa Sumatif dan beberapa Materi dalam satu TP.
 
 ## 1. Peta dan akses
-Siswa membuka **Semester → BAB → TP** sesuai Gen–Mapel dan urutan ATP. Paket dan soal milik Gen siswa; versi konten TP dipin ketika mulai. Semester sebelum semester mulai siswa berstatus Dilewati tanpa nilai/sertifikat. TP Esensial ditampilkan informatif tetapi tidak dikerjakan di LMS, tidak dihitung progres.
+Siswa membuka **Semester → BAB → TP** sesuai Gen–Mapel dan urutan ATP. Paket dan soal milik Gen siswa; versi konten TP dipin ketika mulai. Semester sebelum semester mulai siswa berstatus Dilewati tanpa nilai/sertifikat. **Guru tetap menyiapkan satu Materi untuk semua jenis TP**; kebijakan siswa saat ini menampilkan TP Esensial secara informatif tetapi tidak mewajibkan aktivitas/penilaian LMS dan tidak menghitungnya dalam progres. Konten Guru tetap tersimpan, bukan dihapus.
 
 ## 2. Alur wajib TP NonEsensial
 ```mermaid
