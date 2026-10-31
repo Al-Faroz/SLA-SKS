@@ -149,10 +149,10 @@
                 <div class="a-atp-detail__toolbar-actions">
                     <a class="a-btn a-btn--sekunder"
                         href="<?= esc(site_url('guru/peta-atp/unduh/' . (int) $paketId), 'attr') ?>">
-                        Unduh Template ATP V25-2 · 6 Semester
+                        Unduh Template ATP V25-3 · 6 Semester
                     </a>
                 </div>
-                <p class="a-proto-muted">Template versi V25-2 menggunakan delapan kolom TP tanpa Kode TP dan Elemen CP. Jika file bernama tanpa penanda V25-2, jangan digunakan. Isi hanya semester sasaran yang masih kosong. Workbook sama
+                <p class="a-proto-muted">Template versi V25-3 menggunakan dropdown BAB dan rumus urutan TP otomatis, dengan delapan kolom TP tanpa Kode TP dan Elemen CP. Jika file bernama tanpa penanda V25-3, jangan digunakan. Isi hanya semester sasaran yang masih kosong. Workbook sama
                     boleh diunggah ulang untuk pemeriksaan, tetapi tidak akan menulis data duplikat.</p>
                 <form class="a-form" method="post" enctype="multipart/form-data"
                     data-atp-upload-form
@@ -164,7 +164,7 @@
                         <input id="atp-excel-pratinjau" name="atp_excel" type="file"
                             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required>
                         <p class="a-proto-muted" data-atp-upload-status role="status" aria-live="polite">
-                            Pilih file Excel ATP V25-2 (.xlsx). Pratinjau tidak menyimpan data.
+                            Pilih file Excel ATP V25-3 (.xlsx). Pratinjau tidak menyimpan data.
                         </p>
                     </div>
                     <div class="a-atp-detail__toolbar-actions">
