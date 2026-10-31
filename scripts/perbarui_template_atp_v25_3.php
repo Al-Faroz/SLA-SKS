@@ -68,7 +68,7 @@ try {
         }
         $verifikasi = IOFactory::createReader('Xlsx')->load($tmp);
         try {
-            \\App\\Services\\AtpUnduhanService::periksaTemplateV25Tiga($verifikasi);
+            \App\Services\AtpUnduhanService::periksaTemplateV25Tiga($verifikasi);
         } finally {
             $verifikasi->disconnectWorksheets();
         }
