@@ -111,6 +111,7 @@ final class AtpOtomatisTpService
             }
         }
         // Meminta Excel menghitung ulang setelah Guru memilih BAB/Nama TP.
-        $buku->getCalculationEngine()->clearCalculationCache();
+        // Excel otomatis merekalkulasi formula setelah A/D diisi; server
+        // tetap mengabaikan semua cached formula values saat impor.
     }
 }
