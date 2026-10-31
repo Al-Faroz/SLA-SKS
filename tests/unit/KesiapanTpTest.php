@@ -126,8 +126,9 @@ final class KesiapanTpTest extends TestCase
         $tp['diag_durasi'] = 3;
         $tp['bobot_sumatif'] = 30;
         $tp['kkm'] = 0;
+        $tp['sum_maks_percobaan'] = 3;
         $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
-        foreach (['diag_durasi', 'bobot', 'kkm'] as $code) {
+        foreach (['diag_durasi', 'bobot', 'kkm', 'sum_maks_percobaan'] as $code) {
             self::assertFalse(self::hasil($hasil, $code)['terpenuhi']);
         }
     }
