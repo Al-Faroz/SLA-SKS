@@ -116,3 +116,10 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Rumus `B39:B118` dikunci melalui **sheetProtection** yang aktif. Sel input BAB `A13:C32` serta sel input TP `A39:H118` selain kolom B harus tetap **unlocked** agar pengisian Guru tidak terganggu. Proteksi lembar tanpa password berfungsi mencegah salah edit rumus, bukan kontrol keamanan server.
 - Generator, guard sebelum unduhan, skrip regenerasi master, dan unit test pemeriksaan OOXML diperbarui agar menolak XLSX yang format/proteksinya keliru.
 - Audit setelah commit ke GitHub dilakukan terhadap **berkas yang dibaca ulang dari GitHub**: 6 sheet terproteksi, 600 sel Nomor BAB General, 480 sel rumus terkunci, 3.240 sel input dapat diedit, 18 dropdown terlihat, dan 6 Defined Name utuh. XML dan ZIP CRC lolos; pengujian interaktif Microsoft Excel/XAMPP dan PHPUnit atas commit terbaru belum dijalankan.
+
+## Regresi unduhan ATP setelah proteksi sheet — 31 Oktober 2026
+- Kegagalan unduh setelah penambahan proteksi bukan bukti bahwa `docs/` atau `writable/` rusak. Pemeriksaan OOXML di `AtpUnduhanService::periksaFormatProteksiXlsx()` semula hanya mengenali `locked="0"`; writer PhpSpreadsheet justru mengeluarkan `locked="false"` untuk sel input terbuka dan `locked="true"` untuk rumus terkunci.
+- Guard kini menerima representasi Boolean OOXML `0/1` dan `false/true` (case-insensitive), dengan nilai default terkunci jika atribut tidak ada; nilai di luar enumerasi ditolak.
+- Tes regresi `AtpManualTemplateTest::testUnduhanSetelahDisimpanTetapMemilikiFormatDanProteksiValid()` memuat master, mengisi konteks CP/guru fiktif, memformat workbook, menulis XLSX nyata, lalu menjalankan guard dropdown dan proteksi terhadap file akhir.
+- Controller unduh mengirim pesan kegagalan yang tidak lagi menyalahkan direktori dan mencatat pesan error, lokasi, serta baris pengecualian ke log privat untuk investigasi berikutnya.
+- Tidak ada perubahan SQL dan file master XLSX tidak berubah pada patch ini. Pemeriksaan PHPUnit dari XAMPP tetap diperlukan sebelum dinyatakan PASS end-to-end.
