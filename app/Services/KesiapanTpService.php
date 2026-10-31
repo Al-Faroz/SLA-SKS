@@ -269,6 +269,45 @@ final class KesiapanTpService
             'keterangan' => $ok ? 'Memenuhi ketentuan.' : $pesan, 'tautan' => $url];
     }
 
+    /**
+     * Saat TP pertama diaktifkan, paket baru harus ditugaskan ke Gen yang
+     * benar. Tanpa penugasan_paket siswa tidak dapat melihat paket yang
+     * sudah siap. Tidak menimpa paket/penugasan lama dan tidak mengubah Gen.
+     *
+     * @param array<string,mixed> $paket
+     */
+    private function pastikanPaketDitugaskan(array $paket, int $guruId, string $waktu): void
+    {
+        $konteks = [
+            'angkatan_id' => (int) $paket['angkatan_id'],
+            'mapel_id' => (int) $paket['mapel_id'],
+            'semester' => (int) $paket['semester'],
+            'tahun_ajaran_id' => (int) $paket['tahun_ajaran_id'],
+        ];
+        $paketId = (int) $paket['id'];
+        $sudah = $this->db->table('penugasan_paket')
+            ->where('paket_id', $paketId)->get()->getRowArray();
+        if ($sudah !== null) {
+            foreach ($konteks as $kolom => $nilai) {
+                if ((int) ($sudah[$kolom] ?? 0) !== $nilai) {
+                    throw new DomainException('Penugasan paket lama tidak konsisten. Hubungi Admin.');
+                }
+            }
+            return;
+        }
+        if ($this->db->table('penugasan_paket')->where($konteks)->countAllResults() > 0) {
+            throw new DomainException('Semester/Tahun Ajaran telah ditugaskan ke paket lain.');
+        }
+        $this->db->table('penugasan_paket')->insert(array_merge($konteks, [
+            'paket_id' => $paketId,
+            'diperbarui_oleh' => $guruId,
+            'diperbarui_pada' => $waktu,
+        ]));
+        if ($this->db->transStatus() === false || $this->db->affectedRows() !== 1) {
+            throw new RuntimeException('Penugasan paket aktif ke Gen gagal.');
+        }
+    }
+
     /** Publikasi tidak boleh dicoba tanpa tanda tinjau akademik dari Guru. */
     public function terbitkan(int $tpId, int $guruId, int $strukturVersi, bool $diperiksa, string $sidikJari): int
     {
@@ -339,7 +378,13 @@ final class KesiapanTpService
             if ($cek['paket']['status'] === 'draf') {
                 $this->db->table('paket_semester')->where('id', $cek['paket']['id'])
                     ->where('status', 'draf')->update(['status' => 'aktif']);
+                if ($this->db->affectedRows() !== 1) {
+                    throw new DomainException('Status paket berubah saat penerbitan TP.');
+                }
             }
+            // Penugasan satu paket per Gen–Mapel–Semester–Tahun Ajaran
+            // bersifat idempoten dan disahkan dalam transaksi penerbitan.
+            $this->pastikanPaketDitugaskan($cek['paket'], $guruId, $waktu);
             $this->db->table('log_aktivitas')->insert([
                 'pengguna_id' => $guruId, 'peran_aktif' => 'guru',
                 'peristiwa' => 'tp_disiapkan',
