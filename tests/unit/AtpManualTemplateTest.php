@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 final class AtpManualTemplateTest extends TestCase
 {
     private const BERKAS = 'docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
-    private const VERSI = 'SLA-SKS-ATP-MANUAL-V25-2';
+    private const VERSI = 'SLA-SKS-ATP-MANUAL-V25-3';
 
     /**
      * PhpSpreadsheet may return inline-string cells as RichText.
@@ -41,12 +41,22 @@ final class AtpManualTemplateTest extends TestCase
                 self::assertNull($sheet->getCell('J118')->getValue());
                 self::assertSame('C39:C118', $sheet->getDataValidation('C39')->getSqref());
                 self::assertSame('G39:G118', $sheet->getDataValidation('G39')->getSqref());
+                self::assertSame('A39:A118', $sheet->getDataValidation('A39')->getSqref());
+                self::assertSame('BABS_' . $n,
+                    ltrim($sheet->getDataValidation('A39')->getFormula1(), '='));
+                self::assertNotNull($buku->getNamedRange('BABS_' . $n));
+                self::assertStringContainsString("'SEMESTER " . '$n' . "'!$A$13:$A$32",
+                    $buku->getNamedRange('BABS_' . $n)->getRange());
                 self::assertSame('Catatan', (string) $sheet->getCell('H38')->getValue());
                 self::assertSame('', (string) $sheet->getCell('I38')->getValue());
                 self::assertSame('', (string) $sheet->getCell('J38')->getValue());
                 foreach ($sheet->getCellCollection()->getCoordinates() as $coord) {
-                    self::assertNotSame(DataType::TYPE_FORMULA, $sheet->getCell($coord)->getDataType(),
-                        'Dilarang formula di ' . $sheet->getTitle() . '!' . $coord);
+                    if ($sheet->getCell($coord)->getDataType() === DataType::TYPE_FORMULA) {
+                        self::assertMatchesRegularExpression('/^B(?:39|[4-9][0-9]|10[0-9]|11[0-8])$/D', $coord,
+                            'Hanya rumus urutan TP yang diizinkan: ' . $coord);
+                        self::assertSame(\App\Services\AtpOtomatisTpService::rumus((int) substr($coord, 1)),
+                            (string) $sheet->getCell($coord)->getValue());
+                    }
                 }
             }
         } finally {
