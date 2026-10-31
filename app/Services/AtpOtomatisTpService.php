@@ -7,6 +7,8 @@ namespace App\Services;
 use DomainException;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\NamedFormula;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Protection;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -151,6 +153,26 @@ final class AtpOtomatisTpService
                     self::rumus($row), DataType::TYPE_FORMULA
                 );
             }
+
+            // Nomor BAB harus berupa angka/General, bukan Text, supaya
+            // referensi Named Formula dan dropdown dinamis cocok dengan
+            // input angka pada BAB A13:A32.
+            $sheet->getStyle('A13:A32')->getNumberFormat()
+                ->setFormatCode(NumberFormat::FORMAT_GENERAL);
+            $sheet->getStyle('A39:A118')->getNumberFormat()
+                ->setFormatCode(NumberFormat::FORMAT_GENERAL);
+
+            // Kunci hanya area rumus; form BAB/TP Guru tetap bisa diisi.
+            // Locked tidak berlaku tanpa proteksi sheet.
+            $sheet->getStyle('A13:C32')->getProtection()
+                ->setLocked(Protection::PROTECTION_UNPROTECTED);
+            $sheet->getStyle('A39:H118')->getProtection()
+                ->setLocked(Protection::PROTECTION_UNPROTECTED);
+            $sheet->getStyle('B39:B118')->getProtection()
+                ->setLocked(Protection::PROTECTION_PROTECTED);
+            $sheet->getProtection()->setSheet(true);
+            $sheet->getProtection()->setSelectLockedCells(false);
+            $sheet->getProtection()->setSelectUnlockedCells(false);
         }
         // Meminta Excel menghitung ulang setelah Guru memilih BAB/Nama TP.
         // Excel otomatis merekalkulasi formula setelah A/D diisi; server
