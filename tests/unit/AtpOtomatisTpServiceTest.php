@@ -64,7 +64,7 @@ final class AtpOtomatisTpServiceTest extends TestCase
             $sh->setCellValue('B40', '=HYPERLINK("https://example.test","x")');
             self::assertFalse(AtpOtomatisTpService::formulaSah($sh, 'B40'));
             $buku->getDefinedName('BABS_5')->setValue(
-                "=OFFSET('SEMESTER 4'!$A$12,1,0,1,1)"
+                '=OFFSET(\'SEMESTER 4\'!$A$12,1,0,1,1)'
             );
             self::assertFalse(AtpOtomatisTpService::daftarBabSah($buku, 5));
         } finally {
