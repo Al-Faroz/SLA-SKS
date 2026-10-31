@@ -44,12 +44,15 @@ final class ChecklistKontenTpService
             $resume = trim((string) ($item['petunjuk_resume'] ?? '')) !== '';
             $hots = trim((string) ($item['petunjuk_hots'] ?? '')) !== '';
             $nomorBenar = (int) ($item['urutan'] ?? 0) === $urutan;
-            foreach ([
+            $aspekWajib = [
                 ['Media', $media, 'Sumber media belum tersedia'],
-                ['Petunjuk Resume', $resume, 'Isi petunjuk Resume'],
-                ['Petunjuk HOTS', $hots, 'Isi petunjuk HOTS'],
                 ['Urutan', $nomorBenar, 'Periksa nomor urutan Materi'],
-            ] as [$aspek, $valid, $pesan]) {
+            ];
+            if (($tp['jenis_tp'] ?? 'non_esensial') === 'non_esensial') {
+                $aspekWajib[] = ['Petunjuk Resume', $resume, 'Isi petunjuk Resume'];
+                $aspekWajib[] = ['Petunjuk HOTS', $hots, 'Isi petunjuk HOTS'];
+            }
+            foreach ($aspekWajib as [$aspek, $valid, $pesan]) {
                 $hasil[] = ['label' => $nama . ' — ' . $aspek, 'terpenuhi' => $valid,
                     'keterangan' => $valid ? 'Lengkap' : $pesan];
             }
