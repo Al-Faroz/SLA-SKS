@@ -20,6 +20,10 @@ final class AtpManualTemplateTest extends TestCase
         $path = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS;
         self::assertFileExists($path);
         $buku = IOFactory::load($path);
+        // Master lama V25-2 tetap menjadi sumber anonim yang dapat
+        // dikonversi di memori; unduhan Guru WAJIB berkontrak V25-3.
+        \App\Services\AtpTemplateLayoutService::terapkan($buku);
+        \App\Services\AtpOtomatisTpService::terapkan($buku);
         try {
             self::assertSame([
                 'MULAI DI SINI', 'RINGKASAN', 'REFERENSI CP',
@@ -68,6 +72,8 @@ final class AtpManualTemplateTest extends TestCase
     public function testKontrakTampilanTemplateExcel(): void
     {
         $buku = IOFactory::load(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS);
+        \App\Services\AtpTemplateLayoutService::terapkan($buku);
+        \App\Services\AtpOtomatisTpService::terapkan($buku);
         try {
             for ($n = 1; $n <= 6; ++$n) {
                 $sheet = $buku->getSheetByName('SEMESTER ' . $n);
