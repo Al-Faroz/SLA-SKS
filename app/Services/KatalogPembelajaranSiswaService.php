@@ -107,6 +107,36 @@ final class KatalogPembelajaranSiswaService
         return ['kode' => 'pratinjau', 'label' => 'Siap — lihat rincian TP', 'buka' => true];
     }
 
+    /**
+     * Status 'tuntas' saja tidak membuktikan Sumatif sudah diselesaikan:
+     * rilis Diagnostik lama pernah menuliskan 'tuntas' saat lulus.
+     * Hanya bukti percobaan Sumatif selesai sah pada progres siswa
+     * yang boleh membuka TP/semester selanjutnya.
+     *
+     * @param list<int> $tpIds
+     * @return array<int,bool>
+     */
+    private function tpTuntasSah(array $tpIds, int $siswaId): array
+    {
+        if ($tpIds === []) {
+            return [];
+        }
+        $rows = $this->db->table('progres_tp p')
+            ->distinct()->select('p.tp_id')
+            ->join('percobaan_ujian u', 'u.progres_tp_id=p.id')
+            ->where('p.siswa_id', $siswaId)
+            ->where('p.status', 'tuntas')
+            ->where('u.jenis', 'sumatif')
+            ->where('u.status', 'selesai_sah')
+            ->whereIn('p.tp_id', $tpIds)
+            ->get()->getResultArray();
+        $hasil = [];
+        foreach ($rows as $item) {
+            $hasil[(int) $item['tp_id']] = true;
+        }
+        return $hasil;
+    }
+
     /** @return list<array<string,mixed>> */
     private function tpUntukPaket(int $paketId, int $semester, int $mulai,
         int $siswaId): array
@@ -118,17 +148,7 @@ final class KatalogPembelajaranSiswaService
             ->where('t.status !=', 'arsip')
             ->orderBy('t.urutan_atp', 'ASC')->orderBy('t.id', 'ASC')->get()->getResultArray();
         $ids = array_map(static fn (array $tp): int => (int) $tp['id'], $baris);
-        $tuntas = [];
-        if ($ids !== []) {
-            $progres = $this->db->table('progres_tp')
-                ->select('tp_id,status')->where('siswa_id', $siswaId)
-                ->whereIn('tp_id', $ids)->get()->getResultArray();
-            foreach ($progres as $p) {
-                if ($p['status'] === 'tuntas') {
-                    $tuntas[(int) $p['tp_id']] = true;
-                }
-            }
-        }
+        $tuntas = $this->tpTuntasSah($ids, $siswaId);
         // TP Esensial tidak menghalangi atau membuka langkah NonEsensial.
         // Hanya progres tuntas milik siswa yang membuka TP berikutnya.
         $sebelumnyaTuntas = true;
@@ -156,11 +176,7 @@ final class KatalogPembelajaranSiswaService
             return false;
         }
         $ids = array_map(static fn (array $baris): int => (int) $baris['id'], $tp);
-        $selesai = $this->db->table('progres_tp')
-            ->distinct()->select('tp_id')->where('siswa_id', $siswaId)
-            ->where('status', 'tuntas')->whereIn('tp_id', $ids)
-            ->get()->getResultArray();
-        return count($selesai) === count($ids);
+        return count($this->tpTuntasSah($ids, $siswaId)) === count($ids);
     }
 
     /**
