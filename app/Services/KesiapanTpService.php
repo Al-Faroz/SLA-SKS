@@ -199,7 +199,7 @@ final class KesiapanTpService
             ['diag_durasi', 5, 180, 'Durasi Diagnostik'],
             ['sum_durasi', 5, 180, 'Durasi Sumatif'],
             ['diag_tayang', 10, 65535, 'Jumlah tayang Diagnostik'],
-            ['sum_tayang', 5, 65535, 'Jumlah tayang Sumatif'],
+            ['sum_tayang', 30, 65535, 'Jumlah tayang Sumatif'],
             ['sum_maks_percobaan', 1, 255, 'Kuota Sumatif'],
         ] as [$name, $min, $max, $label]) {
             $val = (int) ($tp[$name] ?? 0);
@@ -214,7 +214,7 @@ final class KesiapanTpService
             'Jumlah bobot Resume, HOTS dan Sumatif harus 100%, Sumatif lebih dari nol.',
             $detail . '#kesiapan-tp');
 
-        foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 5]] as $jenis => [$field, $minimal]) {
+        foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 30]] as $jenis => [$field, $minimal]) {
             $bank = array_values(array_filter($soal, static fn (array $s): bool => $s['jenis'] === $jenis));
             $target = (int) ($tp[$field] ?? 0);
             $jumlah = count($bank);
