@@ -51,7 +51,9 @@ final class AtpOtomatisTpService
         $validasi = $sheet->getDataValidation('A39');
         return $validasi->getType() === 'list'
             && $validasi->getSqref() === 'A39:A118'
-            && ltrim($validasi->getFormula1(), '=') === $nama;
+            && ltrim($validasi->getFormula1(), '=') === $nama
+            && ! $validasi->getShowDropDown()
+            && $validasi->getShowErrorMessage();
     }
 
     public static function formulaSah(Worksheet $sheet, string $alamat): bool
