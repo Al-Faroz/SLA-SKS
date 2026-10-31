@@ -110,7 +110,7 @@ final class AtpUnduhanServiceTest extends TestCase
             AtpUnduhanService::isiBuku($buku, $konteks, [
                 ['id' => 1, 'elemen' => 'Sejarah', 'rumusan' => 'Rumusan', 'nomor_versi' => 1],
             ]);
-            self::assertSame('SLA-SKS-ATP-MANUAL-V25-2',
+            self::assertSame('SLA-SKS-ATP-MANUAL-V25-3',
                 (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue());
         } finally {
             $buku->disconnectWorksheets();
@@ -131,7 +131,7 @@ final class AtpUnduhanServiceTest extends TestCase
         }
     }
 
-    public function testUnduhanHanyaDiterimaJikaSemuaSemesterV25DuaDelapanKolom(): void
+    public function testUnduhanHanyaDiterimaJikaSemuaSemesterV25TigaDelapanKolom(): void
     {
         $buku = $this->buku();
         try {
@@ -139,7 +139,7 @@ final class AtpUnduhanServiceTest extends TestCase
                 'id' => 51, 'elemen' => 'Pemahaman Konsep',
                 'rumusan' => 'CP sintetis', 'nomor_versi' => 1,
             ]]);
-            AtpUnduhanService::periksaTemplateV25Dua($buku);
+            AtpUnduhanService::periksaTemplateV25Tiga($buku);
             foreach (range(1, 6) as $n) {
                 $sh = $buku->getSheetByName('SEMESTER ' . $n);
                 self::assertSame('Jenis TP', (string) $sh->getCell('C38')->getValue());
@@ -150,7 +150,7 @@ final class AtpUnduhanServiceTest extends TestCase
             $buku->getSheetByName('SEMESTER 6')->setCellValue('I38', 'Elemen CP (rujukan)');
             $this->expectException(\RuntimeException::class);
             $this->expectExceptionMessage('Kolom TP lama masih ada');
-            AtpUnduhanService::periksaTemplateV25Dua($buku);
+            AtpUnduhanService::periksaTemplateV25Tiga($buku);
         } finally {
             $buku->disconnectWorksheets();
         }
