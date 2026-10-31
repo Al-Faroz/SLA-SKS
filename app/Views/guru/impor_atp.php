@@ -61,8 +61,8 @@
 
         <section class="a-card" aria-labelledby="judul-paket-atp">
             <h2 id="judul-paket-atp">2. Kesiapan enam semester</h2>
-            <p class="a-proto-muted">Paket semester harus sudah dibuat lebih dahulu melalui halaman
-                Semester. Semester yang belum memiliki paket tidak dapat menjadi sasaran impor.
+            <p class="a-proto-muted">Paket draf dibuat untuk enam semester sekaligus dari halaman Peta ATP.
+                Semester yang belum memiliki paket tidak dapat menjadi sasaran impor.
                 Paket acuan digunakan hanya untuk memastikan Kurikulum dan CP workbook.</p>
             <div class="a-tabel-gulir">
                 <table class="a-tbl">
@@ -93,9 +93,7 @@
                             <td><?= (int) $st['bab'] ?></td>
                             <td><?= (int) $st['tp'] ?></td>
                             <td>
-                                <?php if ($dipilih !== null && $n < (int) $dipilih['semester_mulai']): ?>
-                                    Dilewati Gen
-                                <?php elseif ($st['paket'] === 0): ?>
+                                <?php if ($st['paket'] === 0): ?>
                                     Belum ada paket
                                 <?php elseif ($st['paket'] > 1): ?>
                                     Paket ganda — perlu diperiksa
@@ -126,8 +124,12 @@
             <?php if ($opsiPaket === []): ?>
                 <div class="a-empty" role="status">
                     <h3>Belum tersedia paket sebagai acuan</h3>
-                    <p>Buat paket pada salah satu semester,
-                        kemudian kembali ke halaman ini.</p>
+                    <p>Buat draf enam semester dari Peta ATP, kemudian kembali ke halaman ini.</p>
+                    <a class="a-btn a-btn--utama"
+                        href="<?= esc(site_url('guru/peta-atp')
+                            . '?pilihan=' . (int) $nomorPilihan, 'attr') ?>">
+                        Buat Draf Enam Semester
+                    </a>
                 </div>
             <?php else: ?>
                 <form class="a-filter" method="get" action="<?= esc(site_url('guru/peta-atp/impor'), 'attr') ?>">
