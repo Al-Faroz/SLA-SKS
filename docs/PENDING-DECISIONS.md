@@ -4,7 +4,7 @@
 - CP → Semester → BAB → TP; satu CP operasional/mapel, beberapa elemen; BAB/TP 50+225, kode `MAPEL.KELAS.BAB.TP`, nomor BAB sambung 1–2/3–4/5–6.
 - TP Esensial maupun NonEsensial wajib disiapkan Guru dengan tepat satu Materi/media. Aktivitas siswa, ujian dan nilai hanya wajib pada TP NonEsensial; Esensial tetap tercatat di ATP.
 - Diagnostik ≥10 gate; Sumatif ≥30 wajib, bobot jalur gagal 20/20/60 atau lulus 100% Sumatif, KKM default Admin/khusus Guru, 1 remedial <KKM ambil nilai tertinggi, TP Selesai meski nilai di bawah KKM.
-- Guru isi ATP langsung atau Excel ATP manual `.xlsx` tanpa macro dan tanpa tombol Proses; template resmi sudah ditambahkan ke branch fitur pada `docs/`; integrasi generator/impor aplikasi masih belum dikerjakan. Progres persemester hanya NonEsensial.
+- Guru isi ATP langsung atau Excel ATP manual `.xlsx` tanpa macro dan tanpa tombol Proses; template resmi sudah ditambahkan ke branch fitur pada `docs/`; integrasi generator/impor sudah dikodekan pada branch fitur dan membutuhkan verifikasi manual melalui XAMPP sebelum dinyatakan selesai. Progres persemester hanya NonEsensial.
 - Pra-Semester pada tanggal dan jam serentak Admin setelah semua NonEsensial selesai, bank gabungan BAB, pola Sumatif, nilai berdiri sendiri. Tidak ada nilai akhir semester. Export Nilai Guru dapat dilakukan dari satu skor TP.
 - Database baru `sla_sks_v4` terpisah dari `sla_sks_v3`, sumber privat tak dikirim ke repo; semua versi/progres lama dipertahankan sebagai historis.
 
