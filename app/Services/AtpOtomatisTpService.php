@@ -6,7 +6,7 @@ namespace App\Services;
 
 use DomainException;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\NamedRange;
+use PhpOffice\PhpSpreadsheet\NamedFormula;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -79,15 +79,15 @@ final class AtpOtomatisTpService
                 . ' untuk kedua jenis TP; Kode TP dibuat server.');
 
             $nama = 'BABS_' . $semester;
-            if ($buku->getNamedRange($nama) !== null) {
-                $buku->removeNamedRange($nama);
+            if ($buku->getDefinedName($nama) !== null) {
+                $buku->removeDefinedName($nama);
             }
             $namaSheet = "'SEMESTER " . $semester . "'!";
             // 20 sel input BAB A13:A32, tidak A12:A31. MAX(1,..)
             // mencegah range berukuran nol saat Guru belum mengisi BAB.
             $formulaRange = 'OFFSET(' . $namaSheet . '$A$12,1,0,MAX(1,COUNT('
                 . $namaSheet . '$A$13:$A$32)),1)';
-            $buku->addNamedRange(new NamedRange($nama, $sheet, $formulaRange));
+            $buku->addNamedFormula(new NamedFormula($nama, $sheet, '=' . $formulaRange));
 
             $dv = $sheet->getDataValidation('A39');
             $dv->setType('list')
