@@ -44,7 +44,7 @@ try {
         $dv = $sheet->getDataValidation('A39');
         if ($dv->getSqref() !== 'A39:A118'
             || ltrim($dv->getFormula1(), '=') !== 'BABS_' . $n
-            || $buku->getNamedRange('BABS_' . $n) === null) {
+            || $buku->getDefinedName('BABS_' . $n) === null) {
             throw new RuntimeException('Dropdown BAB belum valid Semester ' . $n);
         }
         foreach (range(39,118) as $row) {
