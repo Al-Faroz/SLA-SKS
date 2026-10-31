@@ -117,7 +117,7 @@ Fitur dinyatakan selesai bila **aturan domain + izin + data SQL + route/service 
 |---|---|---|
 | E2E-089 | Guru ditugasi dua Gen/Mapel mengunduh ATP berbeda | RINGKASAN berisi Guru/Gen/Mapel/Kurikulum sesuai pilihan sah; file tidak saling tertukar |
 | E2E-090 | Excel referensi CP otomatis | Hanya CP aktif sesuai Mapel/Fase D/Kurikulum, tanpa mapel lain; semua pilihan CP valid |
-| E2E-091 | Excel enam semester revisi pemilik | Tidak ada istilah BAB operasional, enam sheet semester dan contoh; identitas tidak bisa diklaim oleh Gen lain |
+| E2E-091 | Excel enam semester revisi pemilik | BAB menjadi entitas operasional; enam sheet semester dan contoh; identitas Gen–Mapel tidak bisa diklaim oleh Gen lain |
 | E2E-092 | Impor Excel satu semester saja | BAB/TP draf terbentuk hanya pada semester kosong dengan paket sah; Materi tidak dibuat otomatis; semester lain tidak dihapus |
 | E2E-093 | Impor Excel sama dua kali | File sama menghasilkan Tetap tanpa penulisan; semester berisi BAB manual/TP draf yang berbeda ditolak total, tidak ada DELETE/UPDATE |
 | E2E-094 | ATP mencoba mengubah BAB/TP manual/draf/Siap lewat Excel | Ditolak sebelum commit, bahkan jika draf; data historis tetap |
