@@ -45,7 +45,7 @@ final class AtpManualTemplateTest extends TestCase
                 self::assertSame('BABS_' . $n,
                     ltrim($sheet->getDataValidation('A39')->getFormula1(), '='));
                 self::assertNotNull($buku->getNamedRange('BABS_' . $n));
-                self::assertStringContainsString("'SEMESTER " . '$n' . "'!$A$13:$A$32",
+                self::assertStringContainsString("'SEMESTER " . $n . "'!" . '$A$13:$A$32',
                     $buku->getNamedRange('BABS_' . $n)->getRange());
                 self::assertSame('Catatan', (string) $sheet->getCell('H38')->getValue());
                 self::assertSame('', (string) $sheet->getCell('I38')->getValue());
