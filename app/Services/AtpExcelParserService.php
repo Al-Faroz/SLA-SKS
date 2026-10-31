@@ -146,7 +146,7 @@ final class AtpExcelParserService
     {
         if ($buku->getSheetNames() !== self::SHEETS) {
             throw new DomainException('Susunan sheet Excel tidak sesuai 10 sheet resmi.'
-                . ' Unduh ulang template ATP V25-2, jangan mengubah nama/urutan sheet.');
+                . ' Unduh ulang template ATP V25-3, jangan mengubah nama/urutan sheet.');
         }
         $versiBerkas = self::nilai($buku->getSheetByName('RINGKASAN'), 'B4');
         if ($versiBerkas !== AtpUnduhanService::VERSI) {
