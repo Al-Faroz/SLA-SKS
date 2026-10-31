@@ -61,6 +61,23 @@ final class AtpManualTemplateTest extends TestCase
                     $sheet->getDataValidation('C39')->getFormula1());
                 self::assertSame('"YouTube,PDF,Audio,Gambar"',
                     $sheet->getDataValidation('G39')->getFormula1());
+                self::assertTrue($sheet->getProtection()->getSheet(),
+                    'Sheet wajib diproteksi supaya kolom rumus tidak dapat diedit.');
+                foreach (['A13', 'A32', 'A39', 'A118'] as $addr) {
+                    self::assertSame('General',
+                        $sheet->getStyle($addr)->getNumberFormat()->getFormatCode(),
+                        'Kolom Nomor BAB harus berformat General: ' . $addr);
+                }
+                foreach (['A13', 'B13', 'C32', 'A39', 'C39', 'D39', 'E39', 'F39', 'G39', 'H118'] as $addr) {
+                    self::assertSame('unprotected',
+                        $sheet->getStyle($addr)->getProtection()->getLocked(),
+                        'Input guru harus tetap bisa diedit: ' . $addr);
+                }
+                foreach (['B39', 'B118'] as $addr) {
+                    self::assertSame('protected',
+                        $sheet->getStyle($addr)->getProtection()->getLocked(),
+                        'Rumus wajib terkunci: ' . $addr);
+                }
                 self::assertSame('BABS_' . $n,
                     ltrim($sheet->getDataValidation('A39')->getFormula1(), '='));
                 self::assertNotNull($buku->getDefinedName('BABS_' . $n));
@@ -118,7 +135,8 @@ final class AtpManualTemplateTest extends TestCase
     {
         $file = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS;
         \App\Services\AtpUnduhanService::periksaDropdownXlsx($file);
-        self::assertTrue(true, 'Semua 18 dropdown memiliki showDropDown=0 dalam XLSX.');
+        \App\Services\AtpUnduhanService::periksaFormatProteksiXlsx($file);
+        self::assertTrue(true, '18 dropdown, 240 sel BAB/TP General dan proteksi rumus lolos audit XLSX.');
     }
 
     public function testTidakAdaMacroDanReferensiEksternal(): void
