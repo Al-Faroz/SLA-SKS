@@ -78,7 +78,13 @@ final class AtpExcelParserService
     {
         $sel = $sheet->getCell($alamat);
         if ($sel->getDataType() === DataType::TYPE_FORMULA) {
-            throw new DomainException('Rumus Excel tidak diizinkan: ' . $sheet->getTitle() . '!' . $alamat . '.');
+            if (! AtpOtomatisTpService::formulaSah($sheet, $alamat)) {
+                throw new DomainException('Rumus Excel hanya diizinkan pada B39:B118 dengan pola resmi: '
+                    . $sheet->getTitle() . '!' . $alamat . '.');
+            }
+            // Jangan percaya cache/hasil evaluasi rumus dari workbook.
+            // Urutan diperhitungkan ulang dari baris TP yang sah di server.
+            return '';
         }
         return trim((string) ($sel->getValue() ?? ''));
     }
@@ -146,7 +152,7 @@ final class AtpExcelParserService
         if ($versiBerkas !== AtpUnduhanService::VERSI) {
             throw new DomainException(
                 'Versi Excel tidak sesuai (diperoleh: ' . mb_substr($versiBerkas, 0, 45)
-                . '). Unduh ulang ATP V25-2 dari halaman Kelola ATP Excel.'
+                . '). Unduh ulang ATP V25-3 dari halaman Kelola ATP Excel.'
             );
         }
         // Identitas berkas sekadar pengecekan konsistensi, bukan sumber otorisasi.
@@ -201,7 +207,8 @@ final class AtpExcelParserService
         foreach ($buku->getAllSheets() as $sheet) {
             // Formula tersembunyi pada sheet panduan, CP atau di luar area tabel juga ditolak.
             foreach ($sheet->getCellCollection()->getCoordinates() as $alamat) {
-                if ($sheet->getCell($alamat)->getDataType() === DataType::TYPE_FORMULA) {
+                if ($sheet->getCell($alamat)->getDataType() === DataType::TYPE_FORMULA
+                    && ! AtpOtomatisTpService::formulaSah($sheet, $alamat)) {
                     throw new DomainException('Rumus tidak diizinkan pada ' . $sheet->getTitle()
                         . '!' . $alamat . '.');
                 }
@@ -237,7 +244,7 @@ final class AtpExcelParserService
             }
             if (self::nilai($sheet, 'I38') !== '' || self::nilai($sheet, 'J38') !== '') {
                 throw new DomainException('SEMESTER ' . $s
-                    . ': kolom I/J bukan area input; unduh template V25-2 yang baru.');
+                    . ': kolom I/J bukan area input; unduh template V25-3 yang baru.');
             }
 
             for ($row = 13; $row <= 32; $row++) {
@@ -263,6 +270,14 @@ final class AtpExcelParserService
                     'nama' => $kolom[1], 'deskripsi' => $kolom[2],
                 ];
             }
+            // V25-3 selalu memiliki rumus terkontrol pada seluruh 80
+            // baris, termasuk baris kosong. Rumus rusak/ditimpa ditolak.
+            for ($row = 39; $row <= 118; ++$row) {
+                if (! AtpOtomatisTpService::formulaSah($sheet, 'B' . $row)) {
+                    throw new DomainException('SEMESTER ' . $s . '!B' . $row
+                        . ': rumus urutan TP berubah. Unduh template ATP V25-3.');
+                }
+            }
             for ($row = 39; $row <= 118; $row++) {
                 $kolom = [];
                 foreach (range('A', 'H') as $k) {
@@ -280,7 +295,9 @@ final class AtpExcelParserService
                 }
                 $lokasi = 'SEMESTER ' . $s . ' baris ' . $row;
                 $nomorBab = self::nomor($kolom[0], $lokasi . ' kolom A');
-                $urutan = self::nomor($kolom[1], $lokasi . ' kolom B');
+                // Formula B hanya bantuan tampilan. Nomor server dihitung
+                // dari banyaknya TP sebelumnya dengan BAB yang sama.
+                $urutan = count($tpSem[$s][$nomorBab] ?? []) + 1;
                 if (! isset($babSem[$s][$nomorBab])) {
                     throw new DomainException($lokasi . ': nomor BAB tidak ada di Bagian A semester ini.');
                 }
