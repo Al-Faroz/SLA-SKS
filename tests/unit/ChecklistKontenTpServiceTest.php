@@ -59,11 +59,24 @@ final class ChecklistKontenTpServiceTest extends TestCase
         self::assertTrue($hasil[6]['terpenuhi']);
         self::assertFalse($hasil[7]['terpenuhi']);
     }
+    public function testEsensialTidakMewajibkanTugasResumeHots(): void
+    {
+        $cek = ChecklistKontenTpService::periksa([
+            'kode_tp' => 'SKI.8.1.1', 'rumusan' => 'Materi esensial',
+            'indikator' => 'Memahami', 'jenis_tp' => 'esensial',
+        ], [[
+            'urutan' => 1, 'jenis' => 'pdf', 'berkas_id' => 4,
+            'petunjuk_resume' => '', 'petunjuk_hots' => '',
+        ]]);
+        self::assertCount(6, $cek);
+        self::assertNotContains(false, array_column($cek, 'terpenuhi'));
+    }
+
     public function testTautanCpHilangDitandaiDanCpTertautBelumDianggapValid(): void
     {
         $tp = ['kode_tp' => 'TP-01', 'rumusan' => 'Menganalisis', 'indikator' => 'Menjelaskan'];
         $kosong = ChecklistKontenTpService::periksa($tp, [], 0);
-        self::assertSame('Tautan CP pada TP', $kosong[3]['label']);
+        self::assertSame('Elemen CP operasional aktif', $kosong[3]['label']);
         self::assertFalse($kosong[3]['terpenuhi']);
 
         $ada = ChecklistKontenTpService::periksa($tp, [], 2);
