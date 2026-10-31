@@ -25,8 +25,20 @@ final class MateriDrafService
     }
 
     /** @return array{judul:string,jenis:string,petunjuk_resume:string,petunjuk_hots:string,min_waktu_detik:int,url_youtube:?string} */
-    public function bersihkan(array $input): array
+    public function bersihkan(array $input, ?int $tpId = null): array
     {
+        // TP Esensial tetap wajib media, tetapi Resume/HOTS adalah
+        // kegiatan khusus NonEsensial. Jenis TP dibaca dari DB, bukan POST.
+        $wajibKegiatan = true;
+        if ($tpId !== null) {
+            $tp = $this->db->table('tp')->select('jenis_tp')
+                ->where('id', $tpId)->get()->getRowArray();
+            if ($tp === null || ! in_array((string) ($tp['jenis_tp'] ?? ''),
+                ['esensial', 'non_esensial'], true)) {
+                throw new DomainException('Jenis TP tidak tersedia.');
+            }
+            $wajibKegiatan = $tp['jenis_tp'] === 'non_esensial';
+        }
         $judul = trim((string) ($input['judul'] ?? ''));
         $jenis = (string) ($input['jenis'] ?? '');
         $resume = trim((string) ($input['petunjuk_resume'] ?? ''));
@@ -42,10 +54,10 @@ final class MateriDrafService
         if (! in_array($jenis, ['pdf', 'gambar', 'audio', 'youtube'], true)) {
             throw new DomainException('Pilih jenis media yang tersedia: YouTube, PDF, Gambar atau Audio.');
         }
-        if ($resume === '' || mb_strlen($resume) > 20000) {
+        if (($wajibKegiatan && $resume === '') || mb_strlen($resume) > 20000) {
             throw new DomainException('Petunjuk Resume wajib diisi (maksimal 20.000 karakter).');
         }
-        if ($hots === '' || mb_strlen($hots) > 20000) {
+        if (($wajibKegiatan && $hots === '') || mb_strlen($hots) > 20000) {
             throw new DomainException('Petunjuk tugas HOTS wajib diisi (maksimal 20.000 karakter).');
         }
         if (! $formatMenit || $waktu < 0 || $waktu > 65535) {
@@ -108,7 +120,7 @@ final class MateriDrafService
 
     public function tambah(int $tpId, int $versi, array $input): void
     {
-        $data = $this->bersihkan($input);
+        $data = $this->bersihkan($input, $tpId);
         $this->ubah($tpId, $versi, function () use ($tpId, $data): void {
             // Kontrak v2.5: satu TP (Esensial/NonEsensial) memiliki
             // tepat satu Materi. Periksa dalam transaksi terkunci,
@@ -135,7 +147,7 @@ final class MateriDrafService
 
     public function simpan(int $tpId, int $materiId, int $versi, array $input): void
     {
-        $data = $this->bersihkan($input);
+        $data = $this->bersihkan($input, $tpId);
         $this->ubah($tpId, $versi, function () use ($tpId, $materiId, $data): void {
             $lama = $this->db->table('materi')->where('id', $materiId)
                 ->where('tp_id', $tpId)->get()->getRowArray();
