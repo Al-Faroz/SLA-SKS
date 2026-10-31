@@ -113,6 +113,14 @@ final class AtpManualTemplateTest extends TestCase
         }
     }
 
+    /** Regression: getShowDropDown() saja tidak cukup, cek atribut ZIP XML final. */
+    public function testDropdownTerlihatDiBerkasXlsxNyata(): void
+    {
+        $file = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS;
+        \App\Services\AtpUnduhanService::periksaDropdownXlsx($file);
+        self::assertTrue(true, 'Semua 18 dropdown memiliki showDropDown=0 dalam XLSX.');
+    }
+
     public function testTidakAdaMacroDanReferensiEksternal(): void
     {
         $zip = new ZipArchive();
