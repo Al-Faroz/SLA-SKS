@@ -82,7 +82,7 @@ final class CpDaftarResponsifTest extends TestCase
         $excel = file_get_contents($root . '/app/Views/guru/impor_atp.php');
         self::assertIsString($excel);
         self::assertStringContainsString('guru/peta-atp/impor', $atp);
-        self::assertStringContainsString('Unduh Template ATP V25-2 · 6 Semester', $excel);
+        self::assertStringContainsString('Unduh Template ATP V25-3 · 6 Semester', $excel);
         self::assertStringNotContainsString('Unduh Template ATP Excel', $semester);
     }
 }
