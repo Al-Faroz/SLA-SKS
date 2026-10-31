@@ -56,7 +56,8 @@ final class AtpOtomatisTpService
 
     public static function formulaSah(Worksheet $sheet, string $alamat): bool
     {
-        if (! preg_match('/\AB(39|[4-9][0-9]|10[0-9]|11[0-8])\z/D', $alamat)
+        if (! preg_match('/\ASEMESTER [1-6]\z/D', $sheet->getTitle())
+            || ! preg_match('/\AB(39|[4-9][0-9]|10[0-9]|11[0-8])\z/D', $alamat)
             || $sheet->getCell($alamat)->getDataType() !== DataType::TYPE_FORMULA) {
             return false;
         }
