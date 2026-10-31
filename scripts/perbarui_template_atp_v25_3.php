@@ -72,6 +72,7 @@ try {
         } finally {
             $verifikasi->disconnectWorksheets();
         }
+        \App\Services\AtpUnduhanService::periksaDropdownXlsx($tmp);
         if (! rename($tmp, $file)) {
             throw new RuntimeException('Gagal menyimpan template master V25-3.');
         }
