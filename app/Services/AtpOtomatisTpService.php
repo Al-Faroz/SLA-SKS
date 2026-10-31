@@ -124,6 +124,21 @@ final class AtpOtomatisTpService
                 ->setError('Pilih Nomor BAB dari daftar BAB pada bagian atas sheet ini.')
                 ->setFormula1($nama);
 
+            // Semua dropdown harus tampak dan menolak isian di luar daftar.
+            // OOXML showDropDown=true justru menyembunyikan panah Excel.
+            foreach ([
+                ['C39', 'C39:C118', '"Esensial,NonEsensial"', 'Jenis TP tidak terdaftar',
+                    'Pilih jenis TP dari daftar yang tersedia.'],
+                ['G39', 'G39:G118', '"YouTube,PDF,Audio,Gambar"', 'Jenis media tidak terdaftar',
+                    'Pilih jenis media dari daftar yang tersedia.'],
+            ] as [$alamat, $rentang, $daftarPilihan, $judulGalat, $pesanGalat]) {
+                $sheet->getDataValidation($alamat)
+                    ->setType('list')->setSqref($rentang)->setFormula1($daftarPilihan)
+                    ->setAllowBlank(true)->setShowDropDown(false)
+                    ->setShowErrorMessage(true)->setErrorTitle($judulGalat)
+                    ->setError($pesanGalat);
+            }
+
             foreach (['D39', 'H39'] as $alamat) {
                 $obsolete = $sheet->getDataValidation($alamat);
                 $obsolete->setType('none')->setFormula1('')
