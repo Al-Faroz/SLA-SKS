@@ -121,6 +121,21 @@ final class AtpImporPratinjauService
                 ->whereIn('paket_semester_id', array_values($paketSem))
                 ->get()->getResultArray();
         }
+        // Judul dan jenis Media (F/G) menjadi Materi draf saat impor.
+        // Saat unggah ulang, status Tetap harus mencocokkan rencana
+        // media pula; jangan diam-diam mengabaikan perbedaan Materi.
+        $materiTerdaftar = [];
+        $materiTp = [];
+        $tpIds = array_map('intval', array_column($tpTerdaftar, 'id'));
+        if ($tpIds !== []) {
+            $materiTerdaftar = $this->db->table('materi')
+                ->select('id,tp_id,judul,jenis,aktif,berkas_id,url_youtube')
+                ->whereIn('tp_id', $tpIds)
+                ->orderBy('id', 'ASC')->get()->getResultArray();
+            foreach ($materiTerdaftar as $m) {
+                $materiTp[(int) $m['tp_id']][] = $m;
+            }
+        }
         $semesterDariPaket = array_flip($paketSem);
         $babIndeks = [];
         $babId = [];
@@ -205,7 +220,18 @@ final class AtpImporPratinjauService
             if ($sama) {
                 foreach ($et as $t) {
                     $old = $tpIndeks[$s][(string) $t['kode']] ?? null;
-                    if ($old === null
+                    $materiSesuai = false;
+                    if ($old !== null) {
+                        $daftarMateri = $materiTp[(int) $old['id']] ?? [];
+                        $jenisMedia = [
+                            'YouTube' => 'youtube', 'PDF' => 'pdf',
+                            'Audio' => 'audio', 'Gambar' => 'gambar',
+                        ][$t['media']] ?? null;
+                        $materiSesuai = count($daftarMateri) === 1
+                            && $daftarMateri[0]['judul'] === $t['materi']
+                            && $daftarMateri[0]['jenis'] === $jenisMedia;
+                    }
+                    if ($old === null || ! $materiSesuai
                         || $old['nama_tp'] !== $t['nama']
                         || $old['deskripsi_tp'] !== $t['deskripsi']
                         || $old['jenis_tp'] !== $t['jenis']
@@ -285,7 +311,8 @@ final class AtpImporPratinjauService
             strcmp((string) $a['elemen'], (string) $b['elemen']));
         $fingerprint = hash('sha256', json_encode([
             $paket, $cp, $elemen, $daftarPaket, $babTerdaftar,
-            $tpTerdaftar, $jumlah, $daftar, $modeSem, $tahunSem,
+            $tpTerdaftar, $materiTerdaftar,
+            $jumlah, $daftar, $modeSem, $tahunSem,
         ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
         $kosong = $hasil['jumlah_bab'] === 0 && $hasil['jumlah_tp'] === 0;
         return [
