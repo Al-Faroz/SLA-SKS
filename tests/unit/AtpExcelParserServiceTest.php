@@ -34,7 +34,6 @@ final class AtpExcelParserServiceTest extends TestCase
     {
         $s = $buku->getSheetByName('SEMESTER ' . $semester);
         $s->setCellValue('A39', $nomorBab);
-        $s->setCellValue('B39', $urutan);
         $s->setCellValue('C39', $jenis);
         $s->setCellValue('D39', 'Menganalisis peristiwa');
         $s->setCellValue('E39', 'Mengenali sebab dan akibat peristiwa penting');
@@ -245,6 +244,46 @@ final class AtpExcelParserServiceTest extends TestCase
             AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
         } finally {
             $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testUrutanTpDihitungPerBabOlehServerMeskiBarisDiselingi(): void
+    {
+        $buku = $this->buku();
+        try {
+            $this->bab($buku, 4, 13, 1);
+            $this->bab($buku, 4, 14, 2);
+            $sh = $buku->getSheetByName('SEMESTER 4');
+            foreach ([39=>1, 40=>2, 41=>1, 42=>2] as $row=>$nomorBab) {
+                $sh->setCellValue('A' . $row, $nomorBab);
+                $sh->setCellValue('C' . $row, 'Esensial');
+                $sh->setCellValue('D' . $row, 'Tujuan belajar ' . $row);
+                $sh->setCellValue('E' . $row, 'Uraian akademik ' . $row);
+                $sh->setCellValue('F' . $row, 'Materi sejarah ' . $row);
+                $sh->setCellValue('G' . $row, 'PDF');
+            }
+            $hasil = AtpExcelParserService::bacaBuku($buku,'SKI',4,'GEN2025');
+            self::assertSame(['SKI.8.1.1','SKI.8.2.1','SKI.8.1.2','SKI.8.2.2'],
+                array_column($hasil['tp'], 'kode'));
+            self::assertSame([1,1,2,2], array_column($hasil['tp'], 'urutan'));
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
+    public function testRumusTpDigantiNilaiAtauRumusAsingDitolak(): void
+    {
+        foreach (['2', '=1+1'] as $palsu) {
+            $buku = $this->buku();
+            try {
+                $buku->getSheetByName('SEMESTER 5')->setCellValue('B41', $palsu);
+                AtpExcelParserService::bacaBuku($buku, 'SKI', 4, 'GEN2025');
+            } catch (\DomainException $e) {
+                self::assertStringContainsString('SEMESTER 5', $e->getMessage());
+                $this->addToAssertionCount(1);
+            } finally {
+                $buku->disconnectWorksheets();
+            }
         }
     }
 
