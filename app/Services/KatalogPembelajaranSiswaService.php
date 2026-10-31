@@ -98,6 +98,9 @@ final class KatalogPembelajaranSiswaService
         if ($jenis === 'esensial') {
             return ['kode' => 'esensial', 'label' => 'Esensial — tanpa aktivitas siswa', 'buka' => false];
         }
+        if ($jenis !== 'non_esensial') {
+            return ['kode' => 'terkunci', 'label' => 'Jenis TP belum valid', 'buka' => false];
+        }
         if (!$pertama || $urutan < 1) {
             return ['kode' => 'terkunci', 'label' => 'Selesaikan TP sebelumnya', 'buka' => false];
         }
@@ -157,7 +160,7 @@ final class KatalogPembelajaranSiswaService
             $tp['akses'] = self::statusTp($semester, $mulai, (int) $tp['urutan_atp'],
                 (string) $tp['status'], (int) $tp['jumlah_versi'] > 0,
                 $sebelumnyaTuntas, $jenis, true);
-            if ($jenis === 'non_esensial' && ! isset($tuntas[(int) $tp['id']])) {
+            if ($jenis !== 'esensial' && ! isset($tuntas[(int) $tp['id']])) {
                 $sebelumnyaTuntas = false;
             }
         }
@@ -169,13 +172,22 @@ final class KatalogPembelajaranSiswaService
     private function semesterTuntas(int $paketId, int $siswaId): bool
     {
         $tp = $this->db->table('tp')
-            ->select('id')->where('paket_semester_id', $paketId)
-            ->where('jenis_tp', 'non_esensial')->where('status !=', 'arsip')
-            ->get()->getResultArray();
-        if ($tp === []) {
+            ->select('id,jenis_tp')->where('paket_semester_id', $paketId)
+            ->where('status !=', 'arsip')->get()->getResultArray();
+        $ids = [];
+        foreach ($tp as $item) {
+            $jenis = (string) $item['jenis_tp'];
+            if (! in_array($jenis, ['esensial', 'non_esensial'], true)) {
+                return false; // Jenis historis tak dikenal bukan TP selesai.
+            }
+            if ($jenis === 'non_esensial') {
+                $ids[] = (int) $item['id'];
+            }
+        }
+        // Semester tanpa TP wajib tidak otomatis dianggap 100% tuntas.
+        if ($ids === []) {
             return false;
         }
-        $ids = array_map(static fn (array $baris): int => (int) $baris['id'], $tp);
         return count($this->tpTuntasSah($ids, $siswaId)) === count($ids);
     }
 
