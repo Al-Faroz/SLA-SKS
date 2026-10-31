@@ -24,7 +24,7 @@ final class ChecklistKontenTpService
 
         if ($jumlahTautanCp !== null) {
             $adaCp = $jumlahTautanCp > 0;
-            $hasil[] = ['label' => 'Tautan CP pada TP', 'terpenuhi' => $adaCp,
+            $hasil[] = ['label' => 'Elemen CP operasional aktif', 'terpenuhi' => $adaCp,
                 'keterangan' => $adaCp ? $jumlahTautanCp . ' CP tertaut (status/versi/CP utama belum diverifikasi)'
                     : 'TP belum ditautkan dengan CP'];
         }
