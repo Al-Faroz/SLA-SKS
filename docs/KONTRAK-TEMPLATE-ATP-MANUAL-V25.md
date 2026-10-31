@@ -2,7 +2,7 @@
 
 **Berkas resmi:** [TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx](TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx)
 
-**Versi:** `SLA-SKS-ATP-MANUAL-V25-2` — file `.xlsx`, 10 sheet, tanpa VBA/macro/tombol proses/rumus pembentuk BAB–TP.
+**Versi aktif:** `SLA-SKS-ATP-MANUAL-V25-3` — file `.xlsx`, 10 sheet, tanpa VBA/macro/tombol proses; formula otomatis hanya untuk Urutan TP B39:B118.
 
 ## Struktur stabil untuk generator dan parser
 
@@ -21,7 +21,7 @@ Jumlah 20 BAB/80 TP adalah **kapasitas fisik template per semester, bukan batas 
 
 ## Pemisahan tanggung jawab
 
-Berkas di `docs/` adalah **kerangka master tanpa identitas akun**. Generator unduhan berikutnya wajib mengisi `RINGKASAN` dan `REFERENSI CP` dari penugasan Guru yang sah; tidak menyalin data pribadi ke GitHub. Parser berikutnya hanya membaca sheet `SEMESTER 1–6`, menolak formula/makro/zip bomb serta kode/jenis/relasi salah. Isian Materi di Excel **bukan unggah media atau penguncian TP Siap**. Pratinjau perubahan dan konfirmasi transaksional/idempoten tetap wajib; baris kosong atau hilang tidak menghapus TP terdahulu. **Revisi aturan final 28-10-2026:** impor hanya INSERT ke semester kosong, bukan upsert/UPDATE draf; semester terisi hanya diterima sebagai *Tetap* apabila seluruh BAB/TP identik; Excel yang mencoba mengubah/menambah ditolak untuk seluruh batch. TP Siap, progres, ujian, nilai dan histori tidak boleh ditimpa.
+Berkas di `docs/` adalah **kerangka master tanpa identitas akun**. Generator unduhan berikutnya wajib mengisi `RINGKASAN` dan `REFERENSI CP` dari penugasan Guru yang sah; tidak menyalin data pribadi ke GitHub. Parser berikutnya hanya membaca sheet `SEMESTER 1–6`, menolak formula di luar B39:B118/makro/zip bomb serta kode/jenis/relasi salah. Isian Materi di Excel **bukan unggah media atau penguncian TP Siap**. Pratinjau perubahan dan konfirmasi transaksional/idempoten tetap wajib; baris kosong atau hilang tidak menghapus TP terdahulu. **Revisi aturan final 28-10-2026:** impor hanya INSERT ke semester kosong, bukan upsert/UPDATE draf; semester terisi hanya diterima sebagai *Tetap* apabila seluruh BAB/TP identik; Excel yang mencoba mengubah/menambah ditolak untuk seluruh batch. TP Siap, progres, ujian, nilai dan histori tidak boleh ditimpa.
 
 **Status setelah PR generator:** Template fisik dan generator unduhan kontekstual Guru → Paket telah dibuat. Tombol unduh muncul pada detail semester dengan paket non-arsip, memverifikasi hak G1 pada Service, mengambil kurikulum/tahun dan CP aktif dari server, mengisi RINGKASAN dan REFERENSI CP, dan menjaga enam sheet input BAB/TP tetap kosong. **Parser, pratinjau dan transaksi impor belum dibuat**. UI tetap menggunakan komponen Emerald Glass yang sudah ada. Tidak ada patch SQL. Unduhan memerlukan paket semester yang sudah dibuat dan CP aktif Fase D; paket lintas Gen maupun arsip ditolak.
 
@@ -41,7 +41,7 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Parser membaca **keenam** sheet SEMESTER 1–6, memvalidasi nama kolom, versi, kode TP, jenis TP, nomor BAB yang berlanjut lintas pasangan semester, urutan TP per BAB, elemen CP aktif, panjang nama/deskripsi, larangan rumus/macro/koneksi, serta batas ZIP 5 MB terkompresi / 25 MB isi. Sheet CONTOH MAT VII tidak diimpor.
 - Pratinjau mengambil konteks Gen–Mapel–Kurikulum–Tahun Ajaran–CP dari **server**, lalu membandingkan dengan BAB/TP tersimpan. Hasil per baris: **Baru / Berubah / Tetap / Galat**, disertai nomor semester dan baris sumber. Baris yang tidak tercantum **bukan perintah hapus**.
 - Perubahan TP Siap, TP arsip, BAB yang berisi TP Siap, nama melebihi batas kolom database terpasang, dan data untuk semester tanpa paket nonarsip diperingatkan sebagai **Galat**.
-- **Tidak ada staging persisten, konfirmasi, INSERT, UPDATE, DELETE, atau impor otomatis** pada tahap 3A. Berkas unggahan sementara dibuang oleh PHP setelah request. Setelah konfirmasi transaksi aman pada tahap berikutnya, data harus divalidasi ulang, termasuk otorisasi, diff, urutan, dan perlindungan histori.
+- **Tahap 3A historis:** tidak ada staging persisten, konfirmasi, INSERT, UPDATE, DELETE, atau impor otomatis pada tahap awal tersebut. Berkas unggahan sementara dibuang oleh PHP setelah request. Setelah konfirmasi transaksi aman pada tahap berikutnya, data harus divalidasi ulang, termasuk otorisasi, diff, urutan, dan perlindungan histori.
 - UI menggunakan komponen Emerald Glass final dan tidak mengubah desain workbook yang sudah disetujui.
 
 ## Tahap 3B — konfirmasi transaksional (PR setelah #71)
@@ -55,7 +55,7 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 ## Revisi final 29 Oktober 2026 — TP delapan kolom
 - **Keluarkan Kode TP dan Elemen CP dari input Excel**. Guru tetap mengisi Nomor BAB dan Urutan TP. Server membuat Kode TP pada pratinjau dan ulangi validasi saat konfirmasi. CP operasional sudah terikat ke TP melalui `cp_mapel_id`; referensi CP aktif tetap ada di sheet REFERENSI CP.
 - Struktur input TP **A38:H38 / A39:H118**; C = Jenis TP dengan dropdown, F = Judul satu Materi, G = Jenis media dengan dropdown, H = Catatan. I:J tidak dipakai dan harus kosong.
-- Versi baru **SLA-SKS-ATP-MANUAL-V25-2** menggantikan V25-1; Excel V25-1 wajib diunduh ulang dan ditolak parser. Sheet tetap 10; tidak ada macro/formula, SQL, penghapusan CP atau perubahan UI aplikasi di luar pesan pratinjau.
+- Versi baru **SLA-SKS-ATP-MANUAL-V25-2** menggantikan V25-1; Excel V25-1 wajib diunduh ulang dan ditolak parser. Sheet tetap 10; pada versi V25-2 lama belum ada formula TP, SQL, penghapusan CP atau perubahan UI aplikasi di luar pesan pratinjau.
 
 ## Anti-unduh template lama (29 Oktober 2026)
 - Unduhan XLSX sekarang bernama `ATP-V25-2-<GEN>-<MAPEL>-6-SEMESTER.xlsx` agar tidak tertukar dengan unduhan V25-1.
