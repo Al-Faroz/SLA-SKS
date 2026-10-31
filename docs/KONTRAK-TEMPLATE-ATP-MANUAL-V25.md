@@ -109,3 +109,10 @@ Perbaikan ini disatukan ke PR #70 setelah peninjauan file hasil unduhan di XAMPP
 - Master telah dianonimkan: identitas Gen/Guru dan referensi CP spesifik pada file unduhan Guru telah dikosongkan; konten sharedStrings yang tidak dipakai dibersihkan. Materi/TP dari Guru tidak ikut disimpan.
 - Verifikasi telah mencakup pembacaan ZIP/XML, pemeriksaan CRC, pencocokan SHA GitHub dengan master sumber yang diuji, dan impor independen workbook oleh pembaca XLSX untuk enam sheet serta rumus `B39`. **Belum diuji dengan Microsoft Excel langsung atau PHPUnit di XAMPP setelah commit**.
 - Untuk lokal yang sudah mengubah file master dengan skrip regenerasi, amankan perubahan khusus `docs/...xlsx` menggunakan `git stash push -- docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx`, baru `git pull --ff-only`. Jangan `stash pop` ke master baru kecuali memang ingin mengembalikan versi lokal lama.
+
+## Penutupan regresi format Nomor BAB & proteksi rumus — 31 Oktober 2026
+- File master XLSX **fisik** di repository telah diperbarui pada branch `feature/v25-atp-dropdown-bab-urutan-otomatis-20261031`; bukan hanya generator di PHP.
+- Sel `A13:A32` dan `A39:A118` pada **SEMESTER 1–6** wajib menggunakan format angka **General** (OOXML `numFmtId=0`), supaya Defined Name `BABS_1`–`BABS_6` dan validasi list BAB dinamis membaca nomor sebagai angka, bukan teks.
+- Rumus `B39:B118` dikunci melalui **sheetProtection** yang aktif. Sel input BAB `A13:C32` serta sel input TP `A39:H118` selain kolom B harus tetap **unlocked** agar pengisian Guru tidak terganggu. Proteksi lembar tanpa password berfungsi mencegah salah edit rumus, bukan kontrol keamanan server.
+- Generator, guard sebelum unduhan, skrip regenerasi master, dan unit test pemeriksaan OOXML diperbarui agar menolak XLSX yang format/proteksinya keliru.
+- Audit setelah commit ke GitHub dilakukan terhadap **berkas yang dibaca ulang dari GitHub**: 6 sheet terproteksi, 600 sel Nomor BAB General, 480 sel rumus terkunci, 3.240 sel input dapat diedit, 18 dropdown terlihat, dan 6 Defined Name utuh. XML dan ZIP CRC lolos; pengujian interaktif Microsoft Excel/XAMPP dan PHPUnit atas commit terbaru belum dijalankan.
