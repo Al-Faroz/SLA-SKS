@@ -52,7 +52,7 @@ final class AtpOtomatisTpService
         return $validasi->getType() === 'list'
             && $validasi->getSqref() === 'A39:A118'
             && ltrim($validasi->getFormula1(), '=') === $nama
-            && ! $validasi->getShowDropDown()
+            && $validasi->getShowDropDown()
             && $validasi->getShowErrorMessage();
     }
 
@@ -120,14 +120,14 @@ final class AtpOtomatisTpService
             $dv->setType('list')
                 ->setSqref('A39:A118')
                 ->setAllowBlank(true)
-                ->setShowDropDown(false) // OOXML: false = panah dropdown terlihat di Excel
+                ->setShowDropDown(true) // PhpSpreadsheet membalik nilai ini saat menulis atribut XLSX
                 ->setShowErrorMessage(true)
                 ->setErrorTitle('Nomor BAB tidak terdaftar')
                 ->setError('Pilih Nomor BAB dari daftar BAB pada bagian atas sheet ini.')
                 ->setFormula1($nama);
 
             // Semua dropdown harus tampak dan menolak isian di luar daftar.
-            // OOXML showDropDown=true justru menyembunyikan panah Excel.
+            // PhpSpreadsheet menulis showDropDown=0 (panah terlihat) bila disetel true.
             foreach ([
                 ['C39', 'C39:C118', '"Esensial,NonEsensial"', 'Jenis TP tidak terdaftar',
                     'Pilih jenis TP dari daftar yang tersedia.'],
@@ -136,7 +136,7 @@ final class AtpOtomatisTpService
             ] as [$alamat, $rentang, $daftarPilihan, $judulGalat, $pesanGalat]) {
                 $sheet->getDataValidation($alamat)
                     ->setType('list')->setSqref($rentang)->setFormula1($daftarPilihan)
-                    ->setAllowBlank(true)->setShowDropDown(false)
+                    ->setAllowBlank(true)->setShowDropDown(true)
                     ->setShowErrorMessage(true)->setErrorTitle($judulGalat)
                     ->setError($pesanGalat);
             }
