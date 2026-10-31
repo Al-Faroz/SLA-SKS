@@ -272,6 +272,10 @@ final class AtpExcelParserService
             }
             // V25-3 selalu memiliki rumus terkontrol pada seluruh 80
             // baris, termasuk baris kosong. Rumus rusak/ditimpa ditolak.
+            if (! AtpOtomatisTpService::daftarBabSah($buku, $s)) {
+                throw new DomainException('SEMESTER ' . $s
+                    . ': daftar pilihan BAB tidak sesuai template V25-3 (BABS_' . $s . ').');
+            }
             for ($row = 39; $row <= 118; ++$row) {
                 if (! AtpOtomatisTpService::formulaSah($sheet, 'B' . $row)) {
                     throw new DomainException('SEMESTER ' . $s . '!B' . $row
