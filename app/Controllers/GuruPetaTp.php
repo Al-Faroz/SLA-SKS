@@ -40,9 +40,9 @@ final class GuruPetaTp extends BaseController
                 $nomor
             );
         }
-        return AturanBabService::denganStatusForm(
-            $hasil, (int) $dipilih['semester_mulai']
-        );
+        // Semua enam semester dapat disiapkan Guru; semester mulai hanya
+        // membatasi akses siswa, bukan editor akademik Guru.
+        return AturanBabService::denganStatusForm($hasil, 1);
     }
 
     public function index(): string|RedirectResponse
@@ -51,10 +51,22 @@ final class GuruPetaTp extends BaseController
         try {
             $konteks = $this->konteksPenugasan($service);
             $semesters = [];
+            $paketSemester = [];
+            $opsiPaket = ['tahun' => [], 'kurikulum' => []];
             if ($konteks['dipilih'] !== null) {
                 foreach ($this->seluruhSemester($service, $konteks['dipilih']) as $nomor => $data) {
                     $semesters[$nomor] = RingkasanSemesterAtpService::dariPeta($data);
+                    foreach ($data['paket'] as $baris) {
+                        if ($baris['status'] !== 'arsip') {
+                            $paketSemester[$nomor] = $baris;
+                            break;
+                        }
+                    }
                 }
+                $opsiPaket = (new PaketSemesterGuruService())->referensi(
+                    (int) $konteks['dipilih']['angkatan_id'],
+                    (int) $konteks['dipilih']['mapel_id']
+                );
             }
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru'))->with('galat', $e->getMessage());
@@ -70,6 +82,8 @@ final class GuruPetaTp extends BaseController
             'dipilih' => $konteks['dipilih'],
             'nomorPilihan' => $konteks['nomor'],
             'ringkasanSemester' => $semesters,
+            'paketSemester' => $paketSemester,
+            'opsiPaket' => $opsiPaket,
         ]);
     }
 
