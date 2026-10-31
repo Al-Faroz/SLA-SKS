@@ -217,18 +217,18 @@ final class KesiapanTpService
             ['sum_durasi', 5, 180, 'Durasi Sumatif'],
             ['diag_tayang', 10, 65535, 'Jumlah tayang Diagnostik'],
             ['sum_tayang', 30, 65535, 'Jumlah tayang Sumatif'],
-            ['sum_maks_percobaan', 1, 255, 'Kuota Sumatif'],
+            ['sum_maks_percobaan', 2, 2, 'Kuota Sumatif (normal + satu remedial)'],
         ] as [$name, $min, $max, $label]) {
             $val = (int) ($tp[$name] ?? 0);
             self::tambahCek($hasil, $name, $label, $val >= $min && $val <= $max,
                 'Nilai ' . $label . ' harus berada dalam rentang ' . $min . '–' . $max . '.',
                 $detail . '#kesiapan-tp');
         }
-        $bobot = (int) ($tp['bobot_resume'] ?? -1) + (int) ($tp['bobot_tugas'] ?? -1)
-            + (int) ($tp['bobot_sumatif'] ?? -1);
         self::tambahCek($hasil, 'bobot', 'Bobot penilaian',
-            $bobot === 100 && (int) ($tp['bobot_sumatif'] ?? 0) > 0,
-            'Jumlah bobot Resume, HOTS dan Sumatif harus 100%, Sumatif lebih dari nol.',
+            (int) ($tp['bobot_resume'] ?? 0) === 20
+                && (int) ($tp['bobot_tugas'] ?? 0) === 20
+                && (int) ($tp['bobot_sumatif'] ?? 0) === 60,
+            'Bobot wajib Resume 20%, HOTS 20%, dan Sumatif 60% (jalur belajar).',
             $detail . '#kesiapan-tp');
 
         foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 30]] as $jenis => [$field, $minimal]) {
