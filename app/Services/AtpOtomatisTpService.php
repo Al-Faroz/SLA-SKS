@@ -118,7 +118,7 @@ final class AtpOtomatisTpService
             $dv->setType('list')
                 ->setSqref('A39:A118')
                 ->setAllowBlank(true)
-                ->setShowDropDown(true)
+                ->setShowDropDown(false) // OOXML: false = panah dropdown terlihat di Excel
                 ->setShowErrorMessage(true)
                 ->setErrorTitle('Nomor BAB tidak terdaftar')
                 ->setError('Pilih Nomor BAB dari daftar BAB pada bagian atas sheet ini.')
