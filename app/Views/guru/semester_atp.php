@@ -185,7 +185,7 @@
                                 <label class="a-label" for="jenis-tp-<?= (int) $bab['id'] ?>">Jenis TP</label>
                                 <select id="jenis-tp-<?= (int) $bab['id'] ?>" name="jenis_tp" required>
                                     <option value="">Pilih jenis TP</option>
-                                    <option value="esensial">Esensial — tanpa materi dan nilai LMS</option>
+                                    <option value="esensial">Esensial — Materi disiapkan Guru, tanpa aktivitas/nilai wajib siswa</option>
                                     <option value="non_esensial">NonEsensial — materi, aktivitas, dan ujian</option>
                                 </select>
                             </div>
