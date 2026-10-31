@@ -71,17 +71,8 @@ final class BabService
             }
 
             $semester = (int) $paket['semester'];
-            $dataGen = $this->db->table('ref_angkatan')
-                ->select('semester_mulai')
-                ->where('id', $paket['angkatan_id'])
-                ->get()->getRowArray();
-            if ($dataGen === null) {
-                throw new DomainException('Data semester mulai Gen tidak ditemukan.');
-            }
-            $semesterMulai = (int) $dataGen['semester_mulai'];
-            if ($semester < $semesterMulai) {
-                throw new DomainException('Semester sebelum semester mulai Gen dilewati dan tidak dapat diisi BAB.');
-            }
+            // Hak Guru menyusun BAB tidak dibatasi semester mulai siswa.
+            // Semester 1–6 dapat disiapkan sejak awal dalam ATP Gen–Mapel.
             $referensiSemester = $this->db->table('ref_semester')->select('kelas_id')
                 ->where('id', $semester)->get()->getRowArray();
             if ($referensiSemester === null) {
@@ -93,9 +84,9 @@ final class BabService
             // Kunci paket dua semester pada kelas sama agar nomor tidak berlomba.
             $this->db->query(
                 'SELECT id FROM paket_semester WHERE angkatan_id=? AND mapel_id=? '
-                . 'AND kurikulum_id=? AND tahun_ajaran_id=? AND semester IN (?,?) ORDER BY id FOR UPDATE',
+                . 'AND kurikulum_id=? AND semester IN (?,?) ORDER BY id FOR UPDATE',
                 [(int) $paket['angkatan_id'], (int) $paket['mapel_id'],
-                    (int) $paket['kurikulum_id'], (int) $paket['tahun_ajaran_id'], $awal, $awal + 1]
+                    (int) $paket['kurikulum_id'], $awal, $awal + 1]
             )->getResultArray();
 
             $terdaftar = $this->db->table('bab b')
@@ -104,10 +95,13 @@ final class BabService
                 ->where('b.angkatan_id', $paket['angkatan_id'])
                 ->where('b.mapel_id', $paket['mapel_id'])
                 ->where('b.kurikulum_id', $paket['kurikulum_id'])
-                ->where('b.tahun_ajaran_id', $paket['tahun_ajaran_id'])
+                // Semester berpasangan dapat mempunyai Tahun Ajaran berbeda;
+                // nomor BAB tetap harus berlanjut pada kelas yang sama.
                 ->where('b.kelas_id', $kelasId)
+                ->whereIn('p.semester', [$awal, $awal + 1])
+                ->where('p.status !=', 'arsip')
                 ->get()->getResultArray();
-            $nomor = AturanBabService::nomorBerikutnya($semester, $terdaftar, $semesterMulai);
+            $nomor = AturanBabService::nomorBerikutnya($semester, $terdaftar, 1);
 
             $this->db->table('bab')->insert([
                 'paket_semester_id' => $paketId,
