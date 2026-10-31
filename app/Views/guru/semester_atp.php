@@ -12,10 +12,10 @@
         foreach ($semester['paket'] as $paket) {
             if ($paket['status'] !== 'arsip') { $paketAktif = $paket; break; }
         }
-        $belumMulai = $nomorSemester < (int) $dipilih['semester_mulai'];
-        $bolehTambahBab = ! $belumMulai && $paketAktif !== null
+        $sebelumMulaiGen = $nomorSemester < (int) $dipilih['semester_mulai'];
+        $bolehTambahBab = $paketAktif !== null
             && ($semester['pola_bab'] ?? false) && ($semester['boleh_tambah_bab'] ?? false);
-        $status = $belumMulai ? 'Semester sebelum awal Gen' : match ($ringkasan['status']) {
+        $status = match ($ringkasan['status']) {
             'aktif' => 'Paket aktif', 'draf' => 'Paket draf',
             'arsip' => 'Paket arsip', default => 'Belum ada paket',
         };
@@ -24,7 +24,7 @@
         <div>
             <p class="a-atp-detail__eyebrow"><?= esc($dipilih['kode_gen'] . ' · ' . $dipilih['nama_mapel']) ?></p>
             <h1>Semester <?= (int) $nomorSemester ?> <small>· Kelas <?= esc($kelas) ?></small></h1>
-            <span class="a-atp-detail__status"><?= esc($status) ?></span>
+            <span class="a-atp-detail__status"><?= esc($status) ?><?= $sebelumMulaiGen ? ' · Persiapan Guru (belum untuk siswa)' : '' ?></span>
         </div>
         <div class="a-atp-detail__metrik" aria-label="Ringkasan data semester">
             <span><strong><?= (int) $ringkasan['bab'] ?></strong> BAB</span>
@@ -50,9 +50,7 @@
             <h2 id="panduan-atp">Susun BAB dan TP</h2>
             <p class="a-proto-muted">Mulai dengan BAB sesuai ATP. Nomor BAB dan kode TP dibuat server; TP baru disimpan sebagai draf.
                 Batas nama mengikuti kapasitas database terpasang; deskripsi maksimal 225 karakter. Pilih jenis TP sesuai tujuan pembelajaran.</p>
-            <?php if ($belumMulai): ?>
-                <p class="a-atp-pesan-terkunci">Semester ini dilewati karena Gen mulai dari Semester <?= (int) $dipilih['semester_mulai'] ?>. Data tetap dapat dilihat.</p>
-            <?php elseif ($paketAktif !== null && ! $bolehTambahBab): ?>
+            <?php if ($paketAktif !== null && ! $bolehTambahBab): ?>
                 <p class="a-atp-pesan-terkunci">Penambahan BAB saat ini terkunci oleh aturan nomor antarsemester.
                     Periksa urutan BAB semester ganjil/genap pada kelas yang sama.</p>
             <?php elseif (! ($semester['pola_bab'] ?? false)): ?>
@@ -63,10 +61,9 @@
             <?php if ($bolehTambahBab): ?>
                 <button class="a-btn a-btn--utama" type="button" data-atp-dialog-open="dialog-bab-semester"
                     aria-haspopup="dialog" aria-controls="dialog-bab-semester">+ Tambah BAB</button>
-            <?php elseif (! $belumMulai && $paketAktif === null
-                && ($opsiPaket['tahun'] ?? []) !== [] && ($opsiPaket['kurikulum'] ?? []) !== []): ?>
-                <button class="a-btn a-btn--utama" type="button" data-atp-dialog-open="dialog-paket-semester"
-                    aria-haspopup="dialog" aria-controls="dialog-paket-semester">+ Buat Paket Draf</button>
+            <?php elseif ($paketAktif === null): ?>
+                <a class="a-btn a-btn--utama"
+                    href="<?= esc(site_url('guru/peta-atp') . '?pilihan=' . (int) $nomorPilihan, 'attr') ?>">Buat Draf Enam Semester di Peta ATP</a>
             <?php endif ?>
         </div>
     </section>
@@ -99,46 +96,6 @@
         </dialog>
     <?php endif ?>
 
-    <?php if (! $belumMulai && $paketAktif === null
-        && ($opsiPaket['tahun'] ?? []) !== [] && ($opsiPaket['kurikulum'] ?? []) !== []): ?>
-        <dialog id="dialog-paket-semester" class="a-modal a-modal--atp" aria-labelledby="judul-dialog-paket">
-            <div class="a-modal-atp__header">
-                <h2 id="judul-dialog-paket">Buat Paket Semester <?= (int) $nomorSemester ?></h2>
-                <button class="a-btn a-btn--sekunder" type="button" aria-label="Tutup dialog paket" data-atp-dialog-close>✕</button>
-            </div>
-            <p class="a-proto-muted">Paket baru berstatus draf dan tidak langsung ditampilkan kepada siswa.</p>
-            <form class="a-form" method="post" action="<?= esc(site_url('guru/paket-semester/baru'), 'attr') ?>" data-atp-dialog-form>
-                <?= csrf_field() ?>
-                <input type="hidden" name="gen_id" value="<?= (int) $dipilih['angkatan_id'] ?>">
-                <input type="hidden" name="mapel_id" value="<?= (int) $dipilih['mapel_id'] ?>">
-                <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
-                <input type="hidden" name="semester" value="<?= (int) $nomorSemester ?>">
-                <div class="a-field">
-                    <label class="a-label" for="tahun-paket">Tahun ajaran</label>
-                    <select id="tahun-paket" name="tahun_id" required>
-                        <option value="">Pilih tahun ajaran</option>
-                        <?php foreach ($opsiPaket['tahun'] as $tahun): ?>
-                            <option value="<?= (int) $tahun['id'] ?>"><?= esc($tahun['nama']) ?></option>
-                        <?php endforeach ?>
-                    </select>
-                </div>
-                <div class="a-field">
-                    <label class="a-label" for="kurikulum-paket">Kurikulum</label>
-                    <select id="kurikulum-paket" name="kurikulum_id" required>
-                        <option value="">Pilih kurikulum</option>
-                        <?php foreach ($opsiPaket['kurikulum'] as $kurikulum): ?>
-                            <option value="<?= (int) $kurikulum['id'] ?>"><?= esc($kurikulum['nama'] . ' — ' . $kurikulum['versi']) ?></option>
-                        <?php endforeach ?>
-                    </select>
-                </div>
-                <div class="a-modal-atp__actions">
-                    <button type="button" class="a-btn a-btn--sekunder" data-atp-dialog-close>Batal</button>
-                    <button type="submit" class="a-btn a-btn--utama">Simpan Paket Draf</button>
-                </div>
-            </form>
-        </dialog>
-    <?php endif ?>
-
     <section class="a-atp-bab-list" aria-labelledby="daftar-bab">
         <div class="a-atp-kelompok__heading">
             <h2 id="daftar-bab">Daftar BAB Semester <?= (int) $nomorSemester ?></h2>
@@ -147,16 +104,16 @@
         <?php if ($semester['bab'] === []): ?>
             <div class="a-card"><div class="a-empty" role="status">
                 <h3>Belum ada BAB</h3>
-                <p><?= $belumMulai ? 'Semester ini belum dapat diisi untuk Gen tersebut.' :
-                    ($paketAktif === null ? 'Buat paket draf terlebih dahulu sebelum menambahkan BAB.' :
-                    'Gunakan tombol Tambah BAB di atas untuk mulai menyusun ATP.') ?></p>
+                <p><?= $paketAktif === null
+                    ? 'Buat paket draf enam semester dari Peta ATP terlebih dahulu.'
+                    : 'Gunakan tombol Tambah BAB di atas untuk mulai menyusun ATP.' ?></p>
             </div></div>
         <?php else: ?>
             <?php foreach ($semester['bab'] as $index => $bab): ?>
                 <?php
                     $tpDalamBab = array_values(array_filter($semester['tp'],
                         static fn (array $tp): bool => (int) ($tp['bab_id'] ?? 0) === (int) $bab['id']));
-                    $bolehTp = $paketAktif !== null && ! $belumMulai
+                    $bolehTp = $paketAktif !== null
                         && (int) $bab['paket_semester_id'] === (int) $paketAktif['id'];
                     $warna = ((int) $index % 6) + 1;
                 ?>
