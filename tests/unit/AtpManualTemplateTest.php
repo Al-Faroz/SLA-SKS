@@ -44,9 +44,23 @@ final class AtpManualTemplateTest extends TestCase
                 self::assertSame('Judul satu Materi', (string) $sheet->getCell('F38')->getValue());
                 self::assertNull($sheet->getCell('A13')->getValue());
                 self::assertNull($sheet->getCell('J118')->getValue());
-                self::assertSame('C39:C118', $sheet->getDataValidation('C39')->getSqref());
-                self::assertSame('G39:G118', $sheet->getDataValidation('G39')->getSqref());
-                self::assertSame('A39:A118', $sheet->getDataValidation('A39')->getSqref());
+                foreach ([
+                    'A39' => 'A39:A118',
+                    'C39' => 'C39:C118',
+                    'G39' => 'G39:G118',
+                ] as $alamat => $rentang) {
+                    $validasi = $sheet->getDataValidation($alamat);
+                    self::assertSame('list', $validasi->getType());
+                    self::assertSame($rentang, $validasi->getSqref());
+                    self::assertFalse($validasi->getShowDropDown(),
+                        'Panah dropdown ' . $alamat . ' wajib terlihat di Excel.');
+                    self::assertTrue($validasi->getShowErrorMessage(),
+                        'Isian di luar daftar ' . $alamat . ' wajib ditolak Excel.');
+                }
+                self::assertSame('"Esensial,NonEsensial"',
+                    $sheet->getDataValidation('C39')->getFormula1());
+                self::assertSame('"YouTube,PDF,Audio,Gambar"',
+                    $sheet->getDataValidation('G39')->getFormula1());
                 self::assertSame('BABS_' . $n,
                     ltrim($sheet->getDataValidation('A39')->getFormula1(), '='));
                 self::assertNotNull($buku->getDefinedName('BABS_' . $n));
