@@ -350,8 +350,16 @@ final class AtpUnduhanService
                         $protect = $stylesXpath->query('./x:protection', $xf);
                         if ($protect !== false && $protect->length > 0) {
                             $node = $protect->item(0);
-                            if ($node instanceof \DOMElement) {
-                                $locked = $node->getAttribute('locked') !== '0';
+                            if ($node instanceof \DOMElement && $node->hasAttribute('locked')) {
+                                // PhpSpreadsheet menulis 'true'/'false'; Excel/OOXML
+                                // juga menerima '1'/'0'. Jangan menganggap
+                                // string 'false' sebagai boolean true di PHP.
+                                $nilai = strtolower(trim($node->getAttribute('locked')));
+                                if (! in_array($nilai, ['true', 'false', '1', '0'], true)) {
+                                    throw new RuntimeException('Atribut locked pada style '
+                                        . $styleId . ' Semester ' . $sem . ' tidak valid.');
+                                }
+                                $locked = in_array($nilai, ['true', '1'], true);
                             }
                         }
                         if ($locked !== $expectedLocked) {
