@@ -178,9 +178,18 @@
             </div>
         <?php endif ?>
     </section>
-    <?php if ($tp['status'] === 'draf'): ?>
+    <?php if ($tp['status'] === 'draf' && (int) $jumlah_materi >= 1): ?>
+        <section class="a-card a-jarak-atas" role="status">
+            <h2>Materi TP sudah tersedia</h2>
+            <p class="a-help">Satu TP hanya memiliki satu Materi, berlaku untuk Esensial maupun
+                NonEsensial. Gunakan tombol Sunting pada daftar Materi di atas untuk
+                memperbarui YouTube, Audio, Gambar, atau PDF. Materi yang sudah ada
+                dan data pembelajaran historis tidak dihapus.</p>
+        </section>
+    <?php endif ?>
+    <?php if ($tp['status'] === 'draf' && (int) $jumlah_materi === 0): ?>
         <section class="a-card a-jarak-atas" aria-labelledby="tambah-materi">
-            <h2 id="tambah-materi">Tambah Materi/Submateri</h2>
+            <h2 id="tambah-materi">Tambah satu Materi</h2>
             <?php $pesanMateriGagal = session()->getFlashdata('materi_galat'); ?>
             <?php $pesanMateriSukses = session()->getFlashdata('materi_sukses'); ?>
             <?php $nilaiMateriLama = session()->getFlashdata('materi_input_lama'); ?>
