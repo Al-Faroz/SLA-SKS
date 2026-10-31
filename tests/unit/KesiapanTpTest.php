@@ -10,7 +10,7 @@ final class KesiapanTpTest extends TestCase
     private static function data(): array
     {
         $tp = [
-            'id' => 1, 'kode_tp' => 'TP-SKI-S4-01', 'judul' => 'Sejarah',
+            'id' => 1, 'cp_mapel_id' => 1, 'kode_tp' => 'TP-SKI-S4-01', 'judul' => 'Sejarah',
             'rumusan' => 'Memahami peristiwa', 'indikator' => 'Menguraikan peristiwa',
             'status' => 'draf', 'struktur_versi' => 1, 'kkm' => 75,
             'bobot_resume' => 20, 'bobot_tugas' => 20, 'bobot_sumatif' => 60,
@@ -20,7 +20,7 @@ final class KesiapanTpTest extends TestCase
         ];
         $paket = ['id' => 10, 'mapel_id' => 2, 'kurikulum_id' => 1, 'status' => 'draf'];
         $cp = [[
-            'cp_versi_id' => 3, 'utama' => 1, 'versi_status' => 'aktif',
+            'cp_mapel_id' => 1, 'cp_versi_id' => 3, 'versi_status' => 'aktif',
             'mapel_id' => 2, 'kurikulum_id' => 1, 'fase' => 'D',
         ]];
         $materi = [[
@@ -64,14 +64,17 @@ final class KesiapanTpTest extends TestCase
         self::assertSame('bank-sumatif', self::hasil($result, 'bank-sumatif')['kode']);
     }
 
-    public function testCpBukanFaseAtauAdaDuaUtamaMemblokirPublikasi(): void
+    public function testCpOperasionalHarusCocokDanBolehMultiElemen(): void
     {
         [$tp, $paket, $cp, $materi, $soal] = self::data();
         $cp[0]['fase'] = 'E';
         self::assertFalse(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
         $cp[0]['fase'] = 'D';
-        $cp[] = $cp[0];
+        $cp[0]['cp_mapel_id'] = 99;
         self::assertFalse(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
+        $cp[0]['cp_mapel_id'] = 1;
+        $cp[] = array_replace($cp[0], ['cp_versi_id' => 4]);
+        self::assertTrue(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
     }
 
     public function testMateriTanpaResumeHotsDanUrutanUtuhDitolak(): void
