@@ -110,6 +110,12 @@ final class MateriDrafService
     {
         $data = $this->bersihkan($input);
         $this->ubah($tpId, $versi, function () use ($tpId, $data): void {
+            // Kontrak v2.5: satu TP (Esensial/NonEsensial) memiliki
+            // tepat satu Materi. Periksa dalam transaksi terkunci,
+            // bukan mengandalkan tombol yang tersembunyi di View.
+            if ($this->db->table('materi')->where('tp_id', $tpId)->countAllResults() > 0) {
+                throw new DomainException('Satu TP hanya boleh memiliki satu Materi. Sunting Materi yang sudah ada.');
+            }
             $akhir = $this->db->table('materi')->selectMax('urutan', 'maks')
                 ->where('tp_id', $tpId)->get()->getRowArray();
             $nomor = (int) ($akhir['maks'] ?? 0) + 1;
