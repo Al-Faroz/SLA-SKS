@@ -13,10 +13,10 @@ final class KesiapanTpTest extends TestCase
             'id' => 1, 'kode_tp' => 'TP-SKI-S4-01', 'judul' => 'Sejarah',
             'rumusan' => 'Memahami peristiwa', 'indikator' => 'Menguraikan peristiwa',
             'status' => 'draf', 'struktur_versi' => 1, 'kkm' => 75,
-            'bobot_resume' => 20, 'bobot_tugas' => 30, 'bobot_sumatif' => 50,
+            'bobot_resume' => 20, 'bobot_tugas' => 20, 'bobot_sumatif' => 60,
             'resume_min' => 50, 'tugas_min' => 200, 'diag_tayang' => 10,
-            'sum_tayang' => 20, 'diag_durasi' => 30, 'sum_durasi' => 60,
-            'sum_maks_percobaan' => 3,
+            'sum_tayang' => 30, 'diag_durasi' => 30, 'sum_durasi' => 60,
+            'sum_maks_percobaan' => 2,
         ];
         $paket = ['id' => 10, 'mapel_id' => 2, 'kurikulum_id' => 1, 'status' => 'draf'];
         $cp = [[
@@ -30,7 +30,7 @@ final class KesiapanTpTest extends TestCase
             'petunjuk_resume' => 'Tuliskan ringkasan', 'petunjuk_hots' => 'Jelaskan dampaknya',
         ]];
         $soal = [];
-        foreach (['diagnostik' => 10, 'sumatif' => 20] as $jenis => $jumlah) {
+        foreach (['diagnostik' => 10, 'sumatif' => 30] as $jenis => $jumlah) {
             for ($i = 1; $i <= $jumlah; $i++) {
                 $soal[] = [
                     'id' => count($soal) + 1, 'jenis' => $jenis, 'urutan' => $i,
@@ -81,6 +81,16 @@ final class KesiapanTpTest extends TestCase
         $materi[0]['petunjuk_hots'] = '';
         $materi[0]['urutan'] = 3;
         self::assertFalse(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'materi-1')['terpenuhi']);
+    }
+
+    public function testSumatifDuaPuluhSembilanSoalDitolakKontrakV25(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $tp['sum_tayang'] = 29;
+        array_pop($soal);
+        $evaluasi = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
+        self::assertFalse(self::hasil($evaluasi, 'sum_tayang')['terpenuhi']);
+        self::assertFalse(self::hasil($evaluasi, 'bank-sumatif')['terpenuhi']);
     }
 
     public function testJumlahSoalDanKunciTidakValidMenolakSiap(): void
