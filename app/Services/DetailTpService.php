@@ -77,10 +77,18 @@ final class DetailTpService
             ->orderBy('id', 'ASC')
             ->get()->getResultArray();
 
-        // Indikator keberadaan tautan, bukan pemeriksaan CP utama/aktif/cocok.
-        // Fixture QA lama bisa belum memiliki tabel tp_cp.
-        $jumlahTautanCp = $this->db->tableExists('tp_cp')
-            ? $this->db->table('tp_cp')->where('tp_id', $tpId)->countAllResults()
+        // Pada v2.5 TP mengacu pada CP operasional, bukan tp_cp lama.
+        // Checklist awal hanya menghitung elemen aktif; kesiapan final
+        // memeriksa Fase D, Gen, Mapel, Kurikulum dan versi CP secara ketat.
+        $cpOperasional = $this->db->table('tp')->select('cp_mapel_id')
+            ->where('id', $tpId)->get()->getRowArray();
+        $jumlahTautanCp = $this->db->tableExists('cp_mapel_elemen')
+            && $this->db->tableExists('ref_cp_versi')
+            && (int) ($cpOperasional['cp_mapel_id'] ?? 0) > 0
+            ? $this->db->table('cp_mapel_elemen e')
+                ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+                ->where('e.cp_mapel_id', (int) $cpOperasional['cp_mapel_id'])
+                ->where('v.status', 'aktif')->countAllResults()
             : null;
 
         return ['tp' => $tp, 'paket' => $paket, 'jumlah_materi' => count($materi), 'materi' => $materi,
