@@ -139,6 +139,50 @@ final class AtpManualTemplateTest extends TestCase
         self::assertTrue(true, '18 dropdown, 240 sel BAB/TP General dan proteksi rumus lolos audit XLSX.');
     }
 
+    /**
+     * Regresi unduhan Guru: template yang valid di docs/ harus tetap valid
+     * setelah isi identitas/CP, styling, dan serialisasi Xlsx oleh writer.
+     * Writer mengeluarkan locked="true"/"false", berbeda dari master
+     * yang dapat memuat locked="1"/"0".
+     */
+    public function testUnduhanSetelahDisimpanTetapMemilikiFormatDanProteksiValid(): void
+    {
+        $master = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . self::BERKAS;
+        $buku = IOFactory::load($master);
+        $temp = tempnam(sys_get_temp_dir(), 'atp_roundtrip_');
+        self::assertNotFalse($temp);
+
+        try {
+            \App\Services\AtpUnduhanService::isiBuku($buku, [
+                'kode_gen' => 'GEN-UJI',
+                'nama_gen' => 'Gen untuk pengujian',
+                'guru_id' => '1',
+                'nama_guru' => 'Guru Pengujian',
+                'kode_mapel' => 'SKI',
+                'nama_mapel' => 'Sejarah Kebudayaan Islam',
+                'kurikulum' => 'Kurikulum Pengujian',
+                'tahun_ajaran' => '2026/2027',
+                'cp_id' => '1',
+                'semester_mulai' => 1,
+                'semester_paket' => 1,
+            ], [
+                ['id' => '1', 'elemen' => 'Pemahaman Konsep',
+                    'rumusan' => 'CP pengujian, bukan data akademik.',
+                    'nomor_versi' => '1'],
+            ]);
+            \App\Services\AtpUnduhanService::periksaTemplateV25Tiga($buku);
+            (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($buku))->save($temp);
+
+            // Jangan hanya memeriksa objek PHP sebelum penyimpanan.
+            \App\Services\AtpUnduhanService::periksaDropdownXlsx($temp);
+            \App\Services\AtpUnduhanService::periksaFormatProteksiXlsx($temp);
+            self::assertGreaterThan(100, (int) filesize($temp));
+        } finally {
+            $buku->disconnectWorksheets();
+            @unlink($temp);
+        }
+    }
+
     public function testTidakAdaMacroDanReferensiEksternal(): void
     {
         $zip = new ZipArchive();
