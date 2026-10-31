@@ -1,6 +1,13 @@
 name: ATP V25-3 Regenerasi Master XLSX
 
 on:
+  push:
+    branches:
+      - feature/v25-atp-dropdown-bab-urutan-otomatis-20261031
+    paths:
+      - 'scripts/perbarui_template_atp_v25_3.php'
+      - 'app/Services/AtpOtomatisTpService.php'
+      - '.github/workflows/atp-v25-3-update-master.yml'
   pull_request:
     paths:
       - 'scripts/perbarui_template_atp_v25_3.php'
@@ -12,12 +19,12 @@ permissions:
 
 jobs:
   upgrade-master:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/v25-atp-dropdown-bab-urutan-otomatis-20261031'
+    if: github.ref == 'refs/heads/feature/v25-atp-dropdown-bab-urutan-otomatis-20261031'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: feature/v25-atp-dropdown-bab-urutan-otomatis-20261031
           persist-credentials: true
       - uses: shivammathur/setup-php@v2
         with:
