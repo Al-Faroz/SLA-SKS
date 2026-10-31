@@ -82,20 +82,22 @@
                                     Semester <?= $n ?> · Kelas <?= esc(match ($n) { 1,2 => 'VII', 3,4 => 'VIII', default => 'IX' }) ?>
                                     <?= $ada !== null ? '(sudah ada)' : '(draf baru)' ?>
                                 </label>
-                                <select id="draf-tahun-<?= $n ?>" name="tahun_id[<?= $n ?>]" required
-                                    <?= $ada !== null ? 'aria-describedby="draf-info-' . $n . '"' : '' ?>>
-                                    <option value="">Pilih Tahun Ajaran</option>
-                                    <?php foreach ($opsiPaket['tahun'] as $tahun): ?>
-                                        <option value="<?= (int) $tahun['id'] ?>"
-                                            <?= ((int) $tahun['id'] === $tahunAda ||
-                                                ($ada === null && count($opsiPaket['tahun']) === 1)) ? 'selected' : '' ?>>
-                                            <?= esc($tahun['nama']) ?>
-                                        </option>
-                                    <?php endforeach ?>
-                                </select>
                                 <?php if ($ada !== null): ?>
-                                    <p class="a-help" id="draf-info-<?= $n ?>">Paket <?= esc($ada['status']) ?> dipertahankan;
-                                        pilihan Tahun Ajaran di atas tidak akan mengubah paket ini.</p>
+                                    <input type="hidden" name="tahun_id[<?= $n ?>]" value="<?= $tahunAda ?>">
+                                    <p class="a-help" id="draf-info-<?= $n ?>">
+                                        Paket <?= esc($ada['status']) ?> dengan Tahun Ajaran yang sudah tersimpan
+                                        akan dipertahankan tanpa perubahan.
+                                    </p>
+                                <?php else: ?>
+                                    <select id="draf-tahun-<?= $n ?>" name="tahun_id[<?= $n ?>]" required>
+                                        <option value="">Pilih Tahun Ajaran</option>
+                                        <?php foreach ($opsiPaket['tahun'] as $tahun): ?>
+                                            <option value="<?= (int) $tahun['id'] ?>"
+                                                <?= count($opsiPaket['tahun']) === 1 ? 'selected' : '' ?>>
+                                                <?= esc($tahun['nama']) ?>
+                                            </option>
+                                        <?php endforeach ?>
+                                    </select>
                                 <?php endif ?>
                             </div>
                         <?php endfor ?>
