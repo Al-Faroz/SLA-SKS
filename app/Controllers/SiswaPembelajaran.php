@@ -78,7 +78,7 @@ final class SiswaPembelajaran extends BaseController
             $data = (new KatalogPembelajaranSiswaService())->rincianTp($tpId);
             $data['progres'] = (new ProgresTpSiswaService())->status($tpId);
             if ($data['progres'] !== null
-                && in_array($data['progres']['status'], ['belajar', 'tuntas'], true)) {
+                && in_array($data['progres']['status'], ['belajar', 'sumatif', 'tuntas'], true)) {
                 // Data berasal dari snapshot terpin, bukan versi live milik Guru.
                 $data['materi'] = (new MateriSiswaService())->daftar($tpId)['materi'];
             }
