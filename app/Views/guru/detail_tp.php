@@ -211,7 +211,7 @@
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                 <div class="a-materi-form-fields">
-                    <?= view('guru/_materi_fields', ['nilai' => $nilaiMateriTambah, 'galatKolom' => $kolomMateriGalat]) ?>
+                    <?= view('guru/_materi_fields', ['nilai' => $nilaiMateriTambah, 'galatKolom' => $kolomMateriGalat, 'jenisTp' => (string) ($tp['jenis_tp'] ?? 'non_esensial')]) ?>
                 </div>
                 <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Tambah Materi draf</button>
                 <p class="a-help" data-materi-status aria-live="polite">Belum disimpan.</p>
