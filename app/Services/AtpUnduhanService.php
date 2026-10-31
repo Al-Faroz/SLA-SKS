@@ -193,7 +193,7 @@ final class AtpUnduhanService
                 $dv = $sheet->getDataValidation($alamat);
                 if ($dv->getType() !== 'list' || $dv->getSqref() !== $rentang
                     || $dv->getFormula1() !== $pilihan
-                    || $dv->getShowDropDown() || ! $dv->getShowErrorMessage()) {
+                    || ! $dv->getShowDropDown() || ! $dv->getShowErrorMessage()) {
                     throw new RuntimeException('Validasi ' . $alamat . ' pada Semester '
                         . $n . ' tidak aktif atau tidak terlihat di Excel.');
                 }
