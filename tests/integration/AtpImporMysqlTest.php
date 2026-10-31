@@ -108,7 +108,6 @@ final class AtpImporMysqlTest extends TestCase
             $sh->setCellValue('B13', $babName);
             $sh->setCellValue('C13', 'Sejarah, latar belakang dan perkembangan');
             $sh->setCellValue('A39', 1);
-            $sh->setCellValue('B39', 1);
             $sh->setCellValue('C39', 'NonEsensial');
             $sh->setCellValue('D39', $tpName);
             $sh->setCellValue('E39', 'Menganalisis hubungan sebab akibat');
@@ -119,7 +118,7 @@ final class AtpImporMysqlTest extends TestCase
                 foreach ([
                     'A13'=>1, 'B13'=>'Tokoh Muslim Nusantara',
                     'C13'=>'Menelaah perkembangan dan keteladanan tokoh',
-                    'A39'=>1, 'B39'=>1, 'C39'=>'NonEsensial',
+                    'A39'=>1, 'C39'=>'NonEsensial',
                     'D39'=>'Perjalanan Islam',
                     'E39'=>'Menganalisis penyebaran Islam di Indonesia',
                     'F39'=>'Materi perkembangan Islam', 'G39'=>'PDF',
@@ -266,7 +265,7 @@ final class AtpImporMysqlTest extends TestCase
             foreach ([
                 'A14'=>2, 'B14'=>'Tokoh Islam',
                 'C14'=>'Mempelajari tokoh dan keteladanannya',
-                'A40'=>2, 'B40'=>1, 'C40'=>'Esensial',
+                'A40'=>2, 'C40'=>'Esensial',
                 'D40'=>'Meneladani Tokoh',
                 'E40'=>'Mengapresiasi perjuangan tokoh Islam',
                 'F40'=>'Materi keteladanan tokoh', 'G40'=>'PDF',
