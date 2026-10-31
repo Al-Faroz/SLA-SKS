@@ -37,14 +37,21 @@ final class KesiapanTpService
             throw new DomainException('TP atau paket semester tidak tersedia.');
         }
 
-        $cp = $this->db->table('tp_cp tc')
-            ->select('tc.cp_versi_id,tc.utama,v.nomor_versi,v.status AS versi_status,' .
-                'c.kode,c.kurikulum_id,c.mapel_id,f.kode AS fase', false)
-            ->join('ref_cp_versi v', 'v.id=tc.cp_versi_id')
-            ->join('ref_cp c', 'c.id=v.cp_id')
+        // v2.5 memakai SATU CP operasional melalui tp.cp_mapel_id;
+        // tidak lagi mewajibkan tautan tp_cp/CP utama model v2.4.
+        // Satu CP operasional boleh merujuk beberapa elemen versi aktif.
+        $cp = $this->db->table('cp_mapel c')
+            ->select('c.id AS cp_mapel_id,c.kurikulum_id,c.mapel_id,'
+                . 'f.kode AS fase,v.id AS cp_versi_id,v.nomor_versi,'
+                . 'v.status AS versi_status,v.elemen,v.rumusan,r.kode', false)
+            ->join('cp_mapel_elemen e', 'e.cp_mapel_id=c.id')
+            ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+            ->join('ref_cp r', 'r.id=v.cp_id AND r.kurikulum_id=c.kurikulum_id'
+                . ' AND r.mapel_id=c.mapel_id AND r.fase_id=c.fase_id')
             ->join('ref_fase f', 'f.id=c.fase_id')
-            ->where('tc.tp_id', $tpId)
-            ->orderBy('tc.id', 'ASC')->get()->getResultArray();
+            ->where('c.id', (int) ($tp['cp_mapel_id'] ?? 0))
+            ->where('v.status', 'aktif')
+            ->orderBy('v.id', 'ASC')->get()->getResultArray();
         $materi = $this->db->table('materi')
             ->where('tp_id', $tpId)->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')
             ->get()->getResultArray();
@@ -154,11 +161,12 @@ final class KesiapanTpService
                 trim((string) ($tp[$field] ?? '')) !== '',
                 'Periksa isian ' . $label . '.', $detail . '#rumusan-tp');
         }
-        $utama = 0;
-        $validCp = count($cp) > 0;
+        $cpId = (int) ($tp['cp_mapel_id'] ?? 0);
+        $validCp = $cpId > 0 && count($cp) > 0;
         foreach ($cp as $row) {
-            $utama += (int) ($row['utama'] ?? 0) === 1 ? 1 : 0;
-            if ($row['versi_status'] !== 'aktif' || ($row['fase'] ?? '') !== 'D'
+            if ((int) ($row['cp_mapel_id'] ?? 0) !== $cpId
+                || $row['versi_status'] !== 'aktif'
+                || ($row['fase'] ?? '') !== 'D'
                 || (int) $row['mapel_id'] !== (int) $paket['mapel_id']
                 || (int) $row['kurikulum_id'] !== (int) $paket['kurikulum_id']) {
                 $validCp = false;
@@ -168,8 +176,9 @@ final class KesiapanTpService
             in_array($paket['status'] ?? '', ['draf', 'aktif'], true),
             'Paket semester arsip tidak boleh menerbitkan TP baru.',
             $detail . '#identitas-tp');
-        self::tambahCek($hasil, 'cp', 'CP resmi aktif dan cocok', $validCp && $utama === 1,
-            'Setiap CP harus aktif, Fase D, sesuai Mapel/Kurikulum, dengan tepat satu CP utama.',
+        self::tambahCek($hasil, 'cp', 'CP operasional aktif dan cocok', $validCp,
+            'TP wajib memiliki satu CP operasional Fase D sesuai Mapel/Kurikulum'
+                . ' dengan sekurangnya satu elemen versi aktif.',
             'guru/peta-atp');
 
         // Kesiapan akademik Guru tidak dibedakan menurut jenis TP.
