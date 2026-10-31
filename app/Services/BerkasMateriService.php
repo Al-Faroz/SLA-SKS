@@ -159,7 +159,7 @@ final class BerkasMateriService
         if ($tpId < 1 || $versi < 1 || ! $file->isValid() || $file->hasMoved()) {
             throw new DomainException('Berkas unggahan tidak sah.');
         }
-        $data = (new MateriDrafService($this->db))->bersihkan($input);
+        $data = (new MateriDrafService($this->db))->bersihkan($input, $tpId);
         if (! in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
             throw new DomainException('Unggah langsung hanya untuk PDF, Gambar dan Audio.');
         }
@@ -234,7 +234,7 @@ final class BerkasMateriService
         if ($tpId < 1 || $materiId < 1 || $versi < 1 || ! $file->isValid() || $file->hasMoved()) {
             throw new DomainException('Unggahan tidak valid.');
         }
-        $data = (new MateriDrafService($this->db))->bersihkan($input);
+        $data = (new MateriDrafService($this->db))->bersihkan($input, $tpId);
         if (! in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
             throw new DomainException('Berkas harus berupa PDF, Gambar atau Audio.');
         }
