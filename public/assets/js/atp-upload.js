@@ -41,7 +41,7 @@
 
     input.addEventListener('change', validate);
     input.addEventListener('invalid', function () {
-        setStatus(input.validationMessage || 'Pilih file Excel ATP V25-2 terlebih dahulu.');
+        setStatus(input.validationMessage || 'Pilih file Excel ATP V25-3 terlebih dahulu.');
     });
     form.addEventListener('submit', function (event) {
         if (!validate()) {
