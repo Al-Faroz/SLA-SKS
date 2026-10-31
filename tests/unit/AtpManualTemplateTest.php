@@ -52,8 +52,8 @@ final class AtpManualTemplateTest extends TestCase
                     $validasi = $sheet->getDataValidation($alamat);
                     self::assertSame('list', $validasi->getType());
                     self::assertSame($rentang, $validasi->getSqref());
-                    self::assertFalse($validasi->getShowDropDown(),
-                        'Panah dropdown ' . $alamat . ' wajib terlihat di Excel.');
+                    self::assertTrue($validasi->getShowDropDown(),
+                        'PhpSpreadsheet harus menulis showDropDown=0 agar panah Excel terlihat: ' . $alamat);
                     self::assertTrue($validasi->getShowErrorMessage(),
                         'Isian di luar daftar ' . $alamat . ' wajib ditolak Excel.');
                 }
