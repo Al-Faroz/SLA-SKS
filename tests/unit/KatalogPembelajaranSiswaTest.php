@@ -111,4 +111,23 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         self::assertStringContainsString('.a-siswa-kartu-grid', $css);
         self::assertStringContainsString('@media(max-width:520px)', $css);
     }
+    public function testStatusEsensialTidakTerbukaWalauSiap(): void
+    {
+        $state = KatalogPembelajaranSiswaService::statusTp(
+            4, 4, 1, 'siap', true, true, 'esensial', true
+        );
+        self::assertFalse($state['buka']);
+        self::assertSame('esensial', $state['kode']);
+    }
+
+    public function testSemesterLanjutanHanyaTerbukaJikaGateServiceMemberiIzin(): void
+    {
+        self::assertFalse(KatalogPembelajaranSiswaService::statusTp(
+            5, 4, 1, 'siap', true, true, 'non_esensial', false
+        )['buka']);
+        self::assertTrue(KatalogPembelajaranSiswaService::statusTp(
+            5, 4, 1, 'siap', true, true, 'non_esensial', true
+        )['buka']);
+    }
+
 }
