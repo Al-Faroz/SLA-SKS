@@ -42,9 +42,7 @@ try {
     for ($n = 1; $n <= 6; ++$n) {
         $sheet = $buku->getSheetByName('SEMESTER ' . $n);
         $dv = $sheet->getDataValidation('A39');
-        if ($dv->getSqref() !== 'A39:A118'
-            || ltrim($dv->getFormula1(), '=') !== 'BABS_' . $n
-            || $buku->getDefinedName('BABS_' . $n) === null) {
+        if (! \App\Services\AtpOtomatisTpService::daftarBabSah($buku, $n)) {
             throw new RuntimeException('Dropdown BAB belum valid Semester ' . $n);
         }
         foreach (range(39,118) as $row) {
