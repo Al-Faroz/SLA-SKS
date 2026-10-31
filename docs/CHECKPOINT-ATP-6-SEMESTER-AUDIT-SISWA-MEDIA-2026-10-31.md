@@ -52,3 +52,11 @@ Basis: `feature/v25-atp-dropdown-bab-urutan-otomatis-20261031`.
 - Keterbatasan utama: implementasi penuh Sumatif/remedial, penilaian, dan Pra-Semester belum tersedia pada seluruh alur siswa di branch ini. **Status aplikasi BELUM FIX end-to-end**, walau fondasi dan gate yang sudah ada dibuat lebih konsisten.
 - **Pengujian nyata:** inspeksi isi file/dump, struktur DDL, pembacaan kode dan audit regresi secara statis; PHPUnit, lint PHP seluruh repository, MySQL QA dan browser XAMPP **belum berhasil dijalankan di lingkungan AI**. GitHub Actions sebelumnya gagal di startup. Uji lokal wajib sebelum merge.
 
+
+## Koreksi audit final setelah pendalaman kode dan dump (31 Oktober 2026)
+
+- `AtpImporPratinjauService` kini memasukkan baris Materi ke *fingerprint* dan pemeriksaan status **Tetap** (judul serta jenis media F/G); tidak menerima perbedaan rencana media sebagai isi ATP identik.
+- Server dan UI editor Materi memperoleh jenis TP dari database. Untuk **Esensial** satu media tetap wajib, sementara petunjuk Resume/HOTS opsional. Untuk **NonEsensial**, petunjuk tersebut tetap wajib. File media harus aktual; draf hasil impor tidak dianggap selesai.
+- `KesiapanTpService` menolak penerbitan TP NonEsensial dengan Sumatif di bawah 30 soal, bobot selain 20/20/60, atau kuota selain dua kesempatan (tes normal dan satu remedial bila diperlukan). Penilaian akhir/remedial **belum** diimplementasikan dalam tahap ini.
+- Daftar uji prioritas setelah pull: (1) pastikan satu paket Semester 4 lama tidak berubah dan lima paket draf dibuat; (2) import ATP V25-3 pada enam semester ke data kosong via staging/pratinjau/konfirmasi, termasuk rencana Materi; (3) unggah/sunting masing-masing media dalam draf, Esensial tanpa tugas serta NonEsensial dengan tugas; (4) TP Siap memvalidasi CP operasional dan 30 Sumatif; (5) hanya paket aktif dengan penugasan valid muncul bagi siswa mulai Semester 4, semester 1–3 tetap ditolak; (6) penolakan akses URL lintas Gen, dan abort/rollback impor yang gagal.
+- **Jangan jalankan** pengujian yang memodifikasi tabel pada database asli `sla_sks_v4`. Uji destruktif/rollback hanya pada salinan QA; jangan menaruh dump privat pada GitHub.
