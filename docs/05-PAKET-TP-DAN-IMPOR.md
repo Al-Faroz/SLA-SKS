@@ -37,3 +37,6 @@
 
 ## Keputusan mengikat 28–29 Oktober 2026 — Penyiapan Guru vs akses siswa
 Guru wajib mengisi **tepat satu judul Materi dan satu jenis media** untuk **setiap** TP Esensial maupun NonEsensial pada ATP V25-2 (kolom F dan G). Tidak boleh menolak atau mengosongkan Materi Esensial. Setelah impor, Materi/media aktual dilengkapi Guru di aplikasi sebelum TP dinyatakan Siap; Excel bukan proses mengunggah berkas. Jenis TP **tidak mengubah kewajiban Guru menyiapkan konten**, melainkan digunakan Service siswa untuk menegakkan akses/kewajiban aktivitas dan progres sesuai aturan yang berlaku. Data/progres/nilai siswa tidak diubah oleh perbaikan validasi impor.
+
+
+**Revisi resmi V25-3, 31 Oktober 2026:** Guru tidak mengetik Urutan TP di kolom B. Kolom A TP adalah daftar pilihan Nomor BAB (Defined Name `BABS_1..BABS_6`, bersumber dari A13:A32 semester masing-masing). B39:B118 berisi formula yang dihitung per BAB; server menolak formula lain dan menghitung ulang `urutan_dalam_bab` untuk kode TP, tanpa mempercayai nilai cache Excel. Template V25-2 wajib diunduh ulang. Lihat `KONTRAK-TEMPLATE-ATP-MANUAL-V25.md` untuk batas aman dan contoh.
