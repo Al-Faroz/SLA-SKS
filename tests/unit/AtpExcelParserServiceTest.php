@@ -15,6 +15,7 @@ final class AtpExcelParserServiceTest extends TestCase
         $buku = IOFactory::load(dirname(__DIR__, 2)
             . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx');
         AtpTemplateLayoutService::terapkan($buku);
+        \App\Services\AtpOtomatisTpService::terapkan($buku);
         $s = $buku->getSheetByName('RINGKASAN');
         $s->setCellValue('B5', 'GEN2025');
         $s->setCellValue('B9', 'SKI');
