@@ -29,6 +29,31 @@ final class AtpOtomatisTpService
             . $baris . ',$D$39:D' . $baris . ',"<>"))';
     }
 
+    public static function namaDaftarBab(int $semester): string
+    {
+        if ($semester < 1 || $semester > 6) {
+            throw new DomainException('Semester di luar enam semester Fase D.');
+        }
+        $namaSheet = "'SEMESTER " . $semester . "'!";
+        return '=OFFSET(' . $namaSheet . '$A$12,1,0,MAX(1,COUNT('
+            . $namaSheet . '$A$13:$A$32)),1)';
+    }
+
+    public static function daftarBabSah(Spreadsheet $buku, int $semester): bool
+    {
+        $nama = 'BABS_' . $semester;
+        $daftar = $buku->getDefinedName($nama);
+        $sheet = $buku->getSheetByName('SEMESTER ' . $semester);
+        if ($daftar === null || $sheet === null
+            || ltrim($daftar->getValue(), '=') !== ltrim(self::namaDaftarBab($semester), '=')) {
+            return false;
+        }
+        $validasi = $sheet->getDataValidation('A39');
+        return $validasi->getType() === 'list'
+            && $validasi->getSqref() === 'A39:A118'
+            && ltrim($validasi->getFormula1(), '=') === $nama;
+    }
+
     public static function formulaSah(Worksheet $sheet, string $alamat): bool
     {
         if (! preg_match('/\AB(39|[4-9][0-9]|10[0-9]|11[0-8])\z/D', $alamat)
@@ -82,12 +107,11 @@ final class AtpOtomatisTpService
             if ($buku->getDefinedName($nama) !== null) {
                 $buku->removeDefinedName($nama);
             }
-            $namaSheet = "'SEMESTER " . $semester . "'!";
             // 20 sel input BAB A13:A32, tidak A12:A31. MAX(1,..)
-            // mencegah range berukuran nol saat Guru belum mengisi BAB.
-            $formulaRange = 'OFFSET(' . $namaSheet . '$A$12,1,0,MAX(1,COUNT('
-                . $namaSheet . '$A$13:$A$32)),1)';
-            $buku->addNamedFormula(new NamedFormula($nama, $sheet, '=' . $formulaRange));
+            // mencegah daftar dengan ukuran nol sebelum BAB diisi.
+            $buku->addNamedFormula(new NamedFormula(
+                $nama, $sheet, self::namaDaftarBab($semester)
+            ));
 
             $dv = $sheet->getDataValidation('A39');
             $dv->setType('list')
