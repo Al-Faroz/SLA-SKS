@@ -167,7 +167,7 @@ final class AtpImporPratinjauService
             if (isset($bukanKurikulum[$s])) {
                 $pesan = 'Paket semester menggunakan kurikulum berbeda. Pilih konteks Excel yang sesuai.';
             } elseif (! isset($paketSem[$s])) {
-                $pesan = 'Paket semester belum ada. Buat paket dengan Tahun Ajaran benar pada halaman semester.';
+                $pesan = 'Paket semester belum ada. Buat draf enam semester dengan Tahun Ajaran masing-masing dari Peta ATP.';
             } elseif ($eb === [] || $et === []) {
                 $pesan = 'Setiap semester sasaran wajib berisi BAB dan sekurangnya satu TP.';
             } elseif (array_filter($eb, static fn (array $b): bool => mb_strlen($b['nama']) > $batasBab)) {
