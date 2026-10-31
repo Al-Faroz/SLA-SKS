@@ -184,6 +184,20 @@ final class AtpUnduhanService
                 throw new RuntimeException('Dropdown dan Defined Name BAB pada Semester '
                     . $n . ' tidak sesuai V25-3.');
             }
+            // Jangan menganggap dropdown lengkap jika opsi Jenis TP/Media
+            // tidak tampil di Excel atau daftar pilihannya hilang.
+            foreach ([
+                'C39' => ['C39:C118', '"Esensial,NonEsensial"'],
+                'G39' => ['G39:G118', '"YouTube,PDF,Audio,Gambar"'],
+            ] as $alamat => [$rentang, $pilihan]) {
+                $dv = $sheet->getDataValidation($alamat);
+                if ($dv->getType() !== 'list' || $dv->getSqref() !== $rentang
+                    || $dv->getFormula1() !== $pilihan
+                    || $dv->getShowDropDown() || ! $dv->getShowErrorMessage()) {
+                    throw new RuntimeException('Validasi ' . $alamat . ' pada Semester '
+                        . $n . ' tidak aktif atau tidak terlihat di Excel.');
+                }
+            }
             foreach (['I38', 'J38'] as $cell) {
                 if (trim((string) ($sheet->getCell($cell)->getValue() ?? '')) !== '') {
                     throw new RuntimeException('Kolom TP lama masih ada pada Semester ' . $n . '.');
