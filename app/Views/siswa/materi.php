@@ -128,7 +128,7 @@
         <?php endif ?>
         <?php if ($sukarela): ?>
             <div class="a-alert" role="status">
-                TP sudah Tuntas melalui Diagnostik. Materi ini hanya untuk belajar sukarela,
+                Lulus Diagnostik membuka jalur menuju Sumatif. Materi ini hanya untuk belajar sukarela,
                 sehingga waktu membaca tidak dicatat sebagai tugas atau tambahan nilai.
             </div>
         <?php else: ?>
