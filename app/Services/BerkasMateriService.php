@@ -168,6 +168,9 @@ final class BerkasMateriService
         if ($rincian['tp']['status'] !== 'draf') {
             throw new DomainException('TP Siap tidak boleh diubah.');
         }
+        if (count($rincian['materi']) > 0) {
+            throw new DomainException('Satu TP hanya boleh memiliki satu Materi. Sunting media yang sudah ada.');
+        }
         $valid = self::validasi($file->getTempName(), $data['jenis'], $file->getClientName());
         $baru = $this->tulisPrivat($file->getTempName(), $data['jenis'], $valid);
 
@@ -180,6 +183,9 @@ final class BerkasMateriService
                 || (int) $tp['struktur_versi'] !== $versi
                 || (int) $rincian['tp']['struktur_versi'] !== $versi) {
                 throw new DomainException('TP sudah berubah. Muat ulang formulir Materi.');
+            }
+            if ($this->db->table('materi')->where('tp_id', $tpId)->countAllResults() > 0) {
+                throw new DomainException('Satu TP hanya boleh memiliki satu Materi. Sunting media yang sudah ada.');
             }
             $akhir = $this->db->table('materi')->selectMax('urutan', 'maks')
                 ->where('tp_id', $tpId)->get()->getRowArray();
