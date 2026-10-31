@@ -26,6 +26,17 @@ final class AtpEnamSemesterUiTest extends TestCase
         );
     }
 
+    public function testTpManualBisaDisiapkanGuruPadaSemesterSebelumGen(): void
+    {
+        $service = (string) file_get_contents(
+            dirname(__DIR__, 2) . '/app/Services/TpBabService.php'
+        );
+        self::assertStringNotContainsString(
+            'Semester sebelum semester mulai Gen tidak boleh diisi TP.', $service
+        );
+        self::assertStringContainsString('Semester mulai hanya membatasi akses SISWA', $service);
+    }
+
     public function testTombolMateriKeduaTersembunyiNamunSuntingTetapTersedia(): void
     {
         $root = dirname(__DIR__, 2);
