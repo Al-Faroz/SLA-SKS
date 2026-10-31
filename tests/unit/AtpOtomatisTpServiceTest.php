@@ -53,6 +53,21 @@ final class AtpOtomatisTpServiceTest extends TestCase
         );
     }
 
+    public function testRumusDiSheetContohTidakDiizinkan(): void
+    {
+        $buku = IOFactory::load(dirname(__DIR__, 2)
+            . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx');
+        try {
+            AtpTemplateLayoutService::terapkan($buku);
+            AtpOtomatisTpService::terapkan($buku);
+            $contoh = $buku->getSheetByName('CONTOH MAT VII');
+            $contoh->setCellValue('B39', AtpOtomatisTpService::rumus(39));
+            self::assertFalse(AtpOtomatisTpService::formulaSah($contoh, 'B39'));
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+    }
+
     public function testFormulaAtauDefinedNameYangDiubahDitolak(): void
     {
         $buku = IOFactory::load(dirname(__DIR__, 2)
