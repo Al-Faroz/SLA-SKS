@@ -55,7 +55,7 @@ final class MesinDiagnostikSiswaService
         return [
             'tp' => $ctx['ctx']['tp'], 'progres' => $ctx['progres'],
             'percobaan' => $existing,
-            'status_akhir' => in_array($ctx['progres']['status'], ['tuntas', 'belajar', 'perlu_bantuan'], true),
+            'status_akhir' => in_array($ctx['progres']['status'], ['sumatif', 'tuntas', 'belajar', 'perlu_bantuan'], true),
         ];
     }
 
@@ -196,7 +196,9 @@ final class MesinDiagnostikSiswaService
         $lulus = $nilai['skor'] >= (int) $s['kkm'];
         $this->db->table('progres_tp')->where('id', (int) $s['progres_tp_id'])
             ->where('status', 'diagnostik')
-            ->update(['status' => $lulus ? 'tuntas' : 'belajar',
+            // Lulus Diagnostik melewati kewajiban Materi/Resume/HOTS,
+            // tetapi Sumatif tetap WAJIB; jangan menandai TP tuntas di sini.
+            ->update(['status' => $lulus ? 'sumatif' : 'belajar',
                 'diubah_pada' => self::iso($now)]);
         $this->riwayat($id, 'berjalan', 'selesai_sah', $alasan, $now);
         $s['skor'] = $nilai['skor'];
