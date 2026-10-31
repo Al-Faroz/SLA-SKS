@@ -29,9 +29,11 @@ final class ChecklistKontenTpService
                     : 'TP belum ditautkan dengan CP'];
         }
 
-        $adaMateri = count($materi) > 0;
-        $hasil[] = ['label' => 'Minimal satu Materi', 'terpenuhi' => $adaMateri,
-            'keterangan' => $adaMateri ? count($materi) . ' Materi terdaftar' : 'Tambahkan Materi terlebih dahulu'];
+        $satuMateri = count($materi) === 1;
+        $hasil[] = ['label' => 'Tepat satu Materi', 'terpenuhi' => $satuMateri,
+            'keterangan' => $satuMateri ? 'Satu Materi terdaftar'
+                : (count($materi) === 0 ? 'Tambahkan satu Materi terlebih dahulu'
+                    : 'TP hanya boleh memiliki satu Materi; perlu peninjauan data lama')];
 
         $urutan = 1;
         foreach ($materi as $item) {
