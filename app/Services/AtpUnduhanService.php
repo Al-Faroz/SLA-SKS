@@ -126,6 +126,7 @@ final class AtpUnduhanService
             try {
                 (new Xlsx($buku))->save($temp);
                 self::periksaDropdownXlsx($temp);
+                self::periksaFormatProteksiXlsx($temp);
                 $isi = file_get_contents($temp);
                 if ($isi === false || strlen($isi) < 100) {
                     throw new RuntimeException('Pembuatan XLSX ATP gagal.');
@@ -173,6 +174,33 @@ final class AtpUnduhanService
                 $cell = chr(65 + $i) . '38';
                 if ((string) $sheet->getCell($cell)->getValue() !== $header) {
                     throw new RuntimeException('Header ATP V25-3 tidak sesuai pada Semester ' . $n . '.');
+                }
+            }
+            if (! $sheet->getProtection()->getSheet()) {
+                throw new RuntimeException('Sheet Semester ' . $n
+                    . ' harus diproteksi agar rumus TP tidak bisa diubah.');
+            }
+            for ($row = 13; $row <= 32; ++$row) {
+                if ($sheet->getStyle('A' . $row)->getNumberFormat()->getFormatCode() !== 'General') {
+                    throw new RuntimeException('Nomor BAB A' . $row . ' harus berformat General.');
+                }
+                foreach (['A', 'B', 'C'] as $kolom) {
+                    if ($sheet->getStyle($kolom . $row)->getProtection()->getLocked() !== 'unprotected') {
+                        throw new RuntimeException('Area input BAB ' . $kolom . $row . ' tidak bisa diedit.');
+                    }
+                }
+            }
+            for ($row = 39; $row <= 118; ++$row) {
+                if ($sheet->getStyle('A' . $row)->getNumberFormat()->getFormatCode() !== 'General') {
+                    throw new RuntimeException('Nomor BAB TP A' . $row . ' harus General.');
+                }
+                if ($sheet->getStyle('B' . $row)->getProtection()->getLocked() !== 'protected') {
+                    throw new RuntimeException('Rumus B' . $row . ' belum terkunci.');
+                }
+                foreach (['A', 'C', 'D', 'E', 'F', 'G', 'H'] as $kolom) {
+                    if ($sheet->getStyle($kolom . $row)->getProtection()->getLocked() !== 'unprotected') {
+                        throw new RuntimeException('Kolom input TP ' . $kolom . $row . ' tidak bisa diedit.');
+                    }
                 }
             }
             for ($row = 39; $row <= 118; ++$row) {
@@ -246,6 +274,90 @@ final class AtpUnduhanService
                         throw new RuntimeException('Dropdown ' . $rentang
                             . ' pada Semester ' . $n
                             . ' tersembunyi atau tidak valid dalam berkas XLSX.');
+                    }
+                }
+            }
+        } finally {
+            $zip->close();
+        }
+    }
+
+    /**
+     * Guard terhadap berkas XLSX fisik: General = numFmtId 0, dan
+     * sheetProtection harus aktif. Semua area input tetap unlocked.
+     */
+    public static function periksaFormatProteksiXlsx(string $path): void
+    {
+        $zip = new \ZipArchive();
+        if ($zip->open($path) !== true) {
+            throw new RuntimeException('File ATP bukan XLSX valid.');
+        }
+        try {
+            $stylesXml = $zip->getFromName('xl/styles.xml');
+            if (! is_string($stylesXml)) {
+                throw new RuntimeException('Styles XLSX ATP hilang.');
+            }
+            $styles = new \DOMDocument();
+            if (! @$styles->loadXML($stylesXml, LIBXML_NONET)) {
+                throw new RuntimeException('Styles XML ATP tidak valid.');
+            }
+            $stylesXpath = new \DOMXPath($styles);
+            $stylesXpath->registerNamespace('x',
+                'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+            $xfs = $stylesXpath->query('/x:styleSheet/x:cellXfs/x:xf');
+            if ($xfs === false || $xfs->length === 0) {
+                throw new RuntimeException('Styles cellXfs ATP hilang.');
+            }
+            for ($sem = 1; $sem <= 6; ++$sem) {
+                $xml = $zip->getFromName('xl/worksheets/sheet' . ($sem + 3) . '.xml');
+                $doc = new \DOMDocument();
+                if (! is_string($xml) || ! @$doc->loadXML($xml, LIBXML_NONET)) {
+                    throw new RuntimeException('XML Semester ' . $sem . ' tidak valid.');
+                }
+                $xp = new \DOMXPath($doc);
+                $xp->registerNamespace('x',
+                    'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+                $sheetLock = $xp->query('/x:worksheet/x:sheetProtection[@sheet="1"]');
+                if ($sheetLock === false || $sheetLock->length !== 1) {
+                    throw new RuntimeException('Proteksi sheet Semester ' . $sem . ' belum aktif.');
+                }
+                foreach ([
+                    ['A', 13, 32, false, true], ['B', 13, 32, false, false],
+                    ['C', 13, 32, false, false],
+                    ['A', 39, 118, false, true], ['B', 39, 118, true, false],
+                    ['C', 39, 118, false, false], ['D', 39, 118, false, false],
+                    ['E', 39, 118, false, false], ['F', 39, 118, false, false],
+                    ['G', 39, 118, false, false], ['H', 39, 118, false, false],
+                ] as [$col, $first, $last, $expectedLocked, $mustGeneral]) {
+                    for ($row = $first; $row <= $last; ++$row) {
+                        $addr = $col . $row;
+                        $cells = $xp->query('/x:worksheet/x:sheetData/x:row/x:c[@r="' . $addr . '"]');
+                        $cell = ($cells !== false && $cells->length === 1) ? $cells->item(0) : null;
+                        if (! $cell instanceof \DOMElement) {
+                            throw new RuntimeException('Sel input/rumus ' . $addr
+                                . ' Semester ' . $sem . ' tidak tersedia.');
+                        }
+                        $styleId = (int) $cell->getAttribute('s');
+                        $xf = $xfs->item($styleId);
+                        if (! $xf instanceof \DOMElement) {
+                            throw new RuntimeException('Style sel ' . $addr . ' tidak sah.');
+                        }
+                        if ($mustGeneral && (int) $xf->getAttribute('numFmtId') !== 0) {
+                            throw new RuntimeException('Format ' . $addr
+                                . ' Semester ' . $sem . ' bukan General.');
+                        }
+                        $locked = true; // Excel: default Locked bila tanpa elemen protection.
+                        $protect = $stylesXpath->query('./x:protection', $xf);
+                        if ($protect !== false && $protect->length > 0) {
+                            $node = $protect->item(0);
+                            if ($node instanceof \DOMElement) {
+                                $locked = $node->getAttribute('locked') !== '0';
+                            }
+                        }
+                        if ($locked !== $expectedLocked) {
+                            throw new RuntimeException('Status kunci ' . $addr
+                                . ' Semester ' . $sem . ' tidak sesuai.');
+                        }
                     }
                 }
             }
