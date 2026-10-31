@@ -26,9 +26,17 @@ final class GuruAtpUnduh extends BaseController
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru/peta-atp/impor'))->with('galat', $e->getMessage());
         } catch (Throwable $e) {
-            log_message('error', 'Unduh ATP v2.5 gagal: {kelas}', ['kelas' => get_class($e)]);
+            // Simpan pesan akar galat di log privat untuk diagnosis; jangan
+            // tampilkan lokasi server, query, atau detail internal kepada Guru.
+            log_message('error',
+                'Unduh ATP v2.5 gagal: {kelas} — {pesan} pada {file}:{baris}', [
+                    'kelas' => get_class($e),
+                    'pesan' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'baris' => $e->getLine(),
+                ]);
             return redirect()->to(site_url('guru/peta-atp/impor'))
-                ->with('galat', 'Template ATP tidak dapat dibuat. Periksa berkas docs dan folder writable.');
+                ->with('galat', 'Template ATP gagal dibuat. Silakan laporkan kepada Admin untuk pemeriksaan log.');
         }
 
         return $this->response->download($hasil['nama'], $hasil['isi'], true)
