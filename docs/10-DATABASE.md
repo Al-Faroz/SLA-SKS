@@ -69,3 +69,8 @@ memakai SQL 0018 yang additive dan hanya diimpor jika diperlukan.
 
 ### Revisi nama BAB/TP 27 Oktober 2026
 Batas nama akademik `bab.nama_bab` dan `tp.nama_tp` berubah dari `VARCHAR(35)` menjadi **`VARCHAR(50)`** tanpa perubahan `deskripsi_bab`/`deskripsi_tp` (`VARCHAR(225)`). Database v4 R2 yang telah dipasang tidak boleh diimpor ulang atau direset; gunakan hanya patch additive/pelebaran kolom **bernomor baru**, setelah backup serta pemeriksaan dump XAMPP terkini. TP draf dan BAB yang sudah tersimpan tetap dipertahankan.
+
+## Pembaruan kolom nama ATP pada skema V4 R2 (31 Oktober 2026)
+
+Dump lokal terbaru `sla_sks_v4` (MariaDB 10.4.32, ekspor 31-10-2026 14.06) masih mempunyai `bab.nama_bab VARCHAR(35)` dan `tp.nama_tp VARCHAR(35)`. Master v2.5 menetapkan batas **50 karakter**. Gunakan patch additive `database/sql/updates/V4-0005_PERLEBAR_NAMA_BAB_TP_50.sql` setelah backup database/writable; jangan mengubah dump privat atau patch yang telah diimpor sebelumnya. Sampai patch diterapkan, Service dan pratinjau impor sengaja menolak nama yang melewati kapasitas nyata (35) dengan pesan validasi, bukan memotong data diam-diam. Verifikasi `information_schema.COLUMNS` dan `schema_version` sesudah impor. Tidak ada Migration/Seeder.
+
