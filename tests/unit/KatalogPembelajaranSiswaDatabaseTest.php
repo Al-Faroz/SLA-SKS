@@ -101,6 +101,22 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
         self::assertSame(0, $this->db->tableExists('progres_tp') ? (int) $this->db->table('progres_tp')->countAllResults() : 0);
     }
 
+    public function testSemesterSebelumMulaiGenTetapDitolakMeskiPaketSudahAktif(): void
+    {
+        $this->db->table('paket_semester')->insert([
+            'id' => 6, 'angkatan_id' => 1, 'mapel_id' => 4, 'semester' => 3,
+            'tahun_ajaran_id' => 1, 'nomor_versi' => 1, 'status' => 'aktif',
+        ]);
+        $this->db->table('penugasan_paket')->insert([
+            'id' => 6, 'angkatan_id' => 1, 'mapel_id' => 4, 'semester' => 3,
+            'tahun_ajaran_id' => 1, 'paket_id' => 6,
+        ]);
+        $layanan = $this->layanan(100);
+        self::assertFalse($layanan->daftarSemester(4)['semester'][2]['buka']);
+        $this->expectException(DomainException::class);
+        $layanan->daftarTp(6);
+    }
+
     public function testGenLainTidakDapatMengaksesPaketGenA(): void
     {
         $this->expectException(DomainException::class);
