@@ -2,7 +2,7 @@
 
 MTs Fase D · LMS CodeIgniter 4 · Admin, Guru, Siswa, Pimpinan · 6 semester.
 
-> **Status:** Master v2.5 dan SQL v4 sedang disiapkan pada branch review. **Kode aplikasi di XAMPP belum diubah ke kontrak baru**. Tidak boleh menyatakan fitur siap sampai implementasi dan tes manual selesai.
+> **Status:** Master v2.5 dan SQL v4 sedang disiapkan pada branch review. **Kode adaptasi v2.5 tersedia di branch pengembangan, tetapi belum dinyatakan lolos pengujian XAMPP/merge `main`**. Tidak boleh menyatakan fitur siap sampai implementasi dan tes manual selesai.
 
 ## Alur produk terbaru
 **Mapel (1 CP operasional) → Semester → BAB → TP**. ATP Guru dibuat melalui aplikasi atau impor template Excel manual (.xlsx) yang sudah disiapkan; tanpa macro, tombol pembentukan otomatis, atau pemasangan VBA. Generator/validator di aplikasi akan diselaraskan pada tahap implementasi. Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misalnya `BIND.8.1.1`). Nomor BAB berlanjut semester 1–2, 3–4, 5–6. Nama BAB/TP maksimal 50 karakter, deskripsi maksimal 225.
