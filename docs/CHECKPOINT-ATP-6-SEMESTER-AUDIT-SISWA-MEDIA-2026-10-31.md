@@ -25,7 +25,7 @@ Basis: `feature/v25-atp-dropdown-bab-urutan-otomatis-20261031`.
 - Tes unit/integrasi di repository diperluas untuk validasi enam Tahun Ajaran, UI/CSRF route, Gen lintas semester, progres TP/semester, larangan aktivitas Esensial, larangan Materi kedua dan pemeriksaan PDF.
 - **Belum dilakukan** eksekusi PHPUnit/CI dan pengujian browser/XAMPP pada branch terbaru. Tidak tersedia database MySQL QA terbaru atau dump privat proyek di lingkungan AI. Jangan menyebut seluruh empat modul FIX sampai bukti PASS dilaporkan.
 - Tes integrasi MySQL memakai database `sla_sks_qa` khusus; **jangan** diarahkan ke `sla_sks_v4` yang berisi data nyata, jangan membuat Migration/Seeder.
-- Tidak ada perubahan SQL, .env, path index.php/.htaccess, atau file siswa nyata. Tidak ada pembaruan pada `main`.
+- Ada **berkas patch SQL additive V4-0005** untuk pelebaran nama BAB/TP 35→50 karakter; **BELUM dijalankan pada database lokal**. Tidak ada perubahan .env, index.php/.htaccess, atau data siswa nyata. Tidak ada pembaruan pada `main`.
 - Pengujian manual prioritas: buat draf enam semester untuk satu Gen–Mapel dengan semester mulai 4; unduh/isi/impor V25-3, pratinjau & konfirmasi sekali, unggah materi masing-masing YouTube/Audio/Gambar/PDF dan uji Sunting; login siswa Gen sama pastikan S1–3 tidak bisa diakses, S4 mengikuti TP Siap/urutan, S5 baru terbuka setelah semua TP wajib S4 tuntas. Uji URL langsung milik Gen lain.
 
 ## Risiko yang harus diuji di XAMPP
@@ -36,3 +36,19 @@ Basis: `feature/v25-atp-dropdown-bab-urutan-otomatis-20261031`.
 - Preview/upload media dan snapshot siswa bergantung data dan modul terkait di aplikasi. Audit kode tidak menggantikan pengujian media nyata.
 
 **DILARANG** menganggap data historis boleh dihapus untuk membuat seluruh semester kosong. Tidak ada impor ke database oleh AI. Tunggu konfirmasi hasil XAMPP sebelum merge.
+
+## Audit gabungan Master v2.5, branch dan dump v4 31-10-2026 (hasil lanjutan)
+
+**Sumber:** dump SQL privat lokal, ekspor 31 Oktober 2026 pukul 14.06 (MariaDB 10.4.32). File SQL mengandung data pribadi/sesi/hash sandi; **tidak pernah dimasukkan ke GitHub**. Yang dicatat hanya pemeriksaan skema/agregat aman.
+
+- Skema: 58 tabel, `schema_version` mencatat hingga `V4-0004-BERSIH-SKI-LAMA`; tersedia 1 paket semester aktif (semester 4 pada satu Gen–Mapel), serta BAB/TP/Materi/progres aktif kosong dalam dump. Form enam semester harus mempertahankan paket aktif lama dan membuat hanya semester lain; jangan reset data.
+- `bab.nama_bab VARCHAR(35)` dan `tp.nama_tp VARCHAR(35)` berbeda dengan 50 karakter menurut Master. Patch additive `database/sql/updates/V4-0005_PERLEBAR_NAMA_BAB_TP_50.sql` dibuat tanpa mengubah data di mesin pengguna. **Backup dahulu, lalu impor di database lokal yang tepat dan verifikasi**; hingga saat itu validasi batas kolom 35 tetap dipakai.
+- Bug ditemukan: `TpBabService` masih menolak Guru menyiapkan TP pada semester sebelum awal Gen. Batas tersebut dihapus hanya pada **persiapan Guru**; gate siswa tetap berlaku.
+- Bug ditemukan: TP v2.5 yang mempunyai `cp_mapel_id` tidak otomatis mempunyai baris `tp_cp` legacy. `KesiapanTpService` kini memeriksa CP operasional dan elemen CP aktif melalui `cp_mapel_elemen` dan `ref_cp_versi`; bukan lagi mewajibkan tautan CP utama v2.4.
+- Bug ditemukan: kesiapan dan ringkasan soal membolehkan bank Sumatif minimum 5. Diselaraskan menjadi **minimum 30**; bobot jalur belajar wajib **20/20/60** dan kuota Sumatif **2 percobaan total** (normal + remedial bila diperlukan).
+- TP Esensial Guru tetap wajib memiliki satu Materi/media siap. Untuk pemeriksaan TP Siap, bank ujian siswa serta petunjuk Resume/HOTS hanya diwajibkan pada NonEsensial.
+- Bug ditemukan: rencana Judul Materi (F) dan Media (G) dari ATP Excel tidak tersimpan setelah konfirmasi. Sekarang setiap TP baru menghasilkan satu Materi **draf tidak aktif** dalam transaksi yang sama. Belum ada file, URL ataupun waktu belajar sah; Guru wajib melengkapi lewat editor sebelum TP Siap.
+- Bug ditemukan: paket draf yang berubah aktif pada penerbitan TP pertama belum mempunyai `penugasan_paket`, sehingga Siswa tidak dapat melihatnya. Penerbitan sekarang memvalidasi dan memastikan relasi penugasan per Gen–Mapel–Semester–Tahun Ajaran tanpa menimpa relasi lama.
+- Keterbatasan utama: implementasi penuh Sumatif/remedial, penilaian, dan Pra-Semester belum tersedia pada seluruh alur siswa di branch ini. **Status aplikasi BELUM FIX end-to-end**, walau fondasi dan gate yang sudah ada dibuat lebih konsisten.
+- **Pengujian nyata:** inspeksi isi file/dump, struktur DDL, pembacaan kode dan audit regresi secara statis; PHPUnit, lint PHP seluruh repository, MySQL QA dan browser XAMPP **belum berhasil dijalankan di lingkungan AI**. GitHub Actions sebelumnya gagal di startup. Uji lokal wajib sebelum merge.
+
