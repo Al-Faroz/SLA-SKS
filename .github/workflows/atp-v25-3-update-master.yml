@@ -1,0 +1,43 @@
+name: ATP V25-3 Regenerasi Master XLSX
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/perbarui_template_atp_v25_3.php'
+      - 'app/Services/AtpOtomatisTpService.php'
+      - '.github/workflows/atp-v25-3-update-master.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade-master:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/v25-atp-dropdown-bab-urutan-otomatis-20261031'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip, mbstring, dom, xml, gd, mysqli
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Build V25-3 official XLSX from anonymous repository master
+        run: php scripts/perbarui_template_atp_v25_3.php
+      - name: Verify six dropdowns, defined names and 480 formulas
+        run: vendor/bin/phpunit --no-coverage --filter AtpManualTemplateTest
+      - name: Commit V25-3 master binary in feature branch
+        run: |
+          if git diff --quiet -- docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx; then
+            echo "Master V25-3 unchanged."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx
+          git commit -m "chore(atp): commit official V25-3 XLSX dropdown and TP formulas"
+          git push origin HEAD:feature/v25-atp-dropdown-bab-urutan-otomatis-20261031
