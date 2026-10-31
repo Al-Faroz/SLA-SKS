@@ -56,7 +56,8 @@ $routes->post('guru/peta-atp/pratinjau/(:num)', 'GuruAtpPratinjau::tampil/$1', [
 $routes->post('guru/peta-atp/konfirmasi/(:num)', 'GuruAtpKonfirmasi::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/bab/baru', 'GuruBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/baru', 'GuruTpBab::buat', ['filter' => 'auth:guru']);
-$routes->post('guru/paket-semester/baru', 'GuruPaketSemester::buat', ['filter' => 'auth:guru']);
+$routes->post('guru/paket-semester/buat-enam', 'GuruPaketSemester::buatEnam', ['filter' => 'auth:guru']);
+// Route pembuatan paket per-semester dihapus dari UI dan POST baru; hanya enam semester sekaligus.
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
