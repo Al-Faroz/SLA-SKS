@@ -32,4 +32,4 @@ Satu `paket_semester` per Gen–Mapel–Semester–Tahun Ajaran/Kurikulum/versi.
 
 Detail: [05](05-PAKET-TP-DAN-IMPOR.md), [06](06-ALUR-PEMBELAJARAN.md), [10](10-DATABASE.md).
 
-**Keputusan final 29-10-2026:** Guru mengisi Nomor BAB, Urutan TP, Jenis, Nama, Deskripsi, rencana Materi/media, dan Catatan. Kode TP dibangkitkan `KodeTpService`; kolom Elemen CP dihapus dari input Excel. Sheet REFERENSI CP tetap wajib. Format V25-1 tidak diterima lagi setelah V25-2.
+**Keputusan terbaru 31-10-2026 (V25-3):** Guru mengisi Nomor BAB dari dropdown Defined Name, Jenis, Nama, Deskripsi, rencana satu Materi/media, dan Catatan. Urutan TP kolom B dihitung rumus per BAB dan dihitung ulang server; tidak boleh diketik Guru. Kode TP dibangkitkan `KodeTpService`; kolom Elemen CP tidak menjadi input. Sheet REFERENSI CP tetap wajib. V25-1/V25-2 ditolak.
