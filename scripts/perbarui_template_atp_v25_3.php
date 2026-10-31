@@ -25,12 +25,11 @@ if (! is_file($file)) {
 $buku = IOFactory::load($file);
 try {
     $versi = (string) $buku->getSheetByName('RINGKASAN')->getCell('B4')->getValue();
-    if ($versi === AtpOtomatisTpService::VERSI) {
-        echo "Master ATP sudah V25-3.\n";
-        exit(0);
-    }
+    // Jangan skip master V25-3: marker versi saja tidak membuktikan
+    // bahwa semua dropdown dan rumus benar-benar tersimpan di XLSX.
     if (! in_array($versi, [
-        AtpTemplateLayoutService::LAMA, AtpTemplateLayoutService::BARU
+        AtpTemplateLayoutService::LAMA, AtpTemplateLayoutService::BARU,
+        AtpOtomatisTpService::VERSI,
     ], true)) {
         throw new DomainException('Versi master ATP tidak didukung: ' . $versi);
     }
@@ -62,7 +61,18 @@ try {
         $writer = new Xlsx($buku);
         $writer->setPreCalculateFormulas(false);
         $writer->save($tmp);
-        if (! is_file($tmp) || filesize($tmp) < 100 || ! rename($tmp, $file)) {
+        // Uji setelah serialisasi, bukan hanya objek PHP di memori.
+        // File lama tidak diganti apabila validasi Excel hilang saat disimpan.
+        if (! is_file($tmp) || filesize($tmp) < 100) {
+            throw new RuntimeException('Hasil XLSX ATP kosong atau gagal dibuat.');
+        }
+        $verifikasi = IOFactory::createReader('Xlsx')->load($tmp);
+        try {
+            \\App\\Services\\AtpUnduhanService::periksaTemplateV25Tiga($verifikasi);
+        } finally {
+            $verifikasi->disconnectWorksheets();
+        }
+        if (! rename($tmp, $file)) {
             throw new RuntimeException('Gagal menyimpan template master V25-3.');
         }
     } finally {
