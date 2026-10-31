@@ -31,6 +31,11 @@ final class AtpTemplateLayoutService
             throw new DomainException('RINGKASAN ATP tidak tersedia.');
         }
         $versi = (string) $ringkasan->getCell('B4')->getValue();
+        if ($versi === AtpOtomatisTpService::VERSI) {
+            // Master V25-3 sudah memiliki header delapan kolom dan formula.
+            // Jangan pernah menggeser kolom pada file final.
+            return;
+        }
         if ($versi === self::BARU) {
             // Workbook statis lama V25-2 dapat memuat petunjuk yang keliru.
             // Selaraskan tanpa menghapus isian Guru atau merevisi versi file.
