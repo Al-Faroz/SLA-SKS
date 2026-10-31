@@ -125,6 +125,7 @@ final class AtpUnduhanService
             }
             try {
                 (new Xlsx($buku))->save($temp);
+                self::periksaDropdownXlsx($temp);
                 $isi = file_get_contents($temp);
                 if ($isi === false || strlen($isi) < 100) {
                     throw new RuntimeException('Pembuatan XLSX ATP gagal.');
@@ -203,6 +204,53 @@ final class AtpUnduhanService
                     throw new RuntimeException('Kolom TP lama masih ada pada Semester ' . $n . '.');
                 }
             }
+        }
+    }
+
+    /**
+     * Periksa OOXML hasil save: berbeda dari getter PhpSpreadsheet,
+     * showDropDown="0" berarti panah pilihan benar-benar terlihat.
+     * Jangan menerima hasil PHP-only yang lulus tetapi XLSX cacat.
+     */
+    public static function periksaDropdownXlsx(string $path): void
+    {
+        $zip = new \ZipArchive();
+        if ($zip->open($path) !== true) {
+            throw new RuntimeException('Hasil Excel ATP bukan berkas ZIP XLSX yang sah.');
+        }
+        try {
+            for ($n = 1; $n <= 6; ++$n) {
+                // Kontrak template menetapkan urutan sheet: 3 sheet awal,
+                // dilanjutkan SEMESTER 1–6.
+                $xml = $zip->getFromName('xl/worksheets/sheet' . ($n + 3) . '.xml');
+                if (! is_string($xml) || $xml === '') {
+                    throw new RuntimeException('XML Semester ' . $n . ' tidak ditemukan.');
+                }
+                $dom = new \DOMDocument();
+                if (! @$dom->loadXML($xml, LIBXML_NONET)) {
+                    throw new RuntimeException('XML Semester ' . $n . ' tidak valid.');
+                }
+                $xpath = new \DOMXPath($dom);
+                $xpath->registerNamespace('m',
+                    'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+                foreach (['A39:A118', 'C39:C118', 'G39:G118'] as $rentang) {
+                    $query = '/m:worksheet/m:dataValidations/m:dataValidation[@sqref="'
+                        . $rentang . '"]';
+                    $nodes = $xpath->query($query);
+                    $dv = ($nodes !== false && $nodes->length === 1)
+                        ? $nodes->item(0) : null;
+                    if (! $dv instanceof \DOMElement
+                        || $dv->getAttribute('type') !== 'list'
+                        || $dv->getAttribute('showDropDown') !== '0'
+                        || $dv->getAttribute('showErrorMessage') !== '1') {
+                        throw new RuntimeException('Dropdown ' . $rentang
+                            . ' pada Semester ' . $n
+                            . ' tersembunyi atau tidak valid dalam berkas XLSX.');
+                    }
+                }
+            }
+        } finally {
+            $zip->close();
         }
     }
 
