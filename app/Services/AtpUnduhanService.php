@@ -180,10 +180,9 @@ final class AtpUnduhanService
                         . ' pada Semester ' . $n . ' tidak sesuai format V25-3.');
                 }
             }
-            $dv = $sheet->getDataValidation('A39');
-            if ($dv->getType() !== 'list' || $dv->getSqref() !== 'A39:A118'
-                || ltrim($dv->getFormula1(), '=') !== 'BABS_' . $n) {
-                throw new RuntimeException('Dropdown BAB pada Semester ' . $n . ' tidak sesuai.');
+            if (! AtpOtomatisTpService::daftarBabSah($buku, $n)) {
+                throw new RuntimeException('Dropdown dan Defined Name BAB pada Semester '
+                    . $n . ' tidak sesuai V25-3.');
             }
             foreach (['I38', 'J38'] as $cell) {
                 if (trim((string) ($sheet->getCell($cell)->getValue() ?? '')) !== '') {
