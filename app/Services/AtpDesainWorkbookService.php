@@ -167,7 +167,7 @@ final class AtpDesainWorkbookService
             'Semua TP wajib memiliki satu Materi: isi judul di F dan jenis media di G, termasuk Esensial.',
             self::PALE, self::TEXT, 11, 34);
         self::banner($sheet, 'A37:J37',
-            'Urutan TP tiap BAB: 1, 2, 3, ...; Kode TP otomatis dari MAPEL.KELAS.BAB.TP.',
+            'Kolom A pilih BAB; kolom B otomatis 1, 2, 3 per BAB; Kode TP dibuat server.',
             self::SKY, self::NAVY, 10, 34);
 
         self::strip($sheet, 'A38:H38', self::TEAL, self::WHITE, 11);
