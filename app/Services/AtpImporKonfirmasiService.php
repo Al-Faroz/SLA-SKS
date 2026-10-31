@@ -207,8 +207,19 @@ final class AtpImporKonfirmasiService
                     'sum_tayang' => 30,
                     'sum_maks_percobaan' => 2,
                 ]);
-                if ($this->db->transStatus() === false || $this->db->affectedRows() !== 1) {
+                $tpBaruId = (int) $this->db->insertID();
+                if ($this->db->transStatus() === false || $this->db->affectedRows() !== 1
+                    || $tpBaruId < 1) {
                     throw new RuntimeException('Gagal membuat TP baru.');
+                }
+                // F/G pada Excel adalah rencana satu Materi, bukan sekadar
+                // teks yang dibuang setelah pratinjau. Materi tetap tidak
+                // aktif sampai Guru melengkapi berkas/URL dan TP diterbitkan.
+                $this->db->table('materi')->insert(
+                    AtpRencanaMateriService::draf($tpBaruId, $t)
+                );
+                if ($this->db->transStatus() === false || $this->db->affectedRows() !== 1) {
+                    throw new RuntimeException('Rencana Materi ATP gagal disimpan.');
                 }
                 $hasil['baru_tp']++;
             }
