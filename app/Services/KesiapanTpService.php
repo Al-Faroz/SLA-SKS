@@ -181,8 +181,13 @@ final class KesiapanTpService
                 . ' dengan sekurangnya satu elemen versi aktif.',
             'guru/peta-atp');
 
-        // Kesiapan akademik Guru tidak dibedakan menurut jenis TP.
-        // Siswa tetap mengikuti gerbang akses/progres pada Service siswa.
+        $jenisTp = (string) ($tp['jenis_tp'] ?? 'non_esensial');
+        $wajibAktivitas = $jenisTp === 'non_esensial';
+        self::tambahCek($hasil, 'jenis-tp', 'Jenis TP valid',
+            in_array($jenisTp, ['esensial', 'non_esensial'], true),
+            'Pilih Esensial atau NonEsensial.', $detail);
+        // Kedua jenis TP harus memiliki satu Materi/media lengkap.
+        // Resume/HOTS dan bank ujian hanya wajib pada TP NonEsensial.
         self::tambahCek($hasil, 'materi', 'Tepat satu Materi per TP', count($materi) === 1,
             'TP Esensial maupun NonEsensial wajib memiliki tepat satu Materi lengkap.',
             $detail . '#daftar-materi');
@@ -190,8 +195,10 @@ final class KesiapanTpService
             $nomor = $idx + 1;
             $benar = (int) ($m['urutan'] ?? 0) === $nomor
                 && trim((string) ($m['judul'] ?? '')) !== ''
-                && trim((string) ($m['petunjuk_resume'] ?? '')) !== ''
-                && trim((string) ($m['petunjuk_hots'] ?? '')) !== ''
+                && (! $wajibAktivitas || (
+                    trim((string) ($m['petunjuk_resume'] ?? '')) !== ''
+                    && trim((string) ($m['petunjuk_hots'] ?? '')) !== ''
+                ))
                 && (int) ($m['min_waktu_detik'] ?? 0) > 0
                 && (in_array($m['jenis'] ?? '', ['pdf', 'audio', 'gambar'], true)
                     ? !empty($m['berkas_id']) : (($m['jenis'] ?? '') === 'youtube'
@@ -201,6 +208,7 @@ final class KesiapanTpService
                 $detail . '/materi/' . ($m['id'] ?? 0) . '/edit');
         }
 
+        if ($wajibAktivitas) {
         foreach ([
             ['kkm', 1, 100, 'KKM'],
             ['resume_min', 10, 1000, 'Minimal karakter Resume'],
@@ -250,6 +258,7 @@ final class KesiapanTpService
                 $valid, 'Soal aktif harus unik per urutan, A–E terisi dan satu kunci sah.',
                 $detail . '/bank-soal?jenis=' . $jenis);
         }
+        } // TP Esensial tidak mewajibkan ujian ataupun nilai siswa.
         return $hasil;
     }
 
