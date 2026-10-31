@@ -38,4 +38,22 @@ final class AtpEnamSemesterUiTest extends TestCase
         self::assertStringContainsString('countAllResults() > 0', $materi);
         self::assertStringContainsString('countAllResults() > 0', $berkas);
     }
+    public function testLulusDiagnostikTetapWajibSumatifSebelumTuntas(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $diagnostik = (string) file_get_contents(
+            $root . '/app/Services/MesinDiagnostikSiswaService.php'
+        );
+        $katalog = (string) file_get_contents(
+            $root . '/app/Services/KatalogPembelajaranSiswaService.php'
+        );
+        $materi = (string) file_get_contents(
+            $root . '/app/Services/MateriSiswaService.php'
+        );
+        self::assertStringContainsString('$lulus ? \'sumatif\' : \'belajar\'', $diagnostik);
+        self::assertStringContainsString("->where('u.jenis', 'sumatif')", $katalog);
+        self::assertStringContainsString("->where('u.status', 'selesai_sah')", $katalog);
+        self::assertStringContainsString("'sumatif', 'tuntas'", $materi);
+    }
+
 }
