@@ -11,7 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Pipeline riil file ZIP XLSX: unduhan V25-2 -> isi Guru -> validasi
+ * Pipeline riil file ZIP XLSX: unduhan V25-3 -> isi Guru -> validasi
  * unggahan -> staging privat -> baca parser tanpa database produksi.
  */
 final class AtpUnggahPratinjauRoundTripTest extends TestCase
@@ -57,7 +57,7 @@ final class AtpUnggahPratinjauRoundTripTest extends TestCase
             foreach ([
                 'A13' => 1, 'B13' => 'Dakwah Rasulullah',
                 'C13' => 'Analisis perjalanan dakwah',
-                'A39' => 1, 'B39' => 1, 'C39' => 'NonEsensial',
+                'A39' => 1, 'C39' => 'NonEsensial',
                 'D39' => 'Meneladani strategi dakwah',
                 'E39' => 'Menganalisis peristiwa dalam dakwah',
                 'F39' => 'Materi sejarah awal',
@@ -78,10 +78,10 @@ final class AtpUnggahPratinjauRoundTripTest extends TestCase
         }
     }
 
-    public function testExcelV25DuaBisaDiperiksaDisimpanPrivatDanDibacaLagi(): void
+    public function testExcelV25TigaBisaDiperiksaDisimpanPrivatDanDibacaLagi(): void
     {
         $file = $this->buatWorkbook();
-        AtpValidasiUnggahService::periksa($file, 'ATP-V25-2-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file));
+        AtpValidasiUnggahService::periksa($file, 'ATP-V25-3-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file));
         $staging = new AtpStagingService($this->directory);
         $data = $staging->buat($file, 9, 11, 'sesi_qa', str_repeat('a', 64));
         $disimpan = $staging->ambil($data['token'], 9, 11, 'sesi_qa');
@@ -105,8 +105,8 @@ final class AtpUnggahPratinjauRoundTripTest extends TestCase
     public function testVersiLamaDitolakDenganPetunjukUnduhUlang(): void
     {
         $file = $this->buatWorkbook(true);
-        AtpValidasiUnggahService::periksa($file, 'ATP-V25-2-TEST.xlsx', filesize($file));
-        $this->expectExceptionMessage('Unduh ulang ATP V25-2');
+        AtpValidasiUnggahService::periksa($file, 'ATP-V25-3-TEST.xlsx', filesize($file));
+        $this->expectExceptionMessage('Unduh ulang ATP V25-3');
         AtpExcelParserService::baca($file, 'SKI', 4, 'GEN2025');
     }
 
