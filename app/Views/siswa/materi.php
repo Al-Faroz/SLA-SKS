@@ -155,7 +155,7 @@
         <h2 id="petunjuk-kegiatan">Kegiatan Materi <?= (int) $materi['urutan'] ?></h2>
 
         <?php if ($sukarela): ?>
-            <p class="a-help">TP sudah tuntas dari Diagnostik. Resume dan HOTS berikut hanya petunjuk baca;
+            <p class="a-help">Lulus Diagnostik tidak menghapus kewajiban Sumatif. Resume dan HOTS berikut hanya petunjuk baca;
                 tidak ada pengumpulan atau nilai tambahan.</p>
             <h3>Petunjuk Resume</h3>
             <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_resume'])) ?></p>
