@@ -31,6 +31,7 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
             'CREATE TABLE penugasan_paket (id INTEGER PRIMARY KEY, angkatan_id INT, mapel_id INT, semester INT, tahun_ajaran_id INT, paket_id INT)',
             'CREATE TABLE tp (id INTEGER PRIMARY KEY, paket_semester_id INT, kode_tp TEXT, judul TEXT, urutan_atp INT, status TEXT, jenis_tp TEXT, rumusan TEXT, indikator TEXT)',
             'CREATE TABLE progres_tp (id INTEGER PRIMARY KEY, siswa_id INT, tp_id INT, paket_semester_id INT, status TEXT)',
+            'CREATE TABLE percobaan_ujian (id INTEGER PRIMARY KEY, progres_tp_id INT, jenis TEXT, status TEXT)',
             'CREATE TABLE versi_konten_tp (id INTEGER PRIMARY KEY, tp_id INT)',
             'CREATE TABLE materi (id INTEGER PRIMARY KEY, tp_id INT, urutan INT, judul TEXT, jenis TEXT, aktif INT)',
         ];
@@ -56,8 +57,8 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
         ]);
         $this->db->table('tp')->insertBatch([
             ['id' => 1, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-1', 'judul' => 'TP pertama', 'urutan_atp' => 1, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Rumusan pertama', 'indikator' => 'Indikator pertama'],
-            ['id' => 2, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-2', 'judul' => 'TP kedua', 'urutan_atp' => 2, 'status' => 'siap', 'rumusan' => 'Rumusan kedua', 'indikator' => 'Indikator kedua'],
-            ['id' => 3, 'paket_semester_id' => 2, 'kode_tp' => 'TP-B-1', 'judul' => 'Milik Gen B', 'urutan_atp' => 1, 'status' => 'siap', 'rumusan' => 'Gen lain', 'indikator' => 'Gen lain'],
+            ['id' => 2, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-2', 'judul' => 'TP kedua', 'urutan_atp' => 2, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Rumusan kedua', 'indikator' => 'Indikator kedua'],
+            ['id' => 3, 'paket_semester_id' => 2, 'kode_tp' => 'TP-B-1', 'judul' => 'Milik Gen B', 'urutan_atp' => 1, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Gen lain', 'indikator' => 'Gen lain'],
         ]);
         $this->db->table('versi_konten_tp')->insertBatch([
             ['id' => 1, 'tp_id' => 1], ['id' => 2, 'tp_id' => 2], ['id' => 3, 'tp_id' => 3],
@@ -143,6 +144,12 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
             'id' => 1, 'siswa_id' => 10, 'tp_id' => 1,
             'paket_semester_id' => 1, 'status' => 'tuntas',
         ]);
+        // Progres tuntas historis sesudah Diagnostik TIDAK cukup.
+        self::assertFalse($guruSiswa->daftarTp(1)['tp'][1]['akses']['buka']);
+        $this->db->table('percobaan_ujian')->insert([
+            'id' => 1, 'progres_tp_id' => 1,
+            'jenis' => 'sumatif', 'status' => 'selesai_sah',
+        ]);
         self::assertTrue($guruSiswa->daftarTp(1)['tp'][1]['akses']['buka']);
     }
 
@@ -173,6 +180,14 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
         $this->db->table('progres_tp')->insert([
             'id' => 2, 'siswa_id' => 10, 'tp_id' => 2,
             'paket_semester_id' => 1, 'status' => 'tuntas',
+        ]);
+        // Status tuntas lama tanpa percobaan Sumatif tidak membuka semester.
+        self::assertFalse($siswa->daftarSemester(4)['semester'][4]['buka']);
+        $this->db->table('percobaan_ujian')->insertBatch([
+            ['id' => 1, 'progres_tp_id' => 1,
+                'jenis' => 'sumatif', 'status' => 'selesai_sah'],
+            ['id' => 2, 'progres_tp_id' => 2,
+                'jenis' => 'sumatif', 'status' => 'selesai_sah'],
         ]);
         self::assertTrue($siswa->daftarSemester(4)['semester'][4]['buka']);
         self::assertSame(4, $siswa->daftarTp(4)['paket']['id']);
