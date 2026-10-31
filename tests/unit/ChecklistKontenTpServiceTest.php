@@ -18,20 +18,33 @@ final class ChecklistKontenTpServiceTest extends TestCase
         }
     }
 
-    public function testMateriLengkapDanUrutanSah(): void
+    public function testSatuMateriLengkapDanUrutanSah(): void
     {
         $tp = ['kode_tp' => 'TP-01', 'rumusan' => 'Menganalisis', 'indikator' => 'Menjelaskan'];
         $materi = [
             ['urutan' => 1, 'jenis' => 'pdf', 'berkas_id' => 42,
              'petunjuk_resume' => 'Buat ringkasan', 'petunjuk_hots' => 'Berikan alasan'],
-            ['urutan' => 2, 'jenis' => 'youtube', 'url_youtube' => 'https://www.youtube.com/watch?v=abc123xyz00',
-             'petunjuk_resume' => 'Rangkum video', 'petunjuk_hots' => 'Buat analisis'],
         ];
         $hasil = ChecklistKontenTpService::periksa($tp, $materi);
-        self::assertCount(12, $hasil);
+        self::assertCount(8, $hasil);
         foreach ($hasil as $cek) {
             self::assertTrue($cek['terpenuhi'], $cek['label']);
         }
+    }
+
+    public function testDuaMateriTidakMemenuhiKontrakV25(): void
+    {
+        $tp = ['kode_tp' => 'TP-01', 'rumusan' => 'Menganalisis', 'indikator' => 'Menjelaskan'];
+        $dua = [
+            ['urutan' => 1, 'jenis' => 'pdf', 'berkas_id' => 42,
+                'petunjuk_resume' => 'Resume', 'petunjuk_hots' => 'HOTS'],
+            ['urutan' => 2, 'jenis' => 'youtube',
+                'url_youtube' => 'https://www.youtube.com/watch?v=abcdefghijk',
+                'petunjuk_resume' => 'Resume', 'petunjuk_hots' => 'HOTS'],
+        ];
+        $cek = ChecklistKontenTpService::periksa($tp, $dua);
+        self::assertSame('Tepat satu Materi', $cek[3]['label']);
+        self::assertFalse($cek[3]['terpenuhi']);
     }
 
     public function testBerkasDanPetunjukYangHilangDitandai(): void
