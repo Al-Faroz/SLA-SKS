@@ -13,6 +13,46 @@ final class GuruPaketSemester extends BaseController
 {
     protected $helpers = ['url', 'form'];
 
+    /** Buat paket Semester 1–6 dari Peta ATP, sekali POST dan satu transaksi. */
+    public function buatEnam(): RedirectResponse
+    {
+        $pilihan = $this->request->getPost('pilihan');
+        $nomor = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) <= 6
+            ? (int) $pilihan : 0;
+        $tujuan = site_url('guru/peta-atp') . '?pilihan=' . $nomor;
+        $gen = $this->request->getPost('gen_id');
+        $mapel = $this->request->getPost('mapel_id');
+        $kurikulum = $this->request->getPost('kurikulum_id');
+        $tahun = $this->request->getPost('tahun_id');
+        foreach ([$gen, $mapel, $kurikulum] as $value) {
+            if (! is_string($value) || ! ctype_digit($value) || strlen($value) > 12) {
+                return redirect()->to($tujuan)->with('galat', 'Gen, Mapel atau Kurikulum tidak valid.');
+            }
+        }
+        if (! is_array($tahun)) {
+            return redirect()->to($tujuan)->with('galat',
+                'Pilih Tahun Ajaran masing-masing untuk enam semester.');
+        }
+        try {
+            $hasil = (new PaketSemesterGuruService())->buatEnam(
+                (int) $gen, (int) $mapel, (int) $kurikulum, $tahun
+            );
+            return redirect()->to($tujuan)->with('sukses',
+                $hasil['baru'] . ' paket draf berhasil dibuat; '
+                . $hasil['tetap'] . ' paket tetap tanpa perubahan. '
+                . 'Semua paket draf belum dapat diakses siswa.');
+        } catch (DomainException $e) {
+            return redirect()->to($tujuan)->with('galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal membuat enam paket ATP: {kelas} {pesan}', [
+                'kelas' => get_class($e), 'pesan' => $e->getMessage(),
+            ]);
+            return redirect()->to($tujuan)->with('galat',
+                'Pembuatan paket draf gagal; tidak ada paket baru yang disimpan. '
+                . 'Hubungi Admin apabila masalah berulang.');
+        }
+    }
+
     public function buat(): RedirectResponse
     {
         $pilihan = $this->request->getPost('pilihan');
