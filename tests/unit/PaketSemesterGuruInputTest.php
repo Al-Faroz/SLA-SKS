@@ -35,4 +35,26 @@ final class PaketSemesterGuruInputTest extends TestCase
         $this->expectException(DomainException::class);
         PaketSemesterGuruService::validasiInput(1, 2, 1, 3, 0);
     }
+    public function testValidasiEnamMenerimaTahunBerbedaPerSemester(): void
+    {
+        self::assertSame([
+            1 => 11, 2 => 11, 3 => 12, 4 => 12, 5 => 13, 6 => 13,
+        ], PaketSemesterGuruService::validasiEnam(1, 2, 3,
+            [1 => '11', 2 => '11', 3 => '12', 4 => '12', 5 => '13', 6 => '13']));
+    }
+
+    public function testTahunSatuSemesterYangTidakDiisiMenolakSeluruhBatch(): void
+    {
+        $this->expectException(DomainException::class);
+        PaketSemesterGuruService::validasiEnam(1, 2, 3,
+            [1 => 11, 2 => 11, 3 => 12, 4 => 12, 5 => 13]);
+    }
+
+    public function testTahunNegatifMenolakSeluruhBatch(): void
+    {
+        $this->expectException(DomainException::class);
+        PaketSemesterGuruService::validasiEnam(1, 2, 3,
+            [1 => 11, 2 => 11, 3 => -1, 4 => 12, 5 => 13, 6 => 13]);
+    }
+
 }
