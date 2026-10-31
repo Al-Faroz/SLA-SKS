@@ -29,3 +29,6 @@
 
 ## Keputusan final baru (26 Oktober 2026)
 Ketentuan v2.5 **mencabut** kontrak v2.4 tanpa BAB, banyak materi dalam satu TP, diagnostik sebagai nilai final, bobot 20:30:50, tiga percobaan normal sumatif, dan rata-rata akhir semester. Status implementasi historis dalam dokumen tidak mengubah kontrak baru. Export nilai Guru harus tersedia walau baru satu skor TP.
+
+
+**Ketetapan 31-10-2026 / Template ATP V25-3:** Nomor BAB untuk TP (A39:A118) dipilih melalui dropdown Defined Name `BABS_1..BABS_6` bersumber A13:A32 masing-masing sheet semester. Urutan TP (B39:B118) terisi rumus COUNTIFS per BAB, bukan input manual. Server wajib memvalidasi pola formula ketat dan menghitung urutan dari baris TP yang sah, bukan dari hasil perhitungan workbook. Master binary `docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx` harus berformat V25-3; dilarang mengimpor file V25-2 setelah pemutakhiran. Tak ada perubahan database, alur siswa atau aturan Esensial/NonEsensial.
