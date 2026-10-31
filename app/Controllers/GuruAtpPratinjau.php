@@ -40,7 +40,7 @@ final class GuruAtpPratinjau extends BaseController
         $file = $this->request->getFile('atp_excel');
         if ($file === null || ! $file->isValid()) {
             return redirect()->to($kembali)->with(
-                'galat', 'Unggah Excel gagal. Pilih file ATP V25-2 (.xlsx, maksimal 5 MB).'
+                'galat', 'Unggah Excel gagal. Pilih file ATP V25-3 (.xlsx, maksimal 5 MB).'
                 . ' Pastikan ukuran unggahan PHP pada XAMPP mengizinkan file tersebut.'
             );
         }
