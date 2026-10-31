@@ -155,6 +155,20 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame($this->file,$media['path']);
     }
 
+    public function testLulusDiagnostikBolehBacaMateriSukarelaTetapiBelumTuntas(): void
+    {
+        $this->db->table('progres_tp')->where('id', 11)
+            ->update(['status' => 'sumatif']);
+        $semua = $this->svc()->daftar(1)['materi'];
+        self::assertTrue($semua[0]['buka']);
+        self::assertTrue($semua[1]['buka']);
+        self::assertTrue($semua[1]['sukarela']);
+        $detail = $this->svc()->lihat(1, 31);
+        self::assertTrue($detail['sukarela']);
+        self::assertSame(32, $detail['materi_berikutnya']['id']);
+        self::assertSame(0, $this->db->table('progres_materi')->countAllResults());
+    }
+
     public function testTPtuntasBolehMembukaSemuaMateriSecaraSukarela(): void
     {
         $all=$this->svc(102)->daftar(1)['materi'];
