@@ -77,6 +77,21 @@ final class KesiapanTpTest extends TestCase
         self::assertTrue(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
     }
 
+    public function testTpEsensialWajibMateriTetapiTidakWajibSoalAtauResumeHots(): void
+    {
+        [$tp, $paket, $cp, $materi] = self::data();
+        $tp['jenis_tp'] = 'esensial';
+        $materi[0]['petunjuk_resume'] = '';
+        $materi[0]['petunjuk_hots'] = '';
+        $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, []);
+        self::assertNotContains(false, array_column($hasil, 'terpenuhi'));
+        $materi[0]['url_youtube'] = '';
+        self::assertFalse(self::hasil(
+            KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, []),
+            'materi-1'
+        )['terpenuhi']);
+    }
+
     public function testMateriTanpaResumeHotsDanUrutanUtuhDitolak(): void
     {
         [$tp, $paket, $cp, $materi, $soal] = self::data();
