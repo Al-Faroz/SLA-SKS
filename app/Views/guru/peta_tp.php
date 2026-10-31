@@ -39,6 +39,75 @@
                 <button class="a-btn a-btn--utama" type="submit">Tampilkan peta</button>
             </form>
         </section>
+        <section class="a-card" aria-labelledby="judul-draf-enam">
+            <h2 id="judul-draf-enam">Pembuatan Draf · 6 Semester</h2>
+            <p class="a-proto-muted">Siapkan seluruh paket ATP untuk Gen–Mapel yang dipilih,
+                termasuk semester sebelum awal Gen. Penyiapan ini tidak membuka akses siswa.
+                Paket draf/aktif yang sudah ada tidak akan diubah atau dibuat ulang.</p>
+            <?php if (($opsiPaket['tahun'] ?? []) === [] || ($opsiPaket['kurikulum'] ?? []) === []): ?>
+                <div class="a-empty" role="status">
+                    <p>Referensi Tahun Ajaran atau Kurikulum dengan CP aktif belum tersedia.
+                        Periksa pengaturan Admin dan skema database sebelum membuat draf.</p>
+                </div>
+            <?php elseif (count($paketSemester) === 6): ?>
+                <div class="a-alert" role="status">Enam paket semester sudah tersedia.
+                    Lanjutkan pengisian BAB/TP pada kartu semester atau kelola ATP Excel.</div>
+            <?php else: ?>
+                <form class="a-form" method="post"
+                    action="<?= esc(site_url('guru/paket-semester/buat-enam'), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="gen_id" value="<?= (int) $dipilih['angkatan_id'] ?>">
+                    <input type="hidden" name="mapel_id" value="<?= (int) $dipilih['mapel_id'] ?>">
+                    <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
+                    <div class="a-field">
+                        <label class="a-label" for="draf-kurikulum">Kurikulum untuk enam semester</label>
+                        <select id="draf-kurikulum" name="kurikulum_id" required>
+                            <option value="">Pilih kurikulum</option>
+                            <?php foreach ($opsiPaket['kurikulum'] as $kurikulum): ?>
+                                <option value="<?= (int) $kurikulum['id'] ?>"
+                                    <?= count($opsiPaket['kurikulum']) === 1 ? 'selected' : '' ?>>
+                                    <?= esc($kurikulum['nama'] . ' — ' . $kurikulum['versi']) ?>
+                                </option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="a-atp-kartu-grid">
+                        <?php for ($n = 1; $n <= 6; ++$n): ?>
+                            <?php
+                                $ada = $paketSemester[$n] ?? null;
+                                $tahunAda = $ada === null ? 0 : (int) $ada['tahun_ajaran_id'];
+                            ?>
+                            <div class="a-field">
+                                <label class="a-label" for="draf-tahun-<?= $n ?>">
+                                    Semester <?= $n ?> · Kelas <?= esc(match ($n) { 1,2 => 'VII', 3,4 => 'VIII', default => 'IX' }) ?>
+                                    <?= $ada !== null ? '(sudah ada)' : '(draf baru)' ?>
+                                </label>
+                                <select id="draf-tahun-<?= $n ?>" name="tahun_id[<?= $n ?>]" required
+                                    <?= $ada !== null ? 'aria-describedby="draf-info-' . $n . '"' : '' ?>>
+                                    <option value="">Pilih Tahun Ajaran</option>
+                                    <?php foreach ($opsiPaket['tahun'] as $tahun): ?>
+                                        <option value="<?= (int) $tahun['id'] ?>"
+                                            <?= ((int) $tahun['id'] === $tahunAda ||
+                                                ($ada === null && count($opsiPaket['tahun']) === 1)) ? 'selected' : '' ?>>
+                                            <?= esc($tahun['nama']) ?>
+                                        </option>
+                                    <?php endforeach ?>
+                                </select>
+                                <?php if ($ada !== null): ?>
+                                    <p class="a-help" id="draf-info-<?= $n ?>">Paket <?= esc($ada['status']) ?> dipertahankan;
+                                        pilihan Tahun Ajaran di atas tidak akan mengubah paket ini.</p>
+                                <?php endif ?>
+                            </div>
+                        <?php endfor ?>
+                    </div>
+                    <p class="a-help">Setiap semester menggunakan Tahun Ajaran pilihannya sendiri.
+                        Paket yang baru dibuat selalu berstatus draf dan hanya milik Gen–Mapel ini.</p>
+                    <button class="a-btn a-btn--utama" type="submit">
+                        Buat Draf untuk 6 Semester
+                    </button>
+                </form>
+            <?php endif ?>
+        </section>
         <section class="a-card" aria-labelledby="judul-atp-excel">
             <h2 id="judul-atp-excel">Kelola ATP Excel · enam semester</h2>
             <p class="a-proto-muted">Unduh template, unggah, periksa kesesuaian tiap semester,
@@ -60,13 +129,13 @@
                     <?php foreach ($kelompok['nomor'] as $n): ?>
                         <?php
                             $r = $ringkasanSemester[$n];
-                            $belumMulai = $n < (int) $dipilih['semester_mulai'];
-                            $status = $belumMulai ? 'Dilewati oleh Gen' : match ($r['status']) {
+                            $sebelumGen = $n < (int) $dipilih['semester_mulai'];
+                            $status = match ($r['status']) {
                                 'aktif' => 'Paket aktif', 'draf' => 'Paket draf',
                                 'arsip' => 'Paket arsip', default => 'Belum ada paket',
                             };
                         ?>
-                        <a class="a-atp-kartu a-atp-warna-<?= (int) $n ?><?= $belumMulai ? ' is-dilewati' : '' ?>"
+                        <a class="a-atp-kartu a-atp-warna-<?= (int) $n ?>"
                             href="<?= esc(site_url('guru/peta-atp/semester/' . $n) . '?pilihan=' . (int) $nomorPilihan, 'attr') ?>"
                             aria-label="Semester <?= $n ?>, Kelas <?= esc(match ($n) {1,2 => 'VII',3,4 => 'VIII',default => 'IX'}) ?>, <?= esc($status) ?>, <?= (int) $r['bab'] ?> BAB, <?= (int) $r['tp'] ?> TP. Buka semester">
                             <span class="a-atp-kartu__atas">
@@ -74,7 +143,7 @@
                                 <span aria-hidden="true">↗</span>
                             </span>
                             <strong class="a-atp-kartu__judul">Kelas <?= esc(match ($n) {1,2 => 'VII',3,4 => 'VIII',default => 'IX'}) ?></strong>
-                            <span class="a-atp-kartu__status"><?= esc($status) ?></span>
+                            <span class="a-atp-kartu__status"><?= esc($status) ?><?= $sebelumGen ? ' · Hanya persiapan Guru' : '' ?></span>
                             <span class="a-atp-kartu__angka">
                                 <span><strong><?= (int) $r['bab'] ?></strong><small>BAB</small></span>
                                 <span><strong><?= (int) $r['tp'] ?></strong><small>TP</small></span>
