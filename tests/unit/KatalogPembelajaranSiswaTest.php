@@ -120,6 +120,15 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         self::assertSame('esensial', $state['kode']);
     }
 
+    public function testJenisTpTidakDikenalTidakMembukaAkses(): void
+    {
+        $state = KatalogPembelajaranSiswaService::statusTp(
+            4, 4, 1, 'siap', true, true, '', true
+        );
+        self::assertSame('terkunci', $state['kode']);
+        self::assertFalse($state['buka']);
+    }
+
     public function testSemesterLanjutanHanyaTerbukaJikaGateServiceMemberiIzin(): void
     {
         self::assertFalse(KatalogPembelajaranSiswaService::statusTp(
