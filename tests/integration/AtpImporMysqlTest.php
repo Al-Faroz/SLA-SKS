@@ -90,6 +90,7 @@ final class AtpImporMysqlTest extends TestCase
         $source = dirname(__DIR__, 2) . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
         $buku = IOFactory::load($source);
         AtpTemplateLayoutService::terapkan($buku);
+        \App\Services\AtpOtomatisTpService::terapkan($buku);
         try {
             $sum = $buku->getSheetByName('RINGKASAN');
             $sum->setCellValue('B5', 'GEN2025');
