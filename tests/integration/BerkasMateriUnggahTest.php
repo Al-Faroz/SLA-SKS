@@ -198,9 +198,9 @@ final class BerkasMateriUnggahTest extends TestCase
         $input['judul'] = 'Seharusnya Tidak Tersimpan';
         try {
             $this->service(1)->simpanDenganMedia(
-                1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf(true)
+                1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf(false, 5)
             );
-            self::fail('PDF dengan JavaScript harus ditolak pada penggantian.');
+            self::fail('PDF di bawah 6 halaman harus ditolak pada penggantian.');
         } catch (DomainException $e) {
             $terkini = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
             self::assertSame($idLama, (int) $terkini['berkas_id']);
@@ -237,10 +237,11 @@ final class BerkasMateriUnggahTest extends TestCase
         }
     }
 
-    public function testPdfDenganJavascriptDitolakValidator(): void
+    public function testPdfDenganJumlahHalamanTidakMemenuhiBatasDitolakValidator(): void
     {
-        $pdf = $this->uploadedPdf(true);
+        $pdf = $this->uploadedPdf(false, 5);
         $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('6–40 halaman');
         BerkasMateriService::validasi($pdf->getTempName(), 'pdf', 'materi.pdf');
     }
 

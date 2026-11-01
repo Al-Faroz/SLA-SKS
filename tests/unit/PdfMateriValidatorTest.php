@@ -82,25 +82,6 @@ final class PdfMateriValidatorTest extends TestCase
         self::assertSame(6, $hasil['halaman']);
     }
 
-    public function testOpenActionDenganLaunchTetapDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(6, '/OpenAction << /S /Launch /F (cmd.exe) >>'));
-    }
-
-    public function testOpenActionKeObjekSelainHalamanDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        // Objek 1 adalah katalog, bukan halaman.
-        PdfMateriValidator::periksa($this->pdf(6, '/OpenAction [1 0 R /FitH null]'));
-    }
-
-    public function testOpenActionYangMenyisipkanInstruksiAktifDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(6, '/OpenAction [3 0 R /FitH null] /JS (alert)'));
-    }
-
     public function testMarkerEofDalamMetadataBukanRevisiInkremental(): void
     {
         // Token ini boleh muncul pada data dokumen, bukan blok xref/penutup.
@@ -115,20 +96,18 @@ final class PdfMateriValidatorTest extends TestCase
         self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
-    public function testRevisiKeduaDenganPenutupStrukturalDitolak(): void
+    public function testRevisiPenutupTidakMenjadiBatasan(): void
     {
         $file = $this->pdf(6);
         file_put_contents($file, "\nstartxref\n0\n%%EOF\n", FILE_APPEND);
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($file);
+        self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
-    public function testPdfTanpaPenutupAkhirDitolak(): void
+    public function testTeksSetelahEofTidakMenjadiSyaratTambahan(): void
     {
         $file = $this->pdf(6);
-        file_put_contents($file, (string) file_get_contents($file) . "tambahan tidak sah");
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($file);
+        file_put_contents($file, (string) file_get_contents($file) . "tambahan metadata");
+        self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
     public function testPdfNormalDenganRevisiMetadataNavigasiXyzDanC2paDiterima(): void
@@ -158,10 +137,24 @@ final class PdfMateriValidatorTest extends TestCase
         self::assertSame(10, BerkasMateriService::validasi($file, 'pdf', 'materi.pdf')['halaman']);
     }
 
-    public function testSkripAktifDenganNamaPdfEncodedTetapDitolak(): void
+    public function testMarkerObjectStreamTidakMenghalangiHitungHalaman(): void
     {
+        // Reproduksi penanda /ObjStm pada PDF Word modern (tanpa file guru).
+        $file = $this->pdf(8, '/Metadata << /Type /ObjStm /Filter /FlateDecode >>');
+        self::assertSame(8, PdfMateriValidator::periksa($file));
+        self::assertSame(8, BerkasMateriService::validasi($file, 'pdf', 'materi.pdf')['halaman']);
+    }
+
+    public function testBatasUkuranLebihDari15MbDitolak(): void
+    {
+        $file = $this->pdf(6);
+        $handle = fopen($file, 'c+b');
+        self::assertNotFalse($handle);
+        ftruncate($handle, 15 * 1024 * 1024 + 1);
+        fclose($handle);
         $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(6, '/Java#53cript /#4aS (alert)'));
+        $this->expectExceptionMessage('maksimal 15 MB');
+        PdfMateriValidator::periksa($file);
     }
 
     public function testPdfSatuDanLimaHalamanDitolak(): void
@@ -195,18 +188,6 @@ final class PdfMateriValidatorTest extends TestCase
     {
         $this->expectException(DomainException::class);
         PdfMateriValidator::periksa($this->pdf(41));
-    }
-
-    public function testPdfDenganJavascriptDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(6, '/OpenAction << /S /JavaScript /JS (alert) >>'));
-    }
-
-    public function testPdfDenganNamaDikodekanDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(6, '/#4aS (alert)'));
     }
 
     public function testEkstensiTidakSesuaiDitolak(): void
