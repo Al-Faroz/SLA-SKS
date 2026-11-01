@@ -11,6 +11,9 @@ on:
       - 'docs/assets/galeri-komponen.html'
       - 'tests/unit/DetailTpMateriResponsifTest.php'
       - 'tests/unit/AtpEnamSemesterUiTest.php'
+      - 'tests/unit/StepProgressTpServiceTest.php'
+      - 'app/Services/StepProgressTpService.php'
+      - 'app/Views/guru/_step_progress_tp.php'
       - '.github/workflows/qa-detail-tp-materi-responsif.yml'
   workflow_dispatch:
 
@@ -36,5 +39,8 @@ jobs:
           php -l app/Views/guru/materi_edit.php
           php -l tests/unit/DetailTpMateriResponsifTest.php
           php -l tests/unit/AtpEnamSemesterUiTest.php
+          php -l tests/unit/StepProgressTpServiceTest.php
+          php -l app/Services/StepProgressTpService.php
+          php -l app/Views/guru/_step_progress_tp.php
       - name: Periksa regresi tabel, navigasi Semester dan aksi Materi
-        run: vendor/bin/phpunit --no-coverage --filter 'DetailTpMateriResponsifTest|AtpEnamSemesterUiTest'
+        run: vendor/bin/phpunit --no-coverage --filter 'DetailTpMateriResponsifTest|AtpEnamSemesterUiTest|StepProgressTpServiceTest'
