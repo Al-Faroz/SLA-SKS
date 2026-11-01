@@ -26,9 +26,11 @@
 
 ## Pengujian dan kondisi kelulusan
 
-**Yang benar-benar dilakukan:** pembacaan sumber dan audit statis branch; pembuatan/peninjauan kode tes serta script SQL QA baca-saja. Commit GitHub berhasil.
+**Yang benar-benar dilakukan:** pembacaan sumber dan audit statis branch; tes otomatis GitHub Actions pada **commit `c7dc466`** berhasil **11/11 workflow**, termasuk PHP lint, PHPUnit unit, integrasi CI4 + MySQL 8 fixture anonim `sla_sks_qa`, rollback dan idempotensi ATP, Detail TP, Materi Draf/berkas, CP SKI, UI dan kesiapan TP. [Lihat hasil Actions branch](https://github.com/Al-Faroz/SLA-SKS/actions?query=branch%3Afeature%2Ff1-stabilisasi-pasca-impor-atp-20261101).
 
-**Belum berhasil dijalankan:** php-lint seluruh repository, PHPUnit pada vendor CI4, integrasi `SLA_ATP_QA_DB=sla_sks_qa`, browser XAMPP (Dark/Light dan responsive), upload media sesungguhnya. Jangan mengklaim PASS otomatis pada tahap ini.
+**Akar regresi CI yang diperbaiki:** fixture `tests/fixtures/atp_import_v25_mysql.sql` semula hanya menyimpan dua kolom Materi, sedangkan Service V25-3 membutuhkan rencana Materi lengkap. Fixture `tests/fixtures/peta_atp_mysql.sql` semula tidak memiliki `jenis_tp` dan `cp_mapel_id`, serta INSERT TP perlu daftar kolom eksplisit. Workflow `qa-v25-atp-global-initial-only.yml` semula tidak dapat dimulai karena nama job mengandung titik dua tak dikutip dalam YAML; sudah dibetulkan dan sekarang PASS. Tidak ada perubahan skema DB pengguna.
+
+**Belum dijalankan:** uji browser **XAMPP Windows/MariaDB 10.4** terhadap database lokal nyata, ukuran file/mime media aktual, seluruh kondisi Dark/Light dan perangkat. Hasil otomatis CI tidak menggantikan QA pemilik sebelum F1 FIX.
 
 ### Uji lokal F1 (setelah pemilik pull branch F1)
 
@@ -40,6 +42,24 @@
 6. Jalankan SQL QA baca-saja bila diperlukan dan periksa keluaran agregat serta anomali. Tes destruktif dan rollback wajib hanya di `sla_sks_qa` anonim yang terpisah, jangan di `sla_sks_v4` berisi akun nyata.
 
 **Gate F1:** editor hasil impor, pemeriksaan hak, status Tetap/Galat, dan media draf terbukti melalui XAMPP; tes regresi pada database QA aman berjalan tanpa error. Baru pindah ke **F2 — Media lengkap, bank soal, dan TP Siap**.
+
+## Verifikasi CI terbaru (sebelum pengujian XAMPP)
+
+Pada commit `c7dc466`, seluruh 11 workflow selesai dengan **conclusion=success**:
+
+- QA ATP Global Initial Only v2.5 — PASS
+- QA Konfirmasi ATP Transaksional v2.5 — PASS
+- QA Pratinjau Impor ATP v2.5 — PASS
+- QA Peta ATP v2.4 — PASS
+- QA Materi Draf v2.4 — PASS
+- QA Berkas Materi Privat v2.4 — PASS
+- QA Rincian TP v2.4 — PASS
+- QA Detail TP dan Materi Responsif — PASS
+- QA Kesiapan dan Publikasi TP Siap — PASS
+- QA Pratinjau YouTube Materi v2.4 — PASS
+- QA CP SKI v2.5 dan ATP stale reference — PASS
+
+Nama workflow lama `v2.4` adalah nama tes historis; bukan penggantian kebijakan Master v2.5.
 
 ## Perubahan skema dan batas proyek
 
