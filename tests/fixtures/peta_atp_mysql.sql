@@ -54,6 +54,8 @@ CREATE TABLE tp (
  urutan_atp SMALLINT UNSIGNED NOT NULL,
  status ENUM('draf','siap') NOT NULL,
  struktur_versi INT UNSIGNED NOT NULL,
+ cp_mapel_id BIGINT UNSIGNED NULL,
+ jenis_tp ENUM('esensial','non_esensial') NOT NULL DEFAULT 'non_esensial',
  FOREIGN KEY (paket_semester_id) REFERENCES paket_semester(id)
 ) ENGINE=InnoDB;
 CREATE TABLE berkas (
