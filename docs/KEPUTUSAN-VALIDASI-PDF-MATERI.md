@@ -9,8 +9,8 @@
 
 **Tujuan utama batas PDF adalah menjaga penggunaan ruang simpan shared hosting agar tidak membengkak.** Batas halaman membatasi panjang bahan belajar. Guru **hanya perlu memilih PDF yang dapat dibuka dan mengunggahnya**, bukan memahami tabel xref, incremental update, C2PA, `OpenAction`, `startxref`, atau format internal PDF lainnya.
 
-Aturan bisnis baku:
-- File PDF Materi: **maksimal 15 MB** (implementasi PHP memakai 15 × 1024 × 1024 byte), **1–40 halaman**.
+Aturan pada 24 Oktober 2026 (ketentuan minimum telah diperbarui pada addendum 1 November di bawah):
+- File PDF Materi: **maksimal 15 MB** (implementasi PHP memakai 15 × 1024 × 1024 byte), **1–40 halaman** pada saat keputusan lama.
 - Pastikan file memang PDF yang dapat dibaca, dengan ekstensi/MIME yang sesuai.
 - Perlindungan keamanan tetap wajib: jangan menjalankan atau menerima PDF berisi skrip/aksi aktif yang tidak diizinkan; jangan izinkan akses langsung ke folder privat. Pemeriksaan dilakukan **di server**, bukan hanya atribut HTML/JavaScript.
 - Unggah PDF tidak mengaktifkan Materi otomatis. Batas halaman/ukuran dan otorisasi yang ada **tidak boleh dilonggarkan tanpa keputusan pemilik proyek**.
@@ -67,3 +67,12 @@ Rujukan tes: `tests/unit/PdfMateriValidatorTest.php`, `tests/integration/BerkasM
 - **Tahap sesudahnya:** kembali ke urutan modul Master Document, jangan berputar lagi membahas PDF yang telah FIX kecuali ada laporan bug baru yang konkret.
 
 **Instruksi untuk AI/developer berikutnya:** baca dokumen ini **sebelum** menyentuh kode validasi PDF atau modul Materi, hormati keputusan final, dan kerjakan fitur berikutnya. Jika bug PDF baru muncul, kumpulkan bukti minimal dan buat uji reproduksi; jangan mulai dari nol atau membuat Guru harus memahami format internal PDF.
+
+
+## Addendum aktif 1 November 2026 — minimum PDF Materi enam halaman
+
+**Menggantikan batas bawah historis 1 halaman:** PDF Materi **harus memiliki 6–40 halaman, maksimal 15 MB** untuk unggah baru maupun penggantian file PDF pada TP draf. PDF 1–5 halaman ditolak. PDF 6 dan 40 halaman dapat diterima bila valid; 41 halaman atau >15 MB ditolak. Pesan untuk Guru: **“PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB.”**
+
+Aturan diperiksa pada `PdfMateriValidator::periksa()` melalui `BerkasMateriService::validasi()`; perubahan file hanya terjadi setelah validasi sukses. PDF berkas historis 1–5 halaman **tidak dihapus dan tidak diganti otomatis**. Perlindungan aksi aktif, file privat dan penerimaan PDF wajar dengan metadata, revisi inkremental, dan navigasi tetap berlaku.
+
+Regresi terbaru **menggantikan** tes lama yang menganggap PDF 1 halaman diterima: 1 dan 5 ditolak; 6 dan 40 diterima; 41 ditolak; skrip dan aksi aktif tetap ditolak; gagal ganti 5 halaman menjaga berkas lama. Hasil tes XAMPP diperlukan sebelum status akhir FIX.

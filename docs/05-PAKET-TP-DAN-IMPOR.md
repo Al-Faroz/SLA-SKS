@@ -24,7 +24,7 @@
 
 ## 4. Materi dan media
 - Setiap TP, Esensial maupun NonEsensial, tepat satu media Materi aktif; riwayat Materi lama tidak boleh dihapus. Empat media yang dahulu berada dalam satu TP lama merupakan **data uji v3** dan tidak boleh otomatis dipilih sebagai materi v4 yang aktif.
-- PDF bawaan maksimal **15 MB/40 halaman** tanpa menolak PDF normal hanya karena metadata atau revisi inkremental. Audio mp3/m4a ≤10 MB bawaan; gambar JPG/PNG/WebP, video menggunakan URL YouTube. Berkas privat, pratinjau Guru, validasi ukuran/MIME/akses mengikuti [dokumen keputusan PDF](KEPUTUSAN-VALIDASI-PDF-MATERI.md).
+- PDF Materi **6–40 halaman dengan ukuran maksimal 15 MB** tanpa menolak PDF normal hanya karena metadata atau revisi inkremental. Audio mp3/m4a ≤10 MB bawaan; gambar JPG/PNG/WebP, video menggunakan URL YouTube. Berkas privat, pratinjau Guru, validasi ukuran/MIME/akses mengikuti [dokumen keputusan PDF](KEPUTUSAN-VALIDASI-PDF-MATERI.md).
 - Pembelajaran YouTube/audio selesai pada batas **lebih dahulu** antara waktu minimum Guru dan 90% durasi sah; gambar/PDF memenuhi waktu aktif dan halaman yang diwajibkan. Model penghitungan waktu klien dengan checkpoint server empat menit disepakati; unduh audio/gambar/PDF dibuka setelah syarat media selesai, bersamaan dengan akses Resume/HOTS.
 
 ## 5. Kesiapan dan penguncian
@@ -50,3 +50,8 @@ Keputusan terbaru pemilik untuk pola **CP → Semester → BAB → TP, tepat sat
 3. Editor media tetap memakai form halaman (bukan modal). URL edit lama `/guru/tp/{id}/materi/{mediaId}/edit` memvalidasi hak G1, status draf dan kepemilikan sebelum mengarahkan ke bagian `#materi-tp` di Detail. Berkas PDF/Audio/Gambar tetap privat dan diunggah dengan validator lama.
 4. Kesiapan TP menggunakan **Step Progress** yang dikelompokkan, tetapi pemeriksaan final Service, transaksi, snapshot dan konfirmasi publikasi tetap wajib; UI bukan pengganti pemeriksaan server. Esensial memiliki langkah TP+CP → Materi → Publikasi; NonEsensial menambah Diagnostik dan Sumatif.
 5. Rencana satu Materi dari Excel tetap satu baris draf. Guru menyunting record yang ada, bukan menambah data. Perubahan SQL **tidak diperlukan** untuk perubahan UI ini.
+
+
+## Addendum batas halaman PDF Materi (1 November 2026)
+
+PDF Materi yang baru diunggah maupun file pengganti wajib berisi **minimal 6 dan maksimal 40 halaman** (maksimal 15 MB). PDF 1–5 halaman ditolak sebelum disimpan; data dan berkas historis tidak diubah/hapus otomatis. Pemeriksaan ada di server, dengan petunjuk form sejalan. Validasi file, keamanan dan toleransi metadata/revisi PDF normal tetap mengikuti `KEPUTUSAN-VALIDASI-PDF-MATERI.md`. Perubahan aturan ini tidak membutuhkan SQL.

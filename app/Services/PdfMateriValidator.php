@@ -7,7 +7,7 @@ namespace App\Services;
 use DomainException;
 
 /**
- * PDF bahan belajar: batas biaya penyimpanan 15 MiB / 40 halaman.
+ * PDF bahan belajar: 6–40 halaman, maksimal 15 MiB.
  *
  * Pemeriksaan keamanan hanya menolak aksi aktif, enkripsi dan file yang
  * tidak dapat dibaca. Revisi inkremental, navigasi halaman, hyperlink,
@@ -98,8 +98,8 @@ final class PdfMateriValidator
         $halamanDitemukan = [];
         $jumlah = self::hitungHalaman($pages[1] . ':' . $pages[2], $objects,
             $sudahDikunjungi, $halamanDitemukan, 0);
-        if ($jumlah < 1 || $jumlah > 40) {
-            throw new DomainException('PDF harus berisi 1–40 halaman.');
+        if ($jumlah < 6 || $jumlah > 40) {
+            throw new DomainException('PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB.');
         }
 
         // OpenAction berbentuk tujuan tampilan saja (Fit / XYZ) tidak

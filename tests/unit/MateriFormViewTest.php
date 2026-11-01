@@ -45,6 +45,7 @@ final class MateriFormViewTest extends TestCase
         self::assertMatchesRegularExpression('/value="pdf"\\s+selected/', $html);
         self::assertStringContainsString('name="media"', $html);
         self::assertStringContainsString('data-materi-batas-server=', $html);
+        self::assertStringContainsString('PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB', $html);
         self::assertStringContainsString('aria-invalid="true"', $html);
         self::assertStringContainsString('value="10"', $html);
         self::assertStringContainsString('Ringkas materi di PDF.', $html);

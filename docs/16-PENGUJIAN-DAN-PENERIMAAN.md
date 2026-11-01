@@ -271,3 +271,12 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 | UI-TP-007 | Step Progress Esensial/NonEsensial | 3 vs 5 langkah; status diturunkan dari Service, tidak memberi PASS palsu |
 | UI-TP-008 | TP siap / snapshot | Form draf terkunci, publikasi hanya setelah tes server dan konfirmasi |
 | UI-TP-009 | Gagal upload / pergantian file | Pesan mudah dipahami, isian teks kembali, file harus dipilih ulang, DB tetap satu Materi |
+
+
+### Regresi PDF Materi 6–40 halaman (ketetapan 1 November 2026)
+
+- Guru unggah PDF 1 atau 5 halaman: **ditolak oleh server**, pesan minimal 6 halaman, tanpa membuat file/metadata baru.
+- Guru unggah PDF 6 atau 40 halaman yang sah: **diterima** dan kolom `berkas.halaman` sesuai.
+- PDF 41 halaman atau di atas 15 MB: ditolak; PDF dengan skrip/aksi aktif tetap ditolak.
+- Sunting Materi dengan penggantian PDF 5 halaman: gagal, berkas lama dan versi TP tidak berubah; histori berkas tidak dihapus.
+- Form/JavaScript menampilkan batas yang sama; lanjutkan PHPUnit dan uji manual upload/ganti di XAMPP sebelum menyatakan FIX.
