@@ -64,3 +64,17 @@ Nama workflow lama `v2.4` adalah nama tes historis; bukan penggantian kebijakan 
 ## Perubahan skema dan batas proyek
 
 **Tidak ada patch SQL atau perubahan skema untuk F1**. Patch `V4-0005` sudah terpasang berdasarkan dump terakhir; tidak ada Migration/Seeder. Tidak menyentuh `.env`, konfigurasi DB, root `index.php`/`.htaccess` atau penyimpanan media historis. Tidak ada merge main.
+
+## Koreksi navigasi hasil uji lokal (1 November 2026)
+
+**Laporan pemilik:** setelah pull F1, Guru tidak menemukan halaman untuk melengkapi Materi hasil impor ATP. **Penyebab terverifikasi pada kode:** tabel TP pada halaman `guru/peta-atp/semester/{n}` sebelumnya hanya menampilkan Kode/Nama/Deskripsi/Jenis/Status tanpa tautan menuju Detail TP. Route `GET guru/tp/{id}` serta editor `GET guru/tp/{tpId}/materi/{materiId}/edit` sebenarnya sudah terpasang.
+
+**Perbaikan di branch `fix/f1-navigasi-detail-tp-materi-20261101`:**
+- Tambah kolom **Aksi** per TP dengan tautan `Kelola TP / Materi` (untuk draf) atau `Lihat TP` (untuk Siap), menggunakan ID TP asli dari database, bukan nomor BAB atau urutan; akses lintas Gen tetap dibatasi `DetailTpService`.
+- Dari Detail TP, tombol **Lengkapi satu Materi ini** tetap menuju editor Materi hasil impor; **tidak membuat Materi kedua**.
+- Tambah pengujian kontrak navigasi Semester → Detail TP → Sunting Materi pada `AtpEnamSemesterUiTest` dan workflow pemeriksaan UI.
+- **Tidak mengubah data SQL, DB lokal, .env, file materi privat atau keputusan bisnis.**
+
+**Uji XAMPP yang wajib:** Login Guru → Peta ATP → Semester 4 → daftar BAB dan TP → tombol `Kelola TP / Materi` → Detail TP menampilkan satu Materi → `Lengkapi satu Materi ini` → form Sunting. Ulangi uji pada Semester 1 (persiapan Guru), dan pastikan Guru lintas Gen tidak dapat mengakses detail lewat URL langsung. Uji tautan dan tampilan Dark/Light. Jangan menambah Materi kedua.
+
+**Status:** Belum FIX sebelum pemilik menyatakan jalur navigasi dan penyuntingan di XAMPP berhasil.

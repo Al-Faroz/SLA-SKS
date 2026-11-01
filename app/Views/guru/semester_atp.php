@@ -144,6 +144,7 @@
                                     <th scope="col">Deskripsi</th>
                                     <th scope="col">Jenis</th>
                                     <th scope="col">Status</th>
+                                    <th scope="col">Aksi</th>
                                 </tr></thead>
                                 <tbody>
                                 <?php foreach ($tpDalamBab as $tp): ?>
@@ -153,6 +154,13 @@
                                         <td data-label="Deskripsi"><?= esc($tp['deskripsi_tp'] ?? $tp['rumusan'] ?? '—') ?></td>
                                         <td data-label="Jenis"><?= esc(($tp['jenis_tp'] ?? '') === 'esensial' ? 'Esensial' : 'NonEsensial') ?></td>
                                         <td data-label="Status"><span class="a-badge"><?= esc($tp['status']) ?></span></td>
+                                        <td data-label="Aksi" class="a-materi-aksi">
+                                            <a class="a-btn a-btn--sekunder"
+                                               href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"
+                                               aria-label="<?= esc('Buka rincian ' . $tp['kode_tp'] . ' dan kelola Materi', 'attr') ?>">
+                                                <?= $tp['status'] === 'draf' ? 'Kelola TP / Materi' : 'Lihat TP' ?>
+                                            </a>
+                                        </td>
                                     </tr>
                                 <?php endforeach ?>
                                 </tbody>
