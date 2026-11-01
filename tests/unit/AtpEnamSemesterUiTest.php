@@ -26,6 +26,27 @@ final class AtpEnamSemesterUiTest extends TestCase
         );
     }
 
+    public function testSetiapTpHasilImporMemilikiJalurKelolaMateri(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $semester = (string) file_get_contents($root . '/app/Views/guru/semester_atp.php');
+        $detail = (string) file_get_contents($root . '/app/Views/guru/detail_tp.php');
+        $routes = (string) file_get_contents($root . '/app/Config/Routes.php');
+
+        self::assertStringContainsString('<th scope="col">Aksi</th>', $semester);
+        self::assertStringContainsString('Kelola TP / Materi', $semester);
+        self::assertStringContainsString(
+            "site_url('guru/tp/' . (int) " . '$tp' . "['id'])", $semester
+        );
+        self::assertStringContainsString('Lengkapi satu Materi ini', $detail);
+        self::assertStringContainsString(
+            "'guru/tp/(:num)', 'GuruDetailTp::lihat/\$1'", $routes
+        );
+        self::assertStringContainsString(
+            "'guru/tp/(:num)/materi/(:num)/edit', 'GuruMateri::edit/\$1/\$2'", $routes
+        );
+    }
+
     public function testTpManualBisaDisiapkanGuruPadaSemesterSebelumGen(): void
     {
         $service = (string) file_get_contents(
