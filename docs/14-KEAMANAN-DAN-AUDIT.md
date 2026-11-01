@@ -102,3 +102,8 @@ sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.
 - Checkpoint klien 4 menit tidak memberi kepercayaan penuh pada waktu browser; Service membatasi delta sah dan memerlukan bukti tersimpan sebelum membuka Resume/HOTS/download. Simpan waktu lokal offline hanya sementara pada perangkat sama.
 - Pra-Semester: Admin jadwal, belum selesai TP/di luar jendela waktu ditolak, izin Guru hanya Gen–Mapel, jawaban/snapshot/insiden ujian anonim bagi pihak tak berhak.
 - Export Nilai Guru tersedia saat satu skor ada tetapi tetap membatasi semua baris ke Gen–Mapel pengampu, tanpa hash/token/sesi, mitigasi formula-injection, respons file tidak boleh terindeks/cache publik.
+
+
+### Ketetapan PDF Materi 1 November 2026
+
+Validasi bisnis pada file PDF Materi hanya **jumlah halaman 6–40** dan **ukuran maksimal 15 MB**. Pemeriksaan `ObjStm`, token/struktur internal PDF, metadata maupun aksi PDF bukan syarat tambahan saat unggah. Ekstensi/MIME mengenali jenis file PDF; kontrol server yang terpisah seperti hak Guru G1, status TP draf, CSRF, endpoint media privat, CSP sandbox dan transaksi penyimpanan tidak diubah. Tidak ada file historis yang dihapus.
