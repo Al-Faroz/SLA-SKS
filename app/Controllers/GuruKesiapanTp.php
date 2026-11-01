@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Services\AuthService;
 use App\Services\KesiapanTpService;
+use App\Services\StepProgressTpService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -20,6 +21,9 @@ final class GuruKesiapanTp extends BaseController
     {
         try {
             $hasil = (new KesiapanTpService())->periksa($tpId);
+            $hasil['langkah'] = StepProgressTpService::susun($hasil['cek'],
+                (string) ($hasil['tp']['jenis_tp'] ?? ''),
+                (string) $hasil['tp']['status'], $tpId);
             $akun = (new AuthService())->penggunaSaatIni();
             return view('guru/kesiapan_tp', array_merge($hasil, [
                 'judul' => 'Kesiapan TP Siap',
