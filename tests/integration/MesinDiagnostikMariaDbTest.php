@@ -142,7 +142,7 @@ final class MesinDiagnostikMariaDbTest extends TestCase
         $end=$engine->tindakan(1,$token,'kirim',true);
         self::assertSame('selesai_sah',$end['status']);
         self::assertSame(100.0,$end['skor']);
-        self::assertSame('tuntas',$this->db->table('progres_tp')
+        self::assertSame('sumatif',$this->db->table('progres_tp')
             ->select('status')->where('id',11)->get()->getRowArray()['status']);
         self::assertArrayNotHasKey('soal',$engine->status(1,$token));
         self::assertSame($token,$engine->mulai(1,true)['token']);
