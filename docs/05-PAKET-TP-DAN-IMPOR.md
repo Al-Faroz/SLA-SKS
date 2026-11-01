@@ -55,3 +55,8 @@ Keputusan terbaru pemilik untuk pola **CP → Semester → BAB → TP, tepat sat
 ## Addendum batas halaman PDF Materi (1 November 2026)
 
 PDF Materi yang baru diunggah maupun file pengganti wajib berisi **minimal 6 dan maksimal 40 halaman** (maksimal 15 MB). PDF 1–5 halaman ditolak sebelum disimpan; data dan berkas historis tidak diubah/hapus otomatis. Pemeriksaan ada di server, dengan petunjuk form sejalan. Validasi file, keamanan dan toleransi metadata/revisi PDF normal tetap mengikuti `KEPUTUSAN-VALIDASI-PDF-MATERI.md`. Perubahan aturan ini tidak membutuhkan SQL.
+
+
+## Keputusan final penyederhanaan validasi PDF (1 November 2026)
+
+**Menggantikan semua instruksi validasi internal PDF sebelumnya:** PDF Materi hanya dibatasi dari sisi **jumlah halaman 6–40** dan **ukuran maksimal 15 MB**. Pembacaan katalog, objek terkompresi (ObjStm), revisi, metadata dan navigasi dipakai hanya seperlunya untuk memperoleh angka halaman, **tidak menjadi alasan penolakan tersendiri**. File tetap harus dikenali sebagai jenis PDF saat diunggah (ekstensi/MIME); kewenangan Guru, status TP draf, penyimpanan privat, CSRF dan transaksi tetap berlaku di luar pembatasan Materi. PDF historis tidak dihapus atau diubah otomatis. Tidak ada perubahan SQL.
