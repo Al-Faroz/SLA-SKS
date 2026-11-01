@@ -6,6 +6,8 @@ namespace App\Controllers;
 
 use App\Services\AuthService;
 use App\Services\DetailTpService;
+use App\Services\KesiapanTpService;
+use App\Services\StepProgressTpService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -19,6 +21,9 @@ final class GuruDetailTp extends BaseController
     {
         try {
             $rincian = (new DetailTpService())->lihat($id);
+            $pemeriksaan = (new KesiapanTpService())->periksa($id);
+            $langkah = StepProgressTpService::susun($pemeriksaan['cek'],
+                (string) ($rincian['tp']['jenis_tp'] ?? ''), (string) $rincian['tp']['status'], $id);
         } catch (DomainException $e) {
             return $this->response->setStatusCode(403)->setBody(
                 view('publik/ditolak', ['judul' => 'Akses TP ditolak'])
@@ -28,6 +33,7 @@ final class GuruDetailTp extends BaseController
         $akun = (new AuthService())->penggunaSaatIni();
 
         return view('guru/detail_tp', array_merge($rincian, [
+            'langkah' => $langkah,
             'judul' => 'Rincian TP',
             'namaPengguna' => $akun['nama'],
             'peranAktif' => 'Guru',
@@ -40,11 +46,10 @@ final class GuruDetailTp extends BaseController
         // Route auth:guru serta CSRF global; Service tetap memeriksa G1.
         $judul = $this->request->getPost('judul');
         $rumusan = $this->request->getPost('rumusan');
-        $indikator = $this->request->getPost('indikator');
         $versi = $this->request->getPost('struktur_versi');
 
         if (! is_string($judul) || ! is_string($rumusan)
-            || ! is_string($indikator) || ! is_string($versi)
+            || ! is_string($versi)
             || ! ctype_digit($versi) || strlen($versi) > 10
             || (float) $versi > PHP_INT_MAX) {
             return redirect()->to(site_url('guru/tp/' . $id))
@@ -52,7 +57,7 @@ final class GuruDetailTp extends BaseController
         }
 
         try {
-            (new DetailTpService())->simpanDraf($id, $judul, $rumusan, $indikator, (int) $versi);
+            (new DetailTpService())->simpanDraf($id, $judul, $rumusan, (int) $versi);
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru/tp/' . $id))
                 ->with('galat', $e->getMessage());

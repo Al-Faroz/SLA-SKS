@@ -137,14 +137,14 @@
                         <div class="a-atp-bab-card__kosong" role="status">Belum ada TP pada BAB ini.</div>
                     <?php else: ?>
                         <div class="a-tabel-gulir a-atp-bab-card__tabel">
-                            <table class="a-tbl a-tbl--cards a-tbl--peta-atp">
+                            <table class="a-tbl a-tbl--cards a-tbl--peta-atp a-tbl--tp-enam">
                                 <thead><tr>
                                     <th scope="col">Kode TP</th>
                                     <th scope="col">Nama TP</th>
                                     <th scope="col">Deskripsi</th>
                                     <th scope="col">Jenis</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Aksi</th>
+                                    <th scope="col" class="a-tp-kolom-aksi">Aksi</th>
                                 </tr></thead>
                                 <tbody>
                                 <?php foreach ($tpDalamBab as $tp): ?>
@@ -154,11 +154,11 @@
                                         <td data-label="Deskripsi"><?= esc($tp['deskripsi_tp'] ?? $tp['rumusan'] ?? '—') ?></td>
                                         <td data-label="Jenis"><?= esc(($tp['jenis_tp'] ?? '') === 'esensial' ? 'Esensial' : 'NonEsensial') ?></td>
                                         <td data-label="Status"><span class="a-badge"><?= esc($tp['status']) ?></span></td>
-                                        <td data-label="Aksi" class="a-materi-aksi">
-                                            <a class="a-btn a-btn--sekunder"
+                                        <td data-label="Aksi" class="a-tp-kolom-aksi">
+                                            <a class="a-btn a-btn--sekunder a-tp-aksi-ringkas"
                                                href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>"
                                                aria-label="<?= esc('Buka rincian ' . $tp['kode_tp'] . ' dan kelola Materi', 'attr') ?>">
-                                                <?= $tp['status'] === 'draf' ? 'Kelola TP / Materi' : 'Lihat TP' ?>
+                                                <?= $tp['status'] === 'draf' ? 'Kelola' : 'Lihat' ?>
                                             </a>
                                         </td>
                                     </tr>

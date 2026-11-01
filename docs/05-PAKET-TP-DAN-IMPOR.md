@@ -40,3 +40,13 @@ Guru wajib mengisi **tepat satu judul Materi dan satu jenis media** untuk **seti
 
 
 **Revisi resmi V25-3, 31 Oktober 2026:** Guru tidak mengetik Urutan TP di kolom B. Kolom A TP adalah daftar pilihan Nomor BAB (Defined Name `BABS_1..BABS_6`, bersumber dari A13:A32 semester masing-masing). B39:B118 berisi formula yang dihitung per BAB; server menolak formula lain dan menghitung ulang `urutan_dalam_bab` untuk kode TP, tanpa mempercayai nilai cache Excel. Template V25-2 wajib diunduh ulang. Lihat `KONTRAK-TEMPLATE-ATP-MANUAL-V25.md` untuk batas aman dan contoh.
+
+## Addendum operasional 1 November 2026 — editor TP dan instrumen minimum
+
+Keputusan terbaru pemilik untuk pola **CP → Semester → BAB → TP, tepat satu Materi untuk Esensial dan NonEsensial**:
+
+1. Guru **tidak lagi mengisi kolom terpisah Indikator Ketercapaian** saat mengedit TP. Rumusan/deskripsi TP dan CP operasional menjadi informasi akademik utama. Field DB lama `tp.indikator` tetap tersedia untuk kompatibilitas dan histori, tidak dihapus/reset, tidak menjadi gerbang TP Siap. Aplikasi hanya mengubah Judul dan Rumusan lewat form TP.
+2. `/guru/tp/{id}` merupakan halaman utama penyiapan: identitas/rumusan, **satu formulir Sunting Materi yang sudah diimpor**, tautan bank Diagnostik/Sumatif hanya bagi NonEsensial, dan pemeriksaan sebelum terbit. Tidak ada urutan Naik/Turun/Hapus dalam tampilan Materi tunggal; endpoint historis tidak dikembalikan sebagai fitur multi-Materi.
+3. Editor media tetap memakai form halaman (bukan modal). URL edit lama `/guru/tp/{id}/materi/{mediaId}/edit` memvalidasi hak G1, status draf dan kepemilikan sebelum mengarahkan ke bagian `#materi-tp` di Detail. Berkas PDF/Audio/Gambar tetap privat dan diunggah dengan validator lama.
+4. Kesiapan TP menggunakan **Step Progress** yang dikelompokkan, tetapi pemeriksaan final Service, transaksi, snapshot dan konfirmasi publikasi tetap wajib; UI bukan pengganti pemeriksaan server. Esensial memiliki langkah TP+CP → Materi → Publikasi; NonEsensial menambah Diagnostik dan Sumatif.
+5. Rencana satu Materi dari Excel tetap satu baris draf. Guru menyunting record yang ada, bukan menambah data. Perubahan SQL **tidak diperlukan** untuk perubahan UI ini.

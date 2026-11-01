@@ -11,6 +11,8 @@ on:
       - 'public/assets/css/app.css'
       - 'docs/13-DESIGN-SYSTEM-CSS.md'
       - 'tests/unit/KesiapanTpTest.php'
+      - 'app/Services/StepProgressTpService.php'
+      - 'app/Views/guru/_step_progress_tp.php'
       - '.github/workflows/qa-kesiapan-tp.yml'
   workflow_dispatch:
 
@@ -37,5 +39,7 @@ jobs:
           php -l app/Views/guru/detail_tp.php
           php -l app/Config/Routes.php
           php -l tests/unit/KesiapanTpTest.php
+          php -l app/Services/StepProgressTpService.php
+          php -l app/Views/guru/_step_progress_tp.php
       - name: Uji invariant akademik dan konfirmasi UI
         run: vendor/bin/phpunit --no-coverage tests/unit/KesiapanTpTest.php

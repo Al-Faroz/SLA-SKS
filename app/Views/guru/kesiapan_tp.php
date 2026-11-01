@@ -26,7 +26,7 @@
         <?php $jumlahLolos = count(array_filter($cek, static fn (array $baris): bool => $baris['terpenuhi'])); ?>
         <div class="a-kesiapan-ringkasan">
             <div><strong><?= $jumlahLolos ?> / <?= count($cek) ?></strong><span>Ketentuan terpenuhi</span></div>
-            <div><strong><?= count($materi) ?></strong><span>Materi/Submateri</span></div>
+            <div><strong><?= count($materi) ?></strong><span>Materi (maksimal satu)</span></div>
             <div><strong><?= count($soal) ?></strong><span>Soal aktif</span></div>
             <div><strong><?= $tp['status'] === 'siap' ? 'Siap' : ($siap ? 'Lengkap' : 'Draf') ?></strong><span>Status pemeriksaan</span></div>
         </div>
@@ -52,11 +52,20 @@
         <?php endif ?>
     </section>
 
+    <section class="a-card a-jarak-atas" aria-labelledby="judul-tahapan-final">
+        <h2 id="judul-tahapan-final">Step Progress penyiapan TP</h2>
+        <p class="a-help">Langkah yang belum lengkap dapat dibuka langsung.
+            Status ini berasal dari pemeriksaan Service yang sama dengan keputusan publikasi.</p>
+        <?= view('guru/_step_progress_tp', ['langkah' => $langkah]) ?>
+    </section>
+
     <section class="a-card a-jarak-atas" aria-labelledby="judul-checklist-akhir">
         <h2 id="judul-checklist-akhir">Daftar pemeriksaan final</h2>
         <p class="a-help">Pemeriksaan ini meliputi CP resmi, seluruh Materi, media,
             bank soal Diagnostik/Sumatif, dan pengaturan ujian. Publikasi tetap
             memerlukan konfirmasi Guru.</p>
+        <details class="a-tp-kesiapan-detail">
+            <summary class="a-btn a-btn--sekunder">Lihat rincian ketentuan (<?= count($cek) ?> pemeriksaan)</summary>
         <div class="a-tabel-gulir">
             <table class="a-tbl a-tbl--cards a-kesiapan-tabel">
                 <thead>
@@ -83,6 +92,7 @@
                 </tbody>
             </table>
         </div>
+        </details>
     </section>
 
     <?php if ($tp['status'] === 'draf'): ?>

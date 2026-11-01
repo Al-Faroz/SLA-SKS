@@ -77,6 +77,15 @@ final class KesiapanTpTest extends TestCase
         self::assertTrue(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
     }
 
+    public function testIndikatorTidakWajibUntukSiapTpV25(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $tp['indikator'] = '';
+        $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
+        self::assertNotContains('indikator', array_column($hasil, 'kode'));
+        self::assertNotContains(false, array_column($hasil, 'terpenuhi'));
+    }
+
     public function testTpEsensialWajibMateriTetapiTidakWajibSoalAtauResumeHots(): void
     {
         [$tp, $paket, $cp, $materi] = self::data();
@@ -188,7 +197,7 @@ final class KesiapanTpTest extends TestCase
 
         self::assertSame(1, substr_count($kesiapan, 'id="judul-checklist-akhir"'));
         self::assertStringContainsString('Daftar pemeriksaan final', $kesiapan);
-        self::assertStringContainsString("if (\$tp['status'] === 'siap')", $detail);
+        self::assertStringContainsString('TP sudah Siap', $detail);
         self::assertStringContainsString("if (\$tp['status'] === 'draf')", $kesiapan);
         self::assertStringNotContainsString("'#checklist-konten-tp'", $service);
         self::assertStringContainsString("'guru/peta-atp'", $service);

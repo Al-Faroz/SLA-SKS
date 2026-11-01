@@ -156,7 +156,7 @@ final class KesiapanTpService
         $detail = 'guru/tp/' . $id;
         $hasil = [];
         foreach (['kode_tp' => 'Kode TP', 'judul' => 'Judul TP',
-            'rumusan' => 'Rumusan TP', 'indikator' => 'Indikator ketercapaian'] as $field => $label) {
+            'rumusan' => 'Rumusan TP'] as $field => $label) {
             self::tambahCek($hasil, $field, $label,
                 trim((string) ($tp[$field] ?? '')) !== '',
                 'Periksa isian ' . $label . '.', $detail . '#rumusan-tp');

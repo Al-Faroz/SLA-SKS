@@ -12,7 +12,7 @@ final class ChecklistKontenTpServiceTest extends TestCase
     public function testKosongTidakDapatDianggapLengkap(): void
     {
         $hasil = ChecklistKontenTpService::periksa([], []);
-        self::assertCount(4, $hasil);
+        self::assertCount(3, $hasil);
         foreach ($hasil as $cek) {
             self::assertFalse($cek['terpenuhi']);
         }
@@ -26,7 +26,7 @@ final class ChecklistKontenTpServiceTest extends TestCase
              'petunjuk_resume' => 'Buat ringkasan', 'petunjuk_hots' => 'Berikan alasan'],
         ];
         $hasil = ChecklistKontenTpService::periksa($tp, $materi);
-        self::assertCount(8, $hasil);
+        self::assertCount(7, $hasil);
         foreach ($hasil as $cek) {
             self::assertTrue($cek['terpenuhi'], $cek['label']);
         }
@@ -43,8 +43,8 @@ final class ChecklistKontenTpServiceTest extends TestCase
                 'petunjuk_resume' => 'Resume', 'petunjuk_hots' => 'HOTS'],
         ];
         $cek = ChecklistKontenTpService::periksa($tp, $dua);
-        self::assertSame('Tepat satu Materi', $cek[3]['label']);
-        self::assertFalse($cek[3]['terpenuhi']);
+        self::assertSame('Tepat satu Materi', $cek[2]['label']);
+        self::assertFalse($cek[2]['terpenuhi']);
     }
 
     public function testBerkasDanPetunjukYangHilangDitandai(): void
@@ -54,10 +54,10 @@ final class ChecklistKontenTpServiceTest extends TestCase
             [['urutan' => 3, 'jenis' => 'audio', 'berkas_id' => null,
               'petunjuk_resume' => ' ', 'petunjuk_hots' => 'Pertanyaan']]
         );
+        self::assertFalse($hasil[3]['terpenuhi']);
         self::assertFalse($hasil[4]['terpenuhi']);
-        self::assertFalse($hasil[5]['terpenuhi']);
-        self::assertTrue($hasil[6]['terpenuhi']);
-        self::assertFalse($hasil[7]['terpenuhi']);
+        self::assertTrue($hasil[5]['terpenuhi']);
+        self::assertFalse($hasil[6]['terpenuhi']);
     }
     public function testEsensialTidakMewajibkanTugasResumeHots(): void
     {
@@ -68,7 +68,7 @@ final class ChecklistKontenTpServiceTest extends TestCase
             'urutan' => 1, 'jenis' => 'pdf', 'berkas_id' => 4,
             'petunjuk_resume' => '', 'petunjuk_hots' => '',
         ]]);
-        self::assertCount(6, $cek);
+        self::assertCount(5, $cek);
         self::assertNotContains(false, array_column($cek, 'terpenuhi'));
     }
 
@@ -76,12 +76,24 @@ final class ChecklistKontenTpServiceTest extends TestCase
     {
         $tp = ['kode_tp' => 'TP-01', 'rumusan' => 'Menganalisis', 'indikator' => 'Menjelaskan'];
         $kosong = ChecklistKontenTpService::periksa($tp, [], 0);
-        self::assertSame('Elemen CP operasional aktif', $kosong[3]['label']);
-        self::assertFalse($kosong[3]['terpenuhi']);
+        self::assertSame('Elemen CP operasional aktif', $kosong[2]['label']);
+        self::assertFalse($kosong[2]['terpenuhi']);
 
         $ada = ChecklistKontenTpService::periksa($tp, [], 2);
-        self::assertTrue($ada[3]['terpenuhi']);
-        self::assertStringContainsString('belum diverifikasi', $ada[3]['keterangan']);
+        self::assertTrue($ada[2]['terpenuhi']);
+        self::assertStringContainsString('pemeriksaan akhir', $ada[2]['keterangan']);
+    }
+
+    public function testIndikatorKosongTidakMengunciTpYangPunyaRumusanDanMedia(): void
+    {
+        $cek = ChecklistKontenTpService::periksa([
+            'kode_tp' => 'SKI.8.1.1', 'rumusan' => 'Mengenal sejarah',
+            'indikator' => '', 'jenis_tp' => 'esensial',
+        ], [[
+            'urutan' => 1, 'jenis' => 'pdf', 'berkas_id' => 10,
+            'petunjuk_resume' => '', 'petunjuk_hots' => '',
+        ]]);
+        self::assertNotContains(false, array_column($cek, 'terpenuhi'));
     }
 
 }

@@ -257,3 +257,17 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - **E2E-148:** XLSX V25-2 berisi TP Esensial dengan judul satu Materi di F39 dan jenis media di G39 — parser menerima dan menampilkan rencana dalam pratinjau tanpa membuka akses siswa.
 - **E2E-149:** Esensial maupun NonEsensial yang kolom F/G-nya kosong ditolak dengan lokasi kolom yang jelas; pemeriksaan isi CP, penomoran BAB/TP, hak G1 dan transaksi tetap aktif.
 - **E2E-150:** Guru dapat mengisi satu Materi lengkap pada TP kedua jenis melalui editor; cek Siap memerlukan tepat satu Materi. Layanan siswa/URL media tetap memeriksa hak, alur, status, dan progres serta tidak memberi aktivitas Esensial secara otomatis. Impor Excel hanya menyimpan struktur BAB/TP sampai Guru menambahkan media nyata dalam aplikasi.
+
+## Kasus uji lanjutan 1 November 2026 — penyederhanaan Guru satu Materi
+
+| Kasus | Pemeriksaan | Hasil wajib |
+| --- | --- | --- |
+| UI-TP-001 | Guru melihat Semester → tabel 6 kolom | Header Aksi tidak vertikal, tombol Kelola/Lihat pendek, responsif Dark/Light |
+| UI-TP-002 | Guru membuka `guru/tp/{id}` hasil impor | Hanya satu form editor Materi yang sudah ada, URL/file/durasi dapat disunting |
+| UI-TP-003 | URL Sunting lama `/materi/{id}/edit` | Hak G1 diuji sebelum diarahkan ke `#materi-tp`, tanpa membuka TP lintas Gen |
+| UI-TP-004 | TP dengan 0 Materi | Form Tambah hanya untuk membuat satu, lalu disembunyikan |
+| UI-TP-005 | TP dengan >1 Materi historis | UI menahan pengeditan ganda, tidak menghapus otomatis |
+| UI-TP-006 | Indikator lama kosong | Tidak memblokir kesiapan TP; nilai indikator historis tidak tertimpa |
+| UI-TP-007 | Step Progress Esensial/NonEsensial | 3 vs 5 langkah; status diturunkan dari Service, tidak memberi PASS palsu |
+| UI-TP-008 | TP siap / snapshot | Form draf terkunci, publikasi hanya setelah tes server dan konfirmasi |
+| UI-TP-009 | Gagal upload / pergantian file | Pesan mudah dipahami, isian teks kembali, file harus dipilih ulang, DB tetap satu Materi |
