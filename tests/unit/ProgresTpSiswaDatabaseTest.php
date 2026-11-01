@@ -33,6 +33,7 @@ final class ProgresTpSiswaDatabaseTest extends TestCase
             'CREATE TABLE versi_konten_tp (id INTEGER PRIMARY KEY, tp_id INT, nomor_versi INT, snapshot_json TEXT, checksum TEXT)',
             'CREATE TABLE materi (id INTEGER PRIMARY KEY, tp_id INT, urutan INT, judul TEXT, jenis TEXT, aktif INT)',
             'CREATE TABLE progres_tp (id INTEGER PRIMARY KEY AUTOINCREMENT, siswa_id INT, tp_id INT, paket_semester_id INT, versi_paket_yang_ditugaskan INT, versi_konten_tp_id INT, status TEXT, dimulai_pada TEXT, diubah_pada TEXT, UNIQUE(siswa_id,tp_id,versi_paket_yang_ditugaskan))',
+            'CREATE TABLE percobaan_ujian (id INTEGER PRIMARY KEY, progres_tp_id INT, jenis TEXT, status TEXT)',
             'CREATE TABLE log_aktivitas (id INTEGER PRIMARY KEY AUTOINCREMENT, pengguna_id INT, peran_aktif TEXT, peristiwa TEXT, catatan TEXT, waktu TEXT)',
         ] as $stmt) {
             $this->db->query($stmt);
