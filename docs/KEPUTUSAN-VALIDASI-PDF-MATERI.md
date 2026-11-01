@@ -1,4 +1,4 @@
-# Keputusan Teknis Final — Validasi PDF Materi SLA-SKS v2.4
+# Riwayat dan Keputusan Validasi PDF Materi SLA-SKS
 
 > **Status:** keputusan implementasi yang telah diuji pengguna pada XAMPP, **24 Oktober 2026**.  
 > **Ruang lingkup:** unggah, penggantian, penyimpanan dan pratinjau **PDF Materi/Submateri** oleh Guru pada TP draf.  
@@ -76,3 +76,12 @@ Rujukan tes: `tests/unit/PdfMateriValidatorTest.php`, `tests/integration/BerkasM
 Aturan diperiksa pada `PdfMateriValidator::periksa()` melalui `BerkasMateriService::validasi()`; perubahan file hanya terjadi setelah validasi sukses. PDF berkas historis 1–5 halaman **tidak dihapus dan tidak diganti otomatis**. Perlindungan aksi aktif, file privat dan penerimaan PDF wajar dengan metadata, revisi inkremental, dan navigasi tetap berlaku.
 
 Regresi terbaru **menggantikan** tes lama yang menganggap PDF 1 halaman diterima: 1 dan 5 ditolak; 6 dan 40 diterima; 41 ditolak; skrip dan aksi aktif tetap ditolak; gagal ganti 5 halaman menjaga berkas lama. Hasil tes XAMPP diperlukan sebelum status akhir FIX.
+
+
+## Ketetapan TERBARU 1 November 2026 — dua batas PDF Materi
+
+**Bagian ini menggantikan ketentuan yang bertentangan di seluruh riwayat dokumen ini.** Validasi substantif PDF Materi cukup **jumlah halaman 6–40** dan **ukuran maksimal 15 MB**. Pemeriksaan format internal PDF yang lama (ObjStm, xref/startxref, EOF, JavaScript, OpenAction, revisi, metadata) **tidak menjadi syarat kelulusan tambahan**. Penanganan format PDF hanya dipakai untuk membaca jumlah halaman. Identifikasi ekstensi/MIME tetap untuk memastikan jenis unggahan adalah PDF, sedangkan kontrol izin, CSRF, status draf, file privat dan transaksi masih ditegakkan oleh alur penyimpanan.
+
+**Kasus regresi asli:** `Bahan_Ajar_Siswa_Ilmuwan_Daulah_Ayyubiyah.pdf` dari Guru adalah PDF Word 2019, 8 halaman, 222.354 byte, memuat `ObjStm` dan sebelumnya ditolak meskipun memenuhi kedua batas. Uji perbaikan menggunakan file pengguna **secara lokal saja**, tidak memasukkan file tersebut ke repository. Tambahkan fixture sintetis untuk CI.
+
+Uji: PDF 1/5 halaman ditolak; 6/8/40 diterima (asalkan ukuran sesuai); 41 halaman dan file >15 MB ditolak. Upload/ganti gagal harus menjaga file lama; PDF historis tetap utuh. Hasil pengujian XAMPP tetap diperlukan sebelum menyatakan FIX.
