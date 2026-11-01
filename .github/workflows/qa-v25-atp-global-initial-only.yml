@@ -57,7 +57,7 @@ jobs:
         run: vendor/bin/phpunit --no-coverage --filter 'GuruAtpImporGlobalUiTest|AtpExcelParserServiceTest|AtpUnduhanServiceTest'
 
   mysql:
-    name: MySQL 8: first-import only, cross-year, idempotence and atomic rollback
+    name: 'MySQL 8: first-import only, cross-year, idempotence and atomic rollback'
     runs-on: ubuntu-latest
     services:
       mysql:
