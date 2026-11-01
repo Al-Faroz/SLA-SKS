@@ -77,6 +77,15 @@ final class KesiapanTpTest extends TestCase
         self::assertTrue(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
     }
 
+    public function testIndikatorTidakWajibUntukSiapTpV25(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $tp['indikator'] = '';
+        $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
+        self::assertNotContains('indikator', array_column($hasil, 'kode'));
+        self::assertNotContains(false, array_column($hasil, 'terpenuhi'));
+    }
+
     public function testTpEsensialWajibMateriTetapiTidakWajibSoalAtauResumeHots(): void
     {
         [$tp, $paket, $cp, $materi] = self::data();
