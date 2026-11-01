@@ -16,7 +16,7 @@
 
 14. **Keputusan final PDF Materi (hasil uji XAMPP 24-10-2026):** baca `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md` **sebelum** mengubah `PdfMateriValidator.php`, upload atau pratinjau. Fokus aturan **PDF maksimal 15 MB dan 40 halaman** untuk kapasitas hosting/panjang materi; PDF normal dengan revisi inkremental, navigasi, metadata C2PA, hyperlink atau anotasi **tidak boleh ditolak hanya karena format internalnya**. Keamanan aktif dan akses privat tetap. Pengguna telah menyatakan masalah upload PDF sebelumnya **FIX**; jangan membahas ulang tanpa laporan bug baru yang nyata. Catatan ini tidak mengubah 16 Master Document.
 
-**Addendum 1 November 2026:** PDF Materi yang diunggah/diganti wajib **6–40 halaman dan maksimal 15 MB**. Minimum 1 halaman pada catatan 24 Oktober bersifat historis; gunakan ketetapan terbaru `docs/05-PAKET-TP-DAN-IMPOR.md` dan addendum `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md`. Jangan ubah PDF historis otomatis.
+**Keputusan terbaru 1 November 2026 (menggantikan pemeriksaan internal historis):** Validasi substantif PDF Materi **HANYA 6–40 halaman dan maksimal 15 MB**, baik unggah maupun ganti. ObjStm, xref, revisi, metadata, OpenAction dan JavaScript tidak lagi menjadi gerbang tambahan; parser hanya menghitung halaman. Pengenalan jenis PDF melalui ekstensi/MIME, hak akses, CSRF, privasi file dan transaksi tetap berlaku. PDF historis tidak diubah. Rujuk Master 05 dan addendum terbaru di `docs/KEPUTUSAN-VALIDASI-PDF-MATERI.md`.
 
 
 ## Aturan tambahan gerbang audit SQL (25 Oktober 2026)
