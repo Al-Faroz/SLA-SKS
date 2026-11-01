@@ -99,7 +99,7 @@ INSERT INTO ref_angkatan (id,kode,nama,semester_mulai) VALUES
 INSERT INTO ref_mapel VALUES (1,'MAP-UJI','Mapel Uji');
 INSERT INTO penugasan_guru_gen VALUES (1,1,1,1),(2,2,1,2);
 INSERT INTO paket_semester VALUES (1,1,1,4,1,1,1,'draf'),(2,2,1,4,1,1,1,'draf');
-INSERT INTO tp VALUES
+INSERT INTO tp (id,paket_semester_id,kode_tp,judul,rumusan,indikator,urutan_atp,status,struktur_versi) VALUES
 (1,1,'TP-01','TP untuk Guru A','Rumusan uji','Indikator uji',1,'draf',1),
 (2,2,'TP-02','TP untuk Guru B','Rumusan uji','Indikator uji',1,'draf',1);
 
