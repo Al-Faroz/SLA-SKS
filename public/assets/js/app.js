@@ -159,7 +159,7 @@
         function pesanJenis() {
             switch (jenis.value) {
                 case 'pdf':
-                    return 'PDF maksimal 15 MB dan 40 halaman. File PDF harus dapat dibaca.';
+                    return 'PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB. File PDF harus dapat dibaca.';
                 case 'gambar':
                     return 'JPG, PNG atau WebP maksimal 10 MB.';
                 case 'audio':
