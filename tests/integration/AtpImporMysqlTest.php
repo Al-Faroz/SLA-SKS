@@ -273,6 +273,23 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(1, self::$db->table('materi')->countAllResults());
     }
 
+    public function testNomorTpAtauCpBerubahTidakDianggapImporIdentik(): void
+    {
+        $file = $this->workbook();
+        $p = $this->preview($file);
+        $this->confirm($file, $p['fingerprint']);
+        self::$db->table('tp')->update(['urutan_dalam_bab' => 2]);
+        $urutan = $this->preview($file);
+        self::assertSame(2, $urutan['jumlah']['galat']);
+        self::assertFalse($urutan['boleh_konfirmasi']);
+
+        self::$db->table('tp')->update(['urutan_dalam_bab' => 1, 'cp_mapel_id' => null]);
+        $cp = $this->preview($file);
+        self::assertSame(2, $cp['jumlah']['galat']);
+        self::assertFalse($cp['boleh_konfirmasi']);
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+    }
+
     public function testDuaSemesterBedaTahunAjaranTetapTransaksional(): void
     {
         $file = $this->workbook('Menganalisis Peristiwa', 'Sejarah Awal', true);
