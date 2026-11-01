@@ -108,7 +108,7 @@ final class PetunjukDiagnostikSiswaDatabaseTest extends TestCase
         self::assertSame(30, $data['durasi_menit']);
         self::assertArrayNotHasKey('soal', $data);
         self::assertSame($awal, (int) $this->db->table('progres_tp')->countAllResults());
-        self::assertFalse($this->db->tableExists('percobaan_ujian'));
+        self::assertSame(0, $this->db->table('percobaan_ujian')->countAllResults());
     }
 
     public function testVersiBaruTidakMenggantikanSnapshotTerpin(): void
