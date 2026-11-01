@@ -152,14 +152,22 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame('draf', self::$db->table('tp')->get()->getRow('status'));
         self::assertSame('SKI.8.1.1', self::$db->table('tp')->get()->getRow('kode_tp'));
         self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
-        self::assertSame(0, self::$db->table('materi')->countAllResults());
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+        $materi = self::$db->table('materi')->get()->getRowArray();
+        $tp = self::$db->table('tp')->get()->getRowArray();
+        self::assertSame((int) $tp['id'], (int) $materi['tp_id']);
+        self::assertSame('Materi peristiwa sejarah', $materi['judul']);
+        self::assertSame('pdf', $materi['jenis']);
+        self::assertSame(0, (int) $materi['aktif']);
+        self::assertNull($materi['berkas_id']);
+        self::assertSame(0, (int) $materi['min_waktu_detik']);
     }
 
     public function testPipelineUploadPreviewStagingCommitMenghasilkanBabTp(): void
     {
         $file = $this->workbook();
         AtpValidasiUnggahService::periksa(
-            $file, 'ATP-V25-2-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file)
+            $file, 'ATP-V25-3-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file)
         );
         $pra = $this->preview($file);
         self::assertSame(['baru' => 2, 'ubah' => 0, 'tetap' => 0, 'galat' => 0],
@@ -176,6 +184,7 @@ final class AtpImporMysqlTest extends TestCase
             self::assertSame('SKI.8.1.1',
                 self::$db->table('tp')->get()->getRow('kode_tp'));
             self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+            self::assertSame(1, self::$db->table('materi')->countAllResults());
             $stage->hapus($data['token']);
             $this->expectException(\DomainException::class);
             $stage->ambil($data['token'], 101, 11, 'sesi_guru_qa');
@@ -206,6 +215,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame('Menganalisis Peristiwa',
             self::$db->table('tp')->get()->getRow('nama_tp'));
         self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
     }
 
     public function testDuaSemesterBedaTahunAjaranTetapTransaksional(): void
@@ -222,6 +232,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(1, (int) $bab4['tahun_ajaran_id']);
         self::assertSame(2, (int) $bab5['tahun_ajaran_id']);
         self::assertSame(1, self::$db->table('tp')->where('paket_semester_id', 12)->countAllResults());
+        self::assertSame(2, self::$db->table('materi')->countAllResults());
     }
 
     public function testSemesterManualYangSudahPunyaBabTanpaTpDitolak(): void
@@ -255,6 +266,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(2, $hasil['tetap']);
         self::assertSame(2, self::$db->table('bab')->countAllResults());
         self::assertSame(2, self::$db->table('tp')->countAllResults());
+        self::assertSame(2, self::$db->table('materi')->countAllResults());
     }
 
     public function testDuaBabDiSemesterKosongBerhasilDalamSatuBatch(): void
@@ -285,6 +297,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(2, $r['baru_tp']);
         self::assertSame(2, self::$db->table('bab')->countAllResults());
         self::assertSame(2, self::$db->table('tp')->countAllResults());
+        self::assertSame(2, self::$db->table('materi')->countAllResults());
     }
 
     public function testKonteksLintasGenDitolak(): void
@@ -326,6 +339,7 @@ final class AtpImporMysqlTest extends TestCase
             self::assertSame(0, self::$db->table('bab')->countAllResults(),
                 'BAB harus rollback bila INSERT TP gagal.');
             self::assertSame(0, self::$db->table('tp')->countAllResults());
+            self::assertSame(0, self::$db->table('materi')->countAllResults());
             self::assertSame(0, self::$db->table('log_aktivitas')->countAllResults());
         }
     }
