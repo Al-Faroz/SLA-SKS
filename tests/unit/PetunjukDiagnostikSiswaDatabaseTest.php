@@ -25,7 +25,7 @@ final class PetunjukDiagnostikSiswaDatabaseTest extends TestCase
             'CREATE TABLE ref_mapel (id INTEGER PRIMARY KEY, kode TEXT, nama TEXT)',
             'CREATE TABLE paket_semester (id INTEGER PRIMARY KEY, angkatan_id INT, mapel_id INT, semester INT, tahun_ajaran_id INT, nomor_versi INT, status TEXT)',
             'CREATE TABLE penugasan_paket (id INTEGER PRIMARY KEY, angkatan_id INT, mapel_id INT, semester INT, tahun_ajaran_id INT, paket_id INT)',
-            'CREATE TABLE tp (id INTEGER PRIMARY KEY, paket_semester_id INT, kode_tp TEXT, judul TEXT, urutan_atp INT, status TEXT, rumusan TEXT, indikator TEXT)',
+            'CREATE TABLE tp (id INTEGER PRIMARY KEY, paket_semester_id INT, kode_tp TEXT, judul TEXT, urutan_atp INT, status TEXT, rumusan TEXT, indikator TEXT, jenis_tp TEXT DEFAULT 'non_esensial')',
             'CREATE TABLE versi_konten_tp (id INTEGER PRIMARY KEY, tp_id INT, nomor_versi INT, snapshot_json TEXT, checksum TEXT)',
             'CREATE TABLE materi (id INTEGER PRIMARY KEY, tp_id INT, urutan INT, judul TEXT, jenis TEXT, aktif INT)',
             'CREATE TABLE progres_tp (id INTEGER PRIMARY KEY, siswa_id INT, tp_id INT, paket_semester_id INT, versi_paket_yang_ditugaskan INT, versi_konten_tp_id INT, status TEXT, dimulai_pada TEXT, diubah_pada TEXT)',
