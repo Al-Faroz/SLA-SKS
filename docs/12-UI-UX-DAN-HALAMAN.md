@@ -220,3 +220,11 @@ Semua layar memiliki normal/kosong/loading/sukses/gagal/locked, responsive HP da
 
 ### Pola UI untuk modul selanjutnya
 Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola **halaman ringkasan card sebagai navigasi → halaman rincian satu kelompok → toolbar tindakan di bagian atas → card/tabulasi data per subkelompok → modal native untuk tambah data sederhana**. Terapkan hanya pada modul yang cocok (misalnya semester/BAB/TP), tanpa memaksakan modal untuk editor materi, ujian, impor atau form kompleks yang memerlukan halaman khusus. Pertahankan konteks filter, breadcrumb, hak akses, status kosong/terkunci, warna lembut yang bermakna dan validasi server. Pola ini menjadi rujukan komposisi UI berikutnya tanpa menambah fitur bisnis.
+
+## Addendum G03/G04/G07 1 November 2026 — Detail TP terpadu
+
+- Tabel TP di kartu BAB memiliki **enam kolom berproporsi stabil**, kolom Aksi tidak boleh pecah huruf per huruf; tombol satu kata **Kelola** untuk draf atau **Lihat** untuk Siap. Pada ≤980px tabel berubah menjadi kartu dan aksi tetap dapat disentuh. Warna memakai Emerald Glass, bukan gaya tabel baru yang terpisah.
+- Halaman `guru/tp/{id}`: kartu identitas, ringkasan **Step Progress**, form Judul/Rumusan TP tanpa Indikator Ketercapaian terpisah, **tepat satu editor media langsung di halaman**, pengelolaan bank soal NonEsensial melalui halaman khusus, dan tombol pemeriksaan/publikasi.
+- Form unggah media tetap lengkap dan tidak dimasukkan ke modal. URL lama Sunting Materi boleh mengarahkan dengan otorisasi ke bagian editor yang sama; tidak boleh membuat form edit ganda dan tidak boleh membuat Materi kedua.
+- Halaman kesiapan menampilkan Step Progress sebagai ringkasan utama dengan daftar rincian teknis dapat dibuka (native `details`). Status selesai bersumber dari pemeriksaan final yang sama; informasi kosong/galat, link tindak lanjut, CSRF dan hak akses tidak boleh hilang.
+- Penilaian dan media siswa tidak dipercepat/dibuka hanya karena perubahan UI ini. QA wajib Dark/Light, 390/820/desktop, keyboard, validasi file, dan akses lintas Gen.
