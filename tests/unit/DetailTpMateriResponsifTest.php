@@ -40,7 +40,7 @@ final class DetailTpMateriResponsifTest extends TestCase
         self::assertStringContainsString('enctype="multipart/form-data"', $view);
         self::assertStringContainsString('csrf_field()', $view);
         self::assertStringContainsString('name="struktur_versi"', $view);
-        self::assertStringContainsString("'materi/' . (int) ", str_replace("/materi/' . (int) ", "'materi/' . (int) ", $view));
+        self::assertStringContainsString("'/materi/' . (int) ", $view);
         self::assertStringContainsString("GuruMateri::simpan", $routes);
         self::assertStringNotContainsString("name=\"indikator\"", $view);
     }
