@@ -79,8 +79,7 @@ CREATE TABLE materi (
  berkas_id BIGINT UNSIGNED NULL,
  aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
  UNIQUE KEY uq_materi_row (tp_id,row_uuid),
- UNIQUE KEY uq_materi_urutan (tp_id,urutan),
- CONSTRAINT fk_materi_tp_fixture FOREIGN KEY (tp_id) REFERENCES tp(id)
+ UNIQUE KEY uq_materi_urutan (tp_id,urutan)
 ) ENGINE=InnoDB;
 CREATE TABLE versi_konten_tp (id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED);
 CREATE TABLE progres_tp (id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED);
