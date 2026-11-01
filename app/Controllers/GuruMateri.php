@@ -151,8 +151,7 @@ final class GuruMateri extends BaseController
 
     private function kembaliSunting(int $tpId, int $materiId, string $pesan, bool $sukses = false): RedirectResponse
     {
-        $res = redirect()->to(site_url('guru/tp/' . $tpId . '/materi/' . $materiId . '/edit')
-            . '#sunting-materi')
+        $res = redirect()->to(site_url('guru/tp/' . $tpId) . '#materi-tp')
             ->with($sukses ? 'materi_edit_sukses' : 'materi_edit_galat', $pesan);
         if (! $sukses) {
             $res->with('materi_edit_input_lama', $this->isianUntukUlang());
@@ -218,15 +217,8 @@ final class GuruMateri extends BaseController
                 ->setBody(view('publik/ditolak', ['judul' => 'Akses Materi ditolak']));
         }
 
-        $akun = (new AuthService())->penggunaSaatIni();
-        return view('guru/materi_edit', [
-            'judul' => 'Sunting Materi Draf',
-            'namaPengguna' => $akun['nama'],
-            'peranAktif' => 'Guru',
-            'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
-            'tp' => $rincian['tp'],
-            'materi' => $materi,
-        ]);
+        // URL lama tetap memakai otorisasi G1; editor berpindah ke Detail TP.
+        return redirect()->to(site_url('guru/tp/' . $tpId) . '#materi-tp');
     }
 
     public function pratinjau(int $tpId, int $materiId): ResponseInterface|string
