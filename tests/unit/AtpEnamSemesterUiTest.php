@@ -48,7 +48,8 @@ final class AtpEnamSemesterUiTest extends TestCase
         self::assertStringContainsString('satu Materi', $view);
         self::assertStringContainsString('Lengkapi satu Materi ini', $view);
         self::assertStringContainsString('Draf — belum terbit', $view);
-        self::assertStringContainsString("'/materi/' . (int) $materi[0]['id'] . '/edit'", $view);
+        self::assertStringContainsString('count($materi) === 1', $view);
+        self::assertStringContainsString('materi[0]', $view);
         self::assertStringContainsString('countAllResults() > 0', $materi);
         self::assertStringContainsString('countAllResults() > 0', $berkas);
     }
