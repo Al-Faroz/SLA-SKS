@@ -1586,3 +1586,84 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-atp-detail__toolbar-actions .a-btn { flex: 1; justify-content: center; }
     .a-atp-bab-card__aksi { width: 100%; }
 }
+
+
+/* SLA-SKS v2.5 — tabel BAB/TP enam kolom: aksi tidak pernah pecah per huruf. */
+.a-atp-bab-card__tabel .a-tbl--tp-enam {
+    width: 100%;
+    min-width: 790px;
+    table-layout: fixed;
+}
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td) {
+    vertical-align: middle;
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(1) { width: 12%; }
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(2) { width: 19%; }
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(3) { width: 31%; }
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(4) { width: 14%; }
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(5) { width: 11%; }
+.a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(6) {
+    width: 13%;
+    min-width: 94px;
+    text-align: center;
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+.a-atp-bab-card__tabel .a-tp-aksi-ringkas {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    min-width: 76px;
+    max-width: 100%;
+    min-height: 38px;
+    padding: 8px 11px;
+    white-space: nowrap;
+    text-decoration: none;
+}
+@media (max-width: 980px) {
+    /* app.css menampilkan .a-tbl--cards sebagai kartu pada breakpoint ini. */
+    .a-atp-bab-card__tabel .a-tbl--tp-enam {
+        min-width: 0;
+        table-layout: auto;
+    }
+    .a-atp-bab-card__tabel .a-tbl--tp-enam :is(th,td):nth-child(n) {
+        width: auto;
+        min-width: 0;
+        text-align: start;
+        white-space: normal;
+    }
+    .a-atp-bab-card__tabel .a-tp-aksi-ringkas {
+        min-width: 92px;
+        white-space: nowrap;
+    }
+}
+
+/* V2.5: langkah progres Guru sebagai navigasi, bukan pengganti validasi Service. */
+.a-tp-langkah {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+    gap: 10px;
+    padding: 0;
+    margin: 16px 0;
+}
+.a-tp-langkah__item {
+    border: 1px solid var(--a-border, rgba(136,185,162,.3));
+    background: var(--a-surface, rgba(14,79,61,.12));
+    border-radius: 12px;
+    padding: 12px;
+    min-width: 0;
+}
+.a-tp-langkah__item.is-selesai { border-color: var(--a-success, #37b18b); }
+.a-tp-langkah__item.is-belum { border-style: dashed; }
+.a-tp-langkah__item strong { display:block; font-size: 14px; line-height:1.45; }
+.a-tp-langkah__item small { display:block; margin:5px 0 10px; line-height:1.5; }
+.a-tp-langkah__item .a-btn { max-width:100%; }
+.a-tp-materi-ringkas {
+    display: flex; flex-wrap:wrap; gap: 10px 16px;
+    align-items:center; margin: 10px 0 16px;
+}
+.a-tp-materi-ringkas > * { min-width:0; }
