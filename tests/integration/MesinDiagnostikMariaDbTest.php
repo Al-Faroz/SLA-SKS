@@ -35,7 +35,7 @@ final class MesinDiagnostikMariaDbTest extends TestCase
             'CREATE TABLE ref_mapel(id BIGINT UNSIGNED PRIMARY KEY,kode VARCHAR(30),nama VARCHAR(100)) ENGINE=InnoDB',
             'CREATE TABLE paket_semester(id BIGINT UNSIGNED PRIMARY KEY,angkatan_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,semester INT,tahun_ajaran_id INT,nomor_versi INT,status VARCHAR(30)) ENGINE=InnoDB',
             'CREATE TABLE penugasan_paket(id BIGINT UNSIGNED PRIMARY KEY,angkatan_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,semester INT,tahun_ajaran_id INT,paket_id BIGINT UNSIGNED) ENGINE=InnoDB',
-            'CREATE TABLE tp(id BIGINT UNSIGNED PRIMARY KEY,paket_semester_id BIGINT UNSIGNED,kode_tp VARCHAR(64),judul TEXT,urutan_atp INT,status VARCHAR(30),rumusan TEXT,indikator TEXT,jenis_tp VARCHAR(20) NOT NULL DEFAULT 'non_esensial') ENGINE=InnoDB',
+            'CREATE TABLE tp(id BIGINT UNSIGNED PRIMARY KEY,paket_semester_id BIGINT UNSIGNED,kode_tp VARCHAR(64),judul TEXT,urutan_atp INT,status VARCHAR(30),rumusan TEXT,indikator TEXT,jenis_tp VARCHAR(20) NOT NULL DEFAULT \'non_esensial\') ENGINE=InnoDB',
             'CREATE TABLE materi(id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED,urutan INT,judul TEXT,jenis VARCHAR(15),aktif INT) ENGINE=InnoDB',
             'CREATE TABLE versi_konten_tp(id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED,nomor_versi INT,snapshot_json LONGTEXT,checksum CHAR(64)) ENGINE=InnoDB',
             'CREATE TABLE progres_tp(id BIGINT UNSIGNED PRIMARY KEY,siswa_id BIGINT UNSIGNED,tp_id BIGINT UNSIGNED,paket_semester_id BIGINT UNSIGNED,versi_paket_yang_ditugaskan INT,versi_konten_tp_id BIGINT UNSIGNED,status VARCHAR(30),dimulai_pada DATETIME,diubah_pada DATETIME) ENGINE=InnoDB',
