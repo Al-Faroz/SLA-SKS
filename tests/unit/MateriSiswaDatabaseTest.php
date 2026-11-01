@@ -35,6 +35,7 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,nomor_versi INTEGER,snapshot_json TEXT,checksum TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
+            'CREATE TABLE percobaan_ujian (id INTEGER PRIMARY KEY, progres_tp_id INT, jenis TEXT, status TEXT)',
             'CREATE TABLE berkas(id INTEGER PRIMARY KEY,tp_id INTEGER,nama_acak TEXT,mime TEXT,ukuran_byte INTEGER,halaman INTEGER)',
             'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dibuat_pada TEXT,diubah_pada TEXT,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,umpan_balik TEXT,dinilai_pada TEXT)',
             'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,materi_id INTEGER,row_uuid TEXT,pertanyaan TEXT,petunjuk TEXT)',
