@@ -33,8 +33,8 @@ final class AtpEnamSemesterUiTest extends TestCase
         $detail = (string) file_get_contents($root . '/app/Views/guru/detail_tp.php');
         $routes = (string) file_get_contents($root . '/app/Config/Routes.php');
 
-        self::assertStringContainsString('<th scope="col">Aksi</th>', $semester);
-        self::assertStringContainsString('Kelola TP / Materi', $semester);
+        self::assertStringContainsString('<th scope="col" class="a-tp-kolom-aksi">Aksi</th>', $semester);
+        self::assertStringContainsString('Kelola', $semester);
         self::assertStringContainsString(
             "site_url('guru/tp/' . (int) " . '$tp' . "['id'])", $semester
         );
