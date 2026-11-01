@@ -24,7 +24,7 @@
                     <tr><th scope="row">Urutan ATP</th><td><?= (int) $tp['urutan_atp'] ?></td></tr>
                     <tr><th scope="row">Semester</th><td><?= (int) $paket['semester'] ?></td></tr>
                     <tr><th scope="row">Status TP</th><td><span class="a-badge"><?= esc($tp['status']) ?></span></td></tr>
-                    <tr><th scope="row">Jumlah Materi/Submateri</th><td><?= (int) $jumlah_materi ?></td></tr>
+                    <tr><th scope="row">Jumlah Materi</th><td><?= (int) $jumlah_materi ?> dari 1 yang diwajibkan</td></tr>
                 </tbody>
             </table>
         </div>
@@ -91,15 +91,15 @@
         <?php endif ?>
         <?php if ($jumlah_materi === 0): ?>
             <div class="a-empty" role="status">
-                <strong>Belum ada Materi/Submateri.</strong>
-                <p>Struktur TP sudah terdaftar, tetapi belum memiliki materi. Penyusunan materi akan tersedia dalam tahap berikutnya.</p>
+                <strong>Belum ada Materi.</strong>
+                <p>TP belum memiliki Materi. Gunakan formulir Tambah satu Materi di bagian bawah halaman ini.</p>
             </div>
         <?php endif ?>
         <p class="a-help">Penyuntingan ini hanya untuk redaksi TP draf. Perubahan urutan ATP, tautan CP, struktur Materi dan publikasi menggunakan alur tersendiri.</p>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Kembali ke Peta ATP</a>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="daftar-materi">
-        <h2 id="daftar-materi">Daftar Materi/Submateri</h2>
+        <h2 id="daftar-materi">Materi TP</h2>
         <?php if ($materi === []): ?>
             <div class="a-empty" role="status"><p>Belum ada Materi/Submateri untuk TP ini.</p></div>
         <?php else: ?>
@@ -123,7 +123,7 @@
                                 <th scope="row" data-label="No."><?= (int) $item['urutan'] ?></th>
                                 <td data-label="Judul" class="a-tp-materi-judul"><?= esc($item['judul']) ?></td>
                                 <td data-label="Jenis"><?= esc(strtoupper((string) $item['jenis'])) ?></td>
-                                <td data-label="Status"><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
+                                <td data-label="Status"><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Draf — belum terbit' ?></span></td>
                                 <td class="a-materi-aksi" data-label="Pratinjau">
                                     <?php if (in_array($item['jenis'], ['pdf', 'gambar', 'audio'], true) && $item['berkas_id'] !== null): ?>
                                         <a class="a-btn a-btn--sekunder" target="_blank" rel="noopener noreferrer" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>">Pratinjau</a>
@@ -180,11 +180,14 @@
     </section>
     <?php if ($tp['status'] === 'draf' && (int) $jumlah_materi >= 1): ?>
         <section class="a-card a-jarak-atas" role="status">
-            <h2>Materi TP sudah tersedia</h2>
+            <h2>Materi hasil ATP tersedia — lengkapi melalui Sunting</h2>
             <p class="a-help">Satu TP hanya memiliki satu Materi, berlaku untuk Esensial maupun
                 NonEsensial. Gunakan tombol Sunting pada daftar Materi di atas untuk
                 memperbarui YouTube, Audio, Gambar, atau PDF. Materi yang sudah ada
                 dan data pembelajaran historis tidak dihapus.</p>
+            <?php if (count($materi) === 1): ?>
+                <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi[0]['id'] . '/edit'), 'attr') ?>">Lengkapi satu Materi ini</a>
+            <?php endif ?>
         </section>
     <?php endif ?>
     <?php if ($tp['status'] === 'draf' && (int) $jumlah_materi === 0): ?>

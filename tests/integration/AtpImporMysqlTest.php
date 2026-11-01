@@ -152,14 +152,22 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame('draf', self::$db->table('tp')->get()->getRow('status'));
         self::assertSame('SKI.8.1.1', self::$db->table('tp')->get()->getRow('kode_tp'));
         self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
-        self::assertSame(0, self::$db->table('materi')->countAllResults());
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+        $materi = self::$db->table('materi')->get()->getRowArray();
+        $tp = self::$db->table('tp')->get()->getRowArray();
+        self::assertSame((int) $tp['id'], (int) $materi['tp_id']);
+        self::assertSame('Materi peristiwa sejarah', $materi['judul']);
+        self::assertSame('pdf', $materi['jenis']);
+        self::assertSame(0, (int) $materi['aktif']);
+        self::assertNull($materi['berkas_id']);
+        self::assertSame(0, (int) $materi['min_waktu_detik']);
     }
 
     public function testPipelineUploadPreviewStagingCommitMenghasilkanBabTp(): void
     {
         $file = $this->workbook();
         AtpValidasiUnggahService::periksa(
-            $file, 'ATP-V25-2-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file)
+            $file, 'ATP-V25-3-GEN2025-SKI-6-SEMESTER.xlsx', filesize($file)
         );
         $pra = $this->preview($file);
         self::assertSame(['baru' => 2, 'ubah' => 0, 'tetap' => 0, 'galat' => 0],
@@ -176,6 +184,7 @@ final class AtpImporMysqlTest extends TestCase
             self::assertSame('SKI.8.1.1',
                 self::$db->table('tp')->get()->getRow('kode_tp'));
             self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+            self::assertSame(1, self::$db->table('materi')->countAllResults());
             $stage->hapus($data['token']);
             $this->expectException(\DomainException::class);
             $stage->ambil($data['token'], 101, 11, 'sesi_guru_qa');
@@ -206,6 +215,79 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame('Menganalisis Peristiwa',
             self::$db->table('tp')->get()->getRow('nama_tp'));
         self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+    }
+
+    public function testPerubahanMediaExcelDiSemesterTerisiDitolakTanpaMenulis(): void
+    {
+        $awal = $this->workbook();
+        $pra = $this->preview($awal);
+        $this->confirm($awal, $pra['fingerprint']);
+        $beda = $this->workbook();
+        $buku = IOFactory::load($beda);
+        try {
+            $buku->getSheetByName('SEMESTER 4')->setCellValue('G39', 'YouTube');
+            (new Xlsx($buku))->save($beda);
+        } finally {
+            $buku->disconnectWorksheets();
+        }
+        $hasil = $this->preview($beda);
+        self::assertSame(2, $hasil['jumlah']['galat']);
+        self::assertFalse($hasil['boleh_konfirmasi']);
+        self::assertSame('pdf', self::$db->table('materi')->get()->getRow('jenis'));
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+        self::assertSame(1, self::$db->table('log_aktivitas')->countAllResults());
+    }
+
+    public function testSuntingMateriGuruTidakDitimpaOlehImporUlangExcelLama(): void
+    {
+        $awal = $this->workbook();
+        $pra = $this->preview($awal);
+        $this->confirm($awal, $pra['fingerprint']);
+        self::$db->table('materi')->update(['judul' => 'Materi disunting di aplikasi']);
+        $hasil = $this->preview($awal);
+        self::assertSame(2, $hasil['jumlah']['galat']);
+        self::assertFalse($hasil['boleh_konfirmasi']);
+        self::assertSame('Materi disunting di aplikasi',
+            self::$db->table('materi')->get()->getRow('judul'));
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+    }
+
+    public function testPerubahanMateriSetelahPratinjauMembatalkanKonfirmasiBatch(): void
+    {
+        $awal = $this->workbook();
+        $pra = $this->preview($awal);
+        $this->confirm($awal, $pra['fingerprint']);
+        $dua = $this->workbook('Menganalisis Peristiwa', 'Sejarah Awal', true);
+        $pratinjau = $this->preview($dua);
+        self::assertTrue($pratinjau['boleh_konfirmasi']);
+        self::$db->table('materi')->update(['judul' => 'Diubah di aplikasi']);
+        try {
+            $this->confirm($dua, $pratinjau['fingerprint']);
+            self::fail('Fingerprint Materi sudah berubah; batch harus dibatalkan.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('Data akademik berubah', $e->getMessage());
+        }
+        self::assertSame(1, self::$db->table('bab')->countAllResults());
+        self::assertSame(1, self::$db->table('tp')->countAllResults());
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
+    }
+
+    public function testNomorTpAtauCpBerubahTidakDianggapImporIdentik(): void
+    {
+        $file = $this->workbook();
+        $p = $this->preview($file);
+        $this->confirm($file, $p['fingerprint']);
+        self::$db->table('tp')->update(['urutan_dalam_bab' => 2]);
+        $urutan = $this->preview($file);
+        self::assertSame(2, $urutan['jumlah']['galat']);
+        self::assertFalse($urutan['boleh_konfirmasi']);
+
+        self::$db->table('tp')->update(['urutan_dalam_bab' => 1, 'cp_mapel_id' => null]);
+        $cp = $this->preview($file);
+        self::assertSame(2, $cp['jumlah']['galat']);
+        self::assertFalse($cp['boleh_konfirmasi']);
+        self::assertSame(1, self::$db->table('materi')->countAllResults());
     }
 
     public function testDuaSemesterBedaTahunAjaranTetapTransaksional(): void
@@ -222,6 +304,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(1, (int) $bab4['tahun_ajaran_id']);
         self::assertSame(2, (int) $bab5['tahun_ajaran_id']);
         self::assertSame(1, self::$db->table('tp')->where('paket_semester_id', 12)->countAllResults());
+        self::assertSame(2, self::$db->table('materi')->countAllResults());
     }
 
     public function testSemesterManualYangSudahPunyaBabTanpaTpDitolak(): void
@@ -255,6 +338,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(2, $hasil['tetap']);
         self::assertSame(2, self::$db->table('bab')->countAllResults());
         self::assertSame(2, self::$db->table('tp')->countAllResults());
+        self::assertSame(2, self::$db->table('materi')->countAllResults());
     }
 
     public function testDuaBabDiSemesterKosongBerhasilDalamSatuBatch(): void
@@ -285,6 +369,7 @@ final class AtpImporMysqlTest extends TestCase
         self::assertSame(2, $r['baru_tp']);
         self::assertSame(2, self::$db->table('bab')->countAllResults());
         self::assertSame(2, self::$db->table('tp')->countAllResults());
+        self::assertSame(2, self::$db->table('materi')->countAllResults());
     }
 
     public function testKonteksLintasGenDitolak(): void
@@ -326,6 +411,7 @@ final class AtpImporMysqlTest extends TestCase
             self::assertSame(0, self::$db->table('bab')->countAllResults(),
                 'BAB harus rollback bila INSERT TP gagal.');
             self::assertSame(0, self::$db->table('tp')->countAllResults());
+            self::assertSame(0, self::$db->table('materi')->countAllResults());
             self::assertSame(0, self::$db->table('log_aktivitas')->countAllResults());
         }
     }
@@ -344,11 +430,12 @@ final class AtpImporMysqlTest extends TestCase
             self::$db->table('tp')->get()->getRow('nama_tp'));
     }
 
-    public function testIsiNamaLebih35KarakterDitolakPadaR2(): void
+    public function testPanjangNamaDisesuaikanDenganKapasitasDatabaseQA(): void
     {
-        $f = $this->workbook(str_repeat('T', 37));
-        $p = $this->preview($f);
-        self::assertGreaterThan(0, $p['jumlah']['galat']);
-        self::assertFalse($p['boleh_konfirmasi']);
+        $batas = \App\Services\BatasNamaAtpService::aktual(self::$db, 'tp');
+        // V4-0005 menerima 37 karakter; QA lama R2 (35) menolaknya.
+        $p = $this->preview($this->workbook(str_repeat('T', 37)));
+        self::assertSame($batas >= 37 ? 0 : 2, $p['jumlah']['galat']);
+        self::assertSame($batas >= 37, $p['boleh_konfirmasi']);
     }
 }

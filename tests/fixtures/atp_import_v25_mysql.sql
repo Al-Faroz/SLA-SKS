@@ -64,7 +64,23 @@ CREATE TABLE tp (
  UNIQUE KEY uq_tp_urut(paket_semester_id,urutan_atp),
  CONSTRAINT ck_fixture_nama_tp CHECK (nama_tp <> 'GAGAL-SENGAJA')
 );
-CREATE TABLE materi (id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED);
+-- Fixture v2.5: satu Materi draf F/G per TP, bukan tabel dua kolom lama.
+CREATE TABLE materi (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ tp_id BIGINT UNSIGNED NOT NULL,
+ row_uuid CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ urutan SMALLINT UNSIGNED NOT NULL,
+ judul VARCHAR(180) NOT NULL,
+ jenis ENUM('pdf','audio','gambar','youtube') NOT NULL,
+ petunjuk_resume TEXT NOT NULL,
+ petunjuk_hots TEXT NULL,
+ min_waktu_detik SMALLINT UNSIGNED NOT NULL,
+ url_youtube VARCHAR(255) NULL,
+ berkas_id BIGINT UNSIGNED NULL,
+ aktif TINYINT UNSIGNED NOT NULL DEFAULT 1,
+ UNIQUE KEY uq_materi_row (tp_id,row_uuid),
+ UNIQUE KEY uq_materi_urutan (tp_id,urutan)
+) ENGINE=InnoDB;
 CREATE TABLE versi_konten_tp (id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED);
 CREATE TABLE progres_tp (id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED);
 CREATE TABLE log_aktivitas (

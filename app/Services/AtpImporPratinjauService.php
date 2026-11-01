@@ -116,8 +116,8 @@ final class AtpImporPratinjauService
                 ->whereIn('paket_semester_id', array_values($paketSem))
                 ->get()->getResultArray();
             $tpTerdaftar = $this->db->table('tp')
-                ->select('id,paket_semester_id,bab_id,kode_tp,jenis_tp,'
-                    . 'nama_tp,deskripsi_tp,status')
+                ->select('id,paket_semester_id,bab_id,cp_mapel_id,kode_tp,jenis_tp,'
+                    . 'nama_tp,deskripsi_tp,urutan_atp,urutan_dalam_bab,status')
                 ->whereIn('paket_semester_id', array_values($paketSem))
                 ->get()->getResultArray();
         }
@@ -218,7 +218,7 @@ final class AtpImporPratinjauService
                 }
             }
             if ($sama) {
-                foreach ($et as $t) {
+                foreach ($et as $index => $t) {
                     $old = $tpIndeks[$s][(string) $t['kode']] ?? null;
                     $materiSesuai = false;
                     if ($old !== null) {
@@ -235,6 +235,9 @@ final class AtpImporPratinjauService
                         || $old['nama_tp'] !== $t['nama']
                         || $old['deskripsi_tp'] !== $t['deskripsi']
                         || $old['jenis_tp'] !== $t['jenis']
+                        || (int) ($old['cp_mapel_id'] ?? 0) !== (int) $cp[0]['id']
+                        || (int) ($old['urutan_dalam_bab'] ?? 0) !== (int) $t['urutan']
+                        || (int) ($old['urutan_atp'] ?? 0) !== $index + 1
                         || ($babId[(int) $old['bab_id']] ?? null)
                             !== [$s, (int) $t['nomor_bab']]) {
                         $sama = false;
