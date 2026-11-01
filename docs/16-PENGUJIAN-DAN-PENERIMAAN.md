@@ -280,3 +280,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - PDF 41 halaman atau di atas 15 MB: ditolak; PDF dengan skrip/aksi aktif tetap ditolak.
 - Sunting Materi dengan penggantian PDF 5 halaman: gagal, berkas lama dan versi TP tidak berubah; histori berkas tidak dihapus.
 - Form/JavaScript menampilkan batas yang sama; lanjutkan PHPUnit dan uji manual upload/ganti di XAMPP sebelum menyatakan FIX.
+
+
+### Pembaruan QA PDF (1 November 2026, menggantikan aturan lama)
+
+- Satu-satunya batas konten PDF adalah **6–40 halaman** dan **maksimal 15 MB**. PDF asli dari Word yang memuat objek terkompresi `ObjStm` dengan 8 halaman diterima; kompresi/metadata bukan alasan gagal.
+- PDF 1/5 halaman ditolak; 6/8/40 diterima; 41 atau >15 MB ditolak; berkas PDF tidak terbaca jumlah halamannya memberi pesan jelas.
+- Pengenalan jenis file (ekstensi/MIME), hak Guru G1, status TP draf, CSRF dan penyimpanan privat tetap dijaga oleh komponen yang sudah ada; ketentuan pemeriksaan skrip/aksi/struktur internal pada regresi historis tidak menjadi persyaratan bisnis PDF lagi.
+- Pada Sunting, PDF yang tidak memenuhi dua batas tidak mengganti file atau metadata lama. Lakukan PHPUnit serta tes XAMPP nyata.
