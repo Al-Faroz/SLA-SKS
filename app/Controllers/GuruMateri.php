@@ -140,7 +140,7 @@ final class GuruMateri extends BaseController
 
     private function kembaliTambah(int $tpId, string $pesan, bool $sukses = false): RedirectResponse
     {
-        $res = redirect()->to(site_url('guru/tp/' . $tpId) . '#tambah-materi')
+        $res = redirect()->to(site_url('guru/tp/' . $tpId) . '#materi-tp')
             ->with($sukses ? 'materi_sukses' : 'materi_galat', $pesan);
         if (! $sukses) {
             $res->with('materi_input_lama', $this->isianUntukUlang());
