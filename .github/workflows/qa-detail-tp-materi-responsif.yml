@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'app/Views/guru/detail_tp.php'
+      - 'app/Views/guru/semester_atp.php'
       - 'app/Views/guru/materi_edit.php'
       - 'public/assets/css/app.css'
       - 'docs/13-DESIGN-SYSTEM-CSS.md'
       - 'docs/assets/galeri-komponen.html'
       - 'tests/unit/DetailTpMateriResponsifTest.php'
+      - 'tests/unit/AtpEnamSemesterUiTest.php'
       - '.github/workflows/qa-detail-tp-materi-responsif.yml'
   workflow_dispatch:
 
@@ -30,7 +32,9 @@ jobs:
       - name: Periksa sintaks PHP view dan tes
         run: |
           php -l app/Views/guru/detail_tp.php
+          php -l app/Views/guru/semester_atp.php
           php -l app/Views/guru/materi_edit.php
           php -l tests/unit/DetailTpMateriResponsifTest.php
-      - name: Periksa regresi tabel dan aksi Materi
-        run: vendor/bin/phpunit --no-coverage tests/unit/DetailTpMateriResponsifTest.php
+          php -l tests/unit/AtpEnamSemesterUiTest.php
+      - name: Periksa regresi tabel, navigasi Semester dan aksi Materi
+        run: vendor/bin/phpunit --no-coverage tests/unit/DetailTpMateriResponsifTest.php tests/unit/AtpEnamSemesterUiTest.php
