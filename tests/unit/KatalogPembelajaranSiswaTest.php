@@ -97,6 +97,22 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         }
     }
 
+    public function testKatalogBabDanPetunjukDiagnostikSesuaiV25(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $service = file_get_contents($root . '/app/Services/KatalogPembelajaranSiswaService.php');
+        $daftar = file_get_contents($root . '/app/Views/siswa/daftar_tp.php');
+        $petunjuk = file_get_contents($root . '/app/Views/siswa/diagnostik_petunjuk.php');
+        self::assertIsString($service);
+        self::assertIsString($daftar);
+        self::assertIsString($petunjuk);
+        self::assertStringContainsString('b.id=t.bab_id', $service);
+        self::assertStringContainsString('array_values($bab)', $service);
+        self::assertStringContainsString('foreach ($bab as $kelompok)', $daftar);
+        self::assertStringContainsString('Sumatif tetap wajib', $petunjuk);
+        self::assertStringNotContainsString('TP dinyatakan tuntas', $petunjuk);
+    }
+
     public function testNavigasiSiswaDanHalamanResponsifTersedia(): void
     {
         $root = dirname(__DIR__, 2);
