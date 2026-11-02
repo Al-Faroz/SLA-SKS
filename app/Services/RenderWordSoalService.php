@@ -39,7 +39,16 @@ final class RenderWordSoalService
                 $soal['html_opsi'] = [];
                 for ($j = 0; $j < 6; $j++) {
                     $cells = $xp->query('./w:tc', $rows->item(1 + $i * 6 + $j));
-                    $html = self::children($xp, $zip, $relations, $cells->item(1), $totalBytes, $imageSrc);
+                    $cell = $cells->item(1);
+                    $html = self::children($xp, $zip, $relations, $cell, $totalBytes, $imageSrc);
+                    foreach (SoalMediaDriveService::tautan((string) $cell->textContent) as $media) {
+                        // Guru harus mencoba tautan Viewer saat review; belum ada
+                        // pemeriksaan otomatis hak akses pada Google Drive.
+                        $html .= '<p><a href="' . htmlspecialchars($media['url'], ENT_QUOTES, 'UTF-8')
+                            . '" target="_blank" rel="noopener noreferrer">Buka '
+                            . htmlspecialchars($media['jenis'], ENT_QUOTES, 'UTF-8')
+                            . ' di Google Drive untuk memeriksa pemutaran</a></p>';
+                    }
                     if ($j === 0) {
                         $soal['html_pertanyaan'] = $html;
                     } else {
@@ -135,9 +144,8 @@ final class RenderWordSoalService
                     $html .= '<img class="a-word-image" alt="Ilustrasi soal" src="' .
                         htmlspecialchars((string) $src, ENT_QUOTES, 'UTF-8') . '">';
                 }
-            } elseif ($part->localName === 'oMath') {
-                $html .= '<span class="a-word-math" title="Equation Word">' .
-                    htmlspecialchars(trim($xp->evaluate('string(.//*[local-name()="t"])', $part)), ENT_QUOTES, 'UTF-8') . '</span>';
+            } elseif ($part->localName === 'oMath' || $part->localName === 'oMathPara') {
+                $html .= RenderRumusWordService::html($part);
             } else {
                 $html .= self::inline($xp, $zip, $relations, $part, $bytes, $imageSrc);
             }

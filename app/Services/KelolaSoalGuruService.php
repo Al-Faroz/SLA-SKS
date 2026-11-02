@@ -36,12 +36,24 @@ final class KelolaSoalGuruService
     }
 
     /** @return list<array<string,mixed>> */
-    public function daftar(int $tpId, string $jenis): array
+    public function daftar(int $tpId, string $jenis, int $batas = 15, int $offset = 0): array
+    {
+        $this->konteks($tpId);
+        if ($batas < 1 || $batas > 200 || $offset < 0) {
+            throw new DomainException('Halaman daftar soal tidak valid.');
+        }
+        return $this->db->table('soal')
+            ->where('tp_id', $tpId)->where('jenis', self::jenis($jenis))
+            ->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')
+            ->limit($batas, $offset)->get()->getResultArray();
+    }
+
+    public function jumlahSoal(int $tpId, string $jenis): int
     {
         $this->konteks($tpId);
         return $this->db->table('soal')
             ->where('tp_id', $tpId)->where('jenis', self::jenis($jenis))
-            ->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')->get()->getResultArray();
+            ->countAllResults();
     }
 
     public function lihat(int $tpId, int $soalId): array
@@ -89,7 +101,7 @@ final class KelolaSoalGuruService
         $semua = [];
         foreach (['pertanyaan','opsi_a','opsi_b','opsi_c','opsi_d','opsi_e'] as $name) {
             $semua[$name] = HtmlSoalGuruService::bersihkan(
-                (string) ($input[$name] ?? ''), $tpId, is_string($wordSource) ? $wordSource : null
+                (string) ($input[$name] ?? ''), $tpId, is_string($wordSource) ? $wordSource : null, true
             );
         }
 
@@ -109,7 +121,7 @@ final class KelolaSoalGuruService
                 $rich['word_source_id'] = $wordSource;
             }
             foreach ($semua as $name => $data) {
-                $record[$name] = $data['teks'];
+                $record[$name] = $data['teks'] !== '' ? $data['teks'] : '[Ilustrasi soal]';
                 if ($name !== 'pertanyaan') {
                     $rich['html_opsi'][strtoupper(substr($name, -1))] = $data['html'];
                 }

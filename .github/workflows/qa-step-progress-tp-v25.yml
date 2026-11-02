@@ -1,0 +1,31 @@
+name: QA Step Progress TP v2.5
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/StepProgressTpService.php'
+      - 'app/Views/guru/_step_progress_tp.php'
+      - 'public/assets/css/emerald-glass.css'
+      - 'tests/unit/StepProgressTpServiceTest.php'
+      - '.github/workflows/qa-step-progress-tp-v25.yml'
+  workflow_dispatch:
+
+jobs:
+  step-regresi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, mbstring, zip, intl
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Periksa sintaks PHP
+        run: |
+          php -l app/Services/StepProgressTpService.php
+          php -l app/Views/guru/_step_progress_tp.php
+          php -l tests/unit/StepProgressTpServiceTest.php
+      - name: Uji minimal soal, KKM Sumatif dan status visual
+        run: vendor/bin/phpunit --no-coverage tests/unit/StepProgressTpServiceTest.php

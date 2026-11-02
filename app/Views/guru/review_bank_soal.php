@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page">
+<div class="a-page a-review-word-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Peta ATP</a>
         <span aria-hidden="true">/</span>
@@ -28,10 +28,11 @@
         <?php else: ?>
             <div class="a-alert" role="status">Validasi struktur berhasil. <strong><?= (int) $word_review['jumlah'] ?> soal <?= esc(ucfirst($word_review['jenis'])) ?></strong> siap diperiksa. Belum ada soal yang disimpan.</div>
         <?php endif ?>
-        <p class="a-help">Periksa pertanyaan, pilihan A–E, jawaban benar, gambar dan tabel. Equation Word dalam pratinjau masih dapat tampil sebagai teks sederhana; berkas Word asli dipertahankan untuk ketelitian konten.</p>
+        <p class="a-help">Periksa pertanyaan, pilihan A–E, kunci, gambar, tabel dan semua tautan media. Persamaan Word yang kompleks belum dapat dijamin setara tampilan aslinya; periksa kembali dokumen sumber sebelum menyimpan.</p>
+        <p class="a-help">Buka setiap nomor untuk review. Halaman ini belum menyimpan perubahan sampai tombol Konfirmasi ditekan.</p>
         <div class="a-word-review-list">
             <?php foreach ($word_review['soal'] as $soalItem): ?>
-                <details class="a-word-review-item" open>
+                <details class="a-word-review-item" <?= (int) $soalItem['nomor'] === 1 ? 'open' : '' ?>>
                     <summary>Soal <?= (int) $soalItem['nomor'] ?> <span class="a-help">· <?= (int) $soalItem['konten']['gambar'] ?> gambar, <?= (int) $soalItem['konten']['tabel'] ?> tabel, <?= (int) $soalItem['konten']['rumus'] ?> rumus</span></summary>
                     <div class="a-word-preview"><?= $soalItem['html_pertanyaan'] ?></div>
                     <div class="a-tabel-gulir">
@@ -42,7 +43,7 @@
                                     <tr>
                                         <th scope="row"><?= esc($huruf) ?></th>
                                         <td><div class="a-word-preview"><?= $html ?></div></td>
-                                        <td><?= $soalItem['kunci'] === $huruf ? '✓ Benar' : '—' ?></td>
+                                        <td class="<?= $soalItem['kunci'] === $huruf ? 'a-review-word__kunci-benar' : 'a-review-word__kunci-lain' ?>"><?= $soalItem['kunci'] === $huruf ? '✓ Benar' : '—' ?></td>
                                     </tr>
                                 <?php endforeach ?>
                             </tbody>

@@ -79,6 +79,20 @@ final class ImporBankSoalService
         }
     }
 
+    /**
+     * Mengikat review pada isi bank yang benar-benar ada sewaktu upload.
+     * Perubahan manual maupun impor lain membatalkan konfirmasi usang.
+     */
+    private function sidikJariBank(int $tpId, string $jenis): string
+    {
+        $baris = $this->db->table('soal')
+            ->where('tp_id', $tpId)->where('jenis', $jenis)
+            ->orderBy('id', 'ASC')->get()->getResultArray();
+        $versi = array_map(static fn (array $soal): string =>
+            KelolaSoalGuruService::versi($soal), $baris);
+        return hash('sha256', implode(':', $versi));
+    }
+
     /** @return array{id:string,jumlah:int} */
     public function unggah(string $file, int $tpId, int $guruId, string $jenis): array
     {
@@ -117,6 +131,7 @@ final class ImporBankSoalService
                 'checksum' => $digest, 'status' => 'pratinjau',
                 'data_json' => json_encode([
                     'struktur_versi' => $versi, 'jumlah' => $parsed['jumlah'],
+                    'sidik_jari_bank' => $this->sidikJariBank($tpId, $jenis),
                 ], JSON_THROW_ON_ERROR),
                 'dibuat_pada' => date('Y-m-d H:i:s'),
                 'kedaluwarsa_pada' => date('Y-m-d H:i:s', time() + 7200),
@@ -172,7 +187,8 @@ final class ImporBankSoalService
         $rincian = $this->buka($tpId, $guruId, $id, false);
         if ($rincian['row']['status'] === 'diterapkan') {
             return ['jumlah' => (int) $rincian['hasil']['jumlah'], 'baru' => 0,
-                'diubah' => 0, 'status' => 'sudah_diterapkan'];
+                'diubah' => 0, 'jenis' => (string) $rincian['row']['jenis'],
+                'status' => 'sudah_diterapkan'];
         }
         if ($rincian['row']['status'] !== 'pratinjau'
             || strtotime((string) $rincian['row']['kedaluwarsa_pada']) < time()) {
@@ -198,6 +214,21 @@ final class ImporBankSoalService
             }
 
             $jenis = (string) $rincian['row']['jenis'];
+            $metadata = json_decode((string) $rincian['row']['data_json'], true, 8, JSON_THROW_ON_ERROR);
+            if (!is_array($metadata)
+                || !is_string($metadata['sidik_jari_bank'] ?? null)
+                || !hash_equals($metadata['sidik_jari_bank'], $this->sidikJariBank($tpId, $jenis))) {
+                throw new DomainException('Bank soal berubah sejak Word ditinjau. Unggah dan review ulang agar perubahan terbaru tidak tertimpa.');
+            }
+            foreach ($parsed['soal'] as $soal) {
+                $nomor = (int) $soal['nomor'];
+                $current = $this->db->table('soal')->where('tp_id', $tpId)
+                    ->where('jenis', $jenis)->where('urutan', $nomor)->get()->getRowArray();
+                self::cocokUntukImpor($current, $nomor);
+                if ($current !== null && $current['versi_konten_tp_id'] !== null) {
+                    throw new DomainException('Soal ' . $nomor . ' sudah terikat versi konten TP. Tidak boleh ditimpa.');
+                }
+            }
             $terakhir = $this->db->table('impor_soal_docx')
                 ->select('id,checksum')->where('tp_id', $tpId)->where('jenis', $jenis)
                 ->where('status', 'diterapkan')->orderBy('diterapkan_pada', 'DESC')
@@ -211,7 +242,7 @@ final class ImporBankSoalService
                 }
                 $this->db->transCommit();
                 return ['jumlah' => count($parsed['soal']), 'baru' => 0,
-                    'diubah' => 0, 'status' => 'tidak_berubah'];
+                    'diubah' => 0, 'jenis' => $jenis, 'status' => 'tidak_berubah'];
             }
             $baru = 0;
             $diubah = 0;
@@ -254,7 +285,7 @@ final class ImporBankSoalService
             }
             $this->db->transCommit();
             return ['jumlah' => count($parsed['soal']), 'baru' => $baru,
-                'diubah' => $diubah, 'status' => 'diterapkan'];
+                'diubah' => $diubah, 'jenis' => $jenis, 'status' => 'diterapkan'];
         } catch (\Throwable $e) {
             $this->db->transRollback();
             throw $e;

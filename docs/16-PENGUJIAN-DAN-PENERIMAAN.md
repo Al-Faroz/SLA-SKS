@@ -288,3 +288,34 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - PDF 1/5 halaman ditolak; 6/8/40 diterima; 41 atau >15 MB ditolak; berkas PDF tidak terbaca jumlah halamannya memberi pesan jelas.
 - Pengenalan jenis file (ekstensi/MIME), hak Guru G1, status TP draf, CSRF dan penyimpanan privat tetap dijaga oleh komponen yang sudah ada; ketentuan pemeriksaan skrip/aksi/struktur internal pada regresi historis tidak menjadi persyaratan bisnis PDF lagi.
 - Pada Sunting, PDF yang tidak memenuhi dua batas tidak mengganti file atau metadata lama. Lakukan PHPUnit serta tes XAMPP nyata.
+
+## Regresi Bank Soal Diagnostik–Sumatif terpadu (2 November 2026)
+- UI satu tombol Kelola Bank Soal dari TP NonEsensial; tab Diagnostik/Sumatif tetap terpisah dan tetap mengingat jenis pada redirect gagal/sukses. TP Esensial tidak menampilkan bank soal wajib.
+- Generator Word: Diagnostik 10–200 dan Sumatif 30–200, bukan 5 soal Sumatif; impor dan tambah manual boleh berlangsung bertahap sampai mencapai batas TP Siap.
+- Daftar >15 soal: pagination server; berpindah tab/halaman tanpa tercampur Gen atau jenis. 403 untuk Guru lain, dan mutasi pada TP Siap ditolak.
+- Editor: tambah/edit, periksa A–E, satu kunci, gambar privat, pratinjau HTML tersanitasi sebelum simpan, form tanpa JS sebagai fallback, CSRF pada unggah gambar dan pratinjau.
+- Impor Word: upload → review → konfirmasi; pemeriksaan 10/30 pada TP Siap; soal manual tidak tertimpa; perubahan apa pun pada bank setelah review membatalkan konfirmasi; impor identik tidak melompati perlindungan konflik.
+- Equation Word pecahan/pangkat/akar dapat dibaca sebagai MathML dalam review; bentuk kompleks dan rendering browser perlu tes dokumen nyata. Audio/Video Google Drive hanya tautan file HTTPS, tautan selain file ditolak dan Guru menguji izin Viewer/pemutaran sebelum menyetujui review.
+- PHP lint, unit, integrasi, QA CI dan review XAMPP adalah gerbang. Jangan mengklaim semua kasus E2E PASS bila hanya CI yang lulus; tidak ada migrasi SQL.
+
+### Regresi Mode Dokumentasi untuk Screenshot Full-Page — 2 November 2026
+- Di semua panel berbasis `layouts/panel` (Admin, Guru, Siswa, Pimpinan), tombol kamera Dokumentasi tampak dan bisa ditoggle; `aria-pressed` dan labelnya mengikuti mode.
+- Dengan mode mati, sidebar desktop sticky tetap dapat diminimalkan, menu HP/drawer, tombol tema, login/logout, form dan rute tetap berfungsi. Dengan mode hidup, sidebar tidak sticky, tidak memakai tinggi tetap 100vh dan tidak menggulir sendiri; bidang konten tidak hilang di luar sidebar saat screenshot panjang.
+- Mode disimpan per tab pada sessionStorage, dipulihkan saat navigasi/reload tanpa mengubah preferensi default Dark. Tombol Selesai harus mengembalikan layout tanpa kehilangan form yang belum dikirim. Light/Dark keduanya diuji.
+- Uji ekstensi Screenshot Tool Chrome pada halaman panjang: Review Word 30 soal (beberapa `details` dibuka), Detail TP, Peta ATP/semester, tabel panjang Admin, serta halaman Siswa. Bandingkan screenshot dengan tampilan layar dan cek tidak ada pengulangan sidebar, konten terpotong atau bagian gambar kosong.
+- Unit `ModeDokumentasiShellTest`, JS `node --check` dan PHP lint harus PASS. **Pengujian statis tidak bisa menjamin perilaku semua ekstensi pihak ketiga**; hasil capture XAMPP pengguna tetap penentu status FIX.
+
+
+### Regresi penyesuaian Step Progress TP dan KKM — 2 November 2026
+- Detail TP NonEsensial: langkah Diagnostik berbunyi **Minimal 10 soal sah dan pengaturan kegiatan**; Sumatif **Minimal 30 soal sah, KKM terset**. Keduanya tetap mengarah ke jenis tab yang tepat.
+- Status selesai dan belum selesai memiliki latar/border berbeda serta teks, bukan warna saja; warna teks `✓ Selesai` menggunakan merah kontras pada Dark dan Light. Periksa urutan keyboard, tombol Lihat/Lengkapi, HP/tablet/desktop.
+- Step Sumatif juga mensyaratkan kode pemeriksaan `kkm` (sama dengan Diagnostik), tidak boleh selesai hanya karena bank soalnya cukup ketika KKM efektif tidak valid.
+- **Tahap berikutnya (butuh dump SQL terbaru):** audit penyimpanan `kkm_default` Admin dan `tp.kkm_khusus` Guru vs pembacaan `tp.kkm` saat ini; kemudian form satu nilai KKM efektif yang terlihat pada tab Diagnostik/Sumatif, dapat diganti Guru pada TP draf, konsisten hingga snapshot, soal dan mesin ujian. Jangan menambah kolom/tes DB asumtif sebelum audit dump privat terbaru.
+
+
+### Regresi KKM Admin/Guru dan identitas ringkas — 2 November 2026
+- Draf non_esensial tanpa default Admin dan tanpa KKM khusus Guru belum dapat diterbitkan, meskipun `tp.kkm` historis 75. Isi default Admin melalui `admin/kkm`, periksa Diagnostik+Sumatif menampilkan angka sama. Override Guru lalu buka kedua tab dan periksa angka yang sama.
+- Hapus override memakai tombol **Ikuti Default Admin**; pastikan kembali mengikuti nilai Admin. Perubahan default Admin selanjutnya mempengaruhi TP draf tanpa override, tetapi tidak mengubah TP Siap atau snapshot lama. TP Esensial tidak menerima penyesuaian KKM ujian.
+- Uji keamanan: akun Siswa/Admin tidak boleh POST ke rute KKM Guru; Guru lain tak boleh mengubah TP; CSRF ditolak; versi TP usang harus meminta muat ulang; perubahan KKM menghasilkan audit tanpa menghapus soal/Word/Materi.
+- Tampilan Kelola TP memakai kartu Identitas TP ringkas pada desktop, laptop, HP; seluruh lima metadata tetap terbaca. Import Word diagnostik/sumatif yang sudah FIX tidak diubah.
+- PHPUnit `KkmTpServiceTest` memeriksa batas 1–100 dan pemilihan KKM; CI lint file terkait. Pengujian penuh penyimpanan DB dan browser tetap menunggu XAMPP.

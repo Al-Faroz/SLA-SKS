@@ -49,3 +49,7 @@ Script mengambil paket resmi `suneditor@3.3.3` berlisensi MIT dari npm dan menem
 3. Bila gambar sedang diunggah, penyimpanan soal menunggu sampai selesai (tombol simpan tidak mengirim form ketika unggahan aktif). Bila gagal, berikan pesan jelas di area editor; tidak menyamarkan error sebagai akses ditolak.
 4. Tabel lain di aplikasi perlu audit responsivitas terpisah (360/390/768/1024/1366 px). Jangan mengubah tampilan seluruh halaman tanpa uji per-peran.
 
+## Checkpoint pengembangan 2 November 2026
+Keputusan satu pintu: menu TP punya satu tombol **Kelola Bank Soal**, subjenis Diagnostik dan Sumatif tetap dipilih pada tab yang sama. Implementasi meliputi paginasi server 15 butir, Word template minimum 10/30, pratinjau manual via server sanitizer tanpa mutasi, review Word per butir, pemeriksaan perubahan bank sebelum konfirmasi dan perlindungan terhadap impor identik setelah sunting manual. Sidik jari bank disimpan pada metadata pratinjau privat yang sudah ada; tidak ada perubahan skema/SQL.
+
+Dukungan Equation Word untuk bentuk umum memakai MathML, sedangkan rumus Word yang tidak didukung tetap perlu pemeriksaan terhadap sumber. URL Audio/Video Word diverifikasi sebagai tautan file Google Drive HTTPS; **hak akses Viewer dan pemutaran bukan dapat diverifikasi otomatis oleh server tanpa akses ke sumber**. Guru wajib membuka tautan pada review. Regresi UI, matematika kompleks, media dan interaksi XAMPP belum boleh dinyatakan FIX hanya dari audit statis.

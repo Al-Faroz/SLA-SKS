@@ -1552,3 +1552,480 @@ html[data-theme] .a-publik--prototipe .a-baca .a-form .a-btn {
     transition:none;
   }
 }
+
+
+/* Review impor Word — komponen bacaan harus sepenuhnya bertema Dark/Light.
+   app.css sebelumnya memaksa .a-word-review-item putih (#fff) sambil
+   mewarisi teks terang Emerald Glass sehingga pertanyaan tak terbaca. */
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item {
+  background:var(--eg-table);
+  color:var(--e-text);
+  border:1px solid var(--e-border);
+  border-radius:12px;
+  box-shadow:var(--eg-shadow-soft);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary {
+  padding:14px 18px;
+  background:var(--eg-table-head);
+  color:var(--e-text);
+  border-bottom:1px solid transparent;
+  font-size:14px;
+  font-weight:750;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item[open] > summary {
+  border-bottom-color:var(--e-border);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary .a-help {
+  color:var(--e-muted);
+  font-size:12px;
+  font-weight:600;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary:hover {
+  background:var(--e-soft-hover);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:-3px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-word-preview {
+  color:var(--e-text);
+  font-size:14px;
+  line-height:1.7;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > .a-word-preview {
+  padding:16px 18px 5px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-word-preview a {
+  color:var(--e-primary);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-word-preview :is(table,th,td) {
+  border-color:var(--e-border);
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl {
+  background:var(--eg-table);
+  color:var(--e-text);
+  min-width:460px;
+  font-size:14px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl thead th {
+  background:var(--eg-table-head);
+  color:var(--eg-table-label);
+  border-color:var(--e-border);
+  font-size:13px;
+  font-weight:750;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody :is(th[scope="row"],td) {
+  color:var(--e-text);
+  border-color:var(--eg-line-soft);
+  line-height:1.65;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody th[scope="row"] {
+  color:var(--e-primary);
+  font-weight:800;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody td.a-review-word__kunci-benar {
+  color:var(--e-primary);
+  font-weight:750;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody td.a-review-word__kunci-lain {
+  color:var(--e-muted);
+}
+@media(max-width:640px) {
+  html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary {
+    padding:12px;
+  }
+  html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > .a-word-preview {
+    padding:13px 12px 4px;
+  }
+  html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl {
+    font-size:13px;
+  }
+}
+
+
+/* =============================================================
+   MODE DOKUMENTASI — screenshot full-page Chrome.
+   Sidebar sticky 100vh + overflow-y internal dan backdrop blur
+   menciptakan lapisan komposit yang sering keliru dijahit oleh
+   ekstensi capture. Perubahan hanya saat tombol Dokumentasi aktif.
+   Tidak mempengaruhi UI harian, media pembelajaran, atau ujian.
+   ============================================================= */
+html[data-theme="dark"][data-documentation="on"] {
+  --eg-document-wall:#062C21;
+  --eg-document-side:#09281F;
+  --eg-document-panel:#10372B;
+}
+html[data-theme="light"][data-documentation="on"] {
+  --eg-document-wall:#EFF7F1;
+  --eg-document-side:#E5F0E9;
+  --eg-document-panel:#FFFFFF;
+}
+html[data-theme][data-documentation="on"] {
+  scroll-behavior:auto;
+}
+html[data-theme][data-documentation="on"] body {
+  overflow:visible;
+}
+/* Penting: mode capture tidak boleh memakai dua kolom grid.
+   Chrome extension menempelkan potongan setelah viewport ke kolom sidebar
+   ketika melakukan stitched scrolling pada grid berisi sticky sidebar. */
+html[data-theme][data-documentation="on"] .a-app--prototipe,
+html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed {
+  display:block !important;
+  width:100%;
+  min-width:0;
+  grid-template-columns:none !important;
+  background:var(--eg-document-wall);
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-main,
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-main__konten,
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-page {
+  overflow:visible;
+  min-width:0;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-header {
+  position:static;
+  background:var(--eg-document-panel);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  box-shadow:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe :is(
+  .a-side,.a-header,.a-card,.a-proto-panel,.a-atp-kelompok,.a-siswa-kartu
+) {
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card,
+html[data-theme][data-documentation="on"] .a-app--prototipe :is(.a-proto-panel,.a-atp-kelompok) {
+  background:var(--eg-document-panel);
+  box-shadow:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card::before,
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-atp-kelompok::before {
+  content:none;
+  display:none;
+}
+/* Toolbar debug CI4 yang fixed bukan bagian dari tutorial. */
+html[data-documentation="on"] :is(#debugbar,#debugbarToggle,#debugbar-toolbar) {
+  display:none !important;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi {
+  border-color:var(--e-primary);
+  color:var(--e-text);
+  background:var(--e-soft-hover);
+  font-weight:750;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:3px;
+}
+/* Sidebar dipindahkan ke baris navigasi di atas konten. Aliran
+   dokumen tetap DOM normal tanpa position fixed/sticky atau sub-scroll. */
+@media (min-width:768px) {
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side {
+    position:static !important;
+    inset:auto;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none;
+    overflow:visible !important;
+    transform:none !important;
+    transition:none;
+    visibility:visible;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px 24px;
+    padding:12px clamp(14px,3vw,32px);
+    background:var(--eg-document-side);
+    border-right:0;
+    border-bottom:1px solid var(--eg-line);
+    box-shadow:none;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__atas,
+  html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed .a-side__atas {
+    display:flex;
+    flex-direction:row;
+    flex:0 0 auto;
+    align-items:center;
+    gap:10px;
+    margin:0;
+    padding:0;
+    border:0;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__brand,
+  html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed .a-side__brand {
+    display:inline;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__menu {
+    display:flex;
+    flex:1 1 420px;
+    align-items:center;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:6px;
+    min-width:0;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__tautan {
+    display:inline-flex;
+    align-items:center;
+    width:auto;
+    min-height:38px;
+    padding:8px 11px;
+    gap:7px;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__teks,
+  html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed .a-side__teks {
+    display:inline;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__collapse {
+    display:none;
+  }
+}
+@media (max-width:767px) {
+  /* HP tetap memakai drawer yang tertutup ketika screenshot diambil. */
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side:not(.is-open) {
+    max-height:100dvh;
+  }
+}
+@media (max-width:900px) {
+  html[data-theme] .a-app--prototipe .a-btn--dokumentasi {
+    width:42px;
+    min-width:42px;
+    padding:8px;
+  }
+  html[data-theme] .a-app--prototipe .a-btn--dokumentasi [data-documentation-label] {
+    display:none;
+  }
+}
+@media print {
+  /* Print/PDF memakai aliran yang sama; kontrol interaktif tidak dicetak. */
+  html[data-theme] .a-app--prototipe {
+    --e-text:#19382D;
+    --e-muted:#526E61;
+    --e-border:#CCDDD3;
+    --e-primary:#126B50;
+    --e-soft:#E8F4EC;
+    --e-surface:#FFFFFF;
+    --eg-table:#FFFFFF;
+    --eg-table-head:#E6F2EA;
+    --eg-table-row:#FFFFFF;
+    --eg-table-alt:#F4FAF6;
+    --eg-table-label:#235443;
+    display:block !important;
+    background:#fff !important;
+    color:#19382D !important;
+  }
+  html[data-theme] .a-app--prototipe :is(.a-side,.a-backdrop,.a-header) {
+    display:none !important;
+  }
+  html[data-theme] .a-app--prototipe .a-main,
+  html[data-theme] .a-app--prototipe .a-main__konten {
+    width:100% !important;
+    max-width:100% !important;
+    padding:0 !important;
+    overflow:visible !important;
+  }
+  html[data-theme] .a-app--prototipe .a-page > .a-card {
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    break-inside:auto;
+  }
+  html[data-theme] .a-app--prototipe .a-page > .a-card::before {
+    content:none !important;
+  }
+}
+
+
+/* Step Progress TP — visual berbeda antara terpenuhi dan belum terpenuhi.
+   Menjaga semantik status tetap dari Service; warna merah muda hanya
+   aksen teks "✓ Selesai" sesuai preferensi kontras pemilik. */
+html[data-theme="dark"] .a-app--prototipe {
+  --eg-step-done-bg:linear-gradient(145deg,#174F39,#0C352C);
+  --eg-step-done-border:#53C698;
+  --eg-step-pending-bg:#0D2925;
+  --eg-step-pending-border:rgba(166,194,177,.33);
+  --eg-step-pending-text:#C7D7CF;
+  --eg-step-done-text:#FF9BA6;
+}
+html[data-theme="light"] .a-app--prototipe {
+  --eg-step-done-bg:linear-gradient(145deg,#D7F3E4,#E9F8F0);
+  --eg-step-done-border:#27825A;
+  --eg-step-pending-bg:#F1F5F2;
+  --eg-step-pending-border:#B9CCBF;
+  --eg-step-pending-text:#4D6356;
+  --eg-step-done-text:#A72C47;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item {
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  min-height:178px;
+  color:var(--e-text);
+  transition:none;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-selesai {
+  background:var(--eg-step-done-bg);
+  border:1px solid var(--eg-step-done-border);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-belum {
+  background:var(--eg-step-pending-bg);
+  border:1px dashed var(--eg-step-pending-border);
+  box-shadow:none;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item > strong {
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item > small {
+  color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__status {
+  margin:0 0 12px;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.5;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-selesai .a-tp-langkah__status {
+  color:var(--eg-step-done-text);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-belum .a-tp-langkah__status {
+  color:var(--eg-step-pending-text);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item .a-btn {
+  margin-top:auto;
+  align-self:flex-start;
+}
+
+
+/* Kelola TP: identitas ringkas dalam satu baris pada desktop. */
+html[data-theme] .a-app--prototipe .a-tp-identitas-kartu {
+  padding-block:clamp(12px,1.4vw,18px);
+}
+html[data-theme] .a-app--prototipe .a-tp-identitas-kartu h2 {
+  margin:0 0 12px;
+}
+html[data-theme] .a-app--prototipe .a-tp-identitas-ringkas {
+  display:grid;
+  grid-template-columns:minmax(135px,1.5fr) repeat(4,minmax(95px,1fr));
+  align-items:center;
+  gap:8px 10px;
+  padding:0;
+  margin:0;
+}
+html[data-theme] .a-app--prototipe .a-tp-identitas-ringkas > div {
+  min-width:0;
+  padding:9px 12px;
+  border:1px solid var(--e-border);
+  border-radius:10px;
+  background:var(--eg-table);
+}
+html[data-theme] .a-app--prototipe .a-tp-identitas-ringkas dt {
+  margin:0 0 3px;
+  color:var(--e-muted);
+  font-size:12px;
+  line-height:1.35;
+}
+html[data-theme] .a-app--prototipe .a-tp-identitas-ringkas dd {
+  margin:0;
+  color:var(--e-text);
+  font-size:14px;
+  font-weight:750;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+@media(max-width:1000px) {
+  html[data-theme] .a-app--prototipe .a-tp-identitas-ringkas {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:560px) {
+  html[data-theme] .a-app--prototipe .a-tp-identitas-ringkas {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+
+/* KKM TP: ringkas, jelas sumber Admin/Guru dan nilai efektif. */
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm {
+  margin:0 0 20px;
+  padding:clamp(14px,2vw,20px);
+  border:1px solid var(--e-border);
+  border-radius:14px;
+  background:var(--eg-table);
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-judul {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px 16px;
+  flex-wrap:wrap;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-judul h3 {
+  margin:0;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:12px 0;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas > div {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  min-width:0;
+  gap:5px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid var(--e-border);
+  background:var(--eg-table-alt);
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas small {
+  color:var(--e-muted);
+  font-size:12px;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas strong {
+  color:var(--e-text);
+  font-size:1.12rem;
+  line-height:1.3;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas > div:last-child {
+  border-color:var(--e-primary);
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas > div:last-child strong {
+  color:var(--e-primary);
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-form {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:10px 14px;
+  margin:12px 0;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-form .a-field {
+  flex:0 1 270px;
+  margin:0;
+}
+html[data-theme] .a-app--prototipe .a-bank-soal__kkm-form .a-btn {
+  margin:0;
+}
+html[data-theme] .a-app--prototipe .a-kkm-admin {
+  max-width:720px;
+}
+@media(max-width:600px) {
+  html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  html[data-theme] .a-app--prototipe .a-bank-soal__kkm-ringkas > div:last-child {
+    grid-column:1/-1;
+  }
+}

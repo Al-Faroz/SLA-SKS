@@ -7,6 +7,23 @@
   const current = getSaved('sla-sks-tema') === 'light' ? 'light' : 'dark';
   html.dataset.theme = current;
 
+  // Mode dokumentasi hanya untuk tab ini. Muat sebelum CSS agar layout
+  // tidak bergeser saat berpindah halaman untuk screenshot berurutan.
+  const documentationKey = 'sla-sks-mode-dokumentasi';
+  const getDocumentation = () => {
+    try { return sessionStorage.getItem(documentationKey) === 'on'; }
+    catch (_) { return false; }
+  };
+  const setDocumentation = (active) => {
+    if (active) html.dataset.documentation = 'on';
+    else delete html.dataset.documentation;
+    try {
+      if (active) sessionStorage.setItem(documentationKey, 'on');
+      else sessionStorage.removeItem(documentationKey);
+    } catch (_) { /* Session storage bisa diblokir browser. */ }
+  };
+  if (getDocumentation()) html.dataset.documentation = 'on';
+
   document.addEventListener('DOMContentLoaded', () => {
     const buttons = [...document.querySelectorAll('[data-theme-toggle]')];
     function useTheme(next) {
@@ -24,6 +41,27 @@
       useTheme(next);
       save('sla-sks-tema', next);
     }));
+
+    const documentationButton = document.querySelector('[data-documentation-toggle]');
+    if (documentationButton) {
+      const documentationLabel = documentationButton.querySelector('[data-documentation-label]');
+      const reflectDocumentation = () => {
+        const active = html.dataset.documentation === 'on';
+        documentationButton.setAttribute('aria-pressed', String(active));
+        documentationButton.setAttribute('aria-label', active
+          ? 'Nonaktifkan Mode Dokumentasi dan kembalikan layout biasa'
+          : 'Aktifkan Mode Dokumentasi untuk screenshot panjang');
+        documentationButton.setAttribute('title', active
+          ? 'Kembali ke tampilan aplikasi biasa'
+          : 'Mode Dokumentasi: screenshot halaman panjang tanpa sidebar sticky');
+        if (documentationLabel) documentationLabel.textContent = active ? 'Selesai' : 'Dokumentasi';
+      };
+      reflectDocumentation();
+      documentationButton.addEventListener('click', () => {
+        setDocumentation(html.dataset.documentation !== 'on');
+        reflectDocumentation();
+      });
+    }
 
     const panel = document.querySelector('[data-shell="panel"]');
     const collapse = panel?.querySelector('[data-sidebar-collapse]');

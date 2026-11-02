@@ -228,3 +228,27 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - Form unggah media tetap lengkap dan tidak dimasukkan ke modal. URL lama Sunting Materi boleh mengarahkan dengan otorisasi ke bagian editor yang sama; tidak boleh membuat form edit ganda dan tidak boleh membuat Materi kedua.
 - Halaman kesiapan menampilkan Step Progress sebagai ringkasan utama dengan daftar rincian teknis dapat dibuka (native `details`). Status selesai bersumber dari pemeriksaan final yang sama; informasi kosong/galat, link tindak lanjut, CSRF dan hak akses tidak boleh hilang.
 - Penilaian dan media siswa tidak dipercepat/dibuka hanya karena perubahan UI ini. QA wajib Dark/Light, 390/820/desktop, keyboard, validasi file, dan akses lintas Gen.
+
+### Penataan Bank Soal Guru — 2 November 2026
+- Detail TP menampilkan **satu tombol Kelola Bank Soal**, bukan dua tombol yang menuju satu halaman identik. Step Progress Diagnostik/Sumatif tetap dua status karena syarat berbeda.
+- Halaman Bank Soal mempunyai ringkasan dua jenis; pekerjaan hanya pada **tab aktif**, dengan daftar soal paginasi server (15 per halaman), tombol tambah per butir, unduh/unggah Word per jenis dan riwayat review untuk jenis terpilih.
+- Form manual menampilkan tombol **Pratinjau Soal** yang meminta sanitasi HTML dari server tanpa INSERT/UPDATE, diikuti tombol **Simpan Soal** terpisah. Pratinjau berubah atau hilang ketika input diganti; gambar soal menggunakan aset privat.
+- Review Word dapat membuka per butir sehingga 30+ soal tidak memenuhi layar sekaligus. Pertanyaan, A–E, kunci dan konten kaya harus dapat ditelaah; link Audio/Video Google Drive membuka sumber untuk verifikasi Viewer/pemutaran oleh Guru. Status kesalahan, loading, sukses dan hak akses tetap eksplisit.
+
+
+### Penegasan susunan halaman Bank Soal — 2 November 2026
+- **Bagian pertama: Ketersediaan Bank Soal**, card informasi permanen di atas dengan dua ringkasan Diagnostik/Sumatif, jumlah soal aktif, batas minimal, jumlah tayang dan status kecukupan jumlah. Tidak menyatakan soal siap secara akademik hanya karena jumlah memadai.
+- **Bagian kedua: Bank Soal**, card area kerja tersendiri di bawahnya dengan **dua tab utama Diagnostik dan Sumatif**. Tab aktif jelas terlihat, berlabel jenis dan jumlah soal aktif, memakai navigasi link server `?jenis=...` beserta `aria-current="page"` sehingga tidak bergantung JavaScript. Seluruh daftar 15-per-halaman, tambah/edit, unduh/unggah Word dan riwayat tampil hanya untuk tab tersebut.
+- Pesan sukses/gagal berada dalam card area kerja di bawah navigasi tab; ringkasan tidak bercampur dengan form. Kedua card, tab dan ringkasan responsif pada desktop/HP menggunakan token CSS Emerald Glass yang sudah ada. Tidak mengubah controller, service, aturan akademik, SQL atau format impor.
+
+
+### Revisi Step Progress TP — 2 November 2026
+- Langkah 3 Diagnostik: **Minimal 10 soal sah dan pengaturan kegiatan**. Langkah 4 Sumatif: **Minimal 30 soal sah, KKM terset**. Keduanya tetap menjadi langkah independen pada TP NonEsensial, tetapi memakai satu nilai KKM efektif sesuai Master 02/05/06/08/10.
+- Kartu dengan status `terpenuhi` mendapatkan latar hijau pekat/terang khas Emerald Glass dan batas solid; kartu belum terpenuhi menggunakan latar netral dan batas putus-putus. Tulisan `✓ Selesai` memakai aksen merah kontras (Dark `#FF9BA6`, Light `#A72C47`) yang ditentukan tema, sementara langkah belum terpenuhi tetap memiliki label tekstual. Tombol Lihat/Lengkapi tetap bekerja.
+- **KKM Guru belum diimplementasikan pada tahap visual ini**: Master 10 menetapkan `kkm_default` Admin dan `tp.kkm_khusus` Guru; implementasi aplikasi saat ini membaca `tp.kkm`. Harus audit dump SQL lokal terbaru sebelum menentukan pemetaan/penyimpanan dan menambah form KKM di kedua tab Bank Soal; jangan menciptakan KKM hardcoded atau form yang hanya pura-pura menyimpan.
+
+
+### KKM TP dan Identitas TP ringkas — 2 November 2026 (menggantikan catatan menunggu SQL)
+- Halaman **Kelola TP** menampilkan `Identitas TP` sebagai **kartu ringkas** dengan lima pasangan label–nilai (Kode TP, Urutan ATP, Semester, Status, Materi), satu baris pada desktop dan dua kolom pada HP, memakai `dl/dt/dd` tanpa tabel vertikal. Semua informasi lama tetap tampil.
+- Halaman **Bank Soal** pada tab Diagnostik dan Sumatif memuat kartu Pengaturan KKM TP yang sama: Default Admin, Khusus Guru, dan KKM efektif. Input KKM terisi **nilai efektif saat ini**; tombol **Simpan KKM Khusus** mengatur override, sedangkan **Ikuti Default Admin** melepas override. Untuk TP Siap, informasi hanya dibaca. Pesan berhasil/gagal ditampilkan dekat form.
+- Admin memiliki menu **Pengaturan KKM** (`admin/kkm`) dengan formulir default 1–100. Jika Admin belum mengisinya, aplikasi menampilkan **Belum ditetapkan**; angka dari kolom lama `tp.kkm` tidak dijadikan default terselubung.

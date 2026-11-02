@@ -16,8 +16,12 @@ final class TemplateWordSoalService
 {
     public static function buat(array $identitas, string $jenis, int $jumlah, string $kunci): string
     {
-        if (! in_array($jenis, ['diagnostik', 'sumatif'], true) || $jumlah < 1 || $jumlah > 200) {
-            throw new DomainException('Jenis atau jumlah soal tidak valid (1–200).');
+        if (! in_array($jenis, ['diagnostik', 'sumatif'], true)) {
+            throw new DomainException('Jenis bank soal tidak valid.');
+        }
+        $minimal = $jenis === 'diagnostik' ? 10 : 30;
+        if ($jumlah < $minimal || $jumlah > 200) {
+            throw new DomainException('Template ' . ucfirst($jenis) . ' harus memiliki ' . $minimal . '–200 soal.');
         }
         if (strlen($kunci) < 32) {
             throw new RuntimeException('Kunci tanda tangan template belum dikonfigurasi dengan aman.');

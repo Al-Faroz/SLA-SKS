@@ -16,19 +16,15 @@
                 · <?= esc($tp['status']) ?> · Satu TP = satu Materi</p>
         </div>
     </header>
-    <section class="a-card" aria-labelledby="identitas-tp">
+    <section class="a-card a-tp-identitas-kartu" aria-labelledby="identitas-tp">
         <h2 id="identitas-tp">Identitas TP</h2>
-        <div class="a-tabel-gulir">
-            <table class="a-tbl a-tp-identitas">
-                <tbody>
-                    <tr><th scope="row">Kode TP</th><td><?= esc($tp['kode_tp']) ?></td></tr>
-                    <tr><th scope="row">Urutan ATP</th><td><?= (int) $tp['urutan_atp'] ?></td></tr>
-                    <tr><th scope="row">Semester</th><td><?= (int) $paket['semester'] ?></td></tr>
-                    <tr><th scope="row">Status TP</th><td><span class="a-badge"><?= esc($tp['status']) ?></span></td></tr>
-                    <tr><th scope="row">Materi</th><td><?= (int) $jumlah_materi ?> dari 1</td></tr>
-                </tbody>
-            </table>
-        </div>
+        <dl class="a-tp-identitas-ringkas">
+            <div><dt>Kode TP</dt><dd><?= esc($tp['kode_tp']) ?></dd></div>
+            <div><dt>Urutan ATP</dt><dd><?= (int) $tp['urutan_atp'] ?></dd></div>
+            <div><dt>Semester</dt><dd><?= (int) $paket['semester'] ?></dd></div>
+            <div><dt>Status TP</dt><dd><span class="a-badge"><?= esc($tp['status']) ?></span></dd></div>
+            <div><dt>Materi</dt><dd><?= (int) $jumlah_materi ?> dari 1</dd></div>
+        </dl>
     </section>
 
     <section class="a-card a-jarak-atas" id="langkah-tp" aria-labelledby="judul-langkah-tp">
@@ -177,10 +173,9 @@
             <h2 id="judul-bank-soal">3. Diagnostik dan Sumatif</h2>
             <p class="a-help">Diagnostik memerlukan minimal 10 soal, Sumatif minimal 30 soal.
                 Pengelolaan soal melalui editor khusus agar rumus, gambar, dan tabel tetap nyaman.</p>
-            <a class="a-btn a-btn--sekunder"
-                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=diagnostik'), 'attr') ?>">Kelola Diagnostik</a>
-            <a class="a-btn a-btn--sekunder"
-                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=sumatif'), 'attr') ?>">Kelola Sumatif</a>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal'), 'attr') ?>">Kelola Bank Soal</a>
+            <p class="a-help">Diagnostik dan Sumatif dikelola melalui dua tab pada halaman yang sama.</p>
         </section>
     <?php endif ?>
 

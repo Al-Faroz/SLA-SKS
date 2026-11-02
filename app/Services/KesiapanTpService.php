@@ -37,6 +37,13 @@ final class KesiapanTpService
             throw new DomainException('TP atau paket semester tidak tersedia.');
         }
 
+        // KKM TP draf dihitung dari khusus Guru atau default Admin. Angka
+        // tp.kkm historis (misalnya 75) bukan sumber kebijakan saat draf.
+        // Snapshot TP Siap tetap memakai angka terpin, walau default berubah.
+        if ($tp['status'] === 'draf' && ($tp['jenis_tp'] ?? '') === 'non_esensial') {
+            $tp['kkm'] = (new KkmTpService($this->db))->informasi($tp)['efektif'];
+        }
+
         // v2.5 memakai SATU CP operasional melalui tp.cp_mapel_id;
         // tidak lagi mewajibkan tautan tp_cp/CP utama model v2.4.
         // Satu CP operasional boleh merujuk beberapa elemen versi aktif.
@@ -371,7 +378,10 @@ final class KesiapanTpService
             // Materi yang lengkap disiapkan bersamaan dengan TP, bukan saat upload.
             $this->db->table('materi')->where('tp_id', $tpId)->update(['aktif' => 1]);
             $this->db->table('tp')->where('id', $tpId)->where('status', 'draf')
-                ->where('struktur_versi', $strukturVersi)->update(['status' => 'siap']);
+                ->where('struktur_versi', $strukturVersi)->update([
+                    'status' => 'siap',
+                    'kkm' => (int) $cek['tp']['kkm'],
+                ]);
             if ($this->db->affectedRows() !== 1) {
                 throw new DomainException('TP berubah selama publikasi. Muat ulang halaman.');
             }

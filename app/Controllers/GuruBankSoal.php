@@ -14,6 +14,7 @@ use App\Services\PratinjauWordSoalService;
 use App\Services\RenderWordSoalService;
 use App\Services\ImporBankSoalService;
 use App\Services\KelolaSoalGuruService;
+use App\Services\KkmTpService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -31,16 +32,30 @@ final class GuruBankSoal extends BaseController
         }
 
         $akun = (new AuthService())->penggunaSaatIni();
+        // G1 sudah diverifikasi DetailTpService; KKM diambil khusus untuk
+        // Bank Soal agar query Peta ATP dan fixture pengujian lama tetap stabil.
+        $tpKkm = db_connect()->table('tp')->select('kkm_khusus,kkm')
+            ->where('id', $tpId)->get()->getRowArray();
+        if ($tpKkm === null) {
+            return $this->response->setStatusCode(404)->setBody('TP tidak ditemukan.');
+        }
         $ringkasan = (new RingkasanBankSoalService())->lihat($tpId);
         $jenisDipilih = (string) ($this->request->getGet('jenis') ?: 'diagnostik');
         if (!in_array($jenisDipilih, ['diagnostik', 'sumatif'], true)) {
             $jenisDipilih = 'diagnostik';
         }
-        $daftarSoal = (new KelolaSoalGuruService())->daftar($tpId, $jenisDipilih);
+        $bank = new KelolaSoalGuruService();
+        $totalSoal = $bank->jumlahSoal($tpId, $jenisDipilih);
+        $batas = 15;
+        $jumlahHalaman = max(1, (int) ceil($totalSoal / $batas));
+        $halaman = filter_var($this->request->getGet('halaman'), FILTER_VALIDATE_INT);
+        $halaman = $halaman === false || $halaman < 1 ? 1 : min($halaman, $jumlahHalaman);
+        $daftarSoal = $bank->daftar($tpId, $jenisDipilih, $batas, ($halaman - 1) * $batas);
 
         $riwayat = db_connect()->table('impor_soal_docx')
             ->select('id,jenis,status,dibuat_pada,diterapkan_pada')
             ->where('tp_id', $tpId)->where('guru_id', (int) $akun['id'])
+            ->where('jenis', $jenisDipilih)
             ->orderBy('dibuat_pada', 'DESC')->limit(10)->get()->getResultArray();
 
         return view('guru/bank_soal', array_merge($rincian, [
@@ -49,11 +64,42 @@ final class GuruBankSoal extends BaseController
             'peranAktif' => 'Guru',
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'ringkasan_bank' => $ringkasan,
+            'kkm_info' => (new KkmTpService())->informasi($tpKkm),
             'word_riwayat' => $riwayat,
             'jenis_dipilih' => $jenisDipilih,
             'daftar_soal' => $daftarSoal,
+            'total_soal' => $totalSoal,
+            'halaman_aktif' => $halaman,
+            'jumlah_halaman' => $jumlahHalaman,
         ]));
     }
+    /** POST: nilai khusus Guru berlaku untuk kedua tab bank pada TP ini. */
+    public function simpanKkm(int $tpId): ResponseInterface
+    {
+        $jenis = (string) ($this->request->getPost('jenis') ?? 'diagnostik');
+        if (!in_array($jenis, ['diagnostik', 'sumatif'], true)) {
+            $jenis = 'diagnostik';
+        }
+        $url = site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis) . '#pengaturan-kkm';
+        $pilihan = $this->request->getPost('pilihan');
+        $raw = $pilihan === 'default' ? '' : $this->request->getPost('kkm_khusus');
+        $versi = $this->request->getPost('struktur_versi');
+        if (!in_array($pilihan, ['khusus', 'default'], true)
+            || !is_string($raw) || !is_string($versi)
+            || !ctype_digit($versi) || (int) $versi < 1 || strlen($versi) > 10) {
+            return redirect()->to($url)->with('kkm_galat', 'Isi KKM dan versi TP tidak valid.');
+        }
+        try {
+            (new KkmTpService())->simpanKhusus($tpId, $raw, (int) $versi);
+        } catch (DomainException $e) {
+            return redirect()->to($url)->with('kkm_galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Simpan KKM TP {tpId} gagal: {reason}', ['tpId' => $tpId, 'reason' => $e->getMessage()]);
+            return redirect()->to($url)->with('kkm_galat', 'KKM belum dapat disimpan. Silakan coba kembali.');
+        }
+        return redirect()->to($url)->with('kkm_sukses', 'KKM TP berhasil disimpan. Berlaku untuk Diagnostik dan Sumatif.');
+    }
+
     public function unduh(int $tpId, string $jenis): ResponseInterface
     {
         try {
@@ -67,7 +113,7 @@ final class GuruBankSoal extends BaseController
 
             $jumlahRaw = $this->request->getGet('jumlah');
             $jumlah = filter_var($jumlahRaw, FILTER_VALIDATE_INT);
-            $minimal = $jenis === 'diagnostik' ? 10 : 5;
+            $minimal = $jenis === 'diagnostik' ? 10 : 30;
             if ($jumlah === false || $jumlah < $minimal || $jumlah > 200) {
                 throw new DomainException('Jumlah soal harus ' . $minimal . ' sampai 200.');
             }
@@ -142,10 +188,10 @@ final class GuruBankSoal extends BaseController
             );
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal/review/' . $stage['id']));
         } catch (DomainException $e) {
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))->with('word_galat', $e->getMessage());
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis))->with('word_galat', $e->getMessage());
         } catch (\Throwable $e) {
             log_message('error', 'Unggah bank soal gagal: {reason}', ['reason' => $e->getMessage()]);
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis))
                 ->with('word_galat', 'Berkas belum dapat diproses. Periksa format atau kapasitas penyimpanan.');
         }
     }
@@ -185,7 +231,7 @@ final class GuruBankSoal extends BaseController
             }
             $akun = (new AuthService())->penggunaSaatIni();
             $hasil = (new ImporBankSoalService())->konfirmasi($tpId, (int) $akun['id'], $id);
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $hasil['jenis']))
                 ->with('word_sukses', $hasil['jumlah'] . ' soal berhasil diproses: '
                     . $hasil['baru'] . ' baru, ' . $hasil['diubah'] . ' diperbarui. '
                     . 'Soal lama yang tidak ada pada Word tetap disimpan.');
