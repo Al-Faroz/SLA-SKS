@@ -96,8 +96,14 @@ final class KkmTpService
         return $khusus ?? $default;
     }
 
+    /** Tidak menyalin default Admin menjadi override bila Guru belum mengubah angkanya. */
+    public static function normalisasiKhusus(?int $usulan, ?int $default): ?int
+    {
+        return $usulan !== null && $usulan === $default ? null : $usulan;
+    }
+
     /** KKM Guru opsional, versi TP naik agar review/publikasi lama tidak dapat dipakai lagi. */
-    public function simpanKhusus(int $tpId, ?string $raw, int $versi): void
+    public function simpanKhusus(int $tpId, ?string $raw, int $versi): bool
     {
         $guru = $this->pengguna('guru');
         $nilai = self::validasi($raw, true);
@@ -117,13 +123,17 @@ final class KkmTpService
             // Service memeriksa G1 langsung dari hubungan Gen–Mapel paket.
             (new DetailTpService($this->db, $this->akunSaatIni))->lihat($tpId);
             $default = $this->defaultAdmin();
+            // KKM sama dengan default Admin tetap mewarisi perubahannya.
+            $nilai = self::normalisasiKhusus($nilai, $default);
             $efektif = self::pilihEfektif($default, $nilai);
             if ($efektif === null) {
                 throw new DomainException('KKM default Admin belum ditetapkan. Isi KKM khusus Guru terlebih dahulu.');
             }
-            if ($lock['kkm_khusus'] !== null && (int) $lock['kkm_khusus'] === $nilai
-                || $lock['kkm_khusus'] === null && $nilai === null) {
-                throw new DomainException('KKM tidak berubah.');
+            if (($lock['kkm_khusus'] !== null && (int) $lock['kkm_khusus'] === $nilai)
+                || ($lock['kkm_khusus'] === null && $nilai === null)) {
+                // Simpan tanpa perubahan bukan galat dan tidak membuat versi palsu.
+                $this->db->transCommit();
+                return false;
             }
             $this->db->table('tp')->where('id', $tpId)->where('status', 'draf')
                 ->where('struktur_versi', $versi)
@@ -145,6 +155,7 @@ final class KkmTpService
                 throw new RuntimeException('Audit perubahan KKM gagal disimpan.');
             }
             $this->db->transCommit();
+            return true;
         } catch (Throwable $e) {
             $this->db->transRollback();
             throw $e;

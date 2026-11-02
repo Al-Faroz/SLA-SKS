@@ -29,6 +29,7 @@ final class NavigasiService
                 'gen' => ['Gen & Tahun Ajaran', 'admin/referensi'],
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
+                'koreksi_tp' => ['Persetujuan Koreksi TP', 'admin/koreksi-tp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
                 'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],

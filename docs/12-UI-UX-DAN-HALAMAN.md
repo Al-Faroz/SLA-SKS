@@ -245,10 +245,21 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 ### Revisi Step Progress TP — 2 November 2026
 - Langkah 3 Diagnostik: **Minimal 10 soal sah dan pengaturan kegiatan**. Langkah 4 Sumatif: **Minimal 30 soal sah, KKM terset**. Keduanya tetap menjadi langkah independen pada TP NonEsensial, tetapi memakai satu nilai KKM efektif sesuai Master 02/05/06/08/10.
 - Kartu dengan status `terpenuhi` mendapatkan latar hijau pekat/terang khas Emerald Glass dan batas solid; kartu belum terpenuhi menggunakan latar netral dan batas putus-putus. Tulisan `✓ Selesai` memakai aksen merah kontras (Dark `#FF9BA6`, Light `#A72C47`) yang ditentukan tema, sementara langkah belum terpenuhi tetap memiliki label tekstual. Tombol Lihat/Lengkapi tetap bekerja.
-- **KKM Guru belum diimplementasikan pada tahap visual ini**: Master 10 menetapkan `kkm_default` Admin dan `tp.kkm_khusus` Guru; implementasi aplikasi saat ini membaca `tp.kkm`. Harus audit dump SQL lokal terbaru sebelum menentukan pemetaan/penyimpanan dan menambah form KKM di kedua tab Bank Soal; jangan menciptakan KKM hardcoded atau form yang hanya pura-pura menyimpan.
+- **Riwayat catatan sebelum implementasi KKM (telah digantikan 2-11-2026):** audit dump lokal terbaru selesai dan formulir KKM efektif pada dua tab sudah ada; `tp.kkm` historis tidak menjadi fallback draf, tetapi dipakai sebagai angka snapshot TP Siap.
 
 
 ### KKM TP dan Identitas TP ringkas — 2 November 2026 (menggantikan catatan menunggu SQL)
 - Halaman **Kelola TP** menampilkan `Identitas TP` sebagai **kartu ringkas** dengan lima pasangan label–nilai (Kode TP, Urutan ATP, Semester, Status, Materi), satu baris pada desktop dan dua kolom pada HP, memakai `dl/dt/dd` tanpa tabel vertikal. Semua informasi lama tetap tampil.
 - Halaman **Bank Soal** pada tab Diagnostik dan Sumatif memuat kartu Pengaturan KKM TP yang sama: Default Admin, Khusus Guru, dan KKM efektif. Input KKM terisi **nilai efektif saat ini**; tombol **Simpan KKM Khusus** mengatur override, sedangkan **Ikuti Default Admin** melepas override. Untuk TP Siap, informasi hanya dibaca. Pesan berhasil/gagal ditampilkan dekat form.
 - Admin memiliki menu **Pengaturan KKM** (`admin/kkm`) dengan formulir default 1–100. Jika Admin belum mengisinya, aplikasi menampilkan **Belum ditetapkan**; angka dari kolom lama `tp.kkm` tidak dijadikan default terselubung.
+
+### KKM default yang diwarisi, bukan override palsu (2 November 2026)
+- Guru melihat KKM default Admin otomatis di isian kedua tab (satu KKM bersama); tidak perlu menekan Simpan jika tidak mengubahnya. Angka berbeda dapat disimpan sebagai KKM khusus berkali-kali selama draf. Kembali ke angka Admin mengembalikan pewarisan.
+- Admin yang belum mengonfigurasi default mendapatkan contoh 80 yang diberi peringatan **belum aktif sampai disimpan**, bukan default tersembunyi. Guru melihat peringatan bila default tidak ada.
+- TP Siap hanya menampilkan KKM terpin; tidak memunculkan tombol edit/koreksi yang belum benar-benar terhubung. Mekanisme koreksi berversi dikembangkan pada tahap terpisah.
+
+
+### Halaman koreksi TP Siap dan sunting CP terbit (2 November 2026)
+- Guru: pada `/guru/tp/{id}` yang Siap ada tombol **Ajukan Koreksi TP Siap** → halaman permohonan dengan kategori A/B/C, alasan, riwayat. Guru dapat membuka satu draf untuk mengubah rincian/KKM/Materi/berkas/soal secara terpisah dan mengirimnya, lalu melihat status ditinjau/disetujui/ditolak. Tidak ada tombol edit langsung pada TP Siap.
+- Admin: menu **Persetujuan Koreksi TP** menampilkan daftar, perbandingan TP/Materi/soal dan catatan keputusan, tombol setujui atau tolak (hanya `diajukan`, tidak untuk akun pemohon yang sama). Antarmuka jelas bila patch V4-0006 belum diimpor.
+- Admin Referensi CP: baris CP aktif (termasuk yang digunakan TP) menampilkan **Sunting CP**; bila sudah ada draf menampilkan **Lanjut Sunting CP**. Penerbitan tetap melalui pratinjau/draf-versi baru yang telah ada, riwayat CP lama tidak berubah.

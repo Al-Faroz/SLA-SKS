@@ -61,9 +61,12 @@
         <section class="a-bank-soal__kkm" id="pengaturan-kkm" aria-labelledby="judul-pengaturan-kkm">
             <div class="a-bank-soal__kkm-judul">
                 <h3 id="judul-pengaturan-kkm">Pengaturan KKM TP</h3>
-                <span class="a-badge"><?= ($kkm_info['sumber'] ?? '') === 'guru' ? 'Khusus Guru' : (($kkm_info['sumber'] ?? '') === 'admin' ? 'Default Admin' : 'Belum terset') ?></span>
+                <span class="a-badge"><?= match ($kkm_info['sumber'] ?? '') { 'guru' => 'Khusus Guru', 'admin' => 'Mengikuti Admin', 'snapshot' => 'Snapshot TP Siap', default => 'Belum terset' } ?></span>
             </div>
             <p class="a-help">Satu KKM berlaku untuk Diagnostik dan Sumatif pada TP ini. Mengubahnya di salah satu tab otomatis berlaku di tab lainnya.</p>
+            <?php if ($kkm_info['default'] === null && $tp['status'] === 'draf'): ?>
+                <div class="a-alert" role="status">KKM default Admin belum ditetapkan. Guru dapat memasukkan KKM khusus, atau meminta Admin menetapkan default pada menu Pengaturan KKM.</div>
+            <?php endif ?>
             <div class="a-bank-soal__kkm-ringkas">
                 <div><small>Default Admin</small><strong><?= $kkm_info['default'] === null ? 'Belum ditetapkan' : (int) $kkm_info['default'] ?></strong></div>
                 <div><small>Khusus Guru</small><strong><?= $kkm_info['khusus'] === null ? 'Mengikuti Admin' : (int) $kkm_info['khusus'] ?></strong></div>
@@ -81,17 +84,17 @@
                     <input type="hidden" name="jenis" value="<?= esc($jenis_dipilih, 'attr') ?>">
                     <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                     <div class="a-field">
-                        <label class="a-label" for="kkm-khusus">KKM khusus Guru (1–100)</label>
+                        <label class="a-label" for="kkm-khusus">Nilai KKM TP (1–100)</label>
                         <input class="a-input" id="kkm-khusus" name="kkm_khusus" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="Isi nilai 1–100" value="<?= $kkm_info['efektif'] === null ? '' : (int) $kkm_info['efektif'] ?>">
                     </div>
-                    <button type="submit" class="a-btn a-btn--utama" name="pilihan" value="khusus">Simpan KKM Khusus</button>
+                    <button type="submit" class="a-btn a-btn--utama" name="pilihan" value="khusus">Simpan KKM</button>
                     <?php if ($kkm_info['default'] !== null && $kkm_info['khusus'] !== null): ?>
                         <button type="submit" class="a-btn a-btn--sekunder" name="pilihan" value="default">Ikuti Default Admin</button>
                     <?php endif ?>
                 </form>
-                <p class="a-help">Kolom menunjukkan KKM efektif saat ini (default Admin jika belum ada nilai khusus). Klik Simpan KKM Khusus untuk mengganti nilainya, atau Ikuti Default Admin untuk melepas override Guru.</p>
+                <p class="a-help">Nilai otomatis terisi dari default Admin jika tersedia. Bila tidak diubah, TP draf langsung memakai nilai Admin tanpa perlu disimpan. Angka yang sama dengan default tidak menjadi KKM khusus. Guru boleh mengubah dan menyimpan angka berbeda berkali-kali selama TP masih Draf. Kosongkan kolom lalu simpan untuk mengikuti default Admin kembali.</p>
             <?php else: ?>
-                <p class="a-help">TP sudah Siap; KKM telah dikunci di versi konten. Perubahan memerlukan mekanisme koreksi.</p>
+                <p class="a-help">TP sudah Siap dan memakai KKM yang dipin saat penerbitan (<?= (int) $kkm_info['efektif'] ?>). KKM, Materi, serta soal tidak dapat disunting langsung; koreksi akademik harus diajukan kepada Admin dan menerbitkan versi baru tanpa menimpa progres siswa lama.</p>
             <?php endif ?>
         </section>
         <section class="a-soal-daftar" aria-labelledby="judul-daftar-bank">
