@@ -265,7 +265,22 @@ final class CpReferensiService
                         ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
                         ->where('v.cp_id', $id)->countAllResults();
                     if ($terhubung > 0) {
-                        throw new DomainException('Kurikulum atau Mapel CP yang sudah tertaut tidak dapat dialihkan tanpa memutus relasi historis. Identitas ini dipertahankan; redaksi, elemen, dan kode tetap dapat disunting.');
+                        // Identitas CP lama tidak boleh dipindahkan sebab terhubung
+                        // ke cp_mapel dan mungkin sudah menjadi snapshot siswa.
+                        // Buat referensi baru pada pilihan kurikulum/mapel baru;
+                        // yang lama dipertahankan sebagai referensi historis.
+                        $id = $this->buatCp($kurikulumId, $mapelId, $kode, $data);
+                        $baru = $this->db->table('ref_cp_versi')->select('id')
+                            ->where('cp_id', $id)->where('status', 'draf')->get()->getRowArray();
+                        if ($baru === null) {
+                            throw new RuntimeException('Referensi CP baru tidak berhasil dibuat.');
+                        }
+                        $this->terbitkan((int) $baru['id']);
+                        if ($this->db->transStatus() === false) {
+                            throw new RuntimeException('Perubahan CP gagal disimpan.');
+                        }
+                        $this->db->transCommit();
+                        return $id;
                     }
                 }
                 $duplikat = $this->db->table('ref_cp')->where('kurikulum_id', $kurikulumId)
