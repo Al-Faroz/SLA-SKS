@@ -40,6 +40,10 @@ final class SiswaSumatif extends BaseController
 
     private function proses(callable $fn): ResponseInterface
     {
+        if (!$this->desktop()) {
+            return $this->response(['ok' => false,
+                'pesan' => 'Sumatif hanya tersedia melalui desktop/laptop.'], 403);
+        }
         try {
             return $this->response(['ok' => true, 'data' => $fn()]);
         } catch (DomainException $e) {
@@ -53,6 +57,11 @@ final class SiswaSumatif extends BaseController
 
     public function halaman(int $tpId): ResponseInterface|string
     {
+        if (!$this->desktop()) {
+            return $this->response->setStatusCode(403)
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody('Sumatif hanya tersedia di desktop/laptop yang mendukung fullscreen.');
+        }
         try {
             $data = $this->engine()->ruang($tpId);
             $this->response->setHeader('Cache-Control', 'private, no-store')
@@ -106,6 +115,9 @@ final class SiswaSumatif extends BaseController
 
     public function media(int $tpId, string $token, string $jenis, string $id): ResponseInterface
     {
+        if (!$this->desktop()) {
+            return $this->response->setStatusCode(403)->setBody('Sumatif hanya untuk desktop/laptop.');
+        }
         try {
             $file = $this->engine()->gambar($tpId, $token, $jenis, $id);
             return $this->response->setHeader('Content-Type', $file['mime'])
