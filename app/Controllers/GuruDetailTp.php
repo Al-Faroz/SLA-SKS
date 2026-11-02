@@ -70,8 +70,9 @@ final class GuruDetailTp extends BaseController
         $judul = $this->request->getPost('judul');
         $rumusan = $this->request->getPost('rumusan');
         $versi = $this->request->getPost('struktur_versi');
+        $jenisTp = $this->request->getPost('jenis_tp');
 
-        if (! is_string($judul) || ! is_string($rumusan)
+        if (! is_string($judul) || ! is_string($rumusan) || ! is_string($jenisTp)
             || ! is_string($versi)
             || ! ctype_digit($versi) || strlen($versi) > 10
             || (float) $versi > PHP_INT_MAX) {
@@ -80,7 +81,7 @@ final class GuruDetailTp extends BaseController
         }
 
         try {
-            (new DetailTpService())->simpanDraf($id, $judul, $rumusan, (int) $versi);
+            (new DetailTpService())->simpanDraf($id, $judul, $rumusan, (int) $versi, $jenisTp);
         } catch (DomainException $e) {
             return redirect()->to(site_url('guru/tp/' . $id))
                 ->with('galat', $e->getMessage());
