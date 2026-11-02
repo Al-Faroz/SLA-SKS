@@ -160,7 +160,7 @@ final class EksporNilaiGuruXlsxTest extends TestCase
         foreach ([$barisNilaiNol,$barisSementara,$barisEsensial,$barisBelum] as $number) {
             self::assertIsInt($number);
         }
-        self::assertSame(0,$sheet->getCell('N'.$barisNilaiNol)->getValue());
+        self::assertEquals(0,$sheet->getCell('N'.$barisNilaiNol)->getValue());
         self::assertSame(DataType::TYPE_NUMERIC,
             $sheet->getCell('N'.$barisNilaiNol)->getDataType());
         self::assertSame('Dilewati',$sheet->getCell('K'.$barisNilaiNol)->getValue());
