@@ -801,4 +801,49 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame('Teks asli',$k->status(1,31)['resume']['isi']);
     }
 
+    public function testA3GerbangSumatifMembacaBuktiVersiTerpinTanpaMembuatAttempt(): void
+    {
+        $akun = static fn (): array => [
+            'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+        ];
+        $service = new \App\Services\KelayakanSumatifSiswaService($this->db, $akun);
+        // Snapshot legacy dengan dua Materi tidak boleh dinilai siap untuk v2.5.
+        self::assertFalse($service->periksa(1)['siap']);
+
+        $row = $this->db->table('versi_konten_tp')->where('id',3)->get()->getRowArray();
+        $snapshot = json_decode($row['snapshot_json'], true);
+        $snapshot['materi'] = [$snapshot['materi'][0]];
+        $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->db->table('versi_konten_tp')->where('id',3)->update([
+            'snapshot_json'=>$json, 'checksum'=>hash('sha256',$json),
+        ]);
+
+        self::assertFalse($service->periksa(1)['siap']);
+        $key = ['progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3];
+        $this->db->table('progres_materi')->insert($key + [
+            'jenis'=>'pdf','status'=>'media_selesai',
+        ]);
+        self::assertFalse($service->periksa(1)['siap']);
+        $this->db->table('resume_materi')->insert($key + [
+            'status'=>'final','isi'=>'Ringkasan uji',
+        ]);
+        self::assertFalse($service->periksa(1)['siap']);
+        $this->db->table('jawaban_hots_materi')->insert($key + [
+            'status'=>'final','isi'=>'Analisis uji',
+        ]);
+        $akhir = $service->periksa(1);
+        self::assertTrue($akhir['siap']);
+        self::assertSame('belajar',$akhir['jalur']);
+        self::assertSame(1,$this->db->table('progres_tp')
+            ->where('id',11)->where('status','belajar')->countAllResults());
+        self::assertSame(0,$this->db->table('percobaan_ujian')->countAllResults());
+
+        $asing = new \App\Services\KelayakanSumatifSiswaService($this->db,
+            static fn (): array => [
+                'id'=>202,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]);
+        $this->expectException(\DomainException::class);
+        $asing->periksa(1);
+    }
+
 }
