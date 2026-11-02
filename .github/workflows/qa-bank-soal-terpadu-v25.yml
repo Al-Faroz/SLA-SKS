@@ -1,0 +1,56 @@
+name: QA Bank Soal Terpadu v2.5
+
+on:
+  pull_request:
+    paths:
+      - 'app/Controllers/GuruBankSoal.php'
+      - 'app/Controllers/GuruSoal.php'
+      - 'app/Services/KelolaSoalGuruService.php'
+      - 'app/Services/ImporBankSoalService.php'
+      - 'app/Services/PratinjauWordSoalService.php'
+      - 'app/Services/RenderWordSoalService.php'
+      - 'app/Services/RenderRumusWordService.php'
+      - 'app/Services/SoalMediaDriveService.php'
+      - 'app/Services/TemplateWordSoalService.php'
+      - 'app/Views/guru/bank_soal.php'
+      - 'app/Views/guru/soal_form.php'
+      - 'app/Views/guru/review_bank_soal.php'
+      - 'public/assets/js/soal-editor.js'
+      - 'tests/unit/SoalMediaDriveServiceTest.php'
+      - 'tests/unit/RenderRumusWordServiceTest.php'
+      - '.github/workflows/qa-bank-soal-terpadu-v25.yml'
+  workflow_dispatch:
+
+jobs:
+  unit-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, mbstring, zip, intl, gd, fileinfo, pdo_mysql
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP syntax
+        run: |
+          php -l app/Controllers/GuruBankSoal.php
+          php -l app/Controllers/GuruSoal.php
+          php -l app/Services/ImporBankSoalService.php
+          php -l app/Services/RenderRumusWordService.php
+          php -l app/Services/SoalMediaDriveService.php
+          php -l app/Services/RenderWordSoalService.php
+          php -l app/Services/PratinjauWordSoalService.php
+          php -l app/Services/TemplateWordSoalService.php
+          php -l app/Services/KelolaSoalGuruService.php
+          php -l app/Views/guru/detail_tp.php
+          php -l app/Views/guru/bank_soal.php
+          php -l app/Views/guru/soal_form.php
+          php -l app/Views/guru/review_bank_soal.php
+          php -l tests/unit/SoalMediaDriveServiceTest.php
+          php -l tests/unit/RenderRumusWordServiceTest.php
+      - name: JavaScript syntax
+        run: node --check public/assets/js/soal-editor.js
+      - name: Unit test bank soal, media dan MathML
+        run: vendor/bin/phpunit --no-coverage --filter '(SoalMediaDriveServiceTest|RenderRumusWordServiceTest|KelolaSoalGuruTest)' tests/unit
