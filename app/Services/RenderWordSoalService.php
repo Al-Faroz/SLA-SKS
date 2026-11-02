@@ -144,9 +144,8 @@ final class RenderWordSoalService
                     $html .= '<img class="a-word-image" alt="Ilustrasi soal" src="' .
                         htmlspecialchars((string) $src, ENT_QUOTES, 'UTF-8') . '">';
                 }
-            } elseif ($part->localName === 'oMath') {
-                $html .= '<span class="a-word-math" title="Equation Word">' .
-                    htmlspecialchars(trim($xp->evaluate('string(.//*[local-name()="t"])', $part)), ENT_QUOTES, 'UTF-8') . '</span>';
+            } elseif ($part->localName === 'oMath' || $part->localName === 'oMathPara') {
+                $html .= RenderRumusWordService::html($part);
             } else {
                 $html .= self::inline($xp, $zip, $relations, $part, $bytes, $imageSrc);
             }
