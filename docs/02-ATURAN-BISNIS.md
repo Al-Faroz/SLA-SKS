@@ -4,21 +4,21 @@
 
 ## 1. Invarian umum
 1. **Jam server** menjadi sumber kebenaran ujian, penugasan waktu, transaksi dan log; zona Asia/Jakarta.
-2. **Tidak ada penghapusan fisik** atas data siswa, nilai, sertifikat, TP Siap, versi CP/TP dan artefak historis. Penonaktifan/arsip berbeda dengan delete.
+2. **Data historis siswa, nilai, sertifikat dan percobaan tidak boleh dihapus/ditimpa.** CP/BAB serta TP yang belum digunakan siswa boleh disunting oleh pemilik kewenangan. Perlindungan riwayat berbeda dari larangan menyunting seluruh data.
 3. **Satu G1 aktif per Gen–Mapel** untuk seluruh semester Gen tersebut, bukan Guru global per mapel. Setiap Gen mengelola paket/TP/soal/materi sendiri. `created_by` adalah catatan sejarah, bukan sumber izin. Penggantian Guru memindahkan hak operasional hanya untuk Gen–Mapel yang dipilih, tanpa menimpa identitas penilai lama.
-4. **Admin boleh mengelola biodata, referensi CP dan pengaturan**, tetapi tidak langsung mengetik nilai akademik/isi soal/materi milik Guru. Persetujuan koreksi guru dilakukan atas permintaan tersimpan.
+4. **Admin mengelola CP langsung**, kapan pun CP sudah dipakai TP atau siswa, tanpa permohonan, kategori, atau persetujuan tambahan. Admin tidak mengetik nilai akademik atau soal/materi milik Guru.
 5. **Admin tunggal diizinkan.** Larangan setuju permohonan sendiri berlaku ketika akun yang sama berperan sebagai *pengusul Guru* dan *pemutus Admin* untuk permohonan akademik; jangan memaksakan admin kedua untuk pembetulan biodata yang menjadi tugas Admin langsung.
 6. Semua keputusan penting diaudit (pelaku, peran aktif, objek, sebelum/sesudah, alasan, waktu, versi). Audit tidak berarti menambah persetujuan manual yang tidak diwajibkan.
 7. Tidak ada penghapusan nilai/sertifikat atau perubahan PDF sertifikat terdahulu. Koreksi menghasilkan riwayat atau pengganti, bukan menimpa sejarah.
-8. TP Siap tidak berubah dari jalur edit biasa, tidak ditarik kembali ke draf, dan tidak mengubah progres siswa yang sudah dimulai.
+8. **TP Siap tetap boleh disunting langsung oleh Guru G1 jika belum pernah digunakan satu pun siswa.** Sesudah minimal satu siswa mulai menggunakan TP, seluruh konten TP (termasuk KKM, Materi, soal) terkunci terhadap perubahan. Status `siap` sendiri **bukan** alasan mengunci. Pemeriksaan penggunaan berlaku saat membuka dan saat menyimpan. Tidak diperlukan kategori A/B/C atau keputusan Admin untuk perubahan TP yang belum digunakan. Tidak ada jalur koreksi konten TP sesudah digunakan pada keputusan ini.
 9. Setiap perubahan yang menyentuh banyak tabel memakai transaksi database dan pemeriksaan ID/otorisasi di service. Penerbitan sertifikat mengunci satu sertifikat berlaku per siswa/paket.
 10. Teks input akademik disimpan sebagai teks biasa; tampilkan dengan escaping. Tidak membiarkan editor HTML bebas.
 
 ## 2. Batas peran dan persetujuan
 - Staf dapat berperan Admin+Guru, Admin+Pimpinan, Guru+Pimpinan; hak akses hanya peran aktif.
 - Pemilik aplikasi menetapkan **satu Admin cukup untuk operasional**. Manajemen biodata oleh Admin tidak memakai formulir pengajuan dan persetujuan dua Admin.
-- Permohonan koreksi TP Siap atau koreksi nilai yang **diajukan sebagai Guru** memerlukan keputusan Admin; satu `pengguna_id` tidak boleh menyetujui permohonannya sendiri sekalipun berpindah role. Bila benar-benar akun yang sama, sistem menampilkan peringatan keterbatasan persetujuan tanpa mengubah kewenangan administrasi normal.
-- Penelaahan CP dilakukan **langsung oleh Admin** dan tidak memakai reviewer `cp_review` terpisah. Jika usulan CP diajukan Guru yang juga Admin, aturan larangan self-approval akademik tetap diperiksa.
+- **Sunting TP Siap sebelum dipakai siswa dan sunting CP oleh Admin bukan permohonan akademik**, tidak memerlukan kategori, reviewer atau persetujuan. Prosedur koreksi *nilai siswa* (bukan konten TP) tetap mengikuti otorisasi dan auditnya sendiri, termasuk larangan menyetujui usulan nilai sendiri bila mekanisme itu dipakai.
+- **CP disunting langsung oleh Admin**; tidak ada gerbang usulan Guru, reviewer, atau self-approval bagi edit langsung CP. Perubahan dicatat otomatis dan tidak memutasi progres/nilai siswa.
 
 ### Administrasi akun dan profil v2.4
 - Dua menu Admin, **Pengelola** dan **Siswa**, menggunakan satu sistem `pengguna` dan peran aktif yang sudah ada. Akun siswa tidak merangkap role staf.
@@ -34,7 +34,7 @@
 - Diagnostik min 10 adalah gate bukan nilai TP. Sumatif min 30. Nilai gagal Diagnostik 20/20/60 (Resume/HOTS/Sumatif), lulus 100% Sumatif. Admin menentukan KKM default dan Guru dapat menetapkan khusus.
 - Sumatif < KKM memperoleh satu remedial; gunakan nilai tertinggi. Setelah aktivitas dan kesempatan sah terkait selesai, **TP selesai meskipun nilai masih < KKM**. Progres semester hanya TP NonEsensial.
 - Pra-Semester dijadwalkan tanggal/jam oleh Admin secara serentak setelah semua TP NonEsensial selesai; nilai tersendiri. **Tidak ada nilai akhir semester.**
-- Resume/HOTS Simpan Draf manual, Kirim Final, penilaian Guru. TP Siap historis/snapshot tetap dilindungi.
+- Resume/HOTS Simpan Draf manual, Kirim Final, penilaian Guru. TP Siap tanpa penggunaan boleh disunting; begitu ada penggunaan siswa, konten dan snapshot yang digunakannya dilindungi.
 
 ## 4. Keputusan final tentang ujian
 - Profil Ketat sama untuk Diagnostik, Sumatif dan Pra-Semester. PG lima pilihan A–E dengan satu kunci; aturan fullscreen, jeda/insiden, koneksi di dokumen 07.
@@ -51,7 +51,7 @@
 | Domain | Nilai status | Makna |
 |---|---|---|
 | Pengguna | aktif/nonaktif/terkunci | Bisa login, tidak bisa login, ditolak sementara karena kegagalan login |
-| TP | draf/siap | Bisa diedit atau immutable lewat jalur biasa |
+| TP | draf/siap | Draf bisa diedit; Siap juga bisa diedit selama belum pernah digunakan siswa. Status Siap tidak sama dengan terkunci |
 | Progres TP | belum_mulai/diagnostik/belajar/sumatif/perlu_bantuan/tuntas | Proses siswa; transisi harus sesuai prasyarat |
 | Ujian | berjalan/jeda_fullscreen/jeda_koneksi/selesai_sah/dibatalkan_menunggu_guru | Skor hanya pada selesai_sah |
 | Penilaian | belum_dinilai/dinilai/koreksi_diajukan/koreksi_diterapkan | Riwayat menyimpan perubahan |
@@ -68,3 +68,9 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 3. Pra-Semester tanggal serentak Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
 4. Excel ATP **manual** tanpa macro dan tanpa tombol Proses sudah dipilih; penyusunan BAB/TP dilakukan melalui isian langsung pada workbook atau aplikasi, serta divalidasi server saat impor. KBC, izin Gen–Mapel, Word PG A–E tetap.
 
+## 9. Aturan final hak sunting CP, BAB, TP (2 November 2026)
+1. **CP**: Admin boleh memperbaiki isian CP kapan saja tanpa terhalang jumlah BAB/TP/siswa yang telah merujuk. Audit/riwayat sistem boleh dilakukan otomatis; pengguna tidak diminta kategori koreksi atau approval.
+2. **BAB**: Guru G1 boleh memperbaiki isian BAB yang memang sudah tersedia, tanpa mengunci BAB semata karena ada TP berstatus Siap. Penomoran dan hubungan akademik yang sudah berlaku tetap diperiksa; tidak ada fitur baru pemindahan TP antar-BAB.
+3. **TP**: status *Siap* berarti konten telah disiapkan, **bukan** otomatis terkunci. Guru G1 boleh mengubah TP Siap, KKM tunggal, satu Materi, dan soal jika TP tersebut **belum pernah digunakan siswa**. Jika satu saja siswa sudah memulai TP tersebut, konten TP **tidak dapat diubah**, termasuk lewat URL/API/Word/import. Tidak tersedia persetujuan atau jalur koreksi A/B/C untuk menerobos penguncian tersebut.
+4. **Pemeriksaan penggunaan**: server mengecek riwayat progres/aktivitas/percobaan TP terkait dari sumber data sah, pada GET dan ulang secara atomik pada POST. *Melihat TP dalam daftar* atau status `siap` tidak sama dengan mulai menggunakannya. Tidak mereset progres untuk membuka kunci.
+5. **Integritas**: ketika TP Siap yang belum digunakan diubah, data kesiapan dan snapshot konten aktif harus diselaraskan otomatis oleh Service sebelum boleh diakses siswa, tanpa permintaan admin atau tahapan revisi manual. Semua cek/readiness, otorisasi G1, CSRF, transaksi dan audit tetap berlaku; tidak boleh ada kondisi siswa memulai versi yang sedang diperbarui.
