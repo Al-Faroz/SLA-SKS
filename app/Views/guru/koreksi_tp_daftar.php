@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page">
+<div class="a-page a-koreksi-tp">
     <nav class="a-breadcrumb"><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kelola TP</a> / Koreksi TP Siap</nav>
     <header class="a-page__heading"><div><p class="a-proto-eyebrow">Guru · Koreksi akademik</p>
         <h1>Koreksi TP Siap</h1><p class="a-proto-muted"><?= esc($tp['kode_tp'] . ' — ' . $tp['judul']) ?></p></div></header>
