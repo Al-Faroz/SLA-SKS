@@ -38,7 +38,7 @@ final class SuntingTpService
         }
         // Lindungi aktivitas siswa historis yang mungkin belum mempunyai
         // progres_tp, tanpa mengubah ataupun membersihkan data tersebut.
-        foreach (['progres_materi', 'resume_materi', 'tugas_hots_materi'] as $tabel) {
+        foreach (['progres_materi', 'resume_materi', 'jawaban_hots_materi'] as $tabel) {
             if ($this->db->tableExists($tabel) && $this->db->fieldExists('materi_id', $tabel)
                 && $this->db->table($tabel . ' aktivitas')
                     ->join('materi m', 'm.id=aktivitas.materi_id')
