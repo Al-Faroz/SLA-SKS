@@ -81,6 +81,10 @@ final class SiswaPembelajaran extends BaseController
             $data['progres'] = (new ProgresTpSiswaService())->status($tpId);
             $data['kesiapanSumatif'] = null;
             $data['nilaiTp'] = null;
+            $data['aksesUlang'] = null;
+            if ($data['progres'] !== null && $data['progres']['status'] === 'perlu_bantuan') {
+                $data['aksesUlang'] = (new \App\Services\PermintaanAksesUlangSiswaService())->kebutuhan($tpId);
+            }
             if ($data['progres'] !== null
                 && in_array($data['progres']['status'], ['belajar', 'sumatif', 'tuntas'], true)) {
                 // Data berasal dari snapshot terpin, bukan versi live milik Guru.
