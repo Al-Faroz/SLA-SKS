@@ -9,6 +9,8 @@ MTs Fase D · LMS CodeIgniter 4 · Admin, Guru, Siswa, Pimpinan · 6 semester.
 
 **Setiap TP Esensial maupun NonEsensial wajib disiapkan Guru dengan tepat satu Materi dan media lengkap.** Jenis TP hanya menentukan kewajiban dan akses **siswa** di alur pembelajaran; TP Esensial tidak dihitung pada nilai/progres sesuai aturan siswa saat ini. Diagnostik minimal 10 soal adalah gerbang: lulus boleh melewati Materi, Resume, HOTS; yang tidak lulus wajib Materi→Resume→HOTS. **Keduanya wajib Sumatif minimal 30 soal**. Nilai jalur gagal Diagnostik = 20% Resume +20% HOTS +60% Sumatif; jalur lulus = 100% Sumatif. KKM default Admin/khusus Guru; Sumatif < KKM mendapat satu remedial, skor tertinggi dipakai, TP tetap selesai walau di bawah KKM.
 
+**Koreksi final 2 November 2026:** Tes Diagnostik/Sumatif TP bersifat mandiri; bila gagal selesai, siswa meminta izin akses ulang kepada Guru untuk tahap yang sama (bukan pembatalan/remedial). Pembatalan khusus Pra-Semester. Remedial Sumatif tetap satu kali sesudah tes awal sah di bawah KKM; skor tertinggi, TP tetap Selesai meskipun belum mencapai KKM. Lihat Master 02/06/07/08/16.
+
 Progres semester hanya TP NonEsensial. **Pra-Semester** setelah seluruh TP NonEsensial selesai, mengikuti tanggal/jam serentak Admin, soal gabungan seluruh BAB satu semester, pola Sumatif. **Tidak ada nilai akhir semester.** Guru dapat ekspor semua nilai TP + Pra-Semester seluruh siswa Gen–Mapel sejak satu nilai pun tersedia.
 
 ## Dokumen dan perubahan
