@@ -49,7 +49,11 @@
         let decoded;
         try { decoded = await response.json(); }
         catch (_) { throw new Error('Koneksi atau sesi gagal. Muat ulang ruang ujian jika diperlukan.'); }
-        if (typeof decoded.csrf === 'string') csrf = decoded.csrf;
+        if (typeof decoded.csrf === 'string') {
+            csrf = decoded.csrf;
+            const permintaanCsrf = $('[data-ujian-akses-ulang] input[name="' + csrfName + '"]');
+            if (permintaanCsrf) permintaanCsrf.value = csrf;
+        }
         if (!response.ok || !decoded.ok) throw new Error(decoded.pesan || 'Permintaan tidak diterima server.');
         return decoded.data;
     }
