@@ -320,7 +320,16 @@ final class KoreksiTpService
     /** Pratinjau media dari salinan koreksi tanpa mengakses file lewat URL publik. */
     public function mediaGuru(int $id): array
     {
-        $row = $this->lihatGuru($id);
+        return $this->mediaDariUsulan($this->lihatGuru($id));
+    }
+
+    public function mediaAdmin(int $id): array
+    {
+        return $this->mediaDariUsulan($this->lihatAdmin($id));
+    }
+
+    private function mediaDariUsulan(array $row): array
+    {
         $m = $row['usulan']['materi'][0] ?? null;
         if (!is_array($m) || !in_array($m['jenis'], ['pdf','audio','gambar'], true)
             || (int) ($m['berkas_id'] ?? 0) < 1) {
