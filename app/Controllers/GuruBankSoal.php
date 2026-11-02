@@ -74,9 +74,11 @@ final class GuruBankSoal extends BaseController
             $jenis = 'diagnostik';
         }
         $url = site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis) . '#pengaturan-kkm';
-        $raw = $this->request->getPost('kkm_khusus');
+        $pilihan = $this->request->getPost('pilihan');
+        $raw = $pilihan === 'default' ? '' : $this->request->getPost('kkm_khusus');
         $versi = $this->request->getPost('struktur_versi');
-        if (!is_string($raw) || !is_string($versi)
+        if (!in_array($pilihan, ['khusus', 'default'], true)
+            || !is_string($raw) || !is_string($versi)
             || !ctype_digit($versi) || (int) $versi < 1 || strlen($versi) > 10) {
             return redirect()->to($url)->with('kkm_galat', 'Isi KKM dan versi TP tidak valid.');
         }
