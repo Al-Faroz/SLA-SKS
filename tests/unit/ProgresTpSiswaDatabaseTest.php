@@ -130,6 +130,7 @@ final class ProgresTpSiswaDatabaseTest extends TestCase
     public function testAktivasiSiswaLangsungMengunciEditorGuruTanpaMengubahSnapshot(): void
     {
         $pengunci = new \App\Services\SuntingTpService($this->db);
+        $jumlahVersiSebelum = $this->db->table('versi_konten_tp')->countAllResults();
         $pengunci->pastikanBelumDipakai(1);
         $awal = $this->layanan(101)->mulai(1);
         self::assertSame(1, $this->db->table('progres_tp')->countAllResults());
@@ -140,7 +141,7 @@ final class ProgresTpSiswaDatabaseTest extends TestCase
         } catch (\DomainException $e) {
             self::assertStringContainsString('digunakan siswa', $e->getMessage());
         }
-        self::assertSame(1, $this->db->table('versi_konten_tp')->countAllResults());
+        self::assertSame($jumlahVersiSebelum, $this->db->table('versi_konten_tp')->countAllResults());
     }
 
     public function testGenLainDitolakTanpaMembuatProgres(): void
