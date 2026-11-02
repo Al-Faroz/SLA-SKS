@@ -14,6 +14,32 @@ use ZipArchive;
 
 final class ReviewWordSoalTest extends TestCase
 {
+    /**
+     * Fixture historis memakai 1 soal, sedangkan validator final memerlukan
+     * 10 Diagnostik / 30 Sumatif. Lengkapi slot lainnya di DOCX uji saja.
+     */
+    private static function isiSlotSisanya(DOMXPath $xp, int $jumlah): void
+    {
+        $rows = $xp->query('//w:body/w:tbl[1]/w:tr');
+        self::assertNotFalse($rows);
+        for ($n = 2; $n <= $jumlah; $n++) {
+            for ($i = 0; $i < 6; $i++) {
+                $row = $rows->item(1 + (($n - 1) * 6) + $i);
+                self::assertNotNull($row);
+                $cells = $xp->query('./w:tc', $row);
+                self::assertNotFalse($cells);
+                $teks = $xp->query('.//w:t', $cells->item(1))->item(0);
+                self::assertNotNull($teks);
+                $teks->nodeValue = $i === 0 ? 'Pertanyaan uji nomor ' . $n : 'Pilihan ' . $i . ' soal ' . $n;
+                if ($i === 1) {
+                    $kunci = $xp->query('.//w:t', $cells->item(2))->item(0);
+                    self::assertNotNull($kunci);
+                    $kunci->nodeValue = '✓';
+                }
+            }
+        }
+    }
+
     public function testValidasiDanReviewMempertahankanTabelBersarang(): void
     {
         $data = TemplateWordSoalService::buat([
@@ -21,7 +47,7 @@ final class ReviewWordSoalTest extends TestCase
             'struktur_versi' => 1, 'gen' => 'Gen QA', 'guru' => 'Guru QA',
             'mapel' => 'SKI', 'kurikulum' => 'KBC', 'semester' => '4',
             'kode_tp' => 'TP-QA-01', 'judul_tp' => 'Uji review',
-        ], 'diagnostik', 1, str_repeat('x', 32));
+        ], 'diagnostik', 10, str_repeat('x', 32));
 
         $file = tempnam(sys_get_temp_dir(), 'qa-word-');
         self::assertNotFalse($file);
@@ -62,11 +88,12 @@ final class ReviewWordSoalTest extends TestCase
                     $cells->item(1)->appendChild($tbl);
                 }
             }
+            self::isiSlotSisanya($xp, 10);
             self::assertTrue($zip->addFromString('word/document.xml', $doc->saveXML()));
             self::assertTrue($zip->close());
 
             $hasil = PratinjauWordSoalService::periksa($file, 11, 33, 22, 1, 'diagnostik', str_repeat('x', 32));
-            self::assertSame(1, $hasil['jumlah']);
+            self::assertSame(10, $hasil['jumlah']);
             self::assertSame('B', $hasil['soal'][0]['kunci']);
             self::assertSame(1, $hasil['soal'][0]['konten']['tabel']);
             $html = RenderWordSoalService::hasil($file, $hasil);
@@ -84,7 +111,7 @@ final class ReviewWordSoalTest extends TestCase
             'struktur_versi' => 1, 'gen' => 'Gen QA', 'guru' => 'Guru QA',
             'mapel' => 'SKI', 'kurikulum' => 'KBC', 'semester' => '4',
             'kode_tp' => 'TP-QA-01', 'judul_tp' => 'Periksa tabel',
-        ], 'sumatif', 1, str_repeat('x', 32));
+        ], 'sumatif', 30, str_repeat('x', 32));
         $file = tempnam(sys_get_temp_dir(), 'qa-save-word-');
         self::assertNotFalse($file);
         file_put_contents($file, $data);
@@ -104,6 +131,7 @@ final class ReviewWordSoalTest extends TestCase
                     $xp->query('.//w:t', $cells->item(2))->item(0)->nodeValue = '✓';
                 }
             }
+            self::isiSlotSisanya($xp, 30);
             self::assertTrue($zip->addFromString('word/document.xml', $doc->saveXML()));
             // Mensimulasikan Microsoft Word menyimpan ulang dokumen dan
             // membuang part customXml yang tidak diregistrasikan generator lama.
@@ -113,7 +141,7 @@ final class ReviewWordSoalTest extends TestCase
             $parsed = PratinjauWordSoalService::periksa(
                 $file, 11, 33, 22, 1, 'sumatif', str_repeat('x', 32), 'TP-QA-01'
             );
-            self::assertSame(1, $parsed['jumlah']);
+            self::assertSame(30, $parsed['jumlah']);
             self::assertSame('A', $parsed['soal'][0]['kunci']);
             self::assertSame('identitas_terlihat', $parsed['pemeriksaan_identitas']);
         } finally {
