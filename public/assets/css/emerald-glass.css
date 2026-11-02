@@ -1704,6 +1704,10 @@ html[data-theme][data-documentation="on"] .a-app--prototipe .a-atp-kelompok::bef
   content:none;
   display:none;
 }
+/* Toolbar debug CI4 yang fixed bukan bagian dari tutorial. */
+html[data-documentation="on"] :is(#debugbar,#debugbarToggle,#debugbar-toolbar) {
+  display:none !important;
+}
 html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi {
   border-color:var(--e-primary);
   color:var(--e-text);
