@@ -73,7 +73,7 @@ final class KkmTpService
         return [
             'default' => $default,
             'khusus' => $khusus,
-            'efektif' => $khusus ?? $default,
+            'efektif' => self::pilihEfektif($default, $khusus),
             'sumber' => $khusus !== null ? 'guru' : ($default !== null ? 'admin' : 'belum_tersedia'),
         ];
     }
@@ -90,6 +90,12 @@ final class KkmTpService
         return (int) $akun['id'];
     }
 
+    /** Pilih angka efektif tanpa fallback ke tp.kkm historis. */
+    public static function pilihEfektif(?int $default, ?int $khusus): ?int
+    {
+        return $khusus ?? $default;
+    }
+
     /** KKM Guru opsional, versi TP naik agar review/publikasi lama tidak dapat dipakai lagi. */
     public function simpanKhusus(int $tpId, ?string $raw, int $versi): void
     {
@@ -101,16 +107,17 @@ final class KkmTpService
         $this->db->transBegin();
         try {
             $lock = $this->db->query(
-                'SELECT id,status,struktur_versi,kkm_khusus FROM tp WHERE id=? FOR UPDATE', [$tpId]
+                'SELECT id,status,jenis_tp,struktur_versi,kkm_khusus FROM tp WHERE id=? FOR UPDATE', [$tpId]
             )->getRowArray();
             if ($lock === null || $lock['status'] !== 'draf'
+                || $lock['jenis_tp'] !== 'non_esensial'
                 || (int) $lock['struktur_versi'] !== $versi) {
                 throw new DomainException('TP sudah Siap atau telah berubah. Muat ulang halaman.');
             }
             // Service memeriksa G1 langsung dari hubungan Gen–Mapel paket.
             (new DetailTpService($this->db, $this->akunSaatIni))->lihat($tpId);
             $default = $this->defaultAdmin();
-            $efektif = $nilai ?? $default;
+            $efektif = self::pilihEfektif($default, $nilai);
             if ($efektif === null) {
                 throw new DomainException('KKM default Admin belum ditetapkan. Isi KKM khusus Guru terlebih dahulu.');
             }
