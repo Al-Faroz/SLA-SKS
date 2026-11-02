@@ -99,6 +99,11 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
         self::assertFalse($semester['semester'][4]['buka']);
         $tp = $layanan->daftarTp(1);
         self::assertCount(2, $tp['tp']);
+        self::assertCount(1, $tp['bab']);
+        self::assertSame('BAB Contoh 1', $tp['bab'][0]['nama']);
+        self::assertCount(2, $tp['bab'][0]['tp']);
+        self::assertSame([1, 2], array_map(static fn (array $item): int => (int) $item['id'],
+            $tp['bab'][0]['tp']));
         self::assertTrue($tp['tp'][0]['akses']['buka']);
         self::assertFalse($tp['tp'][1]['akses']['buka']);
         $rincian = $layanan->rincianTp(1);
