@@ -15,41 +15,52 @@
             <p class="a-proto-muted"><?= esc($tp['kode_tp'] . ' — ' . $tp['judul']) ?></p>
         </div>
     </header>
-    <section class="a-card" aria-labelledby="bank-soal-status">
-        <h2 id="bank-soal-status">Ketersediaan bank soal</h2>
-        <p class="a-help">Satu halaman untuk Diagnostik dan Sumatif. Pilih tab untuk menambah, menyunting, mengimpor, dan meninjau soal. Jumlah minimal: 10 Diagnostik dan 30 Sumatif.</p>
-        <?php if ($pesan = session()->getFlashdata('soal_galat') ?? session()->getFlashdata('word_galat')): ?>
-            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
-        <?php endif ?>
-        <?php if ($pesan = session()->getFlashdata('soal_sukses') ?? session()->getFlashdata('word_sukses')): ?>
-            <div class="a-alert" role="status"><?= esc($pesan) ?></div>
-        <?php endif ?>
-        <div class="a-tabel-gulir">
-            <table class="a-tbl a-tbl--cards">
-                <thead><tr><th scope="col">Jenis ujian</th><th scope="col">Soal aktif</th><th scope="col">Jumlah tayang</th><th scope="col">Status jumlah</th></tr></thead>
-                <tbody>
-                    <?php foreach ($ringkasan_bank as $jenis => $data): ?>
-                        <tr>
-                            <th scope="row" data-label="Jenis ujian"><?= esc(ucfirst($jenis)) ?></th>
-                            <td data-label="Soal aktif"><?= (int) $data['aktif'] ?></td>
-                            <td data-label="Jumlah tayang"><?= (int) $data['target'] ?></td>
-                            <td data-label="Status jumlah"><?= $data['memadai'] ? 'Jumlah mencukupi' : 'Belum mencukupi' ?></td>
-                        </tr>
-                    <?php endforeach ?>
-                </tbody>
-            </table>
+    <section class="a-card a-bank-soal__ringkasan" aria-labelledby="bank-soal-status">
+        <h2 id="bank-soal-status">Ketersediaan Bank Soal</h2>
+        <p class="a-help">Ringkasan untuk kedua jenis ujian pada TP ini. Jumlah soal aktif diperiksa terpisah dari kelengkapan isi, kunci, dan media.</p>
+        <div class="a-bank-soal__ringkasan-grid">
+            <?php foreach ($ringkasan_bank as $jenis => $data): ?>
+                <article class="a-bank-soal__ringkasan-item">
+                    <div class="a-bank-soal__ringkasan-atas">
+                        <h3><?= esc(ucfirst($jenis)) ?></h3>
+                        <span class="a-bank-soal__status <?= $data['memadai'] ? 'is-cukup' : 'is-kurang' ?>">
+                            <?= $data['memadai'] ? 'Jumlah mencukupi' : 'Belum mencukupi' ?>
+                        </span>
+                    </div>
+                    <p class="a-bank-soal__angka"><strong><?= (int) $data['aktif'] ?></strong> <span>soal aktif</span></p>
+                    <dl class="a-bank-soal__rincian">
+                        <div><dt>Minimal</dt><dd><?= (int) $data['minimal'] ?> soal</dd></div>
+                        <div><dt>Jumlah tayang</dt><dd><?= (int) $data['target'] ?> soal</dd></div>
+                    </dl>
+                </article>
+            <?php endforeach ?>
         </div>
-        <p class="a-help">Jumlah yang mencukupi belum berarti soal siap dipublikasikan: isi soal, opsi A–E, kunci dan aset tetap harus diperiksa.</p>
+        <p class="a-help">Status di atas hanya menunjukkan kecukupan jumlah soal. Pemeriksaan final konten dilakukan saat TP akan dijadikan Siap.</p>
+    </section>
+
+    <section class="a-card a-bank-soal__workspace a-jarak-atas" aria-labelledby="judul-kelola-bank">
+        <h2 id="judul-kelola-bank">Bank Soal</h2>
+        <p class="a-help">Pilih tab jenis ujian untuk mengelola soal. Semua daftar, formulir dan riwayat di bawah mengikuti tab yang sedang aktif.</p>
+        <nav class="a-bank-soal__tabs" aria-label="Jenis bank soal">
+            <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenisTab => $namaTab): ?>
+                <a href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenisTab), 'attr') ?>"
+                    class="a-bank-soal__tab <?= $jenis_dipilih === $jenisTab ? 'is-aktif' : '' ?>"
+                    <?= $jenis_dipilih === $jenisTab ? 'aria-current="page"' : '' ?>>
+                    <strong><?= esc($namaTab) ?></strong>
+                    <span><?= (int) ($ringkasan_bank[$jenisTab]['aktif'] ?? 0) ?> soal aktif</span>
+                </a>
+            <?php endforeach ?>
+        </nav>
+        <div class="a-bank-soal__tab-konten">
+            <?php if ($pesan = session()->getFlashdata('soal_galat') ?? session()->getFlashdata('word_galat')): ?>
+                <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+            <?php endif ?>
+            <?php if ($pesan = session()->getFlashdata('soal_sukses') ?? session()->getFlashdata('word_sukses')): ?>
+                <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+            <?php endif ?>
         <section class="a-soal-daftar" aria-labelledby="judul-daftar-bank">
             <h3 id="judul-daftar-bank">Bank <?= esc(ucfirst($jenis_dipilih)) ?></h3>
             <p class="a-help">Jumlah tersimpan: <?= (int) $total_soal ?> soal (aktif maupun nonaktif). Pilih cara menyiapkan soal: satu per satu di aplikasi atau melalui Word.</p>
-            <nav class="a-soal-tabs" aria-label="Jenis bank soal">
-                <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenisTab => $namaTab): ?>
-                    <a href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenisTab), 'attr') ?>"
-                        class="a-btn a-btn--sekunder <?= $jenis_dipilih === $jenisTab ? 'is-aktif' : '' ?>"
-                        <?= $jenis_dipilih === $jenisTab ? 'aria-current="page"' : '' ?>><?= esc($namaTab) ?></a>
-                <?php endforeach ?>
-            </nav>
             <?php if ($tp['status'] === 'draf'): ?>
                 <a class="a-btn a-btn--utama a-jarak-atas"
                     href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/soal/' . $jenis_dipilih . '/baru'), 'attr') ?>">
@@ -166,7 +177,8 @@
                 </table>
             </div>
         <?php endif ?>
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke Rincian TP</a>
+        </div>
+        <a class="a-btn a-btn--sekunder a-jarak-atas" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke Rincian TP</a>
     </section>
 </div>
 <?= $this->endSection() ?>
