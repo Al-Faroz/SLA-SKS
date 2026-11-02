@@ -1747,8 +1747,20 @@ html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi:
 @media print {
   /* Print/PDF memakai aliran yang sama; kontrol interaktif tidak dicetak. */
   html[data-theme] .a-app--prototipe {
+    --e-text:#19382D;
+    --e-muted:#526E61;
+    --e-border:#CCDDD3;
+    --e-primary:#126B50;
+    --e-soft:#E8F4EC;
+    --e-surface:#FFFFFF;
+    --eg-table:#FFFFFF;
+    --eg-table-head:#E6F2EA;
+    --eg-table-row:#FFFFFF;
+    --eg-table-alt:#F4FAF6;
+    --eg-table-label:#235443;
     display:block !important;
     background:#fff !important;
+    color:#19382D !important;
   }
   html[data-theme] .a-app--prototipe :is(.a-side,.a-backdrop,.a-header) {
     display:none !important;
