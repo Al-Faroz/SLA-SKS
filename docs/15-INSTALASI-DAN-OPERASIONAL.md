@@ -90,3 +90,10 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 4. **Jangan mengalihkan `.env` ke v4 selama kode MVC/Service/UI masih kontrak lama.** Sesudah penerapan kode v2.5 dan QA, pemilik dapat memilih DB v4 lokal dan menjalankan pengujian. URL `http://localhost/sla-sks/`/root index.php tidak berubah.
 5. MySQL lokal dan MariaDB hosting **perlu dua tes terpisah**; belum ada deployment hosting sehingga jangan menyatakan lolos di sana. Dump PII/backup/hash tidak dipush GitHub.
 6. Template ATP Excel **manual tanpa macro** sudah dibuat sebagai berkas lokal; pemasukan template ke `docs/`, generator/validator impor, dan implementasi aplikasi dijadwalkan setelah fondasi dokumen/DB ini.
+
+
+## Catatan transisi keputusan edit CP/BAB/TP (2 November 2026)
+- Revisi 16 Master Document ini **dokumentasi aturan bisnis**, bukan SQL atau patch program; tidak ada alasan mengubah `.env`, konfigurasi localhost, root `index.php`/`.htaccess`, atau data XAMPP hanya untuk menyimpan dokumen.
+- Jalur kategori A/B/C/approval untuk TP Siap pada branch fitur terdahulu **dibatalkan**. **Jangan impor `V4-0006_KOREKSI_TP_SIAP.sql`** untuk menerapkan aturan baru. Jika sudah pernah diimpor pengguna, jangan hapus tabel tanpa dump terbaru, backup dan izin eksplisit.
+- Implementasi form CP **tepat lima field** mungkin perlu pembaruan validasi/SQL untuk membuat metadata lama tidak wajib; audit dump privat XAMPP terbaru terlebih dahulu. Bila skema harus berubah, sediakan patch SQL incremental yang kompatibel MySQL/MariaDB; tidak memakai Migration/Seeder.
+- Setiap implementasi cek G1, status penggunaan siswa, atomisitas penyimpanan/snapshot, akses berkas privat, regresi Word dan pengujian XAMPP sebelum merge.
