@@ -143,6 +143,16 @@ final class KeputusanUjianBatalService
                 || (int) $p['versi_konten_tp_id'] !== (int) $ujian['versi_konten_tp_id']) {
                 throw new DomainException('Percobaan sudah berubah atau snapshot tidak sesuai.');
             }
+            // Otorisasi G1 diperiksa ulang dan dikunci menjelang commit,
+            // sehingga pergantian pengampu tidak menghasilkan keputusan lama.
+            $g1 = $this->db->query(
+                'SELECT guru_id FROM penugasan_guru_gen WHERE angkatan_id=?'
+                . ' AND mapel_id=?' . $lock,
+                [(int) $row['angkatan_id'], (int) $row['mapel_id']]
+            )->getRowArray();
+            if (!$g1 || (int) $g1['guru_id'] !== $guruId) {
+                throw new DomainException('Penugasan Guru sudah berubah. Muat ulang halaman.');
+            }
             $latest = $this->db->table('percobaan_ujian')
                 ->select('id')->where('progres_tp_id', (int) $p['id'])
                 ->where('jenis', $ujian['jenis'])->where('tahap', $ujian['tahap'])
