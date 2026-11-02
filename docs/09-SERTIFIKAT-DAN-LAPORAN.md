@@ -27,3 +27,7 @@ Sertifikat awal terbit menyimpan snapshot isi, template background/logo/TTD dan 
 - Log ujian, aktivitas, persetujuan, revisi, dan pengumuman tetap berizin sesuai peran, audit, dan privasi.
 
 Semua tampilan termasuk Pimpinan dibatasi pembacaan yang diizinkan; data nilai antargen tidak tercampur.
+
+
+## Perlindungan laporan/sertifikat pada penyuntingan akademik (2 November 2026)
+Penyuntingan CP oleh Admin dan isian BAB oleh Guru bukan tindakan menerbitkan/mencabut sertifikat atau menghitung ulang nilai. TP Siap hanya dapat disunting Guru G1 sebelum digunakan siswa; sesudah ada aktivitas siswa, konten TP terkunci. Seluruh riwayat nilai, PDF sertifikat dan QR yang sudah ada tetap dilindungi. Keputusan ini **tidak menambahkan mekanisme koreksi sertifikat baru**.
