@@ -110,6 +110,9 @@ final class PratinjauWordSoalService
                     }
                     $cell = $cells->item(1);
                     $isi = trim(self::teks($xp, $cell));
+                    // Google Drive adalah media eksternal yang dibolehkan,
+                    // tetapi bentuk URL-nya harus menunjuk satu file HTTPS.
+                    SoalMediaDriveService::tautan($isi);
                     if ($isi === '' && self::jumlah($xp, './/*[local-name()="drawing" or local-name()="pict" or local-name()="oMath" or local-name()="tbl"]', $cell) === 0) {
                         throw new DomainException('Soal ' . ($i + 1) . ': ' . $expected . ' masih kosong.');
                     }
