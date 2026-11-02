@@ -14,6 +14,7 @@ use App\Services\PratinjauWordSoalService;
 use App\Services\RenderWordSoalService;
 use App\Services\ImporBankSoalService;
 use App\Services\KelolaSoalGuruService;
+use App\Services\KkmTpService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 
@@ -56,6 +57,7 @@ final class GuruBankSoal extends BaseController
             'peranAktif' => 'Guru',
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'ringkasan_bank' => $ringkasan,
+            'kkm_info' => (new KkmTpService())->informasi($rincian['tp']),
             'word_riwayat' => $riwayat,
             'jenis_dipilih' => $jenisDipilih,
             'daftar_soal' => $daftarSoal,
@@ -64,6 +66,31 @@ final class GuruBankSoal extends BaseController
             'jumlah_halaman' => $jumlahHalaman,
         ]));
     }
+    /** POST: nilai khusus Guru berlaku untuk kedua tab bank pada TP ini. */
+    public function simpanKkm(int $tpId): ResponseInterface
+    {
+        $jenis = (string) ($this->request->getPost('jenis') ?? 'diagnostik');
+        if (!in_array($jenis, ['diagnostik', 'sumatif'], true)) {
+            $jenis = 'diagnostik';
+        }
+        $url = site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis) . '#pengaturan-kkm';
+        $raw = $this->request->getPost('kkm_khusus');
+        $versi = $this->request->getPost('struktur_versi');
+        if (!is_string($raw) || !is_string($versi)
+            || !ctype_digit($versi) || (int) $versi < 1 || strlen($versi) > 10) {
+            return redirect()->to($url)->with('kkm_galat', 'Isi KKM dan versi TP tidak valid.');
+        }
+        try {
+            (new KkmTpService())->simpanKhusus($tpId, $raw, (int) $versi);
+        } catch (DomainException $e) {
+            return redirect()->to($url)->with('kkm_galat', $e->getMessage());
+        } catch (\\Throwable $e) {
+            log_message('error', 'Simpan KKM TP {tpId} gagal: {reason}', ['tpId' => $tpId, 'reason' => $e->getMessage()]);
+            return redirect()->to($url)->with('kkm_galat', 'KKM belum dapat disimpan. Silakan coba kembali.');
+        }
+        return redirect()->to($url)->with('kkm_sukses', 'KKM TP berhasil disimpan. Berlaku untuk Diagnostik dan Sumatif.');
+    }
+
     public function unduh(int $tpId, string $jenis): ResponseInterface
     {
         try {
