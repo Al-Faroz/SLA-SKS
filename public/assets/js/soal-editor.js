@@ -7,6 +7,11 @@
     const status = document.getElementById('status-gambar-soal');
     const script = document.currentScript;
     const uploadUrl = script?.dataset.uploadUrl || '';
+    const previewUrl = script?.dataset.previewUrl || '';
+    const csrfInput = () => form.querySelector('input[type="hidden"][name]:not([name="versi"]):not([name="jenis"]):not([name="soal_id"])');
+    const syncEditors = () => {
+        syncEditors();
+    };
     const editors = new Map();
     let uploadsActive = 0;
 
@@ -26,7 +31,7 @@
             status.textContent = 'Pilih satu gambar PNG/JPEG maksimal 2 MB.';
             return;
         }
-        const csrf = form.querySelector('input[type="hidden"][name]:not([name="versi"])');
+        const csrf = csrfInput();
         const payload = new FormData();
         payload.append('gambar', file);
         if (csrf) payload.append(csrf.name, csrf.value);
@@ -120,5 +125,78 @@
             if (textarea) textarea.value = instance.$.html.get();
         });
     });
+
+    // HTML pratinjau datang dari sanitizer server yang sama dengan simpan soal.
+    const previewButton = document.getElementById('pratinjau-soal');
+    const previewPanel = document.getElementById('hasil-pratinjau-soal');
+    const previewContents = document.getElementById('pratinjau-soal-isi');
+    if (previewButton && previewPanel && previewContents && previewUrl) {
+        previewButton.addEventListener('click', async () => {
+            if (uploadsActive > 0) {
+                status.textContent = 'Selesaikan unggahan gambar sebelum pratinjau.';
+                return;
+            }
+            syncEditors();
+            previewButton.disabled = true;
+            previewButton.textContent = 'Memeriksa soal...';
+            previewPanel.hidden = true;
+            status.textContent = 'Menyiapkan pratinjau...';
+            try {
+                const response = await fetch(previewUrl, {
+                    method: 'POST', body: new FormData(form), credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const result = await response.json();
+                const csrf = csrfInput();
+                if (csrf && result.csrfHash) {
+                    csrf.value = result.csrfHash;
+                    if (result.csrfName) csrf.name = result.csrfName;
+                }
+                if (!response.ok || !result.pertanyaan || !result.opsi) {
+                    throw new Error(result.errorMessage || 'Periksa isi soal dan koneksi.');
+                }
+                previewContents.replaceChildren();
+                const question = document.createElement('div');
+                question.className = 'a-word-preview';
+                question.innerHTML = result.pertanyaan;
+                previewContents.appendChild(question);
+
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'a-tabel-gulir a-jarak-atas';
+                const table = document.createElement('table');
+                table.className = 'a-tbl';
+                const tbody = document.createElement('tbody');
+                ['A', 'B', 'C', 'D', 'E'].forEach((letter) => {
+                    const tr = document.createElement('tr');
+                    const th = document.createElement('th');
+                    th.scope = 'row';
+                    th.textContent = letter;
+                    const td = document.createElement('td');
+                    const content = document.createElement('div');
+                    content.className = 'a-word-preview';
+                    content.innerHTML = result.opsi[letter] || '';
+                    td.appendChild(content);
+                    const answer = document.createElement('td');
+                    answer.textContent = result.kunci === letter ? '✓ Jawaban benar' : '—';
+                    tr.append(th, td, answer);
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                tableContainer.appendChild(table);
+                previewContents.appendChild(tableContainer);
+                previewPanel.hidden = false;
+                status.textContent = 'Pratinjau siap. Periksa lalu klik Simpan Soal jika sudah benar.';
+                previewPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                status.textContent = error.message || 'Pratinjau tidak dapat ditampilkan.';
+            } finally {
+                previewButton.disabled = false;
+                previewButton.textContent = 'Pratinjau Soal';
+            }
+        });
+        form.addEventListener('input', () => {
+            if (!previewPanel.hidden) previewPanel.hidden = true;
+        });
+    }
 
 })();
