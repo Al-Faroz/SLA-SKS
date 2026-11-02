@@ -77,15 +77,15 @@
             <p class="a-help">Penyebab tes tidak selesai: <?= esc((string) ($pilih['alasan_batal'] ?: 'Insiden ujian Ketat.')) ?></p>
             <p class="a-help">Waktu akhir: <?= esc((string) ($pilih['waktu_selesai'] ?? 'Belum tercatat')) ?> UTC.</p>
             <div class="a-alert" role="status">Tes mandiri ini tidak selesai dan tidak memperoleh skor sah.
-                Keputusan ulang tidak mengubah skor, butir atau jawaban historis.</div>
+                Izin akses ulang tidak mengubah skor, butir atau jawaban historis.</div>
 
             <?php $sudah = $pilih['keputusan']; ?>
             <?php if ($sudah !== null && $sudah['keputusan'] !== 'tunda_tinjauan'): ?>
                 <p class="a-alert" role="status">
-                    Keputusan tersimpan: <strong><?= esc(str_replace('_', ' ', (string) $sudah['keputusan'])) ?></strong>.
+                    Izin tersimpan: <strong><?= esc(str_replace('_', ' ', (string) $sudah['keputusan'])) ?></strong>.
                     Izin digunakan: <?= $sudah['digunakan_pada'] === null
                         ? 'Belum' : esc((string) $sudah['digunakan_pada']) . ' UTC' ?>.
-                    Keputusan final tidak dapat diubah melalui halaman ini.
+                    Izin ini tidak dapat diubah melalui halaman ini.
                 </p>
             <?php else: ?>
                 <?php if ($sudah !== null): ?>
@@ -93,12 +93,12 @@
                         <strong>Ulang Sumatif</strong> setelah pemeriksaan.</div>
                 <?php endif ?>
                 <form method="post" class="a-form a-form-penilaian"
-                    action="<?= esc(site_url('guru/ujian-batal/' . (int) $pilih['id']), 'attr') ?>">
+                    action="<?= esc(site_url('guru/akses-ulang/' . (int) $pilih['id']), 'attr') ?>">
                     <?= csrf_field() ?>
                     <div class="a-field">
                         <label class="a-label" for="keputusan-ujian">Izin Guru</label>
                         <select class="a-input" id="keputusan-ujian" name="keputusan" required>
-                            <option value="">Pilih keputusan</option>
+                            <option value="">Pilih izin akses ulang</option>
                             <?php foreach ($pilihanKeputusan as $aksi): ?>
                                 <option value="<?= esc($aksi, 'attr') ?>" <?= old('keputusan') === $aksi ? 'selected' : '' ?>>
                                     <?= esc(match ($aksi) {
@@ -120,8 +120,8 @@
                             disimpan dalam riwayat audit.</p>
                     </div>
                     <button type="submit" class="a-btn a-btn--utama"
-                        onclick="return confirm('Berikan izin akses ulang ujian ini? Persetujuan ulang hanya sekali pakai.');">
-                        Simpan keputusan
+                        onclick="return confirm('Setujui akses ulang untuk tahap tes yang tidak selesai? Izin hanya sekali pakai.');">
+                        Berikan izin akses ulang
                     </button>
                 </form>
             <?php endif ?>
