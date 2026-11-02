@@ -78,6 +78,33 @@ $statusNilai = static fn (array $baris): string =>
                 Tidak ada perhitungan nilai akhir semester.</p>
         </section>
 
+        <section class="a-card a-jarak-atas" aria-labelledby="ekspor-nilai-tp">
+            <h2 id="ekspor-nilai-tp">Unduh Nilai Excel (.xlsx)</h2>
+            <p class="a-help">Unduhan mencakup <strong>semua siswa Gen</strong>, semua nilai TP yang tersedia,
+                termasuk nilai Sementara dan TP Esensial tanpa nilai. Nilai yang belum tersedia
+                dibiarkan kosong, bukan 0. Unduhan tidak dibatasi 25 baris halaman ini.</p>
+            <?php
+                $urlEkspor = static fn (int $cakupan): string =>
+                    site_url('guru/rekap-nilai/unduh') . '?' . http_build_query([
+                        'pilihan' => $pilihan_aktif,
+                        'semester' => $cakupan,
+                    ]);
+            ?>
+            <div class="a-penilaian-aksi">
+                <a class="a-btn a-btn--utama"
+                    href="<?= esc($urlEkspor((int) $semester), 'attr') ?>">
+                    <span aria-hidden="true">↓</span> Unduh Semester <?= (int) $semester ?>
+                </a>
+                <a class="a-btn a-btn--sekunder"
+                    href="<?= esc($urlEkspor(0), 'attr') ?>">
+                    Unduh Semua Semester 1–6
+                </a>
+            </div>
+            <p class="a-help">File berisi sheet informasi, daftar seluruh siswa Gen, serta sheet nilai
+                TP per semester. Pra-Semester belum dimasukkan karena modul nilainya belum tersedia.
+                Tidak ada nilai akhir semester.</p>
+        </section>
+
         <section class="a-card a-jarak-atas" aria-labelledby="daftar-rekap">
             <h2 id="daftar-rekap">Daftar Nilai per Siswa dan TP</h2>
             <p class="a-help">Jumlah pasangan siswa–TP: <?= (int) $rekap['total'] ?>.
