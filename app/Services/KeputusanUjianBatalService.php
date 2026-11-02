@@ -119,14 +119,10 @@ final class KeputusanUjianBatalService
      * Izin akses ulang tahap tes mandiri diberikan oleh Guru, sekali pakai.
      * Izin baru tidak mengaktifkan remedial atau mengubah skor sah.
      */
-    public function putuskan(int $attemptId, string $aksi, string $alasan): void
+    public function putuskan(int $attemptId, string $aksi): void
     {
         $guruId = $this->guruId();
         $this->pastikanSkema();
-        $alasan = trim(preg_replace('/\s+/u', ' ', $alasan) ?? '');
-        if ($alasan === '' || mb_strlen($alasan, 'UTF-8') > 255) {
-            throw new DomainException('Alasan keputusan wajib diisi, maksimal 255 karakter.');
-        }
         $this->db->transBegin();
         try {
             $row = $this->lihat($attemptId);
@@ -177,6 +173,9 @@ final class KeputusanUjianBatalService
             if ($aksi !== 'tunda_tinjauan' && $p['status'] !== 'perlu_bantuan') {
                 throw new DomainException('TP tidak sedang menunggu izin akses ulang.');
             }
+            // Alasan audit dibangkitkan sistem; sebab teknis tersimpan pada percobaan.
+            $alasan = 'Izin akses ulang ' . ucfirst((string) $ujian['jenis'])
+                . ' (' . (string) $ujian['tahap'] . ') diberikan Guru atas permintaan siswa.';
             $waktu = gmdate('Y-m-d H:i:s');
             $data = ['keputusan'=>$aksi,'guru_id'=>$guruId,'alasan'=>$alasan,
                 'diputus_pada'=>$waktu,'digunakan_pada'=>null];
