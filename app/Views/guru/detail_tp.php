@@ -29,8 +29,13 @@
 
     <section class="a-card a-jarak-atas" id="langkah-tp" aria-labelledby="judul-langkah-tp">
         <h2 id="judul-langkah-tp">Langkah penyiapan TP</h2>
-        <p class="a-help">Setiap langkah memakai hasil pemeriksaan Service. TP belum diterbitkan
-            sebelum semua ketentuan terpenuhi dan Guru menyetujui publikasi.</p>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            TP sudah diterbitkan. Langkah di bawah menunjukkan hasil pemeriksaan konten;
+            penyuntingan tetap mengikuti status penggunaan siswa.
+            <?php else: ?>
+            Setiap langkah memakai hasil pemeriksaan Service. TP belum diterbitkan
+            sebelum semua ketentuan terpenuhi dan Guru menyetujui publikasi.
+            <?php endif ?></p>
         <?= view('guru/_step_progress_tp', ['langkah' => $langkah]) ?>
     </section>
 
@@ -188,8 +193,13 @@
 
     <section class="a-card a-jarak-atas" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
         <h2 id="judul-kesiapan-tp"><?= $tp['status'] === 'siap' ? 'TP sudah Siap' : 'Langkah akhir · Pemeriksaan kesiapan' ?></h2>
-        <p class="a-help">Penerbitan tetap memerlukan pemeriksaan final server, konfirmasi Guru,
-            dan penyimpanan snapshot konten yang terkunci.</p>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            TP telah diterbitkan. Snapshot konten tersimpan; akses sunting ditentukan
+            oleh apakah TP sudah pernah digunakan siswa.
+            <?php else: ?>
+            Penerbitan memerlukan pemeriksaan final server, konfirmasi Guru,
+            dan penyimpanan snapshot konten.
+            <?php endif ?></p>
         <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
             <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/sunting'), 'attr') ?>">
                 <?= csrf_field() ?>
