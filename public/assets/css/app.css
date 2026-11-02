@@ -1208,6 +1208,19 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 .a-siswa-kartu .a-help { margin:0; }
 .a-siswa-kartu > .a-btn { align-self:flex-start; margin-top:auto; max-width:100%; }
 .a-siswa-daftar-tp { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-top:16px; }
+/* A1: kelompok BAB dari relasi database, tanpa mengubah komponen tema utama. */
+.a-siswa-bab { display:grid; gap:12px; padding:16px; min-width:0;
+    background:var(--a-permukaan); border:1px solid var(--a-garis);
+    border-radius:var(--a-radius); }
+.a-siswa-bab__judul { display:flex; align-items:start; justify-content:space-between;
+    flex-wrap:wrap; gap:10px; }
+.a-siswa-bab__judul .a-proto-eyebrow { margin:0 0 4px; }
+.a-siswa-bab__judul h3 { margin:0; font-size:1.08rem; }
+.a-siswa-bab__judul .a-help { margin:6px 0 0; }
+.a-siswa-bab__tp { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+.a-siswa-bab .a-siswa-kartu h4 { margin:0; font-size:1rem; line-height:1.45; }
+@media(max-width:520px) { .a-siswa-bab { padding:12px; } }
+
 .a-siswa-tp-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
     gap:9px 18px; margin-bottom:7px; }
 .a-siswa-tp-heading > div { min-width:0; flex:1 1 250px; }
