@@ -35,8 +35,10 @@ final class ModeDokumentasiShellTest extends TestCase
         self::assertStringContainsString('position: sticky; top: 0; height: 100vh', $app);
         self::assertStringContainsString('html[data-theme][data-documentation="on"]', $css);
         self::assertStringContainsString('@media (min-width:768px)', $css);
+        self::assertStringContainsString('grid-template-columns:none !important;', $css);
+        self::assertStringContainsString('display:block !important;', $css);
         self::assertMatchesRegularExpression(
-            '/html\[data-theme\]\[data-documentation="on"\]\s+\.a-app--prototipe\s+\.a-side\s*\{[^}]*position:static;[^}]*height:auto;[^}]*overflow:visible;/s',
+            '/html\[data-theme\]\[data-documentation="on"\]\s+\.a-app--prototipe\s+\.a-side\s*\{[^}]*position:static !important;[^}]*height:auto !important;[^}]*overflow:visible !important;/s',
             $css
         );
         self::assertStringContainsString('backdrop-filter:none;', $css);
