@@ -44,6 +44,24 @@ final class AdminKoreksiTp extends BaseController
         }
     }
 
+    public function media(int $id): \CodeIgniter\HTTP\ResponseInterface
+    {
+        try {
+            $item = (new KoreksiTpService())->mediaAdmin($id);
+            $bytes = file_get_contents($item['path']);
+            if ($bytes === false) {
+                throw new DomainException('Berkas usulan tidak dapat dibaca.');
+            }
+            return $this->response->setHeader('Content-Type', $item['mime'])
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Disposition', 'inline')
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody($bytes);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(403)->setBody('Media tidak tersedia atau tidak berizin.');
+        }
+    }
+
     public function putuskan(int $id): RedirectResponse
     {
         $pilihan = $this->request->getPost('keputusan');
