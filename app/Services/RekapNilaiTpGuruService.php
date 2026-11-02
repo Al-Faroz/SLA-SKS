@@ -128,10 +128,11 @@ final class RekapNilaiTpGuruService
      * @return array{baris:array,total:int,halaman:int,jumlah_halaman:int,
      *     jumlah_siswa:int,jumlah_final:int,jumlah_sementara:int,jumlah_belum:int}
      */
-    public function rekap(?array $pilihan, int $semester, int $halaman = 1): array
+    public function rekap(?array $pilihan, int $semester, int $halaman = 1, int $perHalaman = 25): array
     {
         $guruId = $this->guruId();
-        if ($semester < 1 || $semester > 6 || $halaman < 1 || $halaman > 100000) {
+        if ($semester < 1 || $semester > 6 || $halaman < 1 || $halaman > 100000
+            || $perHalaman < 1 || $perHalaman > 500) {
             throw new DomainException('Semester atau halaman rekap tidak valid.');
         }
         $hasil = [
@@ -167,7 +168,6 @@ final class RekapNilaiTpGuruService
             . $dari, $args
         )->getRowArray();
         $total = (int) ($jumlah['total'] ?? 0);
-        $perHalaman = 25;
         $pages = max(1, (int) ceil($total / $perHalaman));
         $halaman = min($pages, $halaman);
         $offset = ($halaman - 1) * $perHalaman;
