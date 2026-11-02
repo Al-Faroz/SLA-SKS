@@ -319,3 +319,10 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Uji keamanan: akun Siswa/Admin tidak boleh POST ke rute KKM Guru; Guru lain tak boleh mengubah TP; CSRF ditolak; versi TP usang harus meminta muat ulang; perubahan KKM menghasilkan audit tanpa menghapus soal/Word/Materi.
 - Tampilan Kelola TP memakai kartu Identitas TP ringkas pada desktop, laptop, HP; seluruh lima metadata tetap terbaca. Import Word diagnostik/sumatif yang sudah FIX tidak diubah.
 - PHPUnit `KkmTpServiceTest` memeriksa batas 1–100 dan pemilihan KKM; CI lint file terkait. Pengujian penuh penyimpanan DB dan browser tetap menunggu XAMPP.
+
+### Regresi KKM diwarisi dan rencana koreksi berversi — 2 November 2026
+- Admin belum menyimpan default (`pengaturan.kkm_default = NULL`): contoh 80 pada form diberi penjelasan belum berlaku, Guru draf menampilkan belum diset. Tidak ada fallback diam-diam ke `tp.kkm = 75`.
+- Admin menyimpan default misalnya 80: TP draf tanpa override menampilkan 80 pada kedua tab dan lolos gerbang KKM tanpa Guru menyimpan angka khusus.
+- Guru klik Simpan tanpa mengubah nilai 80: tidak menaikkan `struktur_versi`, tidak menambah audit palsu, `tp.kkm_khusus` tetap NULL. Ganti 85: tersimpan khusus; kembalikan 80: khusus menjadi NULL.
+- Admin kemudian mengubah default saat TP telah Siap: tampilan TP Siap dan percobaan yang terpin tetap membaca KKM snapshot, tidak tertukar ke Admin terbaru.
+- Jalur koreksi TP Siap **belum diluncurkan**; pengujian penerimaan E2E-017–019 tetap syarat sebelum tombol Ajukan Koreksi/Setujui dibuka. Jangan menyatakan koreksi Materi/soal siap karena berkas checkpoint semata.
