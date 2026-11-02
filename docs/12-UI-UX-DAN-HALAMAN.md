@@ -228,3 +228,9 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - Form unggah media tetap lengkap dan tidak dimasukkan ke modal. URL lama Sunting Materi boleh mengarahkan dengan otorisasi ke bagian editor yang sama; tidak boleh membuat form edit ganda dan tidak boleh membuat Materi kedua.
 - Halaman kesiapan menampilkan Step Progress sebagai ringkasan utama dengan daftar rincian teknis dapat dibuka (native `details`). Status selesai bersumber dari pemeriksaan final yang sama; informasi kosong/galat, link tindak lanjut, CSRF dan hak akses tidak boleh hilang.
 - Penilaian dan media siswa tidak dipercepat/dibuka hanya karena perubahan UI ini. QA wajib Dark/Light, 390/820/desktop, keyboard, validasi file, dan akses lintas Gen.
+
+### Penataan Bank Soal Guru — 2 November 2026
+- Detail TP menampilkan **satu tombol Kelola Bank Soal**, bukan dua tombol yang menuju satu halaman identik. Step Progress Diagnostik/Sumatif tetap dua status karena syarat berbeda.
+- Halaman Bank Soal mempunyai ringkasan dua jenis; pekerjaan hanya pada **tab aktif**, dengan daftar soal paginasi server (15 per halaman), tombol tambah per butir, unduh/unggah Word per jenis dan riwayat review untuk jenis terpilih.
+- Form manual menampilkan tombol **Pratinjau Soal** yang meminta sanitasi HTML dari server tanpa INSERT/UPDATE, diikuti tombol **Simpan Soal** terpisah. Pratinjau berubah atau hilang ketika input diganti; gambar soal menggunakan aset privat.
+- Review Word dapat membuka per butir sehingga 30+ soal tidak memenuhi layar sekaligus. Pertanyaan, A–E, kunci dan konten kaya harus dapat ditelaah; link Audio/Video Google Drive membuka sumber untuk verifikasi Viewer/pemutaran oleh Guru. Status kesalahan, loading, sukses dan hak akses tetap eksplisit.
