@@ -36,12 +36,24 @@ final class KelolaSoalGuruService
     }
 
     /** @return list<array<string,mixed>> */
-    public function daftar(int $tpId, string $jenis): array
+    public function daftar(int $tpId, string $jenis, int $batas = 15, int $offset = 0): array
+    {
+        $this->konteks($tpId);
+        if ($batas < 1 || $batas > 200 || $offset < 0) {
+            throw new DomainException('Halaman daftar soal tidak valid.');
+        }
+        return $this->db->table('soal')
+            ->where('tp_id', $tpId)->where('jenis', self::jenis($jenis))
+            ->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')
+            ->limit($batas, $offset)->get()->getResultArray();
+    }
+
+    public function jumlahSoal(int $tpId, string $jenis): int
     {
         $this->konteks($tpId);
         return $this->db->table('soal')
             ->where('tp_id', $tpId)->where('jenis', self::jenis($jenis))
-            ->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')->get()->getResultArray();
+            ->countAllResults();
     }
 
     public function lihat(int $tpId, int $soalId): array
