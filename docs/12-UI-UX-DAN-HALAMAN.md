@@ -234,3 +234,9 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - Halaman Bank Soal mempunyai ringkasan dua jenis; pekerjaan hanya pada **tab aktif**, dengan daftar soal paginasi server (15 per halaman), tombol tambah per butir, unduh/unggah Word per jenis dan riwayat review untuk jenis terpilih.
 - Form manual menampilkan tombol **Pratinjau Soal** yang meminta sanitasi HTML dari server tanpa INSERT/UPDATE, diikuti tombol **Simpan Soal** terpisah. Pratinjau berubah atau hilang ketika input diganti; gambar soal menggunakan aset privat.
 - Review Word dapat membuka per butir sehingga 30+ soal tidak memenuhi layar sekaligus. Pertanyaan, A–E, kunci dan konten kaya harus dapat ditelaah; link Audio/Video Google Drive membuka sumber untuk verifikasi Viewer/pemutaran oleh Guru. Status kesalahan, loading, sukses dan hak akses tetap eksplisit.
+
+
+### Penegasan susunan halaman Bank Soal — 2 November 2026
+- **Bagian pertama: Ketersediaan Bank Soal**, card informasi permanen di atas dengan dua ringkasan Diagnostik/Sumatif, jumlah soal aktif, batas minimal, jumlah tayang dan status kecukupan jumlah. Tidak menyatakan soal siap secara akademik hanya karena jumlah memadai.
+- **Bagian kedua: Bank Soal**, card area kerja tersendiri di bawahnya dengan **dua tab utama Diagnostik dan Sumatif**. Tab aktif jelas terlihat, berlabel jenis dan jumlah soal aktif, memakai navigasi link server `?jenis=...` beserta `aria-current="page"` sehingga tidak bergantung JavaScript. Seluruh daftar 15-per-halaman, tambah/edit, unduh/unggah Word dan riwayat tampil hanya untuk tab tersebut.
+- Pesan sukses/gagal berada dalam card area kerja di bawah navigasi tab; ringkasan tidak bercampur dengan form. Kedua card, tab dan ringkasan responsif pada desktop/HP menggunakan token CSS Emerald Glass yang sudah ada. Tidak mengubah controller, service, aturan akademik, SQL atau format impor.
