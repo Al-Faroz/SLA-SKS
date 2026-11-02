@@ -297,3 +297,10 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Impor Word: upload → review → konfirmasi; pemeriksaan 10/30 pada TP Siap; soal manual tidak tertimpa; perubahan apa pun pada bank setelah review membatalkan konfirmasi; impor identik tidak melompati perlindungan konflik.
 - Equation Word pecahan/pangkat/akar dapat dibaca sebagai MathML dalam review; bentuk kompleks dan rendering browser perlu tes dokumen nyata. Audio/Video Google Drive hanya tautan file HTTPS, tautan selain file ditolak dan Guru menguji izin Viewer/pemutaran sebelum menyetujui review.
 - PHP lint, unit, integrasi, QA CI dan review XAMPP adalah gerbang. Jangan mengklaim semua kasus E2E PASS bila hanya CI yang lulus; tidak ada migrasi SQL.
+
+### Regresi Mode Dokumentasi untuk Screenshot Full-Page — 2 November 2026
+- Di semua panel berbasis `layouts/panel` (Admin, Guru, Siswa, Pimpinan), tombol kamera Dokumentasi tampak dan bisa ditoggle; `aria-pressed` dan labelnya mengikuti mode.
+- Dengan mode mati, sidebar desktop sticky tetap dapat diminimalkan, menu HP/drawer, tombol tema, login/logout, form dan rute tetap berfungsi. Dengan mode hidup, sidebar tidak sticky, tidak memakai tinggi tetap 100vh dan tidak menggulir sendiri; bidang konten tidak hilang di luar sidebar saat screenshot panjang.
+- Mode disimpan per tab pada sessionStorage, dipulihkan saat navigasi/reload tanpa mengubah preferensi default Dark. Tombol Selesai harus mengembalikan layout tanpa kehilangan form yang belum dikirim. Light/Dark keduanya diuji.
+- Uji ekstensi Screenshot Tool Chrome pada halaman panjang: Review Word 30 soal (beberapa `details` dibuka), Detail TP, Peta ATP/semester, tabel panjang Admin, serta halaman Siswa. Bandingkan screenshot dengan tampilan layar dan cek tidak ada pengulangan sidebar, konten terpotong atau bagian gambar kosong.
+- Unit `ModeDokumentasiShellTest`, JS `node --check` dan PHP lint harus PASS. **Pengujian statis tidak bisa menjamin perilaku semua ekstensi pihak ketiga**; hasil capture XAMPP pengguna tetap penentu status FIX.
