@@ -63,6 +63,34 @@ final class RekapNilaiTpGuruService
         return [$gen, $mapel];
     }
 
+    /**
+     * Daftar siswa Gen untuk sheet tersendiri, termasuk saat semester belum
+     * memiliki TP. Tetap wajib lewat pemeriksaan G1 server.
+     *
+     * @return list<array{id:int|string,nama:string}>
+     */
+    public function daftarSiswa(array $pilihan, int $maks = 5000): array
+    {
+        $guru = $this->guruId();
+        [$gen, $mapel] = $this->cakupan($pilihan, $guru);
+        if ($maks < 1 || $maks > 5000) {
+            throw new DomainException('Batas ekspor siswa tidak valid.');
+        }
+        $baris = $this->db->query(
+            'SELECT s.id,u.nama FROM siswa s'
+            . ' JOIN pengguna u ON u.id=s.pengguna_id'
+            . ' WHERE s.angkatan_id=?'
+            . ' AND EXISTS (SELECT 1 FROM penugasan_guru_gen g'
+            . ' WHERE g.angkatan_id=s.angkatan_id AND g.mapel_id=? AND g.guru_id=?)'
+            . ' ORDER BY u.nama ASC,s.id ASC LIMIT ' . ($maks + 1),
+            [$gen, $mapel, $guru]
+        )->getResultArray();
+        if (count($baris) > $maks) {
+            throw new DomainException('Jumlah siswa melebihi batas keamanan ekspor. Hubungi Admin.');
+        }
+        return $baris;
+    }
+
     /** Nilai nol adalah nilai sah; NULL berarti belum ada. */
     public static function tampilNilai(mixed $angka, bool $esensial = false): string
     {
@@ -100,10 +128,11 @@ final class RekapNilaiTpGuruService
      * @return array{baris:array,total:int,halaman:int,jumlah_halaman:int,
      *     jumlah_siswa:int,jumlah_final:int,jumlah_sementara:int,jumlah_belum:int}
      */
-    public function rekap(?array $pilihan, int $semester, int $halaman = 1): array
+    public function rekap(?array $pilihan, int $semester, int $halaman = 1, int $perHalaman = 25): array
     {
         $guruId = $this->guruId();
-        if ($semester < 1 || $semester > 6 || $halaman < 1 || $halaman > 100000) {
+        if ($semester < 1 || $semester > 6 || $halaman < 1 || $halaman > 100000
+            || $perHalaman < 1 || $perHalaman > 500) {
             throw new DomainException('Semester atau halaman rekap tidak valid.');
         }
         $hasil = [
@@ -139,7 +168,6 @@ final class RekapNilaiTpGuruService
             . $dari, $args
         )->getRowArray();
         $total = (int) ($jumlah['total'] ?? 0);
-        $perHalaman = 25;
         $pages = max(1, (int) ceil($total / $perHalaman));
         $halaman = min($pages, $halaman);
         $offset = ($halaman - 1) * $perHalaman;
