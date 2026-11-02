@@ -191,7 +191,7 @@
         </section>
     <?php endif ?>
 
-    <section class="a-card a-jarak-atas" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
+    <section class="a-card a-jarak-atas a-tp-penutup" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
         <h2 id="judul-kesiapan-tp"><?= $tp['status'] === 'siap' ? 'TP sudah Siap' : 'Langkah akhir · Pemeriksaan kesiapan' ?></h2>
         <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
             TP telah diterbitkan. Snapshot konten tersimpan; akses sunting ditentukan
@@ -201,22 +201,25 @@
             dan penyimpanan snapshot konten.
             <?php endif ?></p>
         <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
-            <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/sunting'), 'attr') ?>">
-                <?= csrf_field() ?>
-                <p class="a-help">Sunting TP membuka editor biasa. TP sementara kembali menjadi Draf dan harus diperiksa serta disiapkan lagi sebelum siswa dapat memulainya. Snapshot lama tetap tersimpan.</p>
-                <button class="a-btn a-btn--utama" type="submit">Sunting TP</button>
-            </form>
+            <p class="a-help">Sunting TP membuka editor biasa. TP sementara kembali menjadi Draf dan harus diperiksa serta disiapkan lagi sebelum siswa dapat memulainya. Snapshot lama tetap tersimpan.</p>
         <?php elseif ($tp['status'] === 'siap'): ?>
             <p class="a-help">TP telah digunakan siswa; seluruh rincian, KKM, Materi, media, Resume/HOTS dan Bank Soal terkunci.</p>
         <?php endif ?>
-        <a class="a-btn a-btn--utama"
-            href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">
-            <?= $tp['status'] === 'siap' ? 'Lihat status dan versi TP' : 'Periksa kesiapan TP Siap' ?>
-        </a>
-        <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial' && $tp['status'] === 'siap'): ?>
-
-            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Antrean Penilaian</a>
-        <?php endif ?>
+        <div class="a-tp-penutup__aksi">
+            <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
+                <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/sunting'), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <button class="a-btn a-btn--utama" type="submit">Sunting TP</button>
+                </form>
+            <?php endif ?>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">
+                <?= $tp['status'] === 'siap' ? 'Lihat status dan versi TP' : 'Periksa kesiapan TP Siap' ?>
+            </a>
+            <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial' && $tp['status'] === 'siap'): ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Antrean Penilaian</a>
+            <?php endif ?>
+        </div>
     </section>
 </div>
 <?= $this->endSection() ?>
