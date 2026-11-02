@@ -57,7 +57,7 @@ $peranAktif = $peranAktif ?? '';
                         str_contains($jalurIkon, 'profil') => 'user-round',
                         str_contains($jalurIkon, 'laporan') => 'chart-no-axes-combined',
                         str_contains($jalurIkon, 'referensi'), str_contains($jalurIkon, 'mapel') => 'library-big',
-                        str_contains($jalurIkon, 'pengaturan'), str_contains($jalurIkon, 'identitas') => 'settings',
+                        str_contains($jalurIkon, 'pengaturan'), str_contains($jalurIkon, 'identitas'), str_contains($jalurIkon, '/kkm') => 'settings',
                         default => 'layout-dashboard',
                     };
                 ?>
