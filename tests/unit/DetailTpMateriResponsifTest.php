@@ -16,7 +16,8 @@ final class DetailTpMateriResponsifTest extends TestCase
     public function testDetailTpSatuHalamanDanStepProgress(): void
     {
         $view = self::file('app/Views/guru/detail_tp.php');
-        self::assertStringContainsString('a-tbl a-tp-identitas', $view);
+        self::assertStringContainsString('a-tp-identitas-ringkas', $view);
+        self::assertStringNotContainsString('a-tbl a-tp-identitas', $view);
         self::assertStringContainsString('id="langkah-tp"', $view);
         self::assertStringContainsString("view('guru/_step_progress_tp'", $view);
         self::assertStringContainsString('id="rumusan-tp"', $view);
