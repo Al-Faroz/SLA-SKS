@@ -82,11 +82,14 @@
                     <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                     <div class="a-field">
                         <label class="a-label" for="kkm-khusus">KKM khusus Guru (1–100)</label>
-                        <input class="a-input" id="kkm-khusus" name="kkm_khusus" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="Kosong = ikut Admin" value="<?= $kkm_info['khusus'] === null ? '' : (int) $kkm_info['khusus'] ?>">
+                        <input class="a-input" id="kkm-khusus" name="kkm_khusus" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="Isi nilai 1–100" value="<?= $kkm_info['efektif'] === null ? '' : (int) $kkm_info['efektif'] ?>">
                     </div>
-                    <button type="submit" class="a-btn a-btn--utama">Simpan KKM</button>
+                    <button type="submit" class="a-btn a-btn--utama" name="pilihan" value="khusus">Simpan KKM Khusus</button>
+                    <?php if ($kkm_info['default'] !== null): ?>
+                        <button type="submit" class="a-btn a-btn--sekunder" name="pilihan" value="default">Ikuti Default Admin</button>
+                    <?php endif ?>
                 </form>
-                <p class="a-help">Kosongkan KKM khusus lalu simpan untuk kembali mengikuti default Admin. Bila Admin belum menetapkan default, Guru harus mengisi KKM khusus.</p>
+                <p class="a-help">Kolom menunjukkan KKM efektif saat ini (default Admin jika belum ada nilai khusus). Klik Simpan KKM Khusus untuk mengganti nilainya, atau Ikuti Default Admin untuk melepas override Guru.</p>
             <?php else: ?>
                 <p class="a-help">TP sudah Siap; KKM telah dikunci di versi konten. Perubahan memerlukan mekanisme koreksi.</p>
             <?php endif ?>
