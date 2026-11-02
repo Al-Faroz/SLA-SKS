@@ -90,6 +90,9 @@
         <h1 data-ujian-hasil-judul>Status Diagnostik</h1>
         <p data-ujian-hasil-pesan></p>
         <p class="a-ujian-skor" data-ujian-hasil-skor></p>
+        <p class="a-help">Jika tes tidak selesai, buka Rincian TP untuk
+            meminta akses ulang yang tepat berdasarkan percobaan terakhir.</p>
+
         <a class="a-btn a-btn--sekunder"
             href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke rincian TP</a>
     </section>

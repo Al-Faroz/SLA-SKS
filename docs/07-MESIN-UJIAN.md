@@ -1,62 +1,50 @@
-# 07 — Mesin Ujian Diagnostik, Sumatif dan Pra-Semester
+# 07 — Mesin Ujian Diagnostik, Sumatif TP, dan Pra-Semester
 
-## 1. Kebijakan perangkat dan lokasi
-**Satu profil keamanan: Ketat.** Tidak ada pilihan longgar/standar. **Sumatif diizinkan dari rumah** hanya melalui **desktop/laptop** yang mendukung fullscreen. Diagnostik boleh dari HP/tablet apabila browser benar-benar mampu masuk fullscreen; jika tidak, akses **ditolak sebelum percobaan tercipta**, dengan pesan `Perangkat/browser ini tidak mendukung fullscreen. Buka ujian di desktop/laptop yang mendukungnya.` Jika kapabilitas tidak terverifikasi, jangan memulai ujian tanpa pengecekan lagi pada saat user gesture.
+> **Keputusan final 2 November 2026 — pembetulan terminologi dan alur:** Diagnostik dan Sumatif TP adalah tes **mandiri**, dengan **permintaan akses ulang kepada Guru** apabila percobaan tidak dapat diselesaikan. **Pembatalan ujian hanya untuk Pra-Semester**. Keputusan ini menggantikan semua pernyataan terdahulu yang menyamakan tes mandiri dengan ujian dibatalkan. Pertahankan ketentuan akademik v2.5: satu Sumatif awal sah, satu remedial bila nilainya di bawah KKM, nilai tertinggi, TP tetap Selesai walaupun belum mencapai KKM.
 
-Instruksi petunjuk S05 menyampaikan bahwa membuka ujian memerlukan koneksi stabil dan fullscreen; pengawasan fisik tidak diasumsikan karena sumatif boleh dari rumah. User-Agent hanya indikasi tipe perangkat, bukan kontrol keamanan absolut.
+## 1. Tiga tujuan dan pola pelaksanaan berbeda
+- **Diagnostik:** dilakukan mandiri saat awal TP NonEsensial, minimal 10 PG tunggal lima opsi A–E; skor dibandingkan dengan **satu KKM efektif TP** untuk memilih jalur. Lulus boleh melewati Materi/Resume/HOTS; tidak lulus harus menuntaskannya. Keduanya tetap wajib Sumatif. Skor Diagnostik **tidak masuk** nilai akhir TP; **tidak ada remedial Diagnostik**.
+- **Sumatif TP:** dilakukan mandiri setelah prasyarat jalur siswa terpenuhi, minimal 30 PG A–E. Ada **satu tes awal sah**. Jika skor tes awal sah di bawah KKM, tersedia **satu remedial nilai**; ambil skor tertinggi. TP selesai setelah kewajiban dan kesempatan sah terpenuhi meskipun nilai belum mencapai KKM.
+- **Pra-Semester:** ujian tersendiri di tingkat paket semester, minimal 30 soal gabungan semua BAB, hanya setelah seluruh TP NonEsensial selesai dan **hanya dalam jadwal serentak yang ditetapkan Admin**. Pola penilaian Sumatif (satu remedial bila di bawah KKM), nilai mandiri tanpa nilai akhir semester.
 
-## 2. Percobaan sah
-- Diagnostik minimal 10 soal, satu percobaan normal; skor hanya gate pembelajaran, tidak menjadi nilai final TP.
-- Sumatif minimal 30 soal, **wajib bagi semua TP NonEsensial**, satu tes awal sah. Jika nilai < KKM, **satu remedial**; nilai tertinggi tes awal/remedial menjadi skor Sumatif efektif. Kuota tiga percobaan normal v2.4 tidak berlaku lagi.
-- Pra-Semester minimal 30 soal dari semua BAB semester, ujian tersendiri (bukan TP), pola dan keamanan Sumatif, serta remedial satu kali bila skor < KKM. Admin menetapkan satu jendela waktu ujian serentak bagi siswa dalam paket. Siswa belum selesai semua TP NonEsensial ditolak sebelum attempt.
-- Ujian batal karena koneksi/pelanggaran tidak memberi skor dan tidak menghabiskan percobaan sah; Guru menangani ulang/lanjut sesuai kebijakan. Seluruh soal PG A–E satu kunci, bank/snapshot, kunci dan jawaban tetap diproses di server.
+## 2. Perangkat dan pengamanan saat pengerjaan
+Pertahankan satu profil keamanan pengerjaan **Ketat** (fullscreen, waktu dan deteksi koneksi), tanpa menyamakan **konsekuensi kegagalan**. Sumatif TP wajib desktop/laptop dan boleh dikerjakan dari rumah. Diagnostik boleh dari HP/tablet **hanya jika** fullscreen benar-benar didukung; bila tidak, tolak sebelum membuat percobaan dan berikan pesan penggunaan desktop/laptop. Pra-Semester mengikuti persyaratan fullscreen dan perangkat Sumatif.
 
-## 3. Waktu aktif dan jeda
-| Parameter | Nilai final | Aturan |
+| Parameter | Nilai | Perlakuan selama ujian |
 |---|---:|---|
-| Jeda fullscreen per kejadian | **90 detik** | Jika tercapai, batal menunggu guru |
-| Total jeda fullscreen | **180 detik** | Terakumulasi semua kejadian |
-| Pelanggaran fullscreen | **3 kali** | Kejadian ketiga → batal tanpa skor |
-| Timeout heartbeat koneksi | **20 detik** | Waktu aktif tetap berjalan pada 20 detik deteksi |
-| Total jeda koneksi | **300 detik** | Jika tercapai, batal menunggu guru |
+| Jeda fullscreen per kejadian | 90 detik | Penghentian pengerjaan saat jeda |
+| Jeda fullscreen total | 180 detik | Akumulasi tanpa menghitung waktu tumpang tindih ganda |
+| Jumlah insiden fullscreen | 3 | Insiden ketiga menghentikan percobaan |
+| Timeout heartbeat koneksi | 20 detik | Jeda dihitung sejak last_seen + 20 detik |
+| Total jeda koneksi | 300 detik | Melampaui batas menghentikan percobaan |
 
-`fullscreenchange`, `visibilitychange` dan `blur` yang terjadi karena satu perpindahan fokus adalah **satu insiden**, bukan tiga pelanggaran. Jika fullscreen keluar: server memindahkan `berjalan → jeda_fullscreen`, menghentikan waktu aktif, menolak jawab/kirim saat jeda, serta mencatat insiden. Melanjutkan wajib melalui tombol klik `Kembali ke fullscreen` dan validasi server.
+`fullscreenchange`, `visibilitychange`, dan `blur` yang berasal dari satu perpindahan fokus dihitung **satu insiden**. Ketika jeda, server menghentikan waktu aktif dan menolak penyimpanan jawaban/kirim sampai pulih. Memulihkan fullscreen memerlukan gesture klik dan validasi server. Waktu, sisa durasi, peristiwa, dan jawaban yang sudah sah disimpan tetap bersumber dari server.
 
-Jika heartbeat tidak diterima ≥20 detik, saat rekonsiliasi server menyatakan jeda sejak `last_seen_server_at + 20 detik`, bukan sejak saat worker kebetulan berjalan. Pada koneksi kembali, server menghitung total jeda secara otoritatif; jika melewati 300 detik, batal. Jika fullscreen dan koneksi sama-sama bermasalah, **waktu yang tumpang tindih tidak dihitung ganda sebagai dua jenis jeda**. Urutan kejadian dan prioritas alasan harus deterministik, direkam pada segmen jeda.
+Jika layanan shared hosting tidak memiliki worker terus-menerus, rekonsiliasi dilakukan pada setiap status, heartbeat, jawab, kirim, buka layar, dan pemulihan koneksi; cron hanya tambahan. Tidak mengklaim peristiwa pasti terdeteksi persis pada detik ke-20 tanpa request.
 
-**Shared hosting:** jangan mensyaratkan service daemon 24 jam sebagai satu-satunya mekanisme. Rekonsiliasi wajib dijalankan **setiap request status, heartbeat, jawab, kirim, buka layar, dan kembalinya koneksi**. Cron hosting adalah pengawas tambahan. Tanpa worker/deteksi aktif, transisi persis pada detik ke-20 tidak dapat dijamin saat sama sekali tidak ada request; sistem tetap harus menghasilkan status/waktu yang benar menggunakan waktu server ketika akhirnya direkonsiliasi. Dokumentasikan batas hosting ini secara jujur dan uji pada hosting tujuan.
+## 3. **Diagnostik dan Sumatif: permintaan akses ulang, bukan pembatalan**
+1. Siswa yang menyelesaikan percobaan secara sah memperoleh hasil sesuai jenis tes.
+2. Jika Diagnostik atau Sumatif **tidak dapat diselesaikan** akibat batas insiden/jeda keamanan, percobaan **berakhir tanpa skor sah**, bukti jawaban/insiden tetap tersimpan, dan status kebutuhan siswa adalah **memerlukan akses ulang Guru**, **bukan ujian dibatalkan**.
+3. Siswa **meminta akses ulang** kepada Guru pengampu saat ini pada Gen–Mapel-nya. Jenis tes (**Diagnostik** atau **Sumatif**, termasuk tahap **normal/remedial**) **ditentukan server dari percobaan terakhir TP yang tidak selesai**, bukan berdasarkan tombol atau halaman ujian yang terbuka. Permintaan/izin mencatat identitas percobaan, tahap, **alasan teknis dan audit otomatis**, waktu, dan pelaku. Guru **cukup menekan satu tombol Izinkan Akses Ulang, tanpa mengisi alasan atau memilih jenis tes**; sistem hanya mengizinkan tahap yang terhenti.
+4. Sebelum ada izin Guru, sistem **melarang** percobaan pengganti. Izin Guru **sekali pakai**, digunakan atomik saat attempt pengganti dibuat. Tidak memberikan skor otomatis, tidak mereset progres/materi/Resume/HOTS, dan tidak mengubah kuota tes/remedial yang sah.
+5. **Diagnostik tidak selesai** → setelah izin Guru, mengerjakan Diagnostik ulang untuk memperoleh keputusan jalur dari skor sah. Bukan keputusan otomatis `langsung_belajar`.
+6. **Sumatif normal tidak selesai** → setelah izin Guru, mengerjakan **Sumatif normal pengganti**, **bukan remedial**. **Remedial tidak selesai** → setelah izin Guru, mengerjakan **remedial pengganti**, bukan remedial tambahan. Dua kasus ini tidak mengulang pembelajaran/Resume/HOTS yang sudah sah.
+7. **Remedial nilai** hanya timbul sesudah **Sumatif normal selesai sah dan skornya di bawah KKM**. Batasnya **satu remedial sah**; skor tertinggi antara Sumatif awal sah dan remedial sah digunakan untuk nilai TP. Jika keduanya masih di bawah KKM, TP tetap Selesai.
+8. Kesempatan tes yang belum selesai **tidak boleh** dicatat sebagai tes sah ataupun sebagai remedial terpakai. Permintaan ulang tidak boleh memberi jalur untuk melewati ujian sah.
 
-## 4. Status percobaan
-`baru → berjalan ↔ jeda_fullscreen` atau `jeda_koneksi`, `berjalan → selesai_sah`, serta dari status berjalan/jeda ke `dibatalkan_menunggu_guru`. Jangan memberi nilai pada dibatalkan. Keluar dari ujian tidak menghapus jawaban yang tersimpan; percobaan tidak berubah menjadi baru pada refresh. Pemeriksaan status/expired dilakukan sebelum menerima setiap jawaban, bukan setelahnya.
+**Terminologi antarmuka:** `Tes tidak selesai — ajukan/minta akses ulang kepada Guru`, `Menunggu izin akses ulang`, `Izinkan akses ulang Diagnostik`, `Izinkan akses ulang Sumatif (normal/remedial)`. Jangan memakai label `Ujian Dibatalkan` pada Diagnostik/Sumatif.
 
-## 5. Keputusan Guru atas pembatalan
-- Diagnostik: Guru memilih **`ulang_diagnostik`** atau **`langsung_belajar`**.
-- Sumatif: Guru memilih **`ulang_sumatif`** atau **`tunda_tinjauan`**.
-- Ulang sumatif yang diperlukan harus disetujui Guru **sekali pakai**, dibuat sebagai percobaan pengganti, tidak memotong kuota normal karena percobaan batal.
-- Alasan tindakan dan pelaku tercatat; Guru hanya mapelnya; Admin/Pimpinan tidak mengubah nilai ujian lewat menu umum.
+## 4. **Pra-Semester: pembatalan ujian**
+Hanya Pra-Semester yang memakai nomenklatur **`dibatalkan_menunggu_guru`** bila batas keamanan dilewati. Percobaan batal tidak menghasilkan skor sah; bukti insiden dan jawaban sebelumnya diaudit. Tindak lanjut harus menjaga jadwal serentak Admin dan hak Guru per Gen–Mapel; tidak otomatis membuka ujian di luar jadwal. Pengaturan izin ulang Pra-Semester yang belum dirinci dalam Master tidak boleh diasumsikan dari izin ulang tes mandiri.
 
-## 6. UI S05/S06/S07
-- **S05:** syarat perangkat, fullscreen, stabilitas koneksi, sisa percobaan, durasi dan tombol `Mulai ujian`; preflight memeriksa kemampuan fullscreen, perangkat sumatif dan hak siswa. Tolak sebelum insert percobaan jika gagal.
-- **S06:** tata letak tanpa sidebar, timer server, soal, pilihan, navigator, indikator menyimpan, jumlah insiden terhitung, tampilan jeda penuh; tidak ada notifikasi/pengumuman/perayaan saat ujian. Tombol kembali fullscreen dan tombol kirim berkonfirmasi. Respons saat offline tidak dianggap sudah tersimpan tanpa konfirmasi server.
-- **S07:** tampil skor/ketuntasan hanya `selesai_sah`, atau status `Menunggu keputusan guru` tanpa nilai bila batal. Tidak membuka kunci jawaban sebelum kebijakan perujian mengizinkan.
+## 5. Status dan kompatibilitas database
+**Kontrak semantik baru:** status selesai sah adalah `selesai_sah`; tes mandiri yang terhenti dan memerlukan izin Guru menggunakan istilah domain **`akses_ulang_diperlukan`**, sedangkan Pra-Semester dapat menggunakan `dibatalkan_menunggu_guru`. Status `jeda_fullscreen`, `jeda_koneksi`, `berjalan`, dan `baru` tetap digunakan saat pengerjaan.
 
-### Wewenang Guru per Gen–Mapel (v2.4)
-Penanganan ujian batal, izin ulang, pembacaan percobaan/snapshot, dan telaah insiden hanya tersedia bagi Guru yang **saat itu ditugaskan ke pasangan Gen–Mapel siswa/ujian**. Service memeriksa relasi paket ujian ke Gen pemilik, `siswa.angkatan_id`, peran aktif Guru dan penugasan aktif. Guru Gen lain tidak dapat melakukan GET/POST dengan menebak ID ujian. Pergantian Guru dalam Gen yang sama menjaga snapshot, keputusan, dan pencatat historis. Seluruh kebijakan fullscreen, waktu server, jeda dan profil Ketat tidak berubah.
+**Catatan implementasi bertahap:** dump database lokal sebelum patch terakhir masih memiliki enum `dibatalkan_menunggu_guru` sebagai satu-satunya kode kegagalan. Sebelum perubahan enum/schema dan migrasi data **wajib audit dump terbaru sesudah patch terakhir**, versi SQL additive dan backup. Kode kompatibilitas yang sementara membaca kode status historis **tidak boleh** menampilkan istilah pembatalan untuk Diagnostik/Sumatif dan **tidak boleh menganggapnya aturan akademik**. Jangan me-reset histori.
 
-## 7. Keamanan dan hak
-Throttler per akun dan percobaan, CSRF, session auth, anti replay, cek status setiap request, soal/opsi acak server, ID percobaan sulit ditebak, tanpa skor pada percobaan batal, log insiden tidak terhitung dan terhitung terpisah. Fullscreen hanya mitigasi berbasis browser, **bukan jaminan ujian anticurang**.
-
-## 8. Kontrak soal Word dan multimedia v2.4
-- Diagnostik dan Sumatif memakai **satu tipe soal PG lima opsi A–E**. Tidak menerapkan PG kompleks, menjodohkan, isian, uraian, atau tipe CBT lain. Soal dapat diacak dari bank soal TP versi aktif dan urutan opsi diacak; kunci disimpan di server.
-- Impor dari dua template Word beridentitas `SLA-SKS-WORD-V1` mengikuti [05](05-PAKET-TP-DAN-IMPOR.md). Teks, Equation Word/OMML, gambar, tabel termasuk tabel bersarang dipertahankan **pada pertanyaan maupun pilihan** dalam rendering ujian.
-- Audio/video soal via Google Drive boleh hanya jika URL sah, izin akses dan pemutaran telah lolos pratinjau; kegagalan media penting harus mencegah bank dinyatakan Siap. Ini tidak mengubah kebijakan YouTube untuk media pembelajaran.
-- Sanitasi konten DOCX, kontrol kunci dan cache aset historis wajib; sampel ujian tidak mengirim kunci ke klien sebelum sesuai kebijakan hasil.
-
-## 9. Kontrak Pra-Semester
-Menggunakan pemeriksaan fullscreen Ketat yang sama, jeda fullscreen 90 detik per kejadian/180 akumulatif, insiden ketiga batal, koneksi 20 detik/300 akumulatif. Server memeriksa waktu mulai/akhir Admin dan status seluruh TP NonEsensial sebelum membuat percobaan. Jadwal **serentak** bukan jaminan siswa yang tidak hadir dapat mengerjakan di luar jadwal.
-
-
-## Penguncian Bank Soal berdasarkan penggunaan TP (final 2 November 2026)
-- Guru G1 boleh menyunting bank soal dan pengaturan ujian pada TP Draf serta TP Siap **yang belum pernah digunakan siswa**. Penerbitan TP Siap tidak mengunci bank soal dengan sendirinya.
-- Sesudah ada satu siswa yang mulai menggunakan TP, soal dan kunci, KKM, durasi dan pengaturan akademik TP tidak dapat diubah lewat editor, impor Word maupun API. Snapshot attempt/ujian yang sah tetap utuh; tidak menggunakan kategori koreksi A/B/C atau persetujuan Admin untuk membuka kunci.
-- Perlindungan ujian yang sudah ada (fullscreen, heartbeat, soal/kunci privat, remedial, jumlah minimum dan prasyarat) **tidak dilonggarkan** oleh perubahan kebijakan edit.
+## 6. Hak akses, bank soal dan UI
+- Hanya Guru G1 aktif Gen–Mapel siswa dapat melihat permintaan akses ulang dan memberi izin; validasi di Controller **dan** Service, termasuk saat izin digunakan. Guru pengganti yang sah mewarisi hak operasional, tetapi pelaku lama tetap tersimpan dalam audit.
+- Soal PG satu kunci A–E, urutan soal/opsi acak server, snapshot soal dan kunci privat, CSRF, anti-replay, throttle, serta pemeriksaan status sebelum menjawab/kirim. Word memakai struktur `SLA-SKS-WORD-V1`; dukungan teks/Arab/Equation/gambar/tabel/media eksternal mengikuti Master 05.
+- Layar S05 menampilkan petunjuk/kapabilitas fullscreen; S06 tanpa sidebar, timer, navigator, indikator tersimpan dan jeda; S07 hanya memberi skor pada `selesai_sah`. Bila tes mandiri terhenti, tampil **permintaan akses ulang**, tanpa skor.
+- Konten ujian TP Siap boleh disunting Guru G1 sampai pertama kali **digunakan siswa**; setelah itu soal/kunci, KKM, durasi, dan snapshot terkunci sesuai Master 02/05/08. Penyuntingan CP/BAB tidak mereset histori ujian.
+- Fullscreen adalah mitigasi tingkat browser, bukan jaminan anticurang.

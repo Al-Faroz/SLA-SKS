@@ -49,7 +49,11 @@
         let decoded;
         try { decoded = await response.json(); }
         catch (_) { throw new Error('Koneksi atau sesi gagal. Muat ulang ruang ujian jika diperlukan.'); }
-        if (typeof decoded.csrf === 'string') csrf = decoded.csrf;
+        if (typeof decoded.csrf === 'string') {
+            csrf = decoded.csrf;
+            const permintaanCsrf = $('[data-ujian-akses-ulang] input[name="' + csrfName + '"]');
+            if (permintaanCsrf) permintaanCsrf.value = csrf;
+        }
         if (!response.ok || !decoded.ok) throw new Error(decoded.pesan || 'Permintaan tidak diterima server.');
         return decoded.data;
     }
@@ -70,10 +74,10 @@
             setText('[data-ujian-hasil-judul]',
                 state.status === 'selesai_sah' ? 'Hasil ' + namaUjian
                     : (jenis === 'diagnostik' && langsungBelajar
-                        ? 'Keputusan Guru: Langsung Belajar' : 'Menunggu keputusan Guru'));
+                        ? 'Keputusan historis Guru: Langsung Belajar' : 'Tes tidak selesai — akses ulang diperlukan'));
             let pesanHasil = jenis === 'diagnostik' && langsungBelajar
-                ? 'Diagnostik dibatalkan tanpa skor. Guru telah memilih jalur Langsung Belajar; selesaikan satu Materi, Resume final, HOTS final, kemudian Sumatif.'
-                : 'Percobaan dibatalkan tanpa skor. Hubungi Guru pengampu.';
+                ? 'Keputusan historis Guru: lanjut jalur belajar. Selesaikan Materi, Resume final, HOTS final, kemudian Sumatif.'
+                : 'Tes tidak selesai tanpa skor sah. Kembali ke Rincian TP untuk meminta akses ulang kepada Guru.';
             if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
                 pesanHasil = state.skor >= state.kkm
                     ? 'Diagnostik memenuhi KKM. Materi/Resume/HOTS boleh dilewati; Sumatif tetap wajib.'

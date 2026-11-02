@@ -46,7 +46,7 @@ final class MesinSumatifSiswaService
 
     /**
      * Satu Sumatif normal sah dan maksimal satu remedial bila skor normal < KKM.
-     * Hasil yang dibatalkan menunggu keputusan Guru, tidak membuat jatah baru.
+     * Tes yang tidak selesai menunggu izin akses ulang Guru; bukan remedial dan tidak menambah jatah sah.
      */
     public static function tahapBerikut(?array $normal, ?array $remedial): string
     {
@@ -307,14 +307,14 @@ final class MesinSumatifSiswaService
             if (in_array($tahap, ['lanjut_normal','lanjut_remedial'], true)) {
                 $lama = $tahap === 'lanjut_normal' ? $normal : $remedial;
                 if (!in_array($row['status'], ['belajar','sumatif'], true)) {
-                    throw new DomainException('Percobaan harus ditinjau Guru sebelum dilanjutkan.');
+                    throw new DomainException('Tes menunggu izin akses ulang Guru sebelum dimulai lagi.');
                 }
                 $this->db->transCommit();
                 return ['token' => $lama['token_publik'], 'sudah_ada' => true];
             }
             if (!in_array($tahap, ['normal','remedial','ulang_normal','ulang_remedial'], true)
                 || !in_array($row['status'], ['belajar','sumatif'], true)) {
-                throw new DomainException('Kesempatan Sumatif tidak tersedia atau menunggu Guru.');
+                throw new DomainException('Kesempatan Sumatif belum tersedia atau sedang menunggu izin akses ulang Guru.');
             }
             // Verifikasi gerbang A3 setelah lock, bukan berdasarkan UI sebelumnya.
             $syarat = (new KelayakanSumatifSiswaService($this->db, $this->akunSaatIni))
@@ -425,7 +425,7 @@ final class MesinSumatifSiswaService
                 && ($s['tahap'] ?? 'normal') === 'normal'
                 && (float) ($s['skor'] ?? 0) < (int) $s['kkm'],
             'pesan' => $status === 'dibatalkan_menunggu_guru'
-                ? 'Percobaan dibatalkan. Menunggu keputusan Guru.' : '',
+                ? 'Tes Sumatif tidak selesai. Minta akses ulang kepada Guru untuk tahap yang sama.' : '',
         ];
     }
 

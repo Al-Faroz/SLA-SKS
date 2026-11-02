@@ -10,7 +10,7 @@ use RuntimeException;
 use Throwable;
 
 /**
- * A5: otorisasi Guru saat ini untuk keputusan ujian batal.
+ * Kompatibilitas A5: izin akses ulang tes mandiri oleh Guru G1, bukan pembatalan akademik.
  * Tidak mengubah skor/jawaban/riwayat percobaan; izin pengganti sekali pakai.
  */
 final class KeputusanUjianBatalService
@@ -27,8 +27,8 @@ final class KeputusanUjianBatalService
     public static function pilihan(string $jenis): array
     {
         return match ($jenis) {
-            'diagnostik' => ['ulang_diagnostik', 'langsung_belajar'],
-            'sumatif' => ['ulang_sumatif', 'tunda_tinjauan'],
+            'diagnostik' => ['ulang_diagnostik'],
+            'sumatif' => ['ulang_sumatif'],
             default => [],
         };
     }
@@ -39,7 +39,7 @@ final class KeputusanUjianBatalService
         if (!$akun || ($akun['peran_aktif'] ?? '') !== 'guru'
             || ($akun['status'] ?? '') !== 'aktif'
             || (int) ($akun['wajib_ganti_sandi'] ?? 1) !== 0) {
-            throw new DomainException('Keputusan ujian hanya untuk Guru aktif.');
+            throw new DomainException('Pemberian izin akses ulang hanya untuk Guru aktif.');
         }
         return (int) $akun['id'];
     }
@@ -73,7 +73,8 @@ final class KeputusanUjianBatalService
             ->where('g.guru_id', $guruId)
             ->where('s.angkatan_id=p.angkatan_id')
             ->whereIn('pu.jenis', ['diagnostik', 'sumatif'])
-            ->where('pu.status', 'dibatalkan_menunggu_guru');
+            ->where('pu.status', 'dibatalkan_menunggu_guru') // kode status enum DB lama
+            ->where('EXISTS (SELECT 1 FROM riwayat_status_ujian rs WHERE rs.percobaan_ujian_id=pu.id AND rs.alasan=' . $this->db->escape(PermintaanAksesUlangSiswaService::ALASAN_PERMINTAAN) . ')', null, false);
     }
 
     public function antrean(): array
@@ -108,29 +109,25 @@ final class KeputusanUjianBatalService
         $this->pastikanSkema();
         $row = $this->queryOtorisasi($guru)->where('pu.id', $attemptId)
             ->get()->getRowArray();
-        if (!$row) throw new DomainException('Ujian di luar Gen–Mapel Anda atau tidak dibatalkan.');
+        if (!$row) throw new DomainException('Permintaan akses ulang tidak ditemukan atau di luar Gen–Mapel Anda.');
         $row['keputusan'] = $this->db->table('keputusan_ujian_batal')
             ->where('percobaan_ujian_id', $attemptId)->get()->getRowArray();
         return $row;
     }
 
     /**
-     * Progres TP dikunci. Tunda boleh dilanjutkan menjadi ulang Sumatif,
-     * namun keputusan final tidak dapat diubah/diulang.
+     * Izin akses ulang tahap tes mandiri diberikan oleh Guru, sekali pakai.
+     * Izin baru tidak mengaktifkan remedial atau mengubah skor sah.
      */
-    public function putuskan(int $attemptId, string $aksi, string $alasan): void
+    public function putuskan(int $attemptId, string $aksi): void
     {
         $guruId = $this->guruId();
         $this->pastikanSkema();
-        $alasan = trim(preg_replace('/\s+/u', ' ', $alasan) ?? '');
-        if ($alasan === '' || mb_strlen($alasan, 'UTF-8') > 255) {
-            throw new DomainException('Alasan keputusan wajib diisi, maksimal 255 karakter.');
-        }
         $this->db->transBegin();
         try {
             $row = $this->lihat($attemptId);
             if (!in_array($aksi, self::pilihan((string) $row['jenis']), true)) {
-                throw new DomainException('Keputusan tidak sesuai jenis ujian.');
+                throw new DomainException('Izin tidak sesuai jenis tes mandiri.');
             }
             $lock = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
             $p = $this->db->query(
@@ -141,7 +138,7 @@ final class KeputusanUjianBatalService
                 [$attemptId])->getRowArray();
             if (!$p || !$ujian || $ujian['status'] !== 'dibatalkan_menunggu_guru'
                 || (int) $p['versi_konten_tp_id'] !== (int) $ujian['versi_konten_tp_id']) {
-                throw new DomainException('Percobaan sudah berubah atau snapshot tidak sesuai.');
+                throw new DomainException('Tes yang memerlukan akses ulang sudah berubah atau snapshot tidak sesuai.');
             }
             // Otorisasi G1 diperiksa ulang dan dikunci menjelang commit,
             // sehingga pergantian pengampu tidak menghasilkan keputusan lama.
@@ -174,8 +171,11 @@ final class KeputusanUjianBatalService
                 return;
             }
             if ($aksi !== 'tunda_tinjauan' && $p['status'] !== 'perlu_bantuan') {
-                throw new DomainException('TP tidak menunggu keputusan ujian.');
+                throw new DomainException('TP tidak sedang menunggu izin akses ulang.');
             }
+            // Alasan audit dibangkitkan sistem; sebab teknis tersimpan pada percobaan.
+            $alasan = 'Izin akses ulang ' . ucfirst((string) $ujian['jenis'])
+                . ' (' . (string) $ujian['tahap'] . ') diberikan Guru atas permintaan siswa.';
             $waktu = gmdate('Y-m-d H:i:s');
             $data = ['keputusan'=>$aksi,'guru_id'=>$guruId,'alasan'=>$alasan,
                 'diputus_pada'=>$waktu,'digunakan_pada'=>null];
@@ -218,7 +218,7 @@ final class KeputusanUjianBatalService
         }
     }
 
-    /** Meneruskan jalur yang sudah sah sebelum Sumatif dibatalkan. */
+    /** Memulihkan jalur sah sebelum Sumatif tidak selesai; tanpa mengulang materi. */
     private function jalurSumatif(int $progresId): string
     {
         $diag = $this->db->table('percobaan_ujian')

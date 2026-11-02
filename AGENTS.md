@@ -31,6 +31,8 @@
 - Jika dump terbaru belum terlampir/terverifikasi, **hentikan perubahan SQL**, lanjutkan hanya telaah/dokumentasi/tes yang tidak mengubah DB dan jelaskan keterbatasan pemeriksaan.
 
 
+**Koreksi mengikat 2 November 2026 — AKSES ULANG TES MANDIRI:** Diagnostik dan Sumatif TP **tidak dibatalkan**; jika tidak selesai akibat insiden/jeda keamanan, siswa meminta **akses ulang Guru**. Sumatif normal pengganti bukan remedial; remedial nilai **hanya** setelah Sumatif normal selesai sah di bawah KKM, satu remedial sah, skor tertinggi, TP Selesai walau masih di bawah KKM. Status pembatalan khusus Pra-Semester. Baca Master 02/06/07/08/16, perbarui UI/API secara konsisten; status enum legacy dalam dump memerlukan SQL additive setelah dump XAMPP terbaru pascapatch. Histori jangan reset.
+
 ## Keputusan final baru (26 Oktober 2026)
 Ketentuan v2.5 **mencabut** kontrak v2.4 tanpa BAB, banyak materi dalam satu TP, diagnostik sebagai nilai final, bobot 20:30:50, tiga percobaan normal sumatif, dan rata-rata akhir semester. Status implementasi historis dalam dokumen tidak mengubah kontrak baru. Export nilai Guru harus tersedia walau baru satu skor TP.
 

@@ -10,6 +10,8 @@
 
 **Kontrak v4:** `cp_mapel` (satu CP operasional per mapel/kurikulum/fase), `cp_mapel_elemen` (rujukan multi-elemen/versi `ref_cp` lama), `bab` (paket, nomor, kelas, nama50, deskripsi225; keunikan lintas semester berpasangan), `tp` (BAB, CP operasional, jenis esensial/non_esensial, nama50, deskripsi225, nomor urut BAB, kkm_khusus), `materi` maksimal satu aktif per TP, `nilai_tp` (nilai mandiri per TP), `ujian_pra_semester` dan `soal_pra_semester` (bank lintas BAB dan jadwal Admin), `percobaan_ujian` generik dengan tahap normal/remedial, serta checkpoint pada `progres_materi`.
 
+**Status ujian yang perlu dibedakan:** secara domain Diagnostik/Sumatif yang tidak selesai memerlukan **akses ulang Guru** (bukan status pembatalan); hanya Pra-Semester yang dapat dibatalkan. Dump sebelum pembaruan masih menyimpan status enum legacy `dibatalkan_menunggu_guru` untuk tes mandiri. Jangan melakukan ALTER atau mengubah histori tanpa dump terbaru **setelah patch terakhir**, backup dan file update SQL additive bernomor baru. Kode harus kompatibel dengan status historis sementara dan UI tidak memakai label pembatalan pada tes mandiri.
+
 **Data lama penting tetap ada:** pengguna, peran, siswa, mapel, kurikulum, referensi, Gen, penugasan guru, identitas, materi/soal/percobaan/snapshot. TP uji v3 yang memiliki **4 Materi** diarsipkan dan materi lamanya dinonaktifkan **hanya pada salinan v4** untuk menghindari pelanggaran ketentuan satu Materi aktif per TP. Tidak mengubah progres/percobaan historis. File fisik di `writable/` perlu backup terpisah.
 
 ## 3. Invarian SQL dan transaksi
@@ -28,7 +30,7 @@
 - Bobot efektif TP NonEsensial: **20/20/60** bila gagal Diagnostik, atau **0/0/100** bila lulus.
 - Minimal soal tayang/bank: Diagnostik 10, Sumatif 30, Pra-Semester 30. Sumatif/Pra-Semester: satu remedial bila skor di bawah KKM.
 - Media pembelajaran: checkpoint client-side **4 menit** dan saat perubahan tahap/selesai, validasi server. YouTube/audio selesai pada min(waktu Guru,90% durasi). PDF ≤15MB dan ≤40 halaman.
-- Keamanan ujian: jeda fullscreen 90/180 detik, insiden ketiga batal, heartbeat koneksi 20 detik/jeda 300 detik. Parameter madrasah, sertifikat, foto, login dan audit lama tidak dihapus.
+- Keamanan ujian: jeda fullscreen 90/180 detik, insiden ketiga **menghentikan percobaan** (mandiri: akses ulang; Pra-Semester: batal), heartbeat koneksi 20 detik/jeda 300 detik. Parameter/ madrasah, sertifikat, foto, login dan audit lama tidak dihapus.
 
 ## 5. Paket SQL instalasi dan update
 **Instalasi lokal v4:** dari dump v3 26 Oktober 2026 bangun satu SQL privat `sla_sks_v4_LOKAL_PRIVAT.sql` yang menjalankan `CREATE DATABASE sla_sks_v4` pada DB **baru dan belum ada** lalu memulihkan data v3 dan menerapkan revisi skema berurutan `V4-0001`. `sla_sks_v3` tidak disentuh. **JANGAN COMMIT** file privat (nama/NISN/hash/sesi/jawaban). Repository hanya boleh berisi DDL/patch tanpa data pribadi dan dokumentasi.

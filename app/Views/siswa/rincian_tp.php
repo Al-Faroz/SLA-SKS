@@ -18,6 +18,12 @@
                 Rincian TP dan status aktivasi versi konten Anda.</p>
         </div>
     </header>
+    <?php if ($pesan = session()->getFlashdata('akses_ulang_sukses')): ?>
+        <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+    <?php endif ?>
+    <?php if ($pesan = session()->getFlashdata('akses_ulang_gagal')): ?>
+        <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+    <?php endif ?>
     <section class="a-card" aria-labelledby="rincian-tp-siswa">
         <h2 id="rincian-tp-siswa">Tujuan Pembelajaran</h2>
         <h3>Rumusan TP</h3>
@@ -85,7 +91,31 @@
                     Memuat ulang halaman tidak membuat progres baru.
                 </div>
             <?php endif ?>
-            <?php if ($progres !== null && in_array($progres['status'], ['belajar','sumatif','tuntas','perlu_bantuan'], true)): ?>
+            <?php if ($aksesUlang !== null): ?>
+                <?php $namaAkses = $aksesUlang['jenis'] === 'sumatif'
+                    ? ($aksesUlang['tahap'] === 'remedial' ? 'Remedial Sumatif' : 'Sumatif')
+                    : 'Diagnostik'; ?>
+                <section class="a-card a-jarak-atas" aria-labelledby="akses-ulang-judul">
+                    <h3 id="akses-ulang-judul">Akses Ulang <?= esc($namaAkses) ?></h3>
+                    <p class="a-help">Percobaan <?= esc($namaAkses) ?> terakhir tidak selesai.
+                        Permintaan akses ulang harus disetujui Guru pengampu.
+                        Ini bukan remedial nilai dan tidak mengurangi kesempatan tes sah.</p>
+                    <?php if ($aksesUlang['sudah_diminta']): ?>
+                        <div class="a-alert" role="status">Permintaan akses ulang
+                            <?= esc($namaAkses) ?> sudah dikirim. Menunggu izin Guru.</div>
+                    <?php else: ?>
+                        <form method="post"
+                            action="<?= esc(site_url('siswa/tp/' . (int) $tp['id']
+                                . '/akses-ulang/' . $aksesUlang['jenis']), 'attr') ?>">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="a-btn a-btn--utama">
+                                Minta akses ulang <?= esc($namaAkses) ?> kepada Guru
+                            </button>
+                        </form>
+                    <?php endif ?>
+                </section>
+            <?php endif ?>
+            <?php if ($progres !== null && in_array($progres['status'], ['belajar','sumatif','tuntas'], true)): ?>
                 <p><a class="a-btn a-btn--sekunder"
                     href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/diagnostik/ujian'), 'attr') ?>">
                     Lihat hasil/status Diagnostik

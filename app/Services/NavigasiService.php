@@ -21,7 +21,7 @@ final class NavigasiService
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
             $menu[] = ['label' => 'Antrean Penilaian', 'path' => 'guru/penilaian',
                 'aktif' => $aktif === 'penilaian'];
-            $menu[] = ['label' => 'Ujian Dibatalkan', 'path' => 'guru/ujian-batal',
+            $menu[] = ['label' => 'Permintaan Akses Ulang', 'path' => 'guru/akses-ulang',
                 'aktif' => $aktif === 'ujian_batal'];
             $menu[] = ['label' => 'Rekap Nilai TP', 'path' => 'guru/rekap-nilai',
                 'aktif' => $aktif === 'rekap_nilai'];

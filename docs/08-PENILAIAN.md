@@ -5,10 +5,11 @@
 ## 1. Skema nilai
 - Satu TP **Esensial** tidak memiliki penilaian, tetap tercantum di ATP dan sertifikat tanpa nilai.
 - Pada TP **NonEsensial**, Diagnostik minimal 10 soal menentukan jalur, tidak masuk rumus nilai. Sumatif minimal 30 soal **selalu wajib**, termasuk untuk siswa yang lulus Diagnostik.
-- **Diagnostik tidak lulus / langsung belajar setelah pembatalan:** `nilai_tp = Resume×0.20 + HOTS×0.20 + SumatifTerbaik×0.60`.
+- **Diagnostik selesai sah dengan skor di bawah KKM:** `nilai_tp = Resume×0.20 + HOTS×0.20 + SumatifTerbaik×0.60`.
 - **Diagnostik lulus:** `nilai_tp = SumatifTerbaik×1.00`. Resume/HOTS yang dilewati tidak diberi skor nol dan tidak masuk rumus.
 - KKM efektif diambil dari pilihan khusus Guru bila disetel, selebihnya default Admin. KKM contoh 80 bukan nilai hard-coded yang selalu dipakai.
-- **Remedial satu kali jika Sumatif awal < KKM.** `SumatifTerbaik = MAX(SumatifAwal, SumatifRemedial)`. Tidak ada remedial jika nilai awal sudah mencapai KKM.
+- **Remedial nilai hanya satu kali jika Sumatif awal selesai sah < KKM.** `SumatifTerbaik = MAX(SumatifAwal, SumatifRemedial)`. Tidak ada remedial jika nilai awal sudah mencapai KKM.
+- **Tes Diagnostik/Sumatif yang tidak selesai** harus dimintakan **izin akses ulang kepada Guru** untuk mengerjakan tahap yang sama; ini bukan pembatalan dan bukan remedial. Tidak ada skor sah atau pengurangan kesempatan sah. Pembatalan ujian hanya untuk Pra-Semester. Histori yang sudah sah tidak dihapus. 
 - Setelah semua aktivitas dan kesempatan ujian sah yang relevan diselesaikan, **status TP SELESAI meskipun nilai akhir di bawah KKM**. Informasi tercapai/belum mencapai KKM boleh tampil terpisah dari status progres.
 - Guru menilai Resume/HOTS integer 0–100. Jika skor Guru wajib belum ada, **nilai TP Sementara**, bukan mengisi nol. Simpan presisi dua desimal.
 
@@ -17,7 +18,7 @@
 
 ## 3. Penilaian Guru dan koreksi
 Guru aktif Gen–Mapel menerima antrean Resume/HOTS final tertua, menilai sesuai hak, dapat melihat snapshot dan penilai historis. Siswa boleh lanjut setelah final walaupun belum dinilai. Koreksi nilai oleh Guru lain pada Gen–Mapel sama dilakukan melalui permohonan yang diputus Admin (larangan self-approval). Jejak perubahan sebelum/sesudah, alasan, nomor versi, dan pemberitahuan siswa wajib.
-- **Setelah siswa menggunakan TP, konten soal dan kunci TP tidak boleh diubah.** Jika ditemukan kesalahan akademik pada penilaian siswa yang sudah terjadi, gunakan prosedur **koreksi nilai siswa** yang terpisah dan diaudit dengan melihat snapshot/percobaan sah; jangan memperbarui sumber soal/kunci atau KKM TP yang terkunci. Ujian dibatalkan tidak diberi nilai; perubahan nilai sah tidak otomatis membatalkan status TP Selesai yang ditentukan oleh aktivitas.
+- **Setelah siswa menggunakan TP, konten soal dan kunci TP tidak boleh diubah.** Jika ditemukan kesalahan akademik pada penilaian siswa yang sudah terjadi, gunakan prosedur **koreksi nilai siswa** yang terpisah dan diaudit dengan melihat snapshot/percobaan sah; jangan memperbarui sumber soal/kunci atau KKM TP yang terkunci. Tes mandiri yang tidak selesai tidak diberi nilai; Pra-Semester yang dibatalkan juga tanpa nilai. Perubahan nilai sah tidak otomatis membatalkan status TP Selesai yang ditentukan oleh aktivitas.
 - Koreksi yang memengaruhi daftar nilai sertifikat mengikuti prosedur revisi dokumen 09. PDF lama tidak ditimpa/dicabut.
 - Indikator kemiripan jawaban tetap 3-gram kata Jaccard dengan ambang bawaan 60% untuk **perlu ditinjau**, tanpa hukuman otomatis. Pemeriksaan dibatasi materi/TP, Gen dan hak Guru.
 
