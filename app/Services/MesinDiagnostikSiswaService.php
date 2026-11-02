@@ -248,7 +248,7 @@ final class MesinDiagnostikSiswaService
                 $izin = KeputusanUjianBatalService::izin(
                     $this->db, (int) $existing['id'], 'ulang_diagnostik');
                 if ($izin === null) {
-                    throw new DomainException('Diagnostik dibatalkan. Menunggu keputusan Guru.');
+                    throw new DomainException('Diagnostik tidak selesai. Minta akses ulang kepada Guru.');
                 }
             }
             $check = (new PetunjukDiagnostikSiswaService($this->db, $this->akunSaatIni))->periksa($tpId);
@@ -346,7 +346,7 @@ final class MesinDiagnostikSiswaService
             'jumlah_benar' => $status === 'selesai_sah' ? (int) ($s['jumlah_benar'] ?? 0) : null,
             'kkm' => $status === 'selesai_sah' ? (int) $s['kkm'] : null,
             'pesan' => $status === 'dibatalkan_menunggu_guru'
-                ? 'Percobaan dibatalkan. Menunggu keputusan Guru.' : '',
+                ? 'Tes Diagnostik tidak selesai. Minta akses ulang kepada Guru.' : '',
         ];
     }
 
