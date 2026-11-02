@@ -101,7 +101,7 @@ final class KelolaSoalGuruService
         $semua = [];
         foreach (['pertanyaan','opsi_a','opsi_b','opsi_c','opsi_d','opsi_e'] as $name) {
             $semua[$name] = HtmlSoalGuruService::bersihkan(
-                (string) ($input[$name] ?? ''), $tpId, is_string($wordSource) ? $wordSource : null
+                (string) ($input[$name] ?? ''), $tpId, is_string($wordSource) ? $wordSource : null, true
             );
         }
 
@@ -121,7 +121,7 @@ final class KelolaSoalGuruService
                 $rich['word_source_id'] = $wordSource;
             }
             foreach ($semua as $name => $data) {
-                $record[$name] = $data['teks'];
+                $record[$name] = $data['teks'] !== '' ? $data['teks'] : '[Ilustrasi soal]';
                 if ($name !== 'pertanyaan') {
                     $rich['html_opsi'][strtoupper(substr($name, -1))] = $data['html'];
                 }
