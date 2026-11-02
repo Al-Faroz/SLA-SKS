@@ -130,6 +130,15 @@ final class KoreksiTpService
         return $row;
     }
 
+    public function daftarGuru(int $tpId): array
+    {
+        $this->guru($tpId);
+        $this->perluTabel();
+        return $this->db->table('permohonan_koreksi_tp')
+            ->select('id,kategori,status,alasan,dibuat_pada,diajukan_pada,diputus_pada,catatan_keputusan,versi_terbit_id')
+            ->where('tp_id', $tpId)->orderBy('id', 'DESC')->limit(20)->get()->getResultArray();
+    }
+
     public function daftarAdmin(): array
     {
         $this->akun('admin');
@@ -373,7 +382,7 @@ final class KoreksiTpService
                 throw new DomainException('Permohonan tidak lagi menunggu keputusan.');
             }
             if ((int) $row['guru_id'] === (int) $admin['id']) {
-                throw new DomainException('Akun yang mengajukan sebagai Guru tidak boleh menyetujui permohonannya sendiri.');
+                throw new DomainException('Akun pengusul Guru tidak boleh memutus permohonannya sendiri, baik setuju maupun tolak.');
             }
             $tpId = (int) $row['tp_id'];
             $tp = $this->db->query('SELECT * FROM tp WHERE id=? FOR UPDATE', [$tpId])->getRowArray();
