@@ -105,6 +105,42 @@ final class GuruKoreksiTp extends BaseController
         }
     }
 
+    public function unggahMedia(int $id): RedirectResponse
+    {
+        try {
+            $file = $this->request->getFile('media');
+            if ($file === null || !$file->isValid()) {
+                throw new DomainException('Pilih berkas Materi yang sah. Batas PDF 15 MB, 6–40 halaman; gambar/audio maksimal 10 MB.');
+            }
+            (new KoreksiTpService())->unggahMedia($id, $file);
+            return redirect()->to($this->keDraf($id) . '#rincian')
+                ->with('sukses', 'Media pengganti tersimpan dalam Draf Koreksi. Media TP Siap lama belum berubah.');
+        } catch (DomainException $e) {
+            return redirect()->to($this->keDraf($id) . '#rincian')->with('galat', $e->getMessage());
+        } catch (Throwable $e) {
+            log_message('error', 'Media koreksi gagal: {e}', ['e' => $e->getMessage()]);
+            return redirect()->to($this->keDraf($id))->with('galat', 'Media koreksi gagal disimpan. Periksa log server.');
+        }
+    }
+
+    public function media(int $id): \CodeIgniter\HTTP\ResponseInterface
+    {
+        try {
+            $item = (new KoreksiTpService())->mediaGuru($id);
+            $bytes = file_get_contents($item['path']);
+            if ($bytes === false) {
+                throw new DomainException('Berkas koreksi belum dapat dibaca.');
+            }
+            return $this->response->setHeader('Content-Type', $item['mime'])
+                ->setHeader('X-Content-Type-Options', 'nosniff')
+                ->setHeader('Content-Disposition', 'inline')
+                ->setHeader('Cache-Control', 'private, no-store')
+                ->setBody($bytes);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(403)->setBody('Media tidak tersedia atau tidak berizin.');
+        }
+    }
+
     public function kirim(int $id): RedirectResponse
     {
         try {
