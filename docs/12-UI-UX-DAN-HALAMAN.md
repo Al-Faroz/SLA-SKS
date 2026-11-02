@@ -70,7 +70,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G13 | Detail siswa/ujian | Nilai, histori attempt/insiden, keputusan pembatalan, izin ulang |
 | G14 | Pratinjau siswa | Berkas/TP dalam mode baca tanpa progres, banner pratinjau |
 | G15 | Laporan | Pilih laporan mapelnya dan PDF/Excel |
-| G16 | Koreksi TP | Ajukan kategori A/B/C, diff/versi, status keputusan, riwayat |
+| G16 | Edit TP Siap belum digunakan | Guru G1 langsung membuka editor TP/Materi/soal saat belum ada siswa yang menggunakan TP; bila telah digunakan, tampilkan status terkunci |
 | G17 | Koreksi nilai/kunci ujian | Usulan nilai guru sebelumnya, peninjauan soal/kunci dan dampak akademik |
 | G18 | Pengumuman | Buat/ubah/arsip pengumuman global secara sederhana |
 
@@ -89,7 +89,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | A09 | Audit | Filter peristiwa, aktor dan waktu, detail sebelum/sesudah aman |
 | A10 | Laporan | Unduh laporan seluruh cakupan |
 | A11 | Pemeliharaan | Kapasitas disk, status cron, akun terkunci, backup manual/SOP |
-| A12 | Referensi CP | Daftar sumber/versi, usulan Guru, setujui/tolak/perbaikan langsung Admin |
+| A12 | Referensi CP | Tambah/Sunting CP langsung oleh Admin dengan 5 isian; daftar/filter/ekspor dan histori internal tanpa approval |
 | A13 | Permohonan akademik | Koreksi TP, nilai pengganti/kunci ujian; bandingkan diff/dampak dan putuskan |
 | A14 | Identitas sekolah | Nama, alamat, NPSN, NSM, telepon, email wajib, web opsional, kepala madrasah |
 | A15 | Logo Aplikasi/Favicon/TTD | Satu upload logo aplikasi digunakan sebagai logo dan favicon; TTD dan template sertifikat tetap aset terlindung terpisah |
@@ -123,7 +123,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | P04 | Kebijakan Privasi publik | Teks kebijakan resmi sekolah, versi dan kontak sekolah; tanpa login |
 
 ## 8. Notifikasi internal yang ditampilkan
-Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, keputusan Guru tentang ujian batal/ulang, TP Siap tersedia atau koreksinya terbit, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik kepada Guru. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
+Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, keputusan Guru tentang ujian batal/ulang, TP Siap tersedia, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik yang masih berlaku (misalnya koreksi nilai). Sunting langsung CP/BAB/TP yang belum digunakan bukan permohonan approval. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
 
 ## 9. Detail interaksi wajib semua layar
 **Setiap layar wajib memiliki:** tujuan, siapa dapat membuka, data sumber, komponen yang digunakan, form validation, aksi sukses, aksi gagal, akses browser back, loading, kosong, readonly, locked, responsive, uji minimal. Jangan merender tombol Simpan jika tidak ada perubahan kecuali desain memerlukan. Gunakan pesan error yang spesifik: bukan `Terjadi kesalahan` tanpa instruksi. Untuk aksi berisiko tampilkan modal konfirmasi dengan nama objek.
@@ -148,7 +148,7 @@ Minimal siswa 360px, layar sentuh target ≥40px, kontras teks 4,5:1, fokus keyb
 1. **`/admin/pengelola`**: card `admin-akun_form` **baris pertama full-width/landscape**, field membentuk grid horizontal responsif; card `admin-akun_daftar` **di bawah** dan berisi pencarian/filter/tabel serta **pagination server-side** dengan nomor halaman, jumlah total, empty state dan filter yang bertahan antarhalaman.
 2. **`/admin/siswa`**: susunan sama; `admin-akun_form` atas full-width, `admin-akun_daftar` di bawah dengan pagination server-side. Pertahankan menu impor/ekspor, reset, CSRF dan validasi yang sudah ada.
 3. **`/admin/mapel-guru`**: tabel **Penetapan Guru per Gen** mengatur kontrol pada kolom terpisah: **Guru Pengampu (select)** | **Alasan Penetapan/Pergantian (input)** | **Aksi Simpan (button)**, satu baris konteks Gen–Mapel. Tidak bertumpuk vertikal pada desktop, responsif/scroll aman di HP; **pagination server-side** dan filter kontekstual.
-4. **`/admin/kurikulum-cp`**: **hanya tabel Daftar CP dan Status Versinya** yang diubah: pagination server-side serta **Ekspor Excel XLSX** sesuai filter/status, mencakup kode/mapel/kurikulum/fase/elemen/versi/status/identitas tanggal yang sah dan aman dari formula injection. Formulir dan panel lain **tidak ikut dirombak**, kecuali penyederhanaan form CP yang sudah diputuskan dalam dokumen 04.
+4. **`/admin/kurikulum-cp`**: tabel Daftar CP tetap memiliki pagination dan **Ekspor Excel XLSX** sesuai filter. Form CP **wajib disederhanakan menjadi lima isian** sesuai Master 04; kolom metadata tambahan yang lama tidak ditampilkan/diwajibkan, dan ekspor hanya memuat data sah tanpa formula injection.
 5. **`/admin/identitas`**: tambahkan card unggah **Logo Aplikasi**, pratinjau, validasi file gambar asli/dimensi/ukuran, aktifkan setelah sukses; gunakan sebagai **logo antarmuka/login dan favicon** (varian ukuran dari satu sumber diperbolehkan). Fallback ketika belum ada logo; TTD dan background sertifikat tetap diproses menurut dokumen 09.
 6. **`/profil` untuk SELURUH ROLE**: card **Foto Profil** paling atas **lebar penuh**; di bawahnya **dua card berdampingan** pada desktop, **Identitas Akun** dan **Kontak Pribadi**. Di mobile keduanya bertumpuk sesuai urutan dan tanpa memotong input. Hak edit mengikuti role (siswa hanya hak yang sah); fitur foto yang membutuhkan moderasi tetap memakai proses persetujuan yang sudah berlaku.
 7. Prinsip desain: tetap HTML, CSS kustom `app.css`, JS native, komponen `a-`, keadaan normal/kosong/loading/sukses/galat, akses keyboard/kontras dan responsivitas 360/390/768/1100px. Pagination **bukan memuat seluruh tabel lalu menyembunyikan baris dengan JS**.
@@ -256,10 +256,11 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 ### KKM default yang diwarisi, bukan override palsu (2 November 2026)
 - Guru melihat KKM default Admin otomatis di isian kedua tab (satu KKM bersama); tidak perlu menekan Simpan jika tidak mengubahnya. Angka berbeda dapat disimpan sebagai KKM khusus berkali-kali selama draf. Kembali ke angka Admin mengembalikan pewarisan.
 - Admin yang belum mengonfigurasi default mendapatkan contoh 80 yang diberi peringatan **belum aktif sampai disimpan**, bukan default tersembunyi. Guru melihat peringatan bila default tidak ada.
-- TP Siap hanya menampilkan KKM terpin; tidak memunculkan tombol edit/koreksi yang belum benar-benar terhubung. Mekanisme koreksi berversi dikembangkan pada tahap terpisah.
+- TP Siap **belum dipakai siswa** menampilkan KKM efektif dan editor Guru yang sama seperti Draf; simpan memeriksa ulang tidak ada penggunaan siswa dan menyelaraskan snapshot sebelum siswa memulai. TP yang sudah dipakai menampilkan data readonly dengan alasan kunci yang jelas; tidak menawarkan permohonan kategori A/B/C.
 
 
-### Halaman koreksi TP Siap dan sunting CP terbit (2 November 2026)
-- Guru: pada `/guru/tp/{id}` yang Siap ada tombol **Ajukan Koreksi TP Siap** → halaman permohonan dengan kategori A/B/C, alasan, riwayat. Guru dapat membuka satu draf untuk mengubah rincian/KKM/Materi/berkas/soal secara terpisah dan mengirimnya, lalu melihat status ditinjau/disetujui/ditolak. Tidak ada tombol edit langsung pada TP Siap.
-- Admin: menu **Persetujuan Koreksi TP** menampilkan daftar, perbandingan TP/Materi/soal dan catatan keputusan, tombol setujui atau tolak (hanya `diajukan`, tidak untuk akun pemohon yang sama). Antarmuka jelas bila patch V4-0006 belum diimpor.
-- Admin Referensi CP: baris CP aktif (termasuk yang digunakan TP) menampilkan **Sunting CP**; bila sudah ada draf menampilkan **Lanjut Sunting CP**. Penerbitan tetap melalui pratinjau/draf-versi baru yang telah ada, riwayat CP lama tidak berubah.
+### Penyuntingan langsung CP/BAB/TP (aturan final 2 November 2026)
+- **Guru G1**: pada `/guru/tp/{id}` berstatus Siap **tanpa penggunaan siswa** tampil aksi **Sunting TP** dan editor eksisting yang sama dengan Draf (rincian, KKM bersama, Materi/media, soal/Word). Jika sudah ada satu saja siswa menggunakan TP, tampil informasi **Konten TP telah digunakan siswa; penyuntingan terkunci**, tanpa aksi mutasi; server tetap menolak POST.
+- **BAB**: tombol Sunting pada isian BAB yang sudah ada tetap tersedia berdasarkan hak G1; jangan sembunyikan hanya karena TP dalam BAB telah Siap. Tidak ada menu pindah TP antar-BAB.
+- **Admin**: `/admin/kurikulum-cp` menggunakan form Tambah/Sunting yang sama dengan **tepat lima isian**: Kurikulum, Mata pelajaran, Kode CP, Elemen CP, Rumusan CP resmi. Empat field metadata lama tidak tampak/tidak wajib. Untuk CP yang sudah dipakai TP/siswa, tombol **Sunting CP** tetap aktif dan Simpan langsung berlaku pada referensi CP; audit/versi teknis otomatis tanpa draf/penerbitan manual.
+- **Alur kategori lama dicabut**: tidak menampilkan Ajukan Koreksi A/B/C, kategori, alasan wajib, halaman review Admin untuk perubahan TP yang belum digunakan. Jika SQL V4-0006 belum diimpor, tidak ada kewajiban mengimpornya. Kesesuaian kode dan DB dituntaskan pada tahap implementasi.
