@@ -67,7 +67,7 @@ final class GuruBankSoal extends BaseController
 
             $jumlahRaw = $this->request->getGet('jumlah');
             $jumlah = filter_var($jumlahRaw, FILTER_VALIDATE_INT);
-            $minimal = $jenis === 'diagnostik' ? 10 : 5;
+            $minimal = $jenis === 'diagnostik' ? 10 : 30;
             if ($jumlah === false || $jumlah < $minimal || $jumlah > 200) {
                 throw new DomainException('Jumlah soal harus ' . $minimal . ' sampai 200.');
             }
@@ -142,10 +142,10 @@ final class GuruBankSoal extends BaseController
             );
             return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal/review/' . $stage['id']));
         } catch (DomainException $e) {
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))->with('word_galat', $e->getMessage());
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis))->with('word_galat', $e->getMessage());
         } catch (\Throwable $e) {
             log_message('error', 'Unggah bank soal gagal: {reason}', ['reason' => $e->getMessage()]);
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $jenis))
                 ->with('word_galat', 'Berkas belum dapat diproses. Periksa format atau kapasitas penyimpanan.');
         }
     }
@@ -185,7 +185,7 @@ final class GuruBankSoal extends BaseController
             }
             $akun = (new AuthService())->penggunaSaatIni();
             $hasil = (new ImporBankSoalService())->konfirmasi($tpId, (int) $akun['id'], $id);
-            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal'))
+            return redirect()->to(site_url('guru/tp/' . $tpId . '/bank-soal?jenis=' . $hasil['jenis']))
                 ->with('word_sukses', $hasil['jumlah'] . ' soal berhasil diproses: '
                     . $hasil['baru'] . ' baru, ' . $hasil['diubah'] . ' diperbarui. '
                     . 'Soal lama yang tidak ada pada Word tetap disimpan.');
