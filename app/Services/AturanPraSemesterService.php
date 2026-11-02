@@ -31,6 +31,7 @@ final class AturanPraSemesterService
     public static function kelayakanTp(array $daftarTp, array $statusPerTp): array
     {
         $wajib = [];
+        $telahDiperiksa = [];
         foreach ($daftarTp as $tp) {
             $id = (int) ($tp['id'] ?? 0);
             $jenis = (string) ($tp['jenis_tp'] ?? '');
