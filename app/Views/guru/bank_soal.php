@@ -92,7 +92,7 @@
                         <button type="submit" class="a-btn a-btn--sekunder" name="pilihan" value="default">Ikuti Default Admin</button>
                     <?php endif ?>
                 </form>
-                <p class="a-help">Nilai otomatis terisi dari default Admin jika tersedia. Bila tidak diubah, TP draf langsung memakai nilai Admin tanpa perlu disimpan. Angka yang sama dengan default tidak menjadi KKM khusus. Guru boleh mengubah dan menyimpan angka berbeda berkali-kali selama TP masih Draf. Kosongkan kolom lalu simpan untuk mengikuti default Admin kembali.</p>
+                <p class="a-help">Nilai otomatis terisi dari default Admin jika tersedia. Bila tidak diubah, TP Draf langsung memakai nilai Admin tanpa perlu disimpan. Angka yang sama dengan default tidak menjadi KKM khusus. Guru boleh mengubah dan menyimpan angka berbeda berkali-kali selama TP masih Draf. Kosongkan kolom lalu simpan untuk mengikuti default Admin kembali.</p>
             <?php else: ?>
                 <p class="a-help">TP sudah Siap dan memakai KKM yang dipin saat penerbitan (<?= (int) $kkm_info['efektif'] ?>). Jika belum pernah digunakan siswa, pilih Sunting TP pada Rincian TP untuk memperbaiki KKM, Materi, dan soal melalui editor biasa. Jika sudah digunakan siswa, konten terkunci.</p>
             <?php endif ?>
@@ -106,7 +106,7 @@
                     + Tambah Soal <?= esc(ucfirst($jenis_dipilih)) ?>
                 </a>
             <?php else: ?>
-                <p class="a-help">TP sudah Siap. Penambahan dan koreksi memerlukan proses khusus.</p>
+                <p class="a-help">TP Siap belum dapat disunting dari halaman ini. Jika belum digunakan siswa, gunakan tombol Sunting TP pada halaman Rincian TP.</p>
             <?php endif ?>
             <?php if (empty($daftar_soal)): ?>
                 <p class="a-help a-jarak-atas">Belum ada soal. Tambahkan langsung melalui aplikasi atau impor Word.</p>
