@@ -66,6 +66,11 @@ $routes->post('guru/bab/(:num)/sunting', 'GuruBab::sunting/$1', ['filter' => 'au
 $routes->post('guru/tp/baru', 'GuruTpBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/paket-semester/buat-enam', 'GuruPaketSemester::buatEnam', ['filter' => 'auth:guru']);
 // Route pembuatan paket per-semester dihapus dari UI dan POST baru; hanya enam semester sekaligus.
+// Akses ulang tes mandiri: POST dari siswa + antrean keputusan Guru, terpisah dari pembatalan Pra-Semester.
+$routes->post('siswa/tp/(:num)/akses-ulang/(:segment)', 'SiswaAksesUlang::minta/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('guru/akses-ulang', 'GuruUjianBatal::index', ['filter' => 'auth:guru']);
+$routes->get('guru/akses-ulang/(:num)', 'GuruUjianBatal::index/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/akses-ulang/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/ujian-batal', 'GuruUjianBatal::index', ['filter' => 'auth:guru']);
 $routes->get('guru/ujian-batal/(:num)', 'GuruUjianBatal::index/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/ujian-batal/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' => 'auth:guru']);
