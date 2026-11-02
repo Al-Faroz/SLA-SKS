@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Referensi Akademik</p>
             <h1>Referensi Kurikulum &amp; CP</h1>
-            <p class="a-proto-muted">CP yang sudah tersimpan, termasuk yang telah dipakai TP, dapat diperbaiki melalui <strong>Sunting CP</strong>. Sistem menyimpan draf versi baru dan menerbitkan revisi tanpa menimpa CP historis atau snapshot TP Siap.</p>
+            <p class="a-proto-muted">Admin dapat menambah dan menyunting CP langsung melalui lima isian. Riwayat akademik dipertahankan.</p>
         </div>
     </header>
     <?php if ($galat = session()->getFlashdata('galat')): ?>
@@ -62,17 +62,17 @@
         </section>
     </div>
     <section class="a-card" id="cp-tambah" aria-labelledby="judul-cp-baru">
-        <h2 id="judul-cp-baru">Tambah referensi elemen CP Fase D (draf)</h2>
-        <p class="a-help">Pilih Kurikulum–Mapel–Fase yang tepat. Elemen baru atau revisinya akan terhubung ke satu CP operasional setelah diterbitkan Admin. Draf belum dapat digunakan.</p>
+        <h2 id="judul-cp-baru">Tambah CP Fase D</h2>
+        <p class="a-help">Pilih kurikulum, mata pelajaran, kode CP, elemen, dan rumusan resmi. Fase D otomatis.</p>
         <?php if ($kurikulum === [] || $mapel === []): ?>
             <div class="a-alert a-alert--info" role="status">Tambahkan kurikulum serta mapel pada menu terkait terlebih dahulu.</div>
         <?php else: ?>
             <details class="a-cp__details" open>
-                <summary>Formulir draf CP resmi · isi identitas dan sumber</summary>
+                <summary>Formulir CP resmi · 5 isian</summary>
             <form method="post" action="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>" class="a-form a-cp__form">
                 <?= csrf_field() ?>
                 <div class="a-cp__grid">
-                    <h3 class="a-cp__group-title">1 · Identitas dan cakupan CP</h3>
+                    <h3 class="a-cp__group-title">Identitas CP</h3>
                     <div class="a-field"><label class="a-label" for="cp-kurikulum">Kurikulum</label>
                         <select id="cp-kurikulum" name="kurikulum_id" required>
                             <option value="">Pilih kurikulum</option>
@@ -92,19 +92,11 @@
                         <span class="a-help">Kode stabil dan unik untuk kombinasi kurikulum, mapel, Fase D.</span></div>
                     <div class="a-field"><label class="a-label" for="cp-elemen">Elemen CP</label>
                         <input id="cp-elemen" name="elemen" type="text" minlength="3" maxlength="150" required value="<?= esc(old('elemen', ''), 'attr') ?>"></div>
-                    <h3 class="a-cp__group-title">2 · Rumusan dan dokumen resmi</h3>
+                    <h3 class="a-cp__group-title">Rumusan CP</h3>
                     <div class="a-field a-cp__lebar"><label class="a-label" for="cp-rumusan">Rumusan CP resmi</label>
                         <textarea id="cp-rumusan" name="rumusan" rows="5" minlength="20" maxlength="15000" required><?= esc(old('rumusan', '')) ?></textarea></div>
-                    <div class="a-field"><label class="a-label" for="cp-otoritas">Otoritas penerbit</label>
-                        <input id="cp-otoritas" name="otoritas" type="text" minlength="3" maxlength="150" required value="<?= esc(old('otoritas', ''), 'attr') ?>"></div>
-                    <div class="a-field"><label class="a-label" for="cp-dok">Nomor dokumen resmi</label>
-                        <input id="cp-dok" name="nomor_dokumen" type="text" minlength="3" maxlength="120" required value="<?= esc(old('nomor_dokumen', ''), 'attr') ?>"></div>
-                    <div class="a-field"><label class="a-label" for="cp-url">URL sumber dokumen</label>
-                        <input id="cp-url" name="sumber_url" type="url" maxlength="1024" placeholder="https://..." required value="<?= esc(old('sumber_url', ''), 'attr') ?>"></div>
-                    <div class="a-field"><label class="a-label" for="cp-tanggal">Tanggal berlaku dokumen</label>
-                        <input id="cp-tanggal" name="tanggal_berlaku" type="date" required value="<?= esc(old('tanggal_berlaku', ''), 'attr') ?>"></div>
                 </div>
-                <div class="a-cp__aksi"><button class="a-btn a-btn--utama" type="submit">Simpan draf CP</button></div>
+                <div class="a-cp__aksi"><button class="a-btn a-btn--utama" type="submit">Simpan CP</button></div>
             </form>
             </details>
         <?php endif ?>
@@ -209,7 +201,7 @@
         <p class="a-help" role="status"><?= (int) $cpTotal ?> CP sesuai filter · 25 CP per halaman. Ekspor Excel mencakup seluruh hasil filter.</p>
         <?php if ($cp === []): ?>
             <div class="a-empty" role="status"><strong><?= $cpTotal === 0 ? 'Tidak ada CP yang cocok.' : 'Tidak ada data pada halaman ini.' ?></strong>
-                <p>Sesuaikan filter atau gunakan formulir CP di atas untuk membuat draf baru.</p></div>
+                <p>Sesuaikan filter atau gunakan formulir CP di atas untuk menambah CP.</p></div>
         <?php else: ?>
             <div class="a-tabel-gulir">
                 <table class="a-tbl a-tbl--cards a-cp__tabel">
@@ -223,13 +215,7 @@
                             <td data-label="Versi resmi"><?= $item['versi_aktif_id'] === null ? '<span class="a-badge a-badge--tunggu">Belum terbit</span>' : 'v' . (int) $item['versi_aktif'] ?></td>
                             <td data-label="Draf"><?= $item['versi_draf_id'] === null ? '—' : 'v' . (int) $item['versi_draf'] ?></td>
                             <td data-label="Aksi">
-                                <?php if ($item['versi_draf_id'] !== null): ?>
-                                    <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/versi/' . (int) $item['versi_draf_id'] . '/edit'), 'attr') ?>">Lanjut Sunting CP</a>
-                                <?php elseif ($item['versi_aktif_id'] !== null): ?>
-                                    <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id'] . '/versi-baru'), 'attr') ?>">Sunting CP</a>
-                                <?php else: ?>
-                                    <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Kelola Draf</a>
-                                <?php endif ?>
+                                <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id'] . '/sunting'), 'attr') ?>">Sunting CP</a>
                                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Riwayat</a>
                             </td>
                         </tr>
