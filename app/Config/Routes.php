@@ -55,6 +55,7 @@ $routes->post('guru/peta-atp/pratinjau/(:num)', 'GuruAtpPratinjau::tampil/$1', [
 // Setelah pratinjau dan persetujuan eksplisit; revalidasi di dalam transaksi.
 $routes->post('guru/peta-atp/konfirmasi/(:num)', 'GuruAtpKonfirmasi::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/bab/baru', 'GuruBab::buat', ['filter' => 'auth:guru']);
+$routes->post('guru/bab/(:num)/sunting', 'GuruBab::sunting/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/baru', 'GuruTpBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/paket-semester/buat-enam', 'GuruPaketSemester::buatEnam', ['filter' => 'auth:guru']);
 // Route pembuatan paket per-semester dihapus dari UI dan POST baru; hanya enam semester sekaligus.
