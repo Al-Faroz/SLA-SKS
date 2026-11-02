@@ -28,7 +28,7 @@ flowchart TD
 - Diagnostik adalah **gate sebelum kewajiban mempelajari satu Materi**, bukan bagian nilai TP. Diagnostik lulus hanya membebaskan Materi/Resume/HOTS; Sumatif tetap **wajib**.
 - Siswa jalur belajar menuntaskan Materi, mengirim Resume final dan HOTS final, lalu mengikuti Sumatif. Penyelesaian tidak harus menunggu Guru memberi skor, tetapi nilai TP final menunggu nilai Resume/HOTS.
 - Bila Sumatif di bawah KKM, sediakan **hanya satu remedial**; nilai Sumatif yang digunakan adalah nilai tertinggi tes awal/remedial. Setelah kesempatan normal/remedial yang sah diselesaikan, TP berstatus **SELESAI walaupun skor akhir di bawah KKM**. Syarat selesai bukan sama dengan lulus KKM.
-- Diagnostik dibatalkan mengikuti keputusan Guru: ulang atau langsung jalur belajar tanpa skor diagnostik sah. Ujian Sumatif yang dibatalkan tidak menghabiskan kesempatan sah dan perlu keputusan Guru.
+- **Diagnostik/Sumatif tidak selesai:** siswa meminta **izin akses ulang Guru** untuk mengulang tahap yang terhenti. **Bukan pembatalan.** Sumatif awal yang belum selesai bukan remedial; remedial yang belum selesai tidak menciptakan kesempatan remedial kedua. Skor sah dan pembatasan satu remedial tetap utuh. Pembatalan hanya berlaku pada Pra-Semester (Master 07).
 
 ## 3. Media dan checkpoint
 - Hanya satu Materi aktif per TP NonEsensial. Media dapat berupa YouTube, audio, gambar atau PDF; aturan PDF maksimal 15MB/40 halaman dan pembaca PDF.js lokal dipertahankan.
@@ -44,7 +44,7 @@ flowchart TD
 ## 5. Status dan UI
 Tampilan siswa: Semester (progres), BAB (nama singkat/deskripsi), TP (kode/nama singkat/deskripsi asli/jenis), Diagnostik, satu Materi, Resume, HOTS, Sumatif, Remedial, Pra-Semester terjadwal, nilai, sertifikat. Normal/kosong/loading/error/locked. Jika Sumatif di bawah KKM setelah remedial, tampil **TP Selesai — nilai belum mencapai KKM** tanpa mengunci siswa. Penilaian Resume/HOTS yang belum diberikan Guru tampil Sementara dan tidak disulap menjadi nol.
 
-Pencapaian/lencana boleh dirujuk, tidak menambah poin/ranking. Pengendalian fullscreen ujian dan gangguan koneksi mengikuti dokumen 07; checkpoint media bukan heartbeat keamanan ujian.
+Pencapaian/lencana boleh dirujuk, tidak menambah poin/ranking. Pengendalian fullscreen ujian dan gangguan koneksi mengikuti dokumen 07; **akses ulang Diagnostik/Sumatif bukan pembatalan**; checkpoint media bukan heartbeat keamanan ujian.
 
 
 ## Keputusan lintas modul: perlindungan TP berdasarkan penggunaan (2 November 2026)
