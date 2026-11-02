@@ -42,7 +42,7 @@
                 (<em>fullscreen</em>). HP hanya dapat dipakai bila fullscreen benar-benar berhasil.</li>
             <li>Pastikan koneksi internet stabil dan daya perangkat cukup.</li>
             <li>Selama ujian, keluar dari fullscreen menyebabkan waktu berhenti
-                sementara. Pelanggaran ketiga membatalkan percobaan.</li>
+                sementara. Jika batas insiden terlampaui, tes tidak selesai dan siswa perlu meminta izin akses ulang Guru; bukan pembatalan ujian.</li>
             <li>Batas jeda fullscreen adalah 90 detik per kejadian dan 180 detik
                 total; batas jeda akibat koneksi 300 detik sesuai kebijakan ujian.</li>
             <li>Jawaban dinyatakan tersimpan hanya setelah server mengonfirmasinya.
