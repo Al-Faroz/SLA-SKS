@@ -30,6 +30,7 @@ final class NavigasiService
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
+                'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],
             ] as $kode => [$label, $path]) {
                 $menu[] = ['label' => $label, 'path' => $path, 'aktif' => $aktif === $kode];
