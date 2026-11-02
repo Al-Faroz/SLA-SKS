@@ -52,7 +52,7 @@ final class DetailTpMateriResponsifTest extends TestCase
             'name="petunjuk_resume"', 'name="petunjuk_hots"'] as $field) {
             self::assertStringContainsString($field, $partial);
         }
-        self::assertStringContainsString('PDF maksimal 15 MB dan 40 halaman.', $partial);
+        self::assertStringContainsString('PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB.', $partial);
         self::assertStringContainsString('data-materi-file-error', $partial);
     }
 
