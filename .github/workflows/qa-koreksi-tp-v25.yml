@@ -1,0 +1,35 @@
+name: QA Koreksi TP Siap dan Sunting CP Aktif
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KoreksiTpService.php'
+      - 'app/Controllers/GuruKoreksiTp.php'
+      - 'app/Controllers/AdminKoreksiTp.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/guru/koreksi_tp_*.php'
+      - 'app/Views/admin/koreksi_tp_*.php'
+      - 'app/Views/admin/kurikulum_cp.php'
+      - 'app/Views/guru/detail_tp.php'
+      - 'tests/unit/KoreksiTpServiceV25Test.php'
+      - 'database/sql/updates/V4-0006_KOREKSI_TP_SIAP.sql'
+      - '.github/workflows/qa-koreksi-tp-v25.yml'
+  workflow_dispatch:
+
+jobs:
+  validasi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, mbstring, intl, zip, pdo_mysql
+          coverage: none
+      - name: Dependensi PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Sintaks dan izin route
+        run: |
+          for f in app/Services/KoreksiTpService.php app/Controllers/GuruKoreksiTp.php app/Controllers/AdminKoreksiTp.php app/Config/Routes.php app/Views/guru/koreksi_tp_daftar.php app/Views/guru/koreksi_tp_edit.php app/Views/admin/koreksi_tp_daftar.php app/Views/admin/koreksi_tp_detail.php app/Views/admin/kurikulum_cp.php app/Views/guru/detail_tp.php tests/unit/KoreksiTpServiceV25Test.php; do php -l "$f"; done
+      - name: Unit keamanan snapshot/versi dan CP
+        run: vendor/bin/phpunit --no-coverage tests/unit/KoreksiTpServiceV25Test.php
