@@ -89,7 +89,11 @@
                         canResize: true
                     },
                     events: {
-                        onChange: ({ data }) => { el.value = data; },
+                        onChange: ({ data }) => {
+                            el.value = data;
+                            const currentPreview = document.getElementById('hasil-pratinjau-soal');
+                            if (currentPreview) currentPreview.hidden = true;
+                        },
                         onImageUploadBefore: ({ $, info }) => {
                             if (info.url) {
                                 if (!trusted(info.url)) {
