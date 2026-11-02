@@ -67,11 +67,14 @@ final class UIKonsistensiHalamanTest extends CIUnitTestCase
     public function testCpPanjangMemilikiNavigasiKeIdNyataDanFormTerbuka(): void
     {
         $sumber = $this->berkas('app/Views/admin/kurikulum_cp.php');
-        foreach (['kurikulum-tambah', 'kurikulum-daftar', 'cp-tambah', 'cp-daftar'] as $id) {
+        foreach (['kurikulum-daftar', 'cp-tambah', 'cp-daftar', 'cp-operasional'] as $id) {
             $this->assertStringContainsString('href="#' . $id . '"', $sumber);
             $this->assertStringContainsString('id="' . $id . '"', $sumber);
         }
-        $this->assertStringContainsString('<details class="a-cp__details" open>', $sumber);
+        $this->assertStringContainsString('id="kurikulum-tambah"', $sumber);
+        $this->assertStringContainsString('<details class="a-cp__details"', $sumber);
+        $this->assertStringContainsString("old('kode') !== null ? 'open' : ''", $sumber);
+        $this->assertStringContainsString('Daftar CP dan sunting langsung', $sumber);
         $this->assertStringContainsString('name="rumusan"', $sumber);
         $this->assertStringNotContainsString('name="sumber_url"', $sumber);
         $this->assertStringNotContainsString('name="tanggal_berlaku"', $sumber);
