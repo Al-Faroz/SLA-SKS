@@ -134,11 +134,18 @@
                     <p class="a-help" role="status"><?= esc((string) $kesiapanSumatif['pesan']) ?></p>
                     <?php if ($kesiapanSumatif['siap']): ?>
                         <p class="a-alert" role="status">
-                            Syarat untuk mengikuti Sumatif sudah terpenuhi.
-                            Sumatif tetap wajib untuk menyelesaikan TP.
-                            Ujian Sumatif belum tersedia pada tahap pengembangan ini;
-                            tidak ada percobaan atau nilai yang dibuat dari halaman ini.
+                            Syarat Sumatif terpenuhi. Satu tes awal wajib; bila skor
+                            tes awal di bawah KKM, tersedia satu remedial.
                         </p>
+                        <a class="a-btn a-btn--utama"
+                            href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/sumatif/ujian'), 'attr') ?>">
+                            Buka Ujian Sumatif / Remedial
+                        </a>
+                        <p class="a-help">Sumatif hanya dapat dikerjakan di desktop/laptop dengan fullscreen.
+                            Jawaban, waktu, dan hasil dinilai oleh server.</p>
+                    <?php elseif ($kesiapanSumatif['selesai']): ?>
+                        <p class="a-alert" role="status">TP telah selesai. Nilai TP ditampilkan
+                            setelah seluruh komponen penilaian Guru tersedia.</p>
                     <?php endif ?>
                 </section>
             <?php endif ?>
