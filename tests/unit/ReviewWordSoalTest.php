@@ -153,7 +153,7 @@ final class ReviewWordSoalTest extends TestCase
         $data = TemplateWordSoalService::buat([
             'tp_id' => 11, 'paket_id' => 22, 'guru_id' => 33,
             'struktur_versi' => 1, 'kode_tp' => 'TP-QA-01',
-        ], 'diagnostik', 1, str_repeat('x', 32));
+        ], 'diagnostik', 10, str_repeat('x', 32));
         $file = tempnam(sys_get_temp_dir(), 'qa-beda-tp-');
         self::assertNotFalse($file);
         file_put_contents($file, $data);
