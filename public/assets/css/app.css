@@ -539,6 +539,10 @@ a:hover { text-decoration-thickness: 2px; }
 .a-cp__section-heading { display:flex; align-items:center; justify-content:space-between;
     flex-wrap:wrap; gap:12px; }
 .a-cp__section-heading h2 { margin-bottom:4px; }
+.a-cp__editor-kode { display:inline-flex; margin:4px 0 0; padding:4px 10px;
+    font-weight:700; font-size:13px; overflow-wrap:anywhere; color:var(--a-teks);
+    background:var(--a-latar); border:1px solid var(--a-garis); border-radius:8px; }
+.a-cp__grid textarea[name="rumusan"] { min-height:220px; line-height:1.75; resize:vertical; }
 .a-cp__section-heading .a-help { margin:0; }
 .a-cp__kurikulum-form .a-cp__details > .a-form { padding:16px; }
 .a-cp__referensi > .a-tabel-gulir,
