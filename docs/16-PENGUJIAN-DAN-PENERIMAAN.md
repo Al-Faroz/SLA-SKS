@@ -17,16 +17,16 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-007 | Guru Gen–Mapel diganti | Guru baru hanya berwenang pada pasangan itu; Gen lain tetap, riwayat penilai lama utuh |
 | E2E-008 | Semester Gen dan override siswa | Semester sebelum mulai Dilewati, tidak menghilangkan progres |
 | E2E-009 | Guru membuat TP dengan CP resmi | Satu CP operasional Mapel, bisa banyak elemen, mapel/fase valid |
-| E2E-010 | Guru usul CP; Admin memutus | Publikasi versi CP baru tanpa reviewer Guru lain |
-| E2E-011 | Admin+Guru menyetujui usulan CP sendiri | Ditolak bila benar-benar permohonan akademik diri sendiri |
+| E2E-010 | Admin sunting CP aktif meski telah dipakai TP/siswa | Berhasil tanpa reviewer/approval, relasi TP dan nilai siswa tetap utuh |
+| E2E-011 | Form Tambah/Sunting CP | Tepat lima isian (Kurikulum, Mata pelajaran, Kode CP, Elemen CP, Rumusan CP resmi); empat metadata lama tidak diwajibkan oleh UI/server |
 | E2E-012 | Download Excel peta ATP enam semester | Sheet panduan, RINGKASAN, REFERENSI CP, SEMESTER 1–6 dan contoh; hanya CP aktif mapel/kurikulum terkait |
 | E2E-013 | Impor XLSX ATP valid diulang | Satu semester kosong ditambah sekali; file sama menghasilkan Tetap (0 tulis); file berbeda untuk semester terisi ditolak, tidak ada UPDATE |
 | E2E-014 | Impor versi struktur salah | Ditolak, tampil sheet/baris/kolom/penjelasan |
 | E2E-015 | Excel menghilangkan baris lama | Tidak menghapus otomatis |
 | E2E-016 | Media/HOTS Materi belum lengkap | Excel hanya membentuk struktur; checklist TP Siap menolak materi tanpa media/Resume/HOTS |
-| E2E-017 | TP Siap diedit via form/API/impor | Ditolak; hanya jalur koreksi A–C |
-| E2E-018 | TP koreksi A–C disetujui | Versi baru; siswa yang mulai tetap pada versi lama |
-| E2E-019 | Koreksi kategori D | Ditolak |
+| E2E-017 | TP Siap belum dipakai siswa diedit Guru G1 | Diizinkan via editor biasa; kesiapan dan snapshot diselaraskan otomatis, tidak perlu kategori/approval |
+| E2E-018 | TP telah dipakai minimal satu siswa dicoba sunting | Seluruh mutasi konten ditolak (form/API/Word/media/KKM), progres dan snapshot tetap utuh |
+| E2E-019 | BAB dengan TP Siap disunting Guru G1 | Isian BAB yang telah ada dapat diperbaiki tanpa dikunci hanya karena TP Siap; tidak ada fitur pindah TP antar-BAB |
 | E2E-020 | Siswa tidak lulus diagnostik | Tepat satu Materi → Resume final → HOTS final → Sumatif minimal 30 |
 | E2E-021 | Siswa lulus diagnostik | Melewati Materi/Resume/HOTS tetapi tetap mengerjakan Sumatif minimal 30 untuk menyelesaikan TP |
 | E2E-022 | Simpan draf manual | Data berubah baru tersimpan setelah klik Simpan; indikator jelas |
@@ -292,7 +292,7 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 ## Regresi Bank Soal Diagnostik–Sumatif terpadu (2 November 2026)
 - UI satu tombol Kelola Bank Soal dari TP NonEsensial; tab Diagnostik/Sumatif tetap terpisah dan tetap mengingat jenis pada redirect gagal/sukses. TP Esensial tidak menampilkan bank soal wajib.
 - Generator Word: Diagnostik 10–200 dan Sumatif 30–200, bukan 5 soal Sumatif; impor dan tambah manual boleh berlangsung bertahap sampai mencapai batas TP Siap.
-- Daftar >15 soal: pagination server; berpindah tab/halaman tanpa tercampur Gen atau jenis. 403 untuk Guru lain, dan mutasi pada TP Siap ditolak.
+- Daftar >15 soal: pagination server; berpindah tab/halaman tanpa tercampur Gen atau jenis. 403 untuk Guru lain; edit TP Siap **belum dipakai siswa** diizinkan dan mutasi sesudah siswa mulai ditolak.
 - Editor: tambah/edit, periksa A–E, satu kunci, gambar privat, pratinjau HTML tersanitasi sebelum simpan, form tanpa JS sebagai fallback, CSRF pada unggah gambar dan pratinjau.
 - Impor Word: upload → review → konfirmasi; pemeriksaan 10/30 pada TP Siap; soal manual tidak tertimpa; perubahan apa pun pada bank setelah review membatalkan konfirmasi; impor identik tidak melompati perlindungan konflik.
 - Equation Word pecahan/pangkat/akar dapat dibaca sebagai MathML dalam review; bentuk kompleks dan rendering browser perlu tes dokumen nyata. Audio/Video Google Drive hanya tautan file HTTPS, tautan selain file ditolak dan Guru menguji izin Viewer/pemutaran sebelum menyetujui review.
@@ -315,24 +315,22 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 
 ### Regresi KKM Admin/Guru dan identitas ringkas — 2 November 2026
 - Draf non_esensial tanpa default Admin dan tanpa KKM khusus Guru belum dapat diterbitkan, meskipun `tp.kkm` historis 75. Isi default Admin melalui `admin/kkm`, periksa Diagnostik+Sumatif menampilkan angka sama. Override Guru lalu buka kedua tab dan periksa angka yang sama.
-- Hapus override memakai tombol **Ikuti Default Admin**; pastikan kembali mengikuti nilai Admin. Perubahan default Admin selanjutnya mempengaruhi TP draf tanpa override, tetapi tidak mengubah TP Siap atau snapshot lama. TP Esensial tidak menerima penyesuaian KKM ujian.
+- Hapus override memakai tombol **Ikuti Default Admin**; pastikan kembali mengikuti nilai Admin. Perubahan default Admin selanjutnya mempengaruhi TP Draf/Siap-belum-digunakan tanpa override; tidak menimpa nilai atau snapshot TP yang sudah digunakan siswa. TP Esensial tidak menerima penyesuaian KKM ujian.
 - Uji keamanan: akun Siswa/Admin tidak boleh POST ke rute KKM Guru; Guru lain tak boleh mengubah TP; CSRF ditolak; versi TP usang harus meminta muat ulang; perubahan KKM menghasilkan audit tanpa menghapus soal/Word/Materi.
 - Tampilan Kelola TP memakai kartu Identitas TP ringkas pada desktop, laptop, HP; seluruh lima metadata tetap terbaca. Import Word diagnostik/sumatif yang sudah FIX tidak diubah.
 - PHPUnit `KkmTpServiceTest` memeriksa batas 1–100 dan pemilihan KKM; CI lint file terkait. Pengujian penuh penyimpanan DB dan browser tetap menunggu XAMPP.
 
-### Regresi KKM diwarisi dan rencana koreksi berversi — 2 November 2026
-- Admin belum menyimpan default (`pengaturan.kkm_default = NULL`): contoh 80 pada form diberi penjelasan belum berlaku, Guru draf menampilkan belum diset. Tidak ada fallback diam-diam ke `tp.kkm = 75`.
-- Admin menyimpan default misalnya 80: TP draf tanpa override menampilkan 80 pada kedua tab dan lolos gerbang KKM tanpa Guru menyimpan angka khusus.
-- Guru klik Simpan tanpa mengubah nilai 80: tidak menaikkan `struktur_versi`, tidak menambah audit palsu, `tp.kkm_khusus` tetap NULL. Ganti 85: tersimpan khusus; kembalikan 80: khusus menjadi NULL.
-- Admin kemudian mengubah default saat TP telah Siap: tampilan TP Siap dan percobaan yang terpin tetap membaca KKM snapshot, tidak tertukar ke Admin terbaru.
-- Jalur koreksi TP Siap **belum diluncurkan**; pengujian penerimaan E2E-017–019 tetap syarat sebelum tombol Ajukan Koreksi/Setujui dibuka. Jangan menyatakan koreksi Materi/soal siap karena berkas checkpoint semata.
+### Regresi KKM diwarisi dan status penggunaan siswa — 2 November 2026
+- Admin belum menyimpan default: contoh 80 pada UI Admin jelas belum aktif, Guru melihat belum terset. Tidak memakai nilai historis 75 otomatis.
+- Admin menyimpan default: TP Draf maupun Siap belum dipakai siswa tanpa override mengikuti satu KKM Admin untuk Diagnostik dan Sumatif. Mengisi angka sama tidak menjadi override; perubahan berbeda disimpan selama belum digunakan.
+- TP yang pernah digunakan siswa terkunci termasuk KKM; perubahan default Admin berikutnya tidak memutasi KKM/nilai/snapshot siswa historis.
 
-
-### E2E koreksi TP Siap V4-0006 dan revisi CP (2 November 2026)
-1. Cadangkan DB dan writable, impor `V4-0006_KOREKSI_TP_SIAP.sql` ke `sla_sks_v4`, periksa UNIQUE `kunci_terbuka` dan `schema_version`. Uji pemanggilan route sebelum impor: tampil instruksi, tidak menyebabkan penulisan separuh.
-2. Guru G1 buka TP #23 Siap → Ajukan Koreksi → pilih A/B/C dan alasan ≥10 karakter → draf terbentuk. Coba buka draf kedua untuk TP yang sama: ditolak. Guru Gen lain dan Siswa/Admin tidak dapat mengakses editor Guru.
-3. Koreksi KKM 80→85 dan rincian TP, ubah petunjuk Materi, unggah PDF sah 6–40 halaman ≤15 MB; lihat pratinjau privat. Uji PDF lima halaman/file terlalu besar gagal tanpa menimpa lama. Sunting satu soal teks/kunci, simpan; Word Equation tetap terlindung dari konversi.
-4. Ajukan perubahan; permohonan tanpa perubahan ditolak. Admin melihat diff dan catatan. Admin yang pengguna_id sama dengan Guru pengusul tidak dapat setuju **atau menolak**. Admin berbeda setujui → `versi_konten_tp` bertambah satu, checksum SHA256 valid, `tp.status` tetap `siap`, bank soal historis tidak dihapus, media lama tetap ada. Periksa Guru melihat versi dan konten terbaru.
-5. Siswa yang sudah mulai tetap `progres_tp.versi_konten_tp_id` semula, sedangkan siswa yang mulai kemudian memakai snapshot terbaru. Ujian lama di `percobaan_ujian`/butir tidak berubah, skor atau sertifikat tidak dihitung ulang otomatis. Coba mengesahkan usulan lama setelah versi berubah: ditolak.
-6. Admin membuka `admin/kurikulum-cp`, Sunting CP yang sudah direferensikan TP, ubah rumusan dalam draf → terbitkan. Versi aktif terbaru terbaca dari CP operasional, snapshot TP #23 yang lama tetap aman. Uji pengulangan tanpa menciptakan CP operasional ganda.
-7. QA GitHub PHP lint, PHPUnit kontrak domain dan schema smoke tidak menggantikan E2E dengan XAMPP MariaDB dan berkas privat sungguhan.
+### E2E final penyuntingan CP/BAB/TP dan simplifikasi isian CP — 2 November 2026
+1. **CP lima field**: Admin buat/sunting CP menggunakan hanya Kurikulum, Mata pelajaran, Kode CP, Elemen CP, Rumusan CP resmi. Empat metadata (Otoritas penerbit, Nomor dokumen resmi, URL sumber dokumen, Tanggal berlaku) tidak tampil dan tidak diminta server. Fase D otomatis. Uji validasi pilihan kurikulum/mapel, kode dan rumusan; jangan fabrikasi metadata yang dihapus.
+2. **CP boleh disunting selalu**: perbaiki CP aktif yang dirujuk TP #23 bahkan bila siswa sudah menggunakan TP; perubahan tersimpan tanpa draf/approval manual dan tidak mengubah TP, bank soal, KKM, progres, ataupun nilai siswa. Relasi CP tetap benar.
+3. **BAB**: Guru G1 edit isian BAB yang tersedia meskipun ada TP Siap; nomor/keunikan tetap valid. Guru Gen lain dilarang. Tidak ada tombol/proses pindah TP antar-BAB.
+4. **TP Siap belum digunakan**: Guru G1 edit rincian, KKM tunggal, satu Materi/media, soal/Word lewat editor normal tanpa kategori, alasan wajib, atau persetujuan Admin. Pemeriksaan kesiapan/snapshot aktif benar setelah simpan, status Siap tidak menjadi indikator terkunci.
+5. **TP yang sudah digunakan**: lakukan satu awal aktivitas siswa sah, lalu Guru coba semua jalur editor/KKM/Word/upload/APIs dan URL lama; seluruh mutasi ditolak. Siswa tetap dapat menyelesaikan aktivitas memakai snapshot yang sah. Jangan membuka kunci dengan menghapus/reset data siswa.
+6. **Persaingan transaksi**: siswa memulai TP tepat ketika Guru menyimpan perubahan TP Siap; satu operasi harus ditolak atau diserialisasi sehingga siswa tidak pernah mengakses snapshot campuran; rollback tanpa data parsial.
+7. **Alur usang**: tidak ada UI wajib kategori A/B/C, permohonan TP atau keputusan Admin untuk TP belum digunakan. Patch SQL V4-0006 tidak diperlukan. Jika tabel sudah ada pada DB lokal, tidak dihapus tanpa izin/backup. Pastikan penilaian siswa dan sertifikat yang sudah FIX tetap tidak tersentuh.
+8. **Regresi**: semua 16 Master tetap konsisten; API, CSRF, G1, keamanan file, PHP lint/PHPUnit, browser HP/desktop Dark/Light dan pengujian DB XAMPP harus dijalankan setelah kode berubah. Pembaruan Master saja **bukan** klaim fitur telah berfungsi.
