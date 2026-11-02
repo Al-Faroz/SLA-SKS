@@ -4,14 +4,14 @@
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
-        <span aria-current="page">Ujian Dibatalkan</span>
+        <span aria-current="page">Permintaan Akses Ulang</span>
     </nav>
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Guru · Penanganan Ujian Ketat</p>
-            <h1>Ujian yang Dibatalkan</h1>
+            <p class="a-proto-eyebrow">Guru · Izin Pengerjaan Ulang Tes Mandiri</p>
+            <h1>Permintaan Akses Ulang Tes Mandiri</h1>
             <p class="a-proto-muted">Hanya percobaan siswa dari Gen–Mapel yang sedang Anda ampu.
-                Jawaban dan riwayat lama tidak dihapus; ujian batal tidak memperoleh skor.</p>
+                Jawaban dan riwayat lama tidak dihapus; tes tidak selesai tidak mendapat skor sah dan tidak mengurangi kesempatan Sumatif/remedial yang sah.</p>
         </div>
     </header>
     <?php if ($pesan = session()->getFlashdata('ujian_sukses')): ?>
@@ -22,10 +22,10 @@
     <?php endif ?>
 
     <section class="a-card" aria-labelledby="antrean-ujian">
-        <h2 id="antrean-ujian">Menunggu keputusan Guru</h2>
+        <h2 id="antrean-ujian">Menunggu izin akses ulang Guru</h2>
         <?php if ($antrean === []): ?>
-            <p class="a-help" role="status">Tidak ada ujian dibatalkan yang masih memerlukan keputusan.
-                Jika Guru telah menyetujui ulang, siswa dapat memulai percobaan pengganti.</p>
+            <p class="a-help" role="status">Tidak ada permintaan akses ulang yang menunggu izin Guru.
+                Siswa dapat memulai percobaan pengganti hanya setelah Guru memberikan izin.</p>
         <?php else: ?>
             <div class="a-table-wrap">
                 <table class="a-table">
@@ -49,10 +49,10 @@
                                 <?= $r['tahap'] === 'remedial' ? '(remedial)' : '(normal)' ?>
                                 #<?= (int) $r['nomor_percobaan'] ?></td>
                             <td><?= $r['keputusan'] === 'tunda_tinjauan'
-                                ? 'Ditunda untuk tinjauan' : 'Menunggu keputusan' ?></td>
+                                ? 'Ditunda untuk tinjauan' : 'Menunggu izin Guru' ?></td>
                             <td>
                                 <a class="a-btn a-btn--sekunder"
-                                    href="<?= esc(site_url('guru/ujian-batal/' . (int) $r['id']), 'attr') ?>">
+                                    href="<?= esc(site_url('guru/akses-ulang/' . (int) $r['id']), 'attr') ?>">
                                     Tinjau ujian
                                 </a>
                             </td>
@@ -74,9 +74,9 @@
                 · tahap <?= esc((string) $pilih['tahap']) ?>
                 · percobaan #<?= (int) $pilih['nomor_percobaan'] ?>
                 · versi konten #<?= (int) $pilih['versi_konten_tp_id'] ?></p>
-            <p class="a-help">Alasan pembatalan: <?= esc((string) ($pilih['alasan_batal'] ?: 'Insiden ujian Ketat.')) ?></p>
+            <p class="a-help">Penyebab tes tidak selesai: <?= esc((string) ($pilih['alasan_batal'] ?: 'Insiden ujian Ketat.')) ?></p>
             <p class="a-help">Waktu akhir: <?= esc((string) ($pilih['waktu_selesai'] ?? 'Belum tercatat')) ?> UTC.</p>
-            <div class="a-alert" role="status">Percobaan ini dibatalkan tanpa skor.
+            <div class="a-alert" role="status">Tes mandiri ini tidak selesai dan tidak memperoleh skor sah.
                 Keputusan ulang tidak mengubah skor, butir atau jawaban historis.</div>
 
             <?php $sudah = $pilih['keputusan']; ?>
@@ -96,15 +96,15 @@
                     action="<?= esc(site_url('guru/ujian-batal/' . (int) $pilih['id']), 'attr') ?>">
                     <?= csrf_field() ?>
                     <div class="a-field">
-                        <label class="a-label" for="keputusan-ujian">Keputusan Guru</label>
+                        <label class="a-label" for="keputusan-ujian">Izin Guru</label>
                         <select class="a-input" id="keputusan-ujian" name="keputusan" required>
                             <option value="">Pilih keputusan</option>
                             <?php foreach ($pilihanKeputusan as $aksi): ?>
                                 <option value="<?= esc($aksi, 'attr') ?>" <?= old('keputusan') === $aksi ? 'selected' : '' ?>>
                                     <?= esc(match ($aksi) {
-                                        'ulang_diagnostik' => 'Izinkan Ulang Diagnostik',
+                                        'ulang_diagnostik' => 'Izinkan Akses Ulang Diagnostik',
                                         'langsung_belajar' => 'Langsung Belajar (tanpa skor Diagnostik)',
-                                        'ulang_sumatif' => 'Izinkan Ulang Sumatif',
+                                        'ulang_sumatif' => 'Izinkan Akses Ulang Sumatif',
                                         'tunda_tinjauan' => 'Tunda untuk Tinjauan',
                                         default => $aksi,
                                     }) ?>
@@ -120,13 +120,13 @@
                             disimpan dalam riwayat audit.</p>
                     </div>
                     <button type="submit" class="a-btn a-btn--utama"
-                        onclick="return confirm('Simpan keputusan ujian ini? Persetujuan ulang hanya sekali pakai.');">
+                        onclick="return confirm('Berikan izin akses ulang ujian ini? Persetujuan ulang hanya sekali pakai.');">
                         Simpan keputusan
                     </button>
                 </form>
             <?php endif ?>
             <p class="a-jarak-atas">
-                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/ujian-batal'), 'attr') ?>">
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/akses-ulang'), 'attr') ?>">
                     Kembali ke antrean
                 </a>
             </p>
