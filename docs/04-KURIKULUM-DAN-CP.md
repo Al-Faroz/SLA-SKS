@@ -33,3 +33,7 @@ Satu `paket_semester` per Gen–Mapel–Semester–Tahun Ajaran/Kurikulum/versi.
 Detail: [05](05-PAKET-TP-DAN-IMPOR.md), [06](06-ALUR-PEMBELAJARAN.md), [10](10-DATABASE.md).
 
 **Keputusan terbaru 31-10-2026 (V25-3):** Guru mengisi Nomor BAB dari dropdown Defined Name, Jenis, Nama, Deskripsi, rencana satu Materi/media, dan Catatan. Urutan TP kolom B dihitung rumus per BAB dan dihitung ulang server; tidak boleh diketik Guru. Kode TP dibangkitkan `KodeTpService`; kolom Elemen CP tidak menjadi input. Sheet REFERENSI CP tetap wajib. V25-1/V25-2 ditolak.
+
+
+### Penyuntingan CP terbit yang sudah digunakan TP — 2 November 2026
+Admin membuka `/admin/kurikulum-cp`, menekan **Sunting CP** pada baris referensi yang tersimpan (termasuk yang telah digunakan TP), lalu mengubah rumusan/elemen/sumber pada draf versi berikutnya dan menerbitkannya dari halaman detail. Referensi `ref_cp` dan identitas `cp_mapel` tetap; versi resmi lama diarsipkan, tetapi tidak dihapus atau ditimpa. Snapshot TP Siap yang sudah diterbitkan tetap berisi versi CP historis yang terpin untuk siswa yang telah memulai. Guru tidak dapat mengubah CP langsung; perubahan sumber resmi tetap oleh Admin. Tidak perlu SQL baru khusus perubahan CP.
