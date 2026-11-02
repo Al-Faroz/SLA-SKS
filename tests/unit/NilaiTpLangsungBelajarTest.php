@@ -93,7 +93,7 @@ final class NilaiTpLangsungBelajarTest extends TestCase
 
     public function testTanpaKeputusanGuruTidakBolehMengarangJalurBelajar(): void
     {
-        $this->db->table('keputusan_ujian_batal')->delete();
+        $this->db->table('keputusan_ujian_batal')->where('id',1)->delete();
         $this->expectException(\DomainException::class);
         NilaiTpService::sinkronkan($this->db,11);
     }
