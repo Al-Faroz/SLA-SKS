@@ -304,3 +304,10 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Mode disimpan per tab pada sessionStorage, dipulihkan saat navigasi/reload tanpa mengubah preferensi default Dark. Tombol Selesai harus mengembalikan layout tanpa kehilangan form yang belum dikirim. Light/Dark keduanya diuji.
 - Uji ekstensi Screenshot Tool Chrome pada halaman panjang: Review Word 30 soal (beberapa `details` dibuka), Detail TP, Peta ATP/semester, tabel panjang Admin, serta halaman Siswa. Bandingkan screenshot dengan tampilan layar dan cek tidak ada pengulangan sidebar, konten terpotong atau bagian gambar kosong.
 - Unit `ModeDokumentasiShellTest`, JS `node --check` dan PHP lint harus PASS. **Pengujian statis tidak bisa menjamin perilaku semua ekstensi pihak ketiga**; hasil capture XAMPP pengguna tetap penentu status FIX.
+
+
+### Regresi penyesuaian Step Progress TP dan KKM — 2 November 2026
+- Detail TP NonEsensial: langkah Diagnostik berbunyi **Minimal 10 soal sah dan pengaturan kegiatan**; Sumatif **Minimal 30 soal sah, KKM terset**. Keduanya tetap mengarah ke jenis tab yang tepat.
+- Status selesai dan belum selesai memiliki latar/border berbeda serta teks, bukan warna saja; warna teks `✓ Selesai` menggunakan merah kontras pada Dark dan Light. Periksa urutan keyboard, tombol Lihat/Lengkapi, HP/tablet/desktop.
+- Step Sumatif juga mensyaratkan kode pemeriksaan `kkm` (sama dengan Diagnostik), tidak boleh selesai hanya karena bank soalnya cukup ketika KKM efektif tidak valid.
+- **Tahap berikutnya (butuh dump SQL terbaru):** audit penyimpanan `kkm_default` Admin dan `tp.kkm_khusus` Guru vs pembacaan `tp.kkm` saat ini; kemudian form satu nilai KKM efektif yang terlihat pada tab Diagnostik/Sumatif, dapat diganti Guru pada TP draf, konsisten hingga snapshot, soal dan mesin ujian. Jangan menambah kolom/tes DB asumtif sebelum audit dump privat terbaru.
