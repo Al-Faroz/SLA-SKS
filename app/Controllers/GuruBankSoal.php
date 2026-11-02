@@ -36,11 +36,18 @@ final class GuruBankSoal extends BaseController
         if (!in_array($jenisDipilih, ['diagnostik', 'sumatif'], true)) {
             $jenisDipilih = 'diagnostik';
         }
-        $daftarSoal = (new KelolaSoalGuruService())->daftar($tpId, $jenisDipilih);
+        $bank = new KelolaSoalGuruService();
+        $totalSoal = $bank->jumlahSoal($tpId, $jenisDipilih);
+        $batas = 15;
+        $jumlahHalaman = max(1, (int) ceil($totalSoal / $batas));
+        $halaman = filter_var($this->request->getGet('halaman'), FILTER_VALIDATE_INT);
+        $halaman = $halaman === false || $halaman < 1 ? 1 : min($halaman, $jumlahHalaman);
+        $daftarSoal = $bank->daftar($tpId, $jenisDipilih, $batas, ($halaman - 1) * $batas);
 
         $riwayat = db_connect()->table('impor_soal_docx')
             ->select('id,jenis,status,dibuat_pada,diterapkan_pada')
             ->where('tp_id', $tpId)->where('guru_id', (int) $akun['id'])
+            ->where('jenis', $jenisDipilih)
             ->orderBy('dibuat_pada', 'DESC')->limit(10)->get()->getResultArray();
 
         return view('guru/bank_soal', array_merge($rincian, [
@@ -52,6 +59,9 @@ final class GuruBankSoal extends BaseController
             'word_riwayat' => $riwayat,
             'jenis_dipilih' => $jenisDipilih,
             'daftar_soal' => $daftarSoal,
+            'total_soal' => $totalSoal,
+            'halaman_aktif' => $halaman,
+            'jumlah_halaman' => $jumlahHalaman,
         ]));
     }
     public function unduh(int $tpId, string $jenis): ResponseInterface
