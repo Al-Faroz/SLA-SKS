@@ -28,6 +28,12 @@
 - [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
 - **[Keputusan final validasi PDF Materi](KEPUTUSAN-VALIDASI-PDF-MATERI.md)** — pembatasan 15 MB/40 halaman untuk storage hosting, bug PDF yang sudah FIX di XAMPP, batas parser tersisa dan tes regresi wajib. Baca sebelum perubahan kode media; catatan implementasi ini **bukan Master ke-17**.
 
+## Keputusan fundamental final — 2 November 2026 (wajib didahulukan)
+- **Sunting CP:** Admin boleh memperbaiki CP kapan pun, termasuk sesudah digunakan TP/siswa; form Tambah/Sunting **hanya Kurikulum, Mata pelajaran, Kode CP, Elemen CP, Rumusan CP resmi**. Fase D dari sistem; tidak mewajibkan Otoritas penerbit, Nomor dokumen resmi, URL sumber dokumen, atau Tanggal berlaku. Lihat Master 04.
+- **Sunting BAB:** Guru G1 boleh memperbaiki isian BAB yang sudah ada tanpa penguncian semata karena TP Siap; aturan nomor/kode yang sudah disepakati tetap. **Tidak membuat fitur memindah TP antar-BAB.** Lihat Master 04–05.
+- **Sunting TP:** Guru G1 boleh mengubah TP Draf **dan Siap yang belum pernah digunakan siswa**. Sesudah ada satu siswa memulai TP, kontennya terkunci. Tidak ada kategori A/B/C, permohonan Guru, atau persetujuan Admin untuk edit TP yang belum digunakan. Lihat Master 02, 05, 11, 16.
+- **Ketentuan lama yang bertentangan tidak berlaku:** draft PR kode koreksi TP Siap V4-0006 bukan jalur produk terbaru dan SQL-nya **tidak perlu diimpor**. Sebelum implementasi sesuaikan seluruh UI/controller/service/tes dan audit dump terbaru untuk kebutuhan perubahan skema; jangan reset data.
+
 ## Ketentuan perubahan
 - Aturan hidup pada dokumen domain masing-masing, tanpa membuat versi alternatif. Dokumen lain merujuk domain utama.
 - **PR dokumentasi ini tidak otomatis mengubah kode atau SQL**. Branch implementasi terpisah mengacu v2.5; tiap langkah diikuti tes dan persetujuan pemilik sebelum merge.
