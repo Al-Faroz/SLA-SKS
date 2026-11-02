@@ -36,7 +36,7 @@
             Jawaban hanya dianggap tersimpan setelah server mengonfirmasi.</p>
         <?php if ($status_akhir): ?>
             <p class="a-ujian-peringatan"><?= $menunggu_guru
-                ? 'Ujian dibatalkan dan menunggu keputusan Guru.'
+                ? 'Sumatif tidak selesai. Minta akses ulang kepada Guru untuk tahap yang sama.'
                 : 'Kesempatan Sumatif sudah selesai.' ?>
                 Gunakan <strong>Lihat hasil/status</strong> untuk memeriksa status tersimpan.</p>
             <button type="button" class="a-btn a-btn--utama" data-ujian-lihat-hasil>Lihat hasil/status</button>
@@ -96,6 +96,13 @@
         <h1 data-ujian-hasil-judul>Status Sumatif</h1>
         <p data-ujian-hasil-pesan></p>
         <p class="a-ujian-skor" data-ujian-hasil-skor></p>
+        <form method="post" data-ujian-akses-ulang hidden
+            action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/akses-ulang/sumatif'), 'attr') ?>">
+            <input type="hidden" name="<?= esc($csrfName, 'attr') ?>" value="<?= esc($csrfValue, 'attr') ?>">
+            <button type="submit" class="a-btn a-btn--utama">Minta akses ulang kepada Guru</button>
+            <p class="a-help">Permintaan tersimpan di sistem. Izin Guru diperlukan sebelum tes pengganti dapat dimulai.</p>
+        </form>
+
         <a class="a-btn a-btn--utama" data-ujian-remedial hidden
             href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/sumatif/ujian'), 'attr') ?>">
             Lanjut remedial Sumatif
