@@ -81,6 +81,25 @@ final class UIKonsistensiHalamanTest extends CIUnitTestCase
         $this->assertStringContainsString('Sunting CP', $sumber);
     }
 
+    public function testPreflightDiagnostikTetapTerbacaDanMenghormatiHidden(): void
+    {
+        $view = $this->berkas('app/Views/siswa/diagnostik_petunjuk.php');
+        $js = $this->berkas('public/assets/js/diagnostik-preflight.js');
+        $css = $this->berkas('public/assets/css/emerald-glass.css');
+
+        $this->assertStringContainsString('data-keluar-fullscreen hidden', $view);
+        $this->assertStringContainsString('data-hasil-preflight role="status"', $view);
+        $this->assertStringContainsString('leave.hidden = !open', $js);
+        $this->assertStringContainsString('.a-diagnostik-tombol [hidden]', $css);
+        $this->assertStringContainsString('display:none !important;', $css);
+        foreach (['.a-diagnostik-hasil {',
+            '.a-diagnostik-hasil[data-status="success"]',
+            '.a-diagnostik-hasil[data-status="checking"]',
+            '.a-diagnostik-hasil[data-status="failed"]'] as $selector) {
+            $this->assertStringContainsString($selector, $css);
+        }
+    }
+
     public function testSatuCssDanTokenDipakaiKonsisten(): void
     {
         $sumber = $this->berkas('public/assets/css/app.css');
