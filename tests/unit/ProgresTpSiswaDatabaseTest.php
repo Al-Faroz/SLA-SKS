@@ -57,12 +57,12 @@ final class ProgresTpSiswaDatabaseTest extends TestCase
             ['id'=>2,'angkatan_id'=>2,'mapel_id'=>4,'semester'=>4,'tahun_ajaran_id'=>1,'paket_id'=>8],
         ]);
         $this->db->table('bab')->insertBatch([
-            ['id'=>1,'paket_semester_id'=>7,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 1','deskripsi_bab'=>'Contoh untuk pengujian'],
+            ['id'=>1,'bab_id'=>1,'paket_semester_id'=>7,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 1','deskripsi_bab'=>'Contoh untuk pengujian'],
             ['id'=>2,'paket_semester_id'=>8,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 2','deskripsi_bab'=>'Contoh untuk pengujian'],
         ]);
         $this->db->table('tp')->insertBatch([
             ['id'=>1,'paket_semester_id'=>7,'kode_tp'=>'TP-A-1','judul'=>'Pertama','urutan_atp'=>1,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
-            ['id'=>2,'paket_semester_id'=>7,'kode_tp'=>'TP-A-2','judul'=>'Kedua','urutan_atp'=>2,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
+            ['id'=>2,'bab_id'=>1,'paket_semester_id'=>7,'kode_tp'=>'TP-A-2','judul'=>'Kedua','urutan_atp'=>2,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
             ['id'=>3,'bab_id'=>2,'paket_semester_id'=>8,'kode_tp'=>'TP-B-1','judul'=>'Gen lain','urutan_atp'=>1,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
         ]);
         foreach ([1,2,3] as $tpId) {
