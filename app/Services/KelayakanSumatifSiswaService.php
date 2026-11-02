@@ -36,9 +36,9 @@ final class KelayakanSumatifSiswaService
         $hasil = [
             'siap' => false, 'selesai' => false, 'jalur' => 'terkunci',
             'bukti' => [
-                'media' => $bukti['media'] === true,
-                'resume' => $bukti['resume'] === true,
-                'hots' => $bukti['hots'] === true,
+                'media' => ($bukti['media'] ?? false) === true,
+                'resume' => ($bukti['resume'] ?? false) === true,
+                'hots' => ($bukti['hots'] ?? false) === true,
             ],
             'pesan' => 'Selesaikan Diagnostik sah sebelum menuju Sumatif.',
         ];
