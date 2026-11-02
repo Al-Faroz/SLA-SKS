@@ -183,11 +183,15 @@
         <h2 id="judul-kesiapan-tp"><?= $tp['status'] === 'siap' ? 'TP sudah Siap' : 'Langkah akhir · Pemeriksaan kesiapan' ?></h2>
         <p class="a-help">Penerbitan tetap memerlukan pemeriksaan final server, konfirmasi Guru,
             dan penyimpanan snapshot konten yang terkunci.</p>
+        <?php if ($tp['status'] === 'siap' && ($tp['jenis_tp'] ?? '') === 'esensial'): ?>
+            <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/koreksi'), 'attr') ?>">Ajukan Koreksi TP Siap</a>
+        <?php endif ?>
         <a class="a-btn a-btn--utama"
             href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">
             <?= $tp['status'] === 'siap' ? 'Lihat status dan versi TP' : 'Periksa kesiapan TP Siap' ?>
         </a>
         <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial' && $tp['status'] === 'siap'): ?>
+            <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/koreksi'), 'attr') ?>">Ajukan Koreksi TP Siap</a>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Antrean Penilaian</a>
         <?php endif ?>
     </section>
