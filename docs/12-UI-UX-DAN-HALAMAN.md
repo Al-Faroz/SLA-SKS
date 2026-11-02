@@ -90,7 +90,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | A10 | Laporan | Unduh laporan seluruh cakupan |
 | A11 | Pemeliharaan | Kapasitas disk, status cron, akun terkunci, backup manual/SOP |
 | A12 | Referensi CP | Tambah/Sunting CP langsung oleh Admin dengan 5 isian; daftar/filter/ekspor dan histori internal tanpa approval |
-| A13 | Permohonan akademik | Koreksi TP, nilai pengganti/kunci ujian; bandingkan diff/dampak dan putuskan |
+| A13 | Koreksi nilai bila dibutuhkan | Usulan dan keputusan atas nilai yang sudah ada (bukan izin membuka TP yang sudah digunakan siswa) |
 | A14 | Identitas sekolah | Nama, alamat, NPSN, NSM, telepon, email wajib, web opsional, kepala madrasah |
 | A15 | Logo Aplikasi/Favicon/TTD | Satu upload logo aplikasi digunakan sebagai logo dan favicon; TTD dan template sertifikat tetap aset terlindung terpisah |
 | A16 | Template sertifikat | JPG/PNG A4 landscape, cek upload, preset posisi, pratinjau, aktivasi global/fallback |
@@ -250,7 +250,7 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 
 ### KKM TP dan Identitas TP ringkas — 2 November 2026 (menggantikan catatan menunggu SQL)
 - Halaman **Kelola TP** menampilkan `Identitas TP` sebagai **kartu ringkas** dengan lima pasangan label–nilai (Kode TP, Urutan ATP, Semester, Status, Materi), satu baris pada desktop dan dua kolom pada HP, memakai `dl/dt/dd` tanpa tabel vertikal. Semua informasi lama tetap tampil.
-- Halaman **Bank Soal** pada tab Diagnostik dan Sumatif memuat kartu Pengaturan KKM TP yang sama: Default Admin, Khusus Guru, dan KKM efektif. Input KKM terisi **nilai efektif saat ini**; tombol **Simpan KKM Khusus** mengatur override, sedangkan **Ikuti Default Admin** melepas override. Untuk TP Siap, informasi hanya dibaca. Pesan berhasil/gagal ditampilkan dekat form.
+- Halaman **Bank Soal** pada tab Diagnostik dan Sumatif memuat kartu Pengaturan KKM TP yang sama: Default Admin, Khusus Guru, dan KKM efektif. Input KKM terisi **nilai efektif saat ini**; tombol **Simpan KKM Khusus** mengatur override, sedangkan **Ikuti Default Admin** melepas override. **TP Siap yang belum digunakan siswa juga dapat diubah**; setelah pernah digunakan siswa, informasi hanya dibaca. Pesan berhasil/gagal ditampilkan dekat form.
 - Admin memiliki menu **Pengaturan KKM** (`admin/kkm`) dengan formulir default 1–100. Jika Admin belum mengisinya, aplikasi menampilkan **Belum ditetapkan**; angka dari kolom lama `tp.kkm` tidak dijadikan default terselubung.
 
 ### KKM default yang diwarisi, bukan override palsu (2 November 2026)
