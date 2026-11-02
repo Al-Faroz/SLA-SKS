@@ -177,10 +177,9 @@
             <h2 id="judul-bank-soal">3. Diagnostik dan Sumatif</h2>
             <p class="a-help">Diagnostik memerlukan minimal 10 soal, Sumatif minimal 30 soal.
                 Pengelolaan soal melalui editor khusus agar rumus, gambar, dan tabel tetap nyaman.</p>
-            <a class="a-btn a-btn--sekunder"
-                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=diagnostik'), 'attr') ?>">Kelola Diagnostik</a>
-            <a class="a-btn a-btn--sekunder"
-                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=sumatif'), 'attr') ?>">Kelola Sumatif</a>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal'), 'attr') ?>">Kelola Bank Soal</a>
+            <p class="a-help">Diagnostik dan Sumatif dikelola melalui dua tab pada halaman yang sama.</p>
         </section>
     <?php endif ?>
 
