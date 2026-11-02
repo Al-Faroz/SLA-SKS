@@ -29,7 +29,7 @@ final class PenilaianGuruDatabaseTest extends TestCase
             'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,snapshot_json TEXT,checksum TEXT)',
-            'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER)',
+            'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,status TEXT NOT NULL DEFAULT \'belajar\')',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,guru_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER)',
             'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,dinilai_pada TEXT,umpan_balik TEXT)',
             'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,materi_id INTEGER,row_uuid TEXT,pertanyaan TEXT,petunjuk TEXT)',

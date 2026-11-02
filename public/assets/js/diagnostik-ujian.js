@@ -7,6 +7,8 @@
     const $ = sel => root.querySelector(sel);
     const url = root.dataset.ujianUrl;
     const tp = root.dataset.ujianTp;
+    const jenis = root.dataset.ujianJenis === 'sumatif' ? 'sumatif' : 'diagnostik';
+    const namaUjian = jenis === 'sumatif' ? 'Sumatif' : 'Diagnostik';
     const csrfName = root.dataset.csrfName;
     let csrf = root.dataset.csrfHash;
     let token = root.dataset.ujianToken || '';
@@ -65,11 +67,22 @@
             show('[data-ujian-sambutan]', false);
             show('[data-ujian-hasil]', true);
             setText('[data-ujian-hasil-judul]',
-                state.status === 'selesai_sah' ? 'Hasil Diagnostik' : 'Menunggu keputusan Guru');
-            setText('[data-ujian-hasil-pesan]', state.status === 'selesai_sah'
-                ? (state.skor >= state.kkm ? 'KKM tercapai: TP tuntas.'
-                    : 'KKM belum tercapai: lanjutkan jalur Materi/Resume/HOTS ketika tersedia.')
-                : 'Percobaan dibatalkan tanpa skor. Hubungi Guru pengampu.');
+                state.status === 'selesai_sah' ? 'Hasil ' + namaUjian : 'Menunggu keputusan Guru');
+            let pesanHasil = 'Percobaan dibatalkan tanpa skor. Hubungi Guru pengampu.';
+            if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
+                pesanHasil = state.skor >= state.kkm
+                    ? 'Diagnostik memenuhi KKM. Materi/Resume/HOTS boleh dilewati; Sumatif tetap wajib.'
+                    : 'Diagnostik belum memenuhi KKM. Selesaikan satu Materi, Resume dan HOTS final sebelum Sumatif.';
+            } else if (state.status === 'selesai_sah') {
+                pesanHasil = state.perlu_remedial
+                    ? 'Skor tes awal di bawah KKM. Satu remedial Sumatif tersedia.'
+                    : (state.tahap === 'remedial'
+                        ? 'Remedial selesai. Nilai Sumatif menggunakan skor tertinggi.'
+                        : 'Sumatif selesai sah. Periksa nilai TP di halaman rincian.');
+            }
+            setText('[data-ujian-hasil-pesan]', pesanHasil);
+            show('[data-ujian-remedial]', jenis === 'sumatif'
+                && state.status === 'selesai_sah' && state.perlu_remedial === true);
             setText('[data-ujian-hasil-skor]',
                 state.status === 'selesai_sah' ? 'Skor: ' + state.skor
                     + ' · KKM: ' + state.kkm + ' · Benar: ' + state.jumlah_benar : '');
@@ -189,6 +202,9 @@
         return result;
     }
     async function gestureFullscreen() {
+        if (jenis === 'sumatif' && /android|iphone|ipad|ipod|mobile|tablet|windows phone/i.test(navigator.userAgent)) {
+            throw new Error('Sumatif hanya tersedia di desktop/laptop, bukan HP atau tablet.');
+        }
         if (!didukung()) throw new Error('Perangkat/browser tidak mendukung fullscreen. Gunakan desktop/laptop yang mendukungnya.');
         if (navigator.onLine === false) throw new Error('Perangkat offline. Sambungkan internet dahulu.');
         if (!full()) await document.documentElement.requestFullscreen();
@@ -249,7 +265,7 @@
     });
     $('[data-ujian-kirim]')?.addEventListener('click',async ()=>{
         if (!aktif || !full() || memintaFinal) return;
-        if (!window.confirm('Kirim semua jawaban tersimpan dan akhiri Diagnostik?')) return;
+        if (!window.confirm('Kirim semua jawaban tersimpan dan akhiri ' + namaUjian + '?')) return;
         memintaFinal = true;
         try {
             const result=await req('POST','/'+token+'/tindakan',{aksi:'kirim',fullscreen:'ya'});

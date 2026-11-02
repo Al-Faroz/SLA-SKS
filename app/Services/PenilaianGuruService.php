@@ -276,6 +276,10 @@ final class PenilaianGuruService
                     . ', TP #' . $objek['tp_id'] . ', skor ' . $nilai,
                 'waktu'=>$now,
             ]);
+            // Bila Sumatif dan seluruh aktivitas sah sudah selesai,
+            // penilaian Guru langsung memperbarui nilai_tp secara atomik.
+            // Jika komponen lain belum dinilai, tetap status sementara.
+            NilaiTpService::sinkronkan($this->db, (int) $objek['progres_tp_id']);
             if (!$this->db->transStatus()) {
                 throw new RuntimeException('Nilai gagal disimpan.');
             }

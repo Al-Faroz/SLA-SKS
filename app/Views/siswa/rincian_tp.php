@@ -134,11 +134,49 @@
                     <p class="a-help" role="status"><?= esc((string) $kesiapanSumatif['pesan']) ?></p>
                     <?php if ($kesiapanSumatif['siap']): ?>
                         <p class="a-alert" role="status">
-                            Syarat untuk mengikuti Sumatif sudah terpenuhi.
-                            Sumatif tetap wajib untuk menyelesaikan TP.
-                            Ujian Sumatif belum tersedia pada tahap pengembangan ini;
-                            tidak ada percobaan atau nilai yang dibuat dari halaman ini.
+                            Syarat Sumatif terpenuhi. Satu tes awal wajib; bila skor
+                            tes awal di bawah KKM, tersedia satu remedial.
                         </p>
+                        <a class="a-btn a-btn--utama"
+                            href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/sumatif/ujian'), 'attr') ?>">
+                            Buka Ujian Sumatif / Remedial
+                        </a>
+                        <p class="a-help">Sumatif hanya dapat dikerjakan di desktop/laptop dengan fullscreen.
+                            Jawaban, waktu, dan hasil dinilai oleh server.</p>
+                    <?php elseif ($kesiapanSumatif['selesai']): ?>
+                        <p class="a-alert" role="status">TP telah selesai, termasuk kesempatan
+                            remedial bila diperlukan. Status selesai tidak mensyaratkan nilai mencapai KKM.</p>
+                        <?php if ($nilaiTp !== null): ?>
+                            <h3>Hasil nilai TP</h3>
+                            <p class="a-help">Jalur:
+                                <?= $nilaiTp['jalur'] === 'lulus_diagnostik'
+                                    ? 'Diagnostik lulus (100% Sumatif)'
+                                    : 'Belajar wajib (20% Resume + 20% HOTS + 60% Sumatif)' ?>.</p>
+                            <dl class="a-siswa-materi-ringkas">
+                                <?php foreach ([
+                                    'nilai_resume' => 'Resume',
+                                    'nilai_hots' => 'HOTS',
+                                    'nilai_sumatif' => 'Sumatif terbaik',
+                                    'nilai_tp' => 'Nilai akhir TP',
+                                ] as $kolomNilai => $namaNilai): ?>
+                                    <div>
+                                        <dt><?= esc($namaNilai) ?></dt>
+                                        <dd><?= $nilaiTp[$kolomNilai] === null
+                                            ? ($nilaiTp['jalur'] === 'lulus_diagnostik'
+                                                && in_array($kolomNilai, ['nilai_resume','nilai_hots'], true)
+                                                    ? 'Dilewati sesuai jalur' : 'Menunggu penilaian Guru')
+                                            : esc(number_format((float) $nilaiTp[$kolomNilai], 2, ',', '.')) ?></dd>
+                                    </div>
+                                <?php endforeach ?>
+                            </dl>
+                            <p class="a-help" role="status">Status nilai:
+                                <strong><?= $nilaiTp['status_nilai'] === 'final'
+                                    ? 'Final' : 'Sementara — menunggu penilaian Guru' ?></strong>
+                            </p>
+                        <?php else: ?>
+                            <p class="a-help" role="status">Catatan nilai TP belum tersedia.
+                                Hubungi pengelola apabila Sumatif sah sudah selesai.</p>
+                        <?php endif ?>
                     <?php endif ?>
                 </section>
             <?php endif ?>

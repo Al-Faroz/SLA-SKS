@@ -43,6 +43,13 @@ $routes->get('siswa/tp/(:num)/diagnostik/(:segment)/status', 'SiswaUjian::status
 $routes->post('siswa/tp/(:num)/diagnostik/(:segment)/jawab', 'SiswaUjian::jawab/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/diagnostik/(:segment)/tindakan', 'SiswaUjian::tindakan/$1/$2', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/diagnostik/media/(:segment)/(:segment)/(:segment)', 'SiswaUjian::media/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
+
+$routes->get('siswa/tp/(:num)/sumatif/ujian', 'SiswaSumatif::halaman/$1', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/sumatif/mulai', 'SiswaSumatif::mulai/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/sumatif/(:segment)/status', 'SiswaSumatif::status/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/sumatif/(:segment)/jawab', 'SiswaSumatif::jawab/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/tp/(:num)/sumatif/(:segment)/tindakan', 'SiswaSumatif::tindakan/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/tp/(:num)/sumatif/media/(:segment)/(:segment)/(:segment)', 'SiswaSumatif::media/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
 $routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 // G05 — gerbang ATP Excel enam semester, tanpa aksi impor di detail semester.

@@ -82,6 +82,8 @@ final class KelayakanSumatifSiswaTest extends TestCase
         self::assertStringContainsString('versi_konten_tp_id', $service);
         self::assertStringContainsString('resume_materi', $service);
         self::assertStringContainsString('jawaban_hots_materi', $service);
-        self::assertStringNotContainsString("SiswaSumatif::mulai", $route);
+        // A3 tadinya melarang route palsu; A4 telah menyediakan endpoint Sumatif nyata.
+        self::assertStringContainsString("SiswaSumatif::mulai", $route);
+        self::assertStringContainsString("SiswaSumatif::status", $route);
     }
 }
