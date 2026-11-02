@@ -48,7 +48,7 @@ final class KkmTpServiceTest extends TestCase
         self::assertStringContainsString("name=\"pilihan\" value=\"khusus\"", $view);
         self::assertStringContainsString("name=\"pilihan\" value=\"default\"", $view);
         self::assertStringContainsString("name=\"kkm_khusus\"", $view);
-        self::assertStringContainsString("value=\"<?= $kkm_info['efektif']", $view);
+        self::assertStringContainsString("value=\"<?= \$kkm_info['efektif']", $view);
         self::assertStringContainsString('csrf_field()', $view);
     }
 
@@ -56,9 +56,9 @@ final class KkmTpServiceTest extends TestCase
     {
         $source = file_get_contents(dirname(__DIR__, 2) . '/app/Services/KesiapanTpService.php');
         self::assertIsString($source);
-        self::assertStringContainsString("->informasi($tp)['efektif']", $source);
-        self::assertStringContainsString("'kkm' => (int) $cek['tp']['kkm']", $source);
-        self::assertStringContainsString("if ($tp['status'] === 'draf'", $source);
+        self::assertStringContainsString("->informasi(\$tp)['efektif']", $source);
+        self::assertStringContainsString("'kkm' => (int) \$cek['tp']['kkm']", $source);
+        self::assertStringContainsString("if (\$tp['status'] === 'draf'", $source);
     }
 
     public function testAdminMemilikiPengaturanTersendiri(): void
