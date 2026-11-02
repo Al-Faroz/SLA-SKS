@@ -269,7 +269,7 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 | UI-TP-005 | TP dengan >1 Materi historis | UI menahan pengeditan ganda, tidak menghapus otomatis |
 | UI-TP-006 | Indikator lama kosong | Tidak memblokir kesiapan TP; nilai indikator historis tidak tertimpa |
 | UI-TP-007 | Step Progress Esensial/NonEsensial | 3 vs 5 langkah; status diturunkan dari Service, tidak memberi PASS palsu |
-| UI-TP-008 | TP siap / snapshot | Form draf terkunci, publikasi hanya setelah tes server dan konfirmasi |
+| UI-TP-008 | TP Siap / snapshot | TP Siap **belum digunakan siswa** tetap bisa disunting Guru G1; setelah ada satu aktivitas siswa, seluruh konten terkunci. Publikasi awal tetap setelah tes server dan konfirmasi |
 | UI-TP-009 | Gagal upload / pergantian file | Pesan mudah dipahami, isian teks kembali, file harus dipilih ulang, DB tetap satu Materi |
 
 
