@@ -127,6 +127,9 @@
                         <div class="a-atp-bab-card__aksi">
                             <span class="a-badge"><?= count($tpDalamBab) ?> TP</span>
                             <?php if ($bolehTp): ?>
+                                <button class="a-btn a-btn--sekunder" type="button"
+                                    data-atp-dialog-open="dialog-sunting-bab-<?= (int) $bab['id'] ?>"
+                                    aria-haspopup="dialog" aria-controls="dialog-sunting-bab-<?= (int) $bab['id'] ?>">Sunting BAB</button>
                                 <button class="a-btn a-btn--utama" type="button"
                                     data-atp-dialog-open="dialog-tp-<?= (int) $bab['id'] ?>"
                                     aria-haspopup="dialog" aria-controls="dialog-tp-<?= (int) $bab['id'] ?>">+ Tambah TP</button>
@@ -169,6 +172,26 @@
                     <?php endif ?>
                 </article>
                 <?php if ($bolehTp): ?>
+                    <dialog id="dialog-sunting-bab-<?= (int) $bab['id'] ?>" class="a-modal a-modal--atp" aria-labelledby="judul-sunting-bab-<?= (int) $bab['id'] ?>">
+                        <div class="a-modal-atp__header">
+                            <h2 id="judul-sunting-bab-<?= (int) $bab['id'] ?>">Sunting BAB <?= (int) $bab['nomor_bab'] ?></h2>
+                            <button class="a-btn a-btn--sekunder" type="button" data-atp-dialog-close aria-label="Tutup sunting BAB">✕</button>
+                        </div>
+                        <p class="a-help">Nomor BAB dan hubungan TP tidak diubah.</p>
+                        <form class="a-form" method="post" action="<?= esc(site_url('guru/bab/' . (int) $bab['id'] . '/sunting'), 'attr') ?>" data-atp-dialog-form>
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="pilihan" value="<?= (int) $nomorPilihan ?>">
+                            <input type="hidden" name="semester" value="<?= (int) $nomorSemester ?>">
+                            <div class="a-field"><label class="a-label" for="sunting-nama-bab-<?= (int) $bab['id'] ?>">Nama BAB</label>
+                                <input id="sunting-nama-bab-<?= (int) $bab['id'] ?>" name="nama_bab" maxlength="<?= (int) $batasNamaBab ?>" required value="<?= esc($bab['nama_bab'], 'attr') ?>"></div>
+                            <div class="a-field"><label class="a-label" for="sunting-deskripsi-bab-<?= (int) $bab['id'] ?>">Deskripsi BAB</label>
+                                <textarea id="sunting-deskripsi-bab-<?= (int) $bab['id'] ?>" name="deskripsi_bab" maxlength="225" rows="3" required><?= esc($bab['deskripsi_bab']) ?></textarea></div>
+                            <div class="a-modal-atp__actions">
+                                <button class="a-btn a-btn--sekunder" type="button" data-atp-dialog-close>Batal</button>
+                                <button class="a-btn a-btn--utama" type="submit">Simpan BAB</button>
+                            </div>
+                        </form>
+                    </dialog>
                     <dialog id="dialog-tp-<?= (int) $bab['id'] ?>" class="a-modal a-modal--atp"
                         aria-labelledby="judul-dialog-tp-<?= (int) $bab['id'] ?>">
                         <div class="a-modal-atp__header">
