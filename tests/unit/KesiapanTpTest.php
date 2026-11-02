@@ -188,7 +188,7 @@ final class KesiapanTpTest extends TestCase
         self::assertIsString($view);
 
         self::assertStringContainsString('(new SuntingTpService())->pastikanBelumDipakai($tpId)', $controller);
-        self::assertStringContainsString("'suntingDikunci' => \\$suntingDikunci", $controller);
+        self::assertStringContainsString("'suntingDikunci' => " . '$suntingDikunci', $controller);
         self::assertStringContainsString('if ($suntingDikunci)', $view);
         self::assertStringContainsString('TP telah digunakan siswa.', $view);
         self::assertStringContainsString('TP belum digunakan siswa.', $view);
