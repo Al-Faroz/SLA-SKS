@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use CodeIgniter\Database\BaseConnection;
+use CodeIgniter\HTTP\Files\UploadedFile;
 use DomainException;
 use RuntimeException;
 use Throwable;
@@ -269,6 +270,75 @@ final class KoreksiTpService
         });
     }
 
+    /** Unggah file koreksi ke penyimpanan privat TANPA mengganti media TP Siap. */
+    public function unggahMedia(int $id, UploadedFile $file): void
+    {
+        $row = $this->lihatGuru($id);
+        if ($row['status'] !== 'draf' || !$file->isValid() || $file->hasMoved()) {
+            throw new DomainException('Draf atau unggahan media tidak sah.');
+        }
+        $materi = $row['usulan']['materi'][0] ?? null;
+        $jenis = $materi['jenis'] ?? '';
+        if (!in_array($jenis, ['pdf','audio','gambar'], true)) {
+            throw new DomainException('Materi YouTube diperbaiki melalui kolom URL, bukan unggah berkas.');
+        }
+        $valid = BerkasMateriService::validasi($file->getTempName(), $jenis, $file->getClientName());
+        $folder = rtrim(WRITEPATH, '/\\') . '/uploads/materi';
+        if (!is_dir($folder) && !@mkdir($folder, 0700, true) && !is_dir($folder)) {
+            throw new RuntimeException('Folder berkas Materi privat tidak bisa dibuat.');
+        }
+        $nama = bin2hex(random_bytes(24)) . '.' . $valid['ext'];
+        $file->move($folder, $nama);
+        $path = $folder . '/' . $nama;
+        if (!is_file($path) || (int) filesize($path) !== (int) $valid['bytes']) {
+            @unlink($path);
+            throw new RuntimeException('Berkas koreksi tidak berhasil disimpan utuh.');
+        }
+        try {
+            $this->ubah($id, function (array &$data) use ($row, $valid, $path, $nama): void {
+                if (($data['materi'][0]['jenis'] ?? '') !== ($row['usulan']['materi'][0]['jenis'] ?? '')) {
+                    throw new DomainException('Jenis Materi telah berubah.');
+                }
+                $this->db->table('berkas')->insert([
+                    'tp_id' => (int) $row['tp_id'], 'nama_acak' => $nama,
+                    'mime' => $valid['mime'], 'ukuran_byte' => $valid['bytes'],
+                    'checksum' => hash_file('sha256', $path),
+                    'halaman' => $valid['halaman'], 'durasi_detik' => $valid['durasi_detik'],
+                    'dibuat_pada' => gmdate('Y-m-d H:i:s'),
+                ]);
+                $data['materi'][0]['berkas_id'] = (int) $this->db->insertID();
+            });
+        } catch (Throwable $e) {
+            // File ini BELUM tercatat sebagai media terbit, boleh dibersihkan.
+            @unlink($path);
+            throw $e;
+        }
+    }
+
+    /** Pratinjau media dari salinan koreksi tanpa mengakses file lewat URL publik. */
+    public function mediaGuru(int $id): array
+    {
+        $row = $this->lihatGuru($id);
+        $m = $row['usulan']['materi'][0] ?? null;
+        if (!is_array($m) || !in_array($m['jenis'], ['pdf','audio','gambar'], true)
+            || (int) ($m['berkas_id'] ?? 0) < 1) {
+            throw new DomainException('Tidak ada berkas dalam usulan koreksi.');
+        }
+        $berkas = $this->db->table('berkas')->where('id', (int) $m['berkas_id'])
+            ->where('tp_id', (int) $row['tp_id'])->get()->getRowArray();
+        if ($berkas === null || !preg_match('/^[a-f0-9]{48}\.(?:pdf|jpg|png|webp|mp3|m4a)$/D',
+            (string) $berkas['nama_acak'])) {
+            throw new DomainException('Media privat koreksi tidak ditemukan.');
+        }
+        $path = rtrim(WRITEPATH, '/\\') . '/uploads/materi/' . $berkas['nama_acak'];
+        if (!is_file($path) || !is_readable($path)
+            || (int) filesize($path) !== (int) $berkas['ukuran_byte']
+            || !hash_equals((string) $berkas['checksum'], hash_file('sha256', $path))) {
+            throw new DomainException('Berkas media koreksi rusak atau tidak tersedia.');
+        }
+        return ['path' => $path, 'mime' => $berkas['mime'], 'bytes' => (int) $berkas['ukuran_byte']];
+    }
+
     /** Sunting satu butir saja per POST agar tetap aman dari max_input_vars PHP. */
     public function simpanSoal(int $id, int $soalId, array $input): void
     {
@@ -317,6 +387,24 @@ final class KoreksiTpService
         });
     }
 
+    private function periksaFileMateri(int $tpId, array $data): void
+    {
+        $m = $data['materi'][0] ?? [];
+        if (!in_array($m['jenis'] ?? '', ['pdf','audio','gambar'], true)) {
+            return;
+        }
+        $berkas = $this->db->table('berkas')->where('tp_id', $tpId)
+            ->where('id', (int) ($m['berkas_id'] ?? 0))->get()->getRowArray();
+        if (!$berkas) {
+            throw new DomainException('Sumber file Materi usulan belum tersedia.');
+        }
+        $path = rtrim(WRITEPATH, '/\\') . '/uploads/materi/' . $berkas['nama_acak'];
+        if (!is_file($path) || (int) filesize($path) !== (int) $berkas['ukuran_byte']
+            || !hash_equals((string) $berkas['checksum'], hash_file('sha256', $path))) {
+            throw new DomainException('Sumber file Materi usulan tidak utuh.');
+        }
+    }
+
     private static function periksa(array $data, array $asal): void
     {
         if (hash_equals(self::encode($data), self::encode($asal))) {
@@ -350,8 +438,9 @@ final class KoreksiTpService
                 || !hash_equals((string) $lock['checksum_dasar'], (string) $asal['checksum'])) {
                 throw new DomainException('Versi TP telah berubah. Buat permohonan berdasarkan versi terbaru.');
             }
-            self::periksa(self::decode((string) $lock['usulan_json']),
-                self::decode((string) $asal['snapshot_json']));
+            $usulan = self::decode((string) $lock['usulan_json']);
+            $this->periksaFileMateri((int) $lock['tp_id'], $usulan);
+            self::periksa($usulan, self::decode((string) $asal['snapshot_json']));
             $this->db->table('permohonan_koreksi_tp')->where('id', $id)->update([
                 'status' => 'diajukan', 'diajukan_pada' => gmdate('Y-m-d H:i:s'),
             ]);
@@ -399,6 +488,7 @@ final class KoreksiTpService
             if ($setujui) {
                 $data = self::decode((string) $row['usulan_json']);
                 $sebelum = self::decode((string) $asal['snapshot_json']);
+                $this->periksaFileMateri($tpId, $data);
                 self::periksa($data, $sebelum);
                 $noVersi = (int) $asal['nomor_versi'] + 1;
                 $data['tp']['struktur_versi'] = (int) $tp['struktur_versi'] + 1;
@@ -462,6 +552,7 @@ final class KoreksiTpService
                         'petunjuk_hots' => $m['petunjuk_hots'],
                         'min_waktu_detik' => (int) $m['min_waktu_detik'],
                         'url_youtube' => $m['url_youtube'],
+                        'berkas_id' => $m['berkas_id'],
                     ]);
                 $kkm = (int) $data['tp']['kkm'];
                 $default = (new KkmTpService($this->db))->defaultAdmin();
