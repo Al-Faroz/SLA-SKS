@@ -11,13 +11,19 @@
     <header class="a-page__heading">
         <div>
             <p class="a-proto-eyebrow">Guru · Bank Soal TP</p>
-            <h1>Bank Soal Diagnostik dan Sumatif</h1>
+            <h1>Kelola Bank Soal</h1>
             <p class="a-proto-muted"><?= esc($tp['kode_tp'] . ' — ' . $tp['judul']) ?></p>
         </div>
     </header>
     <section class="a-card" aria-labelledby="bank-soal-status">
         <h2 id="bank-soal-status">Ketersediaan bank soal</h2>
-        <p class="a-help">Ringkasan hanya menampilkan jumlah soal aktif, tanpa pertanyaan atau kunci jawaban. Unduhan template Word kosong tersedia untuk TP draf. Setelah unggah, Guru meninjau isi Word kemudian mengonfirmasi penyimpanan pada TP draf.</p>
+        <p class="a-help">Satu halaman untuk Diagnostik dan Sumatif. Pilih tab untuk menambah, menyunting, mengimpor, dan meninjau soal. Jumlah minimal: 10 Diagnostik dan 30 Sumatif.</p>
+        <?php if ($pesan = session()->getFlashdata('soal_galat') ?? session()->getFlashdata('word_galat')): ?>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+        <?php endif ?>
+        <?php if ($pesan = session()->getFlashdata('soal_sukses') ?? session()->getFlashdata('word_sukses')): ?>
+            <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+        <?php endif ?>
         <div class="a-tabel-gulir">
             <table class="a-tbl a-tbl--cards">
                 <thead><tr><th scope="col">Jenis ujian</th><th scope="col">Soal aktif</th><th scope="col">Jumlah tayang</th><th scope="col">Status jumlah</th></tr></thead>
@@ -35,7 +41,8 @@
         </div>
         <p class="a-help">Jumlah yang mencukupi belum berarti soal siap dipublikasikan: isi soal, opsi A–E, kunci dan aset tetap harus diperiksa.</p>
         <section class="a-soal-daftar" aria-labelledby="judul-daftar-bank">
-            <h3 id="judul-daftar-bank">Daftar soal yang tersimpan</h3>
+            <h3 id="judul-daftar-bank">Bank <?= esc(ucfirst($jenis_dipilih)) ?></h3>
+            <p class="a-help">Jumlah tersimpan: <?= (int) $total_soal ?> soal (aktif maupun nonaktif). Pilih cara menyiapkan soal: satu per satu di aplikasi atau melalui Word.</p>
             <nav class="a-soal-tabs" aria-label="Jenis bank soal">
                 <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenisTab => $namaTab): ?>
                     <a href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenisTab), 'attr') ?>"
@@ -85,11 +92,27 @@
                     </tbody>
                 </table></div>
             <?php endif ?>
+            <?php if ($jumlah_halaman > 1): ?>
+                <nav class="a-soal-tabs a-jarak-atas" aria-label="Halaman soal <?= esc(ucfirst($jenis_dipilih)) ?>">
+                    <?php if ($halaman_aktif > 1): ?>
+                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenis_dipilih . '&halaman=' . ($halaman_aktif - 1)), 'attr') ?>">Sebelumnya</a>
+                    <?php endif ?>
+                    <?php for ($hal = max(1, $halaman_aktif - 2); $hal <= min($jumlah_halaman, $halaman_aktif + 2); $hal++): ?>
+                        <a class="a-btn a-btn--sekunder <?= $hal === $halaman_aktif ? 'is-aktif' : '' ?>"
+                           <?= $hal === $halaman_aktif ? 'aria-current="page"' : '' ?>
+                           href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenis_dipilih . '&halaman=' . $hal), 'attr') ?>"><?= $hal ?></a>
+                    <?php endfor ?>
+                    <?php if ($halaman_aktif < $jumlah_halaman): ?>
+                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenis_dipilih . '&halaman=' . ($halaman_aktif + 1)), 'attr') ?>">Berikutnya</a>
+                    <?php endif ?>
+                </nav>
+            <?php endif ?>
         </section>
         <?php if ($tp['status'] === 'draf'): ?>
-            <h3>Unduh template Word kosong</h3>
+            <h3 class="a-jarak-atas">Siapkan melalui Word — <?= esc(ucfirst($jenis_dipilih)) ?></h3>
             <p class="a-help">Pilih jumlah soal yang akan dibuat. Setiap soal memiliki satu bagian pertanyaan dan lima opsi A–E, seluruhnya kosong. Pilih jumlah soal, unduh, isi, lalu unggah untuk review dan konfirmasi.</p>
             <?php foreach ($ringkasan_bank as $jenis => $data): ?>
+                <?php if ($jenis !== $jenis_dipilih) continue; ?>
                 <form class="a-form a-jarak-atas" method="get" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/word/' . $jenis), 'attr') ?>">
                     <div class="a-field">
                         <label class="a-label" for="word-jumlah-<?= esc($jenis, 'attr') ?>">Jumlah soal <?= esc(ucfirst($jenis)) ?></label>
@@ -101,6 +124,7 @@
             <h3 class="a-jarak-atas">Unggah Word untuk validasi</h3>
             <p class="a-help">Unggahan diperiksa dan disimpan sementara secara privat. Bank soal baru berubah setelah Anda memeriksa seluruh soal dan menekan Konfirmasi Simpan.</p>
             <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenis => $namaJenis): ?>
+                <?php if ($jenis !== $jenis_dipilih) continue; ?>
                 <form method="post" enctype="multipart/form-data" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/word/' . $jenis . '/pratinjau'), 'attr') ?>">
                     <?= csrf_field() ?>
                     <div class="a-field">
@@ -111,12 +135,7 @@
                 </form>
             <?php endforeach ?>
         <?php endif ?>
-        <?php if ($pesan = session()->getFlashdata('soal_galat') ?? session()->getFlashdata('word_galat')): ?>
-            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
-        <?php endif ?>
-        <?php if ($pesan = session()->getFlashdata('soal_sukses') ?? session()->getFlashdata('word_sukses')): ?>
-            <div class="a-alert" role="status"><?= esc($pesan) ?></div>
-        <?php endif ?>
+
         <?php if (!empty($word_riwayat)): ?>
             <h3 class="a-jarak-atas">Riwayat unggah dan review</h3>
             <p class="a-help">Buka pratinjau tersimpan untuk melihat ulang pertanyaan, opsi, gambar, tabel, dan kunci. Arsip Word disimpan privat di server.</p>
