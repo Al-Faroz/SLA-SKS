@@ -29,7 +29,8 @@ final class ProgresTpSiswaDatabaseTest extends TestCase
             'CREATE TABLE ref_mapel (id INTEGER PRIMARY KEY, kode TEXT, nama TEXT)',
             'CREATE TABLE paket_semester (id INTEGER PRIMARY KEY, angkatan_id INT, mapel_id INT, semester INT, tahun_ajaran_id INT, nomor_versi INT, status TEXT)',
             'CREATE TABLE penugasan_paket (id INTEGER PRIMARY KEY, angkatan_id INT, mapel_id INT, semester INT, tahun_ajaran_id INT, paket_id INT)',
-            'CREATE TABLE tp (id INTEGER PRIMARY KEY, paket_semester_id INT, kode_tp TEXT, judul TEXT, urutan_atp INT, status TEXT, rumusan TEXT, indikator TEXT, jenis_tp TEXT DEFAULT \'non_esensial\')',
+             'CREATE TABLE bab (id INTEGER PRIMARY KEY, paket_semester_id INT, nomor_bab INT, nama_bab TEXT, deskripsi_bab TEXT)',
+            'CREATE TABLE tp (id INTEGER PRIMARY KEY, paket_semester_id INT,bab_id INT DEFAULT 1, kode_tp TEXT, judul TEXT, urutan_atp INT, status TEXT, rumusan TEXT, indikator TEXT, jenis_tp TEXT DEFAULT \'non_esensial\')',
             'CREATE TABLE versi_konten_tp (id INTEGER PRIMARY KEY, tp_id INT, nomor_versi INT, snapshot_json TEXT, checksum TEXT)',
             'CREATE TABLE materi (id INTEGER PRIMARY KEY, tp_id INT, urutan INT, judul TEXT, jenis TEXT, aktif INT)',
             'CREATE TABLE progres_tp (id INTEGER PRIMARY KEY AUTOINCREMENT, siswa_id INT, tp_id INT, paket_semester_id INT, versi_paket_yang_ditugaskan INT, versi_konten_tp_id INT, status TEXT, dimulai_pada TEXT, diubah_pada TEXT, UNIQUE(siswa_id,tp_id,versi_paket_yang_ditugaskan))',
@@ -55,10 +56,14 @@ final class ProgresTpSiswaDatabaseTest extends TestCase
             ['id'=>1,'angkatan_id'=>1,'mapel_id'=>4,'semester'=>4,'tahun_ajaran_id'=>1,'paket_id'=>7],
             ['id'=>2,'angkatan_id'=>2,'mapel_id'=>4,'semester'=>4,'tahun_ajaran_id'=>1,'paket_id'=>8],
         ]);
+        $this->db->table('bab')->insertBatch([
+            ['id'=>1,'paket_semester_id'=>7,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 1','deskripsi_bab'=>'Contoh untuk pengujian'],
+            ['id'=>2,'paket_semester_id'=>8,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 2','deskripsi_bab'=>'Contoh untuk pengujian'],
+        ]);
         $this->db->table('tp')->insertBatch([
             ['id'=>1,'paket_semester_id'=>7,'kode_tp'=>'TP-A-1','judul'=>'Pertama','urutan_atp'=>1,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
             ['id'=>2,'paket_semester_id'=>7,'kode_tp'=>'TP-A-2','judul'=>'Kedua','urutan_atp'=>2,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
-            ['id'=>3,'paket_semester_id'=>8,'kode_tp'=>'TP-B-1','judul'=>'Gen lain','urutan_atp'=>1,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
+            ['id'=>3,'bab_id'=>2,'paket_semester_id'=>8,'kode_tp'=>'TP-B-1','judul'=>'Gen lain','urutan_atp'=>1,'status'=>'siap','rumusan'=>'Rumusan','indikator'=>'Indikator'],
         ]);
         foreach ([1,2,3] as $tpId) {
             $json = json_encode([
