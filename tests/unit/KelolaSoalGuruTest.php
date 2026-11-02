@@ -87,4 +87,34 @@ final class KelolaSoalGuruTest extends TestCase
         }
     }
 
+
+    public function testKetersediaanTerpisahDanBankSoalMemakaiDuaTabJelas(): void
+    {
+        $view = file_get_contents(__DIR__ . '/../../app/Views/guru/bank_soal.php');
+        $css = file_get_contents(__DIR__ . '/../../public/assets/css/app.css');
+        self::assertIsString($view);
+        self::assertIsString($css);
+
+        $ringkasan = strpos($view, 'id="bank-soal-status"');
+        $kerja = strpos($view, 'id="judul-kelola-bank"');
+        $tab = strpos($view, 'class="a-bank-soal__tabs"');
+        $daftar = strpos($view, 'class="a-soal-daftar"');
+        self::assertNotFalse($ringkasan);
+        self::assertNotFalse($kerja);
+        self::assertNotFalse($tab);
+        self::assertNotFalse($daftar);
+        self::assertTrue($ringkasan < $kerja && $kerja < $tab && $tab < $daftar);
+
+        self::assertSame(1, substr_count($view, 'class="a-bank-soal__ringkasan-grid"'));
+        self::assertSame(1, substr_count($view, 'class="a-bank-soal__tabs"'));
+        self::assertStringContainsString("['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif']", $view);
+        self::assertStringContainsString("'/bank-soal?jenis=' . $jenisTab", $view);
+        self::assertStringContainsString('aria-current="page"', $view);
+        self::assertStringContainsString('class="a-bank-soal__tab-konten"', $view);
+
+        self::assertStringContainsString('.a-bank-soal__ringkasan-grid', $css);
+        self::assertStringContainsString('.a-bank-soal__tab.is-aktif', $css);
+        self::assertStringContainsString('.a-bank-soal__tab:focus-visible', $css);
+    }
+
 }
