@@ -1,0 +1,86 @@
+name: QA A5 Keputusan Ujian Batal
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KeputusanUjianBatalService.php'
+      - 'app/Services/MesinDiagnostikSiswaService.php'
+      - 'app/Services/MesinSumatifSiswaService.php'
+      - 'app/Services/NilaiTpService.php'
+      - 'app/Controllers/GuruUjianBatal.php'
+      - 'app/Views/guru/ujian_batal.php'
+      - 'app/Config/Routes.php'
+      - 'app/Services/NavigasiService.php'
+      - 'tests/unit/KeputusanUjianBatalDatabaseTest.php'
+      - 'database/sql/updates/V4-0008_KEPUTUSAN_UJIAN_BATAL.sql'
+      - '.github/workflows/qa-a5-ujian-batal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite, mysqli, intl, gd, dom, xml, zip
+          coverage: none
+      - run: mkdir -p writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Pemeriksaan sintaks PHP
+        run: |
+          php -l app/Services/KeputusanUjianBatalService.php
+          php -l app/Services/MesinDiagnostikSiswaService.php
+          php -l app/Services/MesinSumatifSiswaService.php
+          php -l app/Services/NilaiTpService.php
+          php -l app/Controllers/GuruUjianBatal.php
+          php -l app/Views/guru/ujian_batal.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/KeputusanUjianBatalDatabaseTest.php
+      - name: Uji Guru G1, keputusan, idempoten, skor dan remedial
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/KeputusanUjianBatalDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/SumatifRemedialNilaiV25Test.php
+
+  mariadb-schema:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: localqa
+          MARIADB_DATABASE: sla_a5_qa
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pasang MariaDB client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq mariadb-client
+      - name: Fixture anonim dan patch V4-0008
+        run: |
+          mariadb -h 127.0.0.1 -u root -plocalqa sla_a5_qa <<'SQL'
+          CREATE TABLE pengguna (id BIGINT UNSIGNED PRIMARY KEY) ENGINE=InnoDB;
+          CREATE TABLE percobaan_ujian (id BIGINT UNSIGNED PRIMARY KEY) ENGINE=InnoDB;
+          CREATE TABLE schema_version (versi VARCHAR(40) PRIMARY KEY, diterapkan_pada TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB;
+          INSERT INTO pengguna (id) VALUES (4);
+          INSERT INTO percobaan_ujian (id) VALUES (101);
+          SQL
+          sed '/^USE sla_sks_v4;$/d' database/sql/updates/V4-0008_KEPUTUSAN_UJIAN_BATAL.sql > /tmp/a5-update.sql
+          mariadb -h 127.0.0.1 -u root -plocalqa sla_a5_qa < /tmp/a5-update.sql
+          mariadb -h 127.0.0.1 -u root -plocalqa sla_a5_qa -e "
+            INSERT INTO keputusan_ujian_batal (percobaan_ujian_id,keputusan,guru_id,alasan,diputus_pada)
+            VALUES (101,'ulang_diagnostik',4,'Uji anonim',UTC_TIMESTAMP());
+            INSERT INTO riwayat_keputusan_ujian_batal
+            (keputusan_ujian_batal_id,guru_id,keputusan_baru,alasan,terjadi_pada)
+            VALUES (1,4,'ulang_diagnostik','Uji anonim',UTC_TIMESTAMP());"
+          test "$(mariadb -h 127.0.0.1 -u root -plocalqa -N sla_a5_qa -e "SELECT COUNT(*) FROM keputusan_ujian_batal")" = "1"
+          test "$(mariadb -h 127.0.0.1 -u root -plocalqa -N sla_a5_qa -e "SELECT COUNT(*) FROM schema_version WHERE versi='V4-0008-KEPUTUSAN-UJIAN-BATAL'")" = "1"
