@@ -60,3 +60,11 @@ PDF Materi yang baru diunggah maupun file pengganti wajib berisi **minimal 6 dan
 ## Keputusan final penyederhanaan validasi PDF (1 November 2026)
 
 **Menggantikan semua instruksi validasi internal PDF sebelumnya:** PDF Materi hanya dibatasi dari sisi **jumlah halaman 6–40** dan **ukuran maksimal 15 MB**. Pembacaan katalog, objek terkompresi (ObjStm), revisi, metadata dan navigasi dipakai hanya seperlunya untuk memperoleh angka halaman, **tidak menjadi alasan penolakan tersendiri**. File tetap harus dikenali sebagai jenis PDF saat diunggah (ekstensi/MIME); kewenangan Guru, status TP draf, penyimpanan privat, CSRF dan transaksi tetap berlaku di luar pembatasan Materi. PDF historis tidak dihapus atau diubah otomatis. Tidak ada perubahan SQL.
+
+## Addendum 2 November 2026 — pengelolaan bank soal satu pintu
+
+Pada TP NonEsensial, tombol **Kelola Bank Soal** menuju satu halaman per TP dengan dua tab **Diagnostik** dan **Sumatif**. Pemisahan tab, jumlah minimal dan status readiness tetap per jenis: Diagnostik **≥10**, Sumatif **≥30**. Penyusunan bertahap diperbolehkan dalam status TP draf; syarat jumlah berlaku pada pembangkitan template Word resmi dan publikasi TP Siap, bukan melarang Guru menambah soal satu per satu.
+
+Editor soal Guru mendukung pratinjau **tanpa menyimpan** (hasil sanitasi server), lalu simpan eksplisit. List soal memakai pagination server, bukan menyembunyikan baris dengan JavaScript. Review Word bersifat bertahap per butir (expand/collapse) dan memerlukan konfirmasi Guru; konfirmasi ditolak jika bank soal berubah setelah review, termasuk Word identik yang sebelumnya dapat melewati pemeriksaan edit manual.
+
+Equation Word umum ditampilkan melalui MathML (pecahan, superscript, subscript, akar dan konstruksi lainnya yang didukung); **kesetaraan semua konstruksi Equation Word belum dijamin**, sehingga guru harus memeriksa bentuk kompleks terhadap Word sumber dan uji browser. Audio/Video Word tetap hanya menggunakan URL file **Google Drive HTTPS**; sistem memeriksa bentuk URL dan menyediakan link buka untuk uji Viewer/pemutaran **manual**, bukan klaim sudah memeriksa izin file secara otomatis. Jangan menerbitkan TP sebelum Guru memverifikasi media eksternal tersebut. Tidak ada SQL, dump privat maupun perubahan data historis.
