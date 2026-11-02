@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
 <?php $data = $koreksi['usulan']; $tp = $data['tp']; $materi = $data['materi'][0] ?? []; $bolehUbah = $koreksi['status'] === 'draf'; ?>
-<div class="a-page">
+<div class="a-page a-koreksi-tp">
     <nav class="a-breadcrumb"><a href="<?= esc(site_url('guru/tp/' . (int) $koreksi['tp_id'] . '/koreksi'), 'attr') ?>">Koreksi TP</a> / Permohonan #<?= (int) $koreksi['id'] ?></nav>
     <header class="a-page__heading"><div><p class="a-proto-eyebrow">Guru · Usulan koreksi berversi</p>
         <h1>Koreksi <?= esc($tp['kode_tp']) ?></h1>
