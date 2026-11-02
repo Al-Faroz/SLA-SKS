@@ -12,6 +12,7 @@ on:
       - 'app/Config/Routes.php'
       - 'app/Services/NavigasiService.php'
       - 'tests/unit/KeputusanUjianBatalDatabaseTest.php'
+      - 'tests/unit/NilaiTpLangsungBelajarTest.php'
       - 'database/sql/updates/V4-0008_KEPUTUSAN_UJIAN_BATAL.sql'
       - '.github/workflows/qa-a5-ujian-batal.yml'
   workflow_dispatch:
@@ -41,9 +42,11 @@ jobs:
           php -l app/Views/guru/ujian_batal.php
           php -l app/Config/Routes.php
           php -l tests/unit/KeputusanUjianBatalDatabaseTest.php
+          php -l tests/unit/NilaiTpLangsungBelajarTest.php
       - name: Uji Guru G1, keputusan, idempoten, skor dan remedial
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/KeputusanUjianBatalDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/NilaiTpLangsungBelajarTest.php
           vendor/bin/phpunit --no-coverage tests/unit/SumatifRemedialNilaiV25Test.php
 
   mariadb-schema:
