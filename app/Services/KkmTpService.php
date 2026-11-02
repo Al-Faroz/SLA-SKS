@@ -96,6 +96,12 @@ final class KkmTpService
         return $khusus ?? $default;
     }
 
+    /** Tidak menyalin default Admin menjadi override bila Guru belum mengubah angkanya. */
+    public static function normalisasiKhusus(?int $usulan, ?int $default): ?int
+    {
+        return $usulan !== null && $usulan === $default ? null : $usulan;
+    }
+
     /** KKM Guru opsional, versi TP naik agar review/publikasi lama tidak dapat dipakai lagi. */
     public function simpanKhusus(int $tpId, ?string $raw, int $versi): bool
     {
@@ -118,9 +124,7 @@ final class KkmTpService
             (new DetailTpService($this->db, $this->akunSaatIni))->lihat($tpId);
             $default = $this->defaultAdmin();
             // KKM sama dengan default Admin tetap mewarisi perubahannya.
-            if ($default !== null && $nilai === $default) {
-                $nilai = null;
-            }
+            $nilai = self::normalisasiKhusus($nilai, $default);
             $efektif = self::pilihEfektif($default, $nilai);
             if ($efektif === null) {
                 throw new DomainException('KKM default Admin belum ditetapkan. Isi KKM khusus Guru terlebih dahulu.');
