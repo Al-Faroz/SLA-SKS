@@ -77,7 +77,7 @@
                         ? 'Keputusan historis Guru: Langsung Belajar' : 'Tes tidak selesai — akses ulang diperlukan'));
             let pesanHasil = jenis === 'diagnostik' && langsungBelajar
                 ? 'Keputusan historis Guru: lanjut jalur belajar. Selesaikan Materi, Resume final, HOTS final, kemudian Sumatif.'
-                : 'Tes tidak selesai tanpa skor sah. Ajukan akses ulang kepada Guru untuk mengerjakan tahap yang sama.';
+                : 'Tes tidak selesai tanpa skor sah. Kembali ke Rincian TP untuk meminta akses ulang kepada Guru.';
             if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
                 pesanHasil = state.skor >= state.kkm
                     ? 'Diagnostik memenuhi KKM. Materi/Resume/HOTS boleh dilewati; Sumatif tetap wajib.'
@@ -90,7 +90,6 @@
                         : 'Sumatif selesai sah. Periksa nilai TP di halaman rincian.');
             }
             setText('[data-ujian-hasil-pesan]', pesanHasil);
-            show('[data-ujian-akses-ulang]', state.status === 'dibatalkan_menunggu_guru' && !(jenis === 'diagnostik' && langsungBelajar));
             show('[data-ujian-remedial]', jenis === 'sumatif'
                 && state.status === 'selesai_sah' && state.perlu_remedial === true);
             setText('[data-ujian-hasil-skor]',
