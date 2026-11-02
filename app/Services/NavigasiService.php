@@ -23,6 +23,8 @@ final class NavigasiService
                 'aktif' => $aktif === 'penilaian'];
             $menu[] = ['label' => 'Ujian Dibatalkan', 'path' => 'guru/ujian-batal',
                 'aktif' => $aktif === 'ujian_batal'];
+            $menu[] = ['label' => 'Rekap Nilai TP', 'path' => 'guru/rekap-nilai',
+                'aktif' => $aktif === 'rekap_nilai'];
         }
         if ($peran === 'admin') {
             foreach ([
