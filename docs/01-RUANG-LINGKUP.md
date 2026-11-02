@@ -40,7 +40,8 @@ Tidak ada registrasi publik, login Google, marketplace kursus, rombel sebagai pe
 | CP | Capaian Pembelajaran Fase D yang dikelola dan boleh disunting langsung Admin, termasuk setelah dirujuk TP/siswa |
 | Jalur diagnostik | Lulus dapat melewati Materi, Resume dan HOTS tetapi tetap wajib Sumatif |
 | Jalur belajar | Satu Materi → Resume → HOTS → Sumatif setelah Diagnostik belum lulus |
-| Ujian dibatalkan | Tidak memiliki nilai; menunggu keputusan guru |
+| Akses ulang tes mandiri | Diagnostik/Sumatif tidak selesai: siswa meminta izin Guru untuk mengerjakan tahap yang sama tanpa menghabiskan kuota sah | 
+| Ujian dibatalkan | Khusus Pra-Semester; tidak memiliki nilai; penanganan sesuai kebijakan ujian terjadwal |
 | Nilai sementara | Nilai belum lengkap karena komponen wajib masih menunggu penilaian guru |
 | `berlaku` | Sertifikat resmi aktif untuk siswa dan paket semester tertentu |
 | `digantikan` | Sertifikat historis yang telah memiliki pengganti; bukan pencabutan |
