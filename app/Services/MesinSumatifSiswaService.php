@@ -81,7 +81,9 @@ final class MesinSumatifSiswaService
         }
         $tahap = self::tahapBerikut($normal, $remedial);
         $lanjut = $tahap === 'lanjut_normal' ? $normal
-            : ($tahap === 'lanjut_remedial' ? $remedial : null);
+            : ($tahap === 'lanjut_remedial' ? $remedial
+                : (in_array($tahap, ['selesai','menunggu_guru'], true)
+                    ? ($remedial ?? $normal) : null));
         $boleh = false;
         if (in_array($tahap, ['normal','remedial','lanjut_normal','lanjut_remedial'], true)) {
             $syarat = (new KelayakanSumatifSiswaService($this->db, $this->akunSaatIni))
