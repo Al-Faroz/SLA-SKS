@@ -21,17 +21,28 @@ final class SusunButirUjianService
      */
     public static function diagnostik(array $snapshot): array
     {
+        return self::pilih($snapshot, 'diagnostik', 'diag_tayang', 10);
+    }
+
+    /** Sumatif dan remedial sama-sama menggunakan bank sumatif pada snapshot terpin. */
+    public static function sumatif(array $snapshot): array
+    {
+        return self::pilih($snapshot, 'sumatif', 'sum_tayang', 30);
+    }
+
+    private static function pilih(array $snapshot, string $jenis, string $kolomTayang, int $minimal): array
+    {
         $tp = $snapshot['tp'] ?? [];
-        $jumlahTayang = (int) ($tp['diag_tayang'] ?? 0);
+        $jumlahTayang = (int) ($tp[$kolomTayang] ?? 0);
         $bank = $snapshot['soal'] ?? [];
         if (($snapshot['format'] ?? null) !== 'SLA-SKS-TP-V1'
-            || !is_array($bank) || $jumlahTayang < 10 || $jumlahTayang > 65535) {
-            throw new DomainException('Snapshot Diagnostik tidak memenuhi kontrak.');
+            || !is_array($bank) || $jumlahTayang < $minimal || $jumlahTayang > 65535) {
+            throw new DomainException('Snapshot bank soal ' . ucfirst($jenis) . ' tidak memenuhi kontrak.');
         }
         $kandidat = [];
         $idUnik = [];
         foreach ($bank as $soal) {
-            if (!is_array($soal) || ($soal['jenis'] ?? null) !== 'diagnostik'
+            if (!is_array($soal) || ($soal['jenis'] ?? null) !== $jenis
                 || (int) ($soal['aktif'] ?? 1) !== 1) {
                 continue;
             }
@@ -39,7 +50,7 @@ final class SusunButirUjianService
             if ($id < 1 || isset($idUnik[$id])
                 || !in_array($soal['kunci'] ?? null, self::HURUF, true)
                 || trim((string) ($soal['pertanyaan'] ?? '')) === '') {
-                throw new DomainException('Ada soal Diagnostik tidak sah pada snapshot.');
+                throw new DomainException('Ada soal ' . ucfirst($jenis) . ' tidak sah pada snapshot.');
             }
             $idUnik[$id] = true;
             foreach (self::HURUF as $huruf) {
