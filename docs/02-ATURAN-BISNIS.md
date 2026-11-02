@@ -37,9 +37,9 @@
 - Resume/HOTS Simpan Draf manual, Kirim Final, penilaian Guru. TP Siap tanpa penggunaan boleh disunting; begitu ada penggunaan siswa, konten dan snapshot yang digunakannya dilindungi.
 
 ## 4. Keputusan final tentang ujian
-- Profil Ketat sama untuk Diagnostik, Sumatif dan Pra-Semester. PG lima pilihan A–E dengan satu kunci; aturan fullscreen, jeda/insiden, koneksi di dokumen 07.
+- Profil pengamanan pengerjaan Ketat (fullscreen, waktu, koneksi) dipakai pada Diagnostik, Sumatif dan Pra-Semester, **tetapi kegagalan tes mandiri ditangani dengan permintaan akses ulang Guru, bukan pembatalan**. Pembatalan hanya untuk Pra-Semester. PG lima pilihan A–E dengan satu kunci; aturan operasional lengkap pada dokumen 07.
 - Diagnostik minimal 10, Sumatif minimal 30, Pra-Semester minimal 30 soal gabungan seluruh BAB semester.
-- Sumatif dan Pra-Semester memberikan **satu remedial jika skor < KKM**, mengambil nilai tertinggi. Percobaan batal tanpa skor tidak menghabiskan kesempatan sah; ulang memerlukan keputusan Guru.
+- Sumatif dan Pra-Semester memberikan **satu remedial jika skor Sumatif/Pra-Semester normal selesai sah di bawah KKM**, mengambil skor tertinggi. **Diagnostik/Sumatif yang tidak selesai** tidak menghasilkan skor, bukan pembatalan dan bukan remedial; siswa meminta akses ulang Guru sesuai tahap yang gagal tanpa menghabiskan kesempatan sah. **Pembatalan ujian hanya berlaku untuk Pra-Semester**.
 - Admin mengatur jendela Pra-Semester serentak; akses siswa tanpa seluruh TP NonEsensial selesai ditolak.
 
 ## 5. Keputusan final tentang sertifikat
@@ -53,7 +53,7 @@
 | Pengguna | aktif/nonaktif/terkunci | Bisa login, tidak bisa login, ditolak sementara karena kegagalan login |
 | TP | draf/siap | Draf bisa diedit; Siap juga bisa diedit selama belum pernah digunakan siswa. Status Siap tidak sama dengan terkunci |
 | Progres TP | belum_mulai/diagnostik/belajar/sumatif/perlu_bantuan/tuntas | Proses siswa; transisi harus sesuai prasyarat |
-| Ujian | berjalan/jeda_fullscreen/jeda_koneksi/selesai_sah/dibatalkan_menunggu_guru | Skor hanya pada selesai_sah |
+| Ujian | berjalan/jeda_fullscreen/jeda_koneksi/selesai_sah; mandiri: akses_ulang_diperlukan; Pra-Semester: dibatalkan_menunggu_guru | Skor hanya pada selesai_sah; enum DB lama masih memerlukan update SQL additive setelah audit dump terbaru |
 | Penilaian | belum_dinilai/dinilai/koreksi_diajukan/koreksi_diterapkan | Riwayat menyimpan perubahan |
 | Sertifikat | menyiapkan_revisi/berlaku/digantikan | Tidak ada `dicabut` |
 | CP/template | draf/aktif/diarsipkan | Versi aktif tunggal sesuai jenis referensi |
