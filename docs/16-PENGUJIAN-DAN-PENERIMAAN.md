@@ -326,3 +326,13 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Guru klik Simpan tanpa mengubah nilai 80: tidak menaikkan `struktur_versi`, tidak menambah audit palsu, `tp.kkm_khusus` tetap NULL. Ganti 85: tersimpan khusus; kembalikan 80: khusus menjadi NULL.
 - Admin kemudian mengubah default saat TP telah Siap: tampilan TP Siap dan percobaan yang terpin tetap membaca KKM snapshot, tidak tertukar ke Admin terbaru.
 - Jalur koreksi TP Siap **belum diluncurkan**; pengujian penerimaan E2E-017–019 tetap syarat sebelum tombol Ajukan Koreksi/Setujui dibuka. Jangan menyatakan koreksi Materi/soal siap karena berkas checkpoint semata.
+
+
+### E2E koreksi TP Siap V4-0006 dan revisi CP (2 November 2026)
+1. Cadangkan DB dan writable, impor `V4-0006_KOREKSI_TP_SIAP.sql` ke `sla_sks_v4`, periksa UNIQUE `kunci_terbuka` dan `schema_version`. Uji pemanggilan route sebelum impor: tampil instruksi, tidak menyebabkan penulisan separuh.
+2. Guru G1 buka TP #23 Siap → Ajukan Koreksi → pilih A/B/C dan alasan ≥10 karakter → draf terbentuk. Coba buka draf kedua untuk TP yang sama: ditolak. Guru Gen lain dan Siswa/Admin tidak dapat mengakses editor Guru.
+3. Koreksi KKM 80→85 dan rincian TP, ubah petunjuk Materi, unggah PDF sah 6–40 halaman ≤15 MB; lihat pratinjau privat. Uji PDF lima halaman/file terlalu besar gagal tanpa menimpa lama. Sunting satu soal teks/kunci, simpan; Word Equation tetap terlindung dari konversi.
+4. Ajukan perubahan; permohonan tanpa perubahan ditolak. Admin melihat diff dan catatan. Admin yang pengguna_id sama dengan Guru pengusul tidak dapat setuju **atau menolak**. Admin berbeda setujui → `versi_konten_tp` bertambah satu, checksum SHA256 valid, `tp.status` tetap `siap`, bank soal historis tidak dihapus, media lama tetap ada. Periksa Guru melihat versi dan konten terbaru.
+5. Siswa yang sudah mulai tetap `progres_tp.versi_konten_tp_id` semula, sedangkan siswa yang mulai kemudian memakai snapshot terbaru. Ujian lama di `percobaan_ujian`/butir tidak berubah, skor atau sertifikat tidak dihitung ulang otomatis. Coba mengesahkan usulan lama setelah versi berubah: ditolak.
+6. Admin membuka `admin/kurikulum-cp`, Sunting CP yang sudah direferensikan TP, ubah rumusan dalam draf → terbitkan. Versi aktif terbaru terbaca dari CP operasional, snapshot TP #23 yang lama tetap aman. Uji pengulangan tanpa menciptakan CP operasional ganda.
+7. QA GitHub PHP lint, PHPUnit kontrak domain dan schema smoke tidak menggantikan E2E dengan XAMPP MariaDB dan berkas privat sungguhan.
