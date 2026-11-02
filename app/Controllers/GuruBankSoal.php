@@ -84,7 +84,7 @@ final class GuruBankSoal extends BaseController
             (new KkmTpService())->simpanKhusus($tpId, $raw, (int) $versi);
         } catch (DomainException $e) {
             return redirect()->to($url)->with('kkm_galat', $e->getMessage());
-        } catch (\\Throwable $e) {
+        } catch (\Throwable $e) {
             log_message('error', 'Simpan KKM TP {tpId} gagal: {reason}', ['tpId' => $tpId, 'reason' => $e->getMessage()]);
             return redirect()->to($url)->with('kkm_galat', 'KKM belum dapat disimpan. Silakan coba kembali.');
         }
