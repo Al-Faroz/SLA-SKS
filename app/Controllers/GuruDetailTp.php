@@ -22,6 +22,14 @@ final class GuruDetailTp extends BaseController
         try {
             $rincian = (new DetailTpService())->lihat($id);
             $pemeriksaan = (new KesiapanTpService())->periksa($id);
+            $suntingDikunci = false;
+            if ($rincian['tp']['status'] === 'siap') {
+                try {
+                    (new \App\Services\SuntingTpService())->pastikanBelumDipakai($id);
+                } catch (DomainException) {
+                    $suntingDikunci = true;
+                }
+            }
             $langkah = StepProgressTpService::susun($pemeriksaan['cek'],
                 (string) ($rincian['tp']['jenis_tp'] ?? ''), (string) $rincian['tp']['status'], $id);
         } catch (DomainException $e) {
@@ -34,6 +42,7 @@ final class GuruDetailTp extends BaseController
 
         return view('guru/detail_tp', array_merge($rincian, [
             'langkah' => $langkah,
+            'suntingDikunci' => $suntingDikunci,
             'judul' => 'Rincian TP',
             'namaPengguna' => $akun['nama'],
             'peranAktif' => 'Guru',
