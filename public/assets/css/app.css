@@ -1667,3 +1667,99 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     align-items:center; margin: 10px 0 16px;
 }
 .a-tp-materi-ringkas > * { min-width:0; }
+
+
+/* Bank Soal v2.5 — ringkasan selalu terpisah dari panel kerja per jenis ujian. */
+.a-bank-soal__ringkasan-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--a-gap-kartu, 14px);
+    margin: 16px 0;
+}
+.a-bank-soal__ringkasan-item {
+    min-width: 0;
+    padding: clamp(14px, 2vw, 20px);
+    border: 1px solid var(--a-garis);
+    border-radius: 14px;
+    background: linear-gradient(140deg, rgba(22, 132, 88, .10), rgba(13, 107, 113, .045));
+}
+.a-bank-soal__ringkasan-atas {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+}
+.a-bank-soal__ringkasan-atas h3 { margin: 0; font-size: 1.08rem; }
+.a-bank-soal__status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1px solid var(--a-garis);
+    font-size: .78rem;
+    font-weight: 750;
+    color: var(--a-teks);
+    background: rgba(166, 111, 23, .11);
+}
+.a-bank-soal__status.is-cukup {
+    background: rgba(23, 147, 95, .13);
+    border-color: rgba(23, 147, 95, .42);
+}
+.a-bank-soal__angka { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+.a-bank-soal__angka strong { font-size: clamp(1.7rem, 3vw, 2.2rem); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.a-bank-soal__angka span { color: var(--a-redup); font-size: .9rem; }
+.a-bank-soal__rincian { display: flex; flex-wrap: wrap; gap: 12px 25px; margin: 0; padding-top: 10px; border-top: 1px solid var(--a-garis); }
+.a-bank-soal__rincian > div { display: flex; gap: 8px; flex-wrap: wrap; }
+.a-bank-soal__rincian dt { color: var(--a-redup); }
+.a-bank-soal__rincian dd { margin: 0; font-weight: 750; }
+.a-bank-soal__tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-top: 18px;
+    border-bottom: 1px solid var(--a-garis);
+}
+.a-bank-soal__tab {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    gap: 1px;
+    min-height: 74px;
+    min-width: 0;
+    padding: 11px 15px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 12px;
+    border: 1px solid var(--a-garis);
+    background: rgba(22, 132, 88, .065);
+    color: var(--a-teks);
+    transition: background .16s ease, border-color .16s ease;
+}
+.a-bank-soal__tab strong { font-size: 1.03rem; }
+.a-bank-soal__tab span { font-size: .84rem; opacity: .84; }
+.a-bank-soal__tab:hover { border-color: var(--a-primer-gelap); text-decoration: none; }
+.a-bank-soal__tab.is-aktif {
+    background: linear-gradient(118deg, #146b4a, #176d6b);
+    border-color: #146b4a;
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(13, 70, 59, .18);
+}
+.a-bank-soal__tab.is-aktif span { opacity: .95; }
+.a-bank-soal__tab:focus-visible { outline: 3px solid var(--a-sorot); outline-offset: 3px; }
+.a-bank-soal__tab-konten { padding-top: var(--a-ruang-4); }
+.a-bank-soal__tab-konten > .a-alert { margin-bottom: var(--a-ruang-4); }
+.a-bank-soal__workspace .a-soal-daftar { margin: 0 0 22px; padding-top: 0; border-top: 0; }
+.a-bank-soal__workspace .a-soal-daftar h3 { margin-top: 0; }
+@media (max-width: 640px) {
+    .a-bank-soal__ringkasan-grid { grid-template-columns: minmax(0, 1fr); }
+    .a-bank-soal__tabs { gap: 8px; }
+    .a-bank-soal__tab { padding: 9px 6px; min-height: 72px; }
+    .a-bank-soal__tab strong { font-size: .95rem; }
+    .a-bank-soal__tab span { font-size: .77rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .a-bank-soal__tab { transition: none; }
+}
