@@ -257,3 +257,9 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - Guru melihat KKM default Admin otomatis di isian kedua tab (satu KKM bersama); tidak perlu menekan Simpan jika tidak mengubahnya. Angka berbeda dapat disimpan sebagai KKM khusus berkali-kali selama draf. Kembali ke angka Admin mengembalikan pewarisan.
 - Admin yang belum mengonfigurasi default mendapatkan contoh 80 yang diberi peringatan **belum aktif sampai disimpan**, bukan default tersembunyi. Guru melihat peringatan bila default tidak ada.
 - TP Siap hanya menampilkan KKM terpin; tidak memunculkan tombol edit/koreksi yang belum benar-benar terhubung. Mekanisme koreksi berversi dikembangkan pada tahap terpisah.
+
+
+### Halaman koreksi TP Siap dan sunting CP terbit (2 November 2026)
+- Guru: pada `/guru/tp/{id}` yang Siap ada tombol **Ajukan Koreksi TP Siap** → halaman permohonan dengan kategori A/B/C, alasan, riwayat. Guru dapat membuka satu draf untuk mengubah rincian/KKM/Materi/berkas/soal secara terpisah dan mengirimnya, lalu melihat status ditinjau/disetujui/ditolak. Tidak ada tombol edit langsung pada TP Siap.
+- Admin: menu **Persetujuan Koreksi TP** menampilkan daftar, perbandingan TP/Materi/soal dan catatan keputusan, tombol setujui atau tolak (hanya `diajukan`, tidak untuk akun pemohon yang sama). Antarmuka jelas bila patch V4-0006 belum diimpor.
+- Admin Referensi CP: baris CP aktif (termasuk yang digunakan TP) menampilkan **Sunting CP**; bila sudah ada draf menampilkan **Lanjut Sunting CP**. Penerbitan tetap melalui pratinjau/draf-versi baru yang telah ada, riwayat CP lama tidak berubah.
