@@ -127,17 +127,23 @@ final class DetailTpService
 
             // Pemeriksaan status dan versi juga berada di WHERE untuk mencegah
             // perubahan status/versi serentak menimpa data yang lebih baru.
+            // Fixture historis sebelum v4 belum memiliki kolom ATP v2.5;
+            // pada dump v4 sinkronisasi keduanya wajib agar Peta ATP konsisten.
+            $perubahan = [
+                'judul' => $judul,
+                'rumusan' => $rumusan,
+                'struktur_versi' => $versi + 1,
+            ];
+            if ($this->db->fieldExists('nama_tp', 'tp')
+                && $this->db->fieldExists('deskripsi_tp', 'tp')
+                && $this->db->fieldExists('jenis_tp', 'tp')) {
+                $perubahan['nama_tp'] = $judul;
+                $perubahan['deskripsi_tp'] = $rumusan;
+                $perubahan['jenis_tp'] = $jenisTp ?? (string) ($rincian['tp']['jenis_tp'] ?? 'non_esensial');
+            }
             $this->db->table('tp')->where('id', $tpId)
                 ->where('status', 'draf')
-                ->where('struktur_versi', $versi)
-                ->update([
-                    'judul' => $judul,
-                    'rumusan' => $rumusan,
-                    'nama_tp' => $judul,
-                    'deskripsi_tp' => $rumusan,
-                    'jenis_tp' => $jenisTp ?? $rincian['tp']['jenis_tp'],
-                    'struktur_versi' => $versi + 1,
-                ]);
+                ->where('struktur_versi', $versi)->update($perubahan);
             if ($this->db->affectedRows() !== 1) {
                 throw new DomainException('TP telah berubah. Muat ulang halaman sebelum menyimpan.');
             }
