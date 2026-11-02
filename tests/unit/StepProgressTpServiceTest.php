@@ -81,4 +81,23 @@ final class StepProgressTpServiceTest extends TestCase
         self::assertTrue($lengkap[3]['terpenuhi']);
     }
 
+    public function testKartuProgresDanLabelStatusMengikutiTemaDarkLight(): void
+    {
+        $view = file_get_contents(dirname(__DIR__, 2) . '/app/Views/guru/_step_progress_tp.php');
+        $css = file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/emerald-glass.css');
+        self::assertIsString($view);
+        self::assertIsString($css);
+        self::assertStringContainsString('is-selesai', $view);
+        self::assertStringContainsString('is-belum', $view);
+        self::assertStringContainsString('a-tp-langkah__status', $view);
+        self::assertStringContainsString('✓ Selesai', $view);
+        self::assertStringContainsString('○ Perlu dilengkapi', $view);
+        self::assertStringContainsString('--eg-step-done-bg:', $css);
+        self::assertStringContainsString('--eg-step-pending-bg:', $css);
+        self::assertStringContainsString('--eg-step-done-text:#FF9BA6;', $css);
+        self::assertStringContainsString('--eg-step-done-text:#A72C47;', $css);
+        self::assertStringContainsString('.a-tp-langkah__item.is-selesai', $css);
+        self::assertStringContainsString('.a-tp-langkah__item.is-belum', $css);
+    }
+
 }
