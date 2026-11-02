@@ -19,11 +19,15 @@
         </div>
     </header>
     <section class="a-card" aria-labelledby="rincian-tp-siswa">
-        <h2 id="rincian-tp-siswa">Tujuan dan indikator</h2>
+        <h2 id="rincian-tp-siswa">Tujuan Pembelajaran</h2>
         <h3>Rumusan TP</h3>
         <p><?= nl2br(esc((string) $tp['rumusan'])) ?></p>
-        <h3>Indikator ketercapaian</h3>
-        <p><?= nl2br(esc((string) $tp['indikator'])) ?></p>
+        <?php if (trim((string) $tp['indikator']) !== ''): ?>
+            <details class="a-cp__details">
+                <summary>Indikator historis TP</summary>
+                <p><?= nl2br(esc((string) $tp['indikator'])) ?></p>
+            </details>
+        <?php endif ?>
     </section>
     <section class="a-card a-jarak-atas">
         <h2>Materi pada TP ini</h2>
@@ -94,13 +98,20 @@
                 </a></p>
             <?php endif ?>
             <p class="a-help">
-                <strong>Diagnostik wajib adalah langkah ujian pertama.</strong>
-                Tes Diagnostik berjalan melalui ruang ujian khusus. Jika skor di bawah KKM,
-                Materi pertama terbuka untuk dibaca; Materi selanjutnya membutuhkan
-                penyelesaian media serta pengiriman final Resume dan HOTS sebelumnya.
-                Jika skor memenuhi KKM, Materi boleh dipelajari secara sukarela tanpa
-                penugasan atau nilai tambahan.
+                <strong>Diagnostik adalah langkah ujian pertama.</strong>
+                Jika skor di bawah KKM, siswa wajib menyelesaikan satu Materi, Resume
+                final dan HOTS final sebelum Sumatif. Jika skor memenuhi KKM, ketiga
+                aktivitas tersebut boleh dilewati. <strong>Sumatif tetap wajib pada
+                kedua jalur</strong>; Diagnostik tidak langsung menuntaskan TP.
             </p>
+            <?php if ($progres !== null && $progres['status'] === 'sumatif'): ?>
+                <p class="a-alert" role="status">Diagnostik telah memenuhi KKM.
+                    Materi, Resume dan HOTS boleh dilewati. Anda tetap wajib
+                    mengikuti Sumatif sebelum TP selesai.</p>
+            <?php elseif ($progres !== null && $progres['status'] === 'belajar'): ?>
+                <p class="a-alert" role="status">Diagnostik belum memenuhi KKM.
+                    Selesaikan Materi, Resume final dan HOTS final sebelum Sumatif.</p>
+            <?php endif ?>
         </div>
     </section>
     <p class="a-kesiapan-kembali">
