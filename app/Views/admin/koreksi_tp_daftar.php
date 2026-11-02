@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page">
+<div class="a-page a-koreksi-tp">
     <nav class="a-breadcrumb"><a href="<?= esc(site_url('admin'), 'attr') ?>">Admin</a> / Koreksi TP</nav>
     <header class="a-page__heading"><div><p class="a-proto-eyebrow">Admin · Persetujuan Akademik</p><h1>Permohonan Koreksi TP</h1>
         <p class="a-proto-muted">Tinjau perubahan versi baru sebelum diterbitkan; pengusul tidak boleh memutus permohonannya sendiri.</p></div></header>
