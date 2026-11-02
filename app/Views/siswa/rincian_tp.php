@@ -18,6 +18,12 @@
                 Rincian TP dan status aktivasi versi konten Anda.</p>
         </div>
     </header>
+    <?php if ($pesan = session()->getFlashdata('akses_ulang_sukses')): ?>
+        <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+    <?php endif ?>
+    <?php if ($pesan = session()->getFlashdata('akses_ulang_gagal')): ?>
+        <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+    <?php endif ?>
     <section class="a-card" aria-labelledby="rincian-tp-siswa">
         <h2 id="rincian-tp-siswa">Tujuan Pembelajaran</h2>
         <h3>Rumusan TP</h3>
