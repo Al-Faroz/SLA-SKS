@@ -44,7 +44,7 @@ final class AdminKurikulumCp extends BaseController
     private function versiInput(): array
     {
         $hasil = [];
-        foreach (['elemen','rumusan','otoritas','nomor_dokumen','sumber_url','tanggal_berlaku'] as $k) {
+        foreach (['elemen','rumusan'] as $k) {
             $hasil[$k] = $this->isian($k);
         }
         return $hasil;
@@ -112,16 +112,54 @@ final class AdminKurikulumCp extends BaseController
     public function simpanCp(): RedirectResponse
     {
         try {
-            $id = $this->service()->buatCp(
+            $id = $this->service()->simpanLangsung(null,
                 (int) $this->isian('kurikulum_id'),
                 (int) $this->isian('mapel_id'),
                 $this->isian('kode'),
                 $this->versiInput()
             );
             return redirect()->to(site_url('admin/kurikulum-cp/' . $id))
-                ->with('sukses', 'Draf CP berhasil dibuat. Periksa sumber lalu terbitkan jika sudah sesuai.');
+                ->with('sukses', 'CP berhasil disimpan.');
         } catch (DomainException $e) {
             return $this->gagal($e, 'admin/kurikulum-cp');
+        }
+    }
+
+    public function sunting(int $id): string|RedirectResponse
+    {
+        try {
+            $data = $this->service()->detail($id);
+            $opsi = $this->service()->daftar(false);
+            $versi = array_values(array_filter($data['versi'],
+                static fn (array $baris): bool => $baris['status'] === 'aktif'));
+            if ($versi === []) {
+                $versi = array_values(array_filter($data['versi'],
+                    static fn (array $baris): bool => $baris['status'] === 'draf'));
+            }
+            return view('admin/cp_sunting', array_merge(
+                $this->layout('Sunting CP'), $opsi,
+                ['cp' => $data['cp'], 'dataVersi' => $versi[0] ?? []]
+            ));
+        } catch (DomainException $e) {
+            return $this->gagal($e, 'admin/kurikulum-cp');
+        }
+    }
+
+    public function simpanSunting(int $id): RedirectResponse
+    {
+        try {
+            $cpId = $this->service()->simpanLangsung($id,
+                (int) $this->isian('kurikulum_id'), (int) $this->isian('mapel_id'),
+                $this->isian('kode'), $this->versiInput()
+            );
+            return redirect()->to(site_url('admin/kurikulum-cp/' . $cpId))
+                ->with('sukses', 'CP berhasil diperbarui. Riwayat tersimpan.');
+        } catch (DomainException $e) {
+            return $this->gagal($e, 'admin/kurikulum-cp/' . $id . '/sunting');
+        } catch (Throwable $e) {
+            log_message('error', 'Sunting CP gagal: ' . get_class($e));
+            return redirect()->to(site_url('admin/kurikulum-cp/' . $id . '/sunting'))
+                ->with('galat', 'CP belum tersimpan. Periksa log server.');
         }
     }
 
