@@ -66,9 +66,23 @@ final class NilaiTpService
         $diagnostik = $attempt('diagnostik', 'normal');
         $normal = $attempt('sumatif', 'normal');
         $remedial = $attempt('sumatif', 'remedial');
-        if ($diagnostik === null || $diagnostik['skor'] === null
-            || $normal === null || $normal['skor'] === null) {
-            throw new DomainException('Nilai TP memerlukan Diagnostik dan Sumatif sah.');
+        if ($normal === null || $normal['skor'] === null) {
+            throw new DomainException('Nilai TP memerlukan Sumatif sah.');
+        }
+        $langsungBelajar = false;
+        if ($diagnostik === null || $diagnostik['skor'] === null) {
+            // Keputusan langsung_belajar oleh Guru setelah Diagnostik batal,
+            // tidak menciptakan skor Diagnostik fiktif.
+            $langsungBelajar = $db->table('keputusan_ujian_batal k')
+                ->join('percobaan_ujian u','u.id=k.percobaan_ujian_id')
+                ->where('u.progres_tp_id',$progresId)
+                ->where('u.jenis','diagnostik')
+                ->where('u.status','dibatalkan_menunggu_guru')
+                ->where('k.keputusan','langsung_belajar')
+                ->countAllResults() > 0;
+            if (!$langsungBelajar) {
+                throw new DomainException('Nilai TP memerlukan Diagnostik sah atau keputusan Guru Langsung Belajar.');
+            }
         }
         $awal = (float) $normal['skor'];
         $kkm = (int) $normal['kkm'];
@@ -77,7 +91,7 @@ final class NilaiTpService
             throw new DomainException('Sumatif remedial sah belum lengkap.');
         }
         $terbaik = max($awal, $remedial !== null ? (float) $remedial['skor'] : $awal);
-        $jalur = (float) $diagnostik['skor'] >= (int) $diagnostik['kkm']
+        $jalur = !$langsungBelajar && (float) $diagnostik['skor'] >= (int) $diagnostik['kkm']
             ? 'lulus_diagnostik' : 'belajar_wajib';
         $resume = null;
         $hots = null;

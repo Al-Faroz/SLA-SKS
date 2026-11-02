@@ -13,6 +13,7 @@
     data-ujian-url="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/diagnostik'), 'attr') ?>"
     data-ujian-token="<?= esc((string) ($percobaan['token_publik'] ?? ''), 'attr') ?>"
     data-ujian-existing="<?= esc((string) ($percobaan['status'] ?? ''), 'attr') ?>"
+    data-ujian-langsung-belajar="<?= !empty($langsung_belajar) ? 'ya' : 'tidak' ?>"
     data-csrf-name="<?= esc($csrfName,'attr') ?>"
     data-csrf-hash="<?= esc($csrfValue,'attr') ?>">
     <header class="a-ujian-header">

@@ -69,10 +69,10 @@ final class MesinSumatifSiswaService
         $ctx = $this->konteks($tpId);
         $p = $ctx['progres'];
         $attempt = $this->db->table('percobaan_ujian')
-            ->select('token_publik,status,tahap,skor,kkm')
+            ->select('id,token_publik,status,tahap,skor,kkm,nomor_percobaan')
             ->where('progres_tp_id', (int) $p['id'])
             ->where('versi_konten_tp_id', (int) $p['versi_konten_tp_id'])
-            ->where('jenis', 'sumatif')->get()->getResultArray();
+            ->where('jenis', 'sumatif')->orderBy('id','ASC')->get()->getResultArray();
         $normal = null;
         $remedial = null;
         foreach ($attempt as $item) {
@@ -80,12 +80,19 @@ final class MesinSumatifSiswaService
             if ($item['tahap'] === 'remedial') $remedial = $item;
         }
         $tahap = self::tahapBerikut($normal, $remedial);
+        if ($tahap === 'menunggu_guru') {
+            $batal = $remedial ?? $normal;
+            if ($batal !== null && KeputusanUjianBatalService::izin(
+                $this->db, (int) $batal['id'], 'ulang_sumatif') !== null) {
+                $tahap = $batal['tahap'] === 'remedial' ? 'ulang_remedial' : 'ulang_normal';
+            }
+        }
         $lanjut = $tahap === 'lanjut_normal' ? $normal
             : ($tahap === 'lanjut_remedial' ? $remedial
                 : (in_array($tahap, ['selesai','menunggu_guru'], true)
                     ? ($remedial ?? $normal) : null));
         $boleh = false;
-        if (in_array($tahap, ['normal','remedial','lanjut_normal','lanjut_remedial'], true)) {
+        if (in_array($tahap, ['normal','remedial','lanjut_normal','lanjut_remedial','ulang_normal','ulang_remedial'], true)) {
             $syarat = (new KelayakanSumatifSiswaService($this->db, $this->akunSaatIni))
                 ->periksa($tpId);
             $boleh = $syarat['siap'];
@@ -95,7 +102,7 @@ final class MesinSumatifSiswaService
         }
         return [
             'tp' => $ctx['ctx']['tp'], 'progres' => $p, 'percobaan' => $lanjut,
-            'tahap' => in_array($tahap, ['remedial','lanjut_remedial'], true) ? 'remedial' : 'normal',
+            'tahap' => in_array($tahap, ['remedial','lanjut_remedial','ulang_remedial'], true) ? 'remedial' : 'normal',
             'boleh_mulai' => $boleh,
             'status_akhir' => in_array($tahap, ['selesai','menunggu_guru'], true),
             'menunggu_guru' => $tahap === 'menunggu_guru',
@@ -278,7 +285,7 @@ final class MesinSumatifSiswaService
             }
             $attempt = $this->db->table('percobaan_ujian')
                 ->where('progres_tp_id', (int) $p['id'])
-                ->where('jenis', 'sumatif')->get()->getResultArray();
+                ->where('jenis', 'sumatif')->orderBy('id','ASC')->get()->getResultArray();
             $normal = null;
             $remedial = null;
             foreach ($attempt as $item) {
@@ -286,6 +293,17 @@ final class MesinSumatifSiswaService
                 if ($item['tahap'] === 'remedial') $remedial = $item;
             }
             $tahap = self::tahapBerikut($normal, $remedial);
+            $izin = null;
+            if ($tahap === 'menunggu_guru') {
+                $batal = $remedial ?? $normal;
+                if ($batal !== null) {
+                    $izin = KeputusanUjianBatalService::izin(
+                        $this->db, (int) $batal['id'], 'ulang_sumatif');
+                }
+                if ($izin !== null) {
+                    $tahap = $batal['tahap'] === 'remedial' ? 'ulang_remedial' : 'ulang_normal';
+                }
+            }
             if (in_array($tahap, ['lanjut_normal','lanjut_remedial'], true)) {
                 $lama = $tahap === 'lanjut_normal' ? $normal : $remedial;
                 if (!in_array($row['status'], ['belajar','sumatif'], true)) {
@@ -294,7 +312,7 @@ final class MesinSumatifSiswaService
                 $this->db->transCommit();
                 return ['token' => $lama['token_publik'], 'sudah_ada' => true];
             }
-            if (!in_array($tahap, ['normal','remedial'], true)
+            if (!in_array($tahap, ['normal','remedial','ulang_normal','ulang_remedial'], true)
                 || !in_array($row['status'], ['belajar','sumatif'], true)) {
                 throw new DomainException('Kesempatan Sumatif tidak tersedia atau menunggu Guru.');
             }
@@ -321,11 +339,16 @@ final class MesinSumatifSiswaService
             $now = time();
             $awal = AturanWaktuUjianService::awal($durasi * 60, $now);
             $token = bin2hex(random_bytes(24));
+            $tahapUjian = str_contains($tahap, 'remedial') ? 'remedial' : 'normal';
+            $nomorBerikut = 1;
+            foreach ($attempt as $item) {
+                $nomorBerikut = max($nomorBerikut, (int) $item['nomor_percobaan'] + 1);
+            }
             $this->db->table('percobaan_ujian')->insert([
                 'token_publik' => $token, 'progres_tp_id' => (int) $p['id'],
                 'versi_konten_tp_id' => (int) $p['versi_konten_tp_id'],
-                'jenis' => 'sumatif', 'tahap' => $tahap,
-                'nomor_percobaan' => $tahap === 'normal' ? 1 : 2,
+                'jenis' => 'sumatif', 'tahap' => $tahapUjian,
+                'nomor_percobaan' => $nomorBerikut,
                 'status' => 'berjalan', 'profil_keamanan' => 'ketat',
                 'jumlah_soal' => count($butir), 'kkm' => $kkm,
                 'durasi_detik' => $durasi * 60, 'sisa_detik' => $awal['sisa_detik'],
@@ -340,10 +363,13 @@ final class MesinSumatifSiswaService
                     array_merge($item, ['percobaan_ujian_id' => $id]));
             }
             $this->riwayat($id, null, 'berjalan',
-                'Memulai Sumatif ' . $tahap . ' melalui fullscreen.', $now);
+                'Memulai Sumatif ' . $tahapUjian . ' melalui fullscreen.', $now);
+            if ($izin !== null) {
+                KeputusanUjianBatalService::gunakan($this->db, (int) $izin['id']);
+            }
             if (!$this->db->transStatus()) throw new RuntimeException('Transaksi Sumatif gagal.');
             $this->db->transCommit();
-            return ['token' => $token, 'sudah_ada' => false, 'tahap' => $tahap];
+            return ['token' => $token, 'sudah_ada' => false, 'tahap' => $tahapUjian];
         } catch (Throwable $e) {
             $this->db->transRollback();
             throw $e;
