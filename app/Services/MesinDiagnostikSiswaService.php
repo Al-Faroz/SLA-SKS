@@ -58,9 +58,21 @@ final class MesinDiagnostikSiswaService
             // Keputusan Guru sudah membuka ulang: jangan kirim token yang batal.
             $existing = null;
         }
+        $langsungBelajar = false;
+        if ($existing !== null && $existing['status'] === 'dibatalkan_menunggu_guru'
+            && $ctx['progres']['status'] === 'belajar') {
+            $langsungBelajar = $this->db->table('keputusan_ujian_batal k')
+                ->join('percobaan_ujian pu', 'pu.id=k.percobaan_ujian_id')
+                ->where('pu.token_publik', (string) $existing['token_publik'])
+                ->where('pu.progres_tp_id', (int) $ctx['progres']['id'])
+                ->where('pu.jenis', 'diagnostik')
+                ->where('k.keputusan', 'langsung_belajar')
+                ->countAllResults() > 0;
+        }
         return [
             'tp' => $ctx['ctx']['tp'], 'progres' => $ctx['progres'],
             'percobaan' => $existing,
+            'langsung_belajar' => $langsungBelajar,
             'status_akhir' => in_array($ctx['progres']['status'], ['sumatif', 'tuntas', 'belajar', 'perlu_bantuan'], true),
         ];
     }
