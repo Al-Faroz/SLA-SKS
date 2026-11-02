@@ -100,6 +100,7 @@ $routes->post('guru/tp/(:num)/materi/(:num)/hapus', 'GuruMateri::hapus/$1/$2', [
 $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
 $routes->get('admin/koreksi-tp', 'AdminKoreksiTp::index', ['filter' => 'auth:admin']);
 $routes->get('admin/koreksi-tp/(:num)', 'AdminKoreksiTp::detail/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/koreksi-tp/(:num)/media', 'AdminKoreksiTp::media/$1', ['filter' => 'auth:admin']);
 $routes->post('admin/koreksi-tp/(:num)/putuskan', 'AdminKoreksiTp::putuskan/$1', ['filter' => 'auth:admin']);
 $routes->get('admin/kkm', 'AdminKkm::index', ['filter' => 'auth:admin']);
 $routes->post('admin/kkm', 'AdminKkm::simpan', ['filter' => 'auth:admin']);
