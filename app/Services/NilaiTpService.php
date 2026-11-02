@@ -32,6 +32,21 @@ final class NilaiTpService
             'status_nilai' => 'final'];
     }
 
+    /**
+     * Hanya progres TP akun siswa yang login; tidak menerima siswa_id dari URL.
+     * Nilai 0 tetap angka, sedangkan komponen yang menunggu Guru tetap NULL.
+     */
+    public static function untukSiswa(int $tpId, ?BaseConnection $db = null,
+        ?callable $akun = null): ?array
+    {
+        $db = $db ?? db_connect();
+        $progres = (new ProgresTpSiswaService($db, $akun))->status($tpId);
+        if ($progres === null || $progres['status'] !== 'tuntas') return null;
+        return $db->table('nilai_tp')
+            ->select('jalur,nilai_resume,nilai_hots,nilai_sumatif,nilai_tp,status_nilai')
+            ->where('progres_tp_id', (int) $progres['id'])->get()->getRowArray();
+    }
+
     /** @return array<string,mixed>|null */
     public static function sinkronkan(BaseConnection $db, int $progresId): ?array
     {
