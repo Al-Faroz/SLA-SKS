@@ -65,6 +65,7 @@ $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru
 $routes->get('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::lihat/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::siapkan/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/bank-soal', 'GuruBankSoal::index/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/bank-soal/kkm', 'GuruBankSoal::simpanKkm/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/pratinjau-manual', 'GuruSoal::pratinjau/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/bank-soal/soal/(:segment)/baru', 'GuruSoal::baru/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/soal/(:segment)', 'GuruSoal::simpan/$1/$2', ['filter' => 'auth:guru']);
