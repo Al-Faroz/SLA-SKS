@@ -6,8 +6,15 @@
         <span aria-hidden="true">/</span><span aria-current="page">Sunting CP</span>
     </nav>
     <section class="a-card a-cp__editor">
-        <h1>Sunting CP</h1>
-        <p class="a-help">Perubahan disimpan langsung. Fase D ditentukan sistem; riwayat akademik tetap dipertahankan.</p>
+        <div class="a-cp__section-heading">
+            <div>
+                <p class="a-proto-eyebrow">Admin · Editor CP Fase D</p>
+                <h1>Sunting CP</h1>
+                <p class="a-cp__editor-kode"><?= esc($cp['kode']) ?></p>
+            </div>
+            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $cp['id']), 'attr') ?>">Lihat riwayat CP</a>
+        </div>
+        <p class="a-help">Ubah lima isian di bawah. Perubahan disimpan langsung, dan versi CP sebelumnya tetap tercatat.</p>
         <?php if ($galat = session()->getFlashdata('galat')): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>
         <?php endif ?>
@@ -40,7 +47,8 @@
                 </div>
                 <div class="a-field a-cp__lebar">
                     <label class="a-label" for="edit-rumusan-cp">Rumusan CP resmi</label>
-                    <textarea id="edit-rumusan-cp" name="rumusan" rows="7" minlength="20" maxlength="15000" required><?= esc(old('rumusan', $dataVersi['rumusan'] ?? '')) ?></textarea>
+                    <textarea id="edit-rumusan-cp" name="rumusan" rows="12" minlength="20" maxlength="15000" aria-describedby="edit-rumusan-help" required><?= esc(old('rumusan', $dataVersi['rumusan'] ?? '')) ?></textarea>
+                    <span class="a-help" id="edit-rumusan-help">Pastikan rumusan resmi lengkap sebelum menyimpan. Batas 15.000 karakter.</span>
                 </div>
             </div>
             <div class="a-cp__aksi">
