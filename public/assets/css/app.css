@@ -1698,6 +1698,16 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 }
 .a-tp-materi-ringkas > * { min-width:0; }
 
+/* Rincian TP: tombol penutup tidak bertumpuk ketika aksi sunting tersedia. */
+.a-tp-penutup__aksi { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; }
+.a-tp-penutup__aksi form { margin:0; }
+.a-tp-penutup__aksi .a-btn { display:inline-flex; align-items:center; justify-content:center; }
+@media(max-width:520px) {
+    .a-tp-penutup__aksi > form,
+    .a-tp-penutup__aksi > a.a-btn { width:100%; }
+    .a-tp-penutup__aksi form .a-btn { width:100%; }
+}
+
 
 /* Bank Soal v2.5 — ringkasan selalu terpisah dari panel kerja per jenis ujian. */
 .a-bank-soal__ringkasan-grid {
