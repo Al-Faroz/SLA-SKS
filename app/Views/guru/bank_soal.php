@@ -58,6 +58,39 @@
             <?php if ($pesan = session()->getFlashdata('soal_sukses') ?? session()->getFlashdata('word_sukses')): ?>
                 <div class="a-alert" role="status"><?= esc($pesan) ?></div>
             <?php endif ?>
+        <section class="a-bank-soal__kkm" id="pengaturan-kkm" aria-labelledby="judul-pengaturan-kkm">
+            <div class="a-bank-soal__kkm-judul">
+                <h3 id="judul-pengaturan-kkm">Pengaturan KKM TP</h3>
+                <span class="a-badge"><?= ($kkm_info['sumber'] ?? '') === 'guru' ? 'Khusus Guru' : (($kkm_info['sumber'] ?? '') === 'admin' ? 'Default Admin' : 'Belum terset') ?></span>
+            </div>
+            <p class="a-help">Satu KKM berlaku untuk Diagnostik dan Sumatif pada TP ini. Mengubahnya di salah satu tab otomatis berlaku di tab lainnya.</p>
+            <div class="a-bank-soal__kkm-ringkas">
+                <div><small>Default Admin</small><strong><?= $kkm_info['default'] === null ? 'Belum ditetapkan' : (int) $kkm_info['default'] ?></strong></div>
+                <div><small>Khusus Guru</small><strong><?= $kkm_info['khusus'] === null ? 'Mengikuti Admin' : (int) $kkm_info['khusus'] ?></strong></div>
+                <div><small>KKM efektif</small><strong><?= $kkm_info['efektif'] === null ? 'Belum terset' : (int) $kkm_info['efektif'] ?></strong></div>
+            </div>
+            <?php if ($pesan = session()->getFlashdata('kkm_galat')): ?>
+                <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+            <?php endif ?>
+            <?php if ($pesan = session()->getFlashdata('kkm_sukses')): ?>
+                <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+            <?php endif ?>
+            <?php if ($tp['status'] === 'draf'): ?>
+                <form class="a-bank-soal__kkm-form" method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/kkm'), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="jenis" value="<?= esc($jenis_dipilih, 'attr') ?>">
+                    <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
+                    <div class="a-field">
+                        <label class="a-label" for="kkm-khusus">KKM khusus Guru (1–100)</label>
+                        <input class="a-input" id="kkm-khusus" name="kkm_khusus" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="Kosong = ikut Admin" value="<?= $kkm_info['khusus'] === null ? '' : (int) $kkm_info['khusus'] ?>">
+                    </div>
+                    <button type="submit" class="a-btn a-btn--utama">Simpan KKM</button>
+                </form>
+                <p class="a-help">Kosongkan KKM khusus lalu simpan untuk kembali mengikuti default Admin. Bila Admin belum menetapkan default, Guru harus mengisi KKM khusus.</p>
+            <?php else: ?>
+                <p class="a-help">TP sudah Siap; KKM telah dikunci di versi konten. Perubahan memerlukan mekanisme koreksi.</p>
+            <?php endif ?>
+        </section>
         <section class="a-soal-daftar" aria-labelledby="judul-daftar-bank">
             <h3 id="judul-daftar-bank">Bank <?= esc(ucfirst($jenis_dipilih)) ?></h3>
             <p class="a-help">Jumlah tersimpan: <?= (int) $total_soal ?> soal (aktif maupun nonaktif). Pilih cara menyiapkan soal: satu per satu di aplikasi atau melalui Word.</p>
