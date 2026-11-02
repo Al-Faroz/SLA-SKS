@@ -289,6 +289,13 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Pengenalan jenis file (ekstensi/MIME), hak Guru G1, status TP draf, CSRF dan penyimpanan privat tetap dijaga oleh komponen yang sudah ada; ketentuan pemeriksaan skrip/aksi/struktur internal pada regresi historis tidak menjadi persyaratan bisnis PDF lagi.
 - Pada Sunting, PDF yang tidak memenuhi dua batas tidak mengganti file atau metadata lama. Lakukan PHPUnit serta tes XAMPP nyata.
 
+### Regresi permintaan akses ulang tes mandiri (2 November 2026)
+- Siswa dengan Diagnostik terakhir tidak selesai (contoh `sla_uji_05`) melihat hanya aksi **Minta akses ulang Diagnostik**, lalu status Menunggu izin Guru. Tidak ada nilai palsu atau jalur belajar otomatis.
+- Siswa dengan **Diagnostik sah dan Sumatif terakhir tidak selesai** (contoh `sla_uji_08`) melihat **Minta akses ulang Sumatif**, **bukan Diagnostik**. POST salah jenis ditolak server walaupun URL ditebak.
+- Ketika **remedial Sumatif** yang terakhir tidak selesai, akses ulang tetap **tahap remedial** dan tidak memberi kesempatan remedial baru; skor sah Sumatif normal tidak diubah.
+- Guru G1 melihat permintaan siswa, tombol tunggal **Izinkan Akses Ulang** tanpa isian alasan dan tanpa dropdown; sebab teknis/izin otomatis tercatat di audit. Tes pengganti hanya sekali dan hanya setelah izin Guru; G1 Gen lain ditolak; klik ganda idempoten.
+- Uji `perlu_bantuan`, `sumatif`, `diagnostik`, `tuntas`; setelah izin diberikan halaman Rincian TP membuka tes yang benar. Nilai, riwayat dan soal historis tetap utuh.
+
 ## Regresi Bank Soal Diagnostik–Sumatif terpadu (2 November 2026)
 - UI satu tombol Kelola Bank Soal dari TP NonEsensial; tab Diagnostik/Sumatif tetap terpisah dan tetap mengingat jenis pada redirect gagal/sukses. TP Esensial tidak menampilkan bank soal wajib.
 - Generator Word: Diagnostik 10–200 dan Sumatif 30–200, bukan 5 soal Sumatif; impor dan tambah manual boleh berlangsung bertahap sampai mencapai batas TP Siap.
