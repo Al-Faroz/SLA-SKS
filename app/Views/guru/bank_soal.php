@@ -94,7 +94,7 @@
                 </form>
                 <p class="a-help">Nilai otomatis terisi dari default Admin jika tersedia. Bila tidak diubah, TP draf langsung memakai nilai Admin tanpa perlu disimpan. Angka yang sama dengan default tidak menjadi KKM khusus. Guru boleh mengubah dan menyimpan angka berbeda berkali-kali selama TP masih Draf. Kosongkan kolom lalu simpan untuk mengikuti default Admin kembali.</p>
             <?php else: ?>
-                <p class="a-help">TP sudah Siap dan memakai KKM yang dipin saat penerbitan (<?= (int) $kkm_info['efektif'] ?>). KKM, Materi, serta soal tidak dapat disunting langsung; koreksi akademik harus diajukan kepada Admin dan menerbitkan versi baru tanpa menimpa progres siswa lama.</p>
+                <p class="a-help">TP sudah Siap dan memakai KKM yang dipin saat penerbitan (<?= (int) $kkm_info['efektif'] ?>). Jika belum pernah digunakan siswa, pilih Sunting TP pada Rincian TP untuk memperbaiki KKM, Materi, dan soal melalui editor biasa. Jika sudah digunakan siswa, konten terkunci.</p>
             <?php endif ?>
         </section>
         <section class="a-soal-daftar" aria-labelledby="judul-daftar-bank">
