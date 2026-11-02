@@ -58,8 +58,8 @@ Server mengontrol state/jam/attempt, tidak menerima jawaban saat jeda; soal dan 
 |---|---|
 | Login/gagal/peran/reset sandi | actor, IP, waktu, tipe; tanpa sandi |
 | Guru ditetapkan/diganti | mapel, guru asal/baru, Admin, waktu |
-| TP Siap/koreksi | TP, versi lama/baru, guru, Admin pemutus, alasan |
-| CP diterbitkan | CP, sumber, versi, pengusul, Admin |
+| TP Siap / sunting sebelum digunakan | TP, guru G1, status/penggunaan, perubahan dan waktu; tanpa reviewer Admin |
+| CP ditambah/disunting | CP, Admin pelaku, field sebelum/sesudah, waktu dan versi audit bila tersedia; tidak memerlukan data sumber hukum fiktif |
 | Ujian insiden/keputusan | percobaan, insiden, waktu server, alasan, Guru keputusan |
 | Nilai ditetapkan/dikoreksi | nilai sebelum/sesudah, TP, pengusul, Admin jika diperlukan |
 | Biodata/NISN diperbaiki | siswa ID, sebelum/sesudah, Admin, waktu; hindari kebocoran publik |
@@ -107,3 +107,9 @@ sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.
 ### Ketetapan PDF Materi 1 November 2026
 
 Validasi bisnis pada file PDF Materi hanya **jumlah halaman 6–40** dan **ukuran maksimal 15 MB**. Pemeriksaan `ObjStm`, token/struktur internal PDF, metadata maupun aksi PDF bukan syarat tambahan saat unggah. Ekstensi/MIME mengenali jenis file PDF; kontrol server yang terpisah seperti hak Guru G1, status TP draf, CSRF, endpoint media privat, CSP sandbox dan transaksi penyimpanan tidak diubah. Tidak ada file historis yang dihapus.
+
+## 12. Keamanan perubahan CP/BAB/TP — final 2 November 2026
+- **CP**: hanya Admin aktif yang boleh mengubah melalui endpoint sah dan CSRF. Boleh disunting saat dipakai TP/siswa; hubungan ID referensi tetap konsisten, audit perubahan dicatat. Tidak menuntut kategori permohonan atau otoritas penerbit/URL/tanggal berlaku pada form.
+- **BAB**: Guru yang diizinkan oleh G1 dapat memperbaiki isian BAB yang tersedia meskipun TP dalam BAB sudah Siap; pertahankan validasi nomor/nama/deskripsi dan audit. Tidak menambah fitur pemindahan TP antar-BAB.
+- **TP**: guard server **berdasarkan bukti satu siswa pernah menggunakan TP**, bukan status Siap. Saat siswa sudah mulai, semua perubahan konten TP, KKM, materi/media, bank soal, Word dan endpoint historis ditolak. Sebelum digunakan, perubahan Draf maupun Siap diizinkan untuk Guru G1 dan harus aman terhadap race condition dengan siswa yang mulai di waktu sama.
+- **Tidak ada bypass** melalui status yang diubah paksa, URL ID, batch import, upload, PATCH/POST API maupun persetujuan kategori A/B/C yang telah dibatalkan. Snapshot nilai/percobaan dan audit tidak dihapus. Tidak mencatat password, berkas siswa atau data pribadi dalam GitHub.
