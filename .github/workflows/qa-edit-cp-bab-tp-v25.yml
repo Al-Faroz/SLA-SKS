@@ -22,6 +22,8 @@ jobs:
           php-version: '8.2'
           extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
           coverage: none
+      - name: Siapkan folder writable CI4 yang tidak masuk Git
+        run: mkdir -p writable/cache writable/logs writable/session writable/uploads writable/debugbar
       - name: Instal dependensi
         run: composer install --no-interaction --prefer-dist --no-progress
       - name: Lint seluruh PHP aplikasi dan pengujian
