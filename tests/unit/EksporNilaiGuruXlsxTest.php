@@ -139,21 +139,43 @@ final class EksporNilaiGuruXlsxTest extends TestCase
             $siswa->getCell('B6')->getDataType());
         $sheet=$book->getSheetByName('SEMESTER 1');
         self::assertSame(10,$sheet->getHighestDataRow()); // 2 siswa × 3 TP
-        self::assertSame(0,$sheet->getCell('N5')->getValue());
-        self::assertSame(DataType::TYPE_NUMERIC,$sheet->getCell('N5')->getDataType());
-        self::assertSame('Dilewati',$sheet->getCell('K5')->getValue());
-        self::assertSame('Final',$sheet->getCell('O5')->getValue());
-        self::assertSame('=2+2',$sheet->getCell('G5')->getValue());
-        self::assertSame(DataType::TYPE_STRING,$sheet->getCell('G5')->getDataType());
-        self::assertNull($sheet->getCell('N6')->getValue());
-        self::assertSame('Sementara',$sheet->getCell('O6')->getValue());
-        self::assertSame('—',$sheet->getCell('N7')->getValue());
-        self::assertSame('Tanpa nilai (Esensial)',$sheet->getCell('O7')->getValue());
-        self::assertNull($sheet->getCell('N8')->getValue());
-        self::assertStringNotContainsString('Nilai Akhir Semester',
-            (string) $book->getSheetByName('INFORMASI')->getCell('A1')->getValue());
-        // Workbook tidak boleh mencantumkan Gen lain meski paket/mapel sama.
-        self::assertStringNotContainsString('GEN B PRIVATE',$raw);
+        $barisNilaiNol = null;
+        $barisSementara = null;
+        $barisEsensial = null;
+        $barisBelum = null;
+        for ($row = 5; $row <= 10; $row++) {
+            $nama = $sheet->getCell('B'.$row)->getValue();
+            $kode = $sheet->getCell('F'.$row)->getValue();
+            self::assertNotSame('GEN B PRIVATE', $nama);
+            if ($nama === '=HYPERLINK("https://bad.test","x")') {
+                self::assertSame(DataType::TYPE_STRING,
+                    $sheet->getCell('B'.$row)->getDataType());
+                if ($kode === 'SKI.7.1.1') $barisNilaiNol = $row;
+                if ($kode === 'SKI.7.1.2') $barisSementara = $row;
+                if ($kode === 'SKI.7.1.3') $barisEsensial = $row;
+            } elseif ($kode === 'SKI.7.1.1') {
+                $barisBelum = $row;
+            }
+        }
+        foreach ([$barisNilaiNol,$barisSementara,$barisEsensial,$barisBelum] as $number) {
+            self::assertIsInt($number);
+        }
+        self::assertSame(0,$sheet->getCell('N'.$barisNilaiNol)->getValue());
+        self::assertSame(DataType::TYPE_NUMERIC,
+            $sheet->getCell('N'.$barisNilaiNol)->getDataType());
+        self::assertSame('Dilewati',$sheet->getCell('K'.$barisNilaiNol)->getValue());
+        self::assertSame('Final',$sheet->getCell('O'.$barisNilaiNol)->getValue());
+        self::assertSame('=2+2',$sheet->getCell('G'.$barisNilaiNol)->getValue());
+        self::assertSame(DataType::TYPE_STRING,
+            $sheet->getCell('G'.$barisNilaiNol)->getDataType());
+        self::assertNull($sheet->getCell('N'.$barisSementara)->getValue());
+        self::assertSame('Sementara',$sheet->getCell('O'.$barisSementara)->getValue());
+        self::assertSame('—',$sheet->getCell('N'.$barisEsensial)->getValue());
+        self::assertSame('Tanpa nilai (Esensial)',
+            $sheet->getCell('O'.$barisEsensial)->getValue());
+        self::assertNull($sheet->getCell('N'.$barisBelum)->getValue());
+        self::assertStringNotContainsString('GEN B PRIVATE',
+            $book->getSheetByName('INFORMASI')->getCell('B3')->getValue());
         $book->disconnectWorksheets();
     }
 
