@@ -50,7 +50,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-040 | Guru pengganti mengusulkan koreksi nilai | Menunggu Admin; tidak mengubah nilai sebelum sah |
 | E2E-041 | Admin menyetujui koreksi valid | Nilai, agregat, audit berubah sekali |
 | E2E-042 | Nilai sumber berubah ketika permohonan menunggu | Optimistic conflict; tidak menimpa |
-| E2E-043 | Soal/kunci sah ternyata salah | Koreksi semua attempt sah terdampak dari snapshot; audit lengkap |
+| E2E-043 | Ditemukan kesalahan soal/kunci pada TP yang sudah digunakan | Soal/kunci TP tetap terkunci; bila diperlukan pembetulan nilai siswa gunakan mekanisme koreksi **nilai** yang terpisah dengan audit/snapshot, bukan edit TP |
 | E2E-044 | Koreksi soal menurunkan nilai di bawah KKM | Nilai/indikator KKM dihitung ulang; status TP Selesai tetap berdasar aktivitas dan attempt sah, riwayat tidak dihapus |
 | E2E-045 | Semua TP tuntas tapi tugas menunggu nilai | Sertifikat ditahan; pesan menunggu guru |
 | E2E-046 | TTD PNG belum diunggah | Sertifikat ditahan, Admin mendapat peringatan |
