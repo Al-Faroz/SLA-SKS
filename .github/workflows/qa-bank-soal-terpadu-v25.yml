@@ -15,10 +15,12 @@ on:
       - 'app/Views/guru/bank_soal.php'
       - 'app/Views/guru/soal_form.php'
       - 'app/Views/guru/review_bank_soal.php'
+      - 'public/assets/css/emerald-glass.css'
       - 'public/assets/js/soal-editor.js'
       - 'tests/unit/SoalMediaDriveServiceTest.php'
       - 'tests/unit/RenderRumusWordServiceTest.php'
       - 'tests/unit/TemplateWordSoalV25Test.php'
+      - 'tests/unit/ReviewWordTemaTest.php'
       - '.github/workflows/qa-bank-soal-terpadu-v25.yml'
   workflow_dispatch:
 
@@ -52,7 +54,8 @@ jobs:
           php -l tests/unit/SoalMediaDriveServiceTest.php
           php -l tests/unit/RenderRumusWordServiceTest.php
           php -l tests/unit/TemplateWordSoalV25Test.php
+          php -l tests/unit/ReviewWordTemaTest.php
       - name: JavaScript syntax
         run: node --check public/assets/js/soal-editor.js
       - name: Unit test bank soal, media dan MathML
-        run: vendor/bin/phpunit --no-coverage --filter '(SoalMediaDriveServiceTest|RenderRumusWordServiceTest|TemplateWordSoalV25Test|KelolaSoalGuruTest)' tests/unit
+        run: vendor/bin/phpunit --no-coverage --filter '(SoalMediaDriveServiceTest|RenderRumusWordServiceTest|TemplateWordSoalV25Test|KelolaSoalGuruTest|ReviewWordTemaTest)' tests/unit
