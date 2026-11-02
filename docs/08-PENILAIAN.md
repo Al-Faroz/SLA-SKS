@@ -28,3 +28,9 @@ Bank ujian gabungan seluruh BAB pada semester, minimal 30 soal. Mesin, fullscree
 - Guru dapat mengekspor **seluruh siswa dalam Gen–Mapel yang diampu** dengan identitas minimal yang berwenang, kode/nama TP, nilai masing-masing TP NonEsensial, penanda TP Esensial tanpa nilai, dan nilai Pra-Semester.
 - Export **kapan saja**, termasuk saat baru terdapat **satu nilai TP** atau sebagian siswa belum memiliki nilai. Nilai yang belum tersedia berupa kosong/penanda belum ada, **bukan nol**; hasil sementara dibedakan dari final.
 - Kolom **Nilai Akhir Semester tidak ada**. Izin filter dan sanitasi formula injection XLSX/CSV wajib; hash, sandi dan riwayat ujian privat tidak diekspor.
+
+
+## Edit konten TP dan nilai historis (final 2 November 2026)
+- Status TP Siap bukan gerbang penguncian. Guru G1 boleh menyunting KKM tunggal, soal dan konten TP Siap selama belum ada siswa yang menggunakan TP; validasi kesiapan dan snapshot aktif diulang sebelum tersedia kepada siswa.
+- Setelah minimal satu siswa memakai TP, konten akademik TP terkunci dan **hasil/percobaan/nilai tidak boleh diubah oleh perubahan konten TP**. Koreksi nilai siswa yang diatur tersendiri tetap terpisah, tidak membuka hak sunting TP. KKM Diagnostik dan Sumatif tetap satu nilai.
+- CP boleh disunting Admin kapan saja; perubahan CP tidak memicu perhitungan ulang nilai siswa atau perubahan bobot 20/20/60 maupun 100% Sumatif.
