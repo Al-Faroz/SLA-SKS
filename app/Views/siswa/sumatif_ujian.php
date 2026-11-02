@@ -96,12 +96,8 @@
         <h1 data-ujian-hasil-judul>Status Sumatif</h1>
         <p data-ujian-hasil-pesan></p>
         <p class="a-ujian-skor" data-ujian-hasil-skor></p>
-        <form method="post" data-ujian-akses-ulang hidden
-            action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/akses-ulang/sumatif'), 'attr') ?>">
-            <input type="hidden" name="<?= esc($csrfName, 'attr') ?>" value="<?= esc($csrfValue, 'attr') ?>">
-            <button type="submit" class="a-btn a-btn--utama">Minta akses ulang kepada Guru</button>
-            <p class="a-help">Permintaan tersimpan di sistem. Izin Guru diperlukan sebelum tes pengganti dapat dimulai.</p>
-        </form>
+        <p class="a-help">Jika tes tidak selesai, buka Rincian TP untuk
+            meminta akses ulang tahap tes yang tepat.</p>
 
         <a class="a-btn a-btn--utama" data-ujian-remedial hidden
             href="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/sumatif/ujian'), 'attr') ?>">
