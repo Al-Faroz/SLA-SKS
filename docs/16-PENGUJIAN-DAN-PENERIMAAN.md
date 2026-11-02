@@ -288,3 +288,12 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - PDF 1/5 halaman ditolak; 6/8/40 diterima; 41 atau >15 MB ditolak; berkas PDF tidak terbaca jumlah halamannya memberi pesan jelas.
 - Pengenalan jenis file (ekstensi/MIME), hak Guru G1, status TP draf, CSRF dan penyimpanan privat tetap dijaga oleh komponen yang sudah ada; ketentuan pemeriksaan skrip/aksi/struktur internal pada regresi historis tidak menjadi persyaratan bisnis PDF lagi.
 - Pada Sunting, PDF yang tidak memenuhi dua batas tidak mengganti file atau metadata lama. Lakukan PHPUnit serta tes XAMPP nyata.
+
+## Regresi Bank Soal Diagnostik–Sumatif terpadu (2 November 2026)
+- UI satu tombol Kelola Bank Soal dari TP NonEsensial; tab Diagnostik/Sumatif tetap terpisah dan tetap mengingat jenis pada redirect gagal/sukses. TP Esensial tidak menampilkan bank soal wajib.
+- Generator Word: Diagnostik 10–200 dan Sumatif 30–200, bukan 5 soal Sumatif; impor dan tambah manual boleh berlangsung bertahap sampai mencapai batas TP Siap.
+- Daftar >15 soal: pagination server; berpindah tab/halaman tanpa tercampur Gen atau jenis. 403 untuk Guru lain, dan mutasi pada TP Siap ditolak.
+- Editor: tambah/edit, periksa A–E, satu kunci, gambar privat, pratinjau HTML tersanitasi sebelum simpan, form tanpa JS sebagai fallback, CSRF pada unggah gambar dan pratinjau.
+- Impor Word: upload → review → konfirmasi; pemeriksaan 10/30 pada TP Siap; soal manual tidak tertimpa; perubahan apa pun pada bank setelah review membatalkan konfirmasi; impor identik tidak melompati perlindungan konflik.
+- Equation Word pecahan/pangkat/akar dapat dibaca sebagai MathML dalam review; bentuk kompleks dan rendering browser perlu tes dokumen nyata. Audio/Video Google Drive hanya tautan file HTTPS, tautan selain file ditolak dan Guru menguji izin Viewer/pemutaran sebelum menyetujui review.
+- PHP lint, unit, integrasi, QA CI dan review XAMPP adalah gerbang. Jangan mengklaim semua kasus E2E PASS bila hanya CI yang lulus; tidak ada migrasi SQL.
