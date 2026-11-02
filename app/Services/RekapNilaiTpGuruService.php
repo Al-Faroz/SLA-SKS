@@ -76,15 +76,15 @@ final class RekapNilaiTpGuruService
         if ($maks < 1 || $maks > 5000) {
             throw new DomainException('Batas ekspor siswa tidak valid.');
         }
-        $baris = $this->db->table('siswa s')
-            ->select('s.id,u.nama')
-            ->join('pengguna u', 'u.id=s.pengguna_id')
-            ->where('s.angkatan_id', $gen)
-            ->where('EXISTS (SELECT 1 FROM penugasan_guru_gen g WHERE g.angkatan_id='
-                . (int) $gen . ' AND g.mapel_id=' . (int) $mapel
-                . ' AND g.guru_id=' . (int) $guru . ')', null, false)
-            ->orderBy('u.nama','ASC')->orderBy('s.id','ASC')
-            ->limit($maks + 1)->get()->getResultArray();
+        $baris = $this->db->query(
+            'SELECT s.id,u.nama FROM siswa s'
+            . ' JOIN pengguna u ON u.id=s.pengguna_id'
+            . ' WHERE s.angkatan_id=?'
+            . ' AND EXISTS (SELECT 1 FROM penugasan_guru_gen g'
+            . ' WHERE g.angkatan_id=s.angkatan_id AND g.mapel_id=? AND g.guru_id=?)'
+            . ' ORDER BY u.nama ASC,s.id ASC LIMIT ' . ($maks + 1),
+            [$gen, $mapel, $guru]
+        )->getResultArray();
         if (count($baris) > $maks) {
             throw new DomainException('Jumlah siswa melebihi batas keamanan ekspor. Hubungi Admin.');
         }
