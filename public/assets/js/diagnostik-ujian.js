@@ -9,6 +9,7 @@
     const tp = root.dataset.ujianTp;
     const jenis = root.dataset.ujianJenis === 'sumatif' ? 'sumatif' : 'diagnostik';
     const namaUjian = jenis === 'sumatif' ? 'Sumatif' : 'Diagnostik';
+    const langsungBelajar = root.dataset.ujianLangsungBelajar === 'ya';
     const csrfName = root.dataset.csrfName;
     let csrf = root.dataset.csrfHash;
     let token = root.dataset.ujianToken || '';
@@ -67,8 +68,12 @@
             show('[data-ujian-sambutan]', false);
             show('[data-ujian-hasil]', true);
             setText('[data-ujian-hasil-judul]',
-                state.status === 'selesai_sah' ? 'Hasil ' + namaUjian : 'Menunggu keputusan Guru');
-            let pesanHasil = 'Percobaan dibatalkan tanpa skor. Hubungi Guru pengampu.';
+                state.status === 'selesai_sah' ? 'Hasil ' + namaUjian
+                    : (jenis === 'diagnostik' && langsungBelajar
+                        ? 'Keputusan Guru: Langsung Belajar' : 'Menunggu keputusan Guru'));
+            let pesanHasil = jenis === 'diagnostik' && langsungBelajar
+                ? 'Diagnostik dibatalkan tanpa skor. Guru telah memilih jalur Langsung Belajar; selesaikan satu Materi, Resume final, HOTS final, kemudian Sumatif.'
+                : 'Percobaan dibatalkan tanpa skor. Hubungi Guru pengampu.';
             if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
                 pesanHasil = state.skor >= state.kkm
                     ? 'Diagnostik memenuhi KKM. Materi/Resume/HOTS boleh dilewati; Sumatif tetap wajib.'
