@@ -43,6 +43,7 @@ final class ModeDokumentasiShellTest extends TestCase
         self::assertStringContainsString('scroll-behavior:auto;', $css);
         self::assertStringContainsString('background:var(--eg-document-wall);', $css);
         self::assertStringContainsString('html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card', $css);
+        self::assertStringContainsString('#debugbarToggle', $css);
         self::assertStringContainsString('@media print', $css);
     }
 
