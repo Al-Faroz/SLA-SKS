@@ -53,7 +53,7 @@
                             <td>
                                 <a class="a-btn a-btn--sekunder"
                                     href="<?= esc(site_url('guru/akses-ulang/' . (int) $r['id']), 'attr') ?>">
-                                    Tinjau ujian
+                                    Lihat permintaan
                                 </a>
                             </td>
                         </tr>
@@ -95,33 +95,17 @@
                 <form method="post" class="a-form a-form-penilaian"
                     action="<?= esc(site_url('guru/akses-ulang/' . (int) $pilih['id']), 'attr') ?>">
                     <?= csrf_field() ?>
-                    <div class="a-field">
-                        <label class="a-label" for="keputusan-ujian">Izin Guru</label>
-                        <select class="a-input" id="keputusan-ujian" name="keputusan" required>
-                            <option value="">Pilih izin akses ulang</option>
-                            <?php foreach ($pilihanKeputusan as $aksi): ?>
-                                <option value="<?= esc($aksi, 'attr') ?>" <?= old('keputusan') === $aksi ? 'selected' : '' ?>>
-                                    <?= esc(match ($aksi) {
-                                        'ulang_diagnostik' => 'Izinkan Akses Ulang Diagnostik',
-                                        'langsung_belajar' => 'Langsung Belajar (tanpa skor Diagnostik)',
-                                        'ulang_sumatif' => 'Izinkan Akses Ulang Sumatif',
-                                        'tunda_tinjauan' => 'Tunda untuk Tinjauan',
-                                        default => $aksi,
-                                    }) ?>
-                                </option>
-                            <?php endforeach ?>
-                        </select>
-                    </div>
-                    <div class="a-field">
-                        <label class="a-label" for="alasan-keputusan">Alasan keputusan</label>
-                        <textarea class="a-input" id="alasan-keputusan" name="alasan"
-                            maxlength="255" rows="4" required><?= esc((string) old('alasan')) ?></textarea>
-                        <p class="a-help">Maksimal 255 karakter. Alasan, waktu, dan Guru pencatat
-                            disimpan dalam riwayat audit.</p>
-                    </div>
+                    <?php $aksiIzin = $pilihanKeputusan[0] ?? ''; ?>
+                    <input type="hidden" name="keputusan" value="<?= esc($aksiIzin, 'attr') ?>">
+                    <p class="a-help">Guru cukup memberikan izin untuk mengulangi
+                        <?= esc(ucfirst((string) $pilih['jenis'])) ?>
+                        <?= $pilih['tahap'] === 'remedial' ? '(remedial)' : '(tes normal)' ?>.
+                        Penyebab tes tidak selesai, waktu, dan identitas pemberi izin
+                        tercatat otomatis. Tidak perlu mengisi alasan.</p>
                     <button type="submit" class="a-btn a-btn--utama"
-                        onclick="return confirm('Setujui akses ulang untuk tahap tes yang tidak selesai? Izin hanya sekali pakai.');">
-                        Berikan izin akses ulang
+                        <?= $aksiIzin === '' ? 'disabled' : '' ?>
+                        onclick="return confirm('Izinkan siswa mengulangi tahap tes yang tidak selesai? Izin hanya sekali pakai.');">
+                        Izinkan Akses Ulang
                     </button>
                 </form>
             <?php endif ?>
