@@ -127,7 +127,7 @@ final class PetaTpService
                 ->get()->getResultArray()
             : [];
 
-        $pilihanKolom = 't.id,t.paket_semester_id,t.kode_tp,t.judul,t.rumusan,t.indikator,t.urutan_atp,t.status,t.struktur_versi';
+        $pilihanKolom = 't.id,t.paket_semester_id,t.kode_tp,t.judul,t.rumusan,t.indikator,t.urutan_atp,t.status,t.struktur_versi,t.kkm_khusus,t.kkm';
         if ($polaBab) {
             $pilihanKolom .= ',t.bab_id,t.jenis_tp,t.nama_tp,t.deskripsi_tp,t.urutan_dalam_bab';
         }
