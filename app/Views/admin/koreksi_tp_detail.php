@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
 <?php $data = $koreksi['usulan']; $asal = $koreksi['asal']; $tp = $data['tp']; $tpAsal = $asal['tp']; ?>
-<div class="a-page">
+<div class="a-page a-koreksi-tp">
     <nav class="a-breadcrumb"><a href="<?= esc(site_url('admin/koreksi-tp'), 'attr') ?>">Koreksi TP</a> / #<?= (int) $koreksi['id'] ?></nav>
     <header class="a-page__heading"><div><p class="a-proto-eyebrow">Admin · Review perbandingan</p>
         <h1>Permohonan #<?= (int) $koreksi['id'] ?> · <?= esc($tp['kode_tp']) ?></h1>
