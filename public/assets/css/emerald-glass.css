@@ -1552,3 +1552,97 @@ html[data-theme] .a-publik--prototipe .a-baca .a-form .a-btn {
     transition:none;
   }
 }
+
+
+/* Review impor Word — komponen bacaan harus sepenuhnya bertema Dark/Light.
+   app.css sebelumnya memaksa .a-word-review-item putih (#fff) sambil
+   mewarisi teks terang Emerald Glass sehingga pertanyaan tak terbaca. */
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item {
+  background:var(--eg-table);
+  color:var(--e-text);
+  border:1px solid var(--e-border);
+  border-radius:12px;
+  box-shadow:var(--eg-shadow-soft);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary {
+  padding:14px 18px;
+  background:var(--eg-table-head);
+  color:var(--e-text);
+  border-bottom:1px solid transparent;
+  font-size:14px;
+  font-weight:750;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item[open] > summary {
+  border-bottom-color:var(--e-border);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary .a-help {
+  color:var(--e-muted);
+  font-size:12px;
+  font-weight:600;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary:hover {
+  background:var(--e-soft-hover);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:-3px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-word-preview {
+  color:var(--e-text);
+  font-size:14px;
+  line-height:1.7;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > .a-word-preview {
+  padding:16px 18px 5px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-word-preview a {
+  color:var(--e-primary);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-word-preview :is(table,th,td) {
+  border-color:var(--e-border);
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl {
+  background:var(--eg-table);
+  color:var(--e-text);
+  min-width:460px;
+  font-size:14px;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl thead th {
+  background:var(--eg-table-head);
+  color:var(--eg-table-label);
+  border-color:var(--e-border);
+  font-size:13px;
+  font-weight:750;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody :is(th[scope="row"],td) {
+  color:var(--e-text);
+  border-color:var(--eg-line-soft);
+  line-height:1.65;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody th[scope="row"] {
+  color:var(--e-primary);
+  font-weight:800;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody td.a-review-word__kunci-benar {
+  color:var(--e-primary);
+  font-weight:750;
+}
+html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl tbody td.a-review-word__kunci-lain {
+  color:var(--e-muted);
+}
+@media(max-width:640px) {
+  html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > summary {
+    padding:12px;
+  }
+  html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item > .a-word-preview {
+    padding:13px 12px 4px;
+  }
+  html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tbl {
+    font-size:13px;
+  }
+}
