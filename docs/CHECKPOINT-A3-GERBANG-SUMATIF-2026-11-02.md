@@ -23,5 +23,6 @@
 ## QA
 
 - Unit: `tests/unit/KelayakanSumatifSiswaTest.php` mencakup dua jalur, Materi bukan satu, status belum Diagnostik/TP tuntas, bukti parsial, dan keterhubungan UI/Service.
+- Integrasi SQLite anonim pada `tests/unit/MateriSiswaDatabaseTest.php`: snapshot dua Materi ditolak untuk kesiapan v2.5; snapshot satu Materi memerlukan tiga rekaman sah yang terikat versi, tidak membuat attempt, serta menolak siswa Gen lain.
 - Workflow luas `qa-edit-cp-bab-tp-v25.yml` sudah menargetkan `app/**` dan `tests/**` ketika PR dibuka; memeriksa lint seluruh PHP, PHPUnit unit dan fixture penguncian. **Lihat status Actions PR sebelum mengklaim PASS.**
 - Browser XAMPP belum diuji. Uji manual berikut wajib pada siswa uji saja: sebelum dan sesudah Diagnostik, media belum selesai/selesai, Resume draf/final, HOTS draf/final, dan jalur Diagnostik lulus; pastikan tiap langkah tidak membuka Sumatif yang belum tersedia.
