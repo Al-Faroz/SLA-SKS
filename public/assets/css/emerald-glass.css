@@ -1843,3 +1843,64 @@ html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi:
     content:none !important;
   }
 }
+
+
+/* Step Progress TP — visual berbeda antara terpenuhi dan belum terpenuhi.
+   Menjaga semantik status tetap dari Service; warna merah muda hanya
+   aksen teks "✓ Selesai" sesuai preferensi kontras pemilik. */
+html[data-theme="dark"] .a-app--prototipe {
+  --eg-step-done-bg:linear-gradient(145deg,#174F39,#0C352C);
+  --eg-step-done-border:#53C698;
+  --eg-step-pending-bg:#0D2925;
+  --eg-step-pending-border:rgba(166,194,177,.33);
+  --eg-step-pending-text:#C7D7CF;
+  --eg-step-done-text:#FF9BA6;
+}
+html[data-theme="light"] .a-app--prototipe {
+  --eg-step-done-bg:linear-gradient(145deg,#D7F3E4,#E9F8F0);
+  --eg-step-done-border:#27825A;
+  --eg-step-pending-bg:#F1F5F2;
+  --eg-step-pending-border:#B9CCBF;
+  --eg-step-pending-text:#4D6356;
+  --eg-step-done-text:#A72C47;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item {
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  min-height:178px;
+  color:var(--e-text);
+  transition:none;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-selesai {
+  background:var(--eg-step-done-bg);
+  border:1px solid var(--eg-step-done-border);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-belum {
+  background:var(--eg-step-pending-bg);
+  border:1px dashed var(--eg-step-pending-border);
+  box-shadow:none;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item > strong {
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item > small {
+  color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__status {
+  margin:0 0 12px;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.5;
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-selesai .a-tp-langkah__status {
+  color:var(--eg-step-done-text);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item.is-belum .a-tp-langkah__status {
+  color:var(--eg-step-pending-text);
+}
+html[data-theme] .a-app--prototipe .a-tp-langkah__item .a-btn {
+  margin-top:auto;
+  align-self:flex-start;
+}
