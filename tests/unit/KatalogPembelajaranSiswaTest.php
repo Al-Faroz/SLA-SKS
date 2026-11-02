@@ -87,7 +87,7 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         self::assertStringContainsString("->select('id,urutan,judul,jenis')", $service);
         self::assertStringNotContainsString("->table('soal')", $service);
         self::assertStringNotContainsString("->table('berkas')", $service);
-        self::assertStringContainsString('Diagnostik wajib adalah langkah ujian pertama', $view);
+        self::assertStringContainsString('Diagnostik adalah langkah ujian pertama', $view);
         self::assertStringNotContainsString('Mulai Diagnostik</a>', $view);
         self::assertStringContainsString('method="post"', $view);
         self::assertStringContainsString('Aktifkan TP &amp; simpan versi', $view);
