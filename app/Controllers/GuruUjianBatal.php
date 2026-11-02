@@ -13,7 +13,7 @@ use DomainException;
 use RuntimeException;
 use Throwable;
 
-/** A5: antrean, detail, dan keputusan Guru dengan filter role + Service G1. */
+/** A5 revisi: permintaan akses ulang tes mandiri, filter role dan Service G1. */
 final class GuruUjianBatal extends BaseController
 {
     protected $helpers = ['url', 'form'];
@@ -40,7 +40,7 @@ final class GuruUjianBatal extends BaseController
             $antrean = $svc->antrean();
             $pilih = $id === null ? null : $svc->lihat($id);
             return view('guru/ujian_batal', [
-                'judul'=>'Ujian Dibatalkan',
+                'judul'=>'Permintaan Akses Ulang',
                 'namaPengguna'=>$akun['nama'],
                 'peranAktif'=>'Guru',
                 'tautanNavigasi'=>NavigasiService::untuk('guru','ujian_batal'),
@@ -60,15 +60,15 @@ final class GuruUjianBatal extends BaseController
                     'pesan'=>'Administrator perlu mengimpor SQL V4-0008 sebelum menggunakan menu ini.',
                 ]));
         } catch (Throwable $e) {
-            log_message('error','A5 daftar ujian batal: {error}', ['error'=>$e->getMessage()]);
+            log_message('error','A5 daftar akses ulang: {error}', ['error'=>$e->getMessage()]);
             return $this->response->setStatusCode(500)
-                ->setBody(view('publik/galat_sistem', ['judul'=>'Ujian batal tidak dapat dimuat']));
+                ->setBody(view('publik/galat_sistem', ['judul'=>'Permintaan akses ulang tidak dapat dimuat']));
         }
     }
 
     public function simpan(int $id): RedirectResponse
     {
-        $tujuan = site_url('guru/ujian-batal/' . $id);
+        $tujuan = site_url('guru/akses-ulang/' . $id);
         $aksi = $this->request->getPost('keputusan');
         $alasan = $this->request->getPost('alasan');
         if ($id < 1 || !is_string($aksi) || !is_string($alasan)) {
@@ -83,8 +83,8 @@ final class GuruUjianBatal extends BaseController
                 throw new DomainException('Hanya Guru aktif boleh memutuskan ujian.');
             }
             (new KeputusanUjianBatalService())->putuskan($id, $aksi, $alasan);
-            return redirect()->to(site_url('guru/ujian-batal'))
-                ->with('ujian_sukses','Keputusan Guru sudah tersimpan dan tercatat dalam audit.');
+            return redirect()->to(site_url('guru/akses-ulang'))
+                ->with('ujian_sukses','Izin akses ulang sudah disimpan dan dicatat dalam audit.');
         } catch (DomainException $e) {
             return redirect()->to($tujuan)->withInput()
                 ->with('ujian_gagal',$e->getMessage());
