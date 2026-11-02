@@ -100,6 +100,7 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
             KeputusanUjianBatalService::pilihan('sumatif'));
         self::assertSame([], KeputusanUjianBatalService::pilihan('pra_semester'));
         self::assertCount(0, $this->guru()->antrean()); // tidak masuk antrean tanpa permintaan siswa
+        self::assertSame('diagnostik', $this->siswa()->kebutuhan(10)['jenis']);
         $this->siswa()->minta(10, 'diagnostik');
         $this->siswa()->minta(10, 'diagnostik'); // idempoten
         self::assertSame(1, $this->db->table('riwayat_status_ujian')->countAllResults());
@@ -113,19 +114,19 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
             self::assertStringContainsString('Gen–Mapel', $e->getMessage());
         }
         $this->expectException(\DomainException::class);
-        $this->guru(4,'admin')->putuskan(101,'langsung_belajar','Insiden sudah diperiksa.');
+        $this->guru(4,'admin')->putuskan(101,'langsung_belajar');
     }
 
     public function testUlangDiagnostikSekaliPakaiDenganAuditIdempoten(): void
     {
         $this->siswa()->minta(10, 'diagnostik');
-        $this->guru()->putuskan(101,'ulang_diagnostik','Koneksi buruk, izinkan ujian ulang.');
+        $this->guru()->putuskan(101,'ulang_diagnostik');
         self::assertSame('diagnostik',$this->db->table('progres_tp')
             ->where('id',11)->get()->getRow('status'));
         $izin = KeputusanUjianBatalService::izin($this->db,101,'ulang_diagnostik');
         self::assertNotNull($izin);
         self::assertSame(1,$this->db->table('riwayat_keputusan_ujian_batal')->countAllResults());
-        $this->guru()->putuskan(101,'ulang_diagnostik','Permintaan ulang tanpa dampak.');
+        $this->guru()->putuskan(101,'ulang_diagnostik');
         self::assertSame(1,$this->db->table('riwayat_keputusan_ujian_batal')->countAllResults());
         KeputusanUjianBatalService::gunakan($this->db,(int)$izin['id']);
         self::assertNull(KeputusanUjianBatalService::izin($this->db,101,'ulang_diagnostik'));
@@ -140,7 +141,7 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
     {
         $this->siswa()->minta(10, 'diagnostik');
         $this->expectException(\DomainException::class);
-        $this->guru()->putuskan(101,'langsung_belajar','Opsi historis tidak berlaku.');
+        $this->guru()->putuskan(101,'langsung_belajar');
     }
 
     public function testSumatifDitundaLaluDiizinkanUlangTapiTidakMemotongKuotaSah(): void
@@ -155,13 +156,72 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
             'skor'=>null,'kkm'=>75,
         ]);
         $this->siswa()->minta(10, 'sumatif');
-        $this->guru()->putuskan(103,'ulang_sumatif','Insiden selesai diperiksa, izin ulang.');
+        $this->guru()->putuskan(103,'ulang_sumatif');
         self::assertSame('sumatif',$this->db->table('progres_tp')
             ->where('id',11)->get()->getRow('status'));
         self::assertCount(1,$this->db->table('riwayat_keputusan_ujian_batal')
             ->get()->getResultArray());
         self::assertNotNull(KeputusanUjianBatalService::izin($this->db,103,'ulang_sumatif'));
         self::assertNull($this->db->table('percobaan_ujian')->where('id',103)->get()->getRow('skor'));
+    }
+
+
+    public function testPermintaanSumatifDariPercobaanTerakhirBukanDiagnostik(): void
+    {
+        // Seperti sla_uji_08: Diagnostik sudah selesai sah,
+        // Sumatif normal berikutnya tidak selesai dan TP perlu_bantuan.
+        $this->db->table('percobaan_ujian')->where('id',101)
+            ->update(['status'=>'selesai_sah','skor'=>90.0]);
+        $this->db->table('percobaan_ujian')->insert([
+            'id'=>103,'progres_tp_id'=>11,'versi_konten_tp_id'=>31,
+            'jenis'=>'sumatif','tahap'=>'normal','nomor_percobaan'=>1,
+            'status'=>'dibatalkan_menunggu_guru','alasan_batal'=>'Insiden fullscreen',
+            'skor'=>null,'kkm'=>75,
+        ]);
+        $kebutuhan = $this->siswa()->kebutuhan(10);
+        self::assertNotNull($kebutuhan);
+        self::assertSame('sumatif', $kebutuhan['jenis']);
+        self::assertSame('normal', $kebutuhan['tahap']);
+        self::assertFalse($kebutuhan['sudah_diminta']);
+        try {
+            $this->siswa()->minta(10, 'diagnostik');
+            self::fail('Diagnostik tidak boleh dimintakan ulang ketika Sumatif yang terhenti.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('Jenis tes', $e->getMessage());
+        }
+        $this->siswa()->minta(10, 'sumatif');
+        self::assertTrue($this->siswa()->kebutuhan(10)['sudah_diminta']);
+        self::assertCount(1, $this->guru()->antrean());
+        self::assertSame('sumatif', $this->guru()->antrean()[0]['jenis']);
+        $this->guru()->putuskan(103, 'ulang_sumatif');
+        self::assertSame('sumatif', $this->db->table('progres_tp')
+            ->where('id',11)->get()->getRow('status'));
+        self::assertNull($this->siswa()->kebutuhan(10));
+        $audit = $this->db->table('riwayat_keputusan_ujian_batal')->get()->getRowArray();
+        self::assertStringContainsString('Sumatif', (string)$audit['alasan']);
+    }
+
+    public function testRemedialYangTidakSelesaiMemintaUlangTahapRemedial(): void
+    {
+        $this->db->table('percobaan_ujian')->where('id',101)
+            ->update(['status'=>'selesai_sah','skor'=>90.0]);
+        $this->db->table('percobaan_ujian')->insertBatch([
+            ['id'=>103,'progres_tp_id'=>11,'versi_konten_tp_id'=>31,
+                'jenis'=>'sumatif','tahap'=>'normal','nomor_percobaan'=>1,
+                'status'=>'selesai_sah','skor'=>60.0,'kkm'=>75],
+            ['id'=>104,'progres_tp_id'=>11,'versi_konten_tp_id'=>31,
+                'jenis'=>'sumatif','tahap'=>'remedial','nomor_percobaan'=>2,
+                'status'=>'dibatalkan_menunggu_guru','skor'=>null,'kkm'=>75],
+        ]);
+        self::assertSame('remedial', $this->siswa()->kebutuhan(10)['tahap']);
+        $this->siswa()->minta(10,'sumatif');
+        self::assertSame(104, (int) $this->guru()->antrean()[0]['id']);
+        $this->guru()->putuskan(104,'ulang_sumatif');
+        self::assertSame('sumatif',$this->db->table('progres_tp')
+            ->where('id',11)->get()->getRow('status'));
+        self::assertStringContainsString('remedial', (string)
+            $this->db->table('keputusan_ujian_batal')->where('percobaan_ujian_id',104)
+                ->get()->getRow('alasan'));
     }
 
     public function testPermintaanLintasGenDanJenisTidakSahDitolak(): void
@@ -180,7 +240,7 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
     {
         $this->siswa()->minta(10, 'diagnostik');
         try {
-            $this->guru()->putuskan(101,'ulang_sumatif','Ulang ujian.');
+            $this->guru()->putuskan(101,'ulang_sumatif');
             self::fail('Pilihan Sumatif tidak boleh dipakai untuk Diagnostik.');
         } catch (\DomainException $e) {
             self::assertStringContainsString('jenis', $e->getMessage());
