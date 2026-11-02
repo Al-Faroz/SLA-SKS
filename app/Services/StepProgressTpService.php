@@ -39,15 +39,15 @@ final class StepProgressTpService
         if ($jenisTp === 'non_esensial') {
             $groups[] = [
                 'label' => 'Diagnostik',
-                'keterangan' => '10 soal sah dan pengaturan kegiatan',
+                'keterangan' => 'Minimal 10 soal sah dan pengaturan kegiatan',
                 'kode' => ['kkm','resume_min','tugas_min','diag_durasi','diag_tayang',
                     'bank-diagnostik','valid-diagnostik'],
                 'tautan' => $root . '/bank-soal?jenis=diagnostik',
             ];
             $groups[] = [
                 'label' => 'Sumatif',
-                'keterangan' => '30 soal sah, bobot 20/20/60, satu remedial',
-                'kode' => ['sum_durasi','sum_tayang','sum_maks_percobaan','bobot',
+                'keterangan' => 'Minimal 30 soal sah, KKM terset',
+                'kode' => ['kkm','sum_durasi','sum_tayang','sum_maks_percobaan','bobot',
                     'bank-sumatif','valid-sumatif','aset-soal'],
                 'tautan' => $root . '/bank-soal?jenis=sumatif',
             ];
