@@ -42,4 +42,30 @@ final class GuruBab extends BaseController
         }
         return redirect()->to($tujuan)->with('sukses', 'BAB berhasil ditambahkan.');
     }
+    public function sunting(int $id): RedirectResponse
+    {
+        $nama = $this->request->getPost('nama_bab');
+        $deskripsi = $this->request->getPost('deskripsi_bab');
+        $pilihan = $this->request->getPost('pilihan');
+        $semester = $this->request->getPost('semester');
+        $nomor = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) < 6
+            ? (int) $pilihan : 0;
+        $tujuan = site_url('guru/peta-atp') . '?pilihan=' . $nomor;
+        if (is_string($semester) && ctype_digit($semester)
+            && (int) $semester >= 1 && (int) $semester <= 6) {
+            $tujuan = site_url('guru/peta-atp/semester/' . (int) $semester) . '?pilihan=' . $nomor;
+        }
+        if (!is_string($nama) || !is_string($deskripsi)) {
+            return redirect()->to($tujuan)->with('galat', 'Isian BAB tidak valid.');
+        }
+        try {
+            (new BabService())->sunting($id, $nama, $deskripsi);
+            return redirect()->to($tujuan)->with('sukses', 'BAB berhasil diperbarui.');
+        } catch (DomainException $e) {
+            return redirect()->to($tujuan)->with('galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Sunting BAB gagal: ' . get_class($e));
+            return redirect()->to($tujuan)->with('galat', 'BAB belum tersimpan. Periksa log server.');
+        }
+    }
 }
