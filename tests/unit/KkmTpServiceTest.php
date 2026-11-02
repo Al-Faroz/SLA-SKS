@@ -39,6 +39,35 @@ final class KkmTpServiceTest extends TestCase
         self::assertSame(76, KkmTpService::pilihEfektif(null, 76));
     }
 
+    public function testIsianBawaanAdminTidakMenjadiOverrideGuru(): void
+    {
+        self::assertNull(KkmTpService::normalisasiKhusus(80, 80));
+        self::assertSame(85, KkmTpService::normalisasiKhusus(85, 80));
+        self::assertNull(KkmTpService::normalisasiKhusus(null, 80));
+        self::assertSame(80, KkmTpService::normalisasiKhusus(80, null));
+    }
+
+    public function testTpSiapSelaluMenampilkanKKMTerpinBukanDefaultAdminTerbaru(): void
+    {
+        $source = file_get_contents(dirname(__DIR__, 2) . '/app/Controllers/GuruBankSoal.php');
+        $view = file_get_contents(dirname(__DIR__, 2) . '/app/Views/guru/bank_soal.php');
+        self::assertIsString($source);
+        self::assertIsString($view);
+        self::assertStringContainsString("['status'] ?? '') === 'siap'", $source);
+        self::assertStringContainsString("KkmTpService::validasi((string) \\$tpKkm['kkm'], false)", $source);
+        self::assertStringContainsString("'sumber'] = 'snapshot'", $source);
+        self::assertStringContainsString('Snapshot TP Siap', $view);
+    }
+
+    public function testAdminBelumSetDefaultMenyatakanContohBelumBerlaku(): void
+    {
+        $view = file_get_contents(dirname(__DIR__, 2) . '/app/Views/admin/kkm.php');
+        self::assertIsString($view);
+        self::assertStringContainsString('belum berlaku', $view);
+        self::assertStringContainsString("old('kkm_default', \\$kkm_default ?? '80')", $view);
+        self::assertStringContainsString('sebelum Admin menekan Simpan', $view);
+    }
+
     public function testKeduaTabMemakaiFormYangSamaDenganAksiJelas(): void
     {
         $view = file_get_contents(dirname(__DIR__, 2) . '/app/Views/guru/bank_soal.php');
@@ -48,6 +77,8 @@ final class KkmTpServiceTest extends TestCase
         self::assertStringContainsString("name=\"pilihan\" value=\"khusus\"", $view);
         self::assertStringContainsString("name=\"pilihan\" value=\"default\"", $view);
         self::assertStringContainsString("name=\"kkm_khusus\"", $view);
+        self::assertStringContainsString('Nilai otomatis terisi dari default Admin', $view);
+        self::assertStringContainsString('Simpan KKM', $view);
         self::assertStringContainsString("value=\"<?= \$kkm_info['efektif']", $view);
         self::assertStringContainsString('csrf_field()', $view);
     }
