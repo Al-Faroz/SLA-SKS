@@ -23,7 +23,8 @@ final class KoreksiTpServiceV25Test extends TestCase
         $routes = self::sumber('app/Config/Routes.php');
         foreach (['GuruKoreksiTp::index','GuruKoreksiTp::buat','GuruKoreksiTp::edit',
             'GuruKoreksiTp::rincian','GuruKoreksiTp::soal','GuruKoreksiTp::kirim',
-            'AdminKoreksiTp::index','AdminKoreksiTp::detail','AdminKoreksiTp::putuskan'] as $target) {
+            'AdminKoreksiTp::index','AdminKoreksiTp::detail','AdminKoreksiTp::putuskan',
+            'AdminKoreksiTp::media','GuruKoreksiTp::unggahMedia','GuruKoreksiTp::media'] as $target) {
             self::assertStringContainsString($target, $routes);
         }
         $view = self::sumber('app/Views/guru/detail_tp.php');
@@ -56,6 +57,9 @@ final class KoreksiTpServiceV25Test extends TestCase
         self::assertStringContainsString('nomor_versi', $src);
         self::assertStringContainsString('Akun pengusul Guru tidak boleh memutus', $src);
         self::assertStringContainsString('KesiapanTpService::evaluasi', $src);
+        self::assertStringContainsString('periksaFileMateri', $src);
+        self::assertStringContainsString('mediaAdmin', $src);
+        self::assertStringContainsString('perubahanNyata', $src);
         self::assertStringContainsString('transRollback()', $src);
     }
 
