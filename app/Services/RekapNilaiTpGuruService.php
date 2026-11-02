@@ -71,6 +71,20 @@ final class RekapNilaiTpGuruService
         return number_format((float) $angka, 2, ',', '.');
     }
 
+    /** Menghindari percampuran nilai kosong, nol sah, dan aktivitas yang dilewati. */
+    public static function teksKomponen(array $baris, string $kolom): string
+    {
+        if (!in_array($kolom, ['nilai_resume','nilai_hots','nilai_sumatif','nilai_tp'], true)) {
+            throw new DomainException('Kolom nilai rekap tidak valid.');
+        }
+        if (($baris['jenis_tp'] ?? '') === 'esensial') return '—';
+        if (($baris['jalur'] ?? '') === 'lulus_diagnostik'
+            && in_array($kolom, ['nilai_resume','nilai_hots'], true)) {
+            return 'Dilewati';
+        }
+        return self::tampilNilai($baris[$kolom] ?? null);
+    }
+
     /** Status penilaian tidak sama dengan status penyelesaian TP. */
     public static function labelNilai(?string $status, bool $esensial): string
     {
