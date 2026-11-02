@@ -212,6 +212,6 @@ final class AturanPraSemesterServiceTest extends TestCase
         self::assertStringNotContainsString('db_connect(',$source);
         self::assertStringNotContainsString('table(',$source);
         self::assertStringNotContainsString('INSERT INTO',$source);
-        self::assertStringContainsString('AturanWaktuUjianService',$source) === false;
+        self::assertStringNotContainsString('CREATE TABLE',$source);
     }
 }
