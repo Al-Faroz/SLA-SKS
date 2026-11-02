@@ -21,8 +21,9 @@
         <h2 id="persiapan-diagnostik">Persiapan ujian</h2>
         <p>Diagnostik merupakan langkah wajib sebelum pembelajaran Materi.
             Satu percobaan normal disediakan. Jika hasilnya memenuhi KKM,
-            TP dinyatakan tuntas; jika belum, pembelajaran Materi, Resume,
-            dan HOTS wajib dijalani secara berurutan.</p>
+            Materi, Resume dan HOTS boleh dilewati, tetapi Sumatif tetap wajib.
+            Jika belum memenuhi KKM, siswa wajib menyelesaikan satu Materi,
+            Resume final dan HOTS final sebelum mengerjakan Sumatif.</p>
         <div class="a-diagnostik-ringkasan">
             <div><strong><?= (int) $jumlah_tayang ?></strong><span>Soal ditayangkan</span></div>
             <div><strong><?= (int) $durasi_menit ?> menit</strong><span>Durasi ujian</span></div>
