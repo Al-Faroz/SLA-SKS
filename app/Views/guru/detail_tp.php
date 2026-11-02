@@ -47,13 +47,20 @@
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                 <div class="a-field">
-                    <label class="a-label" for="tp-judul">Judul TP</label>
-                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="180" required
+                    <label class="a-label" for="tp-judul">Nama TP</label>
+                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="50" required
                            value="<?= esc($tp['judul'], 'attr') ?>">
                 </div>
                 <div class="a-field">
                     <label class="a-label" for="tp-rumusan">Rumusan / deskripsi TP</label>
-                    <textarea id="tp-rumusan" name="rumusan" rows="3" maxlength="20000" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
+                    <textarea id="tp-rumusan" name="rumusan" rows="3" maxlength="225" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
+                </div>
+                <div class="a-field">
+                    <label class="a-label" for="tp-jenis">Jenis TP</label>
+                    <select id="tp-jenis" name="jenis_tp" required>
+                        <option value="esensial" <?= ($tp['jenis_tp'] ?? '') === 'esensial' ? 'selected' : '' ?>>Esensial</option>
+                        <option value="non_esensial" <?= ($tp['jenis_tp'] ?? '') === 'non_esensial' ? 'selected' : '' ?>>NonEsensial</option>
+                    </select>
                 </div>
                 <p class="a-help">Indikator ketercapaian tidak lagi menjadi kolom wajib terpisah.
                     Informasi lama yang telah tersimpan tetap dipertahankan.</p>
