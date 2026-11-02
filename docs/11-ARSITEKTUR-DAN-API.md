@@ -33,10 +33,10 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET,POST | `/siswa/materi/{id}`, `/siswa/materi/{id}/resume` | Pembuktian materi, draf manual/kirim |
 | GET,POST | `/siswa/materi/{id}/hots` | Draf manual/kirim |
 | GET | `/siswa/nilai`, `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Hanya miliknya |
-| GET,POST | `/guru/tp/{id}/...` | G1 aktif **Gen–Mapel objek** + hanya draf kecuali koreksi khusus |
+| GET,POST | `/guru/tp/{id}/...` | G1 aktif Gen–Mapel; mutasi konten boleh untuk Draf **atau Siap yang belum pernah digunakan siswa**; cek ulang usage pada commit |
 | GET,POST | `GET /guru/peta-atp/impor`, `GET /guru/peta-atp/unduh/{paketId}`, `POST /guru/peta-atp/pratinjau/{paketId}`, `POST /guru/peta-atp/konfirmasi/{paketId}` | G05: workbook enam semester, konteks G1/CP, pratinjau dan konfirmasi INSERT awal semester kosong, satu transaksi |
 | GET,POST | `/guru/penilaian/...`, `/guru/ujian/{id}/keputusan` | Guru hanya untuk Gen–Mapel siswa/ujian terkait |
-| GET,POST | `/guru/koreksi-tp/...`, `/guru/koreksi-nilai/...` | Pengajuan akademik berversi |
+| GET,POST | `/guru/koreksi-nilai/...` | Hanya koreksi **nilai siswa** sesuai aturan nilai; **bukan** jalur edit konten TP Siap yang belum dipakai |
 | GET,POST | `/admin/pengelola/...`, `/admin/siswa/...` | Dua ruang Admin dengan akun bersama; tambah/ubah/nonaktif/reset per akun, audit |
 | GET,POST | `/admin/pengelola/impor`, `/admin/siswa/impor`, `.../konfirmasi` | Template XLSX terpisah, pratinjau galat, transaksi dan idempotensi |
 | GET | `/admin/pengelola/ekspor`, `/admin/siswa/ekspor` | XLSX sesuai filter; tanpa sandi/hash; sanitasi sel |
@@ -44,7 +44,7 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET | `/guru/{id}/profil` | Siswa hanya profil profesional Guru yang ditugaskan pada Gen-nya; tanpa data kontak pribadi |
 | GET,POST | `/admin/mapel-guru/.../gen/{angkatan_id}` | Penugasan/riwayat satu Guru aktif per Gen–Mapel, validasi role Guru |
 
-| GET,POST | `/admin/cp/...`, `/admin/koreksi-tp/...`, `/admin/koreksi-nilai/...` | Admin; larangan approve usulan sendiri |
+| GET,POST | `/admin/kurikulum-cp/...`, `/admin/koreksi-nilai/...` | Admin sunting CP langsung kapan saja; persetujuan hanya untuk koreksi nilai yang memang memerlukannya |
 | GET,POST | `/admin/pengaturan/identitas`, `/admin/pengaturan/aset` | Branding dengan upload tervalidasi |
 | GET,POST | `/admin/sertifikat/template/...`, `/admin/sertifikat/{id}/revisi-identitas` | Versi background, pratinjau, revisi |
 | GET,POST | `/pengumuman`, `/guru/pengumuman/...`, `/admin/pengumuman/...` | Semua login membaca; Admin/Guru menulis global |
@@ -63,10 +63,10 @@ Validasi MIME hasil inspeksi, ekstensi, ukuran, dimensi, decoder, PDF aktif, dan
 
 ## 5. Transaksi penting
 - `TP draf → Siap`: checklist final, kunci versi dan catat audit dalam transaksi.
-- `Persetujuan koreksi TP`: admin putus, baru publish versi konten baru; student TP sudah mulai pin versi lama.
+- **Edit TP Siap belum digunakan siswa**: G1/CSRF, lock/periksa ulang progres + aktivitas + percobaan dalam transaksi, validasi kesiapan, simpan konten/media/soal, perbarui snapshot/pointer aktif secara konsisten sebelum memberi akses siswa. **Jika telah digunakan minimal satu siswa: tolak**. Tidak memerlukan persetujuan Admin, kategori, atau jalur draf koreksi terpisah.
 - `Penilaian/koreksi`: hitung agregat, update nilai dan audit idempoten; bila sertifikat perlu revisi, siapkan PDF sebelumnya dan commit perpindahan secara terkoordinasi.
 - `Koreksi NISN`: periksa keunikan, ubah biodata dan username dalam transaksi tanpa membuat siswa baru.
-- `Impor Excel ATP`: satu peta Gen–Mapel, pratinjau dan konfirmasi transaksional dengan idempoten UUID/checksum serta larangan mengubah TP Siap.
+- `Impor Excel ATP`: satu peta Gen–Mapel, pratinjau dan konfirmasi transaksional dengan idempoten UUID/checksum; hanya INSERT ke semester yang benar-benar kosong, **tidak memperbarui semester terisi**, terlepas dari status TP.
 - `Ujian`: transisi status setelah pemeriksaan jam server, row lock/optimistic concurrency, nol skor untuk batal.
 
 ## 6. Server timer di shared hosting
@@ -102,4 +102,12 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 - `GET /guru/peta-atp/unduh/{paketId}`: mengirim XLSX resmi 6 semester dengan identitas penugasan G1 dan CP aktif. File tidak berisi perubahan BAB/TP otomatis.
 - `POST /guru/peta-atp/pratinjau/{paketId}`: otorisasi Guru, CSRF, parser XLSX, validasi semua sheet/CP, perbandingan per semester. Sasaran INSERT hanyalah semester dengan paket sah dan **BAB=0, TP=0**; semester yang sudah berisi satu saja ditolak bila file berbeda, tetapi file seluruhnya identik ditandai Tetap tanpa modifikasi. Satu konflik memblokir konfirmasi semua semester.
 - `POST /guru/peta-atp/konfirmasi/{paketId}`: staging privat terikat sesi/akun/paket/checksum maksimal 15 menit, locking G1/paket, fingerprint dan validasi ulang, **INSERT BAB/TP saja** pada paket tiap semester dengan `tahun_ajaran_id` yang diambil dari paket itu. Tidak ada UPDATE/DELETE, tidak membuat Materi/soal/aktivitas siswa. Commit satu transaksi lengkap atau rollback; audit dicatat.
-- Proses penyuntingan setelah impor hanya melalui editor BAB/TP atau prosedur koreksi akademik. SQL/migration/seeder tidak diperlukan untuk memindahkan halaman/aturan ini.
+- Proses penyuntingan setelah impor hanya melalui editor BAB/TP dengan izin G1 dan gerbang penggunaan siswa untuk TP; tidak memakai kategori koreksi akademik. SQL/migration/seeder tidak diperlukan untuk memindahkan halaman/aturan ini.
+
+## 12. Kontrak operasional penyuntingan CP/BAB/TP (final 2 November 2026)
+1. **CP**: Admin membuka Tambah/Sunting CP dengan **lima field saja** (kurikulum_id, mapel_id, kode, elemen, rumusan). Data Fase D dari sistem. Empat metadata lama tidak diperlukan pada request, validasi, atau UI. CP aktif/terpakai tetap boleh disunting kapan saja. FK `cp_mapel` dan riwayat teknis tetap konsisten. **Tombol Simpan** cukup; bila versi internal perlu diperbarui, jalankan otomatis tanpa mewajibkan pengguna membuat draf, review, dan terbit manual.
+2. **BAB**: Guru G1 menggunakan editor isian BAB yang sudah ada, tanpa status TP Siap sebagai alasan penolakan. Validasi nomor/nama/deskripsi dan keunikan yang sudah disetujui tidak dihilangkan; tidak membuat operasi baru seperti pemindahan TP antar-BAB.
+3. **TP**: fungsi tunggal penentu boleh mutasi: G1 sah **dan** (TP Draf **atau** TP Siap belum pernah digunakan siswa). Riwayat progres/aktivitas/percobaan sah adalah gerbang. Daftar TP yang sekadar dilihat siswa tidak dihitung penggunaan. Buat pemeriksaan konsisten pada semua operasi TP, Materi, media, Bank Soal, Word, pengaturan KKM, dan API.
+4. **Race condition**: pada POST, lock/validasi ulang dalam transaksi terhadap kemungkinan siswa baru mulai, dan jangan terbitkan snapshot lama sesudah perubahan sudah commit. Seluruh simpan harus idempoten jika isian sama; perubahan gagal ditolak tanpa partial update.
+5. **TP yang sudah digunakan siswa**: tidak ada operasi perubahan konten, termasuk melalui pengajuan koreksi kategori A/B/C atau admin approval; proteksi semua rute, termasuk rute historis yang sudah ditambahkan pada branch sebelumnya. Koreksi **nilai siswa** adalah domain terpisah.
+6. **Transisi implementasi**: aplikasi/SQL `permohonan_koreksi_tp` kategori A/B/C yang telanjur dibangun harus dibersihkan/dinonaktifkan di tahap kode. Jangan menghapus tabel historis jika telah diimpor; ikuti audit dan izin pemilik.

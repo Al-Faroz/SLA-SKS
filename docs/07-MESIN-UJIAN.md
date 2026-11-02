@@ -54,3 +54,9 @@ Throttler per akun dan percobaan, CSRF, session auth, anti replay, cek status se
 
 ## 9. Kontrak Pra-Semester
 Menggunakan pemeriksaan fullscreen Ketat yang sama, jeda fullscreen 90 detik per kejadian/180 akumulatif, insiden ketiga batal, koneksi 20 detik/300 akumulatif. Server memeriksa waktu mulai/akhir Admin dan status seluruh TP NonEsensial sebelum membuat percobaan. Jadwal **serentak** bukan jaminan siswa yang tidak hadir dapat mengerjakan di luar jadwal.
+
+
+## Penguncian Bank Soal berdasarkan penggunaan TP (final 2 November 2026)
+- Guru G1 boleh menyunting bank soal dan pengaturan ujian pada TP Draf serta TP Siap **yang belum pernah digunakan siswa**. Penerbitan TP Siap tidak mengunci bank soal dengan sendirinya.
+- Sesudah ada satu siswa yang mulai menggunakan TP, soal dan kunci, KKM, durasi dan pengaturan akademik TP tidak dapat diubah lewat editor, impor Word maupun API. Snapshot attempt/ujian yang sah tetap utuh; tidak menggunakan kategori koreksi A/B/C atau persetujuan Admin untuk membuka kunci.
+- Perlindungan ujian yang sudah ada (fullscreen, heartbeat, soal/kunci privat, remedial, jumlah minimum dan prasyarat) **tidak dilonggarkan** oleh perubahan kebijakan edit.

@@ -13,7 +13,7 @@ Struktur utama: **Mapel → 1 CP operasional → Semester → BAB → TP**. Enam
 ## 3. Fungsi versi ini
 - **Akun/otorisasi:** login tertutup; menu Admin terpisah **Pengelola** (Admin/Guru/Pimpinan) dan **Siswa**, keduanya tetap memakai akun autentikasi yang sama. Impor/ekspor XLSX, reset sandi per akun, ganti sandi pertama kali, peran staf, nonaktif akun, pembatasan login.
 - **Administrasi:** Gen, semester mulai, penugasan Guru G1 per Gen–Mapel, tahun ajaran, kurikulum dan CP, branding sekolah, logo, ikon aplikasi, PNG tanda tangan, template sertifikat.
-- **Konten LMS:** paket, TP, CP, Excel peta ATP enam semester dan Word bank soal Diagnostik/Sumatif per TP, berkas PDF/audio/gambar, video YouTube, daftar kesiapan TP, koreksi terotorisasi versi TP Siap.
+- **Konten LMS:** paket, TP, CP, Excel peta ATP enam semester dan Word bank soal Diagnostik/Sumatif per TP, berkas PDF/audio/gambar, video YouTube, daftar kesiapan TP, penyuntingan CP/BAB/TP sesuai hak akses dan status penggunaan siswa.
 - **Siswa:** pembaca materi, diagnostik, resume, HOTS, sumatif, hasil, nilai, progres, lencana, sertifikat, pengumuman global, notifikasi dalam aplikasi, FAQ setelah login.
 - **Informasi dan privasi:** halaman Kebijakan Privasi aplikasi berisi ketentuan resmi yang disahkan sekolah, dapat dibaca tanpa login; kontak sekolah tampil pada menu Hubungi Admin (tanpa sistem tiket).
 - **Guru:** penulisan paket/TP khusus Gen–Mapel yang diampu, penilaian 0–100, pemeriksaan kecurangan/perlu bantuan, izin ujian ulang, monitoring, laporan, pengumuman global.
@@ -35,9 +35,9 @@ Tidak ada registrasi publik, login Google, marketplace kursus, rombel sebagai pe
 | `Gen` / angkatan | Kelompok siswa dengan semester mulai default tertentu |
 | Semester SLA | Posisi program 1–6; berurutan, bukan semester kalender saat login |
 | Paket semester | Konten berversi milik satu Gen untuk satu mapel/semester/tahun ajaran; tidak otomatis dibagi antar-Gen |
-| TP Siap | TP dipublikasikan dan terkunci untuk perubahan biasa |
-| TP | Tujuan pembelajaran dengan rumusan, indikator, urutan, CP dan penilaian |
-| CP | Capaian Pembelajaran resmi bersumber/berversi |
+| TP Siap | TP dinyatakan siap dipelajari; masih boleh disunting Guru G1 selama belum pernah digunakan siswa. Setelah ada penggunaan siswa, konten TP terkunci |
+| TP | Tujuan pembelajaran dengan rumusan, urutan, CP dan penilaian; indikator ketercapaian terpisah tidak diwajibkan |
+| CP | Capaian Pembelajaran Fase D yang dikelola dan boleh disunting langsung Admin, termasuk setelah dirujuk TP/siswa |
 | Jalur diagnostik | Lulus dapat melewati Materi, Resume dan HOTS tetapi tetap wajib Sumatif |
 | Jalur belajar | Satu Materi → Resume → HOTS → Sumatif setelah Diagnostik belum lulus |
 | Ujian dibatalkan | Tidak memiliki nilai; menunggu keputusan guru |
@@ -58,3 +58,5 @@ Aplikasi tidak mengirim data siswa ke penyedia layanan pihak ketiga kecuali mema
 - KKM default Admin/khusus Guru, remedial sekali jika skor Sumatif < KKM dan diambil nilai tertinggi; TP Selesai walau nilai masih < KKM.
 - Progres semester berdasarkan TP NonEsensial; Pra-Semester pada waktu serentak Admin setelah semua TP NonEsensial selesai. Tidak ada nilai akhir semester. Guru ekspor nilai parsial termasuk ketika baru satu TP bernilai.
 
+## 9. Keputusan final penyuntingan akademik 2 November 2026
+**CP** dapat disunting langsung Admin kapan saja, termasuk ketika telah dipakai TP/siswa. **BAB** dapat diperbaiki Guru G1 melalui editor isian yang sudah ada tanpa mengunci seluruh BAB hanya karena TP berstatus Siap; tidak ada aturan/fitur baru pemindahan TP antar-BAB. **TP** Draf dan TP Siap yang belum pernah digunakan siswa dapat disunting Guru G1. Setelah ada aktivitas minimal satu siswa pada TP, konten TP terkunci. Kategori A/B/C, permohonan, atau approval Admin **bukan syarat** penyuntingan TP yang belum digunakan. Form Tambah/Sunting CP hanya lima isian sesuai Master 04. Aturan ini menggantikan pembatasan umum berbasis label *Siap* pada dokumen lama.

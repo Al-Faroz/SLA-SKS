@@ -3,7 +3,7 @@
 > **Master v2.5 · 26 Oktober 2026.** Pengganti ketentuan v2.4 tanpa BAB dan beberapa Materi per TP.
 
 ## 1. Struktur paket
-`paket_semester (Gen–Mapel–Semester) → BAB → TP`. BAB mempunyai nama singkat (≤50), deskripsi (≤225), nomor berlanjut lintas semester berpasangan kelas sama. TP mempunyai nama singkat (≤50), deskripsi asli (≤225), kode format `KODEMAPEL.KELAS.BAB.TP`, jenis Esensial/NonEsensial, nomor urut dalam BAB. TP Siap immutable di editor biasa; versi dan snapshot lama dipertahankan.
+`paket_semester (Gen–Mapel–Semester) → BAB → TP`. BAB mempunyai nama singkat (≤50), deskripsi (≤225), nomor berlanjut lintas semester berpasangan kelas sama. TP mempunyai nama singkat (≤50), deskripsi asli (≤225), kode format `KODEMAPEL.KELAS.BAB.TP`, jenis Esensial/NonEsensial, nomor urut dalam BAB. TP Siap yang belum pernah digunakan siswa tetap boleh disunting Guru G1; setelah ada siswa menggunakan TP, kontennya terkunci. Riwayat siswa tidak dihapus.
 
 **Esensial:** **wajib disiapkan satu Materi/media oleh Guru**, sama seperti NonEsensial. Kebijakan siswa saat ini tidak mewajibkan aktivitas/ujian/nilai Esensial; pelaksanaannya dikendalikan di alur/otorisasi siswa, bukan dengan mengosongkan Materi.
 
@@ -27,11 +27,11 @@
 - PDF Materi **6–40 halaman dengan ukuran maksimal 15 MB** tanpa menolak PDF normal hanya karena metadata atau revisi inkremental. Audio mp3/m4a ≤10 MB bawaan; gambar JPG/PNG/WebP, video menggunakan URL YouTube. Berkas privat, pratinjau Guru, validasi ukuran/MIME/akses mengikuti [dokumen keputusan PDF](KEPUTUSAN-VALIDASI-PDF-MATERI.md).
 - Pembelajaran YouTube/audio selesai pada batas **lebih dahulu** antara waktu minimum Guru dan 90% durasi sah; gambar/PDF memenuhi waktu aktif dan halaman yang diwajibkan. Model penghitungan waktu klien dengan checkpoint server empat menit disepakati; unduh audio/gambar/PDF dibuka setelah syarat media selesai, bersamaan dengan akses Resume/HOTS.
 
-## 5. Kesiapan dan penguncian
+## 5. Kesiapan dan penyuntingan berdasarkan penggunaan siswa
 - BAB siap ditampilkan sebagai kelompok TP; status siap tetap pada TP. Validasi kode, nomor, tipe TP, CP, materi (kedua jenis TP), bank, KKM, waktu/durasi, media, snapshot dan otorisasi dilakukan di Service.
 - Admin menentukan KKM default (misalnya 80) dan Guru dapat menentukan KKM khusus. KKM efektif = khusus jika diatur, selain itu default Admin. Jangan menyisipkan KKM 75 sebagai kebijakan baru hanya karena nilai historis v3.
 - Bobot **jalur tidak lulus Diagnostik 20% Resume + 20% HOTS + 60% Sumatif**. Jalur lulus Diagnostik **100% Sumatif**. Nilai Diagnostik tidak menjadi nilai akhir. Ujian Sumatif di bawah KKM mendapat satu remedial; skor tertinggi digunakan.
-- TP Siap/versi historis, koreksi kategori A/B/C dengan persetujuan Admin, penolakan kategori D, audit dan larangan self-approval tetap. Jangan mereset nilai/progres ketika mengubah Master.
+- **TP Siap bukan kondisi terkunci.** Guru G1 boleh langsung menyuntingnya selama belum digunakan siswa; ketika satu siswa telah memulai, konten TP terkunci. Tidak ada kategori A/B/C, permohonan atau persetujuan Admin untuk sunting TP yang belum digunakan; jangan mereset nilai/progres guna membuka kunci.
 
 **Format final V25-2 (29 Oktober 2026):** sheet Semester 1–6 memiliki tepat **8 kolom input TP**, yaitu Nomor BAB, Urutan TP, Jenis TP, Nama TP, Deskripsi TP, Judul satu Materi, Jenis media (rencana), Catatan. Kolom Kode TP dan Elemen CP tidak ada dalam input. Kode TP dibuat/diperiksa server; seluruh TP tetap mengacu `cp_mapel_id` dari penugasan G1/kurikulum/fase. Referensi CP aktif hanya dibaca dari sheet REFERENSI CP dan diperiksa terhadap database. Tidak ada alasan membuat SQL untuk penyederhanaan dua kolom tersebut.
 
@@ -69,15 +69,15 @@ Editor soal Guru mendukung pratinjau **tanpa menyimpan** (hasil sanitasi server)
 
 Equation Word umum ditampilkan melalui MathML (pecahan, superscript, subscript, akar dan konstruksi lainnya yang didukung); **kesetaraan semua konstruksi Equation Word belum dijamin**, sehingga guru harus memeriksa bentuk kompleks terhadap Word sumber dan uji browser. Audio/Video Word tetap hanya menggunakan URL file **Google Drive HTTPS**; sistem memeriksa bentuk URL dan menyediakan link buka untuk uji Viewer/pemutaran **manual**, bukan klaim sudah memeriksa izin file secara otomatis. Jangan menerbitkan TP sebelum Guru memverifikasi media eksternal tersebut. Tidak ada SQL, dump privat maupun perubahan data historis.
 
-### Keputusan KKM tunggal dan koreksi versi (2 November 2026)
+### Keputusan KKM tunggal (2 November 2026)
 - Diagnostik dan Sumatif memakai **satu KKM efektif**. Guru tidak mengisi dua KKM: nilai efektif = khusus Guru jika berbeda dan terset, selain itu mengikuti default Admin. Tanpa mengubah input Guru, KKM Admin langsung berlaku untuk TP draf, tidak disalin sebagai `kkm_khusus`. **Default Admin yang NULL tetap tidak sah**; contoh angka di UI bukan pengaturan resmi sampai disimpan.
-- Guru dapat menyunting nilai khusus berulang kali pada status `draf`. Menyimpan kembali angka sama dengan default Admin melepaskan override; simpan tanpa perubahan tidak menambah versi atau audit.
-- TP `siap` memiliki KKM tersimpan pada snapshot. Perubahan default Admin sesudahnya tidak mengubah KKM snapshot terbit; edit langsung ditolak. Koreksi A/B/C memakai permohonan Guru, persetujuan Admin, snapshot versi baru; kategori D tidak dibuka. **Implementasi operasional koreksi belum selesai** dan direncanakan dalam checkpoint `CHECKPOINT-KKM-DAN-KOREKSI-TP-2026-11-02.md`.
+- Guru dapat menyunting KKM khusus berulang kali pada TP Draf ataupun Siap yang belum digunakan siswa. Menyimpan kembali angka sama dengan default Admin melepaskan override; simpan tanpa perubahan tidak menambah versi atau audit.
+- TP Siap yang belum dipakai siswa tetap boleh diperbaiki termasuk KKM bersama Diagnostik/Sumatif; kesiapan dan snapshot aktif harus disinkronkan otomatis sebelum siswa memulai. Setelah satu siswa memakai TP, KKM beserta konten TP terkunci; perubahan default Admin berikutnya tidak mengubahnya.
 
-
-### Koreksi TP Siap berversi — implementasi V4-0006 (2 November 2026)
-- Guru G1 membuka **Ajukan Koreksi TP Siap** dari Kelola TP, memilih kategori A/B/C (D dilarang), memberi alasan, lalu menyunting **salinan usulan**: judul/rumusan TP, KKM tunggal, satu Materi (judul, petunjuk Resume/HOTS, waktu minimum, URL YouTube), mengunggah sumber media PDF/audio/gambar ke penyimpanan privat, serta memperbaiki butir/kunci Diagnostik/Sumatif satu per satu.
-- Semua perubahan usulan disimpan di `permohonan_koreksi_tp.usulan_json`; tidak menimpa TP, Materi, Bank Soal, snapshot, atau progres yang telah terbit. Berkas pengganti dapat dipratinjau hanya Guru berizin; file lama tetap untuk siswa snapshot lama. Persetujuan Admin menerbitkan `versi_konten_tp.nomor_versi + 1` di transaksi, mempertahankan riwayat snapshot. Siswa yang sudah mulai tetap terpin pada versi konten semula.
-- Admin memiliki menu **Persetujuan Koreksi TP**, tampilan perbandingan sebelum–sesudah, catatan keputusan wajib, tolak/setujui. Satu akun Guru+Admin dilarang memutus usulan yang dibuatnya sendiri. Satu permohonan draf/diajukan per TP melalui UNIQUE generated key; konflik versi dan pergantian Guru ditolak.
-- Butir yang diedit dibuat sebagai record soal **baru** saat persetujuan, record historis dinonaktifkan tetapi tidak dihapus; atribut KKM/Materi terbaru ditulis untuk kebutuhan Guru, snapshot siswa lama tetap tidak berubah. Word Equation tidak disunting melalui textarea biasa karena risiko menghilangkan rumus; koreksi kunci masih boleh.
-- Instalasi modul melalui **SQL incremental V4-0006**, bukan Migration/Seeder atau impor dump ulang. Semua fitur draf dan form tetap terkunci untuk siswa/pengguna tidak berwenang.
+### Aturan final edit CP/BAB/TP dan penonaktifan alur koreksi lama (2 November 2026)
+- **BAB**: Guru G1 dapat memperbaiki isian BAB yang tersedia tanpa larangan semata karena TP di dalamnya Siap. Aturan kode/penomoran yang telah ditetapkan tetap berlaku; tidak membuat fitur atau aturan baru memindahkan TP antar-BAB.
+- **TP Draf dan TP Siap belum digunakan**: semua editor TP yang sudah ada (rincian TP, KKM tunggal, satu Materi/media, Resume/HOTS, bank Diagnostik/Sumatif, impor Word ke bank yang berwenang) boleh disunting langsung oleh Guru G1. Tidak perlu kategori A/B/C, permohonan, keputusan Admin atau membuat draf koreksi tersendiri.
+- **TP sudah digunakan**: sejak minimal satu siswa mulai TP, seluruh konten akademik TP terkunci. Service memeriksa progres/aktivitas/percobaan sah, bukan sekadar status Siap, pada saat menampilkan dan menyimpan. Akses melalui POST, rute lama, URL ID, upload, bank Word, dan impor tidak boleh menjadi bypass. Snapshot/penilaian yang sudah ada tetap terlindungi.
+- **Setelah sunting TP Siap yang belum digunakan**: validasi kesiapan tetap wajib. Snapshot konten aktif dan metadata diperbarui atomik/otomatis sesuai kebutuhan siswa baru tanpa memaksa Guru melewati prosedur koreksi berversi; tidak membuat status Siap menunjuk konten yang belum lengkap. Penetapan detil transaksi/schema menunggu audit dump terbaru pada tahap kode.
+- **CP**: dikelola Admin, dapat disunting walaupun TP/siswa telah menggunakannya, tidak mencampuri nilai/ujian/progres siswa. Form hanya lima isian sesuai Master 04.
+- **V4-0006 permohonan koreksi TP** dalam branch lama **dibatalkan sebagai syarat fitur**, dan **jangan impor SQL V4-0006** demi implementasi baru. Bila sudah ada tabelnya di lokal, jangan drop/reset tanpa izin. Kode alur kategori lama harus dicabut/ditutup ketika fitur baru diterapkan.
