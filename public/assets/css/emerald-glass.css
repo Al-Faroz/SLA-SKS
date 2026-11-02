@@ -1662,7 +1662,9 @@ html[data-theme="dark"][data-documentation="on"] {
 }
 html[data-theme="light"][data-documentation="on"] {
   --eg-document-wall:#EFF7F1;
-  --eg-document-side:#E5F0E9;
+  /* Teks menu/brand tetap terang seperti sidebar normal.
+     Pakai bidang emerald gelap agar navigasi tidak lenyap pada Light. */
+  --eg-document-side:linear-gradient(115deg,#0D4437,#126B50);
   --eg-document-panel:#FFFFFF;
 }
 html[data-theme][data-documentation="on"] {
