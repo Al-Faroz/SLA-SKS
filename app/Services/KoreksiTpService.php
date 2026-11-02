@@ -204,7 +204,9 @@ final class KoreksiTpService
         try {
             $locked = $this->row($id, true);
             if ($locked['status'] !== 'draf' || $locked['checksum_dasar'] !== $row['checksum_dasar']
-                || (int) $locked['guru_id'] !== (int) $row['guru_id']) {
+                || (int) $locked['guru_id'] !== (int) $row['guru_id']
+                || !hash_equals(hash('sha256', (string) $row['usulan_json']),
+                    hash('sha256', (string) $locked['usulan_json']))) {
                 throw new DomainException('Permohonan telah berubah. Muat ulang halaman.');
             }
             $tp = $this->db->query('SELECT id,status FROM tp WHERE id=? FOR UPDATE',
@@ -405,9 +407,39 @@ final class KoreksiTpService
         }
     }
 
+    private static function perubahanNyata(array $data, array $asal): bool
+    {
+        foreach (['judul','rumusan','kkm'] as $kolom) {
+            if ((string) ($data['tp'][$kolom] ?? '') !== (string) ($asal['tp'][$kolom] ?? '')) {
+                return true;
+            }
+        }
+        foreach (['judul','petunjuk_resume','petunjuk_hots','min_waktu_detik','url_youtube','berkas_id'] as $kolom) {
+            if ((string) ($data['materi'][0][$kolom] ?? '') !== (string) ($asal['materi'][0][$kolom] ?? '')) {
+                return true;
+            }
+        }
+        $lama = [];
+        foreach ($asal['soal'] as $item) {
+            $lama[(int) $item['id']] = $item;
+        }
+        foreach ($data['soal'] as $item) {
+            $id = (int) ($item['id'] ?? 0);
+            if (!isset($lama[$id])) {
+                return true;
+            }
+            foreach (['pertanyaan','opsi_a','opsi_b','opsi_c','opsi_d','opsi_e','kunci'] as $kolom) {
+                if ((string) ($item[$kolom] ?? '') !== (string) ($lama[$id][$kolom] ?? '')) {
+                    return true;
+                }
+            }
+        }
+        return count($lama) !== count($data['soal']);
+    }
+
     private static function periksa(array $data, array $asal): void
     {
-        if (hash_equals(self::encode($data), self::encode($asal))) {
+        if (!self::perubahanNyata($data, $asal)) {
             throw new DomainException('Belum ada perubahan yang diajukan.');
         }
         $cek = KesiapanTpService::evaluasi(
@@ -482,6 +514,16 @@ final class KoreksiTpService
             if ((int) $asal['id'] !== (int) $row['versi_dasar_id']
                 || !hash_equals((string) $asal['checksum'], (string) $row['checksum_dasar'])) {
                 throw new DomainException('Versi TP berubah; permohonan lama tidak boleh diterapkan.');
+            }
+            // Usulan hanya bisa diputus jika pengampu Gen–Mapel masih sama.
+            // Pergantian Guru tidak boleh membiarkan permohonan usang terbit.
+            $penugasan = $this->db->table('tp t')
+                ->select('g.guru_id')
+                ->join('paket_semester p', 'p.id=t.paket_semester_id')
+                ->join('penugasan_guru_gen g', 'g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id')
+                ->where('t.id', $tpId)->get()->getRowArray();
+            if (!$penugasan || (int) ($penugasan['guru_id'] ?? 0) !== (int) $row['guru_id']) {
+                throw new DomainException('Guru pengampu sudah berubah. Usulan lama tidak boleh diterapkan.');
             }
             $waktu = gmdate('Y-m-d H:i:s');
             $versiId = null;
