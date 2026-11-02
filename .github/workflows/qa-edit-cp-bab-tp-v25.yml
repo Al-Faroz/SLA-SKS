@@ -6,6 +6,8 @@ on:
       - 'app/**'
       - 'tests/**'
       - '.github/workflows/qa-edit-cp-bab-tp-v25.yml'
+      - 'database/sql/updates/V4-0007_CP_LIMA_ISIAN.sql'
+      - 'database/sql/qa/V4-0007_CP_LIMA_ISIAN_READONLY.sql'
   workflow_dispatch:
 
 permissions:
@@ -68,11 +70,15 @@ jobs:
         run: vendor/bin/phpunit --no-coverage tests/integration/SuntingTpGuardDatabaseTest.php
 
   cp-sql-mariadb:
-    name: Patch CP V4-0007 tanpa kehilangan histori (MariaDB)
+    name: Patch CP V4-0007 MariaDB ${{ matrix.version }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['10.4', '10.11']
     services:
       mariadb:
-        image: mariadb:10.11
+        image: mariadb:${{ matrix.version }}
         env:
           MARIADB_ROOT_PASSWORD: testing
         ports:
@@ -115,4 +121,4 @@ jobs:
           test "$($DB -N -e "SELECT COUNT(*) FROM ref_cp_versi WHERE id=1 AND otoritas='Sumber historis' AND nomor_dokumen='Nomor sebelumnya' AND tanggal_berlaku='2026-07-01'")" = "1"
           test "$($DB -N -e "SELECT COUNT(*) FROM ref_cp_versi WHERE id=2 AND otoritas IS NULL AND nomor_dokumen IS NULL AND sumber_url IS NULL AND tanggal_berlaku IS NULL")" = "1"
           test "$($DB -N -e "SELECT COUNT(*) FROM schema_version WHERE versi='V4-0007-CP-LIMA-ISIAN'")" = "1"
-          echo "Patch V4-0007 MariaDB: idempoten, histori utuh, metadata baru opsional"
+          echo "Patch V4-0007 MariaDB ${{ matrix.version }}: idempoten, histori utuh, metadata baru opsional"
