@@ -116,8 +116,8 @@ final class KeputusanUjianBatalService
     }
 
     /**
-     * Progres TP dikunci. Tunda boleh dilanjutkan menjadi ulang Sumatif,
-     * namun keputusan final tidak dapat diubah/diulang.
+     * Izin akses ulang tahap tes mandiri diberikan oleh Guru, sekali pakai.
+     * Izin baru tidak mengaktifkan remedial atau mengubah skor sah.
      */
     public function putuskan(int $attemptId, string $aksi, string $alasan): void
     {
@@ -219,7 +219,7 @@ final class KeputusanUjianBatalService
         }
     }
 
-    /** Meneruskan jalur yang sudah sah sebelum Sumatif dibatalkan. */
+    /** Memulihkan jalur sah sebelum Sumatif tidak selesai; tanpa mengulang materi. */
     private function jalurSumatif(int $progresId): string
     {
         $diag = $this->db->table('percobaan_ujian')
