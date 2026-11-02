@@ -70,10 +70,9 @@ final class GuruUjianBatal extends BaseController
     {
         $tujuan = site_url('guru/akses-ulang/' . $id);
         $aksi = $this->request->getPost('keputusan');
-        $alasan = $this->request->getPost('alasan');
-        if ($id < 1 || !is_string($aksi) || !is_string($alasan)) {
+        if ($id < 1 || !is_string($aksi)) {
             return redirect()->to($tujuan)->withInput()
-                ->with('ujian_gagal','Keputusan dan alasan tidak valid.');
+                ->with('ujian_gagal','Izin akses ulang tidak valid.');
         }
         try {
             $akun = (new AuthService())->penggunaSaatIni();
@@ -82,7 +81,7 @@ final class GuruUjianBatal extends BaseController
                 || (int) ($akun['wajib_ganti_sandi'] ?? 1) !== 0) {
                 throw new DomainException('Hanya Guru aktif boleh memutuskan ujian.');
             }
-            (new KeputusanUjianBatalService())->putuskan($id, $aksi, $alasan);
+            (new KeputusanUjianBatalService())->putuskan($id, $aksi);
             return redirect()->to(site_url('guru/akses-ulang'))
                 ->with('ujian_sukses','Izin akses ulang sudah disimpan dan dicatat dalam audit.');
         } catch (DomainException $e) {
