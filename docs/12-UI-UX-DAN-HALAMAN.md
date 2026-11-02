@@ -43,8 +43,8 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | S03 | Detail TP | Ringkasan TP, CP terkait, daftar Materi dan alur Diagnostik/Resume/HOTS/Sumatif | Tidak mengungkap TP draf |
 | S04 | TP | Daftar langkah, indikator akses, materi, diagnostik/sumatif | Diagnostik sudah lulus, pembelajaran sukarela |
 | S05 | Petunjuk ujian | Durasi, percobaan, syarat perangkat/fullscreen, tombol Mulai | Fullscreen tidak didukung ⇒ pesan gunakan desktop/laptop; jangan buat percobaan |
-| S06 | Pengerjaan ujian | PG, timer, navigator, simpan, kirim final, fullscreen | Jeda fullscreen, jeda koneksi, batal, expired, reload |
-| S07 | Hasil | Skor sah, status lulus, percobaan berikutnya atau perlu guru | Batal tidak memiliki skor |
+| S06 | Pengerjaan ujian | PG, timer, navigator, simpan, kirim final, fullscreen | Jeda fullscreen, jeda koneksi, akses ulang tes mandiri, pembatalan khusus Pra-Semester, expired, reload |
+| S07 | Hasil | Skor sah, status lulus, percobaan berikutnya atau perlu guru | Tes mandiri tidak selesai/Pra-Semester dibatalkan tidak memiliki skor |
 | S08 | Materi | PDF book/scroll, YouTube, audio, gambar, progres waktu | File hilang, offline, materi belum tersedia |
 | S09 | Resume | Editor teks, `Simpan draf` manual, `Kirim final` | Draf belum disimpan, gagal simpan, sudah terkirim |
 | S10 | HOTS | Pertanyaan tugas, editor, `Simpan draf`, `Kirim final` | Batas karakter, locked setelah kirim |
@@ -67,7 +67,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G10 | Antrean penilaian | Resume/HOTS belum dinilai, filter **Gen–Mapel** dan urutan tertua |
 | G11 | Penilaian | Lihat jawaban, isi skor 0–100 dan umpan balik, simpan & berikutnya |
 | G12 | Monitoring | Matriks siswa × TP **khusus Gen–Mapel yang diampu**, ringkasan tindakan |
-| G13 | Detail siswa/ujian | Nilai, histori attempt/insiden, keputusan pembatalan, izin ulang |
+| G13 | Detail siswa/ujian | Nilai, histori attempt/insiden, izin akses ulang Diagnostik/Sumatif, pembatalan khusus Pra-Semester |
 | G14 | Pratinjau siswa | Berkas/TP dalam mode baca tanpa progres, banner pratinjau |
 | G15 | Laporan | Pilih laporan mapelnya dan PDF/Excel |
 | G16 | Edit TP Siap belum digunakan | Guru G1 langsung membuka editor TP/Materi/soal saat belum ada siswa yang menggunakan TP; bila telah digunakan, tampilkan status terkunci |
@@ -123,7 +123,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | P04 | Kebijakan Privasi publik | Teks kebijakan resmi sekolah, versi dan kontak sekolah; tanpa login |
 
 ## 8. Notifikasi internal yang ditampilkan
-Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, keputusan Guru tentang ujian batal/ulang, TP Siap tersedia, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik yang masih berlaku (misalnya koreksi nilai). Sunting langsung CP/BAB/TP yang belum digunakan bukan permohonan approval. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
+Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, izin akses ulang tes mandiri oleh Guru atau keputusan pembatalan Pra-Semester, TP Siap tersedia, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik yang masih berlaku (misalnya koreksi nilai). Sunting langsung CP/BAB/TP yang belum digunakan bukan permohonan approval. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
 
 ## 9. Detail interaksi wajib semua layar
 **Setiap layar wajib memiliki:** tujuan, siapa dapat membuka, data sumber, komponen yang digunakan, form validation, aksi sukses, aksi gagal, akses browser back, loading, kosong, readonly, locked, responsive, uji minimal. Jangan merender tombol Simpan jika tidak ada perubahan kecuali desain memerlukan. Gunakan pesan error yang spesifik: bukan `Terjadi kesalahan` tanpa instruksi. Untuk aksi berisiko tampilkan modal konfirmasi dengan nama objek.
