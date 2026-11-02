@@ -19,11 +19,14 @@
                     <?= ($tpAsal[$field] ?? null) !== ($tp[$field] ?? null) ? ' · Berubah' : '' ?></td></tr>
             <?php endforeach ?>
             <?php $m = $data['materi'][0] ?? []; $mAsal = $asal['materi'][0] ?? []; ?>
-            <?php foreach (['judul'=>'Judul Materi','petunjuk_resume'=>'Petunjuk Resume','petunjuk_hots'=>'Petunjuk HOTS','min_waktu_detik'=>'Durasi minimal (detik)','url_youtube'=>'URL video'] as $field=>$label): ?>
+            <?php foreach (['judul'=>'Judul Materi','petunjuk_resume'=>'Petunjuk Resume','petunjuk_hots'=>'Petunjuk HOTS','min_waktu_detik'=>'Durasi minimal (detik)','url_youtube'=>'URL video','berkas_id'=>'ID Berkas Materi'] as $field=>$label): ?>
                 <tr><th scope="row"><?= esc($label) ?></th><td><?= esc((string) ($mAsal[$field] ?? '')) ?></td>
                     <td><?= esc((string) ($m[$field] ?? '')) ?><?= ($mAsal[$field] ?? null) !== ($m[$field] ?? null) ? ' · Berubah' : '' ?></td></tr>
             <?php endforeach ?>
         </tbody></table></div>
+        <?php if (in_array($m['jenis'] ?? '', ['pdf','gambar','audio'], true) && (int) ($m['berkas_id'] ?? 0) > 0): ?>
+            <a class="a-btn a-btn--sekunder a-jarak-atas" href="<?= esc(site_url('admin/koreksi-tp/' . (int) $koreksi['id'] . '/media'), 'attr') ?>" target="_blank" rel="noopener noreferrer">Pratinjau Berkas Materi Usulan</a>
+        <?php endif ?>
     </section>
     <section class="a-card a-jarak-atas"><h2>Perubahan soal</h2>
         <?php $soalLama = []; foreach ($asal['soal'] as $item) { $soalLama[(int) $item['id']] = $item; } ?>
