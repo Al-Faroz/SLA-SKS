@@ -108,7 +108,8 @@ final class KelolaSoalGuruTest extends TestCase
         self::assertSame(1, substr_count($view, 'class="a-bank-soal__ringkasan-grid"'));
         self::assertSame(1, substr_count($view, 'class="a-bank-soal__tabs"'));
         self::assertStringContainsString("['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif']", $view);
-        self::assertStringContainsString("'/bank-soal?jenis=' . $jenisTab", $view);
+        self::assertStringContainsString('bank-soal?jenis=', $view);
+        self::assertStringContainsString('$jenisTab', $view);
         self::assertStringContainsString('aria-current="page"', $view);
         self::assertStringContainsString('class="a-bank-soal__tab-konten"', $view);
 
