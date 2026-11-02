@@ -39,13 +39,13 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-029 | Sumatif di laptop dari rumah | Diizinkan jika memenuhi fullscreen dan hak siswa |
 | E2E-030 | Keluar fullscreen sekali | Satu insiden, jeda waktu aktif, batas 90/180 detik |
 | E2E-031 | Blur+visibility+fullscreen dari satu aksi | Tidak dihitung tiga insiden |
-| E2E-032 | Fullscreen keluar 3 kali | Batal tanpa skor; Guru memutus tindak lanjut |
+| E2E-032 | Fullscreen keluar 3 kali | Diagnostik/Sumatif: tes tidak selesai tanpa skor dan menunggu **izin akses ulang Guru**; Pra-Semester: pembatalan tanpa skor |
 | E2E-033 | Heartbeat terlambat 20 detik | Waktu aktif berhenti tepat ambang berdasarkan jam server, walau rekonsiliasi terlambat |
-| E2E-034 | Jeda koneksi 300 detik | Batal, tidak memotong kuota sah |
+| E2E-034 | Jeda koneksi 300 detik | Tes mandiri: akses ulang Guru; Pra-Semester: batal; tidak memotong kuota sah |
 | E2E-035 | Insiden fullscreen dan koneksi bersamaan | Tidak menghitung waktu ganda |
 | E2E-036 | Refresh ujian dan klik ganda | Tidak mengulang attempt atau menambah jawaban ganda |
 | E2E-037 | Siswa mengirim jawaban saat jeda | Ditolak server |
-| E2E-038 | Guru memutus ujian batal | Hanya empat opsi final sesuai jenis, tidak ada skor palsu |
+| E2E-038 | Guru memberi izin setelah tes mandiri tidak selesai | Hanya akses ulang tahap Diagnostik/Sumatif yang gagal; satu izin dipakai sekali; tanpa keputusan langsung_belajar/tunda_tinjauan baru, tanpa skor palsu |
 | E2E-039 | Guru memberi nilai resume/HOTS | Skor 0–100; status sementara diperbarui |
 | E2E-040 | Guru pengganti mengusulkan koreksi nilai | Menunggu Admin; tidak mengubah nilai sebelum sah |
 | E2E-041 | Admin menyetujui koreksi valid | Nilai, agregat, audit berubah sekali |
@@ -224,7 +224,7 @@ Uji import dump hasil analisis ke DB kosong khusus XAMPP **sesudah backup/izin p
 | 126 | Progres hanya TP NonEsensial; TP draf belum dimulai tidak membuat progres palsu 100% |
 | 127 | Admin jadwal serentak Pra-Semester dan penolakan ujian sebelum waktu |
 | 128 | Pra-Semester hanya setelah semua NonEsensial selesai, bank ≥30 gabungan seluruh BAB |
-| 129 | Pra-Semester memakai mesin ujian ketat, jeda/insiden, remedial sekali dan nilai mandiri |
+| 129 | Pra-Semester memakai mesin ujian ketat, jeda/insiden, **pembatalan**, remedial sekali dan nilai mandiri |
 | 130 | Tidak ada nilai akhir semester agregat di DB, UI, ekspor atau sertifikat |
 | 131 | Export Nilai semua siswa/TP/Pra-Semester dengan hanya satu skor; NULL tidak dianggap nol; batas izin Guru |
 | 132 | Sertifikat daftar Esensial tanpa nilai dan NonEsensial dengan nilai, revisi/QR historis aman |
