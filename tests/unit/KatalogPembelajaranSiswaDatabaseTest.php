@@ -112,6 +112,21 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
         self::assertSame(0, $this->db->tableExists('progres_tp') ? (int) $this->db->table('progres_tp')->countAllResults() : 0);
     }
 
+    public function testDuaBabPadaSemesterYangSamaTidakTercampur(): void
+    {
+        $this->db->table('bab')->insert([
+            'id' => 3, 'paket_semester_id' => 1, 'nomor_bab' => 2,
+            'nama_bab' => 'BAB Kedua', 'deskripsi_bab' => 'Bahasan berbeda',
+        ]);
+        $this->db->table('tp')->where('id', 2)->update(['bab_id' => 3]);
+        $data = $this->layanan(100)->daftarTp(1);
+        self::assertCount(2, $data['bab']);
+        self::assertSame([1, 2], array_column($data['bab'], 'nomor'));
+        self::assertSame([1], array_column($data['bab'][0]['tp'], 'id'));
+        self::assertSame([2], array_column($data['bab'][1]['tp'], 'id'));
+        self::assertFalse($data['bab'][1]['tp'][0]['akses']['buka']);
+    }
+
     public function testSemesterSebelumMulaiGenTetapDitolakMeskiPaketSudahAktif(): void
     {
         $this->db->table('paket_semester')->insert([
