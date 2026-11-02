@@ -54,7 +54,7 @@ final class KkmTpServiceTest extends TestCase
         self::assertIsString($source);
         self::assertIsString($view);
         self::assertStringContainsString("['status'] ?? '') === 'siap'", $source);
-        self::assertStringContainsString("KkmTpService::validasi((string) \\$tpKkm['kkm'], false)", $source);
+        self::assertStringContainsString("KkmTpService::validasi((string) \$tpKkm['kkm'], false)", $source);
         self::assertStringContainsString("'sumber'] = 'snapshot'", $source);
         self::assertStringContainsString('Snapshot TP Siap', $view);
     }
@@ -64,7 +64,7 @@ final class KkmTpServiceTest extends TestCase
         $view = file_get_contents(dirname(__DIR__, 2) . '/app/Views/admin/kkm.php');
         self::assertIsString($view);
         self::assertStringContainsString('belum berlaku', $view);
-        self::assertStringContainsString("old('kkm_default', \\$kkm_default ?? '80')", $view);
+        self::assertStringContainsString("old('kkm_default', \$kkm_default ?? '80')", $view);
         self::assertStringContainsString('sebelum Admin menekan Simpan', $view);
     }
 
