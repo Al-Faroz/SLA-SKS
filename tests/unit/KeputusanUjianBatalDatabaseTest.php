@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use App\Services\KeputusanUjianBatalService;
+use App\Services\PermintaanAksesUlangSiswaService;
 use CodeIgniter\Database\BaseConnection;
 use PHPUnit\Framework\TestCase;
 
-/** A5: SQLite anonim; menguji izin G1, audit dan idempotensi tanpa data siswa nyata. */
+/** Tes mandiri: permintaan eksplisit siswa, izin Guru G1, audit, satu pakai. */
 final class KeputusanUjianBatalDatabaseTest extends TestCase
 {
     private BaseConnection $db;
@@ -31,6 +32,7 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
             'CREATE TABLE percobaan_ujian(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,versi_konten_tp_id INTEGER,jenis TEXT,tahap TEXT,nomor_percobaan INTEGER,status TEXT,alasan_batal TEXT,waktu_selesai TEXT,skor REAL,kkm INTEGER)',
             'CREATE TABLE keputusan_ujian_batal(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER UNIQUE,keputusan TEXT,guru_id INTEGER,alasan TEXT,diputus_pada TEXT,digunakan_pada TEXT)',
             'CREATE TABLE riwayat_keputusan_ujian_batal(id INTEGER PRIMARY KEY AUTOINCREMENT,keputusan_ujian_batal_id INTEGER,guru_id INTEGER,keputusan_lama TEXT,keputusan_baru TEXT,alasan TEXT,terjadi_pada TEXT)',
+            'CREATE TABLE riwayat_status_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,status_lama TEXT,status_baru TEXT,alasan TEXT,terjadi_pada TEXT)',
         ] as $sql) $this->db->query($sql);
         $this->db->table('pengguna')->insertBatch([
             ['id'=>4,'nama'=>'Guru A'],['id'=>5,'nama'=>'Guru B'],
@@ -83,13 +85,24 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
         ]);
     }
 
-    public function testEmpatOpsiSesuaiJenisDanIzinGenTerisolasi(): void
+    private function siswa(int $id = 100): PermintaanAksesUlangSiswaService
     {
-        self::assertSame(['ulang_diagnostik','langsung_belajar'],
+        return new PermintaanAksesUlangSiswaService($this->db, static fn (): array => [
+            'id'=>$id,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+        ]);
+    }
+
+    public function testHanyaDuaIzinAksesUlangDanGenTerisolasi(): void
+    {
+        self::assertSame(['ulang_diagnostik'],
             KeputusanUjianBatalService::pilihan('diagnostik'));
-        self::assertSame(['ulang_sumatif','tunda_tinjauan'],
+        self::assertSame(['ulang_sumatif'],
             KeputusanUjianBatalService::pilihan('sumatif'));
         self::assertSame([], KeputusanUjianBatalService::pilihan('pra_semester'));
+        self::assertCount(0, $this->guru()->antrean()); // tidak masuk antrean tanpa permintaan siswa
+        $this->siswa()->minta(10, 'diagnostik');
+        $this->siswa()->minta(10, 'diagnostik'); // idempoten
+        self::assertSame(1, $this->db->table('riwayat_status_ujian')->countAllResults());
         $queue = $this->guru()->antrean();
         self::assertCount(1, $queue);
         self::assertSame(101, (int) $queue[0]['id']);
@@ -105,6 +118,7 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
 
     public function testUlangDiagnostikSekaliPakaiDenganAuditIdempoten(): void
     {
+        $this->siswa()->minta(10, 'diagnostik');
         $this->guru()->putuskan(101,'ulang_diagnostik','Koneksi buruk, izinkan ujian ulang.');
         self::assertSame('diagnostik',$this->db->table('progres_tp')
             ->where('id',11)->get()->getRow('status'));
@@ -122,16 +136,11 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
         KeputusanUjianBatalService::gunakan($this->db,(int)$izin['id']);
     }
 
-    public function testLangsungBelajarTanpaSkorDiagnostik(): void
+    public function testKeputusanLangsungBelajarLamaTidakBolehDibuatLagi(): void
     {
-        $this->guru()->putuskan(101,'langsung_belajar','Diagnostik dibatalkan. Ikuti jalur belajar.');
-        self::assertSame('belajar',$this->db->table('progres_tp')
-            ->where('id',11)->get()->getRow('status'));
-        self::assertNull($this->db->table('percobaan_ujian')->where('id',101)->get()->getRow('skor'));
-        self::assertNotNull($this->db->table('keputusan_ujian_batal')
-            ->where('percobaan_ujian_id',101)->get()->getRow('digunakan_pada'));
+        $this->siswa()->minta(10, 'diagnostik');
         $this->expectException(\DomainException::class);
-        $this->guru()->putuskan(101,'ulang_diagnostik','Tidak boleh mengganti keputusan final.');
+        $this->guru()->putuskan(101,'langsung_belajar','Opsi historis tidak berlaku.');
     }
 
     public function testSumatifDitundaLaluDiizinkanUlangTapiTidakMemotongKuotaSah(): void
@@ -145,20 +154,31 @@ final class KeputusanUjianBatalDatabaseTest extends TestCase
             'status'=>'dibatalkan_menunggu_guru','alasan_batal'=>'Fullscreen',
             'skor'=>null,'kkm'=>75,
         ]);
-        $this->guru()->putuskan(103,'tunda_tinjauan','Tunggu pemeriksaan bukti.');
-        self::assertSame('perlu_bantuan',$this->db->table('progres_tp')
-            ->where('id',11)->get()->getRow('status'));
+        $this->siswa()->minta(10, 'sumatif');
         $this->guru()->putuskan(103,'ulang_sumatif','Insiden selesai diperiksa, izin ulang.');
         self::assertSame('sumatif',$this->db->table('progres_tp')
             ->where('id',11)->get()->getRow('status'));
-        self::assertCount(2,$this->db->table('riwayat_keputusan_ujian_batal')
+        self::assertCount(1,$this->db->table('riwayat_keputusan_ujian_batal')
             ->get()->getResultArray());
         self::assertNotNull(KeputusanUjianBatalService::izin($this->db,103,'ulang_sumatif'));
         self::assertNull($this->db->table('percobaan_ujian')->where('id',103)->get()->getRow('skor'));
     }
 
+    public function testPermintaanLintasGenDanJenisTidakSahDitolak(): void
+    {
+        try {
+            $this->siswa(200)->minta(10, 'diagnostik');
+            self::fail('Siswa tidak boleh mengajukan permintaan untuk TP Gen lain.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('tidak sedang', $e->getMessage());
+        }
+        $this->expectException(\DomainException::class);
+        $this->siswa()->minta(10, 'pra_semester');
+    }
+
     public function testJenisKeputusanSalahDitolakTanpaDataBaru(): void
     {
+        $this->siswa()->minta(10, 'diagnostik');
         try {
             $this->guru()->putuskan(101,'ulang_sumatif','Ulang ujian.');
             self::fail('Pilihan Sumatif tidak boleh dipakai untuk Diagnostik.');
