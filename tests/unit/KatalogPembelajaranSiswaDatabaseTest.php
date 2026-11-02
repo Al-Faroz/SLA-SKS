@@ -61,8 +61,8 @@ final class KatalogPembelajaranSiswaDatabaseTest extends TestCase
             ['id'=>2,'paket_semester_id'=>2,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 2','deskripsi_bab'=>'Contoh untuk pengujian'],
         ]);
         $this->db->table('tp')->insertBatch([
-            ['id' => 1, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-1', 'judul' => 'TP pertama', 'urutan_atp' => 1, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Rumusan pertama', 'indikator' => 'Indikator pertama'],
-            ['id' => 2, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-2', 'judul' => 'TP kedua', 'urutan_atp' => 2, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Rumusan kedua', 'indikator' => 'Indikator kedua'],
+            ['id' => 1, 'bab_id' => 1, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-1', 'judul' => 'TP pertama', 'urutan_atp' => 1, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Rumusan pertama', 'indikator' => 'Indikator pertama'],
+            ['id' => 2, 'bab_id' => 1, 'paket_semester_id' => 1, 'kode_tp' => 'TP-A-2', 'judul' => 'TP kedua', 'urutan_atp' => 2, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Rumusan kedua', 'indikator' => 'Indikator kedua'],
             ['id' => 3, 'bab_id' => 2, 'paket_semester_id' => 2, 'kode_tp' => 'TP-B-1', 'judul' => 'Milik Gen B', 'urutan_atp' => 1, 'status' => 'siap', 'jenis_tp' => 'non_esensial', 'rumusan' => 'Gen lain', 'indikator' => 'Gen lain'],
         ]);
         $this->db->table('versi_konten_tp')->insertBatch([
