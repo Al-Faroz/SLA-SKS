@@ -37,6 +37,18 @@
                 <?php endif ?>
                 <button class="a-btn a-btn--utama" type="submit">Simpan Draf Rincian</button>
             </form>
+        <?php if (in_array($materi['jenis'] ?? '', ['pdf','audio','gambar'], true)): ?>
+            <?php if ($bolehUbah): ?>
+                <form method="post" action="<?= esc(site_url('guru/koreksi-tp/' . (int) $koreksi['id'] . '/media'), 'attr') ?>" enctype="multipart/form-data" class="a-form a-koreksi__unggah">
+                    <?= csrf_field() ?>
+                    <div class="a-field"><label class="a-label" for="media-koreksi">Berkas <?= esc(strtoupper($materi['jenis'])) ?> pengganti</label>
+                        <input id="media-koreksi" type="file" name="media" required accept="<?= $materi['jenis'] === 'pdf' ? '.pdf,application/pdf' : ($materi['jenis'] === 'audio' ? '.mp3,.m4a,audio/*' : '.jpg,.jpeg,.png,.webp,image/*') ?>">
+                        <p class="a-help">PDF 6–40 halaman dan maksimal 15 MB; audio/gambar maksimal 10 MB. Berkas lama tetap tersimpan untuk siswa versi lama.</p></div>
+                    <button class="a-btn a-btn--sekunder" type="submit">Unggah ke Draf Koreksi</button>
+                </form>
+            <?php endif ?>
+            <a class="a-btn a-btn--sekunder a-jarak-atas" href="<?= esc(site_url('guru/koreksi-tp/' . (int) $koreksi['id'] . '/media'), 'attr') ?>" target="_blank" rel="noopener noreferrer">Pratinjau Berkas Usulan</a>
+        <?php endif ?>
         <?php else: ?><p>Pengaturan sudah dikirim ke Admin dan dikunci dari penyuntingan.</p>
             <dl class="a-rincian"><dt>Judul</dt><dd><?= esc($tp['judul']) ?></dd>
                 <dt>KKM</dt><dd><?= (int) $tp['kkm'] ?></dd>
