@@ -32,6 +32,13 @@ final class GuruBankSoal extends BaseController
         }
 
         $akun = (new AuthService())->penggunaSaatIni();
+        // G1 sudah diverifikasi DetailTpService; KKM diambil khusus untuk
+        // Bank Soal agar query Peta ATP dan fixture pengujian lama tetap stabil.
+        $tpKkm = db_connect()->table('tp')->select('kkm_khusus,kkm')
+            ->where('id', $tpId)->get()->getRowArray();
+        if ($tpKkm === null) {
+            return $this->response->setStatusCode(404)->setBody('TP tidak ditemukan.');
+        }
         $ringkasan = (new RingkasanBankSoalService())->lihat($tpId);
         $jenisDipilih = (string) ($this->request->getGet('jenis') ?: 'diagnostik');
         if (!in_array($jenisDipilih, ['diagnostik', 'sumatif'], true)) {
@@ -57,7 +64,7 @@ final class GuruBankSoal extends BaseController
             'peranAktif' => 'Guru',
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'ringkasan_bank' => $ringkasan,
-            'kkm_info' => (new KkmTpService())->informasi($rincian['tp']),
+            'kkm_info' => (new KkmTpService())->informasi($tpKkm),
             'word_riwayat' => $riwayat,
             'jenis_dipilih' => $jenisDipilih,
             'daftar_soal' => $daftarSoal,
