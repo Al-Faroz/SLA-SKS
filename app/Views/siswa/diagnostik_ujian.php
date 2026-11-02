@@ -90,6 +90,13 @@
         <h1 data-ujian-hasil-judul>Status Diagnostik</h1>
         <p data-ujian-hasil-pesan></p>
         <p class="a-ujian-skor" data-ujian-hasil-skor></p>
+        <form method="post" data-ujian-akses-ulang hidden
+            action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/akses-ulang/diagnostik'), 'attr') ?>">
+            <input type="hidden" name="<?= esc($csrfName, 'attr') ?>" value="<?= esc($csrfValue, 'attr') ?>">
+            <button type="submit" class="a-btn a-btn--utama">Minta akses ulang kepada Guru</button>
+            <p class="a-help">Permintaan tersimpan di sistem. Izin Guru diperlukan sebelum tes pengganti dapat dimulai.</p>
+        </form>
+
         <a class="a-btn a-btn--sekunder"
             href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke rincian TP</a>
     </section>
