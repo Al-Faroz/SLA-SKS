@@ -32,12 +32,12 @@
         </div>
         <?php if ($tp['status'] === 'siap'): ?>
             <div class="a-alert" role="status">
-                <strong>TP sudah Siap dan terkunci.</strong>
+                <strong>TP sudah Siap.</strong>
                 <?php if ($versi_terbit): ?>
                     Versi konten <?= (int) $versi_terbit['nomor_versi'] ?> disimpan
                     pada <?= esc((string) $versi_terbit['disiapkan_pada']) ?> (UTC).
                 <?php endif ?>
-                Perubahan selanjutnya hanya melalui prosedur koreksi akademik.
+                Selama TP belum digunakan siswa, Guru dapat membuka editor normal dari Rincian TP.
             </div>
         <?php elseif ($siap): ?>
             <div class="a-alert" role="status">
@@ -100,8 +100,8 @@
         <h2 id="judul-konfirmasi-tp">Konfirmasi Guru</h2>
         <?php if ($siap): ?>
             <p>Menyiapkan TP akan membuat snapshot materi, CP, soal, kunci,
-                dan pengaturan. TP terkunci dan tidak dapat dikembalikan
-                ke Draf melalui editor biasa.</p>
+                dan pengaturan. Setelah digunakan siswa, konten TP terkunci. Sebelum digunakan,
+                Guru dapat membuka kembali editor melalui tombol Sunting TP.</p>
             <form class="a-form" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>"
                 method="post" onsubmit="return confirm('TP akan diterbitkan dan dikunci. Lanjutkan?');">
                 <?= csrf_field() ?>

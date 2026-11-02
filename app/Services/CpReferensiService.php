@@ -73,42 +73,24 @@ final class CpReferensiService
     /** @param array<string,string> $data */
     public static function versiValid(array $data): bool
     {
-        foreach (['elemen' => [3, 150], 'rumusan' => [20, 15000],
-            'otoritas' => [3, 150], 'nomor_dokumen' => [3, 120],
-        ] as $kunci => [$min, $max]) {
-            if (! isset($data[$kunci]) || mb_strlen(trim($data[$kunci])) < $min
-                || mb_strlen(trim($data[$kunci])) > $max) {
+        foreach (['elemen' => [3, 150], 'rumusan' => [20, 15000]] as $key => [$min, $max]) {
+            if (!isset($data[$key]) || mb_strlen(trim($data[$key])) < $min
+                || mb_strlen(trim($data[$key])) > $max) {
                 return false;
             }
         }
-
-        $sumber = trim($data['sumber_url'] ?? '');
-        if (strlen($sumber) < 10 || strlen($sumber) > 1024
-            || filter_var($sumber, FILTER_VALIDATE_URL) === false
-            || ! in_array(strtolower((string) parse_url($sumber, PHP_URL_SCHEME)),
-                ['https', 'http'], true)) {
-            return false;
-        }
-
-        $date = trim($data['tanggal_berlaku'] ?? '');
-        if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D', $date) !== 1) {
-            return false;
-        }
-        [$y, $m, $d] = array_map('intval', explode('-', $date));
-
-        return checkdate($m, $d, $y);
+        return true;
     }
 
     /** @param array<string,string> $input @return array<string,string> */
     private static function normalVersi(array $input): array
     {
-        $fields = ['elemen', 'rumusan', 'otoritas', 'nomor_dokumen', 'sumber_url', 'tanggal_berlaku'];
-        $data = [];
-        foreach ($fields as $field) {
-            $data[$field] = trim($input[$field] ?? '');
-        }
-        if (! self::versiValid($data)) {
-            throw new DomainException('Lengkapi elemen, rumusan CP (20–15000 karakter), otoritas, dokumen, URL http(s), dan tanggal berlaku yang sah.');
+        $data = [
+            'elemen' => trim($input['elemen'] ?? ''),
+            'rumusan' => trim($input['rumusan'] ?? ''),
+        ];
+        if (!self::versiValid($data)) {
+            throw new DomainException('Elemen CP wajib 3–150 karakter dan rumusan resmi 20–15.000 karakter.');
         }
         return $data;
     }
@@ -212,6 +194,14 @@ final class CpReferensiService
         $admin = $this->admin();
         $kode = strtoupper(trim($kode));
         $data = self::normalVersi($data);
+        // Versi v4 lama mewajibkan empat metadata resmi; jangan mengarang
+        // otoritas/dokumen/URL/tanggal untuk mengakali NOT NULL.
+        foreach ($this->db->getFieldData('ref_cp_versi') as $kolom) {
+            if (in_array($kolom->name, ['otoritas', 'nomor_dokumen', 'sumber_url', 'tanggal_berlaku'], true)
+                && !($kolom->nullable ?? false)) {
+                throw new DomainException('Tambah CP lima isian memerlukan penyesuaian SQL setelah audit dump terbaru. Data belum diubah.');
+            }
+        }
         if ($kurikulumId < 1 || $mapelId < 1 || ! self::kodeValid($kode)) {
             throw new DomainException('Pilih kurikulum, mapel, dan kode CP 2–40 karakter.');
         }
@@ -241,10 +231,102 @@ final class CpReferensiService
         });
     }
 
+    /**
+     * Simpan CP langsung dalam satu transaksi. Draft/versi historis tetap
+     * internal; Admin tidak perlu mengajukan atau menyetujui perubahan.
+     * Identitas CP operasional yang sudah tertaut tidak dipindah diam-diam.
+     *
+     * @param array<string,string> $data
+     */
+    public function simpanLangsung(?int $id, int $kurikulumId, int $mapelId, string $kode, array $data): int
+    {
+        $this->admin();
+        $kode = strtoupper(trim($kode));
+        $data = self::normalVersi($data);
+        if ($kurikulumId < 1 || $mapelId < 1 || !self::kodeValid($kode)) {
+            throw new DomainException('Pilih kurikulum, mata pelajaran, dan kode CP yang valid.');
+        }
+
+        $this->db->transBegin();
+        try {
+            if ($id === null) {
+                $id = $this->buatCp($kurikulumId, $mapelId, $kode, $data);
+            } else {
+                $cp = $this->db->query('SELECT * FROM ref_cp WHERE id=? FOR UPDATE', [$id])->getRowArray();
+                if ($cp === null) {
+                    throw new DomainException('CP tidak ditemukan.');
+                }
+                if ($this->db->table('ref_kurikulum')->where('id', $kurikulumId)->countAllResults() !== 1
+                    || $this->db->table('ref_mapel')->where('id', $mapelId)->countAllResults() !== 1) {
+                    throw new DomainException('Kurikulum atau mata pelajaran tidak ditemukan.');
+                }
+                if ((int) $cp['kurikulum_id'] !== $kurikulumId || (int) $cp['mapel_id'] !== $mapelId) {
+                    $terhubung = $this->db->table('cp_mapel_elemen e')
+                        ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+                        ->where('v.cp_id', $id)->countAllResults();
+                    if ($terhubung > 0) {
+                        // Identitas CP lama tidak boleh dipindahkan sebab terhubung
+                        // ke cp_mapel dan mungkin sudah menjadi snapshot siswa.
+                        // Buat referensi baru pada pilihan kurikulum/mapel baru;
+                        // yang lama dipertahankan sebagai referensi historis.
+                        $id = $this->buatCp($kurikulumId, $mapelId, $kode, $data);
+                        $baru = $this->db->table('ref_cp_versi')->select('id')
+                            ->where('cp_id', $id)->where('status', 'draf')->get()->getRowArray();
+                        if ($baru === null) {
+                            throw new RuntimeException('Referensi CP baru tidak berhasil dibuat.');
+                        }
+                        $this->terbitkan((int) $baru['id']);
+                        if ($this->db->transStatus() === false) {
+                            throw new RuntimeException('Perubahan CP gagal disimpan.');
+                        }
+                        $this->db->transCommit();
+                        return $id;
+                    }
+                }
+                $duplikat = $this->db->table('ref_cp')->where('kurikulum_id', $kurikulumId)
+                    ->where('mapel_id', $mapelId)->where('fase_id', 1)
+                    ->where('kode', $kode)->where('id !=', $id)->countAllResults();
+                if ($duplikat > 0) {
+                    throw new DomainException('Kode CP sudah digunakan pada kurikulum dan mapel ini.');
+                }
+                $this->db->table('ref_cp')->where('id', $id)->update([
+                    'kurikulum_id' => $kurikulumId, 'mapel_id' => $mapelId, 'kode' => $kode,
+                ]);
+                $draf = $this->db->table('ref_cp_versi')->select('id')
+                    ->where('cp_id', $id)->where('status', 'draf')->get()->getRowArray();
+                if ($draf !== null) {
+                    $this->ubahDraf((int) $draf['id'], $data);
+                } else {
+                    $this->versiBaru($id, $data);
+                }
+            }
+            $versi = $this->db->table('ref_cp_versi')->select('id')
+                ->where('cp_id', $id)->where('status', 'draf')
+                ->orderBy('nomor_versi', 'DESC')->get(1)->getRowArray();
+            if ($versi === null) {
+                throw new RuntimeException('Versi CP untuk penyimpanan tidak tersedia.');
+            }
+            $this->terbitkan((int) $versi['id']);
+            if ($this->db->transStatus() === false) {
+                throw new RuntimeException('Perubahan CP gagal disimpan.');
+            }
+            $this->db->transCommit();
+            return $id;
+        } catch (Throwable $e) {
+            $this->db->transRollback();
+            throw $e;
+        }
+    }
+
     /** @param array<string,string> $data */
     private function simpanDraf(int $id, int $nomor, array $data, int $admin): void
     {
-        $this->db->table('ref_cp_versi')->insert($data + [
+        // Kolom sumber hukum historis tidak menjadi isian Admin. Pada revisi,
+        // nilainya diwarisi apa adanya dari versi terdahulu, tidak dibuat-buat.
+        $warisan = $this->db->table('ref_cp_versi')
+            ->select('otoritas,nomor_dokumen,sumber_url,tanggal_berlaku')
+            ->where('cp_id', $id)->orderBy('nomor_versi', 'DESC')->get(1)->getRowArray() ?? [];
+        $this->db->table('ref_cp_versi')->insert($data + $warisan + [
             'cp_id' => $id,
             'nomor_versi' => $nomor,
             'status' => 'draf',

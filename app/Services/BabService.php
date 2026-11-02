@@ -126,4 +126,41 @@ final class BabService
             throw $e;
         }
     }
+    /** Perbaikan redaksi BAB tidak mengubah penomoran, paket atau hubungan TP. */
+    public function sunting(int $babId, string $nama, string $deskripsi): void
+    {
+        $data = self::validasiInput($babId, $nama, $deskripsi);
+        $akun = ($this->akunAktif)();
+        if ($akun === null || ($akun['peran_aktif'] ?? '') !== 'guru'
+            || ($akun['status'] ?? '') !== 'aktif'
+            || (int) ($akun['wajib_ganti_sandi'] ?? 1) !== 0) {
+            throw new DomainException('Hanya Guru G1 aktif dapat menyunting BAB.');
+        }
+        $batas = BatasNamaAtpService::aktual($this->db, 'bab');
+        if (mb_strlen($data['nama']) > $batas) {
+            throw new DomainException('Nama BAB maksimal ' . $batas . ' karakter pada database terpasang.');
+        }
+        $this->db->transBegin();
+        try {
+            $bab = $this->db->query(
+                'SELECT b.id FROM bab b JOIN paket_semester p ON p.id=b.paket_semester_id '
+                . 'JOIN penugasan_guru_gen g ON g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id '
+                . 'WHERE b.id=? AND p.status<>? AND g.guru_id=? FOR UPDATE',
+                [$babId, 'arsip', (int) $akun['id']]
+            )->getRowArray();
+            if ($bab === null) {
+                throw new DomainException('BAB tidak ditemukan atau bukan penugasan Guru G1 Anda.');
+            }
+            $this->db->table('bab')->where('id', $babId)->update([
+                'nama_bab' => $data['nama'], 'deskripsi_bab' => $data['deskripsi'],
+            ]);
+            if ($this->db->transStatus() === false) {
+                throw new DomainException('Perubahan BAB tidak dapat disimpan.');
+            }
+            $this->db->transCommit();
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            throw $e;
+        }
+    }
 }

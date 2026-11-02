@@ -74,9 +74,29 @@
                     <span><strong>Mapel &amp; Guru per Gen</strong><small>Penugasan pengampu</small></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
+                <a href="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4zM8 9h8M8 13h6M8 17h4"/></svg></span>
+                    <span><strong>Kurikulum &amp; CP</strong><small>Tambah, cari, dan sunting CP</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a href="<?= esc(site_url('admin/siswa'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 8h4M19 6v4"/></svg></span>
+                    <span><strong>Data Siswa</strong><small>Akun dan penempatan Gen</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a href="<?= esc(site_url('admin/kkm'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM8 12l3 3 5-6"/></svg></span>
+                    <span><strong>KKM Default</strong><small>Ambang ketuntasan akademik</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
                 <a href="<?= esc(site_url('admin/identitas'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-6 9 6v12H3ZM9 21v-8h6v8M7 10h.01M17 10h.01"/></svg></span>
                     <span><strong>Identitas Madrasah</strong><small>Informasi resmi sekolah</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a href="<?= esc(site_url('admin/foto-profil'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m5 18 5-5 4 3 2-2 3 4"/></svg></span>
+                    <span><strong>Persetujuan Foto</strong><small>Tinjau foto profil pengelola</small></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
             </div>
@@ -94,7 +114,7 @@
             <?php endif ?>
             <div class="a-proto-note">
                 <span class="a-proto-note__mark" aria-hidden="true">i</span>
-                <p>Ringkasan ini hanya menampilkan data referensi. Modul pembelajaran, penilaian, dan laporan akan muncul setelah benar-benar diimplementasikan.</p>
+                <p>Ringkasan berisi data referensi dan penugasan. Kelengkapan TP dan hasil pembelajaran diperiksa pada halaman modul masing-masing.</p>
             </div>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">Periksa penugasan</a>
         </aside>

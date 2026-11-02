@@ -71,7 +71,7 @@ final class StepProgressTpService
         $semuaSah = $cek !== [] && ! in_array(false, array_values($statusCek), true);
         $hasil[] = [
             'label' => $status === 'siap' ? 'TP Siap' : 'Publikasi',
-            'keterangan' => $status === 'siap' ? 'Sudah dikunci dan memiliki versi konten'
+            'keterangan' => $status === 'siap' ? 'Versi konten tersimpan; penyuntingan mengikuti penggunaan siswa'
                 : ($semuaSah ? 'Lengkap — perlu konfirmasi Guru' : 'Menunggu langkah sebelumnya'),
             'terpenuhi' => $status === 'siap',
             'tautan' => $root . '/kesiapan',

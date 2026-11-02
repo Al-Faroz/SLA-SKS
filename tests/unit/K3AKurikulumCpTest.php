@@ -37,32 +37,40 @@ final class K3AKurikulumCpTest extends CIUnitTestCase
         return [
             'elemen' => 'Bilangan',
             'rumusan' => 'Peserta didik mampu menguasai konsep bilangan dalam konteks pembelajaran.',
-            'otoritas' => 'Instansi resmi',
-            'nomor_dokumen' => 'Aturan Nomor 123',
-            'sumber_url' => 'https://example.org/dokumen-cp',
-            'tanggal_berlaku' => '2026-07-01',
         ];
     }
 
-    public function testVersiCpButuhRumusanOtoritasSumberDanTanggalValid(): void
+    public function testValidasiCpHanyaElemenDanRumusan(): void
     {
         $this->assertTrue(CpReferensiService::versiValid($this->dataValid()));
-
         $data = $this->dataValid();
         $data['rumusan'] = 'Pendek';
         $this->assertFalse(CpReferensiService::versiValid($data));
-
         $data = $this->dataValid();
-        $data['sumber_url'] = 'javascript:alert(1)';
+        $data['elemen'] = '';
         $this->assertFalse(CpReferensiService::versiValid($data));
-
-        $data = $this->dataValid();
-        $data['tanggal_berlaku'] = '2026-02-30';
-        $this->assertFalse(CpReferensiService::versiValid($data));
-
         $data = $this->dataValid();
         $data['otoritas'] = '';
-        $this->assertFalse(CpReferensiService::versiValid($data));
+        $data['sumber_url'] = '';
+        $data['tanggal_berlaku'] = 'tidak-diisi';
+        $this->assertTrue(CpReferensiService::versiValid($data),
+            'Empat metadata historis bukan syarat validasi CP.');
+    }
+
+    public function testFormCpBaruDanSuntingHanyaLimaIsian(): void
+    {
+        $baru = file_get_contents(APPPATH . 'Views/admin/kurikulum_cp.php');
+        $edit = file_get_contents(APPPATH . 'Views/admin/cp_sunting.php');
+        $this->assertIsString($baru);
+        $this->assertIsString($edit);
+        foreach (['kurikulum_id', 'mapel_id', 'kode', 'elemen', 'rumusan'] as $nama) {
+            $this->assertStringContainsString('name="' . $nama . '"', $baru);
+            $this->assertStringContainsString('name="' . $nama . '"', $edit);
+        }
+        foreach (['otoritas', 'nomor_dokumen', 'sumber_url', 'tanggal_berlaku'] as $nama) {
+            $this->assertStringNotContainsString('name="' . $nama . '"', $baru);
+            $this->assertStringNotContainsString('name="' . $nama . '"', $edit);
+        }
     }
 
     public function testPatchKurikulumCpAdditiveDanBernomor(): void

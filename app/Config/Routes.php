@@ -55,6 +55,7 @@ $routes->post('guru/peta-atp/pratinjau/(:num)', 'GuruAtpPratinjau::tampil/$1', [
 // Setelah pratinjau dan persetujuan eksplisit; revalidasi di dalam transaksi.
 $routes->post('guru/peta-atp/konfirmasi/(:num)', 'GuruAtpKonfirmasi::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/bab/baru', 'GuruBab::buat', ['filter' => 'auth:guru']);
+$routes->post('guru/bab/(:num)/sunting', 'GuruBab::sunting/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/baru', 'GuruTpBab::buat', ['filter' => 'auth:guru']);
 $routes->post('guru/paket-semester/buat-enam', 'GuruPaketSemester::buatEnam', ['filter' => 'auth:guru']);
 // Route pembuatan paket per-semester dihapus dari UI dan POST baru; hanya enam semester sekaligus.
@@ -62,14 +63,6 @@ $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru
 $routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)', 'GuruDetailTp::lihat/$1', ['filter' => 'auth:guru']);
-$routes->get('guru/tp/(:num)/koreksi', 'GuruKoreksiTp::index/$1', ['filter' => 'auth:guru']);
-$routes->post('guru/tp/(:num)/koreksi', 'GuruKoreksiTp::buat/$1', ['filter' => 'auth:guru']);
-$routes->get('guru/koreksi-tp/(:num)', 'GuruKoreksiTp::edit/$1', ['filter' => 'auth:guru']);
-$routes->post('guru/koreksi-tp/(:num)/rincian', 'GuruKoreksiTp::rincian/$1', ['filter' => 'auth:guru']);
-$routes->post('guru/koreksi-tp/(:num)/soal/(:num)', 'GuruKoreksiTp::soal/$1/$2', ['filter' => 'auth:guru']);
-$routes->post('guru/koreksi-tp/(:num)/media', 'GuruKoreksiTp::unggahMedia/$1', ['filter' => 'auth:guru']);
-$routes->get('guru/koreksi-tp/(:num)/media', 'GuruKoreksiTp::media/$1', ['filter' => 'auth:guru']);
-$routes->post('guru/koreksi-tp/(:num)/kirim', 'GuruKoreksiTp::kirim/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::lihat/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/kesiapan', 'GuruKesiapanTp::siapkan/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/bank-soal', 'GuruBankSoal::index/$1', ['filter' => 'auth:guru']);
@@ -88,6 +81,7 @@ $routes->post('guru/tp/(:num)/bank-soal/word/(:segment)/pratinjau', 'GuruBankSoa
 $routes->get('guru/tp/(:num)/bank-soal/review/(:segment)', 'GuruBankSoal::reviewWord/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/bank-soal/review/(:segment)/konfirmasi', 'GuruBankSoal::konfirmasiWord/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/bank-soal/media/(:segment)/(:segment)', 'GuruBankSoal::mediaWord/$1/$2/$3', ['filter' => 'auth:guru']);
+$routes->post('guru/tp/(:num)/sunting', 'GuruDetailTp::bukaSunting/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)', 'GuruDetailTp::simpan/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi', 'GuruMateri::tambah/$1', ['filter' => 'auth:guru']);
 $routes->get('guru/tp/(:num)/materi/(:num)/edit', 'GuruMateri::edit/$1/$2', ['filter' => 'auth:guru']);
@@ -98,10 +92,6 @@ $routes->get('guru/tp/(:num)/materi/(:num)/media', 'GuruMateri::bukaMedia/$1/$2'
 $routes->post('guru/tp/(:num)/materi/(:num)/urut', 'GuruMateri::urut/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/tp/(:num)/materi/(:num)/hapus', 'GuruMateri::hapus/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
-$routes->get('admin/koreksi-tp', 'AdminKoreksiTp::index', ['filter' => 'auth:admin']);
-$routes->get('admin/koreksi-tp/(:num)', 'AdminKoreksiTp::detail/$1', ['filter' => 'auth:admin']);
-$routes->get('admin/koreksi-tp/(:num)/media', 'AdminKoreksiTp::media/$1', ['filter' => 'auth:admin']);
-$routes->post('admin/koreksi-tp/(:num)/putuskan', 'AdminKoreksiTp::putuskan/$1', ['filter' => 'auth:admin']);
 $routes->get('admin/kkm', 'AdminKkm::index', ['filter' => 'auth:admin']);
 $routes->post('admin/kkm', 'AdminKkm::simpan', ['filter' => 'auth:admin']);
 $routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan']);
@@ -152,12 +142,8 @@ $routes->get('admin/kurikulum-cp/ekspor', 'AdminKurikulumCp::eksporCp', ['filter
 $routes->post('admin/kurikulum-cp/kurikulum', 'AdminKurikulumCp::simpanKurikulum', ['filter' => 'auth:admin']);
 $routes->post('admin/kurikulum-cp', 'AdminKurikulumCp::simpanCp', ['filter' => 'auth:admin']);
 $routes->get('admin/kurikulum-cp/(:num)', 'AdminKurikulumCp::detail/$1', ['filter' => 'auth:admin']);
-$routes->get('admin/kurikulum-cp/(:num)/versi-baru', 'AdminKurikulumCp::versiBaru/$1', ['filter' => 'auth:admin']);
-$routes->post('admin/kurikulum-cp/(:num)/versi-baru', 'AdminKurikulumCp::simpanVersiBaru/$1', ['filter' => 'auth:admin']);
-$routes->get('admin/kurikulum-cp/versi/(:num)/edit', 'AdminKurikulumCp::editDraf/$1', ['filter' => 'auth:admin']);
-$routes->post('admin/kurikulum-cp/versi/(:num)/edit', 'AdminKurikulumCp::simpanDraf/$1', ['filter' => 'auth:admin']);
-$routes->get('admin/kurikulum-cp/versi/(:num)/terbit', 'AdminKurikulumCp::konfirmasiTerbit/$1', ['filter' => 'auth:admin']);
-$routes->post('admin/kurikulum-cp/versi/(:num)/terbit', 'AdminKurikulumCp::terbitkan/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/kurikulum-cp/(:num)/sunting', 'AdminKurikulumCp::sunting/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/kurikulum-cp/(:num)/sunting', 'AdminKurikulumCp::simpanSunting/$1', ['filter' => 'auth:admin']);
 
 // K2 — Data induk akademik, semua akses memakai filter Admin + pemeriksaan Service.
 $routes->get('admin/referensi', 'AdminReferensi::referensi', ['filter' => 'auth:admin']);

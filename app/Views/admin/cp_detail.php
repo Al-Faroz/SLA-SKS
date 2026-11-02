@@ -11,15 +11,10 @@
     </header>
     <?php if ($galat = session()->getFlashdata('galat')): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div><?php endif ?>
     <?php if ($sukses = session()->getFlashdata('sukses')): ?><div class="a-alert" role="status"><?= esc($sukses) ?></div><?php endif ?>
-    <?php $adaDraf = count(array_filter($versi, static fn (array $item): bool => $item['status'] === 'draf')) > 0; ?>
     <section class="a-card">
-        <h2>Riwayat versi dan naskah resmi</h2>
-        <p class="a-help">Versi aktif dapat ditautkan ke TP pada modul Guru berikutnya. Versi historis tetap tersedia dan tidak dapat diedit atau dihapus.</p>
-        <?php if (! $adaDraf): ?>
-            <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $cp['id'] . '/versi-baru'), 'attr') ?>">Buat draf versi baru</a>
-        <?php else: ?>
-            <div class="a-alert a-alert--info">Masih ada draf versi CP. Perbaiki dan terbitkan terlebih dahulu sebelum menambah versi lain.</div>
-        <?php endif ?>
+        <h2>Riwayat CP</h2>
+        <p class="a-help">Perubahan CP dilakukan langsung oleh Admin; versi lama dipertahankan otomatis.</p>
+        <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $cp['id'] . '/sunting'), 'attr') ?>">Sunting CP</a>
         <?php foreach ($versi as $v): ?>
             <article class="a-cp__versi">
                 <div class="a-cp__versi-atas">
@@ -35,12 +30,6 @@
                     <dt>Ditulis</dt><dd><?= esc($v['dibuat_pada']) ?> UTC</dd>
                     <dt>Diterbitkan</dt><dd><?= $v['diterbitkan_pada'] === null ? 'Belum diterbitkan' : esc($v['diterbitkan_pada']) . ' UTC' ?></dd>
                 </dl>
-                <?php if ($v['status'] === 'draf'): ?>
-                    <div class="a-cp__aksi">
-                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/versi/' . (int) $v['id'] . '/edit'), 'attr') ?>">Perbaiki draf</a>
-                        <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/versi/' . (int) $v['id'] . '/terbit'), 'attr') ?>">Tinjau dan terbitkan</a>
-                    </div>
-                <?php endif ?>
             </article>
         <?php endforeach ?>
     </section>

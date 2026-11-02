@@ -99,17 +99,24 @@ final class DetailTpService
      * Menyimpan redaksi TP draf. Otorisasi G1 dan status diperiksa saat transaksi;
      * nomor versi menghindari penggantian perubahan dari tab/perangkat lain.
      */
-    public function simpanDraf(int $tpId, string $judul, string $rumusan, int $versi): void
+    public function simpanDraf(int $tpId, string $judul, string $rumusan, int $versi, ?string $jenisTp = null): void
     {
         $judul = trim($judul);
         $rumusan = trim($rumusan);
         if ($tpId < 1 || $versi < 1
-            || $judul === '' || mb_strlen($judul) > 180
-            || $rumusan === '' || mb_strlen($rumusan) > 20000
+            || $judul === '' || mb_strlen($judul) > 50
+            || $rumusan === '' || mb_strlen($rumusan) > 225
             ) {
             throw new DomainException('Judul dan rumusan TP wajib diisi dengan panjang yang valid.');
         }
 
+        $batas = BatasNamaAtpService::aktual($this->db, 'tp');
+        if (mb_strlen($judul) > $batas) {
+            throw new DomainException('Nama TP maksimal ' . $batas . ' karakter pada database terpasang.');
+        }
+        if ($jenisTp !== null && !in_array($jenisTp, ['esensial', 'non_esensial'], true)) {
+            throw new DomainException('Jenis TP tidak valid.');
+        }
         $this->db->transBegin();
         try {
             // Pemeriksaan otorisasi Service membaca Gen–Mapel dari paket (bukan input).
@@ -120,14 +127,23 @@ final class DetailTpService
 
             // Pemeriksaan status dan versi juga berada di WHERE untuk mencegah
             // perubahan status/versi serentak menimpa data yang lebih baru.
+            // Fixture historis sebelum v4 belum memiliki kolom ATP v2.5;
+            // pada dump v4 sinkronisasi keduanya wajib agar Peta ATP konsisten.
+            $perubahan = [
+                'judul' => $judul,
+                'rumusan' => $rumusan,
+                'struktur_versi' => $versi + 1,
+            ];
+            if ($this->db->fieldExists('nama_tp', 'tp')
+                && $this->db->fieldExists('deskripsi_tp', 'tp')
+                && $this->db->fieldExists('jenis_tp', 'tp')) {
+                $perubahan['nama_tp'] = $judul;
+                $perubahan['deskripsi_tp'] = $rumusan;
+                $perubahan['jenis_tp'] = $jenisTp ?? (string) ($rincian['tp']['jenis_tp'] ?? 'non_esensial');
+            }
             $this->db->table('tp')->where('id', $tpId)
                 ->where('status', 'draf')
-                ->where('struktur_versi', $versi)
-                ->update([
-                    'judul' => $judul,
-                    'rumusan' => $rumusan,
-                    'struktur_versi' => $versi + 1,
-                ]);
+                ->where('struktur_versi', $versi)->update($perubahan);
             if ($this->db->affectedRows() !== 1) {
                 throw new DomainException('TP telah berubah. Muat ulang halaman sebelum menyimpan.');
             }

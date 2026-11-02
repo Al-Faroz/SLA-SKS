@@ -337,8 +337,10 @@ final class KesiapanTpService
             if (!hash_equals($cek['sidik_jari'], $sidikJari)) {
                 throw new DomainException('Konten TP berubah sejak pemeriksaan. Muat ulang, tinjau perubahannya, lalu konfirmasi kembali.');
             }
-            if ($cek['versi_terbit'] !== null) {
-                throw new DomainException('TP sudah memiliki versi publikasi; gunakan prosedur koreksi.');
+            (new SuntingTpService($this->db))->pastikanBelumDipakai($tpId);
+            $nomorBerikutnya = (int) ($cek['versi_terbit']['nomor_versi'] ?? 0) + 1;
+            if ($nomorBerikutnya > 65535) {
+                throw new DomainException('Batas versi publikasi TP tercapai.');
             }
             $akun = (new AuthService())->penggunaSaatIni();
             if ($akun === null || (int) $akun['id'] !== $guruId || $akun['peran_aktif'] !== 'guru') {
@@ -363,7 +365,7 @@ final class KesiapanTpService
             $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
             $waktu = gmdate('Y-m-d H:i:s');
             $this->db->table('versi_konten_tp')->insert([
-                'tp_id' => $tpId, 'nomor_versi' => 1, 'snapshot_json' => $json,
+                'tp_id' => $tpId, 'nomor_versi' => $nomorBerikutnya, 'snapshot_json' => $json,
                 'checksum' => hash('sha256', $json),
                 'disiapkan_oleh' => $guruId, 'disiapkan_pada' => $waktu,
             ]);

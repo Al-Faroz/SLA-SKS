@@ -29,8 +29,13 @@
 
     <section class="a-card a-jarak-atas" id="langkah-tp" aria-labelledby="judul-langkah-tp">
         <h2 id="judul-langkah-tp">Langkah penyiapan TP</h2>
-        <p class="a-help">Setiap langkah memakai hasil pemeriksaan Service. TP belum diterbitkan
-            sebelum semua ketentuan terpenuhi dan Guru menyetujui publikasi.</p>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            TP sudah diterbitkan. Langkah di bawah menunjukkan hasil pemeriksaan konten;
+            penyuntingan tetap mengikuti status penggunaan siswa.
+            <?php else: ?>
+            Setiap langkah memakai hasil pemeriksaan Service. TP belum diterbitkan
+            sebelum semua ketentuan terpenuhi dan Guru menyetujui publikasi.
+            <?php endif ?></p>
         <?= view('guru/_step_progress_tp', ['langkah' => $langkah]) ?>
     </section>
 
@@ -47,13 +52,20 @@
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                 <div class="a-field">
-                    <label class="a-label" for="tp-judul">Judul TP</label>
-                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="180" required
+                    <label class="a-label" for="tp-judul">Nama TP</label>
+                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="50" required
                            value="<?= esc($tp['judul'], 'attr') ?>">
                 </div>
                 <div class="a-field">
                     <label class="a-label" for="tp-rumusan">Rumusan / deskripsi TP</label>
-                    <textarea id="tp-rumusan" name="rumusan" rows="3" maxlength="20000" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
+                    <textarea id="tp-rumusan" name="rumusan" rows="3" maxlength="225" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
+                </div>
+                <div class="a-field">
+                    <label class="a-label" for="tp-jenis">Jenis TP</label>
+                    <select id="tp-jenis" name="jenis_tp" required>
+                        <option value="esensial" <?= ($tp['jenis_tp'] ?? '') === 'esensial' ? 'selected' : '' ?>>Esensial</option>
+                        <option value="non_esensial" <?= ($tp['jenis_tp'] ?? '') === 'non_esensial' ? 'selected' : '' ?>>NonEsensial</option>
+                    </select>
                 </div>
                 <p class="a-help">Indikator ketercapaian tidak lagi menjadi kolom wajib terpisah.
                     Informasi lama yang telah tersimpan tetap dipertahankan.</p>
@@ -61,7 +73,7 @@
             </form>
         <?php else: ?>
             <p><?= nl2br(esc($tp['rumusan'] ?? '')) ?></p>
-            <p class="a-help">TP telah Siap dan terkunci; perubahan akademik melalui mekanisme koreksi.</p>
+            <p class="a-help"><?= $suntingDikunci ? 'TP sudah pernah digunakan siswa. Konten akademik terkunci.' : 'TP Siap masih dapat diperbaiki karena belum digunakan siswa. Gunakan Sunting TP.' ?></p>
         <?php endif ?>
     </section>
 
@@ -128,7 +140,7 @@
                     <p class="a-help" data-materi-status aria-live="polite">Perubahan belum disimpan.</p>
                 </form>
             <?php else: ?>
-                <p class="a-help">Materi telah dikunci bersama TP Siap.</p>
+                <p class="a-help"><?= $suntingDikunci ? 'Materi terkunci karena TP sudah digunakan siswa.' : 'Pilih Sunting TP untuk kembali menggunakan editor Materi.' ?></p>
             <?php endif ?>
         <?php elseif ($jumlah_materi === 0 && $tp['status'] === 'draf'): ?>
             <?php
@@ -179,21 +191,35 @@
         </section>
     <?php endif ?>
 
-    <section class="a-card a-jarak-atas" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
+    <section class="a-card a-jarak-atas a-tp-penutup" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
         <h2 id="judul-kesiapan-tp"><?= $tp['status'] === 'siap' ? 'TP sudah Siap' : 'Langkah akhir · Pemeriksaan kesiapan' ?></h2>
-        <p class="a-help">Penerbitan tetap memerlukan pemeriksaan final server, konfirmasi Guru,
-            dan penyimpanan snapshot konten yang terkunci.</p>
-        <?php if ($tp['status'] === 'siap' && ($tp['jenis_tp'] ?? '') === 'esensial'): ?>
-            <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/koreksi'), 'attr') ?>">Ajukan Koreksi TP Siap</a>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            TP telah diterbitkan. Snapshot konten tersimpan; akses sunting ditentukan
+            oleh apakah TP sudah pernah digunakan siswa.
+            <?php else: ?>
+            Penerbitan memerlukan pemeriksaan final server, konfirmasi Guru,
+            dan penyimpanan snapshot konten.
+            <?php endif ?></p>
+        <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
+            <p class="a-help">Sunting TP membuka editor biasa. TP sementara kembali menjadi Draf dan harus diperiksa serta disiapkan lagi sebelum siswa dapat memulainya. Snapshot lama tetap tersimpan.</p>
+        <?php elseif ($tp['status'] === 'siap'): ?>
+            <p class="a-help">TP telah digunakan siswa; seluruh rincian, KKM, Materi, media, Resume/HOTS dan Bank Soal terkunci.</p>
         <?php endif ?>
-        <a class="a-btn a-btn--utama"
-            href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">
-            <?= $tp['status'] === 'siap' ? 'Lihat status dan versi TP' : 'Periksa kesiapan TP Siap' ?>
-        </a>
-        <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial' && $tp['status'] === 'siap'): ?>
-            <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/koreksi'), 'attr') ?>">Ajukan Koreksi TP Siap</a>
-            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Antrean Penilaian</a>
-        <?php endif ?>
+        <div class="a-tp-penutup__aksi">
+            <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
+                <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/sunting'), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <button class="a-btn a-btn--utama" type="submit">Sunting TP</button>
+                </form>
+            <?php endif ?>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">
+                <?= $tp['status'] === 'siap' ? 'Lihat status dan versi TP' : 'Periksa kesiapan TP Siap' ?>
+            </a>
+            <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial' && $tp['status'] === 'siap'): ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Antrean Penilaian</a>
+            <?php endif ?>
+        </div>
     </section>
 </div>
 <?= $this->endSection() ?>
