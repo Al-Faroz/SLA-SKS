@@ -1,0 +1,66 @@
+name: QA V2.5 Sunting Langsung CP BAB TP
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/qa-edit-cp-bab-tp-v25.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-lint-unit:
+    name: PHP lint dan unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint seluruh PHP aplikasi dan pengujian
+        shell: bash
+        run: |
+          set -euo pipefail
+          find app tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Unit regression lengkap
+        run: vendor/bin/phpunit --no-coverage tests/unit
+
+  penguncian-mysql:
+    name: Uji penguncian siswa di MySQL
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Buat database QA kosong dan impor fixture sintetis
+        run: |
+          mysql --protocol=tcp -h 127.0.0.1 -u root -e "CREATE DATABASE sla_sks_qa_sunting CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+          mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa_sunting < tests/fixtures/sunting_tp_guard_mysql.sql
+      - name: Uji gerbang penggunaan TP sejak progres pertama
+        env:
+          SLA_QA_DB: sla_sks_qa_sunting
+        run: vendor/bin/phpunit --no-coverage tests/integration/SuntingTpGuardDatabaseTest.php
