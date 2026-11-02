@@ -112,6 +112,36 @@
                 <p class="a-alert" role="status">Diagnostik belum memenuhi KKM.
                     Selesaikan Materi, Resume final dan HOTS final sebelum Sumatif.</p>
             <?php endif ?>
+            <?php if ($kesiapanSumatif !== null): ?>
+                <section class="a-jarak-atas" aria-labelledby="syarat-sumatif">
+                    <h3 id="syarat-sumatif">Syarat menuju Sumatif</h3>
+                    <?php if ($kesiapanSumatif['jalur'] === 'belajar'): ?>
+                        <ol class="a-siswa-materi-ringkas" aria-label="Pemeriksaan tahapan belajar">
+                            <?php foreach ([
+                                'media' => 'Satu Materi selesai',
+                                'resume' => 'Resume dikirim final',
+                                'hots' => 'HOTS dikirim final',
+                            ] as $kunci => $labelSyarat): ?>
+                                <li>
+                                    <?= esc($labelSyarat) ?>
+                                    <span class="a-siswa-status <?= $kesiapanSumatif['bukti'][$kunci] ? 'pratinjau' : 'terkunci' ?>">
+                                        <?= $kesiapanSumatif['bukti'][$kunci] ? 'Terpenuhi' : 'Belum terpenuhi' ?>
+                                    </span>
+                                </li>
+                            <?php endforeach ?>
+                        </ol>
+                    <?php endif ?>
+                    <p class="a-help" role="status"><?= esc((string) $kesiapanSumatif['pesan']) ?></p>
+                    <?php if ($kesiapanSumatif['siap']): ?>
+                        <p class="a-alert" role="status">
+                            Syarat untuk mengikuti Sumatif sudah terpenuhi.
+                            Sumatif tetap wajib untuk menyelesaikan TP.
+                            Ujian Sumatif belum tersedia pada tahap pengembangan ini;
+                            tidak ada percobaan atau nilai yang dibuat dari halaman ini.
+                        </p>
+                    <?php endif ?>
+                </section>
+            <?php endif ?>
         </div>
     </section>
     <p class="a-kesiapan-kembali">

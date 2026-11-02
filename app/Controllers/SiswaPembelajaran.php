@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Services\AuthService;
 use App\Services\KatalogPembelajaranSiswaService;
+use App\Services\KelayakanSumatifSiswaService;
 use App\Services\MateriSiswaService;
 use App\Services\NavigasiService;
 use App\Services\ProgresTpSiswaService;
@@ -77,10 +78,13 @@ final class SiswaPembelajaran extends BaseController
         return $this->halaman(static function () use ($tpId): array {
             $data = (new KatalogPembelajaranSiswaService())->rincianTp($tpId);
             $data['progres'] = (new ProgresTpSiswaService())->status($tpId);
+            $data['kesiapanSumatif'] = null;
             if ($data['progres'] !== null
                 && in_array($data['progres']['status'], ['belajar', 'sumatif', 'tuntas'], true)) {
                 // Data berasal dari snapshot terpin, bukan versi live milik Guru.
                 $data['materi'] = (new MateriSiswaService())->daftar($tpId)['materi'];
+                // A3: ringkasan baca-saja. Belum membuka percobaan Sumatif.
+                $data['kesiapanSumatif'] = (new KelayakanSumatifSiswaService())->periksa($tpId);
             }
             return $data;
         }, 'siswa/rincian_tp');
