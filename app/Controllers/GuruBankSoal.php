@@ -39,6 +39,13 @@ final class GuruBankSoal extends BaseController
         if ($tpKkm === null) {
             return $this->response->setStatusCode(404)->setBody('TP tidak ditemukan.');
         }
+        $kkmInfo = (new KkmTpService())->informasi($tpKkm);
+        if (($rincian['tp']['status'] ?? '') === 'siap') {
+            // TP Siap menggunakan angka yang dipin ketika diterbitkan,
+            // bukan default Admin yang mungkin berubah setelah publikasi.
+            $kkmInfo['efektif'] = KkmTpService::validasi((string) $tpKkm['kkm'], false);
+            $kkmInfo['sumber'] = 'snapshot';
+        }
         $ringkasan = (new RingkasanBankSoalService())->lihat($tpId);
         $jenisDipilih = (string) ($this->request->getGet('jenis') ?: 'diagnostik');
         if (!in_array($jenisDipilih, ['diagnostik', 'sumatif'], true)) {
@@ -64,7 +71,7 @@ final class GuruBankSoal extends BaseController
             'peranAktif' => 'Guru',
             'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),
             'ringkasan_bank' => $ringkasan,
-            'kkm_info' => (new KkmTpService())->informasi($tpKkm),
+            'kkm_info' => $kkmInfo,
             'word_riwayat' => $riwayat,
             'jenis_dipilih' => $jenisDipilih,
             'daftar_soal' => $daftarSoal,
@@ -90,14 +97,16 @@ final class GuruBankSoal extends BaseController
             return redirect()->to($url)->with('kkm_galat', 'Isi KKM dan versi TP tidak valid.');
         }
         try {
-            (new KkmTpService())->simpanKhusus($tpId, $raw, (int) $versi);
+            $berubah = (new KkmTpService())->simpanKhusus($tpId, $raw, (int) $versi);
         } catch (DomainException $e) {
             return redirect()->to($url)->with('kkm_galat', $e->getMessage());
         } catch (\Throwable $e) {
             log_message('error', 'Simpan KKM TP {tpId} gagal: {reason}', ['tpId' => $tpId, 'reason' => $e->getMessage()]);
             return redirect()->to($url)->with('kkm_galat', 'KKM belum dapat disimpan. Silakan coba kembali.');
         }
-        return redirect()->to($url)->with('kkm_sukses', 'KKM TP berhasil disimpan. Berlaku untuk Diagnostik dan Sumatif.');
+        return redirect()->to($url)->with('kkm_sukses', $berubah
+            ? 'KKM TP berhasil disimpan. Berlaku untuk Diagnostik dan Sumatif.'
+            : 'KKM tidak berubah; bila sama dengan Admin, nilai tetap mengikuti default Admin.');
     }
 
     public function unduh(int $tpId, string $jenis): ResponseInterface
