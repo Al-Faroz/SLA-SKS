@@ -126,6 +126,12 @@ final class NilaiTpService
                 }
             }
             if ($beda) {
+                // Nilai final yang pernah dicatat tidak boleh diam-diam
+                // ditimpa sinkronisasi otomatis. Koreksi nilai adalah jalur
+                // administratif terpisah dengan audit.
+                if ($lama['status_nilai'] === 'final') {
+                    throw new DomainException('Nilai TP final sudah terkunci. Gunakan prosedur koreksi nilai.');
+                }
                 $db->table('nilai_tp')->where('id', (int) $lama['id'])
                     ->update($data + ['diubah_pada' => gmdate('Y-m-d H:i:s')]);
             }
