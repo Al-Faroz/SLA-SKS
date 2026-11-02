@@ -69,6 +69,7 @@ $routes->post('guru/paket-semester/buat-enam', 'GuruPaketSemester::buatEnam', ['
 $routes->get('guru/ujian-batal', 'GuruUjianBatal::index', ['filter' => 'auth:guru']);
 $routes->get('guru/ujian-batal/(:num)', 'GuruUjianBatal::index/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/ujian-batal/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/rekap-nilai', 'GuruRekapNilai::index', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
