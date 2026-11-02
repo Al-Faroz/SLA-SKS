@@ -147,9 +147,18 @@
                         <tr>
                             <td data-label="Jenis"><?= esc(ucfirst($riwayat['jenis'])) ?></td>
                             <td data-label="Dibuat"><?= esc($riwayat['dibuat_pada']) ?></td>
-                            <td data-label="Status"><?= $riwayat['status'] === 'diterapkan' ? 'Sudah disimpan' : 'Dalam review' ?></td>
+                            <td data-label="Status"><?= esc(match ($riwayat['status']) {
+                                'diterapkan' => 'Sudah disimpan',
+                                'pratinjau' => 'Dalam review',
+                                'kedaluwarsa' => 'Kedaluwarsa',
+                                default => 'Tidak tersedia',
+                            }) ?></td>
                             <td data-label="Tindakan">
-                                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/review/' . $riwayat['id']), 'attr') ?>">Lihat review</a>
+                                <?php if (in_array($riwayat['status'], ['pratinjau', 'diterapkan'], true)): ?>
+                                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/review/' . $riwayat['id']), 'attr') ?>">Lihat review</a>
+                                <?php else: ?>
+                                    <span class="a-help">Unggah ulang Word untuk review baru.</span>
+                                <?php endif ?>
                             </td>
                         </tr>
                     <?php endforeach ?>
