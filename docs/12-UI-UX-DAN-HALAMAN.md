@@ -194,6 +194,11 @@ Waktu gambar/PDF dibaca dari heartbeat sah 5 detik. Gambar yang tidak terlihat/f
 
 Pada kartu Media Audio/Gambar/PDF, tampilkan tombol `Unduh Materi` yang nonaktif dengan penjelasan ketika waktu belajar belum selesai. Setelah server menetapkan `media_selesai`, tampilkan tautan unduh asli. URL harus memiliki gerbang backend yang sama, tidak cukup kontrol tombol saja; respons attachment menggunakan nama berkas aman dan tidak membocorkan path privat.
 
+### Revisi akses ulang tes mandiri (2 November 2026)
+- Pada Rincian TP siswa berstatus `perlu_bantuan`, server menentukan kebutuhan akses ulang dari **percobaan Diagnostik/Sumatif terakhir lintas jenis**; tampilkan **hanya satu aksi** sesuai jenis dan tahap (Sumatif normal/remedial tetap satu jenis Sumatif). Jangan menampilkan tombol Diagnostik apabila Sumatif adalah percobaan terakhir yang gagal selesai.
+- Setelah siswa mengirim permintaan, tampilkan status **Menunggu izin Guru** tanpa form berulang. Guru melihat satu keputusan yang sudah ditentukan sistem: **Izinkan Akses Ulang**. **Tidak ada isian Alasan keputusan atau dropdown keputusan.** Sebab gangguan, Guru, waktu, tes dan tahap tercatat otomatis di audit; sistem tidak mengubah skor/kuota.
+- Layar ujian yang menunjukkan tes tidak selesai harus mengarahkan siswa ke Rincian TP untuk meminta akses ulang; hindari tombol generik yang mengajukan jenis tes keliru.
+
 ## 13. Kontrak layar pola baru v2.5 (menggantikan alur layar tanpa BAB)
 **Guru:** Peta ATP enam semester → Card BAB (nama ≤50, ringkasan ≤225) → daftar TP tiap BAB (kode, nama ≤50, deskripsi asli ≤225, badge jenis) → editor 1 Materi untuk NonEsensial → Diagnostik/Word → Resume/HOTS → Sumatif/Word → kesiapan. Esensial hanya data akademik, tidak menampilkan tombol unggah media/soal. Guru dapat mengisi langsung atau Excel setelah template diadaptasi. Nomor BAB berlanjut antarsemester berpasangan; perlihatkan kode TP contoh `BIND.8.1.1`.
 **Siswa:** Beranda → Semester (progres hanya NonEsensial) → Card BAB → TP Esensial (informasi tanpa tombol pengerjaan) atau NonEsensial (Diagnostik → gate → Materi/Resume/HOTS bila belum lulus → Sumatif wajib → remedial 1 bila perlu → Selesai walau nilai < KKM).
