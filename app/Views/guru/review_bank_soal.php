@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page">
+<div class="a-page a-review-word-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Peta ATP</a>
         <span aria-hidden="true">/</span>
@@ -43,7 +43,7 @@
                                     <tr>
                                         <th scope="row"><?= esc($huruf) ?></th>
                                         <td><div class="a-word-preview"><?= $html ?></div></td>
-                                        <td><?= $soalItem['kunci'] === $huruf ? '✓ Benar' : '—' ?></td>
+                                        <td class="<?= $soalItem['kunci'] === $huruf ? 'a-review-word__kunci-benar' : 'a-review-word__kunci-lain' ?>"><?= $soalItem['kunci'] === $huruf ? '✓ Benar' : '—' ?></td>
                                     </tr>
                                 <?php endforeach ?>
                             </tbody>
