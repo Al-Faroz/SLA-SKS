@@ -25,21 +25,39 @@
             </div>
         <?php else: ?>
             <div class="a-siswa-daftar-tp">
-                <?php foreach ($tp as $item): ?>
-                    <article class="a-siswa-kartu">
-                        <div class="a-siswa-tp-heading">
+                <?php foreach ($bab as $kelompok): ?>
+                    <section class="a-siswa-bab" aria-labelledby="bab-siswa-<?= (int) $kelompok['id'] ?>">
+                        <header class="a-siswa-bab__judul">
                             <div>
-                                <p class="a-proto-eyebrow">Urutan <?= (int) $item['urutan_atp'] ?> · <?= esc((string) $item['kode_tp']) ?></p>
-                                <h3><?= esc((string) $item['judul']) ?></h3>
+                                <p class="a-proto-eyebrow">BAB <?= (int) $kelompok['nomor'] ?></p>
+                                <h3 id="bab-siswa-<?= (int) $kelompok['id'] ?>"><?= esc($kelompok['nama']) ?></h3>
+                                <?php if ($kelompok['deskripsi'] !== ''): ?>
+                                    <p class="a-help"><?= esc($kelompok['deskripsi']) ?></p>
+                                <?php endif ?>
                             </div>
-                            <span class="a-siswa-status <?= esc($item['akses']['kode'], 'attr') ?>"><?= esc($item['akses']['label']) ?></span>
+                            <span class="a-badge"><?= count($kelompok['tp']) ?> TP</span>
+                        </header>
+                        <div class="a-siswa-bab__tp">
+                            <?php foreach ($kelompok['tp'] as $item): ?>
+                                <article class="a-siswa-kartu">
+                                    <div class="a-siswa-tp-heading">
+                                        <div>
+                                            <p class="a-proto-eyebrow">Urutan <?= (int) $item['urutan_atp'] ?> · <?= esc((string) $item['kode_tp']) ?></p>
+                                            <h4><?= esc((string) $item['judul']) ?></h4>
+                                        </div>
+                                        <span class="a-siswa-status <?= esc($item['akses']['kode'], 'attr') ?>"><?= esc($item['akses']['label']) ?></span>
+                                    </div>
+                                    <?php if ($item['akses']['buka']): ?>
+                                        <a class="a-btn a-btn--utama" href="<?= esc(site_url('siswa/tp/' . (int) $item['id']), 'attr') ?>">Lihat rincian TP</a>
+                                    <?php elseif ($item['akses']['kode'] === 'esensial'): ?>
+                                        <p class="a-help">TP Esensial tercatat dalam ATP tanpa aktivitas atau nilai wajib siswa.</p>
+                                    <?php else: ?>
+                                        <p class="a-help"><?= esc($item['akses']['label']) ?></p>
+                                    <?php endif ?>
+                                </article>
+                            <?php endforeach ?>
                         </div>
-                        <?php if ($item['akses']['buka']): ?>
-                            <a class="a-btn a-btn--utama" href="<?= esc(site_url('siswa/tp/' . (int) $item['id']), 'attr') ?>">Lihat rincian TP</a>
-                        <?php else: ?>
-                            <p class="a-help">TP belum dapat dibuka. Ikuti urutan pembelajaran.</p>
-                        <?php endif ?>
-                    </article>
+                    </section>
                 <?php endforeach ?>
             </div>
         <?php endif ?>
