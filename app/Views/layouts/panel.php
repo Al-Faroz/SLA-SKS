@@ -78,6 +78,12 @@ $peranAktif = $peranAktif ?? '';
                 <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#menu"></use></svg> Menu
             </button>
             <div class="a-header__pengguna">
+                <button type="button" class="a-btn a-btn--sekunder a-btn--dokumentasi"
+                        data-documentation-toggle aria-label="Aktifkan Mode Dokumentasi untuk screenshot panjang"
+                        aria-pressed="false" title="Mode Dokumentasi: tata halaman khusus screenshot full-page">
+                    <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#camera"></use></svg>
+                    <span data-documentation-label>Dokumentasi</span>
+                </button>
                 <button type="button" class="a-btn a-btn--tema" data-theme-toggle aria-label="Aktifkan tema terang" title="Aktifkan tema terang" aria-pressed="false">
                     <svg class="a-icon a-tema__ikon--dark" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#sun"></use></svg>
                     <svg class="a-icon a-tema__ikon--light" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#moon"></use></svg>
