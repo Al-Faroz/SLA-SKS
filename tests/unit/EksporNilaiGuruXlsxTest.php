@@ -210,6 +210,22 @@ final class EksporNilaiGuruXlsxTest extends TestCase
         $this->svc()->unduh($this->pilih(),7);
     }
 
+    public function testEksporMelampauiPaginasiRekap25Baris(): void
+    {
+        $users = [];
+        $students = [];
+        for ($i=1;$i<=10;$i++) {
+            $users[] = ['id'=>300+$i,'nama'=>'Siswa Tambahan '.$i];
+            $students[] = ['id'=>400+$i,'pengguna_id'=>300+$i,'angkatan_id'=>1];
+        }
+        $this->db->table('pengguna')->insertBatch($users);
+        $this->db->table('siswa')->insertBatch($students);
+        [$book] = $this->baca($this->svc()->unduh($this->pilih(),1));
+        self::assertSame(36,$book->getSheetByName('SEMESTER 1')->getHighestDataRow()-4);
+        self::assertSame(12,$book->getSheetByName('DAFTAR SISWA')->getHighestDataRow()-4);
+        $book->disconnectWorksheets();
+    }
+
     public function testJalurUnduhTidakMengubahDatabase(): void
     {
         $sebelum=$this->db->table('nilai_tp')->get()->getResultArray();
