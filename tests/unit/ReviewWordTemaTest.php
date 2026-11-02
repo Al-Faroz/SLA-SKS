@@ -29,7 +29,7 @@ final class ReviewWordTemaTest extends TestCase
 
         self::assertStringContainsString('.a-review-word-page .a-word-review-item {', $css);
         self::assertStringContainsString('background:var(--eg-table);', $css);
-        self::assertStringContainsString('.a-review-word-item > summary', $css);
+        self::assertStringContainsString('.a-word-review-item > summary', $css);
         self::assertStringContainsString('color:var(--e-text);', $css);
         self::assertStringContainsString('.a-review-word__kunci-benar', $css);
         self::assertStringContainsString('.a-review-word__kunci-lain', $css);
