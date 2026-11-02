@@ -67,15 +67,37 @@ final class UIKonsistensiHalamanTest extends CIUnitTestCase
     public function testCpPanjangMemilikiNavigasiKeIdNyataDanFormTerbuka(): void
     {
         $sumber = $this->berkas('app/Views/admin/kurikulum_cp.php');
-        foreach (['kurikulum-tambah', 'kurikulum-daftar', 'cp-tambah', 'cp-daftar'] as $id) {
+        foreach (['kurikulum-daftar', 'cp-tambah', 'cp-daftar', 'cp-operasional'] as $id) {
             $this->assertStringContainsString('href="#' . $id . '"', $sumber);
             $this->assertStringContainsString('id="' . $id . '"', $sumber);
         }
-        $this->assertStringContainsString('<details class="a-cp__details" open>', $sumber);
+        $this->assertStringContainsString('id="kurikulum-tambah"', $sumber);
+        $this->assertStringContainsString('<details class="a-cp__details"', $sumber);
+        $this->assertStringContainsString("old('kode') !== null ? 'open' : ''", $sumber);
+        $this->assertStringContainsString('Daftar CP dan sunting langsung', $sumber);
         $this->assertStringContainsString('name="rumusan"', $sumber);
         $this->assertStringNotContainsString('name="sumber_url"', $sumber);
         $this->assertStringNotContainsString('name="tanggal_berlaku"', $sumber);
         $this->assertStringContainsString('Sunting CP', $sumber);
+    }
+
+    public function testPreflightDiagnostikTetapTerbacaDanMenghormatiHidden(): void
+    {
+        $view = $this->berkas('app/Views/siswa/diagnostik_petunjuk.php');
+        $js = $this->berkas('public/assets/js/diagnostik-preflight.js');
+        $css = $this->berkas('public/assets/css/emerald-glass.css');
+
+        $this->assertStringContainsString('data-keluar-fullscreen hidden', $view);
+        $this->assertStringContainsString('data-hasil-preflight role="status"', $view);
+        $this->assertStringContainsString('leave.hidden = !open', $js);
+        $this->assertStringContainsString('.a-diagnostik-tombol [hidden]', $css);
+        $this->assertStringContainsString('display:none !important;', $css);
+        foreach (['.a-diagnostik-hasil {',
+            '.a-diagnostik-hasil[data-status="success"]',
+            '.a-diagnostik-hasil[data-status="checking"]',
+            '.a-diagnostik-hasil[data-status="failed"]'] as $selector) {
+            $this->assertStringContainsString($selector, $css);
+        }
     }
 
     public function testSatuCssDanTokenDipakaiKonsisten(): void

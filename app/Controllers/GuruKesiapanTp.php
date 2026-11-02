@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Services\AuthService;
 use App\Services\KesiapanTpService;
 use App\Services\StepProgressTpService;
+use App\Services\SuntingTpService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -24,9 +25,19 @@ final class GuruKesiapanTp extends BaseController
             $hasil['langkah'] = StepProgressTpService::susun($hasil['cek'],
                 (string) ($hasil['tp']['jenis_tp'] ?? ''),
                 (string) $hasil['tp']['status'], $tpId);
+            $suntingDikunci = false;
+            if ($hasil['tp']['status'] === 'siap') {
+                try {
+                    // Gunakan guard yang sama dengan Rincian TP dan POST sunting.
+                    (new SuntingTpService())->pastikanBelumDipakai($tpId);
+                } catch (DomainException) {
+                    $suntingDikunci = true;
+                }
+            }
             $akun = (new AuthService())->penggunaSaatIni();
             return view('guru/kesiapan_tp', array_merge($hasil, [
                 'judul' => 'Kesiapan TP Siap',
+                'suntingDikunci' => $suntingDikunci,
                 'namaPengguna' => $akun['nama'],
                 'peranAktif' => 'Guru',
                 'tautanNavigasi' => NavigasiService::untuk('guru', 'peta_tp'),

@@ -65,7 +65,7 @@ final class ProgresTpSiswaTest extends TestCase
         self::assertStringContainsString("csrf_field()", $view);
         self::assertStringContainsString("'/mulai'", $view);
         self::assertStringContainsString('Aktifkan TP &amp; simpan versi', $view);
-        self::assertStringContainsString('Tes Diagnostik berjalan melalui ruang ujian khusus', $view);
+        self::assertStringContainsString('Diagnostik adalah langkah ujian pertama', $view);
         self::assertStringContainsString('Buka Materi', $view);
         self::assertStringContainsString("SiswaPembelajaran::mulaiTp", $route);
         self::assertStringContainsString("'auth:siswa'", $route);

@@ -146,7 +146,9 @@ final class KatalogPembelajaranSiswaService
     {
         $baris = $this->db->table('tp t')
             ->select('t.id,t.kode_tp,t.judul,t.urutan_atp,t.status,t.jenis_tp,' .
+                't.bab_id,b.nomor_bab,b.nama_bab,b.deskripsi_bab,' .
                 '(SELECT COUNT(*) FROM versi_konten_tp v WHERE v.tp_id=t.id) AS jumlah_versi', false)
+            ->join('bab b', 'b.id=t.bab_id AND b.paket_semester_id=t.paket_semester_id')
             ->where('t.paket_semester_id', $paketId)
             ->where('t.status !=', 'arsip')
             ->orderBy('t.urutan_atp', 'ASC')->orderBy('t.id', 'ASC')->get()->getResultArray();
@@ -288,10 +290,27 @@ final class KatalogPembelajaranSiswaService
                 )) {
                     throw new DomainException('Semester ini belum tersedia untuk pembelajaran Anda.');
                 }
+                $tp = $this->tpUntukPaket($paketId,
+                    (int) $paket['semester'], (int) $siswa['mulai_efektif'],
+                    (int) $siswa['id']);
+                // BAB asli dari database, bukan hasil memecah kode TP.
+                // Status akses tetap dihitung untuk seluruh urutan TP NonEsensial.
+                $bab = [];
+                foreach ($tp as $item) {
+                    $id = (int) $item['bab_id'];
+                    if (!isset($bab[$id])) {
+                        $bab[$id] = [
+                            'id' => $id,
+                            'nomor' => (int) $item['nomor_bab'],
+                            'nama' => (string) $item['nama_bab'],
+                            'deskripsi' => (string) ($item['deskripsi_bab'] ?? ''),
+                            'tp' => [],
+                        ];
+                    }
+                    $bab[$id]['tp'][] = $item;
+                }
                 return ['siswa' => $siswa, 'paket' => $paket,
-                    'tp' => $this->tpUntukPaket($paketId,
-                        (int) $paket['semester'], (int) $siswa['mulai_efektif'],
-                        (int) $siswa['id'])];
+                    'tp' => $tp, 'bab' => array_values($bab)];
             }
         }
         throw new DomainException('Paket semester tidak tersedia untuk Gen Anda.');

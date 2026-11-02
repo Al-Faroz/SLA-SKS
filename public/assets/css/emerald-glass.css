@@ -1196,6 +1196,32 @@ html[data-theme] .a-app--prototipe .a-siswa-kartu > .a-btn {
   margin-top:auto;
   max-width:100%;
 }
+/* Diagnostik preflight S05: keadaan hidden wajib dihormati walau .a-btn
+   memakai display:inline-flex. Hasil tes terbaca pada tema Dark dan Light. */
+html[data-theme] .a-app--prototipe .a-diagnostik-tombol [hidden] {
+  display:none !important;
+}
+html[data-theme="dark"] .a-app--prototipe .a-diagnostik-hasil {
+  background:#183D31;
+  border:1px solid #487A65;
+  color:#F0F8F3;
+}
+html[data-theme="dark"] .a-app--prototipe .a-diagnostik-hasil[data-status="success"] {
+  background:#164735;
+  border-color:#50DEAC;
+  color:#D8F9E9;
+}
+html[data-theme="dark"] .a-app--prototipe .a-diagnostik-hasil[data-status="checking"] {
+  background:#193A48;
+  border-color:#81BBDA;
+  color:#D9F0FF;
+}
+html[data-theme="dark"] .a-app--prototipe .a-diagnostik-hasil[data-status="failed"] {
+  background:#493619;
+  border-color:#DEB75C;
+  color:#FFF0C9;
+}
+
 /* Status bukan tombol: kode kelas akses tetap berasal dari server. */
 html[data-theme] .a-app--prototipe .a-siswa-status {
   background:var(--es-surface-soft);

@@ -37,7 +37,13 @@
                     Versi konten <?= (int) $versi_terbit['nomor_versi'] ?> disimpan
                     pada <?= esc((string) $versi_terbit['disiapkan_pada']) ?> (UTC).
                 <?php endif ?>
-                Selama TP belum digunakan siswa, Guru dapat membuka editor normal dari Rincian TP.
+                <?php if ($suntingDikunci): ?>
+                    TP telah digunakan siswa. Rincian, KKM, Materi, Resume/HOTS,
+                    dan Bank Soal terkunci untuk menjaga riwayat pembelajaran.
+                <?php else: ?>
+                    TP belum digunakan siswa. Guru dapat memilih Sunting TP
+                    pada Rincian TP untuk kembali ke Draf dan menerbitkan versi baru.
+                <?php endif ?>
             </div>
         <?php elseif ($siap): ?>
             <div class="a-alert" role="status">
@@ -54,16 +60,23 @@
 
     <section class="a-card a-jarak-atas" aria-labelledby="judul-tahapan-final">
         <h2 id="judul-tahapan-final">Step Progress penyiapan TP</h2>
-        <p class="a-help">Langkah yang belum lengkap dapat dibuka langsung.
-            Status ini berasal dari pemeriksaan Service yang sama dengan keputusan publikasi.</p>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            Semua langkah penerbitan telah diperiksa. Rincian berikut merupakan
+            status konten yang sudah diterbitkan, bukan izin untuk menyuntingnya.
+            <?php else: ?>
+            Langkah yang belum lengkap dapat dibuka langsung.
+            Status ini berasal dari pemeriksaan Service yang sama dengan keputusan publikasi.
+            <?php endif ?></p>
         <?= view('guru/_step_progress_tp', ['langkah' => $langkah]) ?>
     </section>
 
     <section class="a-card a-jarak-atas" aria-labelledby="judul-checklist-akhir">
         <h2 id="judul-checklist-akhir">Daftar pemeriksaan final</h2>
-        <p class="a-help">Pemeriksaan ini meliputi CP resmi, seluruh Materi, media,
-            bank soal Diagnostik/Sumatif, dan pengaturan ujian. Publikasi tetap
-            memerlukan konfirmasi Guru.</p>
+        <p class="a-help">Pemeriksaan meliputi CP resmi, Materi, media,
+            bank soal Diagnostik/Sumatif, dan pengaturan ujian.
+            <?= $tp['status'] === 'siap'
+                ? 'Konten TP sudah diterbitkan; hasil ini adalah informasi pemeriksaan.'
+                : 'Publikasi memerlukan konfirmasi Guru setelah seluruh syarat terpenuhi.' ?></p>
         <details class="a-tp-kesiapan-detail">
             <summary class="a-btn a-btn--sekunder">Lihat rincian ketentuan (<?= count($cek) ?> pemeriksaan)</summary>
         <div class="a-tabel-gulir">

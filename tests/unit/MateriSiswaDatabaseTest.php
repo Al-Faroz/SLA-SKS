@@ -31,7 +31,8 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,nomor_versi INTEGER,status TEXT)',
             'CREATE TABLE penugasan_paket(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,paket_id INTEGER)',
-            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,rumusan TEXT,indikator TEXT,jenis_tp TEXT DEFAULT \'non_esensial\',resume_min INTEGER,tugas_min INTEGER)',
+             'CREATE TABLE bab (id INTEGER PRIMARY KEY, paket_semester_id INT, nomor_bab INT, nama_bab TEXT, deskripsi_bab TEXT)',
+            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,bab_id INT DEFAULT 1,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,rumusan TEXT,indikator TEXT,jenis_tp TEXT DEFAULT \'non_esensial\',resume_min INTEGER,tugas_min INTEGER)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,nomor_versi INTEGER,snapshot_json TEXT,checksum TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
@@ -61,6 +62,9 @@ final class MateriSiswaDatabaseTest extends TestCase
         $this->db->table('penugasan_paket')->insert([
             'id'=>8,'angkatan_id'=>1,'mapel_id'=>5,'semester'=>4,
             'tahun_ajaran_id'=>1,'paket_id'=>8,
+        ]);
+        $this->db->table('bab')->insertBatch([
+            ['id'=>1,'paket_semester_id'=>8,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 1','deskripsi_bab'=>'Contoh untuk pengujian'],
         ]);
         $this->db->table('tp')->insert([
             'id'=>1,'paket_semester_id'=>8,'kode_tp'=>'TP-1',
