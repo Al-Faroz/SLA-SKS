@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Referensi Akademik</p>
             <h1>Referensi Kurikulum &amp; CP</h1>
-            <p class="a-proto-muted">Kelola sumber resmi CP Fase D per mapel. CP yang telah terbit tidak bisa disunting; perubahan diterbitkan sebagai versi baru.</p>
+            <p class="a-proto-muted">CP yang sudah tersimpan, termasuk yang telah dipakai TP, dapat diperbaiki melalui <strong>Sunting CP</strong>. Sistem menyimpan draf versi baru dan menerbitkan revisi tanpa menimpa CP historis atau snapshot TP Siap.</p>
         </div>
     </header>
     <?php if ($galat = session()->getFlashdata('galat')): ?>
@@ -222,7 +222,16 @@
                             <td data-label="Mapel / Fase"><?= esc($item['mapel_nama']) ?> · <?= esc($item['fase']) ?></td>
                             <td data-label="Versi resmi"><?= $item['versi_aktif_id'] === null ? '<span class="a-badge a-badge--tunggu">Belum terbit</span>' : 'v' . (int) $item['versi_aktif'] ?></td>
                             <td data-label="Draf"><?= $item['versi_draf_id'] === null ? '—' : 'v' . (int) $item['versi_draf'] ?></td>
-                            <td data-label="Aksi"><a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Lihat versi</a></td>
+                            <td data-label="Aksi">
+                                <?php if ($item['versi_draf_id'] !== null): ?>
+                                    <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/versi/' . (int) $item['versi_draf_id'] . '/edit'), 'attr') ?>">Lanjut Sunting CP</a>
+                                <?php elseif ($item['versi_aktif_id'] !== null): ?>
+                                    <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id'] . '/versi-baru'), 'attr') ?>">Sunting CP</a>
+                                <?php else: ?>
+                                    <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Kelola Draf</a>
+                                <?php endif ?>
+                                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $item['id']), 'attr') ?>">Riwayat</a>
+                            </td>
                         </tr>
                     <?php endforeach ?>
                     </tbody>
