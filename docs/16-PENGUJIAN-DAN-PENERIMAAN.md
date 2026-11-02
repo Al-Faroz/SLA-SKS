@@ -311,3 +311,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Status selesai dan belum selesai memiliki latar/border berbeda serta teks, bukan warna saja; warna teks `✓ Selesai` menggunakan merah kontras pada Dark dan Light. Periksa urutan keyboard, tombol Lihat/Lengkapi, HP/tablet/desktop.
 - Step Sumatif juga mensyaratkan kode pemeriksaan `kkm` (sama dengan Diagnostik), tidak boleh selesai hanya karena bank soalnya cukup ketika KKM efektif tidak valid.
 - **Tahap berikutnya (butuh dump SQL terbaru):** audit penyimpanan `kkm_default` Admin dan `tp.kkm_khusus` Guru vs pembacaan `tp.kkm` saat ini; kemudian form satu nilai KKM efektif yang terlihat pada tab Diagnostik/Sumatif, dapat diganti Guru pada TP draf, konsisten hingga snapshot, soal dan mesin ujian. Jangan menambah kolom/tes DB asumtif sebelum audit dump privat terbaru.
+
+
+### Regresi KKM Admin/Guru dan identitas ringkas — 2 November 2026
+- Draf non_esensial tanpa default Admin dan tanpa KKM khusus Guru belum dapat diterbitkan, meskipun `tp.kkm` historis 75. Isi default Admin melalui `admin/kkm`, periksa Diagnostik+Sumatif menampilkan angka sama. Override Guru lalu buka kedua tab dan periksa angka yang sama.
+- Hapus override memakai tombol **Ikuti Default Admin**; pastikan kembali mengikuti nilai Admin. Perubahan default Admin selanjutnya mempengaruhi TP draf tanpa override, tetapi tidak mengubah TP Siap atau snapshot lama. TP Esensial tidak menerima penyesuaian KKM ujian.
+- Uji keamanan: akun Siswa/Admin tidak boleh POST ke rute KKM Guru; Guru lain tak boleh mengubah TP; CSRF ditolak; versi TP usang harus meminta muat ulang; perubahan KKM menghasilkan audit tanpa menghapus soal/Word/Materi.
+- Tampilan Kelola TP memakai kartu Identitas TP ringkas pada desktop, laptop, HP; seluruh lima metadata tetap terbaca. Import Word diagnostik/sumatif yang sudah FIX tidak diubah.
+- PHPUnit `KkmTpServiceTest` memeriksa batas 1–100 dan pemilihan KKM; CI lint file terkait. Pengujian penuh penyimpanan DB dan browser tetap menunggu XAMPP.
