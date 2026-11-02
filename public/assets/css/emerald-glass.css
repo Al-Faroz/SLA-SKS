@@ -1646,3 +1646,127 @@ html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tb
     font-size:13px;
   }
 }
+
+
+/* =============================================================
+   MODE DOKUMENTASI — screenshot full-page Chrome.
+   Sidebar sticky 100vh + overflow-y internal dan backdrop blur
+   menciptakan lapisan komposit yang sering keliru dijahit oleh
+   ekstensi capture. Perubahan hanya saat tombol Dokumentasi aktif.
+   Tidak mempengaruhi UI harian, media pembelajaran, atau ujian.
+   ============================================================= */
+html[data-theme="dark"][data-documentation="on"] {
+  --eg-document-wall:#062C21;
+  --eg-document-side:#09281F;
+  --eg-document-panel:#10372B;
+}
+html[data-theme="light"][data-documentation="on"] {
+  --eg-document-wall:#EFF7F1;
+  --eg-document-side:#E5F0E9;
+  --eg-document-panel:#FFFFFF;
+}
+html[data-theme][data-documentation="on"] {
+  scroll-behavior:auto;
+}
+html[data-theme][data-documentation="on"] body {
+  overflow:visible;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe {
+  background:var(--eg-document-wall);
+  align-items:stretch;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-main,
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-main__konten,
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-page {
+  overflow:visible;
+  min-width:0;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-header {
+  position:static;
+  background:var(--eg-document-panel);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  box-shadow:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe :is(
+  .a-side,.a-header,.a-card,.a-proto-panel,.a-atp-kelompok,.a-siswa-kartu
+) {
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card,
+html[data-theme][data-documentation="on"] .a-app--prototipe :is(.a-proto-panel,.a-atp-kelompok) {
+  background:var(--eg-document-panel);
+  box-shadow:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card::before,
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-atp-kelompok::before {
+  content:none;
+  display:none;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi {
+  border-color:var(--e-primary);
+  color:var(--e-text);
+  background:var(--e-soft-hover);
+  font-weight:750;
+}
+html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi:focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:3px;
+}
+@media (min-width:768px) {
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side {
+    position:static;
+    inset:auto;
+    top:auto;
+    bottom:auto;
+    height:auto;
+    min-height:100%;
+    max-height:none;
+    overflow:visible;
+    align-self:stretch;
+    transform:none;
+    transition:none;
+    visibility:visible;
+    background:var(--eg-document-side);
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+}
+@media (max-width:900px) {
+  html[data-theme] .a-app--prototipe .a-btn--dokumentasi {
+    width:42px;
+    min-width:42px;
+    padding:8px;
+  }
+  html[data-theme] .a-app--prototipe .a-btn--dokumentasi [data-documentation-label] {
+    display:none;
+  }
+}
+@media print {
+  /* Print/PDF memakai aliran yang sama; kontrol interaktif tidak dicetak. */
+  html[data-theme] .a-app--prototipe {
+    display:block !important;
+    background:#fff !important;
+  }
+  html[data-theme] .a-app--prototipe :is(.a-side,.a-backdrop,.a-header) {
+    display:none !important;
+  }
+  html[data-theme] .a-app--prototipe .a-main,
+  html[data-theme] .a-app--prototipe .a-main__konten {
+    width:100% !important;
+    max-width:100% !important;
+    padding:0 !important;
+    overflow:visible !important;
+  }
+  html[data-theme] .a-app--prototipe .a-page > .a-card {
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    break-inside:auto;
+  }
+  html[data-theme] .a-app--prototipe .a-page > .a-card::before {
+    content:none !important;
+  }
+}
