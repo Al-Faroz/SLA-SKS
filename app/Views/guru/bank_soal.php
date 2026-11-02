@@ -85,7 +85,7 @@
                         <input class="a-input" id="kkm-khusus" name="kkm_khusus" type="number" inputmode="numeric" min="1" max="100" step="1" placeholder="Isi nilai 1–100" value="<?= $kkm_info['efektif'] === null ? '' : (int) $kkm_info['efektif'] ?>">
                     </div>
                     <button type="submit" class="a-btn a-btn--utama" name="pilihan" value="khusus">Simpan KKM Khusus</button>
-                    <?php if ($kkm_info['default'] !== null): ?>
+                    <?php if ($kkm_info['default'] !== null && $kkm_info['khusus'] !== null): ?>
                         <button type="submit" class="a-btn a-btn--sekunder" name="pilihan" value="default">Ikuti Default Admin</button>
                     <?php endif ?>
                 </form>
