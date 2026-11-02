@@ -41,6 +41,20 @@ final class GuruDetailTp extends BaseController
         ]));
     }
 
+    public function bukaSunting(int $id): RedirectResponse
+    {
+        try {
+            (new \App\Services\SuntingTpService())->buka($id);
+            return redirect()->to(site_url('guru/tp/' . $id))
+                ->with('sukses', 'Editor TP dibuka. Tinjau ulang kesiapan setelah menyunting, lalu siapkan TP kembali.');
+        } catch (DomainException $e) {
+            return redirect()->to(site_url('guru/tp/' . $id))->with('galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Buka sunting TP gagal: ' . get_class($e));
+            return redirect()->to(site_url('guru/tp/' . $id))->with('galat', 'Editor TP belum dapat dibuka. Periksa log server.');
+        }
+    }
+
     public function simpan(int $id): RedirectResponse
     {
         // Route auth:guru serta CSRF global; Service tetap memeriksa G1.
@@ -64,7 +78,7 @@ final class GuruDetailTp extends BaseController
         }
 
         return redirect()->to(site_url('guru/tp/' . $id))
-            ->with('sukses', 'Draf TP berhasil disimpan.');
+            ->with('sukses', 'TP berhasil disimpan.');
     }
 
 }
