@@ -117,3 +117,9 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 - `AturanPraSemesterService` adalah validator murni kelayakan seluruh TP NonEsensial, bank soal minimal 30/cakupan BAB, dan jendela **boleh mulai** (WIB); jangan mengubahnya menjadi timer global peserta.
 - `PraSemesterGuruService` menangani bank Guru G1 dan KKM paket. `PraSemesterJadwalService` menangani jadwal dan durasi paket hanya untuk Admin. Adapter mesin berikutnya mengunci percobaan, membuat waktu aktif masing-masing saat mulai, dan tidak memotong durasi ketika jadwal masuk berakhir.
 - Tahap susulan/remedial hanya boleh diaktifkan setelah skema jadwal per sesi dan daftar peserta ada, dengan audit, otorisasi dan izin mulai sesuai jadwal Admin; tidak boleh meminjam izin akses ulang Diagnostik/Sumatif.
+
+
+### Adapter A8-4 (3 November 2026)
+- Service `PenilaianPraSemesterService::ringkas($percobaan)` menerima **urutan kronologis attempt** Pra-Semester satu siswa dan satu bank, menghitung nilai awal, remedial, nilai terbaik, status final/sementara serta fase kesempatan berikutnya. Tidak menyentuh SQL maupun mengubah data.
+- `AturanJadwalPraSemesterService::periksaMulai($jadwal,$percobaan,$waktuServer,...)` memeriksa jenis sesi `utama|remedial|susulan`, tahap `normal|remedial`, jendela WIB, peserta susulan yang ditetapkan Admin, kesiapan TP/bank/perangkat/fullscreen, dan melarang percobaan baru saat masih ada percobaan aktif. Jika sudah aktif, kelanjutan memakai token yang sama bahkan jika jendela mulai ditutup.
+- Adapter berikutnya wajib memverifikasi kepemilikan paket **Gen–Mapel–Semester**, G1/Admin, identitas peserta dan sesi, kunci transaksi sebelum membuat attempt, snapshot soal/KKM, serta audit. Semua data diperoleh dari server, bukan dipilih bebas lewat POST siswa. **Belum ada skema jadwal remedial/susulan** terverifikasi dari XAMPP pascapatch, jadi jangan memanggil fungsi ini untuk membuka akses tanpa jadwal tersimpan.
