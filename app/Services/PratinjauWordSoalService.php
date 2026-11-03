@@ -155,9 +155,13 @@ final class PratinjauWordSoalService
                 if (count($benar) !== 1) {
                     throw new DomainException('Soal ' . ($i + 1) . ': wajib tepat satu kunci ✓.');
                 }
-                $hasil[] = ['nomor' => $i + 1, 'pertanyaan' => $soal,
-                    'opsi' => $opsi, 'kunci' => $benar[0], 'konten' => $media,
-                    'bab_id' => $babId, 'nomor_bab' => $nomorBab];
+                $item = ['nomor' => $i + 1, 'pertanyaan' => $soal,
+                    'opsi' => $opsi, 'kunci' => $benar[0], 'konten' => $media];
+                if ($pra) {
+                    $item['bab_id'] = $babId;
+                    $item['nomor_bab'] = $nomorBab;
+                }
+                $hasil[] = $item;
             }
             if ($pra) {
                 $tercakup = array_unique(array_column($hasil, 'nomor_bab'));
