@@ -7,7 +7,7 @@ SELECT 'ujian_pra_semester' tabel,COUNT(*) jumlah FROM ujian_pra_semester
 UNION ALL SELECT 'soal_pra_semester',COUNT(*) FROM soal_pra_semester
 UNION ALL SELECT 'percobaan_ujian',COUNT(*) FROM percobaan_ujian;
 
--- Jalankan SETELAH impor:
+-- Pemeriksaan berikut aman SEBELUM maupun SETELAH impor:
 SELECT table_name FROM information_schema.tables
 WHERE table_schema=DATABASE()
   AND table_name IN ('jadwal_pra_sesi','peserta_pra_susulan');
@@ -18,6 +18,11 @@ WHERE table_schema=DATABASE()
   AND column_name='jadwal_pra_sesi_id';
 SELECT versi,diterapkan_pada FROM schema_version
 WHERE versi='V4-0009-PRA-SESI-TERJADWAL';
-SELECT 'jadwal_pra_sesi' tabel,COUNT(*) jumlah FROM jadwal_pra_sesi
-UNION ALL SELECT 'peserta_pra_susulan',COUNT(*) FROM peserta_pra_susulan;
--- Tidak ada nama/NISN/jawaban/kunci atau hash sandi yang ditampilkan.
+SELECT table_name,constraint_name,constraint_type
+FROM information_schema.table_constraints
+WHERE table_schema=DATABASE()
+  AND table_name IN ('jadwal_pra_sesi','peserta_pra_susulan','percobaan_ujian')
+  AND (constraint_name LIKE 'fk_%' OR constraint_name LIKE 'uq_pra_%'
+       OR constraint_name LIKE 'ck_jadwal_%')
+ORDER BY table_name,constraint_name;
+-- Semua SELECT aman saat tabel baru belum ada. Tidak ada nama/NISN/jawaban/kunci/hash.
