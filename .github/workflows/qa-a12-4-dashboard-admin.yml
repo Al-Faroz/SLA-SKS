@@ -1,0 +1,44 @@
+name: QA A12-4 Dashboard Admin
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/DashboardAdminService.php'
+      - 'app/Controllers/Akun.php'
+      - 'app/Views/admin/beranda_prototipe.php'
+      - 'public/assets/css/app.css'
+      - 'tests/unit/DashboardAdminDatabaseTest.php'
+      - '.github/workflows/qa-a12-4-dashboard-admin.yml'
+      - 'docs/CHECKPOINT-A12-4-DASHBOARD-ADMIN-2026-11-03.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan direktori writable
+        run: mkdir -p writable/private/sertifikat/aset writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          for file in \
+            app/Services/DashboardAdminService.php \
+            app/Controllers/Akun.php \
+            app/Views/admin/beranda_prototipe.php \
+            tests/unit/DashboardAdminDatabaseTest.php; do
+            php -l "$file"
+          done
+      - name: PHPUnit KPI dan kesiapan Admin (fixture SQLite anonim)
+        run: vendor/bin/phpunit --no-coverage tests/unit/DashboardAdminDatabaseTest.php
+      - name: Regresi Dashboard Pimpinan
+        run: vendor/bin/phpunit --no-coverage tests/unit/DashboardPimpinanDatabaseTest.php
