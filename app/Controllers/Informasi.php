@@ -127,7 +127,7 @@ final class Informasi extends BaseController
 
     private function simpan(string $jenis, ?int $id): RedirectResponse
     {
-        $root = $jenis === 'faq' ? 'admin/faq' : $this->request->getUri()->getSegment(1) . '/pengumuman';
+        $root = $this->prefix($jenis);
         $tujuan = site_url($root . ($id ? '/'. $id . '/sunting' : '/tambah'));
         try {
             $input = $this->request->getPost();
@@ -149,7 +149,7 @@ final class Informasi extends BaseController
 
     private function arsip(string $jenis, int $id): RedirectResponse
     {
-        $root = $jenis === 'faq' ? 'admin/faq' : $this->request->getUri()->getSegment(1) . '/pengumuman';
+        $root = $this->prefix($jenis);
         try {
             $versi = filter_var($this->request->getPost('versi'), FILTER_VALIDATE_INT);
             (new InformasiGlobalService())->arsipkan($jenis, $id, $versi === false ? 0 : (int) $versi);
