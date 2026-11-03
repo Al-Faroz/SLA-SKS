@@ -65,3 +65,11 @@ Penyuntingan CP oleh Admin dan isian BAB oleh Guru bukan tindakan menerbitkan/me
 - Siswa melihat `/siswa/sertifikat` dan mengunduh PDF berizin miliknya, Admin berhak unduh untuk audit. Verifikasi publik `/verifikasi/{kode}` menampilkan whitelist nomor, nama, mapel, semester, nilai TP dan status berlaku/digantikan (serta tautan versi aktif). **Tidak ada NISN, TTD, kontak, alasan revisi, token sesi atau PDF** pada laman publik.
 - URL verifikasi dalam QR mengikuti `site_url`: di XAMPP beralamat localhost dan hanya cocok untuk uji lokal; untuk dokumen nyata sekolah domain **HTTPS permanen** wajib disiapkan terlebih dahulu (Master 15). Tidak mengklaim QR sebagai TTE tersertifikasi.
 - Tahap ini mensyaratkan patch SQL additive `V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql`, bukan Migration/Seeder. Audit dump privat v4 (15) dilakukan; pengujian MariaDB aktif dan XAMPP tetap dibutuhkan untuk PASS.
+
+### A11-3 — Koreksi desain hasil cetak A4 dari uji XAMPP (3 November 2026)
+
+- Sumber QA: PDF sertifikat demo A11-2 yang berhasil diterbitkan di XAMPP, satu halaman A4 landscape, berisi dua BAB/empat TP, QR dan TTD. Ditemukan ruang kosong besar di bawah bingkai karena `SertifikatPdfService` membuat kartu setinggi konten saja; ukuran teks cetak juga relatif kecil.
+- Renderer cetak menggunakan tinggi halaman penuh pada sertifikat pendek **maksimum 4 TP dan 3 BAB**, dengan tipografi fisik satuan `pt`, ruang identitas siswa lebih jelas, tabel TP/BAB lebih terbaca, dan QR/TTD ditempatkan seimbang dekat bawah bingkai.
+- Untuk jumlah TP lebih banyak, gunakan footer dalam alur halaman normal, bukan footer absolut yang dapat menumpuk tabel. Jika Dompdf masih membentuk halaman ekstra pada mode pendek, renderer mengulang menggunakan mode alur normal. Semua TP tidak boleh disembunyikan untuk memaksakan satu halaman.
+- Pratinjau template bawaan kini menggunakan **dua BAB/empat TP sintetis**, tidak menggunakan data siswa atau TTD nyata. Perubahan ini **hanya berlaku pada PDF yang dirender setelah kode diperbarui**; PDF yang sudah diterbitkan tidak boleh dihapus/ditimpa dan tidak otomatis menghasilkan nomor/QR baru.
+- Koreksi estetika/layout tidak mengubah nilai TP, syarat kelayakan, versi/QR lama, aturan revisi, ataupun pemisahan Pra-Semester. Tetap tidak ada Nilai Akhir Semester.
