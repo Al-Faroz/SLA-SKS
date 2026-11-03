@@ -206,6 +206,7 @@ final class KelayakanSertifikatService
                 $selesai++;
                 if ($p['status_nilai'] !== 'final'
                     || $p['nilai_tp'] === null || $p['nilai_sumatif'] === null
+                    || !in_array($p['jalur'],['lulus_diagnostik','belajar_wajib'],true)
                     || ($p['jalur'] === 'belajar_wajib'
                         && ($p['nilai_resume'] === null || $p['nilai_hots'] === null))) {
                     $alasan[] = $kode.': penilaian TP belum Final atau belum lengkap.';
