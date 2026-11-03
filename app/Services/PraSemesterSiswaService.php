@@ -105,6 +105,18 @@ final class PraSemesterSiswaService
         $kkm = $ujian
             ? (new KkmTpService($this->db,$this->akun))->informasi($ujian)
             : ['efektif'=>null,'default'=>null,'khusus'=>null,'sumber'=>'belum_tersedia'];
+        // Setelah peserta pertama memulai, KKM harus identik untuk
+        // SELURUH siswa paket ini, walaupun default Admin kemudian diubah.
+        if ($ujian) {
+            $awalSah = $this->db->table('percobaan_ujian')
+                ->select('kkm')->where('ujian_pra_semester_id',(int)$ujian['id'])
+                ->where('jenis','pra_semester')
+                ->orderBy('id','ASC')->get(1)->getRowArray();
+            if ($awalSah) {
+                $kkm['efektif'] = (int)$awalSah['kkm'];
+                $kkm['sumber'] = 'snapshot_ujian';
+            }
+        }
         if (!$ujian || $ujian['status'] !== 'siap') {
             $gerbang['boleh_mulai'] = false;
             $gerbang['alasan'][] = 'Guru/Admin belum menyiapkan dan membuka ujian utama.';
