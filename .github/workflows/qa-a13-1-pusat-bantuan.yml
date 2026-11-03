@@ -1,0 +1,48 @@
+name: QA A13-1 Pusat Bantuan Peran
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/PanduanBantuanService.php'
+      - 'app/Controllers/Bantuan.php'
+      - 'app/Views/bantuan/index.php'
+      - 'app/Config/Routes.php'
+      - 'app/Services/NavigasiService.php'
+      - 'public/assets/css/app.css'
+      - 'tests/unit/PanduanBantuanServiceTest.php'
+      - '.github/workflows/qa-a13-1-pusat-bantuan.yml'
+      - 'docs/CHECKPOINT-A13-1-PUSAT-BANTUAN-2026-11-03.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  panduan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan direktori writable
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP Bantuan dan integrasi
+        run: |
+          for f in \
+            app/Services/PanduanBantuanService.php \
+            app/Controllers/Bantuan.php \
+            app/Views/bantuan/index.php \
+            app/Config/Routes.php \
+            app/Services/NavigasiService.php \
+            tests/unit/PanduanBantuanServiceTest.php; do
+            php -l "$f"
+          done
+      - name: Tes panduan empat peran, rute berizin dan privasi
+        run: vendor/bin/phpunit --no-coverage tests/unit/PanduanBantuanServiceTest.php
+      - name: Regresi menu dan layout Admin terakhir
+        run: vendor/bin/phpunit --no-coverage tests/unit/AdminUiAuditTest.php
