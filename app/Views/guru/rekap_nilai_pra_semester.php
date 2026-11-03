@@ -8,7 +8,7 @@ $urlFilter = static fn (int $page): string =>
         'pilihan'=>$pilihan_aktif,'semester'=>$semester,'halaman'=>$page,
     ]);
 ?>
-<div class="a-page">
+<div class="a-page a-rekap-page a-rekap-page--pra">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'),'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
@@ -27,9 +27,10 @@ $urlFilter = static fn (int $page): string =>
     <?php if ($pesan=session()->getFlashdata('rekap_galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
     <?php endif ?>
-    <nav class="a-penilaian-aksi" aria-label="Jenis rekap">
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/rekap-nilai'),'attr') ?>">Nilai TP</a>
-        <a class="a-btn a-btn--utama" aria-current="page"
+    <nav class="a-rekap-switch" aria-label="Jenis rekap nilai">
+        <a class="a-rekap-switch__link"
+            href="<?= esc(site_url('guru/rekap-nilai'),'attr') ?>">Nilai TP</a>
+        <a class="a-rekap-switch__link is-aktif" aria-current="page"
             href="<?= esc(site_url('guru/rekap-nilai/pra-semester'),'attr') ?>">Nilai Pra-Semester</a>
     </nav>
     <section class="a-card a-jarak-atas" aria-labelledby="filter-pra">
@@ -39,7 +40,7 @@ $urlFilter = static fn (int $page): string =>
         <?php else: ?>
             <form method="get" action="<?= esc(site_url('guru/rekap-nilai/pra-semester'),'attr') ?>"
                 class="a-form">
-                <div class="a-filter-rekap-grid">
+                <div class="a-filter-rekap-grid a-filter-rekap-grid--dua">
                     <div class="a-field">
                         <label class="a-label" for="pra-gen">Gen – Mata Pelajaran</label>
                         <select class="a-input" id="pra-gen" name="pilihan" required>
@@ -86,9 +87,10 @@ $urlFilter = static fn (int $page): string =>
             <?php if ($rekap['baris'] === []): ?>
                 <div class="a-alert" role="status">Tidak ada siswa pada Gen ini.</div>
             <?php else: ?>
-                <div class="a-table-wrap" tabindex="0" role="region"
+                <p class="a-rekap-scroll-hint">Geser tabel ke samping untuk melihat seluruh kolom nilai.</p>
+                <div class="a-tabel-gulir a-rekap-scroll" tabindex="0" role="region"
                     aria-label="Tabel nilai Pra-Semester dapat digulir horizontal">
-                    <table class="a-table">
+                    <table class="a-tbl a-rekap-table a-rekap-table--pra">
                         <thead><tr>
                             <th scope="col">Siswa</th>
                             <th scope="col">Semester</th>
@@ -101,13 +103,25 @@ $urlFilter = static fn (int $page): string =>
                         <tbody>
                             <?php foreach ($rekap['baris'] as $r): ?>
                                 <tr>
-                                    <th scope="row"><?= esc($r['nama_siswa']) ?></th>
-                                    <td><?= (int)$r['semester'] ?></td>
-                                    <td><?= $r['kkm'] === null ? '—' : (int)$r['kkm'] ?></td>
-                                    <td><?= esc($nilaiTampil($r['skor_normal'])) ?></td>
-                                    <td><?= esc($nilaiTampil($r['skor_remedial'])) ?></td>
-                                    <td><strong><?= esc($nilaiTampil($r['nilai_terbaik'])) ?></strong></td>
-                                    <td><?= esc($r['status_label']) ?></td>
+                                    <th scope="row" class="a-rekap-table__siswa"><?= esc($r['nama_siswa']) ?></th>
+                                    <td class="a-rekap-table__angka"><?= (int)$r['semester'] ?></td>
+                                    <td class="a-rekap-table__angka"><?= $r['kkm'] === null ? '—' : (int)$r['kkm'] ?></td>
+                                    <?php foreach (['skor_normal','skor_remedial','nilai_terbaik'] as $kolom): ?>
+                                        <td class="a-rekap-table__angka">
+                                            <?php if ($r[$kolom] === null): ?>
+                                                <span class="a-rekap-table__kosong">—</span>
+                                            <?php else: ?>
+                                                <strong><?= esc($nilaiTampil($r[$kolom])) ?></strong>
+                                            <?php endif ?>
+                                        </td>
+                                    <?php endforeach ?>
+                                    <td>
+                                        <span class="a-rekap-status <?= ($r['status_nilai'] ?? '') === 'final'
+                                            ? 'a-rekap-status--final' : (($r['status_nilai'] ?? '') === 'sementara'
+                                            ? 'a-rekap-status--sementara' : 'a-rekap-status--netral') ?>">
+                                            <?= esc($r['status_label']) ?>
+                                        </span>
+                                    </td>
                                 </tr>
                             <?php endforeach ?>
                         </tbody>
