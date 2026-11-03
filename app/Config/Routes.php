@@ -24,6 +24,8 @@ $routes->post('peran/ganti', 'Akun::prosesGantiPeran', ['filter' => 'auth']);
 
 $routes->get('siswa', 'Akun::berandaSiswa', ['filter' => 'auth:siswa']);
 $routes->get('siswa/pembelajaran', 'SiswaPembelajaran::mapel', ['filter' => 'auth:siswa']);
+$routes->get('siswa/laporan', 'SiswaLaporan::index', ['filter' => 'auth:siswa']);
+$routes->get('siswa/laporan/(:num)', 'SiswaLaporan::detail/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/mapel/(:num)', 'SiswaPembelajaran::semester/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/semester/(:num)', 'SiswaPembelajaran::paket/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)', 'SiswaPembelajaran::tp/$1', ['filter' => 'auth:siswa']);
