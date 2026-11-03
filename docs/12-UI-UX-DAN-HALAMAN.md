@@ -329,3 +329,11 @@ Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`
 - Menu **Admin → Pemeriksaan Sertifikat** mempunyai filter paket Gen–Mapel–Semester aktif, tabel siswa paginasi dan dua angka per siswa: TP NonEsensial tuntas dengan Sumatif sah serta Nilai TP Final. Gunakan badge teks **Layak akademik** atau **Belum layak**, serta `details` yang dapat dibuka untuk melihat seluruh alasan, bukan hanya warnanya.
 - Card **Kesiapan Administratif** menampilkan kelengkapan identitas madrasah, tautan ke pengaturan identitas, dan pemberitahuan **TTD PNG/template belum tersedia pada A11-1**. Jangan menampilkan tombol *Terbitkan*, *Unduh Sertifikat*, atau QR yang tidak berfungsi. Penerbitan penuh baru pada A11-2.
 - Kondisi paket kosong, siswa kosong, semester dilewati, TP belum Final, data belum lengkap, dan parameter filter tidak sah ditangani. Tabel menggunakan `a-tbl` dan `a-tabel-gulir` dengan scroll horizontal di HP; Dark/Light/Mode Dokumentasi tidak mengubah akses.
+
+### A11-2 — Antarmuka Sertifikat (3 November 2026)
+
+- Admin → Sertifikat: status identitas/TTD aktif, tautan kelola aset, tabel siswa dan aksi berdasarkan kelayakan. Siswa **Layak akademik** hanya mendapatkan tombol **Terbitkan Sertifikat** bila identitas madrasah lengkap dan TTD aktif; setelah terbit terlihat **Unduh PDF** dan panel **Revisi satu per satu** dengan alasan wajib.
+- Admin → Template & TTD: dua kartu unggah terpisah, riwayat aset, status aktif, pratinjau gambar berizin, **pratinjau PDF dummy** dan aktivasi versi. Background kosong tetap memakai template fallback; TTD kosong menghalangi penerbitan dan diberi pesan.
+- Siswa → Sertifikat Saya: daftar sertifikat aktif maupun yang `digantikan` dengan unduhan PDF hanya miliknya. Jika kosong, tampil pesan tanpa tombol palsu.
+- Publik → Verifikasi QR: halaman sederhana responsif, status berlaku/digantikan, rujukan nomor versi pengganti, daftar TP/jenis/nilai yang boleh dipublikasikan; tanpa NISN, TTD, PDF atau kontak. Tidak ada tombol cabut/hapus.
+- CSS tetap Emerald Glass kustom; tabel berkolom lebar boleh digulir di HP. Uji 360/390/768/1100px, dark/light, Mode Dokumentasi, invalid/missing upload, gagal render, ulang submit, dan historis.
