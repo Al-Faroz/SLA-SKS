@@ -645,3 +645,18 @@ Workflow `QA A13-1 Pusat Bantuan Peran` menjalankan PHP lint dan `tests/unit/Pan
 | A13-212 | Dark/Light, 360/390/768/1100px, keyboard | Tabel scroll, panel terbaca, FAQ bisa dibuka via keyboard, pesan kosong benar |
 
 Workflow `QA A13-2 Pengumuman dan FAQ` menjalankan PHP lint, PHPUnit `InformasiGlobalDatabaseTest.php` dengan SQLite anonim, regresi A13-1 `PanduanBantuanServiceTest.php`, serta **impor SQL asli V4-0012 pada MariaDB ephemeral** lewat `SqlA13InformasiSchemaCheck.php`. Pada run awal `41662610185` semuanya PASS: **12 tes/92 assertions**, **9 tes/219 assertions**, SQL MariaDB PASS. Ini bukan uji XAMPP; backup + impor SQL dan browser QA lokal tetap wajib. Notifikasi per penerima, badge unread, Hubungi Admin dan Kebijakan Privasi publik belum ditangani.
+
+
+### A13-3 — QA Hubungi Admin (3 November 2026)
+
+| ID | Skenario | Kriteria PASS |
+|---|---|---|
+| A13-301 | Admin/Guru/Siswa/Pimpinan membuka `/hubungi-admin` | Hanya lima kolom kontak sekolah resmi dari `pengaturan`; tidak memuat data pribadi staf |
+| A13-302 | Belum login, akun nonaktif, sandi awal atau role invalid | Ditolak sebelum membaca kontak |
+| A13-303 | Email, telepon, situs valid | Tautan mailto/tel/HTTP(S) terbentuk dan di-escape |
+| A13-304 | Nilai lama skema JavaScript, email/telepon invalid | Hanya teks di-escape, tidak membuat tautan yang berbahaya |
+| A13-305 | Informasi kontak kosong | State kosong jelas, tidak mengarang nomor/alamat |
+| A13-306 | Navigasi empat role, Bantuan, Dark/Light, HP 360–390px | Semua tautan bekerja, kartu tidak meluber dan fokus keyboard terlihat |
+| A13-307 | Kunjungan GET dan reload | Tidak mengubah pengaturan atau membuat log/tiket/notifikasi |
+
+CI: PHP lint, PHPUnit SQLite anonim `KontakResmiMadrasahServiceTest.php`, regresi Bantuan A13-1; pengujian XAMPP tetap diperlukan sebelum FIX. **A13-3 tidak memerlukan patch SQL.**
