@@ -57,7 +57,7 @@ final class PraSemesterDatabaseTest extends TestCase
         ]);
         $this->db->table('paket_semester')->insertBatch([
             ['id'=>11,'angkatan_id'=>1,'mapel_id'=>1,'semester'=>4,'tahun_ajaran_id'=>3,'kurikulum_id'=>1,'status'=>'aktif'],
-            ['id'=>12,'angkatan_id'=>1,'mapel_id'=>2,'semester'=>4,'tahun_ajaran_id'=>3,'status'=>'aktif'],
+            ['id'=>12,'angkatan_id'=>1,'mapel_id'=>2,'semester'=>4,'tahun_ajaran_id'=>3,'kurikulum_id'=>1,'status'=>'aktif'],
         ]);
         $this->db->table('penugasan_guru_gen')->insertBatch([
             ['id'=>1,'guru_id'=>10,'angkatan_id'=>1,'mapel_id'=>1],
