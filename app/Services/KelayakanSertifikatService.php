@@ -79,6 +79,27 @@ final class KelayakanSertifikatService
         return $p[0];
     }
 
+    /**
+     * Pemeriksaan individual untuk transaksi penerbitan: menggunakan persis
+     * syarat A11-1 yang juga dipakai tabel Admin, bukan logika kedua.
+     */
+    public function periksaSiswa(int $siswaId,int $paketId): array
+    {
+        $this->adminId();
+        if ($siswaId<1 || $paketId<1) {
+            throw new DomainException('Siswa/paket sertifikat tidak ditemukan.');
+        }
+        $halaman=1;
+        do {
+            $rekap=$this->rekap($paketId,$halaman,100);
+            foreach ($rekap['baris'] as $r) {
+                if ((int)$r['siswa_id']===$siswaId) return $r;
+            }
+            $halaman++;
+        } while ($halaman <= (int)$rekap['jumlah_halaman']);
+        throw new DomainException('Siswa tidak terdaftar pada Gen paket ini.');
+    }
+
     /** Data kesiapan administratif; tanda tangan baru diimplementasi A11-2. */
     public function identitas(): array
     {
