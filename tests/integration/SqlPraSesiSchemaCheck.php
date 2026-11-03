@@ -71,3 +71,30 @@ foreach ([
     }
 }
 echo "A8 MariaDB sintetis: DDL V4-0009, FK, CHECK, UNIQUE, schema_version PASS\n";
+
+$wordPatch=file_get_contents(dirname(__DIR__,2).'/database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql');
+if (!is_string($wordPatch)) throw new RuntimeException('Patch staging Word Pra-Semester tidak ditemukan.');
+$wordPatch=preg_replace('/^--.*$/m','',$wordPatch);
+foreach (explode(';',$wordPatch) as $statement) {
+    if(trim($statement)!=='')$test->exec($statement);
+}
+$version=(int)$test->query("SELECT COUNT(*) FROM schema_version WHERE versi='V4-0010-BANK-WORD-PRA'")->fetchColumn();
+if($version!==1)throw new RuntimeException('Versi staging Word tidak dicatat.');
+$id=str_repeat('a',32);
+$test->exec("INSERT INTO impor_soal_pra_docx(id,paket_semester_id,guru_id,checksum,status,data_json,dibuat_pada,kedaluwarsa_pada)
+ VALUES('$id',3,1,'".str_repeat('b',64)."','pratinjau','{\"jumlah\":30}',NOW(),DATE_ADD(NOW(),INTERVAL 2 HOUR))");
+foreach([
+    "INSERT INTO impor_soal_pra_docx(id,paket_semester_id,guru_id,checksum,data_json,dibuat_pada,kedaluwarsa_pada) VALUES('$id',3,1,'".str_repeat('b',64)."','{}',NOW(),NOW())",
+    "INSERT INTO impor_soal_pra_docx(id,paket_semester_id,guru_id,checksum,data_json,dibuat_pada,kedaluwarsa_pada) VALUES('".str_repeat('c',32)."',999,1,'".str_repeat('b',64)."','{}',NOW(),NOW())",
+    "INSERT INTO impor_soal_pra_docx(id,paket_semester_id,guru_id,checksum,data_json,dibuat_pada,kedaluwarsa_pada) VALUES('".str_repeat('d',32)."',3,999,'".str_repeat('b',64)."','{}',NOW(),NOW())",
+    "INSERT INTO impor_soal_pra_docx(id,paket_semester_id,guru_id,checksum,data_json,dibuat_pada,kedaluwarsa_pada) VALUES('".str_repeat('e',32)."',3,1,'".str_repeat('b',64)."','bukan-json',NOW(),NOW())",
+] as $invalid){
+    try {
+        $test->exec($invalid);
+        throw new RuntimeException('SQL V4-0010 gagal menolak staging tidak sah.');
+    } catch(PDOException $e){
+        if(!in_array((string)$e->getCode(),['23000'],true))throw $e;
+    }
+}
+echo "A8 MariaDB sintetis: staging V4-0010, FK, JSON, primary key dan schema_version PASS\n";
+
