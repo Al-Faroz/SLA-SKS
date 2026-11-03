@@ -1,0 +1,52 @@
+name: QA UI Admin Kontras dan Layout
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/DashboardAdminService.php'
+      - 'app/Views/admin/beranda_prototipe.php'
+      - 'app/Views/admin/akun_daftar.php'
+      - 'app/Views/admin/akun_reset_konfirmasi.php'
+      - 'app/Views/admin/mapel_guru.php'
+      - 'app/Views/admin/identitas.php'
+      - 'app/Views/admin/kurikulum_cp.php'
+      - 'public/assets/css/app.css'
+      - 'public/assets/css/emerald-glass.css'
+      - 'tests/unit/AdminUiAuditTest.php'
+      - '.github/workflows/qa-admin-ui-audit-20261103.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan writable
+        run: mkdir -p writable/private/sertifikat/aset writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP view dan Service
+        run: |
+          for f in \
+            app/Services/DashboardAdminService.php \
+            app/Views/admin/beranda_prototipe.php \
+            app/Views/admin/akun_daftar.php \
+            app/Views/admin/akun_reset_konfirmasi.php \
+            app/Views/admin/mapel_guru.php \
+            app/Views/admin/identitas.php \
+            app/Views/admin/kurikulum_cp.php \
+            tests/unit/AdminUiAuditTest.php; do
+            php -l "$f"
+          done
+      - name: Regresi struktur, keamanan form dan tema
+        run: vendor/bin/phpunit --no-coverage tests/unit/AdminUiAuditTest.php
+      - name: Regresi indikator Dashboard Admin
+        run: vendor/bin/phpunit --no-coverage tests/unit/DashboardAdminDatabaseTest.php
