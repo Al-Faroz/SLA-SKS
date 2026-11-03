@@ -99,6 +99,17 @@ final class PraSemesterGuruService
         $terpakai = $exam && $this->db->table('percobaan_ujian')
             ->where('ujian_pra_semester_id', (int) $exam['id'])
             ->countAllResults() > 0;
+        if ($terpakai) {
+            // Guru dan siswa melihat KKM efektif yang sama dari attempt awal,
+            // bukan angka default Admin yang mungkin berubah sesudahnya.
+            $awal = $this->db->table('percobaan_ujian')
+                ->select('kkm')->where('ujian_pra_semester_id',(int)$exam['id'])
+                ->orderBy('id','ASC')->get(1)->getRowArray();
+            if ($awal) {
+                $kkm['efektif'] = (int)$awal['kkm'];
+                $kkm['sumber'] = 'snapshot_ujian';
+            }
+        }
         return compact('paket','bab','exam','soal','kesiapan','kkm','terpakai');
     }
 
