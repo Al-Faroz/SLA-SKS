@@ -140,7 +140,7 @@ $routes->post('guru/tp/(:num)/materi/(:num)/hapus', 'GuruMateri::hapus/$1/$2', [
 $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
 $routes->get('admin/kkm', 'AdminKkm::index', ['filter' => 'auth:admin']);
 $routes->post('admin/kkm', 'AdminKkm::simpan', ['filter' => 'auth:admin']);
-$routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan']);
+$routes->get('pimpinan', 'PimpinanDashboard::index', ['filter' => 'auth:pimpinan']);
 $routes->get('pimpinan/laporan', 'PimpinanLaporan::index', ['filter' => 'auth:pimpinan']);
 $routes->get('pimpinan/laporan/(:num)/siswa/(:num)', 'PimpinanLaporan::detail/$1/$2', ['filter' => 'auth:pimpinan']);
 // K2B v2.3 — satu autentikasi, dua ruang administrasi akun.
