@@ -47,7 +47,7 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, xml, zip
           coverage: none
-      - run: mkdir -p writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
       - run: composer install --no-interaction --prefer-dist --no-progress
       - name: Validasi sintaks service dan test
         run: |
