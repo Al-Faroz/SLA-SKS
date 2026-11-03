@@ -8,6 +8,9 @@ on:
       - 'app/Views/siswa/dashboard.php'
       - 'app/Config/Routes.php'
       - 'tests/unit/DashboardSiswaDatabaseTest.php'
+      - 'docs/CHECKPOINT-A12-3-DASHBOARD-SISWA-2026-11-03.md'
+      - 'docs/06-ALUR-PEMBELAJARAN.md'
+      - 'docs/12-UI-UX-DAN-HALAMAN.md'
       - '.github/workflows/qa-a12-3-dashboard-siswa.yml'
   workflow_dispatch:
 
