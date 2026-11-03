@@ -67,6 +67,45 @@ final class SertifikatTataLetakPdfTest extends TestCase
         self::assertNotFalse(file_put_contents($path,$pdf));
     }
 
+    public function testEmpatTpDenganQrDanTtdSintetisSatuHalaman(): void
+    {
+        $dir=\App\Services\SertifikatAsetService::direktori();
+        if (!is_dir($dir) && !mkdir($dir,0700,true) && !is_dir($dir)) {
+            self::fail('Folder privat untuk uji gambar TTD gagal dibuat.');
+        }
+        $nama=bin2hex(random_bytes(24));
+        $path=$dir.DIRECTORY_SEPARATOR.$nama.'.png';
+        $gambar=imagecreatetruecolor(320,120);
+        $putih=imagecolorallocate($gambar,255,255,255);
+        $hijau=imagecolorallocate($gambar,20,90,64);
+        imagefill($gambar,0,0,$putih);
+        imageline($gambar,30,80,220,32,$hijau);
+        imageline($gambar,60,75,270,66,$hijau);
+        imagepng($gambar,$path);
+        imagedestroy($gambar);
+        try {
+            $ttd=[
+                'nama_acak'=>$nama,
+                'mime'=>'image/png',
+                'sha256'=>hash_file('sha256',$path),
+            ];
+            $data=self::snapshot(4,2);
+            $data['siswa']['nisn']='0000000000';
+            $pdf=(new SertifikatPdfService())->render(
+                $data,null,$ttd,
+                'https://example.invalid/verifikasi/'.str_repeat('a',48),
+                false
+            );
+            self::assertStringStartsWith('%PDF-',$pdf);
+            self::assertGreaterThan(5000,strlen($pdf));
+            self::assertNotFalse(file_put_contents(
+                WRITEPATH.'cache/a11-preview-empat-tp-qr-ttd.pdf',$pdf
+            ));
+        } finally {
+            @unlink($path);
+        }
+    }
+
     public function testContohDuaTpTemplateBawaanTetapBerfungsi(): void
     {
         $pdf=(new SertifikatPdfService())->pratinjau(null,null);
