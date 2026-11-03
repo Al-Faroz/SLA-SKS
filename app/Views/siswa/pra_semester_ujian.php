@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <title>Ujian Pra-Semester · SLA-SKS</title>
+    <link rel="stylesheet" href="<?= esc(base_url('public/assets/css/app.css'), 'attr') ?>">
+</head>
+<body class="a-ujian-halaman">
+<main class="a-ujian" id="konten-utama"
+    data-ujian-tp="<?= (int)$paket['id'] ?>"
+    data-ujian-jenis="pra_semester"
+    data-ujian-url="<?= esc(site_url('siswa/pra-semester/' . (int)$paket['id']), 'attr') ?>"
+    data-ujian-token="<?= esc((string)($percobaan['token_publik'] ?? ''),'attr') ?>"
+    data-ujian-existing="<?= esc((string)($percobaan['status'] ?? ''),'attr') ?>"
+    data-csrf-name="<?= esc($csrfName,'attr') ?>"
+    data-csrf-hash="<?= esc($csrfValue,'attr') ?>">
+    <header class="a-ujian-header">
+        <div>
+            <span class="a-ujian-logo">SLA-SKS · Pra-Semester</span>
+            <p class="a-ujian-subtitle">Gen <?= esc((string)$paket['nama_gen']) ?> ·
+                <?= esc((string)$paket['nama_mapel']) ?> · Semester <?= (int)$paket['semester'] ?></p>
+        </div>
+        <div class="a-ujian-meter">
+            <span>Waktu pengerjaan tersisa</span>
+            <strong data-ujian-timer aria-live="off">--:--</strong>
+        </div>
+    </header>
+    <?php $aktif = $percobaan && in_array($percobaan['status'],
+        ['berjalan','jeda_fullscreen','jeda_koneksi'],true);
+        $akhir = $percobaan && in_array($percobaan['status'],
+            ['selesai_sah','dibatalkan_menunggu_guru'],true); ?>
+    <section class="a-ujian-sambutan" data-ujian-sambutan aria-labelledby="judul-mulai">
+        <h1 id="judul-mulai">Ujian Pra-Semester</h1>
+        <p>Ujian terjadwal oleh Admin, menggunakan desktop/laptop dan fullscreen.
+            Waktu pengerjaan dihitung sejak Anda menekan Mulai dan mulai bekerja,
+            bukan sejak jendela jadwal dibuka. Jawaban dan timer tersimpan di server.</p>
+        <p class="a-help">Jendela boleh mulai (WIB):
+            <strong><?= esc((string)($ujian['mulai_pada'] ?? 'Belum dijadwalkan')) ?></strong>
+            sampai <strong><?= esc((string)($ujian['selesai_pada'] ?? 'Belum dijadwalkan')) ?></strong>.
+            Durasi: <strong><?= $ujian === null ? '—' : (int)$ujian['durasi_menit'] . ' menit' ?></strong>.
+            KKM: <strong><?= $kkm === null ? 'Belum tersedia' : (int)$kkm ?></strong>.
+        </p>
+        <?php if ($akhir): ?>
+            <p class="a-ujian-peringatan"><?= $percobaan['status'] === 'dibatalkan_menunggu_guru'
+                ? 'Ujian dibatalkan. Tunggu jadwal susulan dari Admin; tidak ada akses ulang mandiri.'
+                : 'Ujian utama sudah selesai sah. Jika skor di bawah KKM, remedial menunggu jadwal Admin.' ?></p>
+            <button type="button" class="a-btn a-btn--utama" data-ujian-lihat-hasil>Lihat hasil/status</button>
+        <?php elseif ($aktif || $boleh_mulai): ?>
+            <button type="button" class="a-btn a-btn--utama" data-ujian-mulai>
+                <?= $aktif ? 'Masuk fullscreen &amp; lanjutkan ujian' : 'Masuk fullscreen &amp; mulai Pra-Semester' ?>
+            </button>
+        <?php else: ?>
+            <div class="a-alert" role="status">
+                <strong>Ujian belum dapat dimulai.</strong>
+                <?php foreach ($gerbang['alasan'] as $alasan): ?>
+                    <p><?= esc((string)$alasan) ?></p>
+                <?php endforeach ?>
+            </div>
+        <?php endif ?>
+        <p data-ujian-awal-pesan role="status" aria-live="polite">
+            Percobaan baru hanya dibuat setelah siswa berhasil memasuki fullscreen.
+        </p>
+        <a class="a-btn a-btn--sekunder"
+            href="<?= esc(site_url('siswa/semester/' . (int)$paket['id']), 'attr') ?>">
+            Kembali ke daftar TP semester
+        </a>
+    </section>
+    <section class="a-ujian-kerja" data-ujian-kerja hidden>
+        <div class="a-ujian-statusbar">
+            <span data-ujian-posisi>Soal 1</span>
+            <span data-ujian-simpan role="status" aria-live="polite">Belum ada jawaban tersimpan.</span>
+            <span data-ujian-insiden>Insiden fullscreen: 0/3</span>
+        </div>
+        <article class="a-ujian-soal" aria-labelledby="soal-judul">
+            <h1 id="soal-judul">Pertanyaan <span data-ujian-nomor>1</span></h1>
+            <div class="a-ujian-pertanyaan" data-ujian-pertanyaan></div>
+            <fieldset class="a-ujian-opsi" data-ujian-opsi>
+                <legend>Pilih satu jawaban</legend>
+            </fieldset>
+        </article>
+        <nav class="a-ujian-navigator" aria-label="Navigasi soal">
+            <div data-ujian-nav></div>
+            <div class="a-ujian-navaksi">
+                <button type="button" class="a-btn a-btn--sekunder" data-ujian-sebelum>Sebelumnya</button>
+                <button type="button" class="a-btn a-btn--sekunder" data-ujian-sesudah>Berikutnya</button>
+                <button type="button" class="a-btn a-btn--utama" data-ujian-kirim>Kirim jawaban &amp; selesaikan</button>
+            </div>
+        </nav>
+    </section>
+    <section class="a-ujian-overlay" data-ujian-jeda hidden role="alertdialog"
+        aria-modal="true" aria-labelledby="jeda-judul">
+        <div class="a-ujian-overlay__isi">
+            <h2 id="jeda-judul">Ujian dijeda</h2>
+            <p data-ujian-jeda-pesan>Fullscreen atau koneksi sedang diperiksa server.</p>
+            <button class="a-btn a-btn--utama" data-ujian-pulih type="button">
+                Kembali ke fullscreen dan lanjutkan
+            </button>
+        </div>
+    </section>
+    <section class="a-ujian-hasil" data-ujian-hasil hidden role="status" aria-live="polite">
+        <h1 data-ujian-hasil-judul>Status Pra-Semester</h1>
+        <p data-ujian-hasil-pesan></p>
+        <p class="a-ujian-skor" data-ujian-hasil-skor></p>
+        <p class="a-help">Pembatalan memerlukan jadwal susulan Admin. Remedial nilai juga hanya
+            berlangsung pada jadwal tersendiri dari Admin; tidak ada tombol ulang mandiri.</p>
+        <a class="a-btn a-btn--sekunder"
+            href="<?= esc(site_url('siswa/semester/' . (int)$paket['id']), 'attr') ?>">
+            Kembali ke daftar TP semester
+        </a>
+    </section>
+</main>
+<script src="<?= esc(base_url('public/assets/js/diagnostik-ujian.js'),'attr') ?>" defer></script>
+</body>
+</html>
