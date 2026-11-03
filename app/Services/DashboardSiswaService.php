@@ -56,6 +56,7 @@ final class DashboardSiswaService
                     'semester'=>(int)$s['nomor'],
                     'tp_wajib'=>0,'tp_tuntas'=>0,'nilai_final'=>0,
                     'perlu_bantuan'=>0,'persen'=>null,
+                    'tp_berikutnya'=>null,
                     'tautan'=>'siswa/semester/'.$id,
                     'label_aksi'=>'Buka Semester',
                     'status'=>'Belum ada TP NonEsensial',
@@ -181,12 +182,19 @@ final class DashboardSiswaService
                         || empty($item['akses']['buka'])) continue;
                     $p['tautan']='siswa/tp/'.$tid;
                     $p['label_aksi']='Lanjutkan TP';
+                    // Nama/kode TP hanya boleh muncul jika katalog menyatakan
+                    // akses.buka; jangan bocorkan TP draf/terkunci.
+                    $p['tp_berikutnya']=[
+                        'kode'=>(string)$item['kode_tp'],
+                        'judul'=>(string)$item['judul'],
+                    ];
                     break;
                 }
                 if ($lanjut===null) {
                     $lanjut=[
                         'tautan'=>$p['tautan'],
                         'label'=>$p['label_aksi'],
+                        'tp_berikutnya'=>$p['tp_berikutnya'],
                         'keterangan'=>$p['nama_mapel'].' · Semester '.$p['semester']
                             .' · '.$p['status'],
                     ];
