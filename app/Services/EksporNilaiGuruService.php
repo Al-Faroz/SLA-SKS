@@ -19,8 +19,8 @@ use Throwable;
 
 /**
  * A7: ekspor XLSX dari hasil rekap tersimpan. Read-only, terotorisasi G1
- * pada setiap batch, tanpa memasukkan jawaban ujian/kredensial atau nilai
- * Pra-Semester yang modulnya belum tersedia.
+ * pada setiap batch, tanpa memasukkan jawaban ujian/kredensial.
+ * Nilai Pra-Semester memiliki halaman dan file ekspor tersendiri.
  */
 final class EksporNilaiGuruService
 {
@@ -121,18 +121,20 @@ final class EksporNilaiGuruService
      * Tabel nilai per siswa×TP: NULL tetap kosong; skor 0 sebagai numeric 0.
      * @return int jumlah baris nilai
      */
-    private function semester(Spreadsheet $book, array $pilihan, int $semester): int
+    private function semester(Spreadsheet $book, array $pilihan, int $semester,
+        string $jenisTp, ?int $babId): int
     {
         $sheet = new Worksheet($book, 'SEMESTER '.$semester);
         $book->addSheet($sheet);
         self::teks($sheet,'A1','NILAI TP — SEMESTER '.$semester);
-        self::teks($sheet,'A2','TP Esensial tanpa nilai; Sementara ≠ Final; kosong ≠ angka nol.');
+        self::teks($sheet,'A2','Jenis TP: '.($jenisTp === 'semua' ? 'Semua' : ($jenisTp === 'esensial' ? 'Esensial' : 'NonEsensial')).'; kosong ≠ angka nol.');
         self::header($sheet,4,[
             'No.','Nama Siswa','Semester','No. BAB','Nama BAB',
             'Kode TP','Nama TP','Jenis TP','Progres TP','Jalur',
             'Resume','HOTS','Sumatif Terbaik','Nilai TP','Status Nilai',
         ]);
-        $data = $this->rekap->rekap($pilihan, $semester, 1, self::BATCH);
+        $data = $this->rekap->rekap($pilihan, $semester, 1, self::BATCH,
+            $jenisTp,$babId);
         if ($data['total'] > self::MAKS_BARIS) {
             throw new DomainException('Jumlah baris rekap melebihi batas keamanan ekspor.');
         }
@@ -140,7 +142,8 @@ final class EksporNilaiGuruService
         for ($page = 1; $page <= $data['jumlah_halaman']; $page++) {
             if ($page !== 1) {
                 // Service memeriksa ulang penugasan G1 setiap batch.
-                $lanjut = $this->rekap->rekap($pilihan, $semester, $page, self::BATCH);
+                $lanjut = $this->rekap->rekap($pilihan, $semester, $page, self::BATCH,
+                    $jenisTp,$babId);
                 if ($lanjut['total'] !== $data['total']) {
                     throw new DomainException('Data nilai berubah ketika ekspor. Silakan ulangi unduhan.');
                 }
@@ -193,10 +196,13 @@ final class EksporNilaiGuruService
      * @param int $semester 0 = enam semester, 1..6 = satu semester.
      * @return array{nama:string,isi:string}
      */
-    public function unduh(array $pilihan, int $semester = 0): array
+    public function unduh(array $pilihan, int $semester = 0,
+        string $jenisTp = 'semua', ?int $babId = null): array
     {
-        if ($semester < 0 || $semester > 6) {
-            throw new DomainException('Semester ekspor tidak valid.');
+        if ($semester < 0 || $semester > 6
+            || !in_array($jenisTp,['semua','esensial','non_esensial'],true)
+            || ($babId !== null && ($babId < 1 || $semester === 0))) {
+            throw new DomainException('Filter ekspor nilai TP tidak valid.');
         }
         // Otorisasi pada roster dan untuk setiap halaman/semester dilakukan lagi
         // meski Controller telah memverifikasi pilihan dropdown.
@@ -221,7 +227,7 @@ final class EksporNilaiGuruService
             self::teks($info,'A10','Aktivitas Dilewati hanya untuk jalur lulus Diagnostik.');
             self::teks($info,'A11','TP Esensial ditampilkan tanpa nilai.');
             self::teks($info,'A12','Nilai TP Sementara belum lengkap: menunggu nilai Guru.');
-            self::teks($info,'A13','Pra-Semester belum diekspor karena modul nilainya belum tersedia.');
+            self::teks($info,'A13','Nilai Pra-Semester tersedia pada modul rekap/ekspor terpisah.');
             self::teks($info,'A14','Tidak ada Nilai Akhir Semester; nilai TP mandiri per tujuan.');
             $info->getColumnDimension('A')->setWidth(27);
             $info->getColumnDimension('B')->setWidth(45);
@@ -229,7 +235,7 @@ final class EksporNilaiGuruService
             $countBaris = 0;
             $semesterPilihan = $semester === 0 ? range(1,6) : [$semester];
             foreach ($semesterPilihan as $s) {
-                $countBaris += $this->semester($book,$pilihan,$s);
+                $countBaris += $this->semester($book,$pilihan,$s,$jenisTp,$babId);
                 if ($countBaris > self::MAKS_BARIS) {
                     throw new DomainException('Jumlah baris semua semester melebihi batas ekspor.');
                 }
