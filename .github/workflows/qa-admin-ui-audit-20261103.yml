@@ -9,6 +9,8 @@ on:
       - 'app/Views/admin/akun_reset_konfirmasi.php'
       - 'app/Views/admin/mapel_guru.php'
       - 'app/Views/admin/identitas.php'
+      - 'app/Views/admin/referensi.php'
+      - 'app/Views/akun/profil.php'
       - 'app/Views/admin/kurikulum_cp.php'
       - 'public/assets/css/app.css'
       - 'public/assets/css/emerald-glass.css'
@@ -42,6 +44,8 @@ jobs:
             app/Views/admin/akun_reset_konfirmasi.php \
             app/Views/admin/mapel_guru.php \
             app/Views/admin/identitas.php \
+            app/Views/admin/referensi.php \
+            app/Views/akun/profil.php \
             app/Views/admin/kurikulum_cp.php \
             tests/unit/AdminUiAuditTest.php; do
             php -l "$f"
