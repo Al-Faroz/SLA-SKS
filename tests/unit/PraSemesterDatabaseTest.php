@@ -26,7 +26,8 @@ final class PraSemesterDatabaseTest extends TestCase
             'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,nama TEXT)',
             'CREATE TABLE pengguna(id INTEGER PRIMARY KEY,nama TEXT,status TEXT)',
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,nama TEXT)',
-            'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,status TEXT)',
+            'CREATE TABLE ref_kurikulum(id INTEGER PRIMARY KEY,nama TEXT)',
+            'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,kurikulum_id INTEGER,status TEXT)',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,guru_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER)',
             'CREATE TABLE penugasan_paket(id INTEGER PRIMARY KEY,paket_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER)',
             'CREATE TABLE siswa(id INTEGER PRIMARY KEY,pengguna_id INTEGER,angkatan_id INTEGER,semester_mulai INTEGER)',
@@ -38,6 +39,7 @@ final class PraSemesterDatabaseTest extends TestCase
             'CREATE TABLE percobaan_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,token_publik TEXT,progres_tp_id INTEGER,versi_konten_tp_id INTEGER,ujian_pra_semester_id INTEGER,jadwal_pra_sesi_id INTEGER,siswa_id INTEGER,jenis TEXT,tahap TEXT,nomor_percobaan INTEGER,status TEXT,profil_keamanan TEXT,jumlah_soal INTEGER,kkm INTEGER,durasi_detik INTEGER,sisa_detik INTEGER,waktu_mulai TEXT,waktu_aktif_terakhir TEXT,last_seen_server_at TEXT,jeda_mulai_pada TEXT,jeda_fullscreen_total_detik INTEGER DEFAULT 0,jeda_koneksi_total_detik INTEGER DEFAULT 0,jumlah_pelanggaran_fullscreen INTEGER DEFAULT 0,waktu_selesai TEXT,alasan_batal TEXT,skor REAL,jumlah_benar INTEGER,dibuat_pada TEXT,diubah_pada TEXT)',
             'CREATE TABLE jadwal_pra_sesi(id INTEGER PRIMARY KEY AUTOINCREMENT,ujian_pra_semester_id INTEGER,jenis TEXT,tahap TEXT,mulai_pada TEXT,selesai_pada TEXT,durasi_menit INTEGER,status TEXT,dibuat_oleh INTEGER,dibuat_pada TEXT)',
             'CREATE TABLE peserta_pra_susulan(id INTEGER PRIMARY KEY AUTOINCREMENT,jadwal_pra_sesi_id INTEGER,siswa_id INTEGER,ditetapkan_oleh INTEGER,ditetapkan_pada TEXT,UNIQUE(jadwal_pra_sesi_id,siswa_id))',
+            'CREATE TABLE impor_soal_pra_docx(id TEXT PRIMARY KEY,paket_semester_id INTEGER,guru_id INTEGER,checksum TEXT,status TEXT,data_json TEXT,dibuat_pada TEXT,kedaluwarsa_pada TEXT,diterapkan_pada TEXT)',
             'CREATE TABLE butir_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,soal_asal_id INTEGER,soal_pra_semester_id INTEGER,posisi INTEGER,pertanyaan TEXT,konten_terstruktur_json TEXT,opsi_acak_json TEXT,kunci_acak TEXT)',
             'CREATE TABLE jawaban_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,butir_percobaan_id INTEGER,opsi_dipilih TEXT,waktu_disimpan TEXT)',
             'CREATE TABLE riwayat_status_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,status_lama TEXT,status_baru TEXT,alasan TEXT,terjadi_pada TEXT)',
@@ -49,11 +51,12 @@ final class PraSemesterDatabaseTest extends TestCase
         foreach($sql as $q)$this->db->query($q);
         $this->db->table('pengguna')->insert(['id'=>100,'nama'=>'Siswa Anonim','status'=>'aktif']);
         $this->db->table('ref_angkatan')->insert(['id'=>1,'nama'=>'Gen Uji']);
+        $this->db->table('ref_kurikulum')->insert(['id'=>1,'nama'=>'KBC']);
         $this->db->table('ref_mapel')->insertBatch([
             ['id'=>1,'nama'=>'SKI'],['id'=>2,'nama'=>'Fikih']
         ]);
         $this->db->table('paket_semester')->insertBatch([
-            ['id'=>11,'angkatan_id'=>1,'mapel_id'=>1,'semester'=>4,'tahun_ajaran_id'=>3,'status'=>'aktif'],
+            ['id'=>11,'angkatan_id'=>1,'mapel_id'=>1,'semester'=>4,'tahun_ajaran_id'=>3,'kurikulum_id'=>1,'status'=>'aktif'],
             ['id'=>12,'angkatan_id'=>1,'mapel_id'=>2,'semester'=>4,'tahun_ajaran_id'=>3,'status'=>'aktif'],
         ]);
         $this->db->table('penugasan_guru_gen')->insertBatch([
@@ -338,6 +341,70 @@ final class PraSemesterDatabaseTest extends TestCase
         $this->expectException(\DomainException::class);
         $admin->buat(11,'susulan','normal',
             $d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'45');
+    }
+
+    public function testWordPraSemesterImporAppendDanIdempotenDenganSiswaBelumMenggunakan(): void
+    {
+        $guru = new \App\Services\PraSemesterWordService(
+            $this->db,$this->actor('guru',10)
+        );
+        $data = $guru->unduh(11,30);
+        $path = tempnam(sys_get_temp_dir(),'pra-dbword-');
+        self::assertIsString($path);
+        file_put_contents($path,$data);
+        $stageId=null;
+        try {
+            $zip=new \ZipArchive();
+            self::assertTrue($zip->open($path)===true);
+            $doc=new \DOMDocument();
+            self::assertTrue($doc->loadXML($zip->getFromName('word/document.xml'),LIBXML_NONET));
+            $xp=new \DOMXPath($doc);
+            $xp->registerNamespace('w','http://schemas.openxmlformats.org/wordprocessingml/2006/main');
+            $rows=$xp->query('//w:body/w:tbl[1]/w:tr');
+            for($i=0;$i<30;$i++) {
+                for($j=0;$j<6;$j++) {
+                    $cells=$xp->query('./w:tc',$rows->item(1+$i*6+$j));
+                    $cell=$xp->query('.//w:t',$cells->item(1))->item(0);
+                    $cell->nodeValue= $j===0 ? 'Pertanyaan A8 '.($i+1)
+                        : 'Opsi '.chr(64+$j).' nomor '.($i+1);
+                    if($j===1) {
+                        $xp->query('.//w:t',$cells->item(2))->item(0)->nodeValue='✓';
+                    }
+                }
+            }
+            self::assertTrue($zip->addFromString('word/document.xml',$doc->saveXML()));
+            self::assertTrue($zip->close());
+            $stage=$guru->unggah($path,11);
+            $stageId=$stage['id'];
+            self::assertSame(30,$stage['jumlah']);
+            // Unggah hanya staging; semua 30 soal manual lama tetap sama.
+            self::assertSame(30,$this->db->table('soal_pra_semester')->countAllResults());
+            self::assertSame('pratinjau',$guru->buka(11,$stageId)['row']['status']);
+            $confirm=$guru->konfirmasi(11,$stageId);
+            self::assertSame(30,$confirm['baru']);
+            self::assertSame(60,$this->db->table('soal_pra_semester')->countAllResults());
+            self::assertSame('Soal 1',$this->db->table('soal_pra_semester')
+                ->where('id',1)->get()->getRow('pertanyaan')); // manual tidak ditimpa
+            $rich=$this->db->table('soal_pra_semester')
+                ->where('urutan',31)->get()->getRow('konten_terstruktur_json');
+            self::assertSame($stageId,json_decode($rich,true)['word_source_id']);
+            $repeat=$guru->konfirmasi(11,$stageId);
+            self::assertSame(0,$repeat['baru']);
+            self::assertSame(60,$this->db->table('soal_pra_semester')->countAllResults());
+            self::assertSame('diterapkan',$guru->buka(11,$stageId)['row']['status']);
+            $this->db->table('percobaan_ujian')->insert([
+                'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+                'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'selesai_sah',
+                'kkm'=>75,'skor'=>75,
+            ]);
+            $this->expectException(\DomainException::class);
+            $guru->unggah($path,11);
+        } finally {
+            @unlink($path);
+            if($stageId!==null) {
+                @unlink(WRITEPATH.'private/pra_semester_word/'.$stageId.'.docx');
+            }
+        }
     }
 
 }
