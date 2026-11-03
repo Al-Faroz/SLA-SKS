@@ -20,6 +20,7 @@ on:
       - 'app/Services/NavigasiService.php'
       - 'tests/unit/SertifikatPenerbitanDatabaseTest.php'
       - 'database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql'
+      - 'tests/scripts/a11_sql_patch_mariadb.php'
       - '.github/workflows/qa-a11-2-sertifikat.yml'
   workflow_dispatch:
 
@@ -65,3 +66,30 @@ jobs:
         run: vendor/bin/phpunit --no-coverage tests/unit/SertifikatPenerbitanDatabaseTest.php
       - name: PHPUnit A11-1 kelayakan
         run: vendor/bin/phpunit --no-coverage tests/unit/KelayakanSertifikatDatabaseTest.php
+
+  sql-mariadb:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.4
+        env:
+          MARIADB_ROOT_PASSWORD: a11-fixture-only
+          MARIADB_DATABASE: a11_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pa11-fixture-only --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli
+          coverage: none
+      - name: Lint SQL smoke
+        run: php -l tests/scripts/a11_sql_patch_mariadb.php
+      - name: Uji skema additive pada MariaDB 10.4 TANPA data siswa asli
+        run: php tests/scripts/a11_sql_patch_mariadb.php
