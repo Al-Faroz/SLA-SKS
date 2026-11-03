@@ -45,8 +45,10 @@ final class PraSemesterSesiService
     /** Sumber setiap penentuan kesempatan: riwayat satu ujian+siswa dari server. */
     public function riwayat(int $ujianId, int $siswaId): array
     {
+        $kolom='id,tahap,status,skor,kkm,nomor_percobaan,token_publik';
+        if ($this->terpasang()) $kolom.=',jadwal_pra_sesi_id';
         return $this->db->table('percobaan_ujian')
-            ->select('id,tahap,status,skor,kkm,nomor_percobaan,token_publik,jadwal_pra_sesi_id')
+            ->select($kolom)
             ->where('ujian_pra_semester_id',$ujianId)
             ->where('siswa_id',$siswaId)->where('jenis','pra_semester')
             ->orderBy('id','ASC')->get()->getResultArray();
