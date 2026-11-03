@@ -220,8 +220,12 @@ final class PenilaianGuruService
             . ' ORDER BY dikirim_pada ASC,id ASC,jenis ASC'
             . ' LIMIT ' . $perPage . ' OFFSET ' . (($halaman - 1) * $perPage),
             $bindings)->getResultArray();
-        // Indikator kemiripan dihitung hanya pada detail jawaban;
-        // tabel antrean tidak lagi menampilkan persentasenya.
+        // Data indikator tetap disediakan untuk kompatibilitas dan QA;
+        // kolom Jenis pada View tidak lagi menampilkan persentasenya.
+        foreach ($rows as &$r) {
+            $r['kemiripan'] = $this->skorKemiripan((string)$r['jenis'], $r);
+        }
+        unset($r);
         return ['baris'=>$rows,'total'=>$total,'halaman'=>$halaman,
             'jumlah_halaman'=>$pages];
     }
