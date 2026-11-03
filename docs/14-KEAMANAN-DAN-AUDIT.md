@@ -100,7 +100,7 @@ sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.
 - Excel ATP final **manual `.xlsx` tanpa macro atau tombol Proses**. Tolak file `.xlsm` dan konten VBA/eksternal, hanya baca/validasi sel yang disepakati; cek ZIP/container, ukuran, ekstensi, MIME, formula dan referensi eksternal. Unduhan/unggahan tetap terikat konteks Gen–Mapel dan CSRF.
 - Nomor/kode BAB/TP server-side, validasi lintas dua semester dan hak guru. Jenis TP tidak boleh digunakan untuk menolak pembuatan Materi Guru; kedua jenis TP wajib memiliki tepat satu Materi lengkap. Pembatasan progres/nilai siswa untuk Esensial tetap diawasi di Service siswa; snapshot historis tidak dihapus.
 - Checkpoint klien 4 menit tidak memberi kepercayaan penuh pada waktu browser; Service membatasi delta sah dan memerlukan bukti tersimpan sebelum membuka Resume/HOTS/download. Simpan waktu lokal offline hanya sementara pada perangkat sama.
-- Pra-Semester: Admin jadwal, belum selesai TP/di luar jendela waktu ditolak, izin Guru hanya Gen–Mapel, jawaban/snapshot/insiden ujian anonim bagi pihak tak berhak.
+- Pra-Semester: Admin mengelola jadwal utama, remedial dan susulan per Gen–Mapel–Semester; belum selesai TP/di luar jendela mulai ditolak. Guru G1 hanya mengelola bank/KKM dan membaca insiden pada Gen–Mapel sendiri, bukan mengizinkan susulan. Jawaban, snapshot dan insiden ujian privat bagi pihak tak berhak.
 - Export Nilai Guru tersedia saat satu skor ada tetapi tetap membatasi semua baris ke Gen–Mapel pengampu, tanpa hash/token/sesi, mitigasi formula-injection, respons file tidak boleh terindeks/cache publik.
 
 
