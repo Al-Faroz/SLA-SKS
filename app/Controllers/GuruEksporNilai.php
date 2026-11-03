@@ -32,8 +32,14 @@ final class GuruEksporNilai extends BaseController
         }
         $pilihan = $this->request->getGet('pilihan');
         $semester = $this->request->getGet('semester');
+        $jenisTp = $this->request->getGet('jenis_tp') ?? 'semua';
+        $bab = $this->request->getGet('bab') ?? '0';
         if (!is_string($pilihan) || !ctype_digit($pilihan) || strlen($pilihan) > 5
-            || !is_string($semester) || !preg_match('/^[0-6]$/D', $semester)) {
+            || !is_string($semester) || !preg_match('/^[0-6]$/D', $semester)
+            || !is_string($jenisTp)
+            || !in_array($jenisTp,['semua','esensial','non_esensial'],true)
+            || !is_string($bab) || !ctype_digit($bab) || strlen($bab)>7
+            || ($semester === '0' && (int)$bab !== 0)) {
             return redirect()->to($asal)->with('rekap_galat',
                 'Filter unduhan nilai tidak valid.');
         }
@@ -44,7 +50,8 @@ final class GuruEksporNilai extends BaseController
             if ($dipilih === null) {
                 throw new DomainException('Belum ada penugasan Guru yang dapat diekspor.');
             }
-            $hasil = $svc->unduh($dipilih,(int)$semester);
+            $hasil = $svc->unduh($dipilih,(int)$semester,$jenisTp,
+                (int)$bab > 0 ? (int)$bab : null);
             return $this->response->download($hasil['nama'],$hasil['isi'],true)
                 ->setHeader('Content-Type',
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
