@@ -47,6 +47,11 @@
                 ? 'Ujian dibatalkan. Tunggu jadwal susulan dari Admin; tidak ada akses ulang mandiri.'
                 : 'Ujian utama sudah selesai sah. Jika skor di bawah KKM, remedial menunggu jadwal Admin.' ?></p>
             <button type="button" class="a-btn a-btn--utama" data-ujian-lihat-hasil>Lihat hasil/status</button>
+        <?php elseif (!$desktop): ?>
+            <div class="a-alert" role="status">
+                Jadwal dapat dilihat di HP/tablet, tetapi pengerjaan Pra-Semester
+                wajib menggunakan desktop/laptop yang mendukung fullscreen.
+            </div>
         <?php elseif ($aktif || $boleh_mulai): ?>
             <button type="button" class="a-btn a-btn--utama" data-ujian-mulai>
                 <?= $aktif ? 'Masuk fullscreen &amp; lanjutkan ujian' : 'Masuk fullscreen &amp; mulai Pra-Semester' ?>
