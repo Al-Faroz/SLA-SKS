@@ -16,6 +16,8 @@ $routes->get('ganti-sandi', 'Akun::gantiSandi', ['filter' => 'auth']);
 $routes->post('ganti-sandi', 'Akun::prosesGantiSandi', ['filter' => 'auth']);
 $routes->post('keluar', 'Akun::keluar', ['filter' => 'auth']);
 $routes->get('profil', 'Akun::profil', ['filter' => 'auth']);
+// A13-1: panduan login-only untuk peran aktif; bukan FAQ terkelola.
+$routes->get('bantuan', 'Bantuan::index', ['filter' => 'auth']);
 $routes->post('profil/kontak', 'Profil::simpanKontak', ['filter' => 'auth']);
 $routes->post('profil/foto', 'Profil::unggahFoto', ['filter' => 'auth']);
 $routes->get('profil/foto/(:num)', 'Profil::mediaFoto/$1', ['filter' => 'auth']);
