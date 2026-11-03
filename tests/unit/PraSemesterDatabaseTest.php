@@ -240,6 +240,35 @@ final class PraSemesterDatabaseTest extends TestCase
         $mesin->mulai(11,true,true); // tidak membuka remedial sendiri
     }
 
+
+    public function testSeluruhTpWajibDalamDuaBabHarusSelesaiSahSebelumPraSemester(): void
+    {
+        $this->db->table('tp')->insert([
+            'id'=>25,'paket_semester_id'=>11,'jenis_tp'=>'non_esensial','status'=>'siap',
+        ]);
+        $svc=new PraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $sebelum=$svc->konteks(11);
+        self::assertSame(2,$sebelum['gerbang']['tp']['jumlah_wajib']);
+        self::assertSame(1,$sebelum['gerbang']['tp']['jumlah_tuntas']);
+        self::assertFalse($sebelum['gerbang']['tp']['siap']);
+        $this->db->table('progres_tp')->insert([
+            'id'=>35,'tp_id'=>25,'siswa_id'=>1,
+            'paket_semester_id'=>11,'status'=>'tuntas',
+        ]);
+        // Status tuntas tanpa Sumatif sah tetap tidak dihitung.
+        self::assertFalse($svc->konteks(11)['gerbang']['tp']['siap']);
+        $this->db->table('percobaan_ujian')->insert([
+            'id'=>105,'progres_tp_id'=>35,'jenis'=>'sumatif',
+            'tahap'=>'normal','nomor_percobaan'=>1,
+            'status'=>'selesai_sah','skor'=>45,
+        ]);
+        $sesudah=$svc->konteks(11);
+        self::assertTrue($sesudah['gerbang']['tp']['siap']);
+        self::assertSame(2,$sesudah['gerbang']['tp']['jumlah_tuntas']);
+        self::assertTrue((new MesinPraSemesterSiswaService(
+            $this->db,$this->actor('siswa',100)))->ruang(11)['boleh_mulai']);
+    }
+
     public function testGerbangSiswaTidakMenganggapProgresTuntasTanpaSumatifSah(): void
     {
         $this->db->table('percobaan_ujian')
