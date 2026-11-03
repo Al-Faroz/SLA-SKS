@@ -551,3 +551,15 @@ Workflow `QA A12-2 Dashboard Guru` menjalankan `DashboardGuruDatabaseTest.php` S
 | A12-312 | Dark/Light, Mode Dokumentasi, HP/desktop | Segmen/progress tidak bertumpuk, teks dan tombol tetap terbaca/fokus keyboard |
 
 Pengujian otomatis `tests/unit/DashboardSiswaDatabaseTest.php` menggunakan SQLite in-memory anonim, ditambah regresi Katalog Pembelajaran serta Laporan Akademik di workflow `QA A12-3 Dashboard Siswa`. Tidak ada SQL baru; hasil visual harus diuji pemilik pada XAMPP sebelum A12-3 dinyatakan FIX.
+
+### A12-3 UI QA lanjutan — Validasi setelah screenshot XAMPP (3 November 2026)
+
+| ID | Skenario | Hasil yang wajib |
+|---|---|---|
+| A12-313 | Siswa punya tepat satu paket Semester terbuka pada desktop | Kartu Semester memenuhi lebar panel, informasi mapel/TP serta progres/aksi seimbang dalam dua bidang |
+| A12-314 | Dashboard siswa di HP 360–390px dengan paket tunggal | Kartu dan hero kembali satu kolom; teks panjang TP tidak terpotong/tumpang tindih |
+| A12-315 | TP pertama/berikutnya Siap dan `akses.buka=true` | Kode dan judul TP sesuai katalog terlihat di hero dan kartu, link mengarah ke `/siswa/tp/{id}` |
+| A12-316 | TP belum Siap/terkunci, semester belum terbuka | Kode/judul TP tersebut tidak bocor; tidak ada tombol direct TP, gunakan tautan Semester/daftar yang sah |
+| A12-317 | Nama akun mengandung teks "Diagnostik Dibatalkan" namun progres tidak `perlu_bantuan` | KPI bantuan tetap mengikuti data progres server, bukan membaca nama akun atau asumsi dari screenshot |
+
+Regresi A12-3 wajib memverifikasi bahwa penambahan metadata TP tujuan **tidak melonggarkan hak akses** dan tidak memodifikasi nilai/progres siswa. QA visual XAMPP tetap diperlukan untuk menyatakan revisi UI ini FIX.
