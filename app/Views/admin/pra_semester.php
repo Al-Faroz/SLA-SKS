@@ -175,5 +175,152 @@
             <?php endif ?>
         </section>
     <?php endif ?>
+    <?php if ($pilih !== null): ?>
+        <?php if (!$terpasangSesi): ?>
+            <section class="a-card a-jarak-atas">
+                <h2>Remedial dan Susulan</h2>
+                <div class="a-alert" role="status">
+                    Impor pembaruan skema V4-0009 melalui phpMyAdmin untuk mengaktifkan
+                    pengaturan jadwal remedial dan daftar peserta susulan.
+                    Jadwal utama tetap dapat dikelola tanpa perubahan data.
+                </div>
+            </section>
+        <?php else: ?>
+            <section class="a-card a-jarak-atas" aria-labelledby="pra-jadwal-khusus">
+                <h2 id="pra-jadwal-khusus">Jadwal Remedial &amp; Susulan</h2>
+                <p class="a-help">Setiap sesi memiliki jendela boleh mulai dan durasi sendiri.
+                    Susulan hanya untuk peserta yang ditetapkan Admin; remedial hanya bagi
+                    siswa dengan ujian normal sah di bawah KKM. Jadwal harus setelah ujian utama.</p>
+                <?php if ($daftarSesi === []): ?>
+                    <div class="a-empty" role="status">
+                        <p>Belum ada jadwal tambahan untuk paket ini.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="a-tabel-gulir a-pra-table-wrap" tabindex="0"
+                        role="region" aria-label="Daftar remedial dan susulan">
+                        <table class="a-tbl a-pra-table">
+                            <thead><tr><th scope="col">Jenis sesi</th><th scope="col">Tahap</th>
+                                <th scope="col">Jendela mulai WIB</th><th scope="col">Durasi</th>
+                                <th scope="col">Peserta susulan</th><th scope="col">Aksi</th></tr></thead>
+                            <tbody>
+                                <?php foreach ($daftarSesi as $j): ?>
+                                    <tr>
+                                        <td><strong><?= $j['jenis'] === 'remedial'
+                                            ? 'Remedial' : 'Susulan' ?></strong></td>
+                                        <td><?= $j['tahap'] === 'remedial' ? 'Remedial' : 'Normal' ?></td>
+                                        <td class="a-pra-col-time">
+                                            <time><?= esc((string)$j['mulai_pada']) ?></time>
+                                            <span class="a-pra-time-separator">s.d.</span>
+                                            <time><?= esc((string)$j['selesai_pada']) ?></time>
+                                        </td>
+                                        <td class="a-pra-col-center"><?= (int)$j['durasi_menit'] ?> menit</td>
+                                        <td class="a-pra-col-center"><?= $j['jenis'] === 'susulan'
+                                            ? (int)$j['jumlah_peserta'].' siswa'
+                                            : 'Otomatis sesuai nilai' ?></td>
+                                        <td>
+                                            <?php if ($j['jenis'] === 'susulan'): ?>
+                                                <a class="a-btn a-btn--sekunder a-pra-action"
+                                                    href="<?= esc(site_url('admin/pra-semester/'
+                                                        . (int)$pilih['paket_id']) . '?sesi=' . (int)$j['id'],'attr') ?>">
+                                                    Atur peserta
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="a-badge a-badge--siap">Terjadwal</span>
+                                            <?php endif ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif ?>
+                <form method="post" class="a-form a-pra-sesi-form"
+                    action="<?= esc(site_url('admin/pra-semester/'
+                        . (int)$pilih['paket_id'] . '/sesi'),'attr') ?>">
+                    <?= csrf_field() ?>
+                    <h3>Tambah jadwal remedial atau susulan</h3>
+                    <div class="a-field">
+                        <label class="a-label" for="pra-sesi-tipe">Jenis kesempatan</label>
+                        <select name="sesi_tipe" id="pra-sesi-tipe" class="a-input" required>
+                            <option value="">Pilih jenis</option>
+                            <option value="remedial/remedial">Remedial — ujian normal sah &lt; KKM</option>
+                            <option value="susulan/normal">Susulan — ujian normal batal/tidak hadir</option>
+                            <option value="susulan/remedial">Susulan — remedial batal</option>
+                        </select>
+                    </div>
+                    <div class="a-field">
+                        <label class="a-label" for="pra-sesi-mulai">Awal boleh mulai (WIB)</label>
+                        <input id="pra-sesi-mulai" name="mulai" type="datetime-local"
+                            class="a-input" required>
+                    </div>
+                    <div class="a-field">
+                        <label class="a-label" for="pra-sesi-akhir">Akhir boleh mulai (WIB)</label>
+                        <input id="pra-sesi-akhir" name="akhir" type="datetime-local"
+                            class="a-input" required>
+                    </div>
+                    <div class="a-field">
+                        <label class="a-label" for="pra-sesi-durasi">Durasi pengerjaan (menit)</label>
+                        <input id="pra-sesi-durasi" name="durasi" type="number"
+                            min="5" max="180" value="60" class="a-input" required>
+                    </div>
+                    <button type="submit" class="a-btn a-btn--utama"
+                        onclick="return confirm('Simpan jadwal tambahan ini?');">
+                        Simpan Jadwal Tambahan
+                    </button>
+                </form>
+            </section>
+            <?php if ($sesiTerpilih !== null): ?>
+                <section class="a-card a-jarak-atas" aria-labelledby="pra-peserta-susulan">
+                    <h2 id="pra-peserta-susulan">Tetapkan Peserta Susulan</h2>
+                    <p class="a-help">
+                        Sesi #<?= (int)$sesiTerpilih['id'] ?> ·
+                        <?= $sesiTerpilih['tahap'] === 'normal'
+                            ? 'Susulan tahap normal' : 'Susulan tahap remedial' ?>.
+                        Penetapan peserta bersifat tambahan; peserta yang sudah ditetapkan
+                        tidak dihapus. Siswa yang tidak memenuhi syarat tidak ditampilkan.
+                    </p>
+                    <?php if ($calonSiswa === []): ?>
+                        <div class="a-empty" role="status">
+                            <p>Belum ada siswa yang memenuhi syarat sesi susulan ini.</p>
+                        </div>
+                    <?php else: ?>
+                        <form method="post" class="a-form"
+                            action="<?= esc(site_url('admin/pra-semester/'
+                                . (int)$pilih['paket_id'].'/sesi/'
+                                . (int)$sesiTerpilih['id'].'/peserta'),'attr') ?>">
+                            <?= csrf_field() ?>
+                            <div class="a-tabel-gulir a-pra-table-wrap" tabindex="0"
+                                role="region" aria-label="Daftar calon peserta susulan">
+                                <table class="a-tbl a-pra-table">
+                                    <thead><tr><th scope="col">Pilih</th>
+                                        <th scope="col">Siswa</th><th scope="col">Kondisi</th>
+                                        <th scope="col">Penetapan</th></tr></thead>
+                                    <tbody>
+                                        <?php foreach ($calonSiswa as $siswa): ?>
+                                            <tr>
+                                                <td><input type="checkbox" name="siswa_id[]"
+                                                    value="<?= (int)$siswa['siswa_id'] ?>"
+                                                    aria-label="Pilih <?= esc((string)$siswa['nama'],'attr') ?>"
+                                                    <?= !$siswa['boleh_ditambah'] ? 'disabled' : '' ?>></td>
+                                                <td><?= esc((string)$siswa['nama']) ?></td>
+                                                <td><?= esc(str_replace('_',' ',(string)$siswa['fase'])) ?></td>
+                                                <td><span class="a-badge <?= $siswa['ditetapkan']
+                                                    ? 'a-badge--siap' : 'a-badge--tunggu' ?>">
+                                                    <?= $siswa['ditetapkan'] ? 'Sudah ditetapkan' : 'Belum ditetapkan' ?>
+                                                </span></td>
+                                            </tr>
+                                        <?php endforeach ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="submit" class="a-btn a-btn--utama">
+                                Tambahkan Peserta Terpilih
+                            </button>
+                        </form>
+                    <?php endif ?>
+                </section>
+            <?php endif ?>
+        <?php endif ?>
+    <?php endif ?>
 </div>
 <?= $this->endSection() ?>
