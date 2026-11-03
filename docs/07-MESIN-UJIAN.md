@@ -70,3 +70,10 @@ Sebelum mesin membuat percobaan baru, Service menghitung histori **per satu sisw
 6. **Percobaan masih berjalan/jeda** → lanjutkan **token percobaan sama**; penutupan jendela *boleh mulai* tidak memotong durasi yang telah dimulai dan tidak membuat attempt baru.
 7. KKM satu siswa tetap konsisten antarpercobaan; peserta tidak boleh memakai skor dari percobaan batal, dua normal sah, dua remedial sah, atau remedial tanpa normal sah. Tidak ada nilai akhir semester agregat.
 **Implementasi sementara:** `PenilaianPraSemesterService` dan `AturanJadwalPraSemesterService` merupakan Service domain murni; adapter penjadwalan/roster/DB, mesin remedial dan susulan menunggu verifikasi dump XAMPP pascapatch. Jangan menampilkan tombol remedial/susulan sebelum benar-benar tersedia.
+
+### A8-5 — Sesi operasional susulan/remedial (3 November 2026)
+- Setelah audit dump terbaru `sla_sks_v4 (13).sql`, jadwal susulan dan remedial memakai skema additive `V4-0009-PRA-SESI-TERJADWAL`. Jadwal utama di `ujian_pra_semester` **tidak dipindahkan**.
+- Admin membuat jendela boleh mulai berikut durasi **untuk tiap sesi tambahan** dengan jenis Remedial (tahap remedial), Susulan Normal (untuk batal normal atau tidak hadir), atau Susulan Remedial (untuk remedial batal). Jendela tambahan harus setelah jadwal utama dan tidak bentrok dengan sesi Gen–semester yang sama.
+- Peserta susulan dipilih eksplisit oleh Admin dan dicatat pada tabel `peserta_pra_susulan`; tidak menambah/menghapus riwayat lama. Hanya peserta Gen dan tahap yang sesuai yang dapat ikut. Remedial terbuka berdasarkan normal selesai sah <KKM, bukan semua siswa.
+- Sebelum setiap attempt, sistem membaca histori satu siswa/satu ujian; menggunakan nomor percobaan berurut dan `jadwal_pra_sesi_id` yang terverifikasi. Pembatalan tidak menciptakan skor atau kesempatan sah. Attempt yang masih berjalan tetap bisa dilanjutkan tanpa harus menunggu jadwal lain.
+- Tidak mengubah kebijakan tes mandiri Diagnostik/Sumatif, tidak membuka remedial/susulan tanpa jadwal Admin, dan tidak membahas sertifikat pada tahap ini.
