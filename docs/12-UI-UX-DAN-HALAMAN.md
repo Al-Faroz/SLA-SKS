@@ -297,3 +297,11 @@ Keputusan pemilik: **tidak menempatkan area pengelolaan di bawah tabel daftar**.
 - Halaman `siswa/semester/{paketId}` menampilkan kartu Pra-Semester **berdasarkan Service mesin ujian yang sama dengan URL ujian**, tanpa memuat daftar soal, token atau kunci jawaban.
 - Kartu memuat TP NonEsensial selesai sah/jumlah wajib, jumlah soal bank sah dan cakupan BAB, jadwal utama WIB beserta durasi individual dan KKM, nilai mandiri bila ada, serta status belum mulai/berjalan/menunggu remedial/susulan/selesai. Link ke ruang ujian tetap dapat dibuka untuk membaca alasan terkunci; server yang menentukan hak mulai.
 - Ujian belum tersedia bukan kesalahan tampilan. Hindari tombol mulai palsu di luar jadwal Admin. Saat remedial atau susulan tersedia, tampilkan tahap/jadwal sesuai histori siswa. Tidak mengubah alur Diagnostik, Sumatif, atau UI Admin/Guru yang telah PASS.
+
+### A9 — UI Guru Penilaian dan dua Rekap Nilai (3 November 2026)
+
+1. Sidebar Guru menggunakan menu grup **Rekap Nilai** (native expand/collapse) dengan dua submenu **Nilai TP** dan **Nilai Pra-Semester**; menu aktif dan navigasi di HP harus terlihat jelas.
+2. `guru/penilaian`: filter Gen–Mapel, Semester, BAB, Jenis Tugas (Resume/HOTS) dalam grid responsif; reset filter, pager mempertahankan filter aktif, nilai bukan bagian dari dropdown Jenis.
+3. `guru/penilaian/resume/{id}` dan `guru/penilaian/hots/{id}`: Petunjuk dari Materi versi siswa serta Jawaban siswa adalah **dua kartu berbeda** dengan background kontras lembut berbeda pada Emerald Glass dark/light. Konten snapshot tidak boleh ditimpa tampilan.
+4. `guru/rekap-nilai`: filter Gen–Mapel, Semester, Jenis TP, BAB. Jenis TP **NonEsensial default** karena TP Esensial tidak dinilai; filter juga berlaku saat ekspor. Nilai NULL dan 0 dibedakan.
+5. `guru/rekap-nilai/pra-semester`: halaman tersendiri untuk seluruh siswa Gen dan skor sah ujian Pra-Semester, dengan unduhan XLSX tersendiri; tidak membentuk nilai akhir semester.
