@@ -21,6 +21,9 @@ on:
       - 'app/Views/guru/rekap_nilai_tp.php'
       - 'app/Views/guru/rekap_nilai_pra_semester.php'
       - 'tests/unit/A9FilterGuruTest.php'
+      - 'tests/unit/A9TampilanGuruTest.php'
+      - 'public/assets/css/app.css'
+      - 'public/assets/css/emerald-glass.css'
       - 'tests/unit/PraSemesterDatabaseTest.php'
       - '.github/workflows/qa-a9-rekap-guru.yml'
   workflow_dispatch:
@@ -63,8 +66,10 @@ jobs:
             app/Views/guru/rekap_nilai_tp.php \
             app/Views/guru/rekap_nilai_pra_semester.php \
             tests/unit/A9FilterGuruTest.php \
+            tests/unit/A9TampilanGuruTest.php \
             tests/unit/PraSemesterDatabaseTest.php; do php -l "$f"; done
       - name: PHPUnit A9 dan regresi Pra-Semester
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/A9FilterGuruTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/A9TampilanGuruTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
