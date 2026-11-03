@@ -506,3 +506,7 @@ Gunakan scope `a-sertifikat`, `a-sertifikat__status` (grid 2/1), `a-sertifikat__
 CSS renderer `SertifikatPdfService` **berbeda dari CSS Emerald Glass layar web**, karena orientasi untuk cetak. Kertas A4 landscape 297×210 mm, margin 8×9 mm, bingkai emerald terang, aksen emas kecil, nama madrasah serif, judul sekitar 21pt, identitas siswa 10–12pt, tabel TP ±8,7pt dan teks QR/TTD 8–9pt. Background JPG/PNG aktif tetap dipasang di belakang lapisan terang dan tidak diambil lewat URL remote.
 
 Mode `card--full` hanya untuk maksimal empat TP dan tiga BAB yang dapat muat tanpa teks terjepit. Footer QR/TTD ditempel dekat bagian bawah **hanya pada mode pendek**; mode `card--flow` untuk TP panjang membiarkan halaman lanjut secara normal. Dompdf mengulang render dalam mode alur jika mode pendek menghasilkan lebih dari satu halaman. Hindari pemaksaan ketinggian tetap untuk seluruh semester yang berisi banyak TP.
+
+### A12-1 — Komponen Dashboard Pimpinan (3 November 2026)
+
+Gunakan `a-dashboard-pimpinan` dengan `__filter`, `__metrics`, `__metric`, `__meter`, `__operasional`, `__scroll`, `__table`, dan `__pager` bersama `a-card`, `a-btn`, `a-input`, `a-tbl`, `a-alert` bawaan Emerald Glass. Tidak ada dependensi Bootstrap, React, Vue maupun chart library. Indikator `progress` dilengkapi persentase numerik; jika tidak ada target, tampilkan teks bukan grafik 100%. Badge/warna tidak menggantikan angka. Tabel memiliki `role=region`, label dan `tabindex=0` untuk digulir dengan keyboard. Jaga kontras Dark/Light dan Mode Dokumentasi.
