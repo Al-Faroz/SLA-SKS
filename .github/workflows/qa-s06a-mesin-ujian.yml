@@ -19,6 +19,12 @@ on:
       - 'public/assets/css/app.css'
       - 'app/Services/AturanJadwalPraSemesterService.php'
       - 'app/Services/PenilaianPraSemesterService.php'
+      - 'app/Services/PraSemesterSesiService.php'
+      - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Views/siswa/pra_semester_ujian.php'
+      - 'app/Controllers/AdminPraSemester.php'
+      - 'app/Config/Routes.php'
+      - 'database/sql/updates/V4-0009_PRA_SESI_TERJADWAL.sql'
       - 'tests/unit/PraSemesterRemedialSusulanTest.php'
       - 'tests/unit/AturanWaktuUjianServiceTest.php'
       - 'tests/unit/SusunButirUjianServiceTest.php'
@@ -75,6 +81,10 @@ jobs:
           php -l app/Views/guru/pra_semester.php
           php -l app/Services/AturanJadwalPraSemesterService.php
           php -l app/Services/PenilaianPraSemesterService.php
+          php -l app/Services/PraSemesterSesiService.php
+          php -l app/Services/MesinPraSemesterSiswaService.php
+          php -l app/Views/siswa/pra_semester_ujian.php
+          php -l app/Config/Routes.php
           php -l tests/unit/PraSemesterRemedialSusulanTest.php
           php -l tests/integration/SqlUjianSchemaCheck.php
       - name: Unit test waktu Ketat dan acak opsi
