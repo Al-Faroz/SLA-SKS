@@ -65,7 +65,8 @@ final class DashboardPimpinanService
         $nol=[
             'siswa'=>0,'paket'=>0,'tp_wajib'=>0,'pasangan_wajib'=>0,
             'tuntas_sah'=>0,'nilai_final'=>0,'sertifikat_berlaku'=>0,
-            'persen'=>null,'paket_kosong'=>0,
+            'persen'=>null,'paket_kosong'=>0,'guru_ditugaskan'=>0,
+            'pasangan_gen_mapel'=>0,'antrean_penilaian'=>0,
         ];
         if ($paket === []) {
             return ['pilihan'=>$pilihan,'filter'=>$filter,'ringkasan'=>$nol,
@@ -93,6 +94,25 @@ final class DashboardPimpinanService
             $id=(int)$s['id'];
             $siswaGen[$gen][$id]=($s['semester_mulai']===null)
                 ? ($mulaiGen[$gen] ?? 7) : (int)$s['semester_mulai'];
+        }
+
+        $pasanganGenMapel=[];
+        $mapelIds=[];
+        foreach ($paket as $p) {
+            $key=(int)$p['angkatan_id'].':'.(int)$p['mapel_id'];
+            $pasanganGenMapel[$key]=true;
+            $mapelIds[(int)$p['mapel_id']]=true;
+        }
+        $guruTerisi=[];
+        foreach ($this->db->table('penugasan_guru_gen')
+            ->select('angkatan_id,mapel_id,guru_id')
+            ->whereIn('angkatan_id',$genIds)
+            ->whereIn('mapel_id',array_keys($mapelIds))
+            ->get()->getResultArray() as $g) {
+            $key=(int)$g['angkatan_id'].':'.(int)$g['mapel_id'];
+            if (isset($pasanganGenMapel[$key]) && $g['guru_id']!==null) {
+                $guruTerisi[$key]=true;
+            }
         }
 
         $tpPerPaket=[];
@@ -144,6 +164,7 @@ final class DashboardPimpinanService
 
         $total=$nol;
         $unikSiswa=[];
+        $eligibleByPaket=[];
         foreach ($paket as &$p) {
             $pid=(int)$p['id'];
             $tp=$tpPerPaket[$pid] ?? 0;
@@ -161,6 +182,7 @@ final class DashboardPimpinanService
                 $perSiswa[(int)$sid]=($perSiswa[(int)$sid] ?? 0)+1;
                 if (isset($final[$pid][$key])) $nilai++;
             }
+            $eligibleByPaket[$pid]=$eligible;
             $pasangan=count($eligible)*$tp;
             $p['siswa']=count($eligible);
             $p['tp_wajib']=$tp;
@@ -183,6 +205,32 @@ final class DashboardPimpinanService
         }
         unset($p);
 
+        // Antrean Guru adalah jawaban FINAL yang nilainya belum tersimpan.
+        // Keduanya dijumlahkan terpisah (Resume dan HOTS), bukan per siswa.
+        $antreanPerPaket=[];
+        foreach (['resume_materi','jawaban_hots_materi'] as $tabel) {
+            $rows=$this->db->table($tabel.' j')
+                ->select('j.id AS jawaban_id,pr.paket_semester_id,pr.siswa_id')
+                ->join('progres_tp pr','pr.id=j.progres_tp_id')
+                ->join('tp t','t.id=pr.tp_id AND t.paket_semester_id=pr.paket_semester_id')
+                ->whereIn('pr.paket_semester_id',$ids)
+                ->where('j.status','final')->where('j.nilai',null)
+                ->where('t.jenis_tp','non_esensial')
+                ->where('t.status !=','arsip')->get()->getResultArray();
+            foreach ($rows as $j) {
+                $pid=(int)$j['paket_semester_id'];
+                if (!isset($eligibleByPaket[$pid][(int)$j['siswa_id']])) continue;
+                $key=$tabel.':'.(int)$j['jawaban_id'];
+                $antreanPerPaket[$pid][$key]=true;
+            }
+        }
+        foreach ($paket as &$p) {
+            $p['antrean_penilaian']=count($antreanPerPaket[(int)$p['id']]??[]);
+            $total['antrean_penilaian']+=$p['antrean_penilaian'];
+        }
+        unset($p);
+        $total['pasangan_gen_mapel']=count($pasanganGenMapel);
+        $total['guru_ditugaskan']=count($guruTerisi);
         $total['siswa']=count($unikSiswa);
         $total['paket']=count($paket);
         $total['persen']=$total['pasangan_wajib']===0?null:
