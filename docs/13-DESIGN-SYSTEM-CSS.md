@@ -500,3 +500,9 @@ Layout panel `app/Views/layouts/panel.php` **wajib memberi versi pada URL** `pub
 ### A11-2 — Komponen Sertifikat dan aset Admin (3 November 2026)
 
 Gunakan scope `a-sertifikat`, `a-sertifikat__status` (grid 2/1), `a-sertifikat__filter`, `a-tabel-gulir.a-sertifikat__scroll` dan `a-tbl.a-sertifikat__table`, serta badge status akademik/cetak `a-sertifikat__badge--layak`/`--tahan`. Tabel penerbitan memiliki kolom status/aksi tersendiri, form POST CSRF, alasan revisi di dalam `details`, tidak menumpuk tombol di kolom nilai. Halaman aset memisahkan unggah background dengan TTD, menampilkan status aktif dan tautan pratinjau PDF dummy. Pada HP tabel tetap digulir dan card menjadi satu kolom. Halaman publik QR tidak memakai sidebar/tombol privat dan selalu memperlihatkan teks status berlaku/digantikan.
+
+### A11-3 — Tipografi fisik cetak PDF dan bingkai A4 (3 November 2026)
+
+CSS renderer `SertifikatPdfService` **berbeda dari CSS Emerald Glass layar web**, karena orientasi untuk cetak. Kertas A4 landscape 297×210 mm, margin 8×9 mm, bingkai emerald terang, aksen emas kecil, nama madrasah serif, judul sekitar 21pt, identitas siswa 10–12pt, tabel TP ±8,7pt dan teks QR/TTD 8–9pt. Background JPG/PNG aktif tetap dipasang di belakang lapisan terang dan tidak diambil lewat URL remote.
+
+Mode `card--full` hanya untuk maksimal empat TP dan tiga BAB yang dapat muat tanpa teks terjepit. Footer QR/TTD ditempel dekat bagian bawah **hanya pada mode pendek**; mode `card--flow` untuk TP panjang membiarkan halaman lanjut secara normal. Dompdf mengulang render dalam mode alur jika mode pendek menghasilkan lebih dari satu halaman. Hindari pemaksaan ketinggian tetap untuk seluruh semester yang berisi banyak TP.
