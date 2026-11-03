@@ -50,6 +50,7 @@ $routes->post('siswa/pra-semester/(:num)/mulai', 'SiswaPraSemester::mulai/$1', [
 $routes->get('siswa/pra-semester/(:num)/(:segment)/status', 'SiswaPraSemester::status/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/pra-semester/(:num)/(:segment)/jawab', 'SiswaPraSemester::jawab/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/pra-semester/(:num)/(:segment)/tindakan', 'SiswaPraSemester::tindakan/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/pra-semester/(:num)/(:segment)/media/(:segment)/(:segment)', 'SiswaPraSemester::gambarWord/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/ujian', 'SiswaSumatif::halaman/$1', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/sumatif/mulai', 'SiswaSumatif::mulai/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/(:segment)/status', 'SiswaSumatif::status/$1/$2', ['filter' => 'auth:siswa']);
