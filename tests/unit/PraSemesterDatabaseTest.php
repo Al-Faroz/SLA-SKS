@@ -134,6 +134,11 @@ final class PraSemesterDatabaseTest extends TestCase
         self::assertSame('berjalan',$st['status']);
         self::assertCount(30,$st['soal']);
         self::assertArrayNotHasKey('kunci_acak',$st['soal'][0]);
+        // Default Admin berubah setelah attempt pertama: KKM tetap dipin.
+        $this->db->table('pengaturan')->where('kunci','kkm_default')->update(['nilai'=>'95']);
+        $tetap=(new PraSemesterSiswaService($this->db,$this->actor('siswa',100)))->konteks(11);
+        self::assertSame(75,$tetap['kkm']['efektif']);
+        self::assertSame('snapshot_ujian',$tetap['kkm']['sumber']);
         $selesai=$mesin->tindakan(11,$mulai['token'],'kirim',true);
         self::assertSame('selesai_sah',$selesai['status']);
         self::assertSame(0.0,$selesai['skor']);
