@@ -138,3 +138,8 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 - Penyuntingan/pengarsipan memakai row lock MySQL/MariaDB `FOR UPDATE`, `versi` untuk menolak permintaan tab lama, dan transaksi yang menyimpan perubahan bersama `riwayat_informasi` serta `log_aktivitas`. Arsip terminal, tidak DELETE.
 - Dump SQL privat yang menjadi acuan tidak dipublikasikan. Patch `V4-0012` hanya DDL + penanda versi, tidak menyisipkan akun/siswa nyata atau sandi.
 - Belum ada modul Notifikasi internal per penerima, badge belum dibaca, ataupun email/WhatsApp/push.
+
+
+### A13-3 — Privasi kontak resmi (3 November 2026)
+
+`GET /hubungi-admin` dilindungi filter login dan verifikasi ulang role di `KontakResmiMadrasahService`. Query `pengaturan` hanya memilih kunci kontak sekolah resmi; informasi pribadi `profil_pengelola` dan data akademik tidak dimuat. Semua nilai HTML di-escape, termasuk atribut URL; tautan eksternal hanya HTTP(S) sah, email valid dan telepon yang dinormalisasi. Nilai legacy invalid hanya teks. No-store, tanpa mutasi, tiket, audit event palsu, data siswa maupun notifikasi otomatis.
