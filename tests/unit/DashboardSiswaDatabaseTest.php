@@ -135,7 +135,10 @@ final class DashboardSiswaDatabaseTest extends TestCase
         self::assertSame(1,$r['sertifikat_berlaku']);
         self::assertEqualsWithDelta(33.3,$r['persen'],.1);
         self::assertSame('siswa/tp/202',$r['lanjut']['tautan']);
+        self::assertSame('SIM.8.1.2',$r['lanjut']['tp_berikutnya']['kode']);
+        self::assertSame('TP kedua',$r['lanjut']['tp_berikutnya']['judul']);
         self::assertSame('siswa/tp/202',$r['paket'][0]['tautan']);
+        self::assertSame($r['lanjut']['tp_berikutnya'],$r['paket'][0]['tp_berikutnya']);
         self::assertSame('Lanjutkan TP',$r['paket'][0]['label_aksi']);
         self::assertStringNotContainsString('nisn',json_encode($r));
     }
@@ -147,6 +150,7 @@ final class DashboardSiswaDatabaseTest extends TestCase
         self::assertSame(5,$r['siswa']['semester_mulai']);
         self::assertSame(12,$r['paket'][0]['paket_id']);
         self::assertSame('siswa/tp/205',$r['lanjut']['tautan']);
+        self::assertSame('SIM.9.2.1',$r['lanjut']['tp_berikutnya']['kode']);
         self::assertSame(0,$r['tp_tuntas']);
         self::assertSame(0.0,$r['persen']);
     }
@@ -159,6 +163,20 @@ final class DashboardSiswaDatabaseTest extends TestCase
         self::assertNull($r['persen']);
         self::assertNull($r['paket'][0]['persen']);
         self::assertSame('Buka Semester',$r['paket'][0]['label_aksi']);
+        self::assertNull($r['paket'][0]['tp_berikutnya']);
+    }
+
+    public function testTpYangBelumSiapTidakDitampilkanSebagaiBerikutnya(): void
+    {
+        // Siswa mulai Semester 5, satu TP ada tetapi belum Siap.
+        // Katalog tidak boleh mengirim kode/judul TP terkunci ke dashboard.
+        $this->db->table('tp')->where('id',205)->update(['status'=>'draf']);
+        $r=$this->servis(self::akun(102))->ringkasan();
+        self::assertSame('siswa/semester/12',$r['lanjut']['tautan']);
+        self::assertSame('Buka Semester',$r['lanjut']['label']);
+        self::assertNull($r['lanjut']['tp_berikutnya']);
+        self::assertNull($r['paket'][0]['tp_berikutnya']);
+        self::assertStringNotContainsString('TP semester 5',json_encode($r));
     }
 
     public function testSiswaTanpaPaketMenerimaStateKosong(): void
