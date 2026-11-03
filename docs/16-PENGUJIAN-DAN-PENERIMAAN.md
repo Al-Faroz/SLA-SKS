@@ -483,3 +483,16 @@ Tes SQLite sintetis di `tests/unit/KelayakanSertifikatDatabaseTest.php` dan lint
 | A11-212 | Browser Dark/Light, HP dan Mode Dokumentasi | Card, tabel, preview PDF, tombol/galat/sukses, QR terbaca |
 
 PHP lint + PHPUnit SQLite sintetik + renderer Dompdf/endroid dijalankan GitHub Actions `qa-a11-2-sertifikat.yml`; **pengujian MariaDB aktual dan browser XAMPP tetap wajib** sebelum menyatakan fitur FIX.
+
+### A11-3 — Pemeriksaan tata letak hasil cetak Sertifikat (3 November 2026)
+
+| ID | Kondisi | Hasil wajib |
+|---|---|---|
+| A11-301 | PDF hasil XAMPP dengan 2 BAB, 4 TP, NISN demo, QR dan TTD | A4 landscape; bingkai memenuhi sebagian besar halaman, judul/nama/tabel terbaca, QR dan TTD tidak saling bertumpuk |
+| A11-302 | Preview template bawaan Admin | Dua BAB/empat TP **sintetis**, watermark pratinjau, tanpa NISN/TTD nyata |
+| A11-303 | Semester dengan 24 TP dan beberapa BAB panjang | Semua baris TP muncul dalam PDF; halaman tambahan diperbolehkan, tidak menghapus baris dan tidak menumpuk tanda tangan |
+| A11-304 | Dokumen historis versi V001 sudah diterbitkan sebelum pembaruan renderer | Bytes PDF lama, nomor/QR dan status tidak berubah; tidak ada penerbitan ulang otomatis |
+| A11-305 | Nilai TP Esensial/NonEsensial dan Pra-Semester | Esensial tanpa nilai, NonEsensial nilai TP tersimpan, tidak ada nilai Pra-Semester/Nilai Akhir Semester di dokumen |
+| A11-306 | Cetak printer PDF dan browser layar HP/desktop | Tidak ada judul yang terpotong, font terlalu kecil, overlap tabel dengan QR atau tanda tangan |
+
+Tes otomatis `tests/unit/SertifikatTataLetakPdfTest.php` membuat PDF sintetis 4/24 TP; workflow `QA A11-3 Layout Cetak Sertifikat PDF` memeriksa A4 landscape, jumlah halaman dan teks TP menggunakan `pdfinfo`/`pdftotext`. **QA visual PDF terbaru di XAMPP masih wajib sebelum menutup A11-3.**
