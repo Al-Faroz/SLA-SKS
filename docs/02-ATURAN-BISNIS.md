@@ -33,14 +33,14 @@
 - **Penyiapan Guru:** TP **Esensial maupun NonEsensial sama-sama wajib memiliki tepat satu Materi/media yang lengkap**. **Alur siswa:** Jenis TP hanya menentukan akses dan kewajiban aktivitas di sisi siswa. Pada alur siswa saat ini Esensial tidak memiliki aktivitas/penilaian wajib; NonEsensial menjalankan Diagnostik → (bila gagal: Materi → Resume → HOTS) → Sumatif. Materi Esensial tidak boleh dihapus hanya karena tidak diakses siswa.
 - Diagnostik min 10 adalah gate bukan nilai TP. Sumatif min 30. Nilai gagal Diagnostik 20/20/60 (Resume/HOTS/Sumatif), lulus 100% Sumatif. Admin menentukan KKM default dan Guru dapat menetapkan khusus.
 - Sumatif < KKM memperoleh satu remedial; gunakan nilai tertinggi. Setelah aktivitas dan kesempatan sah terkait selesai, **TP selesai meskipun nilai masih < KKM**. Progres semester hanya TP NonEsensial.
-- Pra-Semester dijadwalkan tanggal/jam oleh Admin secara serentak setelah semua TP NonEsensial selesai; nilai tersendiri. **Tidak ada nilai akhir semester.**
+- Pra-Semester dijadwalkan Admin **per Gen–Mapel–Semester**, serentak bagi peserta paket yang sama setelah semua TP NonEsensial selesai; tiap mapel memiliki jendela mulai dan durasi individual tersendiri; nilai tersendiri. **Tidak ada nilai akhir semester.**
 - Resume/HOTS Simpan Draf manual, Kirim Final, penilaian Guru. TP Siap tanpa penggunaan boleh disunting; begitu ada penggunaan siswa, konten dan snapshot yang digunakannya dilindungi.
 
 ## 4. Keputusan final tentang ujian
 - Profil pengamanan pengerjaan Ketat (fullscreen, waktu, koneksi) dipakai pada Diagnostik, Sumatif dan Pra-Semester, **tetapi kegagalan tes mandiri ditangani dengan permintaan akses ulang Guru, bukan pembatalan**. Pembatalan hanya untuk Pra-Semester. PG lima pilihan A–E dengan satu kunci; aturan operasional lengkap pada dokumen 07.
 - Diagnostik minimal 10, Sumatif minimal 30, Pra-Semester minimal 30 soal gabungan seluruh BAB semester.
 - Sumatif dan Pra-Semester memberikan **satu remedial jika skor Sumatif/Pra-Semester normal selesai sah di bawah KKM**, mengambil skor tertinggi. **Diagnostik/Sumatif yang tidak selesai** tidak menghasilkan skor, bukan pembatalan dan bukan remedial; siswa meminta akses ulang Guru sesuai tahap yang gagal tanpa menghabiskan kesempatan sah. **Pembatalan ujian hanya berlaku untuk Pra-Semester**.
-- Admin mengatur jendela Pra-Semester serentak; akses siswa tanpa seluruh TP NonEsensial selesai ditolak.
+- Admin mengatur jendela boleh mulai, durasi dan jadwal susulan/remedial Pra-Semester per paket Gen–Mapel–Semester; akses tanpa seluruh TP NonEsensial selesai ditolak.
 
 ## 5. Keputusan final tentang sertifikat
 - Daftar nilai sertifikat berisi seluruh TP: Esensial tanpa nilai, NonEsensial dengan nilai; **tidak ada rata-rata nilai akhir semester**.
@@ -65,7 +65,7 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 ## 8. Keputusan lintas modul v2.5
 1. CP operasional satu Mapel → Semester → BAB → TP, nomor BAB berlanjut antardua semester kelas sama. Nama singkat 50, deskripsi 225, kode `KODEMAPEL.KELAS.BAB.TP`.
 2. Esensial dan NonEsensial keduanya mempunyai **satu Materi** yang disiapkan Guru; Esensial tanpa nilai siswa sesuai alur saat ini. Diagnostik menjadi gate dan Sumatif wajib 30 untuk jalur NonEsensial.
-3. Pra-Semester tanggal serentak Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
+3. Pra-Semester memiliki jendela boleh mulai dan durasi individual per Gen–Mapel–Semester dari Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
 4. Excel ATP **manual** tanpa macro dan tanpa tombol Proses sudah dipilih; penyusunan BAB/TP dilakukan melalui isian langsung pada workbook atau aplikasi, serta divalidasi server saat impor. KBC, izin Gen–Mapel, Word PG A–E tetap.
 
 ## 9. Aturan final hak sunting CP, BAB, TP (2 November 2026)
@@ -74,3 +74,9 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 3. **TP**: status *Siap* berarti konten telah disiapkan, **bukan** otomatis terkunci. Guru G1 boleh mengubah TP Siap, KKM tunggal, satu Materi, dan soal jika TP tersebut **belum pernah digunakan siswa**. Jika satu saja siswa sudah memulai TP tersebut, konten TP **tidak dapat diubah**, termasuk lewat URL/API/Word/import. Tidak tersedia persetujuan atau jalur koreksi A/B/C untuk menerobos penguncian tersebut.
 4. **Pemeriksaan penggunaan**: server mengecek riwayat progres/aktivitas/percobaan TP terkait dari sumber data sah, pada GET dan ulang secara atomik pada POST. *Melihat TP dalam daftar* atau status `siap` tidak sama dengan mulai menggunakannya. Tidak mereset progres untuk membuka kunci.
 5. **Integritas**: ketika TP Siap yang belum digunakan diubah, data kesiapan dan snapshot konten aktif harus diselaraskan otomatis oleh Service sebelum boleh diakses siswa, tanpa permintaan admin atau tahapan revisi manual. Semua cek/readiness, otorisasi G1, CSRF, transaksi dan audit tetap berlaku; tidak boleh ada kondisi siswa memulai versi yang sedang diperbarui.
+
+
+## Keputusan operasional Pra-Semester (3 November 2026)
+- Admin menetapkan jadwal **dan durasi pengerjaan per paket Gen–Mapel–Semester**, bukan jadwal global seluruh mapel. Rentang jadwal menentukan kapan peserta boleh **memulai**, sedangkan durasi individual dihitung dari waktu mulai percobaan masing-masing sampai habis; penutupan jendela mulai tidak menghentikan percobaan yang sudah berjalan.
+- Guru G1 menyiapkan bank seluruh BAB dan KKM Pra-Semester; remedial satu kali setelah ujian awal sah di bawah KKM mengikuti **jadwal remedial Admin**. Nilai terbaik digunakan; tidak ada nilai akhir semester.
+- Ujian yang **dibatalkan** mengikuti jadwal **susulan Admin**, bukan permintaan akses ulang mandiri. Admin dapat memasukkan siswa tidak hadir ke susulan; pembatalan berulang boleh mendapat susulan berikutnya dengan audit. Jika remedial dibatalkan, susulannya tetap tahap remedial, bukan jatah baru. Guru tidak diminta alasan/persetujuan tambahan untuk jadwal susulan. Modul sertifikat tidak diubah oleh keputusan ini.

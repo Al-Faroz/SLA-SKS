@@ -341,3 +341,13 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 6. **Persaingan transaksi**: siswa memulai TP tepat ketika Guru menyimpan perubahan TP Siap; satu operasi harus ditolak atau diserialisasi sehingga siswa tidak pernah mengakses snapshot campuran; rollback tanpa data parsial.
 7. **Alur usang**: tidak ada UI wajib kategori A/B/C, permohonan TP atau keputusan Admin untuk TP belum digunakan. Patch SQL V4-0006 tidak diperlukan. Jika tabel sudah ada pada DB lokal, tidak dihapus tanpa izin/backup. Pastikan penilaian siswa dan sertifikat yang sudah FIX tetap tidak tersentuh.
 8. **Regresi**: semua 16 Master tetap konsisten; API, CSRF, G1, keamanan file, PHP lint/PHPUnit, browser HP/desktop Dark/Light dan pengujian DB XAMPP harus dijalankan setelah kode berubah. Pembaruan Master saja **bukan** klaim fitur telah berfungsi.
+
+
+### Regresi Pra-Semester final (3 November 2026)
+1. Dua mapel pada Gen/semester sama dapat memiliki **jadwal dan durasi berbeda**; jadwal tidak menyebar otomatis ke mapel lain. Admin, bukan Guru, menyimpan jadwal; Guru G1, bukan Admin, menyimpan bank dan KKM.
+2. Jendela boleh mulai 08.00–09.00 dan durasi 60 menit: mulai 08.45 memberi timer penuh 60 menit dari **08.45** meskipun jendela tertutup 09.00; mulai 09.00 tepat ditolak. Mulai 07.59 ditolak. Semua waktu server, WIB untuk jadwal.
+3. Bank <30 atau BAB belum terwakili, KKM kosong, TP NonEsensial belum tuntas, akun/gen/mapel salah, fullscreen tidak didukung → **tidak dibuat attempt**.
+4. Ujian awal selesai sah di bawah KKM → jadwal remedial Admin, hanya **satu remedial sah**, skor tertinggi, nilai mandiri; tanpa nilai akhir semester.
+5. Fullscreen/koneksi melampaui batas → **Pra-Semester dibatalkan**, tidak memberi skor; siswa yang dibatalkan maupun tidak hadir hanya mendapat akses ketika Admin menjadwalkan susulan khusus peserta tersebut. Susulan batal lagi → jadwal baru dengan audit; remedial yang batal → susulan remedial, bukan jatah tambahan.
+6. Setelah mulai, ujian memiliki timer individual, jawaban tersimpan server dan dapat pulih saat gangguan sah; race condition start bersamaan tidak membuat dua attempt aktif. Semua keputusan/riwayat tersimpan; tidak ada reset data siswa.
+7. UI normal/kosong/locked/sukses/gagal, desktop/laptop fullscreen, aksesibilitas dan kebocoran kunci; hak Guru G1, Admin, Siswa dan Pimpinan tidak saling melintas.

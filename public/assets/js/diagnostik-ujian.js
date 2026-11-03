@@ -7,8 +7,10 @@
     const $ = sel => root.querySelector(sel);
     const url = root.dataset.ujianUrl;
     const tp = root.dataset.ujianTp;
-    const jenis = root.dataset.ujianJenis === 'sumatif' ? 'sumatif' : 'diagnostik';
-    const namaUjian = jenis === 'sumatif' ? 'Sumatif' : 'Diagnostik';
+    const jenis = root.dataset.ujianJenis === 'pra_semester' ? 'pra_semester'
+        : (root.dataset.ujianJenis === 'sumatif' ? 'sumatif' : 'diagnostik');
+    const namaUjian = jenis === 'pra_semester' ? 'Pra-Semester'
+        : (jenis === 'sumatif' ? 'Sumatif' : 'Diagnostik');
     const langsungBelajar = root.dataset.ujianLangsungBelajar === 'ya';
     const csrfName = root.dataset.csrfName;
     let csrf = root.dataset.csrfHash;
@@ -74,11 +76,19 @@
             setText('[data-ujian-hasil-judul]',
                 state.status === 'selesai_sah' ? 'Hasil ' + namaUjian
                     : (jenis === 'diagnostik' && langsungBelajar
-                        ? 'Keputusan historis Guru: Langsung Belajar' : 'Tes tidak selesai — akses ulang diperlukan'));
+                        ? 'Keputusan historis Guru: Langsung Belajar'
+                        : (jenis === 'pra_semester' ? 'Ujian Pra-Semester dibatalkan'
+                            : 'Tes tidak selesai — akses ulang diperlukan')));
             let pesanHasil = jenis === 'diagnostik' && langsungBelajar
                 ? 'Keputusan historis Guru: lanjut jalur belajar. Selesaikan Materi, Resume final, HOTS final, kemudian Sumatif.'
                 : 'Tes tidak selesai tanpa skor sah. Kembali ke Rincian TP untuk meminta akses ulang kepada Guru.';
-            if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
+            if (jenis === 'pra_semester') {
+                pesanHasil = state.status === 'selesai_sah'
+                    ? (state.skor < state.kkm
+                        ? 'Pra-Semester selesai sah. Remedial menunggu jadwal Admin.'
+                        : 'Pra-Semester selesai sah. Nilai tersimpan sebagai nilai mandiri.')
+                    : 'Ujian Pra-Semester dibatalkan tanpa skor. Tunggu jadwal susulan Admin; tidak tersedia akses ulang mandiri.';
+            } else if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
                 pesanHasil = state.skor >= state.kkm
                     ? 'Diagnostik memenuhi KKM. Materi/Resume/HOTS boleh dilewati; Sumatif tetap wajib.'
                     : 'Diagnostik belum memenuhi KKM. Selesaikan satu Materi, Resume dan HOTS final sebelum Sumatif.';
@@ -211,8 +221,9 @@
         return result;
     }
     async function gestureFullscreen() {
-        if (jenis === 'sumatif' && /android|iphone|ipad|ipod|mobile|tablet|windows phone/i.test(navigator.userAgent)) {
-            throw new Error('Sumatif hanya tersedia di desktop/laptop, bukan HP atau tablet.');
+        if ((jenis === 'sumatif' || jenis === 'pra_semester')
+            && /android|iphone|ipad|ipod|mobile|tablet|windows phone/i.test(navigator.userAgent)) {
+            throw new Error(namaUjian + ' hanya tersedia di desktop/laptop, bukan HP atau tablet.');
         }
         if (!didukung()) throw new Error('Perangkat/browser tidak mendukung fullscreen. Gunakan desktop/laptop yang mendukungnya.');
         if (navigator.onLine === false) throw new Error('Perangkat offline. Sambungkan internet dahulu.');

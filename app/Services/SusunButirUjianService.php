@@ -164,6 +164,83 @@ final class SusunButirUjianService
         ];
     }
 
+    /**
+     * Pra-Semester mengambil minimal satu soal sah dari SETIAP BAB,
+     * kemudian mengisi sisa soal dari bank aktif. Semua urutan/opsi diacak
+     * di server dan snapshot butir disimpan pada percobaan.
+     *
+     * @param list<array<string,mixed>> $bank
+     * @param list<int> $babIds
+     * @return list<array<string,mixed>>
+     */
+    public static function praSemester(array $bank, array $babIds, int $jumlahTayang): array
+    {
+        if ($jumlahTayang < 30 || $jumlahTayang > 200 || $babIds === []
+            || count($babIds) > $jumlahTayang || count(array_unique($babIds)) !== count($babIds)) {
+            throw new DomainException('Jumlah soal tayang atau daftar BAB Pra-Semester tidak sah.');
+        }
+        $groups = array_fill_keys($babIds, []);
+        $ids = [];
+        foreach ($bank as $soal) {
+            if ((int)($soal['aktif'] ?? 0) !== 1) continue;
+            $id = (int)($soal['id'] ?? 0);
+            $bab = (int)($soal['bab_id'] ?? 0);
+            if ($id < 1 || isset($ids[$id])) {
+                throw new DomainException('Identitas soal Pra-Semester tidak sah atau berulang.');
+            }
+            $ids[$id] = true;
+            // Soal dari BAB asing/opsi belum lengkap tidak boleh tayang,
+            // tetapi tidak boleh menggagalkan 30 soal lain yang sudah sah.
+            if (!array_key_exists($bab,$groups)
+                || !in_array($soal['kunci'] ?? null,self::HURUF,true)
+                || trim((string)($soal['pertanyaan'] ?? '')) === '') continue;
+            $opsiSah = true;
+            foreach (self::HURUF as $h) {
+                if (trim((string)($soal['opsi_' . strtolower($h)] ?? '')) === '') {
+                    $opsiSah = false;
+                    break;
+                }
+            }
+            if ($opsiSah) $groups[$bab][] = $soal;
+        }
+        $pilih = [];
+        $sisa = [];
+        foreach ($groups as $items) {
+            if ($items === []) throw new DomainException('Setiap BAB harus terwakili pada bank aktif.');
+            self::acakAman($items);
+            $pilih[] = array_shift($items);
+            foreach ($items as $r) $sisa[] = $r;
+        }
+        if (count($pilih) + count($sisa) < $jumlahTayang) {
+            throw new DomainException('Jumlah soal aktif kurang dari jumlah tayang.');
+        }
+        self::acakAman($sisa);
+        $pilih = array_merge($pilih, array_slice($sisa,0,$jumlahTayang-count($pilih)));
+        self::acakAman($pilih);
+        $hasil = [];
+        foreach ($pilih as $i => $soal) {
+            $hurufLama = self::HURUF;
+            self::acakAman($hurufLama);
+            $opsi = [];
+            $kunci = null;
+            foreach (self::HURUF as $j => $baru) {
+                $asal = $hurufLama[$j];
+                $opsi[$baru] = (string)$soal['opsi_' . strtolower($asal)];
+                if ($asal === $soal['kunci']) $kunci = $baru;
+            }
+            $hasil[] = [
+                'soal_asal_id'=>null,
+                'soal_pra_semester_id'=>(int)$soal['id'],
+                'posisi'=>$i+1,
+                'pertanyaan'=>(string)$soal['pertanyaan'],
+                'konten_terstruktur_json'=>null,
+                'opsi_acak_json'=>json_encode($opsi,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR),
+                'kunci_acak'=>$kunci,
+            ];
+        }
+        return $hasil;
+    }
+
     /** Fisher–Yates dengan random_int (sumber acak kriptografis PHP). */
     private static function acakAman(array &$items): void
     {

@@ -40,7 +40,7 @@ Langkah: backup DB v3 dan `writable/`, impor v4 di phpMyAdmin/CLI, cek `schema_v
 ## 5A. Kontrak tambahan model v2.4
 - Implementasi masih bertahap: kode CI4 v3 yang membaca TP→banyak Materi serta Diagnostik sebagai nilai final **belum otomatis kompatibel** dengan skema v4.
 - SQL v4 tidak menghapus snapshot, data ujian atau progres sebelumnya; perlakuan data uji historis v3 harus transparan.
-- Versi dokumen v2.5 mengganti ketentuan v2.4 yang bertentangan; jadwal Pra-Semester dan persyaratan sertifikat yang belum disepakati tidak boleh diinferensikan.
+- Versi dokumen v2.5 mengganti ketentuan v2.4 yang bertentangan; jadwal Pra-Semester mengikuti **keputusan final 3 November 2026** pada Master 07; hanya persyaratan sertifikat yang masih ditunda dan tidak boleh diinferensikan.
 
 ## 6. Pemeriksaan lintas DB dan target
 Karena MySQL lokal dan MariaDB hosting **berbeda mesin**, semua enum, CHECK constraint, generated column, index, JSON, collation dan DDL alter harus diuji pada **versi spesifik keduanya**, bukan dianggap identik. Catat versi yang lulus tes pada `15-INSTALASI-DAN-OPERASIONAL.md`. Ukuran data kecil tidak menghapus kebutuhan FK, transaksi, indeks, atau audit.
@@ -89,3 +89,8 @@ Dump lokal terbaru `sla_sks_v4` (MariaDB 10.4.32, ekspor 31-10-2026 14.06) masih
 - **TP:** status `draf` atau `siap` **bukan indikator telah digunakan siswa**. Yang dipakai untuk menolak sunting adalah bukti riwayat penggunaan minimal satu siswa pada TP dari tabel progres/aktivitas/percobaan. Server harus memeriksa saat GET dan ulang secara atomik ketika POST. Tidak ada mutasi konten setelah digunakan siswa. Akses berkas, Word, KKM, editor TP dan upload harus memakai gerbang yang sama.
 - **Konsistensi snapshot:** edit TP Siap yang belum digunakan menyelaraskan konten dan pointer/snapshot aktif sebelum siswa dapat mulai; Service harus menghindari kondisi saling berlomba antara siswa memulai dan Guru menyimpan. Jangan hapus snapshot/hasil historis atau rekap nilai. Rincian SQL ditentukan berdasarkan audit dump terbaru pada **tahap implementasi kode**.
 - **Patch V4-0006 `permohonan_koreksi_tp` yang pernah dikembangkan pada branch sebelumnya tidak lagi menjadi kebutuhan fitur**, dan **tidak perlu diimpor** untuk penyuntingan TP menurut keputusan baru. Jika ternyata sudah pernah diimpor pada database lokal, jangan DROP atau reset tanpa audit dump dan izin eksplisit pemilik. SQL yang belum dilaksanakan tetap dapat disimpan sebagai artefak lama di branch, tetapi bukan sumber instalasi aktif.
+
+
+### Kontrak jadwal Pra-Semester (3 November 2026)
+Tabel `ujian_pra_semester` V4-0001 saat ini memiliki satu baris per `paket_semester_id`: `mulai_pada`/`selesai_pada` adalah **jendela boleh memulai ujian utama dalam WIB**, `durasi_menit` adalah durasi individual terpisah yang dihitung server sejak siswa memulai. `kkm_khusus` adalah nilai Guru untuk Pra-Semester, fallback `pengaturan.kkm_default`. `soal_pra_semester` bank seluruh BAB, dan `percobaan_ujian` menyimpan attempt `jenis=pra_semester`.
+Jadwal remedial/susulan dan peserta terpilih memerlukan tabel/relasi baru dengan audit dan identitas tahap (normal/remedial), tanpa mengubah data TP. **Dilarang membuat ALTER/SQL update berdasarkan asumsi** sebelum memperoleh dump XAMPP terbaru sesudah seluruh patch terakhir; SQL baru bernomor, kompatibel MariaDB/MySQL, tidak me-reset data historis.

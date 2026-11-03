@@ -100,7 +100,7 @@ sedangkan indikator kesamaan Master 08 hanya untuk tinjauan Guru.
 - Excel ATP final **manual `.xlsx` tanpa macro atau tombol Proses**. Tolak file `.xlsm` dan konten VBA/eksternal, hanya baca/validasi sel yang disepakati; cek ZIP/container, ukuran, ekstensi, MIME, formula dan referensi eksternal. Unduhan/unggahan tetap terikat konteks Gen–Mapel dan CSRF.
 - Nomor/kode BAB/TP server-side, validasi lintas dua semester dan hak guru. Jenis TP tidak boleh digunakan untuk menolak pembuatan Materi Guru; kedua jenis TP wajib memiliki tepat satu Materi lengkap. Pembatasan progres/nilai siswa untuk Esensial tetap diawasi di Service siswa; snapshot historis tidak dihapus.
 - Checkpoint klien 4 menit tidak memberi kepercayaan penuh pada waktu browser; Service membatasi delta sah dan memerlukan bukti tersimpan sebelum membuka Resume/HOTS/download. Simpan waktu lokal offline hanya sementara pada perangkat sama.
-- Pra-Semester: Admin jadwal, belum selesai TP/di luar jendela waktu ditolak, izin Guru hanya Gen–Mapel, jawaban/snapshot/insiden ujian anonim bagi pihak tak berhak.
+- Pra-Semester: Admin mengelola jadwal utama, remedial dan susulan per Gen–Mapel–Semester; belum selesai TP/di luar jendela mulai ditolak. Guru G1 hanya mengelola bank/KKM dan membaca insiden pada Gen–Mapel sendiri, bukan mengizinkan susulan. Jawaban, snapshot dan insiden ujian privat bagi pihak tak berhak.
 - Export Nilai Guru tersedia saat satu skor ada tetapi tetap membatasi semua baris ke Gen–Mapel pengampu, tanpa hash/token/sesi, mitigasi formula-injection, respons file tidak boleh terindeks/cache publik.
 
 
@@ -113,3 +113,7 @@ Validasi bisnis pada file PDF Materi hanya **jumlah halaman 6–40** dan **ukura
 - **BAB**: Guru yang diizinkan oleh G1 dapat memperbaiki isian BAB yang tersedia meskipun TP dalam BAB sudah Siap; pertahankan validasi nomor/nama/deskripsi dan audit. Tidak menambah fitur pemindahan TP antar-BAB.
 - **TP**: guard server **berdasarkan bukti satu siswa pernah menggunakan TP**, bukan status Siap. Saat siswa sudah mulai, semua perubahan konten TP, KKM, materi/media, bank soal, Word dan endpoint historis ditolak. Sebelum digunakan, perubahan Draf maupun Siap diizinkan untuk Guru G1 dan harus aman terhadap race condition dengan siswa yang mulai di waktu sama.
 - **Tidak ada bypass** melalui status yang diubah paksa, URL ID, batch import, upload, PATCH/POST API maupun persetujuan kategori A/B/C yang telah dibatalkan. Snapshot nilai/percobaan dan audit tidak dihapus. Tidak mencatat password, berkas siswa atau data pribadi dalam GitHub.
+
+
+### Proteksi Pra-Semester (3 November 2026)
+Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah tampil dalam respons siswa. Admin hanya boleh jadwal/durasi per paket, bukan soal/nilai. Pemeriksaan kelayakan seluruh TP, status bank, jendela boleh mulai, peserta remedial/susulan dan perangkat dilakukan **di server dalam transaksi sebelum attempt dibuat**, bukan hanya pada UI. Bank/KKM/durasi yang digunakan dalam ujian tidak boleh berubah saat sudah ada percobaan. Audit jadwal, pembatalan otomatis, susulan berulang, partisipasi siswa, dan izin berjenjang dipertahankan. Token, jawaban, soal/kunci tidak disertakan pada file ekspor publik atau log yang tidak berizin.

@@ -269,3 +269,9 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - **BAB**: tombol Sunting pada isian BAB yang sudah ada tetap tersedia berdasarkan hak G1; jangan sembunyikan hanya karena TP dalam BAB telah Siap. Tidak ada menu pindah TP antar-BAB.
 - **Admin**: `/admin/kurikulum-cp` menggunakan form Tambah/Sunting yang sama dengan **tepat lima isian**: Kurikulum, Mata pelajaran, Kode CP, Elemen CP, Rumusan CP resmi. Empat field metadata lama tidak tampak/tidak wajib. Untuk CP yang sudah dipakai TP/siswa, tombol **Sunting CP** tetap aktif dan Simpan langsung berlaku pada referensi CP; audit/versi teknis otomatis tanpa draf/penerbitan manual.
 - **Alur kategori lama dicabut**: tidak menampilkan Ajukan Koreksi A/B/C, kategori, alasan wajib, halaman review Admin untuk perubahan TP yang belum digunakan. Jika SQL V4-0006 belum diimpor, tidak ada kewajiban mengimpornya. Kesesuaian kode dan DB dituntaskan pada tahap implementasi.
+
+
+### UI Pra-Semester per mapel (3 November 2026)
+- Guru: kartu bank Pra-Semester pada setiap paket, daftar soal dikelompokkan menurut BAB, indikator jumlah sah/30 dan BAB yang belum terwakili, editor PG A–E serta pengaturan KKM khusus tanpa mencampur KKM TP. Tampil readonly sesudah pernah digunakan siswa.
+- Admin: tabel paket Gen–Mapel–Semester, masing-masing pengaturan **jendela boleh mulai** dan **durasi** yang berbeda, serta status belum dijadwalkan/belum mulai/berlangsung/ditutup; jadwal remedial/susulan dan peserta terpilih menjadi tindakan lanjutan setelah skema tersedia.
+- Siswa: kartu Pra-Semester terkunci hingga semua TP NonEsensial tuntas; tampil jadwal per mapel dan durasi yang **mulai dihitung saat peserta memulai**, bukan saat jam jadwal dibuka. Setelah ujian berjalan, jendela jadwal boleh berakhir sementara timer tetap berjalan. Pembatalan memerlukan jadwal susulan Admin; tidak ada tombol mengulang mandiri.

@@ -44,6 +44,12 @@ $routes->post('siswa/tp/(:num)/diagnostik/(:segment)/jawab', 'SiswaUjian::jawab/
 $routes->post('siswa/tp/(:num)/diagnostik/(:segment)/tindakan', 'SiswaUjian::tindakan/$1/$2', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/diagnostik/media/(:segment)/(:segment)/(:segment)', 'SiswaUjian::media/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
 
+// A8-3: ujian utama Pra-Semester, bukan akses ulang Diagnostik/Sumatif.
+$routes->get('siswa/pra-semester/(:num)', 'SiswaPraSemester::halaman/$1', ['filter' => 'auth:siswa']);
+$routes->post('siswa/pra-semester/(:num)/mulai', 'SiswaPraSemester::mulai/$1', ['filter' => 'auth:siswa']);
+$routes->get('siswa/pra-semester/(:num)/(:segment)/status', 'SiswaPraSemester::status/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/pra-semester/(:num)/(:segment)/jawab', 'SiswaPraSemester::jawab/$1/$2', ['filter' => 'auth:siswa']);
+$routes->post('siswa/pra-semester/(:num)/(:segment)/tindakan', 'SiswaPraSemester::tindakan/$1/$2', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/ujian', 'SiswaSumatif::halaman/$1', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/sumatif/mulai', 'SiswaSumatif::mulai/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/(:segment)/status', 'SiswaSumatif::status/$1/$2', ['filter' => 'auth:siswa']);
@@ -74,6 +80,15 @@ $routes->post('guru/akses-ulang/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' 
 $routes->get('guru/ujian-batal', 'GuruUjianBatal::index', ['filter' => 'auth:guru']);
 $routes->get('guru/ujian-batal/(:num)', 'GuruUjianBatal::index/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/ujian-batal/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' => 'auth:guru']);
+// A8: Bank Pra-Semester milik Guru G1, jadwal per paket oleh Admin.
+$routes->get('guru/pra-semester', 'GuruPraSemester::index', ['filter' => 'auth:guru']);
+$routes->get('guru/pra-semester/(:num)', 'GuruPraSemester::index/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/soal', 'GuruPraSemester::simpanSoal/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/soal/(:num)/status', 'GuruPraSemester::statusSoal/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/kkm', 'GuruPraSemester::simpanKkm/$1', ['filter' => 'auth:guru']);
+$routes->get('admin/pra-semester', 'AdminPraSemester::index', ['filter' => 'auth:admin']);
+$routes->get('admin/pra-semester/(:num)', 'AdminPraSemester::index/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pra-semester/(:num)', 'AdminPraSemester::simpan/$1', ['filter' => 'auth:admin']);
 $routes->get('guru/rekap-nilai', 'GuruRekapNilai::index', ['filter' => 'auth:guru']);
 $routes->get('guru/rekap-nilai/unduh', 'GuruEksporNilai::unduh', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);

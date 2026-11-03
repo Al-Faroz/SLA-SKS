@@ -24,7 +24,7 @@ Satu akun staf boleh memiliki dua role saja: Admin+Guru, Admin+Pimpinan, Guru+Pi
 | Menilai resume/tugas | Tidak | **Ya, Gen–Mapelnya** | Tidak | Tidak |
 | Mengajukan koreksi nilai oleh guru pengganti | Tidak | **Ya, Gen–Mapelnya** | Tidak | Tidak |
 | Menyetujui koreksi akademik | **Ya**, bukan usulan sendiri | Tidak | Tidak | Tidak |
-| Memberi izin akses ulang Diagnostik/Sumatif; menangani pembatalan khusus Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
+| Memberi izin akses ulang Diagnostik/Sumatif; melihat pembatalan Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
 | Menyetel logo aplikasi/favikon, TTD PNG dan template | **Ya** | Tidak | Tidak | Baca |
 | Mengelola pengumuman global | **Ya** | **Ya** | Baca | Baca |
 | Mengelola FAQ dan teks Kebijakan Privasi sekolah | **Ya** | Tidak | FAQ baca / privasi publik | FAQ baca / privasi publik |
@@ -69,7 +69,7 @@ Pemeriksaan izin dilakukan di Controller **dan** Service: `peran_aktif`, status 
 - Siswa hanya melihat TP yang telah Siap sesuai urutan semester; Pimpinan hanya membaca laporan/progres.
 
 ## 7. Hak akses tambahan pola BAB–TP v2.5
-- **Admin:** mengelola KKM default, tanggal/jam ujian Pra-Semester serentak, identitas referensi kurikulum/CP; tidak mengubah nilai Guru secara langsung.
+- **Admin:** mengelola KKM default, jadwal utama/remedial/susulan dan durasi per Gen–Mapel–Semester, identitas referensi kurikulum/CP; tidak mengubah nilai Guru secara langsung.
 - **Guru:** G1 berwenang memberi akses ulang Diagnostik/Sumatif mandiri sesuai percobaan yang tidak selesai; tidak menyamakan akses ulang dengan remedial nilai. Pembatalan hanya Pra-Semester.
 - **Guru:** G1 per Gen–Mapel tetap; boleh mengisi ATP lewat aplikasi/Excel, mengelola BAB dan TP Esensial/NonEsensial, tepat satu Materi untuk setiap TP Esensial dan NonEsensial, bank soal TP dan Pra-Semester, penilaian, dan **Export Nilai** seluruh siswa Gen–Mapel termasuk hasil parsial.
 - **Siswa:** mengakses BAB/TP sesuai Gen/semester; hanya TP NonEsensial memerlukan Diagnostik, Materi jika gagal, Resume/HOTS jika wajib, Sumatif dan remedial. Pra-Semester dibuka oleh jadwal Admin setelah semua TP NonEsensial selesai.
@@ -81,3 +81,10 @@ Seluruh layanan menegakkan Gen–Mapel dan peran aktif di Controller **dan Servi
 - **Guru BAB**: editor isian BAB yang sudah ada dapat dibuka sesuai penugasan G1; jangan menutupnya hanya karena satu TP dalam BAB `siap`. Tidak menambah operasi pemindahan TP antar-BAB.
 - **Guru TP**: cek penugasan G1 dan bukti penggunaan siswa pada objek TP; boleh sunting Draf maupun Siap-belum-digunakan. Tolak seluruh mutasi konten pada TP yang pernah digunakan siswa, bukan sekadar yang `status=siap`.
 - **Admin** tidak ikut memberi approval atas edit CP/BAB/TP pada jalur ini; operasi koreksi nilai siswa dan perlindungan sertifikat tidak berubah.
+
+
+### Pembagian kewenangan Pra-Semester (3 November 2026)
+- **Guru G1:** kelola bank soal semester dan KKM khusus Pra-Semester dalam Gen–Mapel sendiri, lihat status/jawaban dan pembatalan milik siswanya; **tidak** menjadwalkan atau menyetujui susulan.
+- **Admin:** jadwalkan jendela **mulai** dan durasi tiap Gen–Mapel–Semester secara terpisah; jadwalkan remedial dan satu atau lebih susulan, tetapkan peserta susulan yang dibatalkan/tidak hadir, audit perubahan. Tidak membuat/mengoreksi nilai atau bank soal Guru.
+- **Siswa:** hanya dapat memulai ketika jendela Admin untuk tahap/identitasnya berlangsung dan seluruh TP NonEsensial paket selesai; setelah mulai memiliki durasi pengerjaan individual. Siswa yang dibatalkan tidak dapat memulai lagi tanpa masuk jadwal susulan Admin. **Pimpinan:** hanya baca hasil.
+- Rumusan historis "Guru menangani pembatalan Pra-Semester" berarti **melihat/memonitor insiden**, bukan memberi izin ulang yang menggantikan jadwal Admin.
