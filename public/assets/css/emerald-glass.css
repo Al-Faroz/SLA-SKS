@@ -2323,3 +2323,23 @@ html[data-theme="light"] .a-app--prototipe .a-sertifikat__badge--tahan {
     border-color:#D9B883;
     background:#FFF2D9;
 }
+
+/* QA Admin: detail konfirmasi reset tetap terbaca pada DARK maupun LIGHT. */
+html[data-theme] .a-app--prototipe .a-page .a-akun-reset .a-rincian {
+    background:var(--eg-pane-soft);
+    color:var(--e-text);
+    border:1px solid var(--eg-line);
+    border-radius:12px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-akun-reset .a-rincian dt {
+    color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-page .a-akun-reset .a-rincian dd {
+    color:var(--e-text);
+    font-weight:650;
+    overflow-wrap:anywhere;
+}
+html[data-theme] .a-app--prototipe .a-page .a-akun-reset :is(.a-btn--bahaya) {
+    border-color:var(--e-danger);
+    color:var(--e-danger);
+}

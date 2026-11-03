@@ -526,3 +526,9 @@ Gunakan `a-dashboard-pimpinan` dengan `__filter`, `__metrics`, `__metric`, `__me
 ### A12-4 — Komponen KPI administrasi dan kesiapan (3 November 2026)
 
 CSS scope `a-dashboard-admin__section`, `__metrics`/`__metric`, `__health`, `__attention` dan `__facts` memakai `a-card` dan tombol `a-btn` yang sudah ada. Beranda sebelumnya `a-proto-metric` dan `a-proto-shortcuts` **tidak dihapus**. KPI enam kartu memakai grid 3/2/1; kesehatan dua panel menjadi satu kolom di bawah 1120px; card berisi 2×2 fakta menjadi satu kolom pada HP. Border amber di perhatian bermakna tindakan perlu diperiksa, tetapi label teks tetap wajib. Semua status `belum diperiksa` tidak boleh memakai badge sukses atau klaim PASS.
+
+### A12-4 audit tema Admin — kontras reset & lebar tabel (3 November 2026)
+
+Perbaikan `a-akun-reset .a-rincian` pada `emerald-glass.css` menggunakan `--eg-pane-soft`, `--eg-line`, `--e-muted`, `--e-text`; tidak boleh memakai background terang hardcode `#f6faf8` tanpa padanan saat mode DARK. Override harus berlaku untuk `html[data-theme]`, sehingga DARK/LIGHT keduanya terbaca. Struktur `dl/dt/dd`, CSRF, tombol bahaya, dan alur hasil sandi satu-kali tidak diubah.
+
+Pada `app.css`, `a-admin-akun__grid` menjadi satu kolom agar tabel Pengelola/Siswa tidak terjepit oleh formulir; di desktop form menggunakan dua kolom dan pada HP satu. Aksi Excel serta filter tetap membungkus natural. `a-mapel-guru__tambah` memakai lebar kontainer dan `__form` dua kolom desktop. `a-cp #cp-daftar .a-cp__filter` diberi jarak vertikal dan hierarki susun jelas dari tabel. Jangan mengubah style global tabel/ujian/siswa karena persoalan UI Admin lokal; semua perubahan CSS dibatasi scope halaman.

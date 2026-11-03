@@ -216,9 +216,9 @@
             <?php if ($ringkasan['gen'] === 0 || $ringkasan['mapel'] === 0): ?>
                 <p>Data Gen atau mata pelajaran masih kosong. Lengkapi referensi sebelum menetapkan pengampu.</p>
             <?php elseif ($ringkasan['belum_ditugaskan'] > 0): ?>
-                <p>Ada pasangan Gen–Mapel yang belum mempunyai Guru. Penetapan dapat dilakukan satu per satu.</p>
+                <p>Sebagian kombinasi potensial Gen–Mapel belum ditetapkan Guru. Tetapkan pengampu pada kombinasi yang memang digunakan dalam pembelajaran.</p>
             <?php else: ?>
-                <p>Setiap pasangan Gen–Mapel yang terdaftar sudah memiliki Guru pengampu.</p>
+                <p>Semua kombinasi Gen–Mapel yang terhitung dalam ringkasan sudah memiliki Guru pengampu.</p>
             <?php endif ?>
             <div class="a-proto-note">
                 <span class="a-proto-note__mark" aria-hidden="true">i</span>
