@@ -122,7 +122,7 @@
                 KKM efektif: <strong><?= $kkm['efektif'] === null ? 'Belum tersedia' : (int)$kkm['efektif'] ?></strong>.
                 Sumber: <?= esc((string)$kkm['sumber']) ?>.</p>
             <?php if (!$terpakai): ?>
-                <form method="post" action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/kkm'),'attr') ?>" class="a-form">
+                <form method="post" action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/kkm') . ($filterGen !== null ? '?gen='.$filterGen : ''),'attr') ?>" class="a-form">
                     <?= csrf_field() ?>
                     <div class="a-field">
                         <label class="a-label" for="kkm-pra-input">KKM khusus Guru (opsional)</label>
@@ -153,9 +153,9 @@
                                 <td>
                                     <?php if (!$terpakai): ?>
                                         <a class="a-btn a-btn--sekunder"
-                                            href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']) . '?edit=' . (int)$soal['id'],'attr') ?>">Sunting</a>
+                                            href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']) . '?edit=' . (int)$soal['id'] . ($filterGen !== null ? '&gen='.$filterGen : ''),'attr') ?>">Sunting</a>
                                         <form method="post" style="display:inline"
-                                            action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/soal/' . (int)$soal['id'] . '/status'),'attr') ?>">
+                                            action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/soal/' . (int)$soal['id'] . '/status') . ($filterGen !== null ? '?gen='.$filterGen : ''),'attr') ?>">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="aktif" value="<?= (int)$soal['aktif'] === 1 ? '0':'1' ?>">
                                             <button class="a-btn a-btn--sekunder" type="submit">
@@ -177,7 +177,7 @@
             <section class="a-card a-jarak-atas" aria-labelledby="soal-pra">
                 <h2 id="soal-pra"><?= $soalEdit !== null ? 'Sunting soal' : 'Tambah soal' ?></h2>
                 <form method="post" class="a-form"
-                    action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/soal'),'attr') ?>">
+                    action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/soal') . ($filterGen !== null ? '?gen='.$filterGen : ''),'attr') ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="soal_id" value="<?= $soalEdit !== null ? (int)$soalEdit['id'] : 0 ?>">
                     <div class="a-field">
@@ -213,7 +213,7 @@
                     <button class="a-btn a-btn--utama" type="submit">Simpan Soal</button>
                     <?php if ($soalEdit !== null): ?>
                         <a class="a-btn a-btn--sekunder"
-                            href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']),'attr') ?>">Batal sunting</a>
+                            href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']) . ($filterGen !== null ? '?gen='.$filterGen : ''),'attr') ?>">Batal sunting</a>
                     <?php endif ?>
                 </form>
             </section>
