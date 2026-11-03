@@ -109,6 +109,49 @@ final class PraSemesterDatabaseTest extends TestCase
         ];
     }
 
+    public function testFilterDaftarAdminDanGuruDiterapkanPadaQueryServer(): void
+    {
+        $admin = new PraSemesterJadwalService($this->db,$this->actor('admin',1));
+        self::assertCount(2,$admin->daftar());
+        self::assertCount(1,$admin->daftar(['gen'=>'1','mapel'=>'1','semester'=>'4','status'=>'siap']));
+        self::assertCount(1,$admin->daftar(['mapel'=>'2','status'=>'belum']));
+        self::assertSame(12,(int)$admin->daftar(['mapel'=>'2','status'=>'belum'])[0]['paket_id']);
+        self::assertSame([], $admin->daftar(['semester'=>'5']));
+        self::assertSame([], $admin->daftar(['status'=>'ditutup']));
+
+        $guru = new PraSemesterGuruService($this->db,$this->actor('guru',10));
+        self::assertCount(1,$guru->paketGuru());
+        self::assertCount(1,$guru->paketGuru(1));
+        self::assertSame([],$guru->paketGuru(2)); // Gen lain tidak boleh terbuka
+        self::assertSame([1=>'Gen Uji'],$guru->pilihanGen());
+        self::assertSame(1,PraSemesterGuruService::filterGen('1'));
+    }
+
+    public function testFilterWhitelistMenolakInputTidakSah(): void
+    {
+        foreach ([
+            ['gen'=>'-1'],
+            ['mapel'=>'1 OR 1=1'],
+            ['semester'=>'7'],
+            ['status'=>'dibatalkan_menunggu_guru'],
+        ] as $f) {
+            try {
+                PraSemesterJadwalService::filterDaftar($f);
+                self::fail('Filter Admin yang tidak sah seharusnya ditolak.');
+            } catch (\DomainException $e) {
+                self::assertNotSame('', $e->getMessage());
+            }
+        }
+        foreach (['-2','1 OR 1=1',[]] as $f) {
+            try {
+                PraSemesterGuruService::filterGen($f);
+                self::fail('Filter Guru yang tidak sah seharusnya ditolak.');
+            } catch (\DomainException $e) {
+                self::assertNotSame('', $e->getMessage());
+            }
+        }
+    }
+
     public function testSiswaMendapatkanJadwalDanDuaBabTanpaMembocorkanKunci(): void
     {
         $siswa=new PraSemesterSiswaService($this->db,$this->actor('siswa',100));
