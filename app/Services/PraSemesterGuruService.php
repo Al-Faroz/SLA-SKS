@@ -51,17 +51,54 @@ final class PraSemesterGuruService
         return $row;
     }
 
-    /** Daftar seluruh paket Guru, termasuk semester yang belum memiliki bank. */
-    public function paketGuru(): array
+    /**
+     * Sumber pilihan hanya penugasan G1 milik guru terautentikasi.
+     * Gen selain yang ditugaskan tidak pernah dimunculkan.
+     */
+    public function pilihanGen(): array
     {
         $guruId = $this->guru();
-        return $this->db->table('paket_semester p')
-            ->select('p.id,p.semester,p.status,a.nama AS nama_gen,m.nama AS nama_mapel')
-            ->join('penugasan_guru_gen g', 'g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id')
+        $rows = $this->db->table('paket_semester p')
+            ->select('p.angkatan_id, a.nama AS nama_gen')
+            ->join('penugasan_guru_gen g',
+                'g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id')
+            ->join('ref_angkatan a','a.id=p.angkatan_id')
+            ->where('g.guru_id',$guruId)
+            ->groupBy('p.angkatan_id,a.nama')
+            ->orderBy('a.nama')->get()->getResultArray();
+        $result = [];
+        foreach ($rows as $r) $result[(int)$r['angkatan_id']] = (string)$r['nama_gen'];
+        return $result;
+    }
+
+    public static function filterGen(mixed $raw): ?int
+    {
+        if ($raw === null || $raw === '') return null;
+        if (!is_string($raw) && !is_int($raw)) {
+            throw new DomainException('Filter Gen tidak valid.');
+        }
+        $v = (string)$raw;
+        if (!ctype_digit($v) || (int)$v < 1) {
+            throw new DomainException('Filter Gen tidak valid.');
+        }
+        return (int)$v;
+    }
+
+    /** Daftar seluruh paket Guru, termasuk semester yang belum memiliki bank. */
+    public function paketGuru(?int $genId = null): array
+    {
+        $guruId = $this->guru();
+        $query = $this->db->table('paket_semester p')
+            ->select('p.id,p.angkatan_id,p.semester,p.status,a.nama AS nama_gen,m.nama AS nama_mapel,'
+                . 'e.id AS ujian_id,e.status AS ujian_status')
+            ->join('penugasan_guru_gen g',
+                'g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id')
             ->join('ref_angkatan a', 'a.id=p.angkatan_id')
             ->join('ref_mapel m', 'm.id=p.mapel_id')
-            ->where('g.guru_id', $guruId)
-            ->orderBy('a.nama')->orderBy('m.nama')->orderBy('p.semester')
+            ->join('ujian_pra_semester e','e.paket_semester_id=p.id','left')
+            ->where('g.guru_id', $guruId);
+        if ($genId !== null) $query->where('p.angkatan_id',$genId);
+        return $query->orderBy('a.nama')->orderBy('m.nama')->orderBy('p.semester')
             ->get()->getResultArray();
     }
 
