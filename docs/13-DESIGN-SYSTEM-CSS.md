@@ -536,3 +536,7 @@ Pada `app.css`, `a-admin-akun__grid` menjadi satu kolom agar tabel Pengelola/Sis
 ### A12-4 UI lanjutan — pengaturan ruang form Admin dan Profil (3 November 2026)
 
 Komponen scoped: `a-admin-akun__form .a-fieldset` grid tiga label peran (hover/fokus tetap terlihat, checkbox native, HP satu kolom), `a-admin-akun__form .a-form > button` baris CTA penuh setelah sandi, `a-referensi-grid` dengan dua `__kolom` Form→Daftar dan fallback satu kolom hingga 960px, `a-identitas-editor__form` dua kolom + `__lebar` untuk alamat textarea/CTA, `a-profil__foto` grid internal pratinjau dan unggah. Untuk ≤800px foto/unggah vertikal, ≤620px form akun/identitas menjadi satu kolom. Jangan memakai CSS global untuk mengubah tampilan soal, tabel Guru, atau ujian. Tidak membuat warna hardcode baru yang mengabaikan token Dark/Light.
+
+### A13-1 — Komponen Pusat Bantuan (3 November 2026)
+
+`a-bantuan`, `__pengenalan`, `__kelompok`, `__panel`, `__pertanyaan`, `__butir`, `__jawaban` didefinisikan dalam `public/assets/css/app.css`. Kartu pertanyaan memakai `details/summary` native, border token `--eg-line`, permukaan `--eg-pane-soft`, dan fokus keyboard yang terlihat (outline). Tombol hanya memakai kelas `a-btn` yang telah ada, memanfaatkan URL `site_url()` ter-escape. Desktop dua kolom topik dengan panel ganjil terakhir melebar, ≤900px satu kolom, ≤620px tombol dan teks fleksibel. Tidak menambahkan Bootstrap, dependensi JS atau ikon font; elemen yang dibuka bekerja bahkan bila JavaScript mati. Tidak menampilkan notifikasi/pesan saat ujian.
