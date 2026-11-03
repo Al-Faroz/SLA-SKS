@@ -515,3 +515,20 @@ Tes otomatis `tests/unit/SertifikatTataLetakPdfTest.php` membuat PDF sintetis 4/
 | A12-112 | Dataset kosong atau paket tanpa TP NonEsensial | Tidak menampilkan progres sebagai 100%, tidak membuat skor simulasi |
 
 QA otomatis `tests/unit/DashboardPimpinanDatabaseTest.php` menggunakan SQLite anonim sesuai skema dump V4-0011; workflow `QA A12-1 Dashboard Pimpinan` menjalankan lint dan regresi `LaporanAkademikDatabaseTest.php`. Uji browser XAMPP tetap wajib sebelum A12-1 dinyatakan FIX. A12 berikutnya mencakup dashboard Admin/Guru/Siswa serta notifikasi/pengumuman/FAQ, bukan klaim bagian A12-1.
+
+### A12-2 — QA Dashboard Guru berbasis Gen–Mapel (3 November 2026)
+
+| ID | Skenario | Syarat |
+|---|---|---|
+| A12-201 | Guru G1 memiliki dua paket semester, Gen lain dimiliki Guru berbeda | Hanya paket Gen–Mapel sendiri; indeks GET lain ditolak |
+| A12-202 | Guru tanpa penugasan, penugasan dicabut, paket semester belum tersedia | State kosong jelas, tidak membaca data Guru sebelumnya |
+| A12-203 | TP Esensial dan NonEsensial masing-masing 0/1/2 Materi aktif | Hanya yang jumlahnya bukan satu masuk `Materi perlu diperiksa`; termasuk Esensial |
+| A12-204 | TP status Siap, Draf, Arsip | Siap/Draf terhitung dan Arsip dikecualikan |
+| A12-205 | Resume/HOTS final dan skor NULL; skor 0; draf; versi lama; Gen lain | Hanya final NULL, dinilai_oleh NULL, snapshot sesuai, Gen cocok masuk antrean |
+| A12-206 | Siswa dengan dua TP status `perlu_bantuan` pada paket sama | Satu siswa dihitung sekali per paket |
+| A12-207 | Diagnostik dan Sumatif status `berjalan` versus selesai dan Pra-Semester | Hanya dua ujian TP aktif dihitung, Pra-Semester tidak dicampur |
+| A12-208 | Filter Semester 1–6 dan pergantian penugasan Guru | Semua KPI mengikuti kombinasi terpilih; data Gen lain tidak bocor |
+| A12-209 | Guru Nonaktif/Pimpinan/Admin/Siswa mencoba service/route | Ditolak; tidak ada POST/mutasi dari dashboard |
+| A12-210 | UI Dark/Light, 360/390/768/1100px dan Mode Dokumentasi | KPI, filter, link Buka Semester, scroll keyboard aman |
+
+Workflow `QA A12-2 Dashboard Guru` menjalankan `DashboardGuruDatabaseTest.php` SQLite sintetis, regresi Penilaian Guru dan Keputusan Akses Ulang, serta PHP lint. Hasil perlu ditinjau pada PR; **uji browser XAMPP tetap diperlukan sebelum FIX**. Tidak ada perubahan SQL.
