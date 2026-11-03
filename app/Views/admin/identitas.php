@@ -12,9 +12,9 @@
 <?php if ($pesan = session()->getFlashdata('galat')): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div><?php endif ?>
 <?php if ($pesan = session()->getFlashdata('sukses')): ?><div class="a-alert" role="status"><?= esc($pesan) ?></div><?php endif ?>
 <?php if (in_array('', $identitas, true)): ?><p class="a-alert a-alert--info" role="status">Data resmi belum lengkap. Isilah seluruh kolom wajib sebelum menyimpan.</p><?php endif ?>
-<section class="a-card a-page__editor a-page__editor--luas" aria-labelledby="judul-form-identitas">
+<section class="a-card a-page__editor a-page__editor--luas a-identitas-editor" aria-labelledby="judul-form-identitas">
 <h2 id="judul-form-identitas">Form identitas resmi</h2>
-<form method="post" action="<?= esc(site_url('admin/identitas'), 'attr') ?>" class="a-form" data-dirty-form>
+<form method="post" action="<?= esc(site_url('admin/identitas'), 'attr') ?>" class="a-form a-identitas-editor__form" data-dirty-form>
 <?= csrf_field() ?>
 <?php foreach ($labelIdentitas as $kode => $label): ?>
 <?php
@@ -26,7 +26,7 @@
     $tipe = $kode === 'email' ? 'email' : ($kode === 'website' ? 'url' : 'text');
     $panjang = $kode === 'alamat_madrasah' ? 1000 : 200;
 ?>
-<div class="a-field">
+<div class="a-field<?= $kode === 'alamat_madrasah' ? ' a-identitas-editor__lebar' : '' ?>">
     <label class="a-label" for="i-<?= esc($kode, 'attr') ?>"><?= esc($labelTampil) ?></label>
     <?php if ($kode === 'alamat_madrasah'): ?>
         <textarea id="i-<?= esc($kode, 'attr') ?>" name="<?= esc($kode, 'attr') ?>" rows="3" maxlength="<?= $panjang ?>" <?= $opsional ? '' : 'required' ?>><?= esc($nilai) ?></textarea>
