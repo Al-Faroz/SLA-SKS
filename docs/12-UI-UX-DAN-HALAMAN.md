@@ -369,3 +369,11 @@ Pratinjau PDF di Admin memakai **data dummy** (dua BAB, empat TP), bukan siswa s
 - Link Laporan Akademik dan Sertifikat ditempatkan terpisah. Pra-Semester sebagai checkpoint di laporan, tanpa kontribusi pada nilai TP, sertifikat atau rata-rata akhir semester.
 - Dark/Light, HP 360/390/768/1100px, Mode Dokumentasi dan keyboard: KPI 5/3/2/1 kolom, paket dua kolom/HP satu kolom, alt teks jumlah progres untuk pembaca layar, fokus tombol jelas. Data belum ada, semesternya terkunci, semua TP selesai, role salah, dan server gagal mempunyai keluaran yang jujur.
 - Rak lencana resmi S11 belum diaktifkan di A12-3 karena belum ada mekanisme penetapan lencana yang disetujui dan dilengkapi data; tidak menggunakan placeholder seolah-olah lencana benar-benar diterbitkan. Pencapaian yang ditampilkan adalah **angka akademik sah**, bukan poin/ranking fiktif.
+
+### A12-3 UI QA — Screenshot XAMPP Dashboard Siswa (3 November 2026)
+
+Tangkapan layar Siswa Simulasi 05 menunjukkan beranda dapat ditampilkan: Gen dan Semester mulai, 0/2 TP selesai sah, nilai Final 0, bantuan 0, sertifikat 0, serta progres semester 0%. **Tampilan secara umum sesuai**, tetapi satu kartu Semester 4 sebelumnya hanya memenuhi sisi kiri halaman dan dua tombol `Lanjutkan TP` tidak menjelaskan TP tujuan.
+
+Perbaikan: jika hanya satu paket semester boleh dibuka, kartunya menggunakan **seluruh lebar panel**, identitas Semester/Mapel di sisi kiri dan progres/tombol di sisi kanan pada laptop/desktop, kembali menjadi satu kolom pada layar kecil. Pada hero dan kartu, tampilkan **kode dan judul TP berikutnya** hanya bila katalog memberikan `akses.buka`; TP draf/terkunci tidak boleh ditampilkan melalui judul atau link. Jika belum ada TP berizin, tampilkan navigasi ke Semester dan pesan yang benar, tanpa tombol ujian palsu. Warna segmen belum selesai lebih jelas, tetap memperhatikan Dark/Light dan aksesibilitas.
+
+Catatan: nama akun simulasi yang mengandung kata "Diagnostik Dibatalkan" adalah **label data uji**, bukan bukti langsung bahwa `progres_tp.status` saat screenshot masih `perlu_bantuan`. Jangan mengganti KPI 0 hanya karena nama akun; cek progres dan riwayat akses ulang jika ada selisih yang dilaporkan.
