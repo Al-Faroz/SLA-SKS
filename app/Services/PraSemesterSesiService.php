@@ -27,7 +27,8 @@ final class PraSemesterSesiService
     public function terpasang(): bool
     {
         return $this->db->tableExists('jadwal_pra_sesi')
-            && $this->db->tableExists('peserta_pra_susulan');
+            && $this->db->tableExists('peserta_pra_susulan')
+            && $this->db->fieldExists('jadwal_pra_sesi_id','percobaan_ujian');
     }
 
     private function admin(): int
@@ -68,6 +69,7 @@ final class PraSemesterSesiService
                 ];
             }
         }
+        if (!$this->terpasang()) return null; // ujian utama tetap berjalan sebelum update SQL
         $rows=$this->db->table('jadwal_pra_sesi j')
             ->select('j.id,j.jenis,j.tahap,j.mulai_pada,j.selesai_pada,j.durasi_menit,ps.id AS ditunjuk')
             ->join('peserta_pra_susulan ps',
