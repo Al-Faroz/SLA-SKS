@@ -421,3 +421,17 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Penilaian: empat filter tetap berfungsi pada resolusi laptop dan HP; detail Petunjuk/Jawaban berbeda warna walau `data-documentation=on`, form skor dan umpan balik tampil dua kolom di desktop.
 - Dokumentasi full-page: menu Rekap Nilai dengan submenu tidak membuat baris ketiga header. Di sidebar normal tetap dapat mengakses kedua submenu.
 - Otomatis: `tests/unit/A9TampilanGuruTest.php` memeriksa class tabel, kartu metrik, pembagian form, menu, dan selector Mode Dokumentasi. Pengujian visual browser nyata Dark/Light, layar 360/390/768/1100+ dan mode Dokumentasi tetap tugas QA localhost pemilik.
+
+### A10 — Ketentuan final sertifikat tanpa gerbang Pra-Semester (3 November 2026)
+
+| ID | Skenario uji | Hasil wajib |
+|---|---|---|
+| SERT-PRA-001 | Seluruh TP NonEsensial tuntas, nilai TP wajib Final, identitas serta TTD siap; Pra-Semester belum dijadwalkan/belum diikuti | **Sertifikat boleh diterbitkan**; tidak meminta hasil Pra-Semester |
+| SERT-PRA-002 | Persyaratan sertifikat TP terpenuhi, Pra-Semester dibatalkan / menunggu susulan / remedial / nilainya Sementara | **Sertifikat tetap boleh diterbitkan**; tidak ada dependensi ke status ujian atau nilai Pra-Semester |
+| SERT-PRA-003 | TP NonEsensial belum tuntas atau satu nilai TP wajib masih Sementara, meski Pra-Semester selesai sah | **Sertifikat ditahan** sesuai prasyarat TP; Pra-Semester tidak menggantikan finalisasi TP |
+| SERT-PRA-004 | PDF sertifikat terbit setelah siswa memenuhi syarat | Hanya daftar BAB/TP Esensial tanpa nilai dan NonEsensial dengan nilai final TP, identitas/TTD/QR; **tidak ada skor, status, atau kolom Pra-Semester**, tidak ada Nilai Akhir Semester |
+| SERT-PRA-005 | Nilai Pra-Semester berubah sah setelah sertifikat terbit | **Nomor/QR/PDF sertifikat tidak berubah**; perubahan Pra-Semester hanya tercatat di rekap/ekspor mandiri |
+| SERT-PRA-006 | Nilai TP yang tercetak atau biodata dikoreksi sah | Tetap mengikuti prosedur revisi sertifikat historis (nomor/QR baru jika konten cetak berubah), terpisah dari perubahan nilai Pra-Semester |
+
+**Dasar keputusan:** Pra-Semester berfungsi sebagai checkpoint sebelum Ujian Semester yang sesungguhnya, bukan gate sertifikat atau nilai tercetak. Tidak menginstruksikan pembuatan modul Ujian Semester baru. Tes sertifikat ini merupakan **kriteria penerimaan mendatang**, bukan klaim bahwa implementasi PDF/QR telah tersedia di branch A9 atau XAMPP.
+
