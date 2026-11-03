@@ -16,7 +16,7 @@ Pertahankan satu profil keamanan pengerjaan **Ketat** (fullscreen, waktu dan det
 | Jeda fullscreen total | 180 detik | Akumulasi tanpa menghitung waktu tumpang tindih ganda |
 | Jumlah insiden fullscreen | 3 | Insiden ketiga menghentikan percobaan |
 | Timeout heartbeat koneksi | 20 detik | Jeda dihitung sejak last_seen + 20 detik |
-| Total jeda koneksi | 300 detik | Melampaui batas menghentikan percobaan |
+| Total jeda koneksi | 600 detik (10 menit) | Pada batas kumulatif menghentikan percobaan sesuai jenis tes |
 
 `fullscreenchange`, `visibilitychange`, dan `blur` yang berasal dari satu perpindahan fokus dihitung **satu insiden**. Ketika jeda, server menghentikan waktu aktif dan menolak penyimpanan jawaban/kirim sampai pulih. Memulihkan fullscreen memerlukan gesture klik dan validasi server. Waktu, sisa durasi, peristiwa, dan jawaban yang sudah sah disimpan tetap bersumber dari server.
 
