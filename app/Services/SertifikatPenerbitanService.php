@@ -395,9 +395,14 @@ final class SertifikatPenerbitanService
         if (!preg_match('/^[a-f0-9]{48}$/D',$token)) return null;
         $r=$this->db->table('sertifikat c')
             ->select('c.id,c.nomor,c.versi,c.status,c.diterbitkan_pada,'
-                .'c.menggantikan_id,c.snapshot_json,c.siswa_id,c.paket_semester_id')
+                .'c.menggantikan_id,c.snapshot_json,c.snapshot_sha256,'
+                .'c.siswa_id,c.paket_semester_id')
             ->where('c.kode_verifikasi',$token)->get()->getRowArray();
         if (!$r) return null;
+        if (!hash_equals((string)$r['snapshot_sha256'],
+            hash('sha256',(string)$r['snapshot_json']))) {
+            throw new RuntimeException('Checksum snapshot sertifikat tidak sesuai.');
+        }
         $konten=json_decode((string)$r['snapshot_json'],true,32,JSON_THROW_ON_ERROR);
         $aktif=$this->db->table('sertifikat_aktif a')
             ->select('c.nomor,c.kode_verifikasi,c.id')
@@ -423,7 +428,7 @@ final class SertifikatPenerbitanService
             'semester'=>$konten['paket']['semester']??'',
             'tp'=>$tp,
             'nomor_aktif'=>$aktif['nomor']??null,
-            'kode_aktif'=>($aktif['id']??null)===$r['id']?null:($aktif['kode_verifikasi']??null),
+            'kode_aktif'=>(int)($aktif['id']??0)===(int)$r['id']?null:($aktif['kode_verifikasi']??null),
         ];
     }
 }
