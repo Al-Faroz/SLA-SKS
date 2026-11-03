@@ -51,3 +51,7 @@ Pencapaian/lencana boleh dirujuk, tidak menambah poin/ranking. Pengendalian full
 - Status `siap` **tidak sama dengan sudah digunakan siswa**. Guru G1 dapat menyunting TP Siap yang belum pernah digunakan; siswa baru mulai pada konten/snapshot aktif yang telah selesai disimpan dan lulus kesiapan.
 - **Saat satu siswa mulai aktivitas TP**, aktivitas/progres/percobaannya menjadi bukti penggunaan yang mengunci konten TP bagi seluruh siswa. Jangan menghilangkan progres untuk membuka kunci. Pelindung server berlaku juga ketika Guru menyimpan bersamaan dengan siswa memulai.
 - Pembaruan CP oleh Admin atau isian BAB oleh Guru bukan aktivitas belajar siswa dan **tidak otomatis mereset** tahapan diagnostik, materi, Resume/HOTS, Sumatif maupun nilai. Alur pembelajaran yang sudah FIX tetap berlaku.
+
+
+### Gerbang Pra-Semester terjadwal (3 November 2026)
+Setelah semua TP NonEsensial selesai, siswa **menunggu jadwal Admin per mapel/semester**. Jendela Admin hanya membatasi kapan siswa boleh mulai, tidak memotong durasi individual sejak saat mulai. Jika percobaan dibatalkan, siswa mengikuti jadwal susulan Admin (juga untuk siswa tidak hadir yang ditetapkan); bukan akses ulang mandiri. Remedial setelah nilai awal sah di bawah KKM dilaksanakan pada jadwal terpisah. Sertifikat tetap di luar ruang lingkup A8.
