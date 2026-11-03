@@ -104,6 +104,27 @@ final class PenilaianGuruService
         return (new PetaTpService($this->db, $this->akun))->genMapelDiampu();
     }
 
+    /** BAB pilihan Guru G1 pada Gen–Mapel; semester 0 berarti seluruh semester. */
+    public function daftarBab(?array $pilihan, int $semester = 0): array
+    {
+        $guru = $this->guruId();
+        if ($pilihan === null) return [];
+        if ($semester < 0 || $semester > 6) {
+            throw new DomainException('Semester penilaian tidak sah.');
+        }
+        $q = $this->db->table('bab b')
+            ->select('b.id,b.nomor_bab,b.nama_bab,p.semester')
+            ->join('paket_semester p','p.id=b.paket_semester_id')
+            ->join('penugasan_guru_gen g',
+                'g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id')
+            ->where('g.guru_id',$guru)
+            ->where('p.angkatan_id',(int)$pilihan['angkatan_id'])
+            ->where('p.mapel_id',(int)$pilihan['mapel_id']);
+        if ($semester > 0) $q->where('p.semester',$semester);
+        return $q->orderBy('p.semester','ASC')->orderBy('b.nomor_bab','ASC')
+            ->orderBy('b.id','ASC')->get()->getResultArray();
+    }
+
     private static function sumber(string $jenis): string
     {
         $t = self::tabel($jenis);
@@ -133,7 +154,7 @@ final class PenilaianGuruService
             . "t.judul AS tp_judul,m.urutan AS urutan_materi,"
             . "m.judul AS materi_judul,u.nama AS nama_siswa,"
             . "a.nama AS nama_gen,rm.nama AS nama_mapel,"
-            . "p.angkatan_id,p.mapel_id,"
+            . "p.angkatan_id,p.mapel_id,p.semester,t.bab_id,"
             . "'" . $jenis . "' AS jenis";
     }
 
@@ -155,12 +176,34 @@ final class PenilaianGuruService
         }
         $where = ' AND r.nilai IS NULL AND r.dinilai_oleh IS NULL';
         $args = [];
+        $jenisFilter = (string)($filter['jenis'] ?? 'semua');
+        $semester = (int)($filter['semester'] ?? 0);
+        $babId = (int)($filter['bab'] ?? 0);
+        if (!in_array($jenisFilter,['semua','resume','hots'],true)
+            || $semester < 0 || $semester > 6 || $babId < 0) {
+            throw new DomainException('Filter jenis tugas, semester atau BAB tidak sah.');
+        }
         if ($filter !== null) {
             $where .= ' AND p.angkatan_id=? AND p.mapel_id=?';
             $args = [(int) $filter['angkatan_id'], (int) $filter['mapel_id']];
+            if ($semester > 0) {
+                $where .= ' AND p.semester=?';
+                $args[] = $semester;
+            }
+            if ($babId > 0) {
+                $allowed = array_column($this->daftarBab($filter,$semester),'id');
+                if (!in_array($babId,array_map('intval',$allowed),true)) {
+                    throw new DomainException('BAB bukan milik Gen–Mapel dan semester penugasan Guru.');
+                }
+                $where .= ' AND t.bab_id=?';
+                $args[] = $babId;
+            }
+        } elseif ($babId > 0) {
+            throw new DomainException('Pilih penugasan Guru sebelum memfilter BAB.');
         }
         $parts = []; $bindings = [];
-        foreach (['resume', 'hots'] as $jenis) {
+        $jenisDipakai = $jenisFilter === 'semua' ? ['resume','hots'] : [$jenisFilter];
+        foreach ($jenisDipakai as $jenis) {
             $parts[] = self::kolom($jenis) . self::sumber($jenis) . $where;
             $bindings[] = $guruId;
             array_push($bindings, ...$args);
@@ -177,10 +220,8 @@ final class PenilaianGuruService
             . ' ORDER BY dikirim_pada ASC,id ASC,jenis ASC'
             . ' LIMIT ' . $perPage . ' OFFSET ' . (($halaman - 1) * $perPage),
             $bindings)->getResultArray();
-        foreach ($rows as &$r) {
-            $r['kemiripan'] = $this->skorKemiripan((string)$r['jenis'], $r);
-        }
-        unset($r);
+        // Indikator kemiripan dihitung hanya pada detail jawaban;
+        // tabel antrean tidak lagi menampilkan persentasenya.
         return ['baris'=>$rows,'total'=>$total,'halaman'=>$halaman,
             'jumlah_halaman'=>$pages];
     }
