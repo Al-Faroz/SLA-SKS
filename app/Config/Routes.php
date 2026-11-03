@@ -18,6 +18,8 @@ $routes->post('keluar', 'Akun::keluar', ['filter' => 'auth']);
 $routes->get('profil', 'Akun::profil', ['filter' => 'auth']);
 // A13-1: panduan login-only untuk peran aktif; bukan FAQ terkelola.
 $routes->get('bantuan', 'Bantuan::index', ['filter' => 'auth']);
+// A13-3: kontak resmi madrasah, hanya baca dan hanya untuk akun login.
+$routes->get('hubungi-admin', 'HubungiAdmin::index', ['filter' => 'auth']);
 
 $routes->get('pengumuman', 'Informasi::pengumuman', ['filter' => 'auth']);
 // A13-2: semua login hanya baca global. Admin/Guru menulis, hanya Admin kelola FAQ.
