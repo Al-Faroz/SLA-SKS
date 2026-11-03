@@ -128,6 +128,16 @@ final class InformasiGlobalDatabaseTest extends TestCase
             array_column($this->db->table('riwayat_informasi')->orderBy('id')->get()->getResultArray(),'aksi'));
         self::ditolak(fn()=> $this->svc()->simpan('pengumuman',[
             'judul'=>'Kembali','isi'=>'Dilarang','status'=>'terbit','versi'=>'3'],$id));
+        self::ditolak(fn()=> $this->svc()->rincianKelola('pengumuman',$id));
+    }
+
+    public function testTerbitTidakBolehTurunKeDrafSelainMelaluiArsip(): void
+    {
+        $id=$this->svc()->simpan('pengumuman',self::isi('terbit'));
+        self::ditolak(fn()=> $this->svc()->simpan('pengumuman',[
+            'judul'=>'Sembunyikan','isi'=>'Teks yang sama','status'=>'draf','versi'=>'1'],$id));
+        self::assertSame('terbit',$this->db->table('pengumuman')->where('id',$id)->get()->getRowArray()['status']);
+        self::assertSame(1,$this->db->table('riwayat_informasi')->countAllResults());
     }
 
     public function testPerubahanBersamaanDitolakDenganVersi(): void
