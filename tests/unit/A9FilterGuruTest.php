@@ -153,8 +153,10 @@ final class A9FilterGuruTest extends TestCase
         $non=$svc->rekap($this->pilihan(),4,1,25,'non_esensial');
         self::assertSame(2,$non['total']);
         self::assertSame('non_esensial',$non['baris'][0]['jenis_tp']);
+        $nilaiSiswaSatu=array_values(array_filter($non['baris'],
+            static fn (array $r): bool => (int)$r['siswa_id']===1))[0];
         self::assertSame('0,00',RekapNilaiTpGuruService::teksKomponen(
-            $non['baris'][0],'nilai_tp'
+            $nilaiSiswaSatu,'nilai_tp'
         ));
         self::assertSame(2,$svc->rekap($this->pilihan(),4,1,25,'esensial')['total']);
         self::assertSame(4,$svc->rekap($this->pilihan(),4,1,25,'semua')['total']);
