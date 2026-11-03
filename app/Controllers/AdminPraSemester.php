@@ -20,12 +20,21 @@ final class AdminPraSemester extends BaseController
     {
         try {
             $service = new PraSemesterJadwalService();
+            $raw = [
+                'gen'=>$this->request->getGet('gen'),
+                'mapel'=>$this->request->getGet('mapel'),
+                'semester'=>$this->request->getGet('semester'),
+                'status'=>$this->request->getGet('status') ?? '',
+            ];
+            $filter = PraSemesterJadwalService::filterDaftar($raw);
             $akun = (new AuthService())->penggunaSaatIni();
             return view('admin/pra_semester', [
                 'judul'=>'Jadwal Pra-Semester',
                 'namaPengguna'=>$akun['nama'], 'peranAktif'=>'Admin',
                 'tautanNavigasi'=>NavigasiService::untuk('admin','pra_semester'),
-                'daftar'=>$service->daftar(),
+                'daftar'=>$service->daftar($raw),
+                'filter'=>$filter,
+                'opsiFilter'=>$service->opsiFilter(),
                 'pilih'=>$paketId !== null ? $service->lihat($paketId) : null,
             ]);
         } catch (DomainException $e) {
