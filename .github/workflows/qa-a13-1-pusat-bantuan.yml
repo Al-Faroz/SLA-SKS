@@ -38,6 +38,7 @@ jobs:
             app/Services/PanduanBantuanService.php \
             app/Controllers/Bantuan.php \
             app/Views/bantuan/index.php \
+            app/Views/layouts/panel.php \
             app/Config/Routes.php \
             app/Services/NavigasiService.php \
             tests/unit/PanduanBantuanServiceTest.php; do
