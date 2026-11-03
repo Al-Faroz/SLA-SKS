@@ -27,7 +27,7 @@ final class DashboardSiswaDatabaseTest extends TestCase
             'CREATE TABLE penugasan_paket(id INTEGER PRIMARY KEY,paket_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER)',
             'CREATE TABLE bab(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,nomor_bab INTEGER,nama_bab TEXT,deskripsi_bab TEXT)',
             'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,bab_id INTEGER,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,jenis_tp TEXT,rumusan TEXT,indikator TEXT)',
-            'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,progres_tp_id INTEGER, siswa_id INTEGER,tp_id INTEGER,paket_semester_id INTEGER,status TEXT)',
+            'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,paket_semester_id INTEGER,status TEXT)',
             'CREATE TABLE percobaan_ujian(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,jenis TEXT,status TEXT)',
             'CREATE TABLE nilai_tp(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,status_nilai TEXT,nilai_tp REAL)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER)',
@@ -80,9 +80,9 @@ final class DashboardSiswaDatabaseTest extends TestCase
             ['id'=>406,'tp_id'=>206],
         ]);
         $this->db->table('progres_tp')->insertBatch([
-            ['id'=>51,'progres_tp_id'=>null,'tp_id'=>201,'siswa_id'=>1,'paket_semester_id'=>11,'status'=>'tuntas'],
-            ['id'=>52,'progres_tp_id'=>null,'tp_id'=>202,'siswa_id'=>1,'paket_semester_id'=>11,'status'=>'perlu_bantuan'],
-            ['id'=>53,'progres_tp_id'=>null,'tp_id'=>203,'siswa_id'=>1,'paket_semester_id'=>11,'status'=>'tuntas'],
+            ['id'=>51,'tp_id'=>201,'siswa_id'=>1,'paket_semester_id'=>11,'status'=>'tuntas'],
+            ['id'=>52,'tp_id'=>202,'siswa_id'=>1,'paket_semester_id'=>11,'status'=>'perlu_bantuan'],
+            ['id'=>53,'tp_id'=>203,'siswa_id'=>1,'paket_semester_id'=>11,'status'=>'tuntas'],
         ]);
         $this->db->table('percobaan_ujian')->insertBatch([
             ['id'=>101,'progres_tp_id'=>51,'jenis'=>'sumatif','status'=>'selesai_sah'],
