@@ -63,6 +63,7 @@ CREATE TABLE `sertifikat` (
   `background_aset_id` bigint(20) UNSIGNED DEFAULT NULL,
   `ttd_aset_id` bigint(20) UNSIGNED NOT NULL,
   `snapshot_json` longtext NOT NULL,
+  `konten_sha256` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `snapshot_sha256` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `pdf_nama_acak` char(48) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `pdf_sha256` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
