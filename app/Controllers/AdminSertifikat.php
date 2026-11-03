@@ -16,7 +16,7 @@ use Throwable;
 /** Pemeriksaan akademik dan penerbitan sertifikat berizin. */
 final class AdminSertifikat extends BaseController
 {
-    protected $helpers = ['url'];
+    protected $helpers = ['url','form'];
 
     private static function angka(mixed $nilai, int $maks): ?int
     {
