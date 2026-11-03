@@ -338,8 +338,12 @@ HTML;
             'tp'=>[
                 ['nomor_bab'=>1,'nama_bab'=>'BAB Contoh','kode_tp'=>'SIM.8.1.1',
                     'nama_tp'=>'TP Esensial','jenis_tp'=>'esensial','nilai_tp'=>null],
-                ['nomor_bab'=>1,'nama_bab'=>'BAB Contoh','kode_tp'=>'SIM.8.1.2',
-                    'nama_tp'=>'TP NonEsensial','jenis_tp'=>'non_esensial','nilai_tp'=>88],
+                ['nomor_bab'=>1,'nama_bab'=>'BAB Contoh Pertama','kode_tp'=>'SIM.8.1.2',
+                    'nama_tp'=>'Penerapan Keteladanan','jenis_tp'=>'non_esensial','nilai_tp'=>90],
+                ['nomor_bab'=>2,'nama_bab'=>'BAB Contoh Kedua','kode_tp'=>'SIM.8.2.1',
+                    'nama_tp'=>'Kajian Sejarah','jenis_tp'=>'esensial','nilai_tp'=>null],
+                ['nomor_bab'=>2,'nama_bab'=>'BAB Contoh Kedua','kode_tp'=>'SIM.8.2.2',
+                    'nama_tp'=>'Refleksi Pembelajaran','jenis_tp'=>'non_esensial','nilai_tp'=>82],
             ],
         ];
         return $this->render($snapshot,$background,$ttd,'',true);
