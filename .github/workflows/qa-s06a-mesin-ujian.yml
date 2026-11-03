@@ -72,6 +72,8 @@ jobs:
           php-version: '8.2'
           extensions: mysqli, pdo_mysql, sqlite3, pdo_sqlite, mbstring, intl, gd, zip, xml, dom, fileinfo
           coverage: none
+      - name: Siapkan penyimpanan Word privat pada CI
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
       - name: Composer install
         run: composer install --no-interaction --prefer-dist --no-progress
       - name: PHP lint
