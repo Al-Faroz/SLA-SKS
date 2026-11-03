@@ -95,7 +95,8 @@ final class MesinPraSemesterSiswaService
             'ujian'=>$ctx['ujian'],
             'gerbang'=>$ctx['gerbang'],
             'percobaan'=>$ctx['percobaan'],
-            'token_mulai'=>$aktif ? (string)($ctx['percobaan']['token_publik'] ?? '') : '',
+            'token_mulai'=>($aktif || !$akses['boleh_mulai'])
+                ? (string)($ctx['percobaan']['token_publik'] ?? '') : '',
             'boleh_mulai'=>$akses['boleh_mulai'] || $aktif,
             'kkm'=>$ctx['kkm']['efektif'],
             'tahap_berikut'=>$akses['ringkasan']['tahap_berikut'],
