@@ -1,9 +1,24 @@
-name: QA A8 Fondasi Pra-Semester
+name: QA A8 Pra-Semester: bank, jadwal, ujian utama
 
 on:
   pull_request:
     paths:
       - 'app/Services/AturanPraSemesterService.php'
+      - 'app/Services/PraSemesterGuruService.php'
+      - 'app/Services/PraSemesterJadwalService.php'
+      - 'app/Services/PraSemesterSiswaService.php'
+      - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Services/SusunButirUjianService.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Controllers/GuruPraSemester.php'
+      - 'app/Controllers/AdminPraSemester.php'
+      - 'app/Controllers/SiswaPraSemester.php'
+      - 'app/Views/guru/pra_semester.php'
+      - 'app/Views/admin/pra_semester.php'
+      - 'app/Views/siswa/pra_semester_ujian.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/js/diagnostik-ujian.js'
+      - 'tests/unit/PraSemesterImplementasiTest.php'
       - 'tests/unit/AturanPraSemesterServiceTest.php'
       - '.github/workflows/qa-a8-pra-semester.yml'
   workflow_dispatch:
@@ -27,7 +42,9 @@ jobs:
         run: |
           php -l app/Services/AturanPraSemesterService.php
           php -l tests/unit/AturanPraSemesterServiceTest.php
+          for phpfile in app/Services/{PraSemesterGuruService,PraSemesterJadwalService,PraSemesterSiswaService,MesinPraSemesterSiswaService,SusunButirUjianService,NavigasiService}.php app/Controllers/{GuruPraSemester,AdminPraSemester,SiswaPraSemester}.php app/Views/{guru/pra_semester,admin/pra_semester,siswa/pra_semester_ujian,siswa/daftar_tp}.php app/Config/Routes.php tests/unit/PraSemesterImplementasiTest.php; do php -l "$phpfile"; done
       - name: Uji kontrak kebijakan Pra-Semester dan regresi waktu Ketat
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/AturanPraSemesterServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterImplementasiTest.php
           vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php
