@@ -55,3 +55,11 @@ Pencapaian/lencana boleh dirujuk, tidak menambah poin/ranking. Pengendalian full
 
 ### Gerbang Pra-Semester terjadwal (3 November 2026)
 Setelah semua TP NonEsensial selesai, siswa **menunggu jadwal Admin per mapel/semester**. Jendela Admin hanya membatasi kapan siswa boleh mulai, tidak memotong durasi individual sejak saat mulai. Jika percobaan dibatalkan, siswa mengikuti jadwal susulan Admin (juga untuk siswa tidak hadir yang ditetapkan); bukan akses ulang mandiri. Remedial setelah nilai awal sah di bawah KKM dilaksanakan pada jadwal terpisah. Sertifikat tetap di luar ruang lingkup A8.
+
+### A12-3 — Ringkasan beranda Siswa berdasarkan gerbang resmi (3 November 2026)
+
+- Daftar paket beranda harus disaring menggunakan gerbang katalog Gen–Mapel, status paket aktif, semester mulai serta ketuntasan TP NonEsensial semester wajib sebelumnya. Semester dilewati atau terkunci **tidak dihitung sebagai paket terbuka** dan tidak diberi tautan TP langsung.
+- Target progres hanya **TP NonEsensial nonarsip**. Satu TP dihitung tuntas tepat sekali jika `progres_tp.status=tuntas` **dan** minimal satu percobaan Sumatif `selesai_sah`; keberhasilan Diagnostik saja atau percobaan Sumatif berjalan/batal tidak memenuhi. Jika target 0, progres kosong (`null`), bukan 0%/100% secara artifisial.
+- Nilai TP Final dihitung hanya pada TP tuntas sah jika `nilai_tp.status_nilai=final` dan `nilai_tp IS NOT NULL`. Nilai `0.00` tetap sah. Siswa dengan `perlu_bantuan` ditampilkan sebagai TP yang membutuhkan bantuan Guru, tidak langsung dianggap berhak remedial atau membuka ujian baru.
+- Tombol Lanjutkan TP hanya menuju TP dengan status `akses.buka` yang dikeluarkan katalog. Jika belum siap, arahkan ke halaman semester/pembelajaran yang sah tanpa mengubah progres. Untuk paket selesai, tautkan Laporan Akademik.
+- Pra-Semester tetap checkpoint terpisah sebelum Ujian Semester sesungguhnya. Tidak menjadi komponen progres TP/sertifikat. Pencapaian berupa hitungan hasil sah dan sertifikat berlaku; **jangan membuat lencana resmi baru tanpa mekanisme penerbitan yang ditetapkan**.
