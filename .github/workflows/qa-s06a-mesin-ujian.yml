@@ -10,6 +10,9 @@ on:
       - 'app/Services/MesinPraSemesterSiswaService.php'
       - 'tests/unit/PraSemesterImplementasiTest.php'
       - 'tests/unit/PraSemesterDatabaseTest.php'
+      - 'app/Services/AturanJadwalPraSemesterService.php'
+      - 'app/Services/PenilaianPraSemesterService.php'
+      - 'tests/unit/PraSemesterRemedialSusulanTest.php'
       - 'tests/unit/AturanWaktuUjianServiceTest.php'
       - 'tests/unit/SusunButirUjianServiceTest.php'
       - 'tests/integration/SqlUjianSchemaCheck.php'
@@ -57,6 +60,9 @@ jobs:
           php -l app/Services/MesinPraSemesterSiswaService.php
           php -l tests/unit/PraSemesterImplementasiTest.php
           php -l tests/unit/PraSemesterDatabaseTest.php
+          php -l app/Services/AturanJadwalPraSemesterService.php
+          php -l app/Services/PenilaianPraSemesterService.php
+          php -l tests/unit/PraSemesterRemedialSusulanTest.php
           php -l tests/integration/SqlUjianSchemaCheck.php
       - name: Unit test waktu Ketat dan acak opsi
         run: |
@@ -64,5 +70,6 @@ jobs:
           vendor/bin/phpunit --no-coverage tests/unit/SusunButirUjianServiceTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterImplementasiTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterRemedialSusulanTest.php
       - name: Impor patch SQL pada MariaDB sintetis
         run: php tests/integration/SqlUjianSchemaCheck.php

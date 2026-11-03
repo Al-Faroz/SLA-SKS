@@ -39,3 +39,10 @@ Bank ujian gabungan seluruh BAB pada semester, minimal 30 soal. Mesin, fullscree
 
 ### Penilaian Pra-Semester dan pembatalan (3 November 2026)
 KKM Pra-Semester: default Admin atau nilai khusus Guru untuk paket Gen–Mapel–Semester (tidak menyalin KKM salah satu TP). Nilai awal hanya dari percobaan `selesai_sah`; bila di bawah KKM tersedia **satu remedial sah** dengan jadwal tersendiri oleh Admin. Skor terbaik menjadi nilai Pra-Semester mandiri, tanpa Nilai Akhir Semester. Percobaan batal/tidak hadir tidak memiliki nilai, tidak memotong jatah sah, dan hanya boleh dikerjakan lagi pada **susulan Admin**. Batal saat remedial memerlukan **susulan remedial**, tanpa tambahan jatah sah.
+
+
+### A8-4 — Penentuan nilai mandiri setelah susulan/remedial (3 November 2026)
+- Hanya percobaan `selesai_sah` dapat menghasilkan nilai; `0.00` merupakan nilai sah, **bukan** `NULL`. Pembatalan tidak pernah mendapat skor.
+- Satu nilai normal sah membuka nilai Pra-Semester **sementara** bila <KKM (menunggu satu remedial sah terjadwal), atau **final** bila ≥KKM.
+- Satu remedial sah (setelah normal sah <KKM) membuat `nilai_terbaik = MAX(skor_normal_sah, skor_remedial_sah)` dan status **final**. Susulan normal/remedial tidak menambah jatah kesempatan sah. Tetap nilai mandiri, tidak menghitung rata-rata akhir semester.
+- Logika nilai dan kesempatan dipusatkan pada `PenilaianPraSemesterService` (pure); adapter rekap/ekspor Guru belum diaktifkan sampai audit dump yang lebih baru dari patch simulasi terakhir.
