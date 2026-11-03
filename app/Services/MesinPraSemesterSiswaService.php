@@ -348,7 +348,7 @@ final class MesinPraSemesterSiswaService
 
     public function status(int $paketId, string $token): array
     {
-        return $this->transact($paketId,$token,function ($row,$s) {
+        return $this->transact($paketId,$token,function ($row,$s) use ($paketId,$token) {
             $out = self::info($s);
             if ($s['status'] !== 'berjalan') return $out;
             $butir = $this->db->table('butir_percobaan')
@@ -356,6 +356,24 @@ final class MesinPraSemesterSiswaService
                 ->where('percobaan_ujian_id',(int)$row['id'])
                 ->orderBy('posisi')->get()->getResultArray();
             $out['soal'] = array_map([SusunButirUjianService::class,'untukSiswa'],$butir);
+            helper('url');
+            foreach ($butir as $i=>$raw) {
+                $r = json_decode((string)($raw['konten_terstruktur_json']??''),true);
+                $source = is_array($r) ? (string)($r['word_source_id']??'') : '';
+                if (!preg_match('/^[0-9a-f]{32}$/D',$source)) continue;
+                $base=site_url('siswa/pra-semester/'.$paketId.'/'.$token.'/media/'.$source.'/');
+                $rewrite = static fn(array $m): string =>
+                    'src="' . htmlspecialchars($base.$m[1],ENT_QUOTES,'UTF-8') . '"';
+                $out['soal'][$i]['html_pertanyaan'] = preg_replace_callback(
+                    '/src="word-image:(rId[0-9]+)"/', $rewrite,
+                    (string)($out['soal'][$i]['html_pertanyaan']??'')
+                );
+                foreach ($out['soal'][$i]['html_opsi'] as $key=>$html) {
+                    $out['soal'][$i]['html_opsi'][$key] = preg_replace_callback(
+                        '/src="word-image:(rId[0-9]+)"/',$rewrite,(string)$html
+                    );
+                }
+            }
             $jawaban = $this->db->table('jawaban_percobaan')
                 ->select('butir_percobaan_id,opsi_dipilih')
                 ->where('percobaan_ujian_id',(int)$row['id'])->get()->getResultArray();
@@ -434,4 +452,55 @@ final class MesinPraSemesterSiswaService
             return self::info($s);
         });
     }
+    /**
+     * Aset Word hanya jika sumbernya ada pada snapshot percobaan yang
+     * benar-benar milik siswa. Token tidak memberi akses ke bank lain.
+     */
+    public function gambarWord(int $paketId,string $token,string $sourceId,string $rid): array
+    {
+        if (!preg_match('/^[a-f0-9]{48}$/D',$token)
+            || !preg_match('/^[a-f0-9]{32}$/D',$sourceId)
+            || !preg_match('/^rId[0-9]+$/D',$rid)) {
+            throw new DomainException('Referensi gambar ujian tidak sah.');
+        }
+        $ctx=$this->siswa->konteks($paketId);
+        $ujian=$ctx['ujian'];
+        if (!$ujian) throw new DomainException('Ujian tidak tersedia.');
+        $attempt=$this->db->table('percobaan_ujian')
+            ->select('id')->where('token_publik',$token)
+            ->where('ujian_pra_semester_id',(int)$ujian['id'])
+            ->where('siswa_id',(int)$ctx['siswa_id'])
+            ->where('jenis','pra_semester')->get()->getRowArray();
+        if (!$attempt) throw new DomainException('Gambar bukan milik siswa.');
+        $status=$this->db->table('percobaan_ujian')->select('status')
+            ->where('id',(int)$attempt['id'])->get()->getRowArray();
+        if (!in_array((string)$status['status'],
+            ['berjalan','jeda_fullscreen','jeda_koneksi','selesai_sah'],true)) {
+            throw new DomainException('Gambar ujian tidak tersedia.');
+        }
+        $source=$this->db->table('impor_soal_pra_docx')
+            ->select('id')->where('id',$sourceId)
+            ->where('paket_semester_id',$paketId)->where('status','diterapkan')
+            ->get()->getRowArray();
+        if (!$source) throw new DomainException('Sumber gambar tidak ditemukan.');
+        $butir=$this->db->table('butir_percobaan')
+            ->select('konten_terstruktur_json')
+            ->where('percobaan_ujian_id',(int)$attempt['id'])
+            ->get()->getResultArray();
+        $authorized=false;
+        foreach ($butir as $b) {
+            $rich=json_decode((string)($b['konten_terstruktur_json']??''),true);
+            if (is_array($rich) && ($rich['word_source_id']??null)===$sourceId
+                && (str_contains((string)($rich['html_pertanyaan']??''),'word-image:'.$rid)
+                    || str_contains(json_encode($rich['html_opsi']??[]),
+                        'word-image:'.$rid))) {
+                $authorized=true;break;
+            }
+        }
+        if (!$authorized) throw new DomainException('Aset tidak ada pada snapshot ujian siswa.');
+        return RenderWordSoalService::gambar(
+            WRITEPATH.'private/pra_semester_word/'.$sourceId.'.docx',$rid
+        );
+    }
+
 }
