@@ -199,6 +199,12 @@ $routes->post('admin/mapel-guru', 'AdminReferensi::buatMapel', ['filter' => 'aut
 $routes->post('admin/mapel-guru/(:num)/gen/(:num)/guru', 'AdminReferensi::tetapkanGuru/$1/$2', ['filter' => 'auth:admin']);
 $routes->get('admin/identitas', 'AdminIdentitas::index', ['filter' => 'auth:admin']);
 $routes->get('admin/sertifikat', 'AdminSertifikat::index', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/aset', 'AdminSertifikatAset::index', ['filter' => 'auth:admin']);
+$routes->post('admin/sertifikat/aset/(:segment)', 'AdminSertifikatAset::unggah/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/aset/(:num)/gambar', 'AdminSertifikatAset::gambar/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/template/pratinjau/(:num)', 'AdminSertifikatAset::pratinjau/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/sertifikat/aset/(:num)/aktifkan', 'AdminSertifikatAset::aktifkan/$1', ['filter' => 'auth:admin']);
+
 $routes->post('admin/identitas', 'AdminIdentitas::simpan', ['filter' => 'auth:admin']);
 
 $routes->set404Override('\App\Controllers\Publik::tidakDitemukan');
