@@ -35,6 +35,39 @@ final class LaporanAkademikService
         return $a;
     }
 
+    public function daftarLaporanSendiri(): array
+    {
+        if ($this->peran()['peran_aktif'] !== 'siswa') {
+            throw new DomainException('Daftar laporan siswa tidak diizinkan.');
+        }
+        $katalog = new KatalogPembelajaranSiswaService($this->db,$this->akun);
+        $hasil = [];
+        foreach ($katalog->daftarMapel()['mapel'] as $m) {
+            foreach ($katalog->daftarSemester((int)$m['id'])['semester'] as $s) {
+                if (!empty($s['buka']) && (int)($s['paket_id'] ?? 0) > 0) {
+                    $hasil[] = [
+                        'paket_id'=>(int)$s['paket_id'],
+                        'mapel'=>(string)$m['nama'],
+                        'semester'=>(int)$s['nomor'],
+                    ];
+                }
+            }
+        }
+        return $hasil;
+    }
+
+    public function laporanSendiri(int $paketId): array
+    {
+        $a = $this->peran();
+        if ($a['peran_aktif'] !== 'siswa') {
+            throw new DomainException('Laporan siswa tidak diizinkan.');
+        }
+        $siswa = $this->db->table('siswa')->select('id')
+            ->where('pengguna_id',(int)$a['id'])->get()->getRowArray();
+        if (!$siswa) throw new DomainException('Data siswa belum tersedia.');
+        return $this->laporan((int)$siswa['id'],$paketId);
+    }
+
     /** Paket yang benar-benar ditugaskan, bukan hasil menebak id URL. */
     private function paket(int $paketId): array
     {
