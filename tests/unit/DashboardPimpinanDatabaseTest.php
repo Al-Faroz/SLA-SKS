@@ -27,6 +27,9 @@ final class DashboardPimpinanDatabaseTest extends TestCase
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,status TEXT)',
             'CREATE TABLE penugasan_paket(id INTEGER PRIMARY KEY,paket_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER)',
             'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,jenis_tp TEXT,status TEXT)',
+            'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,guru_id INTEGER)',
+            'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,status TEXT,nilai REAL)',
+            'CREATE TABLE jawaban_hots_materi(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,status TEXT,nilai REAL)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,siswa_id INTEGER,tp_id INTEGER,status TEXT)',
             'CREATE TABLE nilai_tp(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,status_nilai TEXT,nilai_tp REAL)',
             'CREATE TABLE percobaan_ujian(id INTEGER PRIMARY KEY,progres_tp_id INTEGER,jenis TEXT,status TEXT)',
@@ -54,6 +57,10 @@ final class DashboardPimpinanDatabaseTest extends TestCase
                 'semester'=>$sem,'tahun_ajaran_id'=>1,
             ]);
         }
+        $this->db->table('penugasan_guru_gen')->insertBatch([
+            ['id'=>1,'angkatan_id'=>1,'mapel_id'=>1,'guru_id'=>99],
+            ['id'=>2,'angkatan_id'=>2,'mapel_id'=>1,'guru_id'=>null],
+        ]);
         $this->db->table('siswa')->insertBatch([
             ['id'=>101,'angkatan_id'=>1,'semester_mulai'=>null],
             ['id'=>102,'angkatan_id'=>1,'semester_mulai'=>5],
@@ -88,6 +95,15 @@ final class DashboardPimpinanDatabaseTest extends TestCase
             ['id'=>603,'progres_tp_id'=>403,'status_nilai'=>'final','nilai_tp'=>100],
             ['id'=>604,'progres_tp_id'=>404,'status_nilai'=>'final','nilai_tp'=>88],
             ['id'=>605,'progres_tp_id'=>405,'status_nilai'=>'final','nilai_tp'=>95],
+        ]);
+        $this->db->table('resume_materi')->insertBatch([
+            ['id'=>901,'progres_tp_id'=>401,'status'=>'final','nilai'=>null],
+            ['id'=>902,'progres_tp_id'=>402,'status'=>'final','nilai'=>0],
+            ['id'=>903,'progres_tp_id'=>405,'status'=>'final','nilai'=>null],
+        ]);
+        $this->db->table('jawaban_hots_materi')->insertBatch([
+            ['id'=>911,'progres_tp_id'=>401,'status'=>'final','nilai'=>null],
+            ['id'=>912,'progres_tp_id'=>402,'status'=>'draf','nilai'=>null],
         ]);
         $this->db->table('sertifikat')->insertBatch([
             ['id'=>701,'status'=>'berlaku'],
@@ -133,6 +149,10 @@ final class DashboardPimpinanDatabaseTest extends TestCase
         self::assertSame(1,$d['ringkasan']['sertifikat_berlaku']);
         self::assertSame(75.0,$d['ringkasan']['persen']);
         self::assertSame(1,$d['ringkasan']['paket_kosong']);
+        self::assertSame(2,$d['ringkasan']['pasangan_gen_mapel']);
+        self::assertSame(1,$d['ringkasan']['guru_ditugaskan']);
+        self::assertSame(2,$d['ringkasan']['antrean_penilaian']);
+        self::assertSame(2,$d['baris'][0]['antrean_penilaian']);
         self::assertSame('siap',$d['baris'][0]['pra_status']);
         self::assertSame(0,$d['baris'][2]['siswa']); // Gen B semester dilewati
         self::assertNull($d['baris'][2]['persen']);
