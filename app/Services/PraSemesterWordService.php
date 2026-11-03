@@ -100,6 +100,9 @@ final class PraSemesterWordService
     public function unduh(int $paketId, int $jumlah): string
     {
         $this->guruId();
+        if ($this->guruService->konteks($paketId)['terpakai']) {
+            throw new DomainException('Bank telah digunakan siswa; penyusunan Word dikunci.');
+        }
         // 30 minimal untuk Pra-Semester; file tidak memodifikasi bank.
         return TemplateWordSoalService::buat(
             $this->identitas($paketId), 'pra_semester', $jumlah,
@@ -266,12 +269,10 @@ final class PraSemesterWordService
             $ujianId=(int)$ujian['id'];
             $last=$this->db->table('soal_pra_semester')->selectMax('urutan')
                 ->where('ujian_pra_semester_id',$ujianId)->get()->getRowArray();
-            $count=$this->db->table('soal_pra_semester')
-                ->where('ujian_pra_semester_id',$ujianId)->countAllResults();
-            if ($count + count($rich['soal']) > 200) {
-                throw new DomainException('Total soal setelah impor melebihi batas 200. Rapikan bank terlebih dahulu.');
-            }
             $urut=(int)($last['urutan']??0);
+            if ($urut + count($rich['soal']) > 65535) {
+                throw new DomainException('Urutan soal melebihi kapasitas database.');
+            }
             foreach ($rich['soal'] as $soal) {
                 $urut++;
                 $opsi=$soal['opsi'];
