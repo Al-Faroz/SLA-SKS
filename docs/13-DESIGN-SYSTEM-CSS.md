@@ -474,3 +474,12 @@ Layout panel `app/Views/layouts/panel.php` **wajib memberi versi pada URL** `pub
 - **BAB**: editor yang sudah ada dipertahankan, bukan menambah aksi memindahkan TP antar-BAB. Status TP Siap tidak boleh dengan sendirinya menyebabkan tombol sunting BAB tersembunyi/disabled.
 - **TP**: tampilkan aksi edit untuk Draf dan Siap yang belum digunakan siswa; untuk yang sudah dipakai, tampilkan readonly beserta alasan, bukan pilihan kategori A/B/C. Warna/status responsif pada Dark/Light dan desktop/HP; jangan mengubah styling global atau fitur lain yang sudah FIX.
 - **Status penggunaan** tidak boleh hanya ditentukan oleh CSS/JavaScript; server harus mengembalikan izin sesuai riwayat penggunaan, dan setiap aksi mutasi mengulang pemeriksaan.
+
+### A9-2 — Komponen Rekap Nilai Guru dan Mode Dokumentasi (3 November 2026)
+
+- **Gunakan kelas tabel kanonis `a-tbl`** di dalam `a-tabel-gulir`, bukan `a-table`/`a-table-wrap` yang tidak memperoleh token Emerald Glass. Modifier khusus `a-rekap-table--tp` lebar minimum ±1480px dan `a-rekap-table--pra` minimum ±900px; biarkan area tabel gulir horizontal, hindari mengompresi 10 kolom menjadi teks bertumpuk.
+- Ringkasan `dl.a-rekap-metrik` terdiri dari empat `div` bergaya kartu dengan `dt` dan `dd`; grid 4/2/1 kolom desktop/tablet/HP. Angka menggunakan tabular numerals, bukan tabel akademik baru.
+- Status nilai dalam `a-rekap-status` berbasis teks dengan warna Final/Sementara/netral yang tetap kontras Dark/Light; warna tidak menggantikan label.
+- Filter `a-penilaian-filter` empat kolom adaptif dan `a-filter-rekap-grid--dua` untuk Pra-Semester. Form nilai `a-penilaian-form-grid` memberi kolom lebar untuk umpan balik.
+- Selector `html[data-documentation="on"]` mengubah submenu `a-side__submenu` menjadi menu popover terikat `a-side__group`, tersembunyi ketika tidak dihover/difokuskan, tidak menambah baris navigasi dan tetap bisa diakses dengan keyboard.
+- Kedua kartu detail Penilaian yang menggunakan `a-penilaian-petunjuk` dan `a-card--jawaban-siswa` harus tetap memiliki latar berbeda **meski Mode Dokumentasi menghilangkan efek kaca**. Semua CSS bersifat scoped ke halaman Guru.
