@@ -1,11 +1,19 @@
 # 09 — Sertifikat, Daftar Nilai, Revisi dan Laporan
 
-> **Master v2.5 · 26 Oktober 2026.** Daftar nilai berbasis TP Esensial/NonEsensial, tanpa nilai akhir semester. Aturan apakah Pra-Semester menjadi syarat sertifikat **belum diputuskan**.
+> **Master v2.5 · revisi keputusan final 3 November 2026.** Daftar nilai sertifikat berbasis TP Esensial/NonEsensial, tanpa nilai akhir semester. **Pra-Semester bukan syarat penerbitan sertifikat dan nilainya tidak dicetak pada sertifikat.**
 
 ## 1. Daftar nilai sertifikat
-Sertifikat siswa satu Mapel/Semester menampilkan **semua BAB/TP menurut ATP semester**: TP **Esensial** ditampilkan tanpa nilai, TP **NonEsensial** disertai nilai TP. Sertifikat **tidak** menampilkan nilai akhir semester hasil rerata TP/Pra-Semester, karena nilai agregat tersebut tidak ada. Nilai Pra-Semester berdiri sendiri pada laporan/ekspor; pencantuman pada sertifikat tidak ditetapkan dalam diskusi ini, sehingga jangan diam-diam menambah kolom.
+Sertifikat siswa satu Mapel/Semester menampilkan **semua BAB/TP menurut ATP semester**: TP **Esensial** ditampilkan tanpa nilai, TP **NonEsensial** disertai nilai TP. Sertifikat **tidak** menampilkan nilai akhir semester hasil rerata TP/Pra-Semester, karena nilai agregat tersebut tidak ada. Nilai Pra-Semester tetap berdiri sendiri pada halaman rekap/laporan dan ekspor khusus Pra-Semester; **tidak boleh dicetak atau ditambahkan sebagai kolom, ringkasan, maupun penghitungan pada sertifikat**.
 
-Penerbitan awal mensyaratkan TP NonEsensial selesai dan seluruh penilaian wajib sudah final, serta kesiapan data sertifikat/TTD. Keputusan apakah ujian Pra-Semester perlu selesai sebelum sertifikat diterbitkan **ditunda**; tidak boleh dijadikan gate otomatis sebelum keputusan pemilik.
+Penerbitan awal mensyaratkan seluruh TP NonEsensial pada paket selesai dan seluruh penilaian wajib TP sudah final, serta kesiapan data sertifikat/TTD. **Tidak perlu menunggu Pra-Semester**: belum dijadwalkan, belum diikuti, belum mendapat nilai, dibatalkan, remedial, atau belum selesai Pra-Semester **tidak menjadi alasan menahan penerbitan sertifikat**. Ketuntasan TP dan finalisasi nilai TP tetap wajib; keputusan ini tidak melonggarkan syarat tersebut.
+
+### Keputusan final fungsi Pra-Semester (3 November 2026)
+
+1. Pra-Semester adalah **checkpoint akademik** sebelum **Ujian Semester yang sesungguhnya**. Nilainya tetap terpisah untuk informasi, rekap, monitoring, dan ekspor, bukan bagian nilai atau kelulusan sertifikat SLA-SKS.
+2. Siswa yang memenuhi **seluruh syarat TP NonEsensial selesai, nilai TP wajib final, serta identitas/TTD sertifikat siap** berhak diterbitkan sertifikat, **terlepas dari status ujian Pra-Semester**. Perlu membedakan `Belum mengikuti Pra-Semester` dari `Belum final nilai TP` agar tidak ada gerbang tersembunyi.
+3. Sertifikat hanya mencantumkan **semua BAB/TP**, TP Esensial **tanpa nilai**, dan TP NonEsensial **dengan nilai final**. **Tidak ada nilai Pra-Semester** dan tidak ada Nilai Akhir Semester.
+4. Hasil Pra-Semester yang muncul/berubah kemudian **tidak memicu revisi, regenerasi, pergantian nomor, atau QR sertifikat**. Revisi tetap hanya karena perubahan sah pada konten sertifikat, misalnya biodata atau nilai TP yang tercetak, mengikuti ketentuan histori.
+5. Pernyataan "Ujian Semester yang sesungguhnya" menjelaskan tujuan checkpoint; **tidak berarti menambahkan modul, jadwal, nilai, atau aturan baru untuk Ujian Semester** dalam tahap ini.
 
 ## 2. PDF dan identitas
 Kertas **A4 landscape 297×210 mm**. Background JPG/PNG unggahan Admin, hanya satu versi aktif global, versi historis tersimpan; fallback template bawaan bila belum ada. Identitas sekolah, nama siswa dan **NISN privat**, Mapel, Semester, daftar TP per BAB, nomor/kode QR, kota/tanggal, kepala madrasah/NIP dan **gambar tanda tangan PNG wajib**. Tidak mengklaim PNG sebagai TTE bersertifikasi eksternal. Preview wajib sebelum aktivasi template.
@@ -21,7 +29,7 @@ Sertifikat awal terbit menyimpan snapshot isi, template background/logo/TTD dan 
 `GET /verifikasi/{kode}` berbasis token acak dan pembatasan permintaan. Publik hanya melihat nomor, nama, Mapel, Semester, daftar nilai yang boleh dibuka, status berlaku/digantikan dan tanggal terbit; **NISN, kontak, alasan koreksi, audit dan PDF privat tidak tampil**. QR historis masih valid dengan status digantikan dan rujukan versi aktif.
 
 ## 5. Laporan
-- **Export Nilai Guru (prioritas)**: Gen–Mapel–Semester, semua siswa, kolom setiap TP (Esensial tanpa nilai; NonEsensial nilai) dan Pra-Semester; file dapat diunduh walaupun baru satu nilai TP tersedia, kosong ≠ 0.
+- **Rekap/ekspor Nilai Guru**: dua halaman dan dua file terpisah: **Nilai TP** (Gen–Mapel–Semester, Esensial tanpa nilai, NonEsensial bernilai) dan **Nilai Pra-Semester** (skor sah/riwayat tersendiri). Ekspor dapat dilakukan walaupun baru satu nilai TP tersedia; kosong ≠ 0. Tidak ada file gabungan.
 - Rapor per siswa: daftar TP/kode/jenis, jalur diagnostik, Resume/HOTS bila wajib, Sumatif awal/remedial, nilai TP, nilai Pra-Semester terpisah.
 - Progres per semester: persentase selesai TP NonEsensial, bukan rata-rata nilai.
 - Log ujian, aktivitas, persetujuan, revisi, dan pengumuman tetap berizin sesuai peran, audit, dan privasi.

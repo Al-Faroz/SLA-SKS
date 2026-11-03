@@ -23,7 +23,7 @@ Guru aktif Gen–Mapel menerima antrean Resume/HOTS final tertua, menilai sesuai
 - Indikator kemiripan jawaban tetap 3-gram kata Jaccard dengan ambang bawaan 60% untuk **perlu ditinjau**, tanpa hukuman otomatis. Pemeriksaan dibatasi materi/TP, Gen dan hak Guru.
 
 ## 4. Nilai Pra-Semester
-Bank ujian gabungan seluruh BAB pada semester, minimal 30 soal. Mesin, fullscreen, jeda dan satu remedial mengikuti pola Sumatif. Skor terbaik adalah **nilai Pra-Semester mandiri**. Jendela boleh mulai dan durasi individual ditentukan Admin per Gen–Mapel–Semester, dan hanya siswa yang menyelesaikan seluruh TP NonEsensial berhak mengikutinya; peserta paket sama mengikuti jendela yang sama.
+Bank ujian gabungan seluruh BAB pada semester, minimal 30 soal. Mesin, fullscreen, jeda dan satu remedial mengikuti pola Sumatif. Skor terbaik adalah **nilai Pra-Semester mandiri** untuk rekap/monitoring, **bukan nilai sertifikat maupun syarat penerbitannya**. Jendela boleh mulai dan durasi individual ditentukan Admin per Gen–Mapel–Semester, dan hanya siswa yang menyelesaikan seluruh TP NonEsensial berhak mengikutinya; peserta paket sama mengikuti jendela yang sama.
 
 ## 5. Ekspor Nilai Guru
 - Rekap Nilai Guru menggunakan **dua halaman dan dua berkas ekspor terpisah** di bawah menu `Rekap Nilai`: **Nilai TP** dan **Nilai Pra-Semester**. Data dan sheet kedua kategori **tidak dicampur dalam satu ekspor**.
@@ -55,3 +55,9 @@ KKM Pra-Semester: default Admin atau nilai khusus Guru untuk paket Gen–Mapel�
 - Rekap Nilai TP: filter Gen–Mapel, Semester, Jenis TP dan BAB. **Default NonEsensial**; Esensial dan Semua tersedia sebagai pilihan. File Excel TP mengikuti filter; unduh semua semester mengikuti jenis TP, tetapi tidak memakai BAB khusus semester. Skor 0 sah, nilai yang belum ada kosong.
 - Rekap Nilai Pra-Semester: per siswa dan semester, percobaan hanya `selesai_sah` menghasilkan skor. Nilai terbaik berasal dari `PenilaianPraSemesterService`, bukan rata-rata akhir semester. Hasil bisa kosong, Sementara, Final, menunggu susulan/remedial. Semua siswa Gen tetap masuk.
 - Implementasi A9 hanya baca, filter, dan ekspor. Tidak ada perubahan SQL, aturan nilai, tahapan ujian maupun jadwal Admin. Sebelum penerimaan hasil pada database lokal, tetap wajib audit dump XAMPP terbaru sesuai `AGENTS.md`.
+
+### Penegasan final hubungan nilai Pra-Semester dan sertifikat (3 November 2026)
+
+- **Pra-Semester bukan syarat penerbitan sertifikat**, dan **nilainya tidak dicetak dalam sertifikat**. Ketuntasan TP NonEsensial dan seluruh nilai wajib TP yang sudah Final tetap prasyarat sertifikat sesuai Master 09.
+- Hasil Pra-Semester yang belum ada, batal, masih sementara, atau mengalami remedial **tidak memblokir sertifikat** dan perubahan hasilnya tidak memicu revisi PDF/QR.
+- Fungsi Pra-Semester adalah checkpoint akademik sebelum Ujian Semester yang sesungguhnya; keputusan ini tidak mengesahkan perhitungan Nilai Akhir Semester maupun menambahkan mesin Ujian Semester baru.
