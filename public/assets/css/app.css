@@ -2293,3 +2293,104 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
         grid-template-columns:minmax(0,1fr);
     }
 }
+
+/* A11-1 — Pemeriksaan Sertifikat Admin, scoped Emerald Glass. */
+.a-sertifikat .a-sertifikat__status {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    margin:15px 0;
+}
+.a-sertifikat .a-sertifikat__status-item {
+    border:1px solid var(--a-garis,rgba(145,206,177,.3));
+    background:var(--a-latar,rgba(23,74,60,.23));
+    border-radius:12px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:9px;
+    min-width:0;
+}
+.a-sertifikat .a-sertifikat__status-item > span {
+    font-size:13px;
+    opacity:.85;
+}
+.a-sertifikat .a-sertifikat__status-item > strong {
+    font-size:19px;
+    font-weight:800;
+}
+.a-sertifikat .a-sertifikat__status-item .a-help {margin:0;overflow-wrap:anywhere;}
+.a-sertifikat .a-sertifikat__status-item .a-btn {margin-top:auto;}
+.a-sertifikat .a-sertifikat__filter {
+    display:flex;
+    align-items:end;
+    gap:14px;
+    flex-wrap:wrap;
+}
+.a-sertifikat .a-sertifikat__filter .a-field {
+    flex:1 1 330px;
+    max-width:760px;
+    min-width:0;
+}
+.a-sertifikat .a-sertifikat__scroll {
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    border-radius:12px;
+    scrollbar-width:thin;
+}
+.a-sertifikat .a-sertifikat__table {
+    min-width:950px;
+    width:100%;
+}
+.a-sertifikat .a-sertifikat__table :is(th,td) {
+    vertical-align:middle;
+    line-height:1.5;
+}
+.a-sertifikat .a-sertifikat__table thead th {
+    white-space:normal;
+    font-size:12px;
+    font-weight:800;
+}
+.a-sertifikat .a-sertifikat__table thead th:first-child {min-width:190px;}
+.a-sertifikat .a-sertifikat__table thead th:nth-child(2),
+.a-sertifikat .a-sertifikat__table thead th:nth-child(3) {width:155px;}
+.a-sertifikat .a-sertifikat__table thead th:nth-child(4) {width:160px;}
+.a-sertifikat .a-sertifikat__table thead th:nth-child(5) {min-width:300px;}
+.a-sertifikat .a-sertifikat__badge {
+    display:inline-flex;
+    align-items:center;
+    padding:5px 10px;
+    min-height:28px;
+    font-size:11px;
+    font-weight:800;
+    border-radius:999px;
+    border:1px solid var(--a-garis,rgba(155,185,160,.4));
+    white-space:normal;
+}
+.a-sertifikat .a-sertifikat__alasan summary {
+    cursor:pointer;
+    font-weight:650;
+    text-decoration:underline;
+    text-underline-offset:3px;
+}
+.a-sertifikat .a-sertifikat__alasan ul {
+    margin:8px 0 0;
+    padding-left:20px;
+    font-size:12px;
+}
+.a-sertifikat .a-sertifikat__alasan li+li {margin-top:5px;}
+.a-sertifikat .a-sertifikat__scroll:focus-visible,
+.a-sertifikat .a-sertifikat__alasan summary:focus-visible {
+    outline:3px solid #5BE3B8;
+    outline-offset:3px;
+}
+@media (max-width:750px) {
+    .a-sertifikat .a-sertifikat__status {grid-template-columns:minmax(0,1fr);}
+    .a-sertifikat .a-sertifikat__filter .a-field,
+    .a-sertifikat .a-sertifikat__filter .a-btn {
+        flex:1 1 100%;
+        width:100%;
+    }
+}
