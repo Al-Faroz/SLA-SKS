@@ -112,7 +112,10 @@ final class PraSemesterSesiService
     public function daftar(int $paketId): array
     {
         $this->admin();
-        $this->ujianPaket($paketId);
+        // Halaman detail Admin tetap bisa dilihat saat bank belum dibuat/draf;
+        // hanya pembuatan sesi yang wajib memiliki ujian utama siap.
+        if (!$this->db->table('paket_semester')->where('id',$paketId)
+            ->countAllResults()) throw new DomainException('Paket tidak ditemukan.');
         return $this->db->table('jadwal_pra_sesi j')
             ->select('j.*,COUNT(ps.id) AS jumlah_peserta')
             ->join('ujian_pra_semester u','u.id=j.ujian_pra_semester_id')
