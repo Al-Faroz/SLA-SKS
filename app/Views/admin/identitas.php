@@ -20,11 +20,14 @@
 <?php
     $nilai = old($kode, $identitas[$kode] ?? '');
     $opsional = $kode === 'website';
+    // Label master kadang sudah memuat kata opsional.
+    $labelTampil = $opsional && stripos($label, 'opsional') === false
+        ? $label . ' (opsional)' : $label;
     $tipe = $kode === 'email' ? 'email' : ($kode === 'website' ? 'url' : 'text');
     $panjang = $kode === 'alamat_madrasah' ? 1000 : 200;
 ?>
 <div class="a-field">
-    <label class="a-label" for="i-<?= esc($kode, 'attr') ?>"><?= esc($label) ?><?= $opsional ? ' (opsional)' : '' ?></label>
+    <label class="a-label" for="i-<?= esc($kode, 'attr') ?>"><?= esc($labelTampil) ?></label>
     <?php if ($kode === 'alamat_madrasah'): ?>
         <textarea id="i-<?= esc($kode, 'attr') ?>" name="<?= esc($kode, 'attr') ?>" rows="3" maxlength="<?= $panjang ?>" <?= $opsional ? '' : 'required' ?>><?= esc($nilai) ?></textarea>
     <?php else: ?>
