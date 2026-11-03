@@ -154,7 +154,7 @@ final class PenilaianGuruService
             . "t.judul AS tp_judul,m.urutan AS urutan_materi,"
             . "m.judul AS materi_judul,u.nama AS nama_siswa,"
             . "a.nama AS nama_gen,rm.nama AS nama_mapel,"
-            . "p.angkatan_id,p.mapel_id,p.semester,t.bab_id,"
+            . "p.angkatan_id,p.mapel_id,"
             . "'" . $jenis . "' AS jenis";
     }
 
