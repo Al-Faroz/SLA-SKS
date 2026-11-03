@@ -19,6 +19,8 @@
     <?php if ($pesan = session()->getFlashdata('galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
     <?php endif ?>
+    <?php $filterQuery = http_build_query(array_filter($filter,
+        static fn($value): bool => $value !== null && $value !== '')); ?>
     <section class="a-card a-pra-daftar" aria-labelledby="pra-daftar-judul">
         <div class="a-pra-section-head">
             <div>
@@ -149,7 +151,7 @@
                 <p class="a-help" role="status">Paket belum aktif. Aktifkan paket melalui pengelolaan ATP terlebih dahulu.</p>
             <?php else: ?>
                 <form method="post" class="a-form"
-                    action="<?= esc(site_url('admin/pra-semester/' . (int)$pilih['paket_id']),'attr') ?>">
+                    action="<?= esc(site_url('admin/pra-semester/' . (int)$pilih['paket_id']) . ($filterQuery !== '' ? '?'.$filterQuery : ''),'attr') ?>">
                     <?= csrf_field() ?>
                     <div class="a-field">
                         <label class="a-label" for="pra-mulai">Awal jendela mulai (WIB)</label>
@@ -221,7 +223,7 @@
                                             <?php if ($j['jenis'] === 'susulan'): ?>
                                                 <a class="a-btn a-btn--sekunder a-pra-action"
                                                     href="<?= esc(site_url('admin/pra-semester/'
-                                                        . (int)$pilih['paket_id']) . '?sesi=' . (int)$j['id'],'attr') ?>">
+                                                        . (int)$pilih['paket_id']) . '?sesi=' . (int)$j['id'] . ($filterQuery !== '' ? '&'.$filterQuery : ''),'attr') ?>">
                                                     Atur peserta
                                                 </a>
                                             <?php else: ?>
@@ -242,7 +244,7 @@
                 <?php else: ?>
                 <form method="post" class="a-form a-pra-sesi-form"
                     action="<?= esc(site_url('admin/pra-semester/'
-                        . (int)$pilih['paket_id'] . '/sesi'),'attr') ?>">
+                        . (int)$pilih['paket_id'] . '/sesi') . ($filterQuery !== '' ? '?'.$filterQuery : ''),'attr') ?>">
                     <?= csrf_field() ?>
                     <h3>Tambah jadwal remedial atau susulan</h3>
                     <div class="a-field">
@@ -294,7 +296,7 @@
                         <form method="post" class="a-form"
                             action="<?= esc(site_url('admin/pra-semester/'
                                 . (int)$pilih['paket_id'].'/sesi/'
-                                . (int)$sesiTerpilih['id'].'/peserta'),'attr') ?>">
+                                . (int)$sesiTerpilih['id'].'/peserta') . ($filterQuery !== '' ? '?'.$filterQuery : ''),'attr') ?>">
                             <?= csrf_field() ?>
                             <div class="a-tabel-gulir a-pra-table-wrap" tabindex="0"
                                 role="region" aria-label="Daftar calon peserta susulan">
