@@ -176,43 +176,43 @@ final class SertifikatPdfService
         border: 0;
     }
     .card--full, .card--flow { height: auto; }
-    .kop { text-align: center; border-bottom: 1.5pt solid #246D54; padding-bottom: 3mm; }
-    .kop .identitas { font: bold 17pt DejaVu Serif, serif; line-height: 1.24; }
-    .kop .alamat { font-size: 8.6pt; margin-top: 1.5mm; color: #43695D; }
-    .garis-emas { width: 36mm; height: 1.6pt; margin: 2.5mm auto 0; background: #B28C49; }
-    .judul { margin: 4mm 0 4mm; text-align: center; }
+    .kop { text-align: center; border-bottom: 1.5pt solid #246D54; padding-bottom: 2mm; }
+    .kop .identitas { font: bold 16pt DejaVu Serif, serif; line-height: 1.24; }
+    .kop .alamat { font-size: 8.6pt; margin-top: 1mm; color: #43695D; }
+    .garis-emas { width: 36mm; height: 1.6pt; margin: 1.5mm auto 0; background: #B28C49; }
+    .judul { margin: 2mm 0; text-align: center; }
     .judul .atas { margin: 0; font-size: 7.5pt; letter-spacing: 2pt; color: #8D7140; }
     h1 {
-        margin: 1mm 0 1.5mm; color: #173E33;
-        font: bold 21pt DejaVu Serif, serif; letter-spacing: 1.2pt;
+        margin: .4mm 0 .8mm; color: #173E33;
+        font: bold 19pt DejaVu Serif, serif; letter-spacing: 1.2pt;
     }
     .nomor { margin: 0; font-size: 9pt; color: #3E6657; }
     table { border-collapse: collapse; width: 100%; }
     .biodata {
-        margin: 2mm 0 4mm; table-layout: fixed;
+        margin: 1mm 0 2mm; table-layout: fixed;
         background: #F3F8F5; border: 1px solid #D1E1D7;
     }
     .biodata td {
-        width: 50%; padding: 2.4mm 4mm;
+        width: 50%; padding: 1.1mm 4mm;
         vertical-align: top; border-bottom: 1px solid #E3ECE6;
     }
     .biodata .label { display: block; font-size: 7.4pt; color: #537568; letter-spacing: .45pt; }
-    .biodata .isi { display: block; font-size: 10pt; font-weight: bold; margin-top: 1.1mm; line-height: 1.3; }
+    .biodata .isi { display: block; font-size: 10pt; font-weight: bold; margin-top: .3mm; line-height: 1.2; }
     .biodata .isi--nama { font-size: 12pt; color: #123D30; }
     .label-tabel {
-        margin: 1.2mm 0 2mm; font-size: 8.5pt;
+        margin: .4mm 0 1mm; font-size: 8.5pt;
         font-weight: bold; letter-spacing: 1.1pt; color: #275E4B;
     }
     .tp-table { table-layout: fixed; border: 1px solid #BCD5C8; font-size: 8.7pt; }
     .tp-table thead { display: table-header-group; }
     .tp-table th {
         background: #DCEAE2; color: #1D4A3C;
-        font-size: 8.5pt; text-align: left; padding: 2.4mm 2.5mm;
+        font-size: 8.5pt; text-align: left; padding: 1.4mm 2.2mm;
         border: 1px solid #BCD5C8;
     }
     .tp-table td {
-        vertical-align: top; line-height: 1.3;
-        border: 1px solid #D2E1D8; padding: 2.2mm 2.5mm;
+        vertical-align: top; line-height: 1.2;
+        border: 1px solid #D2E1D8; padding: 1.2mm 2mm;
         overflow-wrap: break-word;
     }
     .tp-table .kode { width: 17%; white-space: nowrap; }
@@ -221,11 +221,11 @@ final class SertifikatPdfService
     .tp-table .num { width: 12%; text-align: center; white-space: nowrap; font-weight: bold; }
     .tp-table .bab-row td {
         background: #E9F2EA; font-weight: bold; color: #225842;
-        padding: 2.1mm 2.6mm; page-break-after: avoid;
+        padding: 1.2mm 2.3mm; page-break-after: avoid;
     }
     .tp-table .bab-label { font-weight: bold; }
     .tp-table .tp-row { page-break-inside: avoid; }
-    .footer { margin-top: 9mm; padding-top: 4mm; border-top: 1px solid #CADFD1; page-break-inside: avoid; }
+    .footer { margin-top: 4mm; padding-top: 2mm; border-top: 1px solid #CADFD1; page-break-inside: avoid; }
     .card--full .footer {
         position: fixed; bottom: 12mm;
         left: 18mm; width: 260mm;
@@ -233,16 +233,16 @@ final class SertifikatPdfService
     }
     .footer td { width: 33.333%; vertical-align: top; text-align: center; padding: 0 2mm; }
     .footer .qr-cell { text-align: left; }
-    .footer .qr { width: 27mm; height: 27mm; display: block; }
+    .footer .qr { width: 23mm; height: 23mm; display: block; }
     .footer .qr-caption { margin: 1mm 0 0; font-size: 7.2pt; color: #466D5D; }
-    .footer .catatan { padding-top: 11mm; font-size: 8pt; line-height: 1.65; color: #536F63; }
+    .footer .catatan { padding-top: 5mm; font-size: 8pt; line-height: 1.65; color: #536F63; }
     .footer .tanggal { font-size: 8.8pt; margin-bottom: 1mm; }
     .footer .jabatan { font-size: 8.7pt; margin-bottom: 1.5mm; }
-    .footer .ttd { height: 20mm; max-width: 48mm; }
-    .footer .ttd-kosong { padding: 8mm 3mm; border: 1px dashed #8DA99B; font-size: 8pt; }
-    .footer .nama { margin-top: 1.5mm; font-size: 9pt; font-weight: bold; text-decoration: underline; }
-    .footer .nip { margin-top: 1mm; font-size: 8pt; }
-    .qr-kosong { padding: 7mm 1mm; border: 1px dashed #8DA99B; text-align: center; font-size: 8pt; }
+    .footer .ttd { height: 16mm; max-width: 48mm; }
+    .footer .ttd-kosong { padding: 5mm 3mm; border: 1px dashed #8DA99B; font-size: 8pt; }
+    .footer .nama { margin-top: .6mm; font-size: 9pt; font-weight: bold; text-decoration: underline; }
+    .footer .nip { margin-top: .5mm; font-size: 8pt; }
+    .qr-kosong { padding: 4mm 1mm; border: 1px dashed #8DA99B; text-align: center; font-size: 8pt; }
     .watermark {
         position: fixed; top: 88mm; left: 20mm; font-size: 23pt;
         font-weight: bold; color: rgba(158,36,36,.28);
