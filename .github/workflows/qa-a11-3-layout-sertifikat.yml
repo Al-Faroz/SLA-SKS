@@ -1,0 +1,56 @@
+name: QA A11-3 Layout Cetak Sertifikat PDF
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/SertifikatPdfService.php'
+      - 'tests/unit/SertifikatTataLetakPdfTest.php'
+      - '.github/workflows/qa-a11-3-layout-sertifikat.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cetak-a4:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan folder CI4
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Syntax PHP
+        run: |
+          php -l app/Services/SertifikatPdfService.php
+          php -l tests/unit/SertifikatTataLetakPdfTest.php
+      - name: Render PDF sintetis 4 TP dan 24 TP
+        run: vendor/bin/phpunit --no-coverage tests/unit/SertifikatTataLetakPdfTest.php
+      - name: Periksa A4 landscape, jumlah halaman, dan kelengkapan TP
+        run: |
+          command -v pdfinfo || (sudo apt-get update -qq && sudo apt-get install -y poppler-utils)
+          SHORT=writable/cache/a11-preview-empat-tp.pdf
+          LONG=writable/cache/a11-preview-duapuluhempat-tp.pdf
+          pdfinfo "$SHORT"
+          pdfinfo "$LONG" | grep -E 'Pages:|Page size:'
+          test "$(pdfinfo "$SHORT" | awk '/^Pages:/ {print $2}')" = "1"
+          pdfinfo "$SHORT" | grep -Eq 'A4|841[.,]89 x 595[.,]28'
+          pdfinfo "$LONG" | grep -Eq 'A4|841[.,]89 x 595[.,]28'
+          pdftotext -layout "$SHORT" - | grep -F 'DEMO.8.1.1'
+          pdftotext -layout "$SHORT" - | grep -F 'DEMO.8.2.4'
+          pdftotext -layout "$LONG" - | grep -F 'DEMO.8.1.1'
+          pdftotext -layout "$LONG" - | grep -F 'DEMO.8.6.24'
+          echo 'PASS: PDF A4 landscape, 4 TP satu halaman, semua 24 TP terbaca.'
+      - name: Lampirkan contoh layout sintetis untuk QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11-3-contoh-layout-sertifikat
+          path: |
+            writable/cache/a11-preview-empat-tp.pdf
+            writable/cache/a11-preview-duapuluhempat-tp.pdf
+          retention-days: 7
