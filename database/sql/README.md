@@ -336,3 +336,34 @@ Berdasarkan basis `V4-0009` yang telah dikonfirmasi berhasil diimpor pengguna. P
 5. Guru membuka `/index.php/guru/pra-semester/{paketId}`, memilih jumlah 30–200 untuk template, mengisi setiap BAB, soal, kunci ✓, kemudian Unggah → Review → Konfirmasi. Upload ke staging privat berumur dua jam.
 
 Tidak memakai Migration/Seeder. Jangan mengunggah dump atau kunci HMAC ke repo. Jika terjadi galat impor, periksa objek yang sudah terbentuk, **jangan** langsung menjalankan ulang SQL.
+
+## V4-0011-SERTIFIKAT — Sertifikat PDF/QR dan aset privat (3 November 2026)
+
+Sumber audit baca-saja **dump privat** `sla_sks_v4 (15).sql` (03-11-2026 pukul 09.32, MariaDB 10.4.32, versi terakhir `V4-0010-BANK-WORD-PRA`). Kode penerbitan sertifikat A11-2 memerlukan empat tabel baru. **Tidak ada data siswa asli atau template TTD dalam patch.**
+
+1. **BACKUP database `sla_sks_v4` dan seluruh `writable/`** sebelum impor. Jangan impor ulang dump instalasi atau SQL historis.
+2. Jalankan baca-saja:
+   ```sql
+   SELECT versi FROM schema_version
+    WHERE versi IN ('V4-0010-BANK-WORD-PRA','V4-0011-SERTIFIKAT')
+    ORDER BY versi;
+   SELECT table_name FROM information_schema.tables
+    WHERE table_schema=DATABASE()
+      AND table_name IN ('sertifikat_aset','sertifikat_aset_aktif',
+                         'sertifikat','sertifikat_aktif');
+   ```
+   Syarat: marker V4-0010 ada, marker V4-0011 belum ada, empat tabel baru belum ada. Jika berbeda, **jangan impor**; audit dahulu.
+3. Via phpMyAdmin database `sla_sks_v4`, impor **sekali** `database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql`. **Tidak memakai CI4 Migration/Seeder**.
+4. Verifikasi:
+   ```sql
+   SELECT versi FROM schema_version WHERE versi='V4-0011-SERTIFIKAT';
+   SELECT COUNT(*) AS jumlah_sertifikat FROM sertifikat;
+   SELECT COUNT(*) AS jumlah_aset FROM sertifikat_aset;
+   SELECT COUNT(*) AS jumlah_pointer_aktif FROM sertifikat_aktif;
+   ```
+   Pada pemasangan awal ketiga jumlah harus 0. Data siswa, TP, nilai dan attempt tidak diubah.
+5. Login Admin, lengkapi identitas, unggah dan aktifkan **TTD PNG**. Background boleh fallback; template unggahan harus dipratinjau dulu sebelum aktif. Pastikan `writable/private/sertifikat/` dapat ditulis tetapi **HTTP langsung ditolak**.
+6. Uji penerbitan hanya untuk siswa **simulasi dengan syarat akademik yang benar-benar terpenuhi**, bukan dengan mengubah nilai asli demi melewati gate. Periksa PDF A4 landscape, QR localhost, download pemilik saja, revisi dengan alasan dan arsip digantikan.
+7. Jika DDL gagal sebagian, **jangan jalankan ulang**: MariaDB dapat melakukan implicit commit; inspeksi tabel/marker dan pulihkan dari backup yang telah dibuat.
+
+Berkas aset/PDF historis berada pada `writable/private/sertifikat/aset/` dan `writable/private/sertifikat/pdf/`. Backup dump SQL **saja tidak cukup**. Pada hosting nyata QR memerlukan domain HTTPS permanen; hasil uji localhost tidak dianggap sertifikat siap digunakan publik.
