@@ -343,3 +343,12 @@ Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`
 Sertifikat resmi cetak **A4 landscape** harus mengisi bidang cetak secara proporsional, bukan menempatkan seluruh bingkai pada dua pertiga teratas. Hirarki visual: identitas madrasah, judul/nomor, identitas penerima, tabel BAB/TP, lalu QR verifikasi dan area TTD kepala madrasah. Nama siswa serta nilai harus lebih mudah dibaca pada kertas, tetap dengan bahasa formal dan tanpa teks teknis internal penilaian.
 
 Pratinjau PDF di Admin memakai **data dummy** (dua BAB, empat TP), bukan siswa sebenarnya. Untuk paket dengan banyak TP, legibilitas dan kelengkapan semua baris diutamakan daripada menekan tulisan kecil agar tetap satu halaman. Jika diperlukan, konten lanjut ke halaman berikutnya secara aman dan tanda tangan tidak boleh menutupi tabel. Tidak menambahkan tombol regenerate otomatis PDF yang sudah terbit.
+
+### A12-1 — Dashboard Akademik Pimpinan (3 November 2026)
+
+- GET `/pimpinan` tidak lagi menampilkan beranda generik akun aktif, melainkan **Dashboard Akademik** baca-saja. KPI dari database resmi: siswa unik Gen yang masuk filter, paket aktif ditugaskan, pasangan siswa×TP NonEsensial wajib, pasangan tuntas dengan Sumatif sah, pasangan dengan nilai TP Final (termasuk 0), sertifikat berlaku, penugasan Guru per Gen–Mapel dan antrean final Resume/HOTS yang belum dinilai.
+- Filter **Gen / Mapel / Semester** bersifat opsional, tombol Terapkan dan Reset berfungsi; pilihan dibatasi paket aktif pada `penugasan_paket`. Angka dihitung ulang mengikuti filter; pagination tabel paket 12 baris/halaman mempertahankan filter.
+- Tabel per paket berisi siswa wajib (semester yang dilewati dikecualikan), jumlah TP NonEsensial, selesai sah/target, Final, sertifikat berlaku, antrean penilaian, status Pra-Semester yang terpisah, dan tautan **Lihat Monitoring** ke halaman A10-1.
+- Cakupan 0/0 ditampilkan **Belum ada target**, bukan 0% atau 100%. Grafik meter native `progress` disertai rasio serta angka teks; tidak ada grafik tanpa alternatif. Tidak ada Nilai Akhir Semester atau gabungan nilai Pra-Semester.
+- Responsif 360/390/768/1100px: kartu KPI grid 5/3/2/1 kolom sesuai ruang, filter 3 kolom desktop/1 HP, tabel lebar boleh scroll horizontal, fokus keyboard terlihat, mode Dark/Light/Dokumentasi tetap tersedia.
+- Tidak menampilkan data NISN, jawaban siswa, token ujian, maupun tombol POST/mutasi untuk Pimpinan. Filter rusak, halaman kosong, paket tanpa TP, role salah, dan kegagalan server mendapat penjelasan yang sesuai.
