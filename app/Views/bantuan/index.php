@@ -53,6 +53,48 @@
                 </div>
             </section>
         <?php endforeach ?>
+
     </div>
+
+    <section class="a-card a-bantuan__faq-resmi a-jarak-atas" aria-labelledby="judul-faq-resmi">
+        <header class="a-informasi__kepala">
+            <div>
+                <p class="a-proto-eyebrow">FAQ · Informasi Madrasah</p>
+                <h2 id="judul-faq-resmi">Pertanyaan Resmi</h2>
+                <p class="a-help">Jawaban di bawah ini dikelola dan diterbitkan oleh Admin madrasah.
+                    Pertanyaan yang masih draf atau sudah diarsipkan tidak ditampilkan.</p>
+            </div>
+            <?php if ($peran === 'admin'): ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/faq'),'attr') ?>">Kelola FAQ</a>
+            <?php endif ?>
+        </header>
+        <?php if (!$faqResmi['data']): ?>
+            <p class="a-informasi__kosong" role="status">Belum ada FAQ resmi yang diterbitkan. Panduan penggunaan di atas tetap dapat digunakan.</p>
+        <?php else: ?>
+            <div class="a-bantuan__pertanyaan">
+                <?php foreach ($faqResmi['data'] as $item): ?>
+                    <details class="a-bantuan__butir">
+                        <summary><?= esc($item['pertanyaan']) ?></summary>
+                        <div class="a-bantuan__jawaban">
+                            <p class="a-informasi__isi"><?= esc($item['jawaban']) ?></p>
+                        </div>
+                    </details>
+                <?php endforeach ?>
+            </div>
+        <?php endif ?>
+        <?php if ($faqResmi['total_halaman'] > 1): ?>
+            <nav class="a-informasi__pagination" aria-label="Halaman FAQ resmi">
+                <span>Halaman <?= (int)$faqResmi['halaman'] ?> dari <?= (int)$faqResmi['total_halaman'] ?></span>
+                <?php if ($faqResmi['halaman'] > 1): ?>
+                    <a class="a-btn a-btn--sekunder"
+                       href="<?= esc(site_url('bantuan').'?halaman_faq='.($faqResmi['halaman']-1),'attr') ?>">Sebelumnya</a>
+                <?php endif ?>
+                <?php if ($faqResmi['halaman'] < $faqResmi['total_halaman']): ?>
+                    <a class="a-btn a-btn--sekunder"
+                       href="<?= esc(site_url('bantuan').'?halaman_faq='.($faqResmi['halaman']+1),'attr') ?>">Selanjutnya</a>
+                <?php endif ?>
+            </nav>
+        <?php endif ?>
+    </section>
 </div>
 <?= $this->endSection() ?>
