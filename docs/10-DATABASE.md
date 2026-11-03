@@ -105,3 +105,8 @@ Jadwal remedial/susulan dan peserta terpilih memerlukan tabel/relasi baru dengan
 ### A8-7 — SQL V4-0010 (staging DOCX Pra-Semester)
 - Setelah V4-0009, impor manual satu kali `database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql` (backup lebih dahulu). Membuat tabel `impor_soal_pra_docx` sebagai staging Word paket, ID acak 32 heksadesimal, FK paket/Guru, checksum SHA-256, status pratinjau/diterapkan/kedaluwarsa, data_json dan timestamp; file di `writable/private/pra_semester_word/`.
 - Tabel `soal_pra_semester` yang sudah ada tetap dipakai; JSON rich-nya menyimpan asal Word dan konten HTML tersanitasi. Tidak menambah/mengubah data TP, percobaan, atau siswa. **Tidak ada Migration/Seeder**.
+
+### V4-0011 — Penyimpanan sertifikat dan aset privat (3 November 2026)
+
+Sumber audit: dump XAMPP privat `sla_sks_v4 (15).sql` diekspor 03-11-2026 09.32, MariaDB 10.4.32, 64 tabel, `schema_version` terakhir V4-0010-BANK-WORD-PRA; **belum ada** tabel sertifikat. Patch additive `database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql` menambah `sertifikat_aset` (gambar immutable), `sertifikat_aset_aktif` (pointer 1 per jenis), `sertifikat` (snapshot PDF/QR berversi) dan `sertifikat_aktif` (pointer 1 per siswa/paket). FK ke `siswa`, `paket_semester`, `pengguna`; UNIQUE versi siswa/paket, nomor, token verifikasi, nama PDF, serta pointer aktif.
+Semua perubahan hanya INSERT sertifikat dan UPDATE status versi sebelumnya saat revisi sah; **tanpa DELETE siswa, progres, nilai atau sertifikat lama**. Berkas PDF, background dan TTD di `writable/private/sertifikat/`. SQL impor sekali setelah backup DB dan `writable/`. DDL harus diuji pada MariaDB XAMPP sebelum dinyatakan PASS, tidak cukup tes SQLite.
