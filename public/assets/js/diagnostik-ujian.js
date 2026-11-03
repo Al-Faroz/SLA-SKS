@@ -84,9 +84,11 @@
                 : 'Tes tidak selesai tanpa skor sah. Kembali ke Rincian TP untuk meminta akses ulang kepada Guru.';
             if (jenis === 'pra_semester') {
                 pesanHasil = state.status === 'selesai_sah'
-                    ? (state.skor < state.kkm
-                        ? 'Pra-Semester selesai sah. Remedial menunggu jadwal Admin.'
-                        : 'Pra-Semester selesai sah. Nilai tersimpan sebagai nilai mandiri.')
+                    ? (state.tahap === 'remedial'
+                        ? 'Remedial Pra-Semester selesai sah. Nilai akhir menggunakan skor terbaik antara ujian normal dan remedial.'
+                        : (state.skor < state.kkm
+                            ? 'Ujian normal selesai sah. Remedial menunggu jadwal Admin.'
+                            : 'Pra-Semester selesai sah. Nilai tersimpan sebagai nilai mandiri.'))
                     : 'Ujian Pra-Semester dibatalkan tanpa skor. Tunggu jadwal susulan Admin; tidak tersedia akses ulang mandiri.';
             } else if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
                 pesanHasil = state.skor >= state.kkm
