@@ -41,3 +41,10 @@
 - Service sesi Admin/roster dan mesin siswa terhubung. Form tambahan dan daftar peserta nyata; jadwal tanpa SQL V4-0009 tetap nonaktif (pesan impor), sedangkan daftar jadwal utama/filter tetap dapat dibuka.
 - Belum menangani impor Word Pra-Semester dan ekspor nilai Pra-Semester ke XLSX; fokus susulan/remedial dan UI tabel terlebih dahulu.
 - Uji XAMPP menunggu pull dan laporan pengguna. Jangan anggap PASS browser/SQL hanya dari CI.
+
+### A8-6 — Pemisahan halaman list/detail (permintaan lanjutan 3 November 2026)
+- Pengguna telah mengonfirmasi SQL V4-0009 berhasil dijalankan di localhost. Tidak ada SQL baru untuk revisi ini.
+- `app/Views/guru/pra_semester.php` hanya daftar dan filter; `app/Views/guru/pra_semester_detail.php` khusus bank soal, KKM, form.
+- `app/Views/admin/pra_semester.php` hanya daftar dan filter; `app/Views/admin/pra_semester_detail.php` khusus jadwal utama/tambahan dan daftar peserta.
+- Controller memilih View berdasarkan ada/tidaknya paketId, URL lama tetap. Setelah jadwal utama disimpan, Admin tetap pada detail untuk menerima pesan sukses.
+- Butuh uji manual localhost untuk breadcrumb, filter dan form; jangan anggap PASS sebelum dilaporkan.
