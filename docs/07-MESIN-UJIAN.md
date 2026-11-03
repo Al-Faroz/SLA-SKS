@@ -77,3 +77,7 @@ Sebelum mesin membuat percobaan baru, Service menghitung histori **per satu sisw
 - Peserta susulan dipilih eksplisit oleh Admin dan dicatat pada tabel `peserta_pra_susulan`; tidak menambah/menghapus riwayat lama. Hanya peserta Gen dan tahap yang sesuai yang dapat ikut. Remedial terbuka berdasarkan normal selesai sah <KKM, bukan semua siswa.
 - Sebelum setiap attempt, sistem membaca histori satu siswa/satu ujian; menggunakan nomor percobaan berurut dan `jadwal_pra_sesi_id` yang terverifikasi. Pembatalan tidak menciptakan skor atau kesempatan sah. Attempt yang masih berjalan tetap bisa dilanjutkan tanpa harus menunggu jadwal lain.
 - Tidak mengubah kebijakan tes mandiri Diagnostik/Sumatif, tidak membuka remedial/susulan tanpa jadwal Admin, dan tidak membahas sertifikat pada tahap ini.
+
+### Konten soal Word Pra-Semester dalam percobaan (A8-7)
+- Saat percobaan dibuat, engine mengacak opsi PG A–E dan **menyimpan snapshot HTML terstruktur tepercaya** (pertanyaan, opsi, word_source_id) dari bank Pra-Semester; kunci tidak dikirim kepada siswa. Konten gambar dari Word diakses melalui endpoint khusus yang memeriksa peran siswa, paket, token percobaan, stage Word telah diterapkan, dan referensi gambar dalam snapshot. Gambar tidak boleh diekspos melalui URL publik langsung ke `writable/`.
+- Materi rich Word di-review Guru sebelum impor dan tidak boleh berubah setelah digunakan siswa. Referensi audio/video Google Drive hanya tautan file, izinnya wajib dicek Guru saat pratinjau; tidak ada klaim pemeriksaan izin secara otomatis.

@@ -222,7 +222,11 @@ final class PraSemesterGuruService
                     ->countAllResults();
                 if ($ada !== 1) throw new DomainException('Soal bukan milik bank semester.');
                 $this->db->table('soal_pra_semester')->where('id', $soalId)
-                    ->where('ujian_pra_semester_id', $eid)->update($data);
+                    ->where('ujian_pra_semester_id', $eid)->update($data + [
+                        // Sunting manual mengganti konten Word secara eksplisit:
+                        // jangan tampilkan HTML lama setelah Guru menyunting teks.
+                        'konten_terstruktur_json' => null,
+                    ]);
             } else {
                 $last = $this->db->table('soal_pra_semester')
                     ->selectMax('urutan')->where('ujian_pra_semester_id', $eid)

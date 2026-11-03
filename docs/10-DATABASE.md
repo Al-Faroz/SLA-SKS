@@ -101,3 +101,7 @@ Jadwal remedial/susulan dan peserta terpilih memerlukan tabel/relasi baru dengan
 - Unique `(ujian_pra_semester_id,siswa_id,nomor_percobaan)` mencegah nomor percobaan Pra-Semester sama untuk siswa yang sama. FK dan indeks mempertahankan histori.
 - Skema ini dibandingkan dengan **dump privat `sla_sks_v4 (13).sql`** (header 3 Nov 2026 04.32, MariaDB 10.4.32, schema_version terakhir `V4-0008-KEPUTUSAN-UJIAN-BATAL`). **Jangan memasukkan dump privat atau kredensial ke GitHub.**
 - Impor **sekali** melalui phpMyAdmin setelah backup DB dan `writable/`. Jalankan `database/sql/qa/V4-0009_PRA_SESI_READONLY.sql` sebelum dan sesudah. Jangan melakukan Migration/Seeder, reset, DROP atau pemulihan data lama.
+
+### A8-7 — SQL V4-0010 (staging DOCX Pra-Semester)
+- Setelah V4-0009, impor manual satu kali `database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql` (backup lebih dahulu). Membuat tabel `impor_soal_pra_docx` sebagai staging Word paket, ID acak 32 heksadesimal, FK paket/Guru, checksum SHA-256, status pratinjau/diterapkan/kedaluwarsa, data_json dan timestamp; file di `writable/private/pra_semester_word/`.
+- Tabel `soal_pra_semester` yang sudah ada tetap dipakai; JSON rich-nya menyimpan asal Word dan konten HTML tersanitasi. Tidak menambah/mengubah data TP, percobaan, atau siswa. **Tidak ada Migration/Seeder**.

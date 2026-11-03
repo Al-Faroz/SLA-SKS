@@ -288,3 +288,7 @@ Keputusan pemilik: **tidak menempatkan area pengelolaan di bawah tabel daftar**.
 - **Admin** `GET /admin/pra-semester`: hanya daftar paket + filter Gen, Mapel, Semester, Status. Tombol **Atur jadwal** membuka `GET /admin/pra-semester/{paketId}`, halaman detail tersendiri untuk jadwal utama, remedial, susulan, dan peserta susulan. Tidak merender tabel semua paket dalam halaman detail.
 - Kedua halaman detail menyediakan breadcrumb dan **Kembali ke daftar**, mempertahankan query filter daftar sebelumnya. Setelah POST sukses/gagal pengguna tetap di halaman detail paket yang sama.
 - Tidak mengubah aturan bisnis, akses Guru G1, data/SQL, warna UI global atau endpoint POST.
+
+### A8-7 — Word pada halaman detail Guru Pra-Semester
+- Halaman daftar dan filter tetap terpisah. Halaman detail `/guru/pra-semester/{paketId}` menambahkan card **Template & Impor Word** di samping KKM, daftar soal dan editor manual. Kontrol: jumlah template 30–200, unduh DOCX, unggah DOCX maksimal 15 MB, riwayat tahap review, pesan SQL belum terpasang/terkunci.
+- Review menggunakan halaman tersendiri yang menampilkan setiap soal dalam `details`, nomor BAB, HTML pertanyaan dan opsi, kunci benar, jumlah media, peringatan review kompleks, checkbox persetujuan dan tombol Konfirmasi. Data belum masuk bank hingga konfirmasi sukses.

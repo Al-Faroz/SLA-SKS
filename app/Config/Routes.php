@@ -50,6 +50,7 @@ $routes->post('siswa/pra-semester/(:num)/mulai', 'SiswaPraSemester::mulai/$1', [
 $routes->get('siswa/pra-semester/(:num)/(:segment)/status', 'SiswaPraSemester::status/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/pra-semester/(:num)/(:segment)/jawab', 'SiswaPraSemester::jawab/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/pra-semester/(:num)/(:segment)/tindakan', 'SiswaPraSemester::tindakan/$1/$2', ['filter' => 'auth:siswa']);
+$routes->get('siswa/pra-semester/(:num)/(:segment)/media/(:segment)/(:segment)', 'SiswaPraSemester::gambarWord/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/ujian', 'SiswaSumatif::halaman/$1', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/sumatif/mulai', 'SiswaSumatif::mulai/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/(:segment)/status', 'SiswaSumatif::status/$1/$2', ['filter' => 'auth:siswa']);
@@ -86,6 +87,10 @@ $routes->get('guru/pra-semester/(:num)', 'GuruPraSemester::index/$1', ['filter' 
 $routes->post('guru/pra-semester/(:num)/soal', 'GuruPraSemester::simpanSoal/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/pra-semester/(:num)/soal/(:num)/status', 'GuruPraSemester::statusSoal/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/pra-semester/(:num)/kkm', 'GuruPraSemester::simpanKkm/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/pra-semester/(:num)/word', 'GuruPraSemester::unduhWord/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/word/pratinjau', 'GuruPraSemester::unggahWord/$1', ['filter' => 'auth:guru']);
+$routes->get('guru/pra-semester/(:num)/word/review/(:segment)', 'GuruPraSemester::reviewWord/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/word/review/(:segment)/konfirmasi', 'GuruPraSemester::konfirmasiWord/$1/$2', ['filter' => 'auth:guru']);
 $routes->get('admin/pra-semester', 'AdminPraSemester::index', ['filter' => 'auth:admin']);
 $routes->get('admin/pra-semester/(:num)', 'AdminPraSemester::index/$1', ['filter' => 'auth:admin']);
 $routes->post('admin/pra-semester/(:num)', 'AdminPraSemester::simpan/$1', ['filter' => 'auth:admin']);

@@ -69,6 +69,79 @@
                 </form>
             <?php endif ?>
         </section>
+        <?php if ($pesan = session()->getFlashdata('word_sukses')): ?>
+            <div class="a-alert" role="status"><?= esc($pesan) ?></div>
+        <?php endif ?>
+        <?php if ($pesan = session()->getFlashdata('word_galat')): ?>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
+        <?php endif ?>
+        <section class="a-card a-jarak-atas" aria-labelledby="pra-word">
+            <h2 id="pra-word">Template &amp; Impor Word Pra-Semester</h2>
+            <p class="a-help">Satu dokumen untuk satu Gen–Mapel–Semester. Minimum 30 soal PG A–E
+                dan setiap BAB harus terwakili. Kolom BAB pada tiap soal Word sudah diisi awal
+                dari daftar BAB; sesuaikan bila pertanyaannya berasal dari BAB yang berbeda.</p>
+            <p class="a-help">Alur: Unduh Word → Isi soal, BAB dan kunci ✓ → Unggah → Review seluruh butir → Konfirmasi.
+                Impor hanya menambahkan soal baru; soal manual dan soal impor lama tidak ditimpa.</p>
+            <?php if ($terpakai): ?>
+                <div class="a-alert" role="status">
+                    Bank sudah digunakan siswa. Template untuk penyuntingan dan impor Word dikunci.
+                </div>
+            <?php elseif (!$word_terpasang): ?>
+                <div class="a-alert a-alert--bahaya" role="status">
+                    Pembaruan database <strong>V4-0010-BANK-WORD-PRA</strong> belum dipasang.
+                    Impor tidak dapat digunakan sebelum SQL dipasang dengan aman.
+                </div>
+            <?php else: ?>
+                <form class="a-form" action="<?= esc(site_url('guru/pra-semester/'
+                    . (int)$paket['id'] . '/word') . ($filterGen !== null ? '?gen='.$filterGen : ''),
+                    'attr') ?>" method="get">
+                    <?php if ($filterGen !== null): ?>
+                        <input type="hidden" name="gen" value="<?= (int)$filterGen ?>">
+                    <?php endif ?>
+                    <div class="a-field">
+                        <label class="a-label" for="pra-word-jumlah">Jumlah soal dalam template</label>
+                        <input class="a-input" id="pra-word-jumlah" type="number"
+                            name="jumlah" min="30" max="200" value="30" required>
+                    </div>
+                    <button type="submit" class="a-btn a-btn--sekunder">Unduh Template Word</button>
+                </form>
+                <form class="a-form a-jarak-atas" enctype="multipart/form-data" method="post"
+                    action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']
+                    . '/word/pratinjau') . ($filterGen !== null ? '?gen='.$filterGen : ''),'attr') ?>">
+                    <?= csrf_field() ?>
+                    <div class="a-field">
+                        <label class="a-label" for="pra-word-file">Pilih file Word yang sudah diisi (.docx)</label>
+                        <input id="pra-word-file" class="a-input" type="file" name="word_soal"
+                            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            required>
+                        <p class="a-help">Maksimal 15 MB. Isi soal dan kunci diperiksa server sebelum tahap review.</p>
+                    </div>
+                    <button class="a-btn a-btn--utama" type="submit">Unggah &amp; Pratinjau Word</button>
+                </form>
+                <?php if ($word_riwayat !== []): ?>
+                    <h3 class="a-jarak-atas">Riwayat Impor Word</h3>
+                    <div class="a-tabel-gulir a-pra-table-wrap">
+                        <table class="a-tbl a-pra-table">
+                            <thead><tr><th>Tanggal</th><th>Status</th><th>Pratinjau</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($word_riwayat as $history): ?>
+                                <tr>
+                                    <td><?= esc((string)$history['dibuat_pada']) ?></td>
+                                    <td><?= esc((string)$history['status']) ?></td>
+                                    <td><a class="a-btn a-btn--sekunder"
+                                        href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']
+                                            . '/word/review/' . $history['id'])
+                                            . ($filterGen !== null ? '?gen='.$filterGen : ''),'attr') ?>">
+                                        Buka Review
+                                    </a></td>
+                                </tr>
+                            <?php endforeach ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif ?>
+            <?php endif ?>
+        </section>
         <section class="a-card a-jarak-atas">
             <h2>Daftar soal</h2>
             <?php if ($konteks['soal'] === []): ?>

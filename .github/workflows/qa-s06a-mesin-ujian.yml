@@ -10,6 +10,13 @@ on:
       - 'app/Services/MesinPraSemesterSiswaService.php'
       - 'tests/unit/PraSemesterImplementasiTest.php'
       - 'tests/unit/PraSemesterDatabaseTest.php'
+      - 'app/Services/PraSemesterWordService.php'
+      - 'app/Services/TemplateWordSoalService.php'
+      - 'app/Services/PratinjauWordSoalService.php'
+      - 'app/Services/RenderWordSoalService.php'
+      - 'app/Views/guru/pra_semester_word_review.php'
+      - 'tests/unit/PraSemesterWordTest.php'
+      - 'database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql'
       - 'app/Services/PraSemesterJadwalService.php'
       - 'app/Services/PraSemesterGuruService.php'
       - 'app/Controllers/AdminPraSemester.php'
@@ -65,6 +72,8 @@ jobs:
           php-version: '8.2'
           extensions: mysqli, pdo_mysql, sqlite3, pdo_sqlite, mbstring, intl, gd, zip, xml, dom, fileinfo
           coverage: none
+      - name: Siapkan penyimpanan Word privat pada CI
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
       - name: Composer install
         run: composer install --no-interaction --prefer-dist --no-progress
       - name: PHP lint
@@ -76,6 +85,12 @@ jobs:
           php -l app/Services/MesinPraSemesterSiswaService.php
           php -l tests/unit/PraSemesterImplementasiTest.php
           php -l tests/unit/PraSemesterDatabaseTest.php
+          php -l app/Services/PraSemesterWordService.php
+          php -l app/Services/TemplateWordSoalService.php
+          php -l app/Services/PratinjauWordSoalService.php
+          php -l app/Services/RenderWordSoalService.php
+          php -l app/Views/guru/pra_semester_word_review.php
+          php -l tests/unit/PraSemesterWordTest.php
           php -l app/Services/PraSemesterJadwalService.php
           php -l app/Services/PraSemesterGuruService.php
           php -l app/Controllers/AdminPraSemester.php
@@ -99,6 +114,9 @@ jobs:
           vendor/bin/phpunit --no-coverage tests/unit/SusunButirUjianServiceTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterImplementasiTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterWordTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/TemplateWordSoalServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/ReviewWordSoalTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterRemedialSusulanTest.php
       - name: Impor patch SQL pada MariaDB sintetis
         run: |

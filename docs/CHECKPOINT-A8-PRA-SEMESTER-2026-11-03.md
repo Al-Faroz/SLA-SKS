@@ -48,3 +48,19 @@
 - `app/Views/admin/pra_semester.php` hanya daftar dan filter; `app/Views/admin/pra_semester_detail.php` khusus jadwal utama/tambahan dan daftar peserta.
 - Controller memilih View berdasarkan ada/tidaknya paketId, URL lama tetap. Setelah jadwal utama disimpan, Admin tetap pada detail untuk menerima pesan sukses.
 - Butuh uji manual localhost untuk breadcrumb, filter dan form; jangan anggap PASS sebelum dilaporkan.
+
+## A8-7 — Template, Pratinjau dan Impor Word Pra-Semester (3 November 2026)
+- Branch: `feature/v25-a8-word-bank-pra-semester-20261103`, Draft PR #103 bertumpuk di atas PR #102. **Jangan merge langsung main** sebelum uji.
+- Existing `TemplateWordSoalService`, `PratinjauWordSoalService`, `RenderWordSoalService` dipakai ulang. Template khusus Pra-Semester 30–200 PG per paket, kolom `BAB n` pada baris soal, kolom kunci ✓ pada baris pilihan, seluruh BAB semester harus terwakili. HMAC template tetap digunakan.
+- Layanan baru `PraSemesterWordService`: file di `writable/private/pra_semester_word/`, staging 2 jam, hash berkas dan sidik jari BAB/bank, konfirmasi transaksional append-only, impor identik tidak menduplikasi, bank terkunci setelah attempt siswa.
+- Halaman `guru/pra-semester/{paketId}` menyediakan unduh, unggah, riwayat; review per nomor berada di `.../word/review/{id}`; tidak ada perubahan halaman daftar/filter. Guru tetap bisa mengedit manual, dan edit manual membersihkan rich HTML lama.
+- Mesin siswa menggunakan snapshot HTML/opsi teracak; proxy gambar di `siswa/pra-semester/{paketId}/{token}/media/{wordId}/{rid}` memverifikasi kepemilikan token dan sumber Word dalam snapshot.
+- SQL **baru** `database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql` untuk staging, plus `database/sql/qa/V4-0010_BANK_WORD_PRA_READONLY.sql`. User sebelumnya mengonfirmasi V4-0009 berhasil diimpor. **V4-0010 belum diimpor pada localhost**. Tidak memakai Migration/Seeder, tidak menyertakan dump privat.
+- QA: tes unit `PraSemesterWordTest.php`, integrasi SQLite pada `PraSemesterDatabaseTest.php`, regresi Word TP dan uji SQL MariaDB sintetis via workflow. Uji browser/XAMPP masih wajib untuk dianggap FIX.
+- Belum dikerjakan pada tahap ini: ekspor nilai Pra-Semester; sertifikat tetap ditunda.
+
+### Bukti QA A8-7 Word — 3 November 2026
+- GitHub Actions **QA S06A Fondasi Mesin Ujian Ketat**, commit `bf488577a40380db8d7870565956225045839176`, run `41580942078`: **SUCCESS** setelah perbaikan direktori `writable/private` pada environment CI (tanpa memodifikasi layanan kunci Word produksi).
+- PHPUnit: aturan waktu 11 tes/38 assertions; acak soal 7/108; kontrak Pra-Semester 6/169; SQLite 12/94; **PraSemesterWordTest 8/1.238**; generator Word lama 2/18; review Word lama 3/751; remedial/susulan 16/79. Total 65 tes pada workflow ini, dan kedua DDL MariaDB sintetis V4-0009 serta V4-0010 PASS.
+- QA lain yang sudah terkonfirmasi PASS pada commit sama: `QA Bank Soal Terpadu v2.5`, `QA S06B Diagnostik End to End`, dan `QA Audit Kontrak Database`.
+- **Tetap belum PASS manual XAMPP:** Guru perlu pull branch, backup dan impor hanya V4-0010 (V4-0009 sudah terpasang), mengunduh dan mengisi template 30 butir untuk BAB semester, review sebelum konfirmasi, kemudian Admin menjadwalkan dan siswa menguji tampilan Word.

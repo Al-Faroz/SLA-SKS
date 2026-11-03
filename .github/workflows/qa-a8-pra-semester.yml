@@ -20,6 +20,13 @@ on:
       - 'public/assets/js/diagnostik-ujian.js'
       - 'tests/unit/PraSemesterImplementasiTest.php'
       - 'tests/unit/PraSemesterDatabaseTest.php'
+      - 'app/Services/PraSemesterWordService.php'
+      - 'app/Services/TemplateWordSoalService.php'
+      - 'app/Services/PratinjauWordSoalService.php'
+      - 'app/Services/RenderWordSoalService.php'
+      - 'app/Views/guru/pra_semester_word_review.php'
+      - 'tests/unit/PraSemesterWordTest.php'
+      - 'database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql'
       - 'app/Services/AturanJadwalPraSemesterService.php'
       - 'app/Services/PenilaianPraSemesterService.php'
       - 'tests/unit/PraSemesterRemedialSusulanTest.php'
@@ -40,7 +47,7 @@ jobs:
           php-version: '8.2'
           extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, xml, zip
           coverage: none
-      - run: mkdir -p writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
       - run: composer install --no-interaction --prefer-dist --no-progress
       - name: Validasi sintaks service dan test
         run: |
@@ -48,6 +55,12 @@ jobs:
           php -l tests/unit/AturanPraSemesterServiceTest.php
           for phpfile in app/Services/{PraSemesterGuruService,PraSemesterJadwalService,PraSemesterSiswaService,MesinPraSemesterSiswaService,SusunButirUjianService,NavigasiService}.php app/Controllers/{GuruPraSemester,AdminPraSemester,SiswaPraSemester}.php app/Views/{guru/pra_semester,admin/pra_semester,siswa/pra_semester_ujian,siswa/daftar_tp}.php app/Config/Routes.php tests/unit/PraSemesterImplementasiTest.php; do php -l "$phpfile"; done
           php -l tests/unit/PraSemesterDatabaseTest.php
+          php -l app/Services/PraSemesterWordService.php
+          php -l app/Services/TemplateWordSoalService.php
+          php -l app/Services/PratinjauWordSoalService.php
+          php -l app/Services/RenderWordSoalService.php
+          php -l app/Views/guru/pra_semester_word_review.php
+          php -l tests/unit/PraSemesterWordTest.php
           php -l app/Services/AturanJadwalPraSemesterService.php
           php -l app/Services/PenilaianPraSemesterService.php
           php -l tests/unit/PraSemesterRemedialSusulanTest.php
@@ -56,5 +69,8 @@ jobs:
           vendor/bin/phpunit --no-coverage tests/unit/AturanPraSemesterServiceTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterImplementasiTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterWordTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/TemplateWordSoalServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/ReviewWordSoalTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterRemedialSusulanTest.php
           vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php

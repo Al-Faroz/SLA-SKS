@@ -325,3 +325,14 @@ Sebelum SQL baru: jalankan `qa/audit_kontrak_database_readonly.sql` di DB yang b
 6. Baru setelah berhasil, uji jadwal utama, remedial dan susulan lewat browser peran Admin/Guru/Siswa. Jika impor gagal, **jangan** mengulang secara membabi buta; simpan pesan galat dan lakukan audit patch parsial.
 
 SQL ini aditif, tidak menghapus data siswa, tidak mengubah root CI4, URL, atau .env. Tidak boleh diimpor pada database selain `sla_sks_v4` yang telah diaudit.
+
+## V4-0010 — Word Pra-Semester (A8-7, 3 November 2026)
+Berdasarkan basis `V4-0009` yang telah dikonfirmasi berhasil diimpor pengguna. Patch ini **bukan** pengganti V4-0009 dan tidak mereset data.
+
+1. Backup database `sla_sks_v4` dan folder `writable/private/` sebelum impor.
+2. Pastikan `schema_version` mengandung `V4-0009-PRA-SESI-TERJADWAL`, dan **belum** mengandung `V4-0010-BANK-WORD-PRA`.
+3. Di phpMyAdmin pilih database `sla_sks_v4`, impor **sekali** `database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql`.
+4. Jalankan pemeriksaan baca-saja `database/sql/qa/V4-0010_BANK_WORD_PRA_READONLY.sql`. Harus muncul tabel `impor_soal_pra_docx` dan versi `V4-0010-BANK-WORD-PRA`. Jumlah soal/percobaan lama tetap sama.
+5. Guru membuka `/index.php/guru/pra-semester/{paketId}`, memilih jumlah 30–200 untuk template, mengisi setiap BAB, soal, kunci ✓, kemudian Unggah → Review → Konfirmasi. Upload ke staging privat berumur dua jam.
+
+Tidak memakai Migration/Seeder. Jangan mengunggah dump atau kunci HMAC ke repo. Jika terjadi galat impor, periksa objek yang sudah terbentuk, **jangan** langsung menjalankan ulang SQL.
