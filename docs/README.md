@@ -77,3 +77,5 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 - **[Checkpoint A12-1 — Dashboard Akademik Pimpinan (3 November 2026)](CHECKPOINT-A12-1-DASHBOARD-PIMPINAN-2026-11-03.md)**. Beranda baca-saja dengan KPI siswa, paket, TP+Sumatif sah, Nilai Final, Guru, antrean Resume/HOTS, sertifikat berlaku, dan status Pra terpisah. Filter/paginasi dan QA SQLite. SQL tidak berubah, menunggu uji XAMPP.
 
 - **[Checkpoint A12-2 — Dashboard Guru G1 (3 November 2026)](CHECKPOINT-A12-2-DASHBOARD-GURU-2026-11-03.md)**. Ringkasan penugasan Gen–Mapel, TP Siap/Draf, Materi aktif, antrean Resume/HOTS, siswa perlu bantuan dan ujian mandiri berjalan. Tanpa SQL; menunggu uji XAMPP sebelum FIX.
+
+- **[Checkpoint A12-3 — Dashboard Siswa berbasis progres sah (3 November 2026)](CHECKPOINT-A12-3-DASHBOARD-SISWA-2026-11-03.md)**. Beranda lanjut belajar dengan gerbang Katalog, progres TP bersegmen, nilai Final termasuk 0, TP perlu bantuan dan sertifikat berlaku; Pra-Semester tetap checkpoint terpisah. Tanpa SQL; menunggu uji XAMPP sebelum FIX.
