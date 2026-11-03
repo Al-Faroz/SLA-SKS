@@ -413,3 +413,9 @@ Menu `Bantuan` telah ditambahkan sebelum `Profil & peran` dalam navigasi **Admin
 - Semua role: ganti sandi; pergantian peran hanya muncul pada panduan staf (tidak untuk Siswa).
 
 Pusat Bantuan ini **belum** merupakan FAQ resmi terkelola Admin, Pengumuman global, notifikasi per pengguna, atau Hubungi Admin dengan data kontak; jangan mengklaim U03/U04/U05 lengkap. Halaman tidak menulis data, tidak mengirim email/WhatsApp dan tidak tampil sebagai pop-up saat ujian berlangsung. Tampilkan normal, fokus keyboard, state klik detail, serta layout Dark/Light/HP. Uji peran dan tautan secara otomatis serta XAMPP manual.
+
+### A13-2 — Pengumuman global dan FAQ resmi pada Bantuan (3 November 2026)
+
+Menu **Pengumuman** tampil untuk Admin, Guru, Siswa, Pimpinan; Admin dan Guru mendapat **Kelola Pengumuman**, Admin tambahan **Kelola FAQ**. `/pengumuman` memuat daftar global hanya status `terbit`, kartu teks, tanggal penerbitan, pagination server-side, dan kondisi kosong. Kelola Pengumuman Guru hanya berisi konten miliknya, sedangkan Admin dapat mengelola semua. Editor Tambah/Sunting memakai judul/isi atau pertanyaan/jawaban, urutan FAQ, status Draf/Terbit dan CSRF; HTML pengguna ditampilkan sebagai teks biasa, bukan markup. Arsip memiliki konfirmasi, tetap dicatat, tidak dihapus.
+
+Di `/bantuan`, **Panduan Penggunaan A13-1** tetap sesuai peran, ditambah **Pertanyaan Resmi** dari FAQ Admin berstatus `terbit`, urut dan dipaginasi dengan `details/summary` keyboard-accessible. Belum ada FAQ/pengumuman: tampil pesan kosong, bukan data contoh. Dark/Light, Mode Dokumentasi, tabel scroll dan HP 360/390px perlu diperiksa. Notifikasi penerima, kontak Hubungi Admin dan Kebijakan Privasi publik tidak termasuk A13-2.
