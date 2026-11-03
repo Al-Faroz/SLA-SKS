@@ -35,18 +35,70 @@ final class PraSemesterJadwalService
         return (int) $a['id'];
     }
 
-    /** @return list<array<string,mixed>> */
-    public function daftar(): array
+    /**
+     * Hanya nilai whitelist; identitas Gen/Mapel/Semester selalu ID numerik
+     * yang terikat melalui Query Builder, bukan SQL mentah dari browser.
+     */
+    public static function filterDaftar(array $raw): array
+    {
+        $result = [];
+        foreach (['gen','mapel','semester'] as $key) {
+            $v = $raw[$key] ?? '';
+            if (!is_string($v) && !is_int($v)) $v = '';
+            $v = (string)$v;
+            if ($v === '') { $result[$key] = null; continue; }
+            if (!ctype_digit($v) || (int)$v < 1
+                || ($key === 'semester' && (int)$v > 6)) {
+                throw new DomainException('Filter ' . ucfirst($key) . ' tidak valid.');
+            }
+            $result[$key] = (int)$v;
+        }
+        $status = $raw['status'] ?? '';
+        if (!is_string($status) || !in_array($status,
+            ['', 'belum', 'draf', 'siap', 'ditutup'], true)) {
+            throw new DomainException('Filter status Pra-Semester tidak valid.');
+        }
+        $result['status'] = $status;
+        return $result;
+    }
+
+    /** Pilihan filter harus berasal dari paket nyata, bukan input bebas. */
+    public function opsiFilter(): array
     {
         $this->admin();
-        return $this->db->table('paket_semester p')
+        $rows = $this->db->table('paket_semester p')
+            ->select('p.angkatan_id,p.mapel_id,a.nama AS nama_gen,m.nama AS nama_mapel')
+            ->join('ref_angkatan a','a.id=p.angkatan_id')
+            ->join('ref_mapel m','m.id=p.mapel_id')
+            ->orderBy('a.nama')->orderBy('m.nama')->get()->getResultArray();
+        $gens = []; $mapels = [];
+        foreach ($rows as $r) {
+            $gens[(int)$r['angkatan_id']] = (string)$r['nama_gen'];
+            $mapels[(int)$r['mapel_id']] = (string)$r['nama_mapel'];
+        }
+        asort($gens,SORT_NATURAL|SORT_FLAG_CASE);
+        asort($mapels,SORT_NATURAL|SORT_FLAG_CASE);
+        return ['gen'=>$gens,'mapel'=>$mapels];
+    }
+
+    /** @return list<array<string,mixed>> */
+    public function daftar(array $rawFilter = []): array
+    {
+        $this->admin();
+        $f = self::filterDaftar($rawFilter);
+        $query = $this->db->table('paket_semester p')
             ->select('p.id AS paket_id,p.semester,p.status AS paket_status,p.angkatan_id,p.mapel_id,'
                 . 'a.nama AS nama_gen,m.nama AS nama_mapel,e.id AS ujian_id,e.status AS ujian_status,'
                 . 'e.mulai_pada,e.selesai_pada,e.durasi_menit,e.jumlah_soal,e.kkm_khusus')
             ->join('ref_angkatan a','a.id=p.angkatan_id')
             ->join('ref_mapel m','m.id=p.mapel_id')
-            ->join('ujian_pra_semester e','e.paket_semester_id=p.id','left')
-            ->orderBy('a.nama')->orderBy('m.nama')->orderBy('p.semester')
+            ->join('ujian_pra_semester e','e.paket_semester_id=p.id','left');
+        if ($f['gen'] !== null) $query->where('p.angkatan_id',$f['gen']);
+        if ($f['mapel'] !== null) $query->where('p.mapel_id',$f['mapel']);
+        if ($f['semester'] !== null) $query->where('p.semester',$f['semester']);
+        if ($f['status'] === 'belum') $query->where('e.id',null);
+        elseif ($f['status'] !== '') $query->where('e.status',$f['status']);
+        return $query->orderBy('a.nama')->orderBy('m.nama')->orderBy('p.semester')
             ->get()->getResultArray();
     }
 
