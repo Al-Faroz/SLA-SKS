@@ -28,13 +28,13 @@ $statusNilai = static fn (array $baris): string =>
     <?php endif ?>
 
     <section class="a-card" aria-labelledby="filter-rekap">
-        <h2 id="filter-rekap">Pilih Gen–Mapel dan Semester</h2>
+        <h2 id="filter-rekap">Filter Rekap Nilai TP</h2>
         <?php if ($penugasan === []): ?>
             <div class="a-alert" role="status">Belum ada penugasan Gen–Mapel aktif untuk akun Guru ini.
                 Hubungi Admin untuk pemeriksaan penugasan.</div>
         <?php else: ?>
             <form method="get" action="<?= esc(site_url('guru/rekap-nilai'), 'attr') ?>" class="a-form">
-                <div class="a-grid a-grid--dua">
+                <div class="a-filter-rekap-grid">
                     <div class="a-field">
                         <label class="a-label" for="pilih-rekap-gen">Gen – Mata Pelajaran</label>
                         <select class="a-input" id="pilih-rekap-gen" name="pilihan" required>
@@ -55,8 +55,42 @@ $statusNilai = static fn (array $baris): string =>
                             <?php endfor ?>
                         </select>
                     </div>
+                    <div class="a-field">
+                        <label class="a-label" for="pilih-jenis-tp">Jenis TP</label>
+                        <select class="a-input" id="pilih-jenis-tp" name="jenis_tp">
+                            <option value="non_esensial" <?= $jenisTp === 'non_esensial' ? 'selected' : '' ?>>NonEsensial (bernilai)</option>
+                            <option value="esensial" <?= $jenisTp === 'esensial' ? 'selected' : '' ?>>Esensial</option>
+                            <option value="semua" <?= $jenisTp === 'semua' ? 'selected' : '' ?>>Semua jenis TP</option>
+                        </select>
+                    </div>
+                    <div class="a-field">
+                        <label class="a-label" for="pilih-rekap-bab">BAB</label>
+                        <select class="a-input" id="pilih-rekap-bab" name="bab">
+                            <option value="0" <?= $bab === 0 ? 'selected' : '' ?>>Semua BAB</option>
+                            <?php foreach ($daftarBab as $b): ?>
+                                <option value="<?= (int)$b['id'] ?>" <?= $bab === (int)$b['id'] ? 'selected' : '' ?>>
+                                    <?= esc('BAB '.$b['nomor_bab'].' — '.$b['nama_bab']) ?>
+                                </option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
                 </div>
-                <button type="submit" class="a-btn a-btn--utama">Tampilkan rekap</button>
+                <div class="a-penilaian-aksi">
+                    <button type="submit" class="a-btn a-btn--utama">Tampilkan Rekap</button>
+                    <a href="<?= esc(site_url('guru/rekap-nilai'), 'attr') ?>" class="a-btn a-btn--sekunder">Reset Filter</a>
+                </div>
+                <script>
+                (() => {
+                    const form=document.getElementById('pilih-rekap-gen')?.form;
+                    if (!form) return;
+                    for (const id of ['pilih-rekap-gen','pilih-rekap-semester']) {
+                        form.querySelector('#'+id)?.addEventListener('change',()=>{
+                            form.querySelector('#pilih-rekap-bab').value='0';
+                            form.submit();
+                        });
+                    }
+                })();
+                </script>
             </form>
         <?php endif ?>
     </section>
@@ -74,20 +108,22 @@ $statusNilai = static fn (array $baris): string =>
                 <div><dt>Belum Ada Nilai</dt><dd><?= (int) $rekap['jumlah_belum'] ?></dd></div>
             </dl>
             <p class="a-help">Angka Final/Sementara/Belum Ada menghitung pasangan siswa–TP
-                NonEsensial, bukan jumlah siswa unik. TP Esensial ditampilkan tanpa nilai.
+                NonEsensial sesuai filter, bukan jumlah siswa unik. TP Esensial tidak memiliki nilai.
                 Tidak ada perhitungan nilai akhir semester.</p>
         </section>
 
         <section class="a-card a-jarak-atas" aria-labelledby="ekspor-nilai-tp">
             <h2 id="ekspor-nilai-tp">Unduh Nilai Excel (.xlsx)</h2>
-            <p class="a-help">Unduhan mencakup <strong>semua siswa Gen</strong>, semua nilai TP yang tersedia,
-                termasuk nilai Sementara dan TP Esensial tanpa nilai. Nilai yang belum tersedia
-                dibiarkan kosong, bukan 0. Unduhan tidak dibatasi 25 baris halaman ini.</p>
+            <p class="a-help">Unduhan mencakup <strong>semua siswa Gen</strong> dan nilai TP sesuai
+                filter Jenis TP serta BAB untuk semester ini. Nilai yang belum tersedia tetap kosong,
+                bukan 0. Unduhan tidak dibatasi 25 baris halaman ini.</p>
             <?php
                 $urlEkspor = static fn (int $cakupan): string =>
                     site_url('guru/rekap-nilai/unduh') . '?' . http_build_query([
                         'pilihan' => $pilihan_aktif,
                         'semester' => $cakupan,
+                        'jenis_tp' => $jenisTp,
+                        'bab' => $cakupan === 0 ? 0 : $bab,
                     ]);
             ?>
             <div class="a-penilaian-aksi">
@@ -100,9 +136,9 @@ $statusNilai = static fn (array $baris): string =>
                     Unduh Semua Semester 1–6
                 </a>
             </div>
-            <p class="a-help">File berisi sheet informasi, daftar seluruh siswa Gen, serta sheet nilai
-                TP per semester. Pra-Semester belum dimasukkan karena modul nilainya belum tersedia.
-                Tidak ada nilai akhir semester.</p>
+            <p class="a-help">Unduh Semua Semester mengikuti filter Jenis TP, tanpa batasan BAB
+                yang hanya berlaku pada semester terpilih. Nilai Pra-Semester akan memakai
+                halaman dan file unduhan tersendiri, tidak dicampur dengan Nilai TP.</p>
         </section>
 
         <section class="a-card a-jarak-atas" aria-labelledby="daftar-rekap">
@@ -112,8 +148,8 @@ $statusNilai = static fn (array $baris): string =>
                 Nilai 0,00 adalah skor sah; “Belum ada” berarti belum tersimpan.</p>
             <?php if ($rekap['baris'] === []): ?>
                 <div class="a-alert" role="status">
-                    Belum ada pasangan siswa dan TP pada Gen–Mapel Semester <?= (int) $semester ?>.
-                    Pastikan paket, TP dan data siswa telah tersedia.
+                    Tidak ada pasangan siswa dan TP yang sesuai dengan filter ini.
+                    Pilih jenis TP atau BAB lain, atau pastikan data telah tersedia.
                 </div>
             <?php else: ?>
                 <div class="a-table-wrap" tabindex="0" role="region"
@@ -164,9 +200,10 @@ $statusNilai = static fn (array $baris): string =>
 
             <?php if ($rekap['jumlah_halaman'] > 1): ?>
                 <?php
-                $urlHalaman = static function (int $n) use ($pilihan_aktif, $semester): string {
+                $urlHalaman = static function (int $n) use ($pilihan_aktif, $semester, $jenisTp, $bab): string {
                     return site_url('guru/rekap-nilai') . '?' . http_build_query([
-                        'pilihan'=>$pilihan_aktif,'semester'=>$semester,'halaman'=>$n,
+                        'pilihan'=>$pilihan_aktif,'semester'=>$semester,
+                        'jenis_tp'=>$jenisTp,'bab'=>$bab,'halaman'=>$n,
                     ]);
                 };
                 ?>
