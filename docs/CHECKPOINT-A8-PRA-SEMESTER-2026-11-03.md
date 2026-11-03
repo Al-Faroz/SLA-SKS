@@ -78,3 +78,9 @@
 - Laporan pengguna: pemeriksaan UI/gerbang Pra-Semester Siswa pada branch A8-8 **PASS**. PASS tersebut bukan klaim bahwa ujian browser sudah berhasil dikerjakan atau remedial sudah diuji di XAMPP.
 - Branch lanjutan `feature/v25-a8-9-qa-mesin-siswa-20261103` menambah 3 skenario integrasi SQLite untuk token silang-siswa, lanjut attempt saat jendela Admin tutup, dan susulan normal setelah siswa absen ditetapkan Admin. Tidak mengubah SQL, data siswa, jadwal ujian, atau layanan produksi.
 - QA CI melalui PR terpisah, belum boleh dianggap PASS sebelum workflow berhasil. Setelah QA otomatis PASS, uji browser menggunakan jadwal uji yang sah dan siswa simulasi yang telah menuntaskan TP NonEsensial secara normal. Ekspor nilai Pra-Semester dan sertifikat belum dikerjakan pada A8-9.
+
+### A8-10 — Audit jeda koneksi Pra-Semester (3 November 2026)
+
+- Audit kode menemukan kasus tepi: `AturanWaktuUjianService::rekonsiliasi()` dapat langsung mengembalikan `dibatalkan_menunggu_guru` jika siswa kehilangan koneksi lebih dari lima menit antara dua permintaan. Status batal sudah benar, tetapi `MesinPraSemesterSiswaService::selaraskan()` sebelumnya hanya membuka segmen audit ketika hasil antara `jeda_koneksi` terlihat.
+- Perbaikan hanya pada pencatatan **segmen audit koneksi** saat transisi langsung berjalan → batal; waktu awal segmen adalah ambang deteksi 20 detik. Tidak mengubah skor, batas waktu, kuota remedial, jadwal, fullscreen, atau status pembatalan.
+- Ditambahkan regresi database sintetis memastikan satu segmen tertutup, skor NULL, tidak membuat audit ganda pada pembacaan status berikutnya. SQL baru: **tidak ada**. Basis data XAMPP dan dump privat tidak disentuh; tes browser nyata tetap terpisah.

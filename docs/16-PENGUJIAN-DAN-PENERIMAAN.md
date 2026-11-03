@@ -392,3 +392,9 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Setelah pengguna menyatakan PASS pada tampilan/status Pra-Semester Siswa A8-8, jalankan regresi integrasi SQLite sintetis tanpa menulis histori XAMPP: (1) siswa yang sudah memulai tetap melanjutkan token, menjawab, dan mengirim setelah jendela **boleh mulai** Admin ditutup; tidak tercipta attempt kedua; (2) token siswa A harus ditolak oleh siswa B pada paket Gen yang sama untuk status, jawab, dan kirim; (3) siswa tidak hadir baru boleh mengikuti susulan normal setelah ditetapkan sebagai peserta oleh Admin, tanpa membuat skor palsu untuk jadwal utama.
 - Kasus ada di `tests/unit/PraSemesterDatabaseTest.php` dan dijalankan melalui workflow `qa-a8-pra-semester.yml`. Status PASS otomatis harus berdasarkan hasil Actions, bukan hanya adanya tes dalam GitHub.
 - Pengujian browser pengerjaan soal, fullscreen, timer, pembatalan, dan remedial/susulan masih memerlukan siswa uji yang memenuhi seluruh TP serta jadwal aktif yang sah. Dilarang melewati gerbang dengan UPDATE progres siswa atau mengubah jadwal resmi tanpa persetujuan.
+
+### A8-10 — Audit pembatalan langsung setelah offline panjang (3 November 2026)
+
+- Buat percobaan Pra-Semester berjalan dalam fixture SQLite anonim, putuskan heartbeat lebih dari total batas 300 detik, lalu lakukan **satu** pembacaan status server. Hasil wajib `dibatalkan_menunggu_guru`, skor NULL, serta tepat satu segmen `koneksi` yang dimulai pada `last_seen_server_at + 20 detik` dan berakhir ketika pembatalan terdeteksi.
+- Permintaan status kedua harus idempoten: tidak menambah segmen, nilai atau percobaan; siswa tetap menunggu jadwal susulan Admin. Kasus masuk `tests/unit/PraSemesterDatabaseTest.php` dan alur CI S06A/A8.
+- Tidak mengubah kebijakan pengamanan Master 07: koneksi 20 detik dan jeda kumulatif maksimal 300 detik. Uji browser XAMPP tetap perlu dilakukan pada akun simulasi berhak dan jadwal Admin sah.

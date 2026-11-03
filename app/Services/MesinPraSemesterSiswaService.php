@@ -314,7 +314,13 @@ final class MesinPraSemesterSiswaService
             return $this->finalisasi($baru,$now,'Waktu pengerjaan individual selesai.');
         }
         if ($baru['status'] !== $s['status']) {
-            if ($baru['status'] === 'jeda_koneksi') {
+            // Jika perangkat baru tersambung setelah lebih dari 300 detik,
+            // rekonsiliasi langsung menghasilkan batal (tanpa respons jeda).
+            // Segmen koneksi tetap wajib dicatat pada batas deteksi 20 detik.
+            $jedaKoneksiLangsungBatal = $s['status'] === 'berjalan'
+                && $baru['status'] === 'dibatalkan_menunggu_guru'
+                && ($baru['jeda_mulai_pada'] ?? null) !== null;
+            if ($baru['status'] === 'jeda_koneksi' || $jedaKoneksiLangsungBatal) {
                 $this->segmenMulai((int)$row['id'],'koneksi',(int)$baru['jeda_mulai_pada']);
             }
             if ($baru['status'] === 'dibatalkan_menunggu_guru') {

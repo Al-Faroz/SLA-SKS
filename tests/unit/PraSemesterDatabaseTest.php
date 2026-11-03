@@ -528,6 +528,45 @@ final class PraSemesterDatabaseTest extends TestCase
         self::assertSame('menunggu_remedial',$mesin->ruang(11)['fase']);
     }
 
+    /**
+     * Klien lama offline >300 detik: satu pemeriksaan langsung batal,
+     * tetapi riwayat dan segmen koneksi tetap harus utuh tanpa skor.
+     */
+    public function testOfflineLamaLangsungBatalTetapMencatatSegmenKoneksiSekali(): void
+    {
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $token = $mesin->mulai(11,true,true)['token'];
+        $id = (int)$this->db->table('percobaan_ujian')
+            ->where('token_publik',$token)->get()->getRow('id');
+        $waktuLama = time() - 400;
+        $timestampLama = gmdate('Y-m-d H:i:s',$waktuLama);
+        $this->db->table('percobaan_ujian')->where('id',$id)->update([
+            'waktu_aktif_terakhir'=>$timestampLama,
+            'last_seen_server_at'=>$timestampLama,
+        ]);
+
+        $status = $mesin->status(11,$token);
+        self::assertSame('dibatalkan_menunggu_guru',$status['status']);
+        self::assertNull($status['skor']);
+        $segmen = $this->db->table('segmen_jeda_ujian')
+            ->where('percobaan_ujian_id',$id)->get()->getResultArray();
+        self::assertCount(1,$segmen);
+        self::assertSame('koneksi',$segmen[0]['jenis']);
+        self::assertSame(gmdate('Y-m-d H:i:s',$waktuLama + 20),
+            $segmen[0]['dimulai_pada']);
+        self::assertNotNull($segmen[0]['berakhir_pada']);
+        self::assertGreaterThanOrEqual(300,(int)$segmen[0]['durasi_detik']);
+        self::assertNull($this->db->table('percobaan_ujian')
+            ->where('id',$id)->get()->getRow('skor'));
+
+        // Pembacaan status berikutnya tidak boleh menulis segmen ganda.
+        self::assertSame('dibatalkan_menunggu_guru',
+            $mesin->status(11,$token)['status']);
+        self::assertSame(1,$this->db->table('segmen_jeda_ujian')
+            ->where('percobaan_ujian_id',$id)->countAllResults());
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+    }
+
     public function testWordPraSemesterImporAppendDanIdempotenDenganSiswaBelumMenggunakan(): void
     {
         $guru = new \App\Services\PraSemesterWordService(
