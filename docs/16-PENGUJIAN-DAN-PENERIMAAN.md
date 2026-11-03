@@ -351,3 +351,12 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 5. Fullscreen/koneksi melampaui batas → **Pra-Semester dibatalkan**, tidak memberi skor; siswa yang dibatalkan maupun tidak hadir hanya mendapat akses ketika Admin menjadwalkan susulan khusus peserta tersebut. Susulan batal lagi → jadwal baru dengan audit; remedial yang batal → susulan remedial, bukan jatah tambahan.
 6. Setelah mulai, ujian memiliki timer individual, jawaban tersimpan server dan dapat pulih saat gangguan sah; race condition start bersamaan tidak membuat dua attempt aktif. Semua keputusan/riwayat tersimpan; tidak ada reset data siswa.
 7. UI normal/kosong/locked/sukses/gagal, desktop/laptop fullscreen, aksesibilitas dan kebocoran kunci; hak Guru G1, Admin, Siswa dan Pimpinan tidak saling melintas.
+
+
+### QA A8-4 kebijakan remedial/susulan (3 November 2026)
+- Sebelum ada attempt: normal hanya pada jadwal utama; **tidak hadir** boleh masuk susulan normal bila Admin menetapkan peserta; selain itu ditolak.
+- Normal selesai sah ≥KKM: nilai final, tidak ada remedial. Normal sah <KKM: nilai sementara, satu remedial sah pada jadwal Admin; nilai terbaik menjadi final setelah remedial selesai sah.
+- Normal dibatalkan sekali/berulang: skor NULL, **susulan normal** terjadwal untuk peserta ditunjuk; tidak memakai jadwal utama lagi atau memberi skor palsu. Remedial dibatalkan: nilai normal tetap utuh, **susulan remedial** dan bukan kesempatan remedial kedua.
+- `0.00` adalah nilai sah, tidak dianggap kosong. KKM berubah antarattempt, dua normal sah, remedial tanpa normal sah, attempt dibatalkan tetapi ada skor → ditolak oleh domain service.
+- Percobaan masih berjalan/jeda boleh dilanjutkan dengan token sama setelah jendela boleh mulai ditutup. Jendela mulai baru tidak mengubah timer individual yang sedang berjalan.
+- Regresi otomatis: `tests/unit/PraSemesterRemedialSusulanTest.php` melalui QA A8/S06A. Tes integrasi DB, role, jadwal susulan dan remedial **masih diperlukan** setelah ada dump XAMPP pascapatch terakhir, bukan dinyatakan PASS berdasarkan unit test saja.
