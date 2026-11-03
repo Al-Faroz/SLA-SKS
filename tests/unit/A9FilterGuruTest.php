@@ -126,7 +126,7 @@ final class A9FilterGuruTest extends TestCase
         ]);
         self::assertSame(1,$resume['total']);
         self::assertSame('resume',$resume['baris'][0]['jenis']);
-        self::assertArrayNotHasKey('kemiripan',$resume['baris'][0]);
+        self::assertArrayHasKey('kemiripan',$resume['baris'][0]);
         $hots=$svc->antrean($this->pilihan()+[
             'semester'=>5,'bab'=>52,'jenis'=>'hots',
         ]);
