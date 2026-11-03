@@ -18,18 +18,20 @@
     <h2 id="judul-status">Akun Anda sudah aktif</h2>
     <p>Anda sedang menggunakan peran <strong><?= esc($peranAktif) ?></strong>. Sistem memeriksa peran aktif Anda pada server setiap kali membuka halaman yang dilindungi.</p>
     <?php if ($peran === 'guru'): ?>
-        <p class="a-help">Peta ATP enam semester sudah tersedia sebagai tampilan baca-saja. Impor ATP, editor Materi, bank soal dan penilaian masih dalam pengembangan.</p>
+        <p class="a-help">Gunakan Peta ATP, Antrean Penilaian, Pra-Semester dan Rekap Nilai untuk menjalankan tugas Guru pada Gen–Mapel yang diampu.</p>
     <?php elseif ($peran === 'siswa'): ?>
-        <p class="a-help">Mata pelajaran, semester, dan rincian TP Siap sudah dapat ditinjau.
-            Ujian Diagnostik, progres belajar, dan pengiriman Resume/HOTS masih dalam pengembangan;
-            tidak ada penilaian atau progres yang dibuat melalui halaman ini.</p>
+        <p class="a-help">Buka Pembelajaran untuk mengikuti TP sesuai urutan, kemudian Laporan Akademik untuk memantau progres dan nilai milik Anda. Hasil Pra-Semester ditampilkan terpisah dari Nilai TP.</p>
+    <?php elseif ($peran === 'pimpinan'): ?>
+        <p class="a-help">Gunakan Monitoring Akademik untuk meninjau progres TP NonEsensial dan hasil siswa pada Gen–Mapel–Semester yang ditugaskan. Semua laporan bersifat baca-saja.</p>
     <?php else: ?>
-        <p class="a-help">Modul pembelajaran, penilaian, dan laporan akan ditambahkan setelah fondasi data masing-masing selesai. Menu yang belum tersedia tidak ditampilkan.</p>
+        <p class="a-help">Akses layanan akademik tersedia melalui menu sesuai peran aktif.</p>
     <?php endif ?>
     <?php if ($peran === 'guru'): ?>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Lihat peta ATP</a>
     <?php elseif ($peran === 'siswa'): ?>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('siswa/pembelajaran'), 'attr') ?>">Lihat mata pelajaran</a>
+    <?php elseif ($peran === 'pimpinan'): ?>
+        <a class="a-btn a-btn--utama" href="<?= esc(site_url('pimpinan/laporan'), 'attr') ?>">Buka Monitoring Akademik</a>
     <?php else: ?>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('profil'), 'attr') ?>">Lihat profil dan peran</a>
     <?php endif ?>
