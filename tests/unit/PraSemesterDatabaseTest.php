@@ -236,7 +236,7 @@ final class PraSemesterDatabaseTest extends TestCase
         self::assertSame('menunggu_remedial',$mesin->ruang(11)['fase']);
         self::assertFalse($mesin->ruang(11)['boleh_mulai']);
 
-        $this->expectException(\\DomainException::class);
+        $this->expectException(\DomainException::class);
         $mesin->mulai(11,true,true); // tidak membuka remedial sendiri
     }
 
@@ -250,7 +250,7 @@ final class PraSemesterDatabaseTest extends TestCase
         self::assertFalse($ctx['gerbang']['tp']['siap']);
         self::assertFalse((new MesinPraSemesterSiswaService(
             $this->db,$this->actor('siswa',100)))->ruang(11)['boleh_mulai']);
-        $this->expectException(\\DomainException::class);
+        $this->expectException(\DomainException::class);
         (new MesinPraSemesterSiswaService(
             $this->db,$this->actor('siswa',100)))->mulai(11,true,true);
     }
