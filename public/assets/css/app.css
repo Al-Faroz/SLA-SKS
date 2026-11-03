@@ -2956,3 +2956,76 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
         justify-self:stretch;
     }
 }
+
+/* A13-1 — Pusat Bantuan per peran; panduan baca-saja, tanpa widget eksternal. */
+.a-bantuan__pengenalan {
+    display:flex;
+    gap:18px;
+    align-items:center;
+    justify-content:space-between;
+}
+.a-bantuan__pengenalan > div {min-width:0;}
+.a-bantuan__pengenalan > .a-btn {flex-shrink:0;}
+.a-bantuan__pengenalan h2 {margin:0 0 8px;font-size:1.13rem;}
+.a-bantuan__kelompok {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:start;
+    gap:16px;
+}
+.a-bantuan__panel {min-width:0;}
+.a-bantuan__panel > h2 {margin:0 0 8px;font-size:1.13rem;}
+.a-bantuan__panel:last-child:nth-child(odd) {grid-column:1/-1;}
+.a-bantuan__pertanyaan {display:grid;gap:10px;margin-top:15px;}
+.a-bantuan__butir {
+    min-width:0;
+    border:1px solid var(--eg-line,rgba(112,164,139,.38));
+    border-radius:12px;
+    background:var(--eg-pane-soft,rgba(73,159,125,.06));
+    overflow:hidden;
+}
+.a-bantuan__butir > summary {
+    position:relative;
+    padding:14px 16px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:.9rem;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+}
+.a-bantuan__butir > summary:hover {
+    background:rgba(77,184,136,.10);
+}
+.a-bantuan__butir > summary:focus-visible {
+    outline:3px solid var(--eg-focus,#44c6a1);
+    outline-offset:-3px;
+}
+.a-bantuan__butir[open] > summary {
+    border-bottom:1px solid var(--eg-line,rgba(112,164,139,.38));
+}
+.a-bantuan__jawaban {padding:12px 16px 16px;}
+.a-bantuan__jawaban p {
+    margin:0 0 14px;
+    font-size:.88rem;
+    line-height:1.7;
+    overflow-wrap:anywhere;
+}
+.a-bantuan__jawaban .a-btn {
+    display:inline-flex;
+    max-width:100%;
+    min-height:42px;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    white-space:normal;
+}
+@media(max-width:900px) {
+    .a-bantuan__kelompok {grid-template-columns:minmax(0,1fr);}
+    .a-bantuan__panel:last-child:nth-child(odd) {grid-column:auto;}
+}
+@media(max-width:620px) {
+    .a-bantuan__pengenalan {flex-direction:column;align-items:stretch;}
+    .a-bantuan__pengenalan > .a-btn {align-self:flex-start;}
+    .a-bantuan__butir > summary {padding:14px;}
+    .a-bantuan__jawaban {padding:12px 14px 15px;}
+}

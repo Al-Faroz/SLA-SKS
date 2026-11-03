@@ -401,3 +401,15 @@ Area yang diperiksa: Dashboard Admin, Pengelola, Siswa, reset sandi, Gen & Tahun
 Screenshot terbaru membuktikan daftar Pengelola/Siswa sekarang memakai form dan tabel **lebar penuh** dengan Dark Mode yang konsisten. Catatan perapian tersisa: pilihan peran Admin/Guru/Pimpinan terlalu tinggi dalam fieldset, tombol Buat Akun terletak di samping input Sandi, Gen & Tahun Ajaran memakai dua baris grid bersama sehingga Daftar Tahun Ajaran turun mengikuti tinggi form Gen, Identitas Madrasah hanya memakai sebagian ruang desktop, dan panel Foto Profil menempatkan pratinjau kecil sendirian di sisi kiri dengan area kosong luas.
 
 Solusi UI: tiga pilihan peran sejajar pada desktop dan satu kolom HP, tombol Buat Akun ditempatkan setelah semua field pada baris sendiri. Setiap kolom halaman Gen & Tahun Ajaran menyusun **form di atas daftar miliknya sendiri**, agar tabel Tahun tidak tertahan form Gen. Identitas resmi memakai dua kolom input singkat pada desktop, alamat textarea selebar panel dan tombol di bawah. Profil Guru/Admin/Pimpinan menata foto + petunjuk/unggah berdampingan pada desktop, tetap satu kolom HP. **Tidak mengubah alur Persetujuan Foto, data akun, hak peran, nilai, atau kelengkapan identitas resmi.**
+
+### A13-1 — Pusat Bantuan: panduan penggunaan berbasis peran (3 November 2026)
+
+Menu `Bantuan` telah ditambahkan sebelum `Profil & peran` dalam navigasi **Admin, Guru, Siswa, Pimpinan**. GET `/bantuan` login-only dengan 403 untuk peran invalid; tombol kembali menuju Beranda peran aktif. Konten berupa kelompok topik dan tanya-jawab dari aturan Master, dibuka melalui elemen native `details/summary`, satu pertanyaan pertama terbuka sebagai orientasi. Semua tautan menuju halaman GET yang benar-benar tersedia dan tetap memeriksa izin di server.
+
+- Siswa: membuka Mapel/Semester/TP, konsekuensi Diagnostik lulus/tidak lulus, Sumatif wajib, permintaan akses ulang, nilai TP & Pra-Semester terpisah, sertifikat tanpa syarat Pra.
+- Guru: Gen–Mapel G1, satu Materi per TP, kebijakan sunting TP Siap belum digunakan, antrean Resume/HOTS, izin akses ulang, Rekap TP terpisah dari Pra.
+- Admin: akun Pengelola, Gen–Mapel G1, jadwal Pra utama/remedial/susulan, KKM dan sertifikat.
+- Pimpinan: monitoring/laporan baca-saja, bukan perubahan nilai.
+- Semua role: ganti sandi; pergantian peran hanya muncul pada panduan staf (tidak untuk Siswa).
+
+Pusat Bantuan ini **belum** merupakan FAQ resmi terkelola Admin, Pengumuman global, notifikasi per pengguna, atau Hubungi Admin dengan data kontak; jangan mengklaim U03/U04/U05 lengkap. Halaman tidak menulis data, tidak mengirim email/WhatsApp dan tidak tampil sebagai pop-up saat ujian berlangsung. Tampilkan normal, fokus keyboard, state klik detail, serta layout Dark/Light/HP. Uji peran dan tautan secara otomatis serta XAMPP manual.

@@ -609,3 +609,20 @@ Tes otomatis `AdminUiAuditTest.php` memeriksa keberadaan token dan struktur HTML
 | A12-425 | Profil Siswa, multi-peran, unggah foto | Akses profil Siswa tidak menampilkan upload staf; proses upload tetap meminta persetujuan Admin, ganti sandi/peran tidak berubah |
 
 Regresi statis PHP menegaskan struktur form/CSRF/elemen CSS, sedangkan screenshot XAMPP Dark/Light dan mobile tetap diperlukan sebelum FIX. Tidak ada perubahan SQL atau penyimpanan data.
+
+### A13-1 — QA Pusat Bantuan peran (3 November 2026)
+
+| ID | Skenario | Kriteria PASS |
+|---|---|---|
+| A13-101 | Admin, Guru, Siswa, Pimpinan aktif login membuka `/bantuan` | Panduan sesuai role aktif, navigasi dan tombol kembali ke beranda sendiri |
+| A13-102 | Pengunjung belum login | AuthFilter mengarahkan login; tidak menampilkan panduan tanpa autentikasi |
+| A13-103 | Sandi sementara belum diganti, akun tidak aktif, peran tidak dikenal | Ditolak/diarahkan oleh pemeriksaan otorisasi sebelum render |
+| A13-104 | Siswa membuka Bantuan | Tidak ada tautan `admin/` atau `guru/`; hanya `siswa/` dan Profil |
+| A13-105 | Staf multi-peran sedang Guru/Pimpinan | Tidak mendapat tautan peran lain sampai ganti peran melalui Profil |
+| A13-106 | Pimpinan membuka panduan | Hanya Monitoring baca-saja dan Profil, tidak ada tombol menulis nilai/jadwal |
+| A13-107 | Seluruh tombol panduan | Semua target GET terdaftar di Routes, akses tetap dicek lagi pada target |
+| A13-108 | Isi akademik Siswa | Diagnostik hanya gerbang, Sumatif wajib, akses ulang bukan remedial, Pra-Semester tidak syarat/cetak sertifikat |
+| A13-109 | Render judul/jawaban dan `path` | Di-escape; tidak ada token/kunci/identitas siswa, tidak ada POST ataupun database baru |
+| A13-110 | Reload dan navigasi, Dark/Light, lebar 360/390/768/1100px | Detail/summary bekerja dengan mouse/keyboard tanpa JS, tidak mengubah status akademik |
+
+Workflow `QA A13-1 Pusat Bantuan Peran` menjalankan PHP lint dan `tests/unit/PanduanBantuanServiceTest.php` serta regresi UI Admin. **Pengumuman, FAQ terkelola Admin, Notifikasi internal, dan Hubungi Admin belum termasuk A13-1** karena perubahan SQL dan sumber resmi harus diverifikasi pada dump XAMPP terbaru menurut AGENTS. Belum ada E2E browser otomatis; uji XAMPP manual tetap wajib untuk FIX.
