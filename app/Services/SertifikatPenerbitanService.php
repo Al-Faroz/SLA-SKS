@@ -254,7 +254,20 @@ final class SertifikatPenerbitanService
             $terkini=$this->aktif($sid,$pid);
             if (($terkini['id']??null)!==($r['lama']['id']??null)
                 || ($terkini['konten_sha256']??null)!==($r['lama']['konten_sha256']??null)) {
+                // Permintaan identik dari tab ganda tetap idempoten;
+                // tidak menerbitkan versi baru, tidak menyimpan PDF duplikat.
+                if (!$revisi && $terkini!==null
+                    && hash_equals((string)$terkini['konten_sha256'],$r['konten_sha256'])) {
+                    $this->db->transRollback();
+                    @unlink($r['path']);
+                    return $terkini;
+                }
                 throw new DomainException('Versi sertifikat berubah. Muat ulang halaman.');
+            }
+            $asetAktif=(new SertifikatAsetService($this->db,$this->akun))->aktif();
+            if ((int)($asetAktif['ttd']['id']??0)!==$r['ttd_id']
+                || (!$revisi && ($asetAktif['background']['id']??null)!==$r['background_id'])) {
+                throw new DomainException('Template atau TTD aktif berubah; ulangi penerbitan.');
             }
             $cek=(new KelayakanSertifikatService($this->db,$this->akun))
                 ->periksaSiswa($sid,$pid);
