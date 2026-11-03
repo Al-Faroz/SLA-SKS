@@ -16,6 +16,8 @@ final class NavigasiService
         if ($peran === 'siswa') {
             $menu[] = ['label' => 'Pembelajaran', 'path' => 'siswa/pembelajaran',
                 'aktif' => $aktif === 'pembelajaran'];
+            $menu[] = ['label' => 'Laporan Akademik', 'path' => 'siswa/laporan',
+                'aktif' => $aktif === 'laporan'];
         }
         if ($peran === 'guru') {
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
