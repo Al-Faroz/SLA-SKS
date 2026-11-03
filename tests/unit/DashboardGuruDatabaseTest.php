@@ -179,10 +179,12 @@ final class DashboardGuruDatabaseTest extends TestCase
         }
     }
 
-    public function testPenggantianPenugasanLangsungMencabutAkses(): void
+    public function testPenggantianPenugasanTidakMembukaDataGuruSebelumnya(): void
     {
         $this->db->table('penugasan_guru_gen')->where('id',1)->update(['guru_id'=>88]);
-        $this->expectException(\DomainException::class);
-        $this->servis()->ringkasan(0);
+        $data=$this->servis()->ringkasan(0);
+        self::assertSame([], $data['pilihan']);
+        self::assertSame([], $data['baris']);
+        self::assertNull($data['terpilih']);
     }
 }
