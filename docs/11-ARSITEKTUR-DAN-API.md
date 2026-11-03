@@ -111,3 +111,9 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 4. **Race condition**: pada POST, lock/validasi ulang dalam transaksi terhadap kemungkinan siswa baru mulai, dan jangan terbitkan snapshot lama sesudah perubahan sudah commit. Seluruh simpan harus idempoten jika isian sama; perubahan gagal ditolak tanpa partial update.
 5. **TP yang sudah digunakan siswa**: tidak ada operasi perubahan konten, termasuk melalui pengajuan koreksi kategori A/B/C atau admin approval; proteksi semua rute, termasuk rute historis yang sudah ditambahkan pada branch sebelumnya. Koreksi **nilai siswa** adalah domain terpisah.
 6. **Transisi implementasi**: aplikasi/SQL `permohonan_koreksi_tp` kategori A/B/C yang telanjur dibangun harus dibersihkan/dinonaktifkan di tahap kode. Jangan menghapus tabel historis jika telah diimpor; ikuti audit dan izin pemilik.
+
+
+### Implementasi A8 — peran dan batas jadwal (3 November 2026)
+- `AturanPraSemesterService` adalah validator murni kelayakan seluruh TP NonEsensial, bank soal minimal 30/cakupan BAB, dan jendela **boleh mulai** (WIB); jangan mengubahnya menjadi timer global peserta.
+- `PraSemesterGuruService` menangani bank Guru G1 dan KKM paket. `PraSemesterJadwalService` menangani jadwal dan durasi paket hanya untuk Admin. Adapter mesin berikutnya mengunci percobaan, membuat waktu aktif masing-masing saat mulai, dan tidak memotong durasi ketika jadwal masuk berakhir.
+- Tahap susulan/remedial hanya boleh diaktifkan setelah skema jadwal per sesi dan daftar peserta ada, dengan audit, otorisasi dan izin mulai sesuai jadwal Admin; tidak boleh meminjam izin akses ulang Diagnostik/Sumatif.
