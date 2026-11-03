@@ -563,3 +563,21 @@ Pengujian otomatis `tests/unit/DashboardSiswaDatabaseTest.php` menggunakan SQLit
 | A12-317 | Nama akun mengandung teks "Diagnostik Dibatalkan" namun progres tidak `perlu_bantuan` | KPI bantuan tetap mengikuti data progres server, bukan membaca nama akun atau asumsi dari screenshot |
 
 Regresi A12-3 wajib memverifikasi bahwa penambahan metadata TP tujuan **tidak melonggarkan hak akses** dan tidak memodifikasi nilai/progres siswa. QA visual XAMPP tetap diperlukan untuk menyatakan revisi UI ini FIX.
+
+### A12-4 — QA Dashboard Admin dan indikator kesehatan yang jujur (3 November 2026)
+
+| ID | Uji | Hasil wajib |
+|---|---|---|
+| A12-401 | Akun/Admin aktif membuka `/admin` | Empat KPI referensi, tautan akses cepat, enam KPI operasional dan panel perhatian tampil |
+| A12-402 | 2 Gen × 2 Mapel, 2 pasangan G1 terisi | KPI terisi 2, belum 2; tidak mengubah penugasan |
+| A12-403 | Akun aktif/nonaktif dan siswa terdaftar | Hitungan akun aktif berbeda dari siswa terdaftar, tidak menampilkan biodata |
+| A12-404 | TP Siap, Draf, Arsip | Hanya status Siap dan Draf dihitung sesuai kolom masing-masing |
+| A12-405 | Dua foto menunggu tetapi hanya satu ditunjuk profil | Antrean persetujuan = 1; foto historis tidak digandakan |
+| A12-406 | Sertifikat berlaku dan digantikan | Hanya versi berlaku pada `sertifikat_aktif` yang dihitung |
+| A12-407 | TTD belum aktif, hilang, checksum rusak, valid | Status jelas belum/bermasalah/siap; tanpa path/SHA berkas privat pada HTML |
+| A12-408 | Disk tidak dapat dibaca, cron dan backup tidak mempunyai sumber status | Tidak menampilkan sehat palsu; cron/backup tetap belum diperiksa |
+| A12-409 | Admin nonaktif/role Guru/Siswa/Pimpinan mengakses service | Ditolak, tanpa data agregat |
+| A12-410 | Reload Dashboard Admin dan tautan aksi | Tidak mengubah foto, nilai, progres, sertifikat, penugasan |
+| A12-411 | UI laptop, HP 360/390px, Dark/Light, Dokumentasi | Grid, angka, teks tindakan, alert dan shortcut responsif; tidak bertumpuk |
+
+GitHub Actions `QA A12-4 Dashboard Admin` memakai SQLite anonim + lint + regresi Dashboard Pimpinan. Uji visual angka pada XAMPP tetap wajib. Tidak ada migrasi, seeder atau SQL pembaruan.
