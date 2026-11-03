@@ -173,3 +173,19 @@ Pra-Semester tetap di `/siswa/laporan`, terpisah dari kemajuan TP dan sertifikat
 `GET /bantuan` memakai filter `auth`; Controller `Bantuan::index` melakukan verifikasi ulang `AuthService::penggunaSaatIni()` untuk akun aktif, peran sah dan sandi awal sudah diganti. `PanduanBantuanService::untukPeran($peran)` mengembalikan katalog tetap FAQ penggunaan per peran berupa tanya/jawab serta `path` GET yang telah ada, dan menolak peran tidak dikenal. View `bantuan/index.php` memakai `details/summary` native, `esc()`, navigasi dari `NavigasiService` dan respons private/no-store. Tidak ada tabel, query baru, notifikasi, event, POST, upload, atau perubahan log. Isi petunjuk berasal dari Master akademik v2.5, **tidak menjadi teks FAQ resmi sekolah yang Admin dapat ubah**.
 
 Model `FaqService` terkelola, `PengumumanService`, `NotifikasiService`, `Hubungi Admin` dengan kontak sekolah resmi dan Kebijakan Privasi berversi tetap memerlukan implementasi terpisah. Sebelum merancang SQL/kolom/indeks, gerbang AGENTS.md mengharuskan dump XAMPP terbaru sesudah patch terakhir; jangan menulis skema berdasarkan asumsi.
+
+### A13-2 — Informasi global terkelola (3 November 2026)
+
+Database dari dump XAMPP 03-11-2026 16.02 (MariaDB 10.4.32) dinyatakan belum memiliki `pengumuman`, `faq`, `riwayat_informasi`. SQL additive `V4-0012_PENGUMUMAN_FAQ.sql` membuat ketiganya dengan FK pengguna; `schema_version` menandai `V4-0012-PENGUMUMAN-FAQ`.
+
+`InformasiGlobalService` mengelola daftar, baca, tambah, ubah dan arsip. Akses baca dan tulis selalu diperiksa ulang lewat `AuthService` dan role aktif. `daftar('pengumuman'|'faq',false)` hanya mengembalikan `status=terbit`; daftar kelola Guru dibatasi `dibuat_oleh`; Admin dapat mengelola semua. Update memakai row lock MySQL `FOR UPDATE`, nomor `versi` untuk menghindari stale POST, transaksi database dan audit `riwayat_informasi` serta `log_aktivitas` dalam transaksi yang sama. Tidak memakai cron, worker, email/WhatsApp, event notifikasi atau penyaringan Gen/role.
+
+| Method | Rute | Akses |
+|---|---|---|
+| GET | `/pengumuman` | Seluruh login, hanya Terbit |
+| GET | `/bantuan` | Seluruh login, panduan A13-1 + FAQ resmi Terbit |
+| GET/POST | `/admin/pengumuman`, `/admin/pengumuman/tambah`, `/admin/pengumuman/{id}/sunting`, POST `.../{id}/arsip` | Admin |
+| GET/POST | `/guru/pengumuman`, `/guru/pengumuman/tambah`, `/guru/pengumuman/{id}/sunting`, POST `.../{id}/arsip` | Guru, hanya Pengumuman miliknya |
+| GET/POST | `/admin/faq`, `/admin/faq/tambah`, `/admin/faq/{id}/sunting`, POST `.../{id}/arsip` | Admin |
+
+Rute GET daftar kelola baca saja; simpan dan arsip memakai POST + CSRF global. Arsip terminal, tidak ada hard DELETE, HTML input disimpan plain text dan selalu `esc()` pada View. Untuk A13-2, `NotifikasiService` internal belum diimplementasikan; jangan mengklaim penerbitan Pengumuman memicu notifikasi atau badge unread.
