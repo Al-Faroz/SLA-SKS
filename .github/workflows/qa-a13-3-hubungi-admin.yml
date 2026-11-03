@@ -7,9 +7,11 @@ on:
       - 'app/Controllers/HubungiAdmin.php'
       - 'app/Views/bantuan/hubungi_admin.php'
       - 'app/Views/bantuan/index.php'
+      - 'app/Views/layouts/panel.php'
       - 'app/Services/NavigasiService.php'
       - 'app/Config/Routes.php'
       - 'tests/unit/KontakResmiMadrasahServiceTest.php'
+      - 'tests/unit/PanduanBantuanServiceTest.php'
       - '.github/workflows/qa-a13-3-hubungi-admin.yml'
   workflow_dispatch:
 
@@ -36,9 +38,11 @@ jobs:
                    app/Controllers/HubungiAdmin.php \
                    app/Views/bantuan/hubungi_admin.php \
                    app/Views/bantuan/index.php \
+                   app/Views/layouts/panel.php \
                    app/Services/NavigasiService.php \
                    app/Config/Routes.php \
-                   tests/unit/KontakResmiMadrasahServiceTest.php; do
+                   tests/unit/KontakResmiMadrasahServiceTest.php \
+                   tests/unit/PanduanBantuanServiceTest.php; do
             php -l "$f"
           done
       - name: Uji kontak resmi dan perlindungan data
