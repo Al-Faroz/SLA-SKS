@@ -25,8 +25,16 @@ final class NavigasiService
                 'aktif' => $aktif === 'pra_semester'];
             $menu[] = ['label' => 'Permintaan Akses Ulang', 'path' => 'guru/akses-ulang',
                 'aktif' => $aktif === 'ujian_batal'];
-            $menu[] = ['label' => 'Rekap Nilai TP', 'path' => 'guru/rekap-nilai',
-                'aktif' => $aktif === 'rekap_nilai'];
+            $menu[] = [
+                'label'=>'Rekap Nilai',
+                'aktif'=>in_array($aktif,['rekap_nilai','rekap_pra_semester'],true),
+                'submenu'=>[
+                    ['label'=>'Nilai TP','path'=>'guru/rekap-nilai',
+                        'aktif'=>$aktif === 'rekap_nilai'],
+                    ['label'=>'Nilai Pra-Semester','path'=>'guru/rekap-nilai/pra-semester',
+                        'aktif'=>$aktif === 'rekap_pra_semester'],
+                ],
+            ];
         }
         if ($peran === 'admin') {
             foreach ([
