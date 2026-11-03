@@ -386,3 +386,9 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 3. Jika skor normal <KKM, nilai sementara dan menunggu jadwal remedial yang resmi. Siswa tidak boleh membuat percobaan kedua di luar jadwal Admin. Kelayakan TP palsu (status `tuntas` tanpa Sumatif sah) tetap menolak percobaan.
 4. Jendela utama dalam dump audit 3 Nov 2026: **15 Desember 2026 pukul 09.00–11.00 WIB**, durasi per siswa 60 menit. Saat audit tidak ada attempt Pra-Semester; **uji browser aktual belum PASS** dan tidak boleh diakali dengan mengubah SQL/histori diam-diam. Skenario otomatis memakai jam sintetis; pengujian XAMPP memerlukan jadwal yang benar-benar aktif menurut Admin.
 5. Uji susulan/remedial yang sudah ada tetap dijalankan; tidak menambah aturan sertifikat/rekap semester.
+
+### A8-9 — Regresi lanjutan mesin Siswa (3 November 2026)
+
+- Setelah pengguna menyatakan PASS pada tampilan/status Pra-Semester Siswa A8-8, jalankan regresi integrasi SQLite sintetis tanpa menulis histori XAMPP: (1) siswa yang sudah memulai tetap melanjutkan token, menjawab, dan mengirim setelah jendela **boleh mulai** Admin ditutup; tidak tercipta attempt kedua; (2) token siswa A harus ditolak oleh siswa B pada paket Gen yang sama untuk status, jawab, dan kirim; (3) siswa tidak hadir baru boleh mengikuti susulan normal setelah ditetapkan sebagai peserta oleh Admin, tanpa membuat skor palsu untuk jadwal utama.
+- Kasus ada di `tests/unit/PraSemesterDatabaseTest.php` dan dijalankan melalui workflow `qa-a8-pra-semester.yml`. Status PASS otomatis harus berdasarkan hasil Actions, bukan hanya adanya tes dalam GitHub.
+- Pengujian browser pengerjaan soal, fullscreen, timer, pembatalan, dan remedial/susulan masih memerlukan siswa uji yang memenuhi seluruh TP serta jadwal aktif yang sah. Dilarang melewati gerbang dengan UPDATE progres siswa atau mengubah jadwal resmi tanpa persetujuan.

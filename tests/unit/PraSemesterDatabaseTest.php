@@ -429,6 +429,105 @@ final class PraSemesterDatabaseTest extends TestCase
             $d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'45');
     }
 
+
+    /**
+     * Jendela utama hanya membatasi klik Mulai BARU. Attempt yang sudah
+     * berjalan tidak boleh hilang ketika jadwal Admin berakhir.
+     */
+    public function testPercobaanBerjalanDapatDilanjutkanSetelahJendelaUtamaTutup(): void
+    {
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $token = $mesin->mulai(11,true,true)['token'];
+        $wib = new DateTimeImmutable('now',new DateTimeZone('Asia/Jakarta'));
+        $this->db->table('ujian_pra_semester')->where('id',51)->update([
+            'mulai_pada'=>$wib->modify('-2 hours')->format('Y-m-d H:i:s'),
+            'selesai_pada'=>$wib->modify('-1 hour')->format('Y-m-d H:i:s'),
+        ]);
+
+        $ruang = $mesin->ruang(11);
+        self::assertSame('sedang_ujian',$ruang['fase']);
+        self::assertTrue($ruang['boleh_mulai']); // berarti boleh lanjut, bukan attempt baru
+        self::assertSame($token,$ruang['token_mulai']);
+        $ulang = $mesin->mulai(11,true,true);
+        self::assertTrue($ulang['sudah_ada']);
+        self::assertSame($token,$ulang['token']);
+        $status = $mesin->status(11,$token);
+        self::assertSame('berjalan',$status['status']);
+        self::assertCount(30,$status['soal']);
+
+        $butirId = (int)$status['soal'][0]['id'];
+        self::assertTrue($mesin->jawab(11,$token,$butirId,'A')['tersimpan']);
+        self::assertSame('selesai_sah',
+            $mesin->tindakan(11,$token,'kirim',true)['status']);
+        self::assertSame(1,$this->db->table('percobaan_ujian')
+            ->where('jenis','pra_semester')->countAllResults());
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+    }
+
+    /** Token tidak boleh membuka status, jawaban maupun kirim milik siswa lain. */
+    public function testTokenSiswaLainTidakBisaDigunakanWalauPaketSama(): void
+    {
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $token = $mesin->mulai(11,true,true)['token'];
+        $butir = $mesin->status(11,$token)['soal'][0]['id'];
+        $this->db->table('pengguna')->insert([
+            'id'=>200,'nama'=>'Siswa Simulasi Kedua','status'=>'aktif',
+        ]);
+        $this->db->table('siswa')->insert([
+            'id'=>2,'pengguna_id'=>200,'angkatan_id'=>1,'semester_mulai'=>4,
+        ]);
+        $lain = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',200));
+
+        foreach ([
+            static fn () => $lain->status(11,$token),
+            static fn () => $lain->jawab(11,$token,(int)$butir,'A'),
+            static fn () => $lain->tindakan(11,$token,'kirim',true),
+        ] as $aksi) {
+            try {
+                $aksi();
+                self::fail('Token siswa lain seharusnya ditolak.');
+            } catch (DomainException $e) {
+                self::assertStringContainsString('bukan milik',$e->getMessage());
+            }
+        }
+        self::assertSame('berjalan',$mesin->status(11,$token)['status']);
+        self::assertSame(0,$this->db->table('jawaban_percobaan')->countAllResults());
+    }
+
+    /**
+     * Siswa tidak hadir hanya bisa ikut susulan normal yang pesertanya
+     * ditetapkan Admin; tidak menghasilkan kesempatan normal ganda.
+     */
+    public function testSiswaTidakHadirMemerlukanPenetapanPesertaSusulan(): void
+    {
+        $wib = new DateTimeImmutable('now',new DateTimeZone('Asia/Jakarta'));
+        $this->db->table('ujian_pra_semester')->where('id',51)->update([
+            'mulai_pada'=>$wib->modify('-3 days')->format('Y-m-d H:i:s'),
+            'selesai_pada'=>$wib->modify('-2 days')->format('Y-m-d H:i:s'),
+        ]);
+        $sesiId = $this->jadwalTambahanAktif('susulan','normal');
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+        self::assertSame(0,$this->db->table('percobaan_ujian')
+            ->where('jenis','pra_semester')->countAllResults());
+
+        $this->db->table('peserta_pra_susulan')->insert([
+            'jadwal_pra_sesi_id'=>$sesiId,'siswa_id'=>1,
+            'ditetapkan_oleh'=>1,'ditetapkan_pada'=>gmdate('Y-m-d H:i:s'),
+        ]);
+        self::assertTrue($mesin->ruang(11)['boleh_mulai']);
+        $mulai = $mesin->mulai(11,true,true);
+        self::assertSame('normal',$mulai['tahap']);
+        $percobaan = $this->db->table('percobaan_ujian')
+            ->where('token_publik',$mulai['token'])->get()->getRowArray();
+        self::assertSame(1,(int)$percobaan['nomor_percobaan']);
+        self::assertSame($sesiId,(int)$percobaan['jadwal_pra_sesi_id']);
+        self::assertSame('selesai_sah',
+            $mesin->tindakan(11,$mulai['token'],'kirim',true)['status']);
+        self::assertSame(0.0,$mesin->ruang(11)['nilai_terbaik']);
+        self::assertSame('menunggu_remedial',$mesin->ruang(11)['fase']);
+    }
+
     public function testWordPraSemesterImporAppendDanIdempotenDenganSiswaBelumMenggunakan(): void
     {
         $guru = new \App\Services\PraSemesterWordService(

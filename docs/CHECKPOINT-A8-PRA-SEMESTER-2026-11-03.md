@@ -72,3 +72,9 @@
 - Tahap berikutnya: uji XAMPP oleh pemilik menggunakan jadwal valid, akun siswa berhak dan tidak berhak, lalu susulan/remedial sesuai jadwal Admin. Ekspor nilai Guru menyusul setelah alur siswa terverifikasi.
 
 - **Temuan gerbang khusus Paket ID 1:** terdapat dua TP NonEsensial wajib (TP ID 23 dan 25). Pada dump terbaru, terdapat 11 baris progres TP ID 23 dan **nol progres TP ID 25**. Karena itu tidak ada siswa pada snapshot ini yang memenuhi gerbang **seluruh** TP wajib selesai, terlepas dari kesiapan bank/jadwal. Uji klik Mulai yang berhasil di XAMPP memerlukan penyelesaian sah TP ID 25 melalui aplikasi sesuai jalur belajar (bukan INSERT/UPDATE progres dummy, bypass service, atau reset histori). **Ini blocker data pengujian, bukan alasan melonggarkan kebijakan akademik.**
+
+### A8-9 — Tambahan regresi mesin Siswa (3 November 2026)
+
+- Laporan pengguna: pemeriksaan UI/gerbang Pra-Semester Siswa pada branch A8-8 **PASS**. PASS tersebut bukan klaim bahwa ujian browser sudah berhasil dikerjakan atau remedial sudah diuji di XAMPP.
+- Branch lanjutan `feature/v25-a8-9-qa-mesin-siswa-20261103` menambah 3 skenario integrasi SQLite untuk token silang-siswa, lanjut attempt saat jendela Admin tutup, dan susulan normal setelah siswa absen ditetapkan Admin. Tidak mengubah SQL, data siswa, jadwal ujian, atau layanan produksi.
+- QA CI melalui PR terpisah, belum boleh dianggap PASS sebelum workflow berhasil. Setelah QA otomatis PASS, uji browser menggunakan jadwal uji yang sah dan siswa simulasi yang telah menuntaskan TP NonEsensial secara normal. Ekspor nilai Pra-Semester dan sertifikat belum dikerjakan pada A8-9.
