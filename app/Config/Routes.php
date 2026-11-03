@@ -74,6 +74,15 @@ $routes->post('guru/akses-ulang/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' 
 $routes->get('guru/ujian-batal', 'GuruUjianBatal::index', ['filter' => 'auth:guru']);
 $routes->get('guru/ujian-batal/(:num)', 'GuruUjianBatal::index/$1', ['filter' => 'auth:guru']);
 $routes->post('guru/ujian-batal/(:num)', 'GuruUjianBatal::simpan/$1', ['filter' => 'auth:guru']);
+// A8: Bank Pra-Semester milik Guru G1, jadwal per paket oleh Admin.
+$routes->get('guru/pra-semester', 'GuruPraSemester::index', ['filter' => 'auth:guru']);
+$routes->get('guru/pra-semester/(:num)', 'GuruPraSemester::index/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/soal', 'GuruPraSemester::simpanSoal/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/soal/(:num)/status', 'GuruPraSemester::statusSoal/$1/$2', ['filter' => 'auth:guru']);
+$routes->post('guru/pra-semester/(:num)/kkm', 'GuruPraSemester::simpanKkm/$1', ['filter' => 'auth:guru']);
+$routes->get('admin/pra-semester', 'AdminPraSemester::index', ['filter' => 'auth:admin']);
+$routes->get('admin/pra-semester/(:num)', 'AdminPraSemester::index/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pra-semester/(:num)', 'AdminPraSemester::simpan/$1', ['filter' => 'auth:admin']);
 $routes->get('guru/rekap-nilai', 'GuruRekapNilai::index', ['filter' => 'auth:guru']);
 $routes->get('guru/rekap-nilai/unduh', 'GuruEksporNilai::unduh', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
