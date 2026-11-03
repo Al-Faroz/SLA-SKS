@@ -60,6 +60,23 @@ final class PraSemesterWordService
         return self::folder() . $id . '.docx';
     }
 
+    /** Hapus file staging kedaluwarsa bertahap; sumber Word yang sudah diterapkan dipertahankan. */
+    private function bersihkanPratinjau(): void
+    {
+        $rows = $this->db->table('impor_soal_pra_docx')
+            ->select('id')->where('status','pratinjau')
+            ->where('kedaluwarsa_pada <',date('Y-m-d H:i:s'))
+            ->limit(50)->get()->getResultArray();
+        foreach ($rows as $row) {
+            $this->db->table('impor_soal_pra_docx')
+                ->where('id',$row['id'])->where('status','pratinjau')
+                ->update(['status'=>'kedaluwarsa']);
+            if ($this->db->affectedRows() === 1) {
+                @unlink(self::lokasi((string)$row['id']));
+            }
+        }
+    }
+
     private function bab(int $paketId): array
     {
         $items = $this->db->table('bab')->select('id,nomor_bab,nama_bab')
@@ -142,6 +159,7 @@ final class PraSemesterWordService
         if (!$this->terpasang()) {
             throw new DomainException('Pembaruan SQL V4-0010 belum diimpor.');
         }
+        $this->bersihkanPratinjau();
         $konteks = $this->guruService->konteks($paketId);
         if ($konteks['terpakai']) {
             throw new DomainException('Bank sudah digunakan siswa dan tidak boleh diimpor.');
