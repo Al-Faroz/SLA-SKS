@@ -17,10 +17,11 @@ final class GuruRekapNilai extends BaseController
 {
     protected $helpers = ['url'];
 
-    private function angka(?string $nilai, string $nama, int $maks): ?int
+    private function angka(mixed $nilai, string $nama, int $maks): ?int
     {
         if ($nilai === null || $nilai === '') return null;
-        if (!ctype_digit($nilai) || strlen($nilai) > 7 || (int) $nilai > $maks) {
+        if (!is_string($nilai) || !ctype_digit($nilai)
+            || strlen($nilai) > 7 || (int) $nilai > $maks) {
             throw new DomainException('Parameter ' . $nama . ' tidak valid.');
         }
         return (int) $nilai;
