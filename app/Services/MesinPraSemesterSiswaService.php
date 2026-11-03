@@ -77,9 +77,8 @@ final class MesinPraSemesterSiswaService
             // menyerialkan dua klik Mulai dari siswa sama pada paket ini.
             $ctx = $this->siswa->konteks($paketId);
             $exam = $ctx['ujian'];
-            if (!$exam || !$ctx['gerbang']['boleh_mulai']) {
-                throw new DomainException('Ujian belum dapat dimulai: '
-                    . implode(' ', $ctx['gerbang']['alasan']));
+            if (!$exam) {
+                throw new DomainException('Guru belum menyiapkan ujian Pra-Semester.');
             }
             $lock = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
             $locked = $this->db->query('SELECT * FROM ujian_pra_semester WHERE id=?'
@@ -87,13 +86,8 @@ final class MesinPraSemesterSiswaService
             if (!$locked || $locked['status'] !== 'siap') {
                 throw new DomainException('Jadwal ujian telah berubah.');
             }
-            $now = time();
-            $jadwal = AturanPraSemesterService::jadwal(
-                (string)$locked['mulai_pada'],(string)$locked['selesai_pada'],$now
-            );
-            if (!$jadwal['boleh_mulai']) {
-                throw new DomainException('Jendela untuk mulai ujian telah ditutup.');
-            }
+            // Tindakan idempoten: lanjutkan attempt berjalan walaupun jendela
+            // boleh mulai sudah ditutup. Durasi siswa tidak boleh terpotong.
             $sudah = $this->db->table('percobaan_ujian')
                 ->where('ujian_pra_semester_id',(int)$locked['id'])
                 ->where('siswa_id',(int)$ctx['siswa_id'])
@@ -107,6 +101,17 @@ final class MesinPraSemesterSiswaService
                 throw new DomainException($sudah['status'] === 'dibatalkan_menunggu_guru'
                     ? 'Ujian dibatalkan. Tunggu jadwal susulan Admin.'
                     : 'Ujian utama sudah selesai. Remedial hanya melalui jadwal Admin.');
+            }
+            if (!$ctx['gerbang']['boleh_mulai']) {
+                throw new DomainException('Ujian belum dapat dimulai: '
+                    . implode(' ', $ctx['gerbang']['alasan']));
+            }
+            $now = time();
+            $jadwal = AturanPraSemesterService::jadwal(
+                (string)$locked['mulai_pada'],(string)$locked['selesai_pada'],$now
+            );
+            if (!$jadwal['boleh_mulai']) {
+                throw new DomainException('Jendela untuk mulai ujian telah ditutup.');
             }
             $durasi = (int)$locked['durasi_menit'];
             $jumlah = (int)$locked['jumlah_soal'];
