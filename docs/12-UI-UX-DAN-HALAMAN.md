@@ -292,3 +292,8 @@ Keputusan pemilik: **tidak menempatkan area pengelolaan di bawah tabel daftar**.
 ### A8-7 — Word pada halaman detail Guru Pra-Semester
 - Halaman daftar dan filter tetap terpisah. Halaman detail `/guru/pra-semester/{paketId}` menambahkan card **Template & Impor Word** di samping KKM, daftar soal dan editor manual. Kontrol: jumlah template 30–200, unduh DOCX, unggah DOCX maksimal 15 MB, riwayat tahap review, pesan SQL belum terpasang/terkunci.
 - Review menggunakan halaman tersendiri yang menampilkan setiap soal dalam `details`, nomor BAB, HTML pertanyaan dan opsi, kunci benar, jumlah media, peringatan review kompleks, checkbox persetujuan dan tombol Konfirmasi. Data belum masuk bank hingga konfirmasi sukses.
+
+### A8-8 — Status Pra-Semester pada daftar TP Siswa (3 November 2026)
+- Halaman `siswa/semester/{paketId}` menampilkan kartu Pra-Semester **berdasarkan Service mesin ujian yang sama dengan URL ujian**, tanpa memuat daftar soal, token atau kunci jawaban.
+- Kartu memuat TP NonEsensial selesai sah/jumlah wajib, jumlah soal bank sah dan cakupan BAB, jadwal utama WIB beserta durasi individual dan KKM, nilai mandiri bila ada, serta status belum mulai/berjalan/menunggu remedial/susulan/selesai. Link ke ruang ujian tetap dapat dibuka untuk membaca alasan terkunci; server yang menentukan hak mulai.
+- Ujian belum tersedia bukan kesalahan tampilan. Hindari tombol mulai palsu di luar jadwal Admin. Saat remedial atau susulan tersedia, tampilkan tahap/jadwal sesuai histori siswa. Tidak mengubah alur Diagnostik, Sumatif, atau UI Admin/Guru yang telah PASS.
