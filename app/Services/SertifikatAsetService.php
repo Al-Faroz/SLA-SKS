@@ -227,7 +227,9 @@ final class SertifikatAsetService
         self::path($aset);
         $this->db->transBegin();
         try {
-            $this->db->query('SELECT id FROM pengguna WHERE id=? FOR UPDATE',[$admin]);
+            $lockSql='SELECT id FROM pengguna WHERE id=?';
+            if ($this->db->DBDriver !== 'SQLite3') $lockSql.=' FOR UPDATE';
+            $this->db->query($lockSql,[$admin]);
             $old=$this->db->table('sertifikat_aset_aktif')
                 ->where('jenis',$jenis)->get()->getRowArray();
             if ($old!==null && (int)$old['aset_id']===$id) {
