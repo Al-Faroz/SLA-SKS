@@ -24,6 +24,7 @@ final class PraSemesterDatabaseTest extends TestCase
         ],false);
         $sql=[
             'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,nama TEXT)',
+            'CREATE TABLE pengguna(id INTEGER PRIMARY KEY,nama TEXT,status TEXT)',
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,nama TEXT)',
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,status TEXT)',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,guru_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER)',
@@ -34,7 +35,9 @@ final class PraSemesterDatabaseTest extends TestCase
             'CREATE TABLE bab(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,nomor_bab INTEGER,nama_bab TEXT)',
             'CREATE TABLE ujian_pra_semester(id INTEGER PRIMARY KEY AUTOINCREMENT,paket_semester_id INTEGER,status TEXT,mulai_pada TEXT,selesai_pada TEXT,jumlah_soal INTEGER,durasi_menit INTEGER,kkm_khusus INTEGER,dibuat_oleh INTEGER,dibuat_pada TEXT)',
             'CREATE TABLE soal_pra_semester(id INTEGER PRIMARY KEY AUTOINCREMENT,ujian_pra_semester_id INTEGER,bab_id INTEGER,urutan INTEGER,pertanyaan TEXT,konten_terstruktur_json TEXT,opsi_a TEXT,opsi_b TEXT,opsi_c TEXT,opsi_d TEXT,opsi_e TEXT,kunci TEXT,aktif INTEGER)',
-            'CREATE TABLE percobaan_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,token_publik TEXT,progres_tp_id INTEGER,versi_konten_tp_id INTEGER,ujian_pra_semester_id INTEGER,siswa_id INTEGER,jenis TEXT,tahap TEXT,nomor_percobaan INTEGER,status TEXT,profil_keamanan TEXT,jumlah_soal INTEGER,kkm INTEGER,durasi_detik INTEGER,sisa_detik INTEGER,waktu_mulai TEXT,waktu_aktif_terakhir TEXT,last_seen_server_at TEXT,jeda_mulai_pada TEXT,jeda_fullscreen_total_detik INTEGER DEFAULT 0,jeda_koneksi_total_detik INTEGER DEFAULT 0,jumlah_pelanggaran_fullscreen INTEGER DEFAULT 0,waktu_selesai TEXT,alasan_batal TEXT,skor REAL,jumlah_benar INTEGER,dibuat_pada TEXT,diubah_pada TEXT)',
+            'CREATE TABLE percobaan_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,token_publik TEXT,progres_tp_id INTEGER,versi_konten_tp_id INTEGER,ujian_pra_semester_id INTEGER,jadwal_pra_sesi_id INTEGER,siswa_id INTEGER,jenis TEXT,tahap TEXT,nomor_percobaan INTEGER,status TEXT,profil_keamanan TEXT,jumlah_soal INTEGER,kkm INTEGER,durasi_detik INTEGER,sisa_detik INTEGER,waktu_mulai TEXT,waktu_aktif_terakhir TEXT,last_seen_server_at TEXT,jeda_mulai_pada TEXT,jeda_fullscreen_total_detik INTEGER DEFAULT 0,jeda_koneksi_total_detik INTEGER DEFAULT 0,jumlah_pelanggaran_fullscreen INTEGER DEFAULT 0,waktu_selesai TEXT,alasan_batal TEXT,skor REAL,jumlah_benar INTEGER,dibuat_pada TEXT,diubah_pada TEXT)',
+            'CREATE TABLE jadwal_pra_sesi(id INTEGER PRIMARY KEY AUTOINCREMENT,ujian_pra_semester_id INTEGER,jenis TEXT,tahap TEXT,mulai_pada TEXT,selesai_pada TEXT,durasi_menit INTEGER,status TEXT,dibuat_oleh INTEGER,dibuat_pada TEXT)',
+            'CREATE TABLE peserta_pra_susulan(id INTEGER PRIMARY KEY AUTOINCREMENT,jadwal_pra_sesi_id INTEGER,siswa_id INTEGER,ditetapkan_oleh INTEGER,ditetapkan_pada TEXT,UNIQUE(jadwal_pra_sesi_id,siswa_id))',
             'CREATE TABLE butir_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,soal_asal_id INTEGER,soal_pra_semester_id INTEGER,posisi INTEGER,pertanyaan TEXT,konten_terstruktur_json TEXT,opsi_acak_json TEXT,kunci_acak TEXT)',
             'CREATE TABLE jawaban_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,butir_percobaan_id INTEGER,opsi_dipilih TEXT,waktu_disimpan TEXT)',
             'CREATE TABLE riwayat_status_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,status_lama TEXT,status_baru TEXT,alasan TEXT,terjadi_pada TEXT)',
@@ -44,6 +47,7 @@ final class PraSemesterDatabaseTest extends TestCase
             'CREATE TABLE log_aktivitas(id INTEGER PRIMARY KEY AUTOINCREMENT,pengguna_id INTEGER,peran_aktif TEXT,peristiwa TEXT,catatan TEXT,waktu TEXT)',
         ];
         foreach($sql as $q)$this->db->query($q);
+        $this->db->table('pengguna')->insert(['id'=>100,'nama'=>'Siswa Anonim','status'=>'aktif']);
         $this->db->table('ref_angkatan')->insert(['id'=>1,'nama'=>'Gen Uji']);
         $this->db->table('ref_mapel')->insertBatch([
             ['id'=>1,'nama'=>'SKI'],['id'=>2,'nama'=>'Fikih']
@@ -107,6 +111,49 @@ final class PraSemesterDatabaseTest extends TestCase
         return static fn (): array => [
             'id'=>$id,'peran_aktif'=>$role,'status'=>'aktif','wajib_ganti_sandi'=>0,
         ];
+    }
+
+    public function testFilterDaftarAdminDanGuruDiterapkanPadaQueryServer(): void
+    {
+        $admin = new PraSemesterJadwalService($this->db,$this->actor('admin',1));
+        self::assertCount(2,$admin->daftar());
+        self::assertCount(1,$admin->daftar(['gen'=>'1','mapel'=>'1','semester'=>'4','status'=>'siap']));
+        self::assertCount(1,$admin->daftar(['mapel'=>'2','status'=>'belum']));
+        self::assertSame(12,(int)$admin->daftar(['mapel'=>'2','status'=>'belum'])[0]['paket_id']);
+        self::assertSame([], $admin->daftar(['semester'=>'5']));
+        self::assertSame([], $admin->daftar(['status'=>'ditutup']));
+
+        $guru = new PraSemesterGuruService($this->db,$this->actor('guru',10));
+        self::assertCount(1,$guru->paketGuru());
+        self::assertCount(1,$guru->paketGuru(1));
+        self::assertSame([],$guru->paketGuru(2)); // Gen lain tidak boleh terbuka
+        self::assertSame([1=>'Gen Uji'],$guru->pilihanGen());
+        self::assertSame(1,PraSemesterGuruService::filterGen('1'));
+    }
+
+    public function testFilterWhitelistMenolakInputTidakSah(): void
+    {
+        foreach ([
+            ['gen'=>'-1'],
+            ['mapel'=>'1 OR 1=1'],
+            ['semester'=>'7'],
+            ['status'=>'dibatalkan_menunggu_guru'],
+        ] as $f) {
+            try {
+                PraSemesterJadwalService::filterDaftar($f);
+                self::fail('Filter Admin yang tidak sah seharusnya ditolak.');
+            } catch (\DomainException $e) {
+                self::assertNotSame('', $e->getMessage());
+            }
+        }
+        foreach (['-2','1 OR 1=1',[]] as $f) {
+            try {
+                PraSemesterGuruService::filterGen($f);
+                self::fail('Filter Guru yang tidak sah seharusnya ditolak.');
+            } catch (\DomainException $e) {
+                self::assertNotSame('', $e->getMessage());
+            }
+        }
     }
 
     public function testSiswaMendapatkanJadwalDanDuaBabTanpaMembocorkanKunci(): void
@@ -204,4 +251,93 @@ final class PraSemesterDatabaseTest extends TestCase
         $this->expectException(\DomainException::class);
         $svc->simpan(12,$d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'60');
     }
+    private function jadwalTambahanAktif(string $jenis,string $tahap): int
+    {
+        $wib=new \DateTimeImmutable('now',new \DateTimeZone('Asia/Jakarta'));
+        $this->db->table('jadwal_pra_sesi')->insert([
+            'ujian_pra_semester_id'=>51,'jenis'=>$jenis,'tahap'=>$tahap,
+            'mulai_pada'=>$wib->modify('-1 minute')->format('Y-m-d H:i:s'),
+            'selesai_pada'=>$wib->modify('+1 hour')->format('Y-m-d H:i:s'),
+            'durasi_menit'=>35,'status'=>'siap','dibuat_oleh'=>1,
+            'dibuat_pada'=>gmdate('Y-m-d H:i:s'),
+        ]);
+        return (int)$this->db->insertID();
+    }
+
+    public function testRemedialTerjadwalMembukaSatuAttemptDanNilaiTerbaik(): void
+    {
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'selesai_sah',
+            'skor'=>50,'kkm'=>75,'token_publik'=>str_repeat('a',48),
+        ]);
+        $id=$this->jadwalTambahanAktif('remedial','remedial');
+        $mesin=new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $ruang=$mesin->ruang(11);
+        self::assertTrue($ruang['boleh_mulai']);
+        self::assertSame('remedial',$ruang['tahap_berikut']);
+        self::assertSame(50.0,$ruang['nilai_terbaik']);
+        $baru=$mesin->mulai(11,true,true);
+        self::assertSame('remedial',$baru['tahap']);
+        $saved=$this->db->table('percobaan_ujian')
+            ->where('token_publik',$baru['token'])->get()->getRowArray();
+        self::assertSame(2,(int)$saved['nomor_percobaan']);
+        self::assertSame($id,(int)$saved['jadwal_pra_sesi_id']);
+        self::assertSame(35*60,(int)$saved['durasi_detik']);
+        $done=$mesin->tindakan(11,$baru['token'],'kirim',true);
+        self::assertSame('selesai_sah',$done['status']);
+        self::assertSame('remedial',$done['tahap']);
+        self::assertSame(50.0,$mesin->ruang(11)['nilai_terbaik']);
+        self::assertSame('final',$mesin->ruang(11)['status_nilai']);
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+    }
+
+    public function testSusulanBatalMembutuhkanPesertaYangDitunjukAdmin(): void
+    {
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'dibatalkan_menunggu_guru',
+            'skor'=>null,'kkm'=>75,'token_publik'=>str_repeat('b',48),
+        ]);
+        $id=$this->jadwalTambahanAktif('susulan','normal');
+        $mesin=new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+        $this->db->table('peserta_pra_susulan')->insert([
+            'jadwal_pra_sesi_id'=>$id,'siswa_id'=>1,'ditetapkan_oleh'=>1,
+            'ditetapkan_pada'=>gmdate('Y-m-d H:i:s'),
+        ]);
+        self::assertTrue($mesin->ruang(11)['boleh_mulai']);
+        $baru=$mesin->mulai(11,true,true);
+        self::assertSame('normal',$baru['tahap']);
+        $saved=$this->db->table('percobaan_ujian')
+            ->where('token_publik',$baru['token'])->get()->getRowArray();
+        self::assertSame(2,(int)$saved['nomor_percobaan']);
+        self::assertSame($id,(int)$saved['jadwal_pra_sesi_id']);
+        self::assertNull($saved['skor']);
+    }
+
+    public function testAdminJadwalSusulanAbsenDanDaftarPesertaAditif(): void
+    {
+        $wib=new \DateTimeImmutable('now',new \DateTimeZone('Asia/Jakarta'));
+        $this->db->table('ujian_pra_semester')->where('id',51)->update([
+            'mulai_pada'=>$wib->modify('-3 days')->format('Y-m-d H:i:s'),
+            'selesai_pada'=>$wib->modify('-2 days')->format('Y-m-d H:i:s'),
+        ]);
+        $admin=new \App\Services\PraSemesterSesiService($this->db,$this->actor('admin',1));
+        $d=$wib->modify('+2 days')->setTime(8,0);
+        $id=$admin->buat(11,'susulan','normal',
+            $d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'45');
+        self::assertGreaterThan(0,$id);
+        $calon=$admin->calonSusulan(11,$id);
+        self::assertCount(1,$calon);
+        self::assertTrue($calon[0]['boleh_ditambah']);
+        self::assertSame(1,$admin->tambahPeserta(11,$id,['1']));
+        self::assertSame(0,$admin->tambahPeserta(11,$id,['1']));
+        self::assertTrue($admin->calonSusulan(11,$id)[0]['ditetapkan']);
+        self::assertSame(1,(int)$admin->daftar(11)[0]['jumlah_peserta']);
+        $this->expectException(\DomainException::class);
+        $admin->buat(11,'susulan','normal',
+            $d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'45');
+    }
+
 }

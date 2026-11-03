@@ -1816,3 +1816,78 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 @media (prefers-reduced-motion: reduce) {
     .a-bank-soal__tab { transition: none; }
 }
+
+
+/* A8 Pra-Semester — filter dan tabel terstruktur kedua peran (Emerald Glass). */
+.a-pra-section-head {
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px; margin-bottom:18px;
+}
+.a-pra-section-head h2 { margin:2px 0 5px; }
+.a-pra-section-head .a-help { margin:0; max-width:65ch; }
+.a-pra-kicker {
+    margin:0 0 4px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--a-redup); font-size:11px; font-weight:800;
+}
+.a-pra-total {
+    border:1px solid var(--a-garis); border-radius:99px;
+    background:rgba(16,141,106,.10); color:var(--a-teks);
+    padding:6px 13px; font-size:12px; font-weight:750; white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+}
+.a-pra-daftar .a-pra-filter {
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px; align-items:end; padding:15px; margin-bottom:16px;
+    border:1px solid var(--a-garis); border-radius:13px;
+    background:linear-gradient(115deg,rgba(15,153,109,.08),rgba(27,104,117,.05));
+}
+.a-pra-daftar .a-pra-filter--guru {
+    grid-template-columns:minmax(220px,1fr) auto;
+}
+.a-pra-daftar .a-pra-filter .a-field { margin:0; min-width:0; }
+.a-pra-daftar .a-pra-filter .a-label { display:block; margin-bottom:4px; }
+.a-pra-daftar .a-pra-filter select { width:100%; }
+.a-pra-filter__actions { display:flex; gap:9px; align-items:center; flex-wrap:wrap; }
+.a-pra-filter--admin .a-pra-filter__actions { grid-column:1 / -1; }
+.a-pra-filter__actions .a-btn { min-height:39px; justify-content:center; }
+.a-pra-table-wrap {
+    max-width:100%; border:1px solid var(--a-garis);
+    border-radius:13px; overflow-x:auto; outline-offset:3px;
+}
+.a-pra-table { width:100%; min-width:760px; border-collapse:separate;
+    border-spacing:0; background:transparent; }
+.a-pra-table thead th {
+    position:relative; padding:12px 14px; background:rgba(22,120,93,.13);
+    color:var(--a-teks); font-size:12px; font-weight:800;
+    letter-spacing:.014em; white-space:nowrap; text-align:left;
+    border-bottom:1px solid var(--a-garis);
+}
+.a-pra-table tbody td {
+    padding:12px 14px; vertical-align:middle;
+    font-size:13px; line-height:1.45;
+    border-bottom:1px solid var(--a-garis);
+}
+.a-pra-table tbody tr:nth-child(even) { background:rgba(38,141,119,.045); }
+.a-pra-table tbody tr:hover,
+.a-pra-table tbody tr.a-pra-table__selected {
+    background:rgba(23,160,118,.12);
+}
+.a-pra-table tbody tr:last-child td { border-bottom:none; }
+.a-pra-table td strong { font-weight:750; }
+.a-pra-col-center { text-align:center; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.a-pra-col-time { min-width:180px; font-size:12px; font-variant-numeric:tabular-nums; }
+.a-pra-col-time time { display:block; white-space:nowrap; }
+.a-pra-time-separator { display:block; color:var(--a-redup); font-size:11px; margin:2px 0; }
+.a-pra-action { min-width:104px; text-align:center; justify-content:center; white-space:nowrap; }
+.a-pra-empty { margin-top:6px; }
+.a-pra-empty p { margin:5px 0 0; }
+@media(max-width:940px) {
+    .a-pra-daftar .a-pra-filter { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .a-pra-filter--admin .a-pra-filter__actions { grid-column:1 / -1; }
+}
+@media(max-width:600px) {
+    .a-pra-daftar .a-pra-filter,
+    .a-pra-daftar .a-pra-filter--guru { grid-template-columns:minmax(0,1fr); }
+    .a-pra-filter--admin .a-pra-filter__actions { grid-column:auto; }
+    .a-pra-filter__actions .a-btn { flex:1; }
+}

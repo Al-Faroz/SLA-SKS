@@ -18,12 +18,14 @@ final class MesinPraSemesterSiswaService
     private BaseConnection $db;
     private $akun;
     private PraSemesterSiswaService $siswa;
+    private PraSemesterSesiService $sesi;
 
     public function __construct(?BaseConnection $db = null, ?callable $akun = null)
     {
         $this->db = $db ?? db_connect();
         $this->akun = $akun ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
         $this->siswa = new PraSemesterSiswaService($this->db,$this->akun);
+        $this->sesi = new PraSemesterSesiService($this->db,$this->akun);
     }
 
     private static function iso(?int $value): ?string
@@ -53,16 +55,55 @@ final class MesinPraSemesterSiswaService
         return $row;
     }
 
+    /**
+     * Ujian utama dan sesi tambahan selalu lewat gerbang sekolah yang sama;
+     * penjadwalan susulan tidak melewati syarat TP dan kesiapan bank.
+     */
+    private function akses(array $ctx, array $histori, int $now): array
+    {
+        $state = PenilaianPraSemesterService::ringkas($histori);
+        $exam = $ctx['ujian'];
+        $tpSiap = (bool)($ctx['gerbang']['tp']['siap'] ?? false);
+        $bankSiap = (bool)($ctx['gerbang']['bank']['siap'] ?? false)
+            && $exam && (int)$ctx['gerbang']['bank']['jumlah_sah'] >= (int)$exam['jumlah_soal'];
+        $boleh = $exam && $exam['status']==='siap'
+            && $tpSiap && $bankSiap && $ctx['kkm']['efektif'] !== null;
+        $slot = $boleh
+            ? $this->sesi->sesiYangTerbuka($exam,(int)$ctx['siswa_id'],$state['fase'],$now)
+            : null;
+        $izin = $slot === null ? null
+            : AturanJadwalPraSemesterService::periksaMulai(
+                $slot,$histori,$now,$tpSiap,$bankSiap,true,true
+            );
+        return [
+            'ringkasan'=>$state,
+            'jadwal'=>$slot,
+            'boleh_mulai'=>$boleh && $izin !== null && $izin['boleh_buat'],
+        ];
+    }
+
     public function ruang(int $paketId): array
     {
         $ctx = $this->siswa->konteks($paketId);
+        $histori=$ctx['ujian']
+            ? $this->sesi->riwayat((int)$ctx['ujian']['id'],(int)$ctx['siswa_id'])
+            : [];
+        $akses=$this->akses($ctx,$histori,time());
+        $aktif=$akses['ringkasan']['percobaan_aktif_id'] !== null;
         return [
             'paket'=>$ctx['paket'],
             'ujian'=>$ctx['ujian'],
             'gerbang'=>$ctx['gerbang'],
             'percobaan'=>$ctx['percobaan'],
-            'boleh_mulai'=>$ctx['gerbang']['boleh_mulai'],
+            'token_mulai'=>($aktif || !$akses['boleh_mulai'])
+                ? (string)($ctx['percobaan']['token_publik'] ?? '') : '',
+            'boleh_mulai'=>$akses['boleh_mulai'] || $aktif,
             'kkm'=>$ctx['kkm']['efektif'],
+            'tahap_berikut'=>$akses['ringkasan']['tahap_berikut'],
+            'fase'=>$akses['ringkasan']['fase'],
+            'jadwal_aktif'=>$akses['jadwal'],
+            'nilai_terbaik'=>$akses['ringkasan']['nilai_terbaik'],
+            'status_nilai'=>$akses['ringkasan']['status_nilai'],
         ];
     }
 
@@ -86,34 +127,27 @@ final class MesinPraSemesterSiswaService
             if (!$locked || $locked['status'] !== 'siap') {
                 throw new DomainException('Jadwal ujian telah berubah.');
             }
-            // Tindakan idempoten: lanjutkan attempt berjalan walaupun jendela
-            // boleh mulai sudah ditutup. Durasi siswa tidak boleh terpotong.
-            $sudah = $this->db->table('percobaan_ujian')
-                ->where('ujian_pra_semester_id',(int)$locked['id'])
-                ->where('siswa_id',(int)$ctx['siswa_id'])
-                ->where('jenis','pra_semester')
-                ->orderBy('id','DESC')->get(1)->getRowArray();
-            if ($sudah !== null) {
-                if (in_array($sudah['status'], ['berjalan','jeda_fullscreen','jeda_koneksi'],true)) {
-                    $this->db->transCommit();
-                    return ['token'=>(string)$sudah['token_publik'],'sudah_ada'=>true];
-                }
-                throw new DomainException($sudah['status'] === 'dibatalkan_menunggu_guru'
-                    ? 'Ujian dibatalkan. Tunggu jadwal susulan Admin.'
-                    : 'Ujian utama sudah selesai. Remedial hanya melalui jadwal Admin.');
+            // Lock paket ujian melindungi dua klik Mulai dan penomoran
+            // percobaan normal/susulan/remedial yang sama.
+            $histori=$this->sesi->riwayat((int)$locked['id'],(int)$ctx['siswa_id']);
+            $state=PenilaianPraSemesterService::ringkas($histori);
+            if ($state['percobaan_aktif_id'] !== null) {
+                $terakhir=end($histori);
+                $this->db->transCommit();
+                return [
+                    'token'=>(string)$terakhir['token_publik'],
+                    'sudah_ada'=>true,
+                    'tahap'=>(string)$terakhir['tahap'],
+                ];
             }
-            if (!$ctx['gerbang']['boleh_mulai']) {
-                throw new DomainException('Ujian belum dapat dimulai: '
-                    . implode(' ', $ctx['gerbang']['alasan']));
+            $now=time();
+            $akses=$this->akses($ctx,$histori,$now);
+            if (!$akses['boleh_mulai'] || $akses['jadwal'] === null) {
+                throw new DomainException('Belum ada jadwal utama, remedial, atau susulan '
+                    . 'yang aktif dan sesuai kesempatan siswa.');
             }
-            $now = time();
-            $jadwal = AturanPraSemesterService::jadwal(
-                (string)$locked['mulai_pada'],(string)$locked['selesai_pada'],$now
-            );
-            if (!$jadwal['boleh_mulai']) {
-                throw new DomainException('Jendela untuk mulai ujian telah ditutup.');
-            }
-            $durasi = (int)$locked['durasi_menit'];
+            $slot=$akses['jadwal'];
+            $durasi=(int)$slot['durasi_menit'];
             $jumlah = (int)$locked['jumlah_soal'];
             $kkm = (int)($ctx['kkm']['efektif'] ?? 0);
             if ($durasi < 5 || $durasi > 180 || $jumlah < 30 || $jumlah > 200
@@ -129,12 +163,13 @@ final class MesinPraSemesterSiswaService
             );
             $state = AturanWaktuUjianService::awal($durasi*60,$now);
             $token = bin2hex(random_bytes(24));
-            $this->db->table('percobaan_ujian')->insert([
+            $insert=[
                 'token_publik'=>$token,
                 'progres_tp_id'=>null,'versi_konten_tp_id'=>null,
                 'ujian_pra_semester_id'=>(int)$locked['id'],
                 'siswa_id'=>(int)$ctx['siswa_id'],
-                'jenis'=>'pra_semester','tahap'=>'normal','nomor_percobaan'=>1,
+                'jenis'=>'pra_semester','tahap'=>(string)$slot['tahap'],
+                'nomor_percobaan'=>count($histori)+1,
                 'status'=>'berjalan','profil_keamanan'=>'ketat',
                 'jumlah_soal'=>$jumlah,'kkm'=>$kkm,
                 'durasi_detik'=>$durasi*60,'sisa_detik'=>$durasi*60,
@@ -142,7 +177,11 @@ final class MesinPraSemesterSiswaService
                 'waktu_aktif_terakhir'=>self::iso($now),
                 'last_seen_server_at'=>self::iso($now),
                 'dibuat_pada'=>self::iso($now),'diubah_pada'=>self::iso($now),
-            ]);
+            ];
+            if ($this->sesi->terpasang()) {
+                $insert['jadwal_pra_sesi_id']=$slot['id'];
+            }
+            $this->db->table('percobaan_ujian')->insert($insert);
             $id = (int)$this->db->insertID();
             if ($id < 1) throw new RuntimeException('Gagal membuat percobaan Pra-Semester.');
             foreach ($butir as $b) {
@@ -150,10 +189,12 @@ final class MesinPraSemesterSiswaService
                     ['percobaan_ujian_id'=>$id] + $b
                 );
             }
-            $this->riwayat($id,null,'berjalan','Mulai ujian utama pada jadwal Admin.', $now);
+            $this->riwayat($id,null,'berjalan',
+                'Mulai Pra-Semester ' . $slot['jenis'] . '/' . $slot['tahap']
+                . ', jadwal #' . ($slot['id'] ?? 'utama') . '.', $now);
             if (!$this->db->transStatus()) throw new RuntimeException('Percobaan gagal disimpan.');
             $this->db->transCommit();
-            return ['token'=>$token,'sudah_ada'=>false,'tahap'=>'normal'];
+            return ['token'=>$token,'sudah_ada'=>false,'tahap'=>(string)$slot['tahap']];
         } catch (Throwable $e) {
             $this->db->transRollback();
             throw $e;
@@ -298,8 +339,8 @@ final class MesinPraSemesterSiswaService
             'skor'=>$sah && $s['skor'] !== null ? (float)$s['skor'] : null,
             'kkm'=>$sah ? (int)$s['kkm'] : null,
             'jumlah_benar'=>$sah && $s['jumlah_benar'] !== null ? (int)$s['jumlah_benar'] : null,
-            'tahap'=>'normal',
-            'perlu_remedial'=>false, // remedial hanya pada jadwal baru oleh Admin
+            'tahap'=>(string)$s['tahap'],
+            'perlu_remedial'=>false, // hak remedial hanya ketika jadwal Admin aktif
             'pesan'=>$s['status'] === 'dibatalkan_menunggu_guru'
                 ? 'Ujian Pra-Semester dibatalkan; tunggu jadwal susulan Admin.' : '',
         ];

@@ -33,3 +33,18 @@
 - Tes regresi: `tests/unit/PraSemesterRemedialSusulanTest.php`, dimasukkan dalam QA A8 dan S06A untuk PHP 8.2.
 - **Batas mutlak:** dump terbaru ditemukan di Library bernama `sla_sks_v4 (12).sql`, dibuat 2 Nov 2026 pukul 13.29 waktu dump, **lebih awal** dari patch simulasi/percobaan yang dinyatakan PASS. Tidak cukup untuk mengaudit SQL berikutnya. Belum dibuat SQL, tidak ada perubahan/DELETE data siswa, tidak ada penjadwalan remedial/susulan di database/UI yang diklaim aktif.
 - Setelah pengguna mengunggah ekspor `sla_sks_v4` terbaru **pasca patch terakhir**, verifikasi DDL/indeks/FK, `schema_version`, count agregat tabel relevan, lalu buat patch SQL additive bernomor, adapter jadwal peserta, UI Admin dan mesin susulan/remedial. Pastikan tetap kompatibel MySQL/MariaDB tanpa CI4 Migration/Seeder.
+
+## A8-5 — Implementasi jadwal operasional dan UI tabel (3 November 2026)
+- Pengguna mengunggah dump terbaru `sla_sks_v4 (13).sql`; audit header dan `schema_version` menunjukkan MariaDB 10.4.32, V4-0008 terakhir, tidak terdapat sesi remedial/susulan. Dump privat tetap di luar repository.
+- Penambahan SQL additive **V4-0009** untuk jadwal khusus, peserta susulan dan relasi percobaan. Berkas audit baca-saja disertakan. SQL **belum diimpor otomatis**; pengguna perlu backup dan impor satu kali di XAMPP.
+- Filter dan tabel Guru/Admin ditata ulang pada Service + Controller + View + CSS. Guru filter Gen; Admin filter Gen, Mapel, Semester, Status. Tidak menyentuh kebijakan UI global lain.
+- Service sesi Admin/roster dan mesin siswa terhubung. Form tambahan dan daftar peserta nyata; jadwal tanpa SQL V4-0009 tetap nonaktif (pesan impor), sedangkan daftar jadwal utama/filter tetap dapat dibuka.
+- Belum menangani impor Word Pra-Semester dan ekspor nilai Pra-Semester ke XLSX; fokus susulan/remedial dan UI tabel terlebih dahulu.
+- Uji XAMPP menunggu pull dan laporan pengguna. Jangan anggap PASS browser/SQL hanya dari CI.
+
+### A8-6 — Pemisahan halaman list/detail (permintaan lanjutan 3 November 2026)
+- Pengguna telah mengonfirmasi SQL V4-0009 berhasil dijalankan di localhost. Tidak ada SQL baru untuk revisi ini.
+- `app/Views/guru/pra_semester.php` hanya daftar dan filter; `app/Views/guru/pra_semester_detail.php` khusus bank soal, KKM, form.
+- `app/Views/admin/pra_semester.php` hanya daftar dan filter; `app/Views/admin/pra_semester_detail.php` khusus jadwal utama/tambahan dan daftar peserta.
+- Controller memilih View berdasarkan ada/tidaknya paketId, URL lama tetap. Setelah jadwal utama disimpan, Admin tetap pada detail untuk menerima pesan sukses.
+- Butuh uji manual localhost untuk breadcrumb, filter dan form; jangan anggap PASS sebelum dilaporkan.

@@ -12,7 +12,7 @@
     data-ujian-tp="<?= (int)$paket['id'] ?>"
     data-ujian-jenis="pra_semester"
     data-ujian-url="<?= esc(site_url('siswa/pra-semester/' . (int)$paket['id']), 'attr') ?>"
-    data-ujian-token="<?= esc((string)($percobaan['token_publik'] ?? ''),'attr') ?>"
+    data-ujian-token="<?= esc((string)$token_mulai,'attr') ?>"
     data-ujian-existing="<?= esc((string)($percobaan['status'] ?? ''),'attr') ?>"
     data-csrf-name="<?= esc($csrfName,'attr') ?>"
     data-csrf-hash="<?= esc($csrfValue,'attr') ?>">
@@ -36,26 +36,42 @@
         <p>Ujian terjadwal oleh Admin, menggunakan desktop/laptop dan fullscreen.
             Waktu pengerjaan dihitung sejak Anda menekan Mulai dan mulai bekerja,
             bukan sejak jendela jadwal dibuka. Jawaban dan timer tersimpan di server.</p>
-        <p class="a-help">Jendela boleh mulai (WIB):
-            <strong><?= esc((string)($ujian['mulai_pada'] ?? 'Belum dijadwalkan')) ?></strong>
-            sampai <strong><?= esc((string)($ujian['selesai_pada'] ?? 'Belum dijadwalkan')) ?></strong>.
-            Durasi: <strong><?= $ujian === null ? '—' : (int)$ujian['durasi_menit'] . ' menit' ?></strong>.
+        <p class="a-help">
+            <?= $jadwal_aktif === null ? 'Jadwal utama' :
+                ($jadwal_aktif['jenis'] === 'remedial' ? 'Jadwal remedial' :
+                    ($jadwal_aktif['jenis'] === 'susulan' ? 'Jadwal susulan' : 'Jadwal utama')) ?>
+            (WIB):
+            <strong><?= esc((string)($jadwal_aktif['mulai'] ?? $ujian['mulai_pada'] ?? 'Belum dijadwalkan')) ?></strong>
+            sampai <strong><?= esc((string)($jadwal_aktif['akhir'] ?? $ujian['selesai_pada'] ?? 'Belum dijadwalkan')) ?></strong>.
+            Durasi: <strong><?= $jadwal_aktif !== null
+                ? (int)$jadwal_aktif['durasi_menit'].' menit'
+                : ($ujian === null ? '—' : (int)$ujian['durasi_menit'].' menit') ?></strong>.
             KKM: <strong><?= $kkm === null ? 'Belum tersedia' : (int)$kkm ?></strong>.
         </p>
-        <?php if ($akhir): ?>
-            <p class="a-ujian-peringatan"><?= $percobaan['status'] === 'dibatalkan_menunggu_guru'
-                ? 'Ujian dibatalkan. Tunggu jadwal susulan dari Admin; tidak ada akses ulang mandiri.'
-                : 'Ujian utama sudah selesai sah. Jika skor di bawah KKM, remedial menunggu jadwal Admin.' ?></p>
-            <button type="button" class="a-btn a-btn--utama" data-ujian-lihat-hasil>Lihat hasil/status</button>
-        <?php elseif (!$desktop): ?>
+        <?php if ($nilai_terbaik !== null): ?>
+            <p class="a-help">Nilai Pra-Semester saat ini:
+                <strong><?= number_format((float)$nilai_terbaik,2,',','.') ?></strong>
+                (<?= $status_nilai === 'final' ? 'Final' : 'Sementara' ?>).</p>
+        <?php endif ?>
+        <?php if (!$desktop): ?>
             <div class="a-alert" role="status">
                 Jadwal dapat dilihat di HP/tablet, tetapi pengerjaan Pra-Semester
                 wajib menggunakan desktop/laptop yang mendukung fullscreen.
             </div>
         <?php elseif ($aktif || $boleh_mulai): ?>
             <button type="button" class="a-btn a-btn--utama" data-ujian-mulai>
-                <?= $aktif ? 'Masuk fullscreen &amp; lanjutkan ujian' : 'Masuk fullscreen &amp; mulai Pra-Semester' ?>
+                <?= $aktif ? 'Masuk fullscreen &amp; lanjutkan ujian'
+                    : ($jadwal_aktif !== null && $jadwal_aktif['jenis'] !== 'utama'
+                        ? 'Masuk fullscreen &amp; mulai '.ucfirst((string)$jadwal_aktif['jenis'])
+                        : 'Masuk fullscreen &amp; mulai Pra-Semester') ?>
             </button>
+        <?php elseif ($akhir): ?>
+            <p class="a-ujian-peringatan"><?= $percobaan['status'] === 'dibatalkan_menunggu_guru'
+                ? 'Ujian dibatalkan. Tunggu jadwal susulan dari Admin; tidak ada akses ulang mandiri.'
+                : ($fase === 'menunggu_remedial' || $fase === 'butuh_susulan_remedial'
+                    ? 'Nilai normal tersimpan. Tunggu jadwal remedial/susulan Admin.'
+                    : 'Ujian Pra-Semester telah selesai sah.') ?></p>
+            <button type="button" class="a-btn a-btn--utama" data-ujian-lihat-hasil>Lihat hasil/status</button>
         <?php else: ?>
             <div class="a-alert" role="status">
                 <strong>Ujian belum dapat dimulai.</strong>

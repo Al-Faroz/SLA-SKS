@@ -94,3 +94,10 @@ Dump lokal terbaru `sla_sks_v4` (MariaDB 10.4.32, ekspor 31-10-2026 14.06) masih
 ### Kontrak jadwal Pra-Semester (3 November 2026)
 Tabel `ujian_pra_semester` V4-0001 saat ini memiliki satu baris per `paket_semester_id`: `mulai_pada`/`selesai_pada` adalah **jendela boleh memulai ujian utama dalam WIB**, `durasi_menit` adalah durasi individual terpisah yang dihitung server sejak siswa memulai. `kkm_khusus` adalah nilai Guru untuk Pra-Semester, fallback `pengaturan.kkm_default`. `soal_pra_semester` bank seluruh BAB, dan `percobaan_ujian` menyimpan attempt `jenis=pra_semester`.
 Jadwal remedial/susulan dan peserta terpilih memerlukan tabel/relasi baru dengan audit dan identitas tahap (normal/remedial), tanpa mengubah data TP. **Dilarang membuat ALTER/SQL update berdasarkan asumsi** sebelum memperoleh dump XAMPP terbaru sesudah seluruh patch terakhir; SQL baru bernomor, kompatibel MariaDB/MySQL, tidak me-reset data historis.
+
+### A8-5 — SQL V4-0009 (setelah audit dump privat terbaru 03-11-2026)
+- **Berkas:** `database/sql/updates/V4-0009_PRA_SESI_TERJADWAL.sql`.
+- Dua tabel aditif: `jadwal_pra_sesi` untuk susulan/remedial per ujian Pra-Semester dan `peserta_pra_susulan` sebagai hubungan peserta–jadwal tersahkan Admin. Kolom nullable `percobaan_ujian.jadwal_pra_sesi_id` menyimpan sumber sesi pada attempt tambahan; attempt utama historis tetap `NULL`.
+- Unique `(ujian_pra_semester_id,siswa_id,nomor_percobaan)` mencegah nomor percobaan Pra-Semester sama untuk siswa yang sama. FK dan indeks mempertahankan histori.
+- Skema ini dibandingkan dengan **dump privat `sla_sks_v4 (13).sql`** (header 3 Nov 2026 04.32, MariaDB 10.4.32, schema_version terakhir `V4-0008-KEPUTUSAN-UJIAN-BATAL`). **Jangan memasukkan dump privat atau kredensial ke GitHub.**
+- Impor **sekali** melalui phpMyAdmin setelah backup DB dan `writable/`. Jalankan `database/sql/qa/V4-0009_PRA_SESI_READONLY.sql` sebelum dan sesudah. Jangan melakukan Migration/Seeder, reset, DROP atau pemulihan data lama.

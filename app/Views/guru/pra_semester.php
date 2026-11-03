@@ -20,155 +20,80 @@
     <?php if ($pesan = session()->getFlashdata('galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
     <?php endif ?>
-    <section class="a-card">
-        <h2>Pilih paket semester</h2>
-        <?php if ($paketGuru === []): ?>
-            <p class="a-help" role="status">Belum ada paket yang ditugaskan kepada Guru ini.</p>
-        <?php else: ?>
-            <div class="a-table-wrap">
-                <table class="a-table">
-                    <thead><tr><th>Gen</th><th>Mapel</th><th>Semester</th><th>Status paket</th><th>Tindakan</th></tr></thead>
-                    <tbody>
-                    <?php foreach ($paketGuru as $p): ?>
-                        <tr>
-                            <td><?= esc((string) $p['nama_gen']) ?></td>
-                            <td><?= esc((string) $p['nama_mapel']) ?></td>
-                            <td><?= (int) $p['semester'] ?></td>
-                            <td><?= esc((string) $p['status']) ?></td>
-                            <td><a class="a-btn a-btn--sekunder"
-                                href="<?= esc(site_url('guru/pra-semester/' . (int) $p['id']), 'attr') ?>">
-                                Kelola bank soal
-                            </a></td>
-                        </tr>
+    <section class="a-card a-pra-daftar" aria-labelledby="pra-paket-guru">
+        <div class="a-pra-section-head">
+            <div>
+                <p class="a-pra-kicker">BANK SOAL PER PAKET</p>
+                <h2 id="pra-paket-guru">Pilih Gen dan Semester</h2>
+                <p class="a-help">Hanya paket dari penugasan Guru Gen–Mapel Anda yang ditampilkan.</p>
+            </div>
+            <span class="a-pra-total" aria-live="polite">
+                <?= count($paketGuru) ?> paket ditemukan
+            </span>
+        </div>
+        <form method="get" class="a-pra-filter a-pra-filter--guru"
+            action="<?= esc(site_url('guru/pra-semester'),'attr') ?>"
+            aria-label="Filter Gen bank soal Pra-Semester">
+            <div class="a-field">
+                <label class="a-label" for="pra-guru-filter-gen">Gen</label>
+                <select class="a-input" id="pra-guru-filter-gen" name="gen">
+                    <option value="">Semua Gen yang diampu</option>
+                    <?php foreach ($pilihanGen as $id => $nama): ?>
+                        <option value="<?= (int)$id ?>"
+                            <?= $filterGen === (int)$id ? 'selected' : '' ?>>
+                            <?= esc((string)$nama) ?>
+                        </option>
                     <?php endforeach ?>
+                </select>
+            </div>
+            <div class="a-pra-filter__actions">
+                <button type="submit" class="a-btn a-btn--utama">Terapkan filter</button>
+                <a class="a-btn a-btn--sekunder"
+                    href="<?= esc(site_url('guru/pra-semester'),'attr') ?>">Reset</a>
+            </div>
+        </form>
+        <?php if ($paketGuru === []): ?>
+            <div class="a-empty a-pra-empty" role="status">
+                <strong>Tidak ada paket sesuai filter.</strong>
+                <p>Periksa pilihan Gen atau penugasan Anda sebagai Guru pengampu.</p>
+            </div>
+        <?php else: ?>
+            <div class="a-tabel-gulir a-pra-table-wrap" tabindex="0"
+                role="region" aria-label="Daftar paket Pra-Semester Guru">
+                <table class="a-tbl a-pra-table">
+                    <thead>
+                        <tr><th scope="col">Gen</th><th scope="col">Mata pelajaran</th>
+                            <th scope="col">Semester</th><th scope="col">Status paket</th>
+                            <th scope="col">Bank ujian</th><th scope="col">Aksi</th></tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($paketGuru as $p): ?>
+                            <?php $ujianStatus = $p['ujian_id'] === null ? 'belum' : (string)$p['ujian_status'];
+                                $ujianLabel = ['belum'=>'Belum dibuat','draf'=>'Draf',
+                                    'siap'=>'Siap','ditutup'=>'Ditutup'][$ujianStatus] ?? $ujianStatus;
+                                $tujuan=site_url('guru/pra-semester/'.(int)$p['id']);
+                                if ($filterGen !== null) $tujuan .= '?gen=' . $filterGen; ?>
+                            <tr <?= $konteks !== null && (int)$konteks['paket']['id'] === (int)$p['id']
+                                ? 'class="a-pra-table__selected"' : '' ?>>
+                                <td><strong><?= esc((string)$p['nama_gen']) ?></strong></td>
+                                <td><?= esc((string)$p['nama_mapel']) ?></td>
+                                <td class="a-pra-col-center"><?= (int)$p['semester'] ?></td>
+                                <td><span class="a-badge <?= $p['status'] === 'aktif'
+                                    ? 'a-badge--siap' : 'a-badge--tunggu' ?>">
+                                    <?= esc(ucfirst((string)$p['status'])) ?></span></td>
+                                <td><span class="a-badge <?= $ujianStatus === 'siap'
+                                    ? 'a-badge--siap' : 'a-badge--tunggu' ?>">
+                                    <?= esc($ujianLabel) ?></span></td>
+                                <td><a class="a-btn a-btn--sekunder a-pra-action"
+                                    href="<?= esc($tujuan,'attr') ?>"
+                                    <?= $konteks !== null && (int)$konteks['paket']['id'] === (int)$p['id']
+                                        ? 'aria-current="page"' : '' ?>>Kelola soal</a></td>
+                            </tr>
+                        <?php endforeach ?>
                     </tbody>
                 </table>
             </div>
         <?php endif ?>
     </section>
-    <?php if ($konteks !== null): ?>
-        <?php $paket = $konteks['paket']; $ujian = $konteks['exam']; $kesiapan = $konteks['kesiapan'];
-            $kkm = $konteks['kkm']; $terpakai = $konteks['terpakai']; ?>
-        <section class="a-card a-jarak-atas">
-            <h2><?= esc((string) $paket['nama_mapel']) ?> — Semester <?= (int) $paket['semester'] ?></h2>
-            <p class="a-help">Gen <?= esc((string) $paket['nama_gen']) ?> ·
-                <?= (int) $kesiapan['jumlah_sah'] ?> soal sah ·
-                <?= (int) $kesiapan['jumlah_bab_tercakup'] ?>/<?= (int) $kesiapan['jumlah_bab'] ?> BAB terwakili</p>
-            <div class="a-alert" role="status">
-                <strong><?= $kesiapan['siap'] ? 'Bank soal siap' : 'Bank soal belum siap' ?></strong>.
-                <?= esc((string) $kesiapan['pesan']) ?>
-            </div>
-            <?php if ($kesiapan['bab_tanpa_soal'] !== []): ?>
-                <p class="a-help">BAB tanpa soal sah:
-                    <?= esc(implode(', ', array_map('strval', $kesiapan['bab_tanpa_soal']))) ?>.</p>
-            <?php endif ?>
-            <?php if ($terpakai): ?>
-                <div class="a-alert">Bank soal dan KKM terkunci karena sudah digunakan siswa.
-                    Jawaban, kunci dan nilai historis tetap utuh.</div>
-            <?php endif ?>
-        </section>
-        <section class="a-card a-jarak-atas" aria-labelledby="kkm-pra">
-            <h2 id="kkm-pra">KKM Pra-Semester</h2>
-            <p>Default Admin: <strong><?= $kkm['default'] === null ? 'Belum ditetapkan' : (int)$kkm['default'] ?></strong>.
-                KKM efektif: <strong><?= $kkm['efektif'] === null ? 'Belum tersedia' : (int)$kkm['efektif'] ?></strong>.
-                Sumber: <?= esc((string)$kkm['sumber']) ?>.</p>
-            <?php if (!$terpakai): ?>
-                <form method="post" action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/kkm'),'attr') ?>" class="a-form">
-                    <?= csrf_field() ?>
-                    <div class="a-field">
-                        <label class="a-label" for="kkm-pra-input">KKM khusus Guru (opsional)</label>
-                        <input id="kkm-pra-input" name="kkm_khusus" class="a-input" type="number" min="1" max="100"
-                            value="<?= esc((string)($kkm['khusus'] ?? ''),'attr') ?>">
-                        <p class="a-help">Kosongkan untuk mengikuti default Admin. Tidak menggunakan KKM salah satu TP.</p>
-                    </div>
-                    <button class="a-btn a-btn--utama" type="submit">Simpan KKM Pra-Semester</button>
-                </form>
-            <?php endif ?>
-        </section>
-        <section class="a-card a-jarak-atas">
-            <h2>Daftar soal</h2>
-            <?php if ($konteks['soal'] === []): ?>
-                <p class="a-help" role="status">Belum ada soal. Tambahkan soal PG A–E dan pilih BAB asal soal.</p>
-            <?php else: ?>
-                <div class="a-table-wrap">
-                    <table class="a-table">
-                        <thead><tr><th>No.</th><th>BAB</th><th>Soal</th><th>Status</th><th>Tindakan</th></tr></thead>
-                        <tbody>
-                        <?php foreach ($konteks['soal'] as $soal): ?>
-                            <tr>
-                                <td><?= (int)$soal['urutan'] ?></td>
-                                <td>#
-                                    <?= (int)$soal['bab_id'] ?></td>
-                                <td><?= esc(mb_strimwidth((string)$soal['pertanyaan'],0,120,'…','UTF-8')) ?></td>
-                                <td><?= (int)$soal['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></td>
-                                <td>
-                                    <?php if (!$terpakai): ?>
-                                        <a class="a-btn a-btn--sekunder"
-                                            href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']) . '?edit=' . (int)$soal['id'],'attr') ?>">Sunting</a>
-                                        <form method="post" style="display:inline"
-                                            action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/soal/' . (int)$soal['id'] . '/status'),'attr') ?>">
-                                            <?= csrf_field() ?>
-                                            <input type="hidden" name="aktif" value="<?= (int)$soal['aktif'] === 1 ? '0':'1' ?>">
-                                            <button class="a-btn a-btn--sekunder" type="submit">
-                                                <?= (int)$soal['aktif'] === 1 ? 'Nonaktifkan' : 'Aktifkan' ?>
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span class="a-help">Terkunci</span>
-                                    <?php endif ?>
-                                </td>
-                            </tr>
-                        <?php endforeach ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif ?>
-        </section>
-        <?php if (!$terpakai): ?>
-            <section class="a-card a-jarak-atas" aria-labelledby="soal-pra">
-                <h2 id="soal-pra"><?= $soalEdit !== null ? 'Sunting soal' : 'Tambah soal' ?></h2>
-                <form method="post" class="a-form"
-                    action="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id'] . '/soal'),'attr') ?>">
-                    <?= csrf_field() ?>
-                    <input type="hidden" name="soal_id" value="<?= $soalEdit !== null ? (int)$soalEdit['id'] : 0 ?>">
-                    <div class="a-field">
-                        <label class="a-label" for="pra-bab">BAB asal soal</label>
-                        <select id="pra-bab" class="a-input" name="bab_id" required>
-                            <option value="">Pilih BAB</option>
-                            <?php foreach ($konteks['bab'] as $bab): ?>
-                                <option value="<?= (int)$bab['id'] ?>"
-                                    <?= (string) old('bab_id',$soalEdit['bab_id'] ?? '') === (string)$bab['id'] ? 'selected' : '' ?>>
-                                    BAB <?= (int)$bab['nomor_bab'] ?> — <?= esc((string)$bab['nama_bab']) ?>
-                                </option>
-                            <?php endforeach ?>
-                        </select>
-                    </div>
-                    <?php foreach (['pertanyaan'=>'Pertanyaan','opsi_a'=>'Opsi A','opsi_b'=>'Opsi B',
-                        'opsi_c'=>'Opsi C','opsi_d'=>'Opsi D','opsi_e'=>'Opsi E'] as $kolom => $label): ?>
-                        <div class="a-field">
-                            <label class="a-label" for="pra-<?= esc($kolom,'attr') ?>"><?= esc($label) ?></label>
-                            <textarea id="pra-<?= esc($kolom,'attr') ?>" class="a-input" name="<?= esc($kolom,'attr') ?>"
-                                maxlength="12000" rows="<?= $kolom === 'pertanyaan' ? '4':'2' ?>" required><?= esc((string)old($kolom,$soalEdit[$kolom] ?? '')) ?></textarea>
-                        </div>
-                    <?php endforeach ?>
-                    <div class="a-field">
-                        <label class="a-label" for="pra-kunci">Jawaban benar</label>
-                        <select id="pra-kunci" class="a-input" name="kunci" required>
-                            <option value="">Pilih kunci</option>
-                            <?php foreach (['A','B','C','D','E'] as $huruf): ?>
-                                <option value="<?= $huruf ?>"
-                                    <?= old('kunci',$soalEdit['kunci'] ?? '') === $huruf ? 'selected' : '' ?>><?= $huruf ?></option>
-                            <?php endforeach ?>
-                        </select>
-                    </div>
-                    <button class="a-btn a-btn--utama" type="submit">Simpan Soal</button>
-                    <?php if ($soalEdit !== null): ?>
-                        <a class="a-btn a-btn--sekunder"
-                            href="<?= esc(site_url('guru/pra-semester/' . (int)$paket['id']),'attr') ?>">Batal sunting</a>
-                    <?php endif ?>
-                </form>
-            </section>
-        <?php endif ?>
-    <?php endif ?>
 </div>
 <?= $this->endSection() ?>

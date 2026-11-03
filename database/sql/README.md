@@ -312,3 +312,16 @@ Sebelum SQL baru: jalankan `qa/audit_kontrak_database_readonly.sql` di DB yang b
 - File publik `updates/V4-0001_POLA_BAB_TP_PRA_SEMESTER.sql` **hanya patch skema** untuk clone v3 kosong-perubahan yang sudah tersedia dalam DB `sla_sks_v4`; tidak berisi data pribadi. **JANGAN IMPOR patch ini lagi setelah mengimpor dump privat v4**, karena patch sudah digabung dan perubahan hanya untuk sekali pakai.
 - Kode aplikasi MVC/Service/UI saat ini belum kompatibel penuh dengan v4. Jangan mengubah `.env` secara otomatis; cek SQL `schema_version`, FK, CP mapel dan 4 materi historis dalam arsip di [audit v4](../../docs/AUDIT-DATABASE-V3-KE-V4-2026-10-26.md).
 - Tidak memakai migration/seeder. Uji MariaDB lokal dan MySQL target berbeda, bukan klaim impor telah PASS.
+
+## V4-0009 — Jadwal Remedial dan Susulan Pra-Semester (3 November 2026)
+
+**Basis audit:** dump lokal privat `sla_sks_v4 (13).sql`, header 03-11-2026 pukul 04.32, MariaDB 10.4.32, versi terakhir `V4-0008-KEPUTUSAN-UJIAN-BATAL`. **Jangan commit dump privat.**
+
+1. Backup **database `sla_sks_v4` dan direktori `writable/`**, jangan reset atau impor ulang dump.
+2. Pada phpMyAdmin pilih database `sla_sks_v4`, jalankan pemeriksaan read-only awal dari `database/sql/qa/V4-0009_PRA_SESI_READONLY.sql`.
+3. Pastikan versi `V4-0008-KEPUTUSAN-UJIAN-BATAL` sudah ada dan `V4-0009-PRA-SESI-TERJADWAL` belum ada.
+4. Impor file **`database/sql/updates/V4-0009_PRA_SESI_TERJADWAL.sql` tepat sekali**, bukan Migration/Seeder.
+5. Jalankan bagian pemeriksaan **SETELAH impor** dari QA read-only: harus terdapat `jadwal_pra_sesi`, `peserta_pra_susulan`, kolom nullable `percobaan_ujian.jadwal_pra_sesi_id`, dan `schema_version V4-0009`. Jumlah attempt/hasil historis tidak boleh berubah oleh update ini.
+6. Baru setelah berhasil, uji jadwal utama, remedial dan susulan lewat browser peran Admin/Guru/Siswa. Jika impor gagal, **jangan** mengulang secara membabi buta; simpan pesan galat dan lakukan audit patch parsial.
+
+SQL ini aditif, tidak menghapus data siswa, tidak mengubah root CI4, URL, atau .env. Tidak boleh diimpor pada database selain `sla_sks_v4` yang telah diaudit.

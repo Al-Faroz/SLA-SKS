@@ -10,12 +10,28 @@ on:
       - 'app/Services/MesinPraSemesterSiswaService.php'
       - 'tests/unit/PraSemesterImplementasiTest.php'
       - 'tests/unit/PraSemesterDatabaseTest.php'
+      - 'app/Services/PraSemesterJadwalService.php'
+      - 'app/Services/PraSemesterGuruService.php'
+      - 'app/Controllers/AdminPraSemester.php'
+      - 'app/Controllers/GuruPraSemester.php'
+      - 'app/Views/admin/pra_semester.php'
+      - 'app/Views/admin/pra_semester_detail.php'
+      - 'app/Views/guru/pra_semester.php'
+      - 'app/Views/guru/pra_semester_detail.php'
+      - 'public/assets/css/app.css'
       - 'app/Services/AturanJadwalPraSemesterService.php'
       - 'app/Services/PenilaianPraSemesterService.php'
+      - 'app/Services/PraSemesterSesiService.php'
+      - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Views/siswa/pra_semester_ujian.php'
+      - 'app/Controllers/AdminPraSemester.php'
+      - 'app/Config/Routes.php'
+      - 'database/sql/updates/V4-0009_PRA_SESI_TERJADWAL.sql'
       - 'tests/unit/PraSemesterRemedialSusulanTest.php'
       - 'tests/unit/AturanWaktuUjianServiceTest.php'
       - 'tests/unit/SusunButirUjianServiceTest.php'
       - 'tests/integration/SqlUjianSchemaCheck.php'
+      - 'tests/integration/SqlPraSesiSchemaCheck.php'
       - '.github/workflows/qa-s06a-mesin-ujian.yml'
   workflow_dispatch:
 
@@ -60,10 +76,23 @@ jobs:
           php -l app/Services/MesinPraSemesterSiswaService.php
           php -l tests/unit/PraSemesterImplementasiTest.php
           php -l tests/unit/PraSemesterDatabaseTest.php
+          php -l app/Services/PraSemesterJadwalService.php
+          php -l app/Services/PraSemesterGuruService.php
+          php -l app/Controllers/AdminPraSemester.php
+          php -l app/Controllers/GuruPraSemester.php
+          php -l app/Views/admin/pra_semester.php
+          php -l app/Views/admin/pra_semester_detail.php
+          php -l app/Views/guru/pra_semester.php
+          php -l app/Views/guru/pra_semester_detail.php
           php -l app/Services/AturanJadwalPraSemesterService.php
           php -l app/Services/PenilaianPraSemesterService.php
+          php -l app/Services/PraSemesterSesiService.php
+          php -l app/Services/MesinPraSemesterSiswaService.php
+          php -l app/Views/siswa/pra_semester_ujian.php
+          php -l app/Config/Routes.php
           php -l tests/unit/PraSemesterRemedialSusulanTest.php
           php -l tests/integration/SqlUjianSchemaCheck.php
+          php -l tests/integration/SqlPraSesiSchemaCheck.php
       - name: Unit test waktu Ketat dan acak opsi
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php
@@ -72,4 +101,6 @@ jobs:
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterRemedialSusulanTest.php
       - name: Impor patch SQL pada MariaDB sintetis
-        run: php tests/integration/SqlUjianSchemaCheck.php
+        run: |
+          php tests/integration/SqlUjianSchemaCheck.php
+          php tests/integration/SqlPraSesiSchemaCheck.php

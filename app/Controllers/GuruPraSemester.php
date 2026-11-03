@@ -16,11 +16,22 @@ final class GuruPraSemester extends BaseController
 {
     protected $helpers = ['url','form'];
 
+    private function suffixGen(): string
+    {
+        try {
+            $gen=PraSemesterGuruService::filterGen($this->request->getGet('gen'));
+            return $gen === null ? '' : '?gen='.$gen;
+        } catch (DomainException) {
+            return '';
+        }
+    }
+
     public function index(?int $paketId = null): ResponseInterface|string
     {
         try {
             $service = new PraSemesterGuruService();
-            $paket = $service->paketGuru();
+            $filterGen = PraSemesterGuruService::filterGen($this->request->getGet('gen'));
+            $paket = $paketId === null ? $service->paketGuru($filterGen) : [];
             $konteks = $paketId === null ? null : $service->konteks($paketId);
             $soalEdit = null;
             if ($konteks !== null) {
@@ -32,11 +43,15 @@ final class GuruPraSemester extends BaseController
                 }
             }
             $akun = (new AuthService())->penggunaSaatIni();
-            return view('guru/pra_semester', [
+            return view($paketId === null
+                ? 'guru/pra_semester'
+                : 'guru/pra_semester_detail', [
                 'judul'=>'Bank Soal Pra-Semester',
                 'namaPengguna'=>$akun['nama'], 'peranAktif'=>'Guru',
                 'tautanNavigasi'=>NavigasiService::untuk('guru','pra_semester'),
                 'paketGuru'=>$paket,'konteks'=>$konteks,'soalEdit'=>$soalEdit,
+                'filterGen'=>$filterGen,
+                'pilihanGen'=>$paketId === null ? $service->pilihanGen() : [],
             ]);
         } catch (DomainException $e) {
             return $this->response->setStatusCode(403)->setBody(
@@ -51,7 +66,7 @@ final class GuruPraSemester extends BaseController
 
     public function simpanSoal(int $paketId): RedirectResponse
     {
-        $url = site_url('guru/pra-semester/' . $paketId);
+        $url = site_url('guru/pra-semester/' . $paketId) . $this->suffixGen();
         $raw = $this->request->getPost('soal_id');
         $id = is_string($raw) && ctype_digit($raw) ? (int) $raw : 0;
         try {
@@ -67,7 +82,7 @@ final class GuruPraSemester extends BaseController
 
     public function statusSoal(int $paketId, int $soalId): RedirectResponse
     {
-        $url = site_url('guru/pra-semester/' . $paketId);
+        $url = site_url('guru/pra-semester/' . $paketId) . $this->suffixGen();
         try {
             $aktif = $this->request->getPost('aktif');
             if (!in_array($aktif, ['0','1'],true)) {
@@ -85,7 +100,7 @@ final class GuruPraSemester extends BaseController
 
     public function simpanKkm(int $paketId): RedirectResponse
     {
-        $url = site_url('guru/pra-semester/' . $paketId);
+        $url = site_url('guru/pra-semester/' . $paketId) . $this->suffixGen();
         $raw = $this->request->getPost('kkm_khusus');
         try {
             if (!is_string($raw)) throw new DomainException('KKM tidak valid.');
