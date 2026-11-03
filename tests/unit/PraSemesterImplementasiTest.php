@@ -151,4 +151,25 @@ final class PraSemesterImplementasiTest extends TestCase
         self::assertStringContainsString("'desktop'=>\$this->desktop()", $siswaCtrl);
         self::assertStringContainsString("jenis === 'pra_semester'",$js);
     }
+    public function testHalamanDaftarTpMenampilkanGerbangPraSemesterTanpaToken(): void
+    {
+        $root = dirname(__DIR__,2);
+        $controller = (string)file_get_contents(
+            $root.'/app/Controllers/SiswaPembelajaran.php'
+        );
+        $view = (string)file_get_contents(
+            $root.'/app/Views/siswa/daftar_tp.php'
+        );
+        self::assertStringContainsString('MesinPraSemesterSiswaService',$controller);
+        self::assertStringContainsString("'praSemester'",$controller);
+        self::assertStringContainsString("['jumlah_tuntas']",$view);
+        self::assertStringContainsString("['jumlah_sah']",$view);
+        self::assertStringContainsString("['jumlah_bab_tercakup']",$view);
+        self::assertStringContainsString('Lihat Jadwal &amp; Status Pra-Semester',$view);
+        self::assertStringContainsString('menunggu_remedial',$view);
+        self::assertStringContainsString('butuh_susulan_normal',$view);
+        self::assertStringNotContainsString('token_publik',$view);
+        self::assertStringNotContainsString('kunci_acak',$view);
+    }
+
 }
