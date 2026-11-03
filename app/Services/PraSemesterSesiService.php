@@ -24,6 +24,12 @@ final class PraSemesterSesiService
         $this->akun = $akun ?? static fn (): ?array => (new AuthService())->penggunaSaatIni();
     }
 
+    public function terpasang(): bool
+    {
+        return $this->db->tableExists('jadwal_pra_sesi')
+            && $this->db->tableExists('peserta_pra_susulan');
+    }
+
     private function admin(): int
     {
         $a = ($this->akun)();
