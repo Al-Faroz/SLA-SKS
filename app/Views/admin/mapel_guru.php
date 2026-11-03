@@ -12,7 +12,6 @@
         <p class="a-proto-muted">Satu Guru aktif setiap pasangan Gen–Mapel; penetapan Guru pada satu Gen tidak mengubah penugasan Gen lain.</p>
     </div>
 </header>
-<p class="a-alert a-alert--info" role="status">Penugasan Guru dari K2 lama tidak disalin otomatis. Pilih Guru pada setiap Gen dan mapel sesuai keputusan madrasah. Data penugasan lama tetap tersimpan sebagai riwayat.</p>
 <?php if ($pesan = session()->getFlashdata('galat')): ?>
     <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
 <?php endif ?>
@@ -20,9 +19,9 @@
     <div class="a-alert" role="status"><?= esc($pesan) ?></div>
 <?php endif ?>
 
-<section class="a-card a-page__editor" aria-labelledby="judul-buat-mapel">
+<section class="a-card a-page__editor a-mapel-guru__tambah" aria-labelledby="judul-buat-mapel">
     <h2 id="judul-buat-mapel">Tambahkan mata pelajaran</h2>
-    <form class="a-form" method="post" action="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">
+    <form class="a-form a-mapel-guru__form" method="post" action="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">
         <?= csrf_field() ?>
         <div class="a-field"><label class="a-label" for="kode-mapel">Kode mapel</label>
             <input id="kode-mapel" name="kode" type="text" maxlength="24" pattern="[A-Za-z0-9._-]{2,24}" required value="<?= esc(old('kode', ''), 'attr') ?>">
