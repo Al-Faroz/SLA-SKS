@@ -464,3 +464,22 @@ Integrasi otomatis A10 memakai **SQLite sintetis** di `tests/unit/LaporanAkademi
 | A11-008 | Filter dan tampilan Dark/Light, HP, Mode Dokumentasi | Tabel dan alasan terbaca, tidak ada tombol semu |
 
 Tes SQLite sintetis di `tests/unit/KelayakanSertifikatDatabaseTest.php` dan lint workflow `QA A11-1 Kelayakan Sertifikat`. Ini kriteria **A11-1 saja**, belum menggantikan E2E-045 sampai E2E-057 penerbitan/versi/QR serta uji browser XAMPP.
+
+### A11-2 — QA sertifikat PDF/QR dan histori (3 November 2026)
+
+| ID | Skenario | Ekspektasi |
+|---|---|---|
+| A11-201 | Upload background rasio A4 landscape valid / rusak / tipe palsu / terlalu besar | Valid hanya PNG/JPG yang lolos MIME+decode+rasio; privat; preview PDF dummy sebelum aktivasi |
+| A11-202 | Upload TTD PNG valid / kosong / format salah | TTD wajib dan PNG asli; penggantian aktif tidak menimpa arsip |
+| A11-203 | Siswa layak dengan skor Nilai TP Final 0, Pra-Semester belum ada | Sertifikat boleh terbit; 0,00 bukan NULL; Pra-Semester tidak dicetak |
+| A11-204 | TP belum tuntas, Sumatif tidak sah, nilai Sementara atau TTD hilang | Tidak ada PDF/DB sertifikat baru, tampil alasan |
+| A11-205 | Admin mengirim POST penerbitan dua kali/bersamaan | Idempoten: satu versi dan satu sertifikat aktif |
+| A11-206 | Admin mengubah nilai cetak secara sah, lalu revisi satu siswa dengan alasan | Nomor+QR baru, template background historis, TTD aktif terbaru; versi lama `digantikan` dan PDF tidak dihapus |
+| A11-207 | Admin revisi tanpa perubahan isi cetak | Tidak membuat versi/PDF baru; hanya audit nilai internal bila ada |
+| A11-208 | Siswa mencoba download sertifikat siswa lain, non-Admin coba POST | Ditolak; file privat tidak dapat diakses langsung |
+| A11-209 | Publik memindai QR berlaku/digantikan dan token acak tak sah | Hanya data whitelist, versi lama menunjuk aktif, tidak ada NISN/TTD/kontak/alasan/PDF, throttle berlaku |
+| A11-210 | Transaksi gagal, PDF rusak/hilang, aset historis berubah | Rollback tanpa dua sertifikat berlaku; file baru boleh dibersihkan, PDF/riwayat lama utuh |
+| A11-211 | Backup dan restore MariaDB XAMPP salinan dengan V4-0011 | Empat tabel, FK/UNIQUE, aset dan PDF lama tetap dapat diverifikasi |
+| A11-212 | Browser Dark/Light, HP dan Mode Dokumentasi | Card, tabel, preview PDF, tombol/galat/sukses, QR terbaca |
+
+PHP lint + PHPUnit SQLite sintetik + renderer Dompdf/endroid dijalankan GitHub Actions `qa-a11-2-sertifikat.yml`; **pengujian MariaDB aktual dan browser XAMPP tetap wajib** sebelum menyatakan fitur FIX.
