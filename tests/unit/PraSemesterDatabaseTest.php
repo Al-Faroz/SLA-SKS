@@ -24,6 +24,7 @@ final class PraSemesterDatabaseTest extends TestCase
         ],false);
         $sql=[
             'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,nama TEXT)',
+            'CREATE TABLE pengguna(id INTEGER PRIMARY KEY,nama TEXT,status TEXT)',
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,nama TEXT)',
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,status TEXT)',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,guru_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER)',
@@ -46,6 +47,7 @@ final class PraSemesterDatabaseTest extends TestCase
             'CREATE TABLE log_aktivitas(id INTEGER PRIMARY KEY AUTOINCREMENT,pengguna_id INTEGER,peran_aktif TEXT,peristiwa TEXT,catatan TEXT,waktu TEXT)',
         ];
         foreach($sql as $q)$this->db->query($q);
+        $this->db->table('pengguna')->insert(['id'=>100,'nama'=>'Siswa Anonim','status'=>'aktif']);
         $this->db->table('ref_angkatan')->insert(['id'=>1,'nama'=>'Gen Uji']);
         $this->db->table('ref_mapel')->insertBatch([
             ['id'=>1,'nama'=>'SKI'],['id'=>2,'nama'=>'Fikih']
@@ -249,4 +251,93 @@ final class PraSemesterDatabaseTest extends TestCase
         $this->expectException(\DomainException::class);
         $svc->simpan(12,$d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'60');
     }
+    private function jadwalTambahanAktif(string $jenis,string $tahap): int
+    {
+        $wib=new \DateTimeImmutable('now',new \DateTimeZone('Asia/Jakarta'));
+        $this->db->table('jadwal_pra_sesi')->insert([
+            'ujian_pra_semester_id'=>51,'jenis'=>$jenis,'tahap'=>$tahap,
+            'mulai_pada'=>$wib->modify('-1 minute')->format('Y-m-d H:i:s'),
+            'selesai_pada'=>$wib->modify('+1 hour')->format('Y-m-d H:i:s'),
+            'durasi_menit'=>35,'status'=>'siap','dibuat_oleh'=>1,
+            'dibuat_pada'=>gmdate('Y-m-d H:i:s'),
+        ]);
+        return (int)$this->db->insertID();
+    }
+
+    public function testRemedialTerjadwalMembukaSatuAttemptDanNilaiTerbaik(): void
+    {
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'selesai_sah',
+            'skor'=>50,'kkm'=>75,'token_publik'=>str_repeat('a',48),
+        ]);
+        $id=$this->jadwalTambahanAktif('remedial','remedial');
+        $mesin=new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $ruang=$mesin->ruang(11);
+        self::assertTrue($ruang['boleh_mulai']);
+        self::assertSame('remedial',$ruang['tahap_berikut']);
+        self::assertSame(50.0,$ruang['nilai_terbaik']);
+        $baru=$mesin->mulai(11,true,true);
+        self::assertSame('remedial',$baru['tahap']);
+        $saved=$this->db->table('percobaan_ujian')
+            ->where('token_publik',$baru['token'])->get()->getRowArray();
+        self::assertSame(2,(int)$saved['nomor_percobaan']);
+        self::assertSame($id,(int)$saved['jadwal_pra_sesi_id']);
+        self::assertSame(35*60,(int)$saved['durasi_detik']);
+        $done=$mesin->tindakan(11,$baru['token'],'kirim',true);
+        self::assertSame('selesai_sah',$done['status']);
+        self::assertSame('remedial',$done['tahap']);
+        self::assertSame(50.0,$mesin->ruang(11)['nilai_terbaik']);
+        self::assertSame('final',$mesin->ruang(11)['status_nilai']);
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+    }
+
+    public function testSusulanBatalMembutuhkanPesertaYangDitunjukAdmin(): void
+    {
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'dibatalkan_menunggu_guru',
+            'skor'=>null,'kkm'=>75,'token_publik'=>str_repeat('b',48),
+        ]);
+        $id=$this->jadwalTambahanAktif('susulan','normal');
+        $mesin=new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+        $this->db->table('peserta_pra_susulan')->insert([
+            'jadwal_pra_sesi_id'=>$id,'siswa_id'=>1,'ditetapkan_oleh'=>1,
+            'ditetapkan_pada'=>gmdate('Y-m-d H:i:s'),
+        ]);
+        self::assertTrue($mesin->ruang(11)['boleh_mulai']);
+        $baru=$mesin->mulai(11,true,true);
+        self::assertSame('normal',$baru['tahap']);
+        $saved=$this->db->table('percobaan_ujian')
+            ->where('token_publik',$baru['token'])->get()->getRowArray();
+        self::assertSame(2,(int)$saved['nomor_percobaan']);
+        self::assertSame($id,(int)$saved['jadwal_pra_sesi_id']);
+        self::assertNull($saved['skor']);
+    }
+
+    public function testAdminJadwalSusulanAbsenDanDaftarPesertaAditif(): void
+    {
+        $wib=new \DateTimeImmutable('now',new \DateTimeZone('Asia/Jakarta'));
+        $this->db->table('ujian_pra_semester')->where('id',51)->update([
+            'mulai_pada'=>$wib->modify('-3 days')->format('Y-m-d H:i:s'),
+            'selesai_pada'=>$wib->modify('-2 days')->format('Y-m-d H:i:s'),
+        ]);
+        $admin=new \App\Services\PraSemesterSesiService($this->db,$this->actor('admin',1));
+        $d=$wib->modify('+2 days')->setTime(8,0);
+        $id=$admin->buat(11,'susulan','normal',
+            $d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'45');
+        self::assertGreaterThan(0,$id);
+        $calon=$admin->calonSusulan(11,$id);
+        self::assertCount(1,$calon);
+        self::assertTrue($calon[0]['boleh_ditambah']);
+        self::assertSame(1,$admin->tambahPeserta(11,$id,['1']));
+        self::assertSame(0,$admin->tambahPeserta(11,$id,['1']));
+        self::assertTrue($admin->calonSusulan(11,$id)[0]['ditetapkan']);
+        self::assertSame(1,(int)$admin->daftar(11)[0]['jumlah_peserta']);
+        $this->expectException(\DomainException::class);
+        $admin->buat(11,'susulan','normal',
+            $d->format('Y-m-d\TH:i'),$d->modify('+1 hour')->format('Y-m-d\TH:i'),'45');
+    }
+
 }
