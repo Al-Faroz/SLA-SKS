@@ -97,3 +97,14 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 - Jalur kategori A/B/C/approval untuk TP Siap pada branch fitur terdahulu **dibatalkan**. **Jangan impor `V4-0006_KOREKSI_TP_SIAP.sql`** untuk menerapkan aturan baru. Jika sudah pernah diimpor pengguna, jangan hapus tabel tanpa dump terbaru, backup dan izin eksplisit.
 - Implementasi form CP **tepat lima field** mungkin perlu pembaruan validasi/SQL untuk membuat metadata lama tidak wajib; audit dump privat XAMPP terbaru terlebih dahulu. Bila skema harus berubah, sediakan patch SQL incremental yang kompatibel MySQL/MariaDB; tidak memakai Migration/Seeder.
 - Setiap implementasi cek G1, status penggunaan siswa, atomisitas penyimpanan/snapshot, akses berkas privat, regresi Word dan pengujian XAMPP sebelum merge.
+
+### Instalasi patch sertifikat V4-0011 (3 November 2026)
+
+1. Backup database `sla_sks_v4` dan folder `writable/` **sebelum pull/impor**. Periksa `SELECT versi FROM schema_version WHERE versi IN ('V4-0010-BANK-WORD-PRA','V4-0011-SERTIFIKAT');`: V4-0010 harus ada, V4-0011 belum ada. Pastikan tidak ada empat tabel sertifikat dalam schema lama.
+2. Pull branch A11-2; impor **sekali** `database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql` di phpMyAdmin database yang benar. **Jangan menjalankan Migration/Seeder atau mengimpor ulang dump lama**.
+3. Periksa `schema_version`, empat tabel baru, isi awal 0; cek kembali jumlah siswa, TP, progres dan nilai dengan query SELECT biasa (seharusnya tidak berubah).
+4. Login Admin → **Sertifikat → Template & TTD**. Background A4 landscape boleh fallback, TTD PNG wajib; lakukan pratinjau sebelum aktivasi background. Pastikan folder `writable/private/sertifikat/{aset,pdf}` dapat ditulis dan tidak bisa diakses langsung lewat HTTP.
+5. Uji penerbitan hanya memakai akun siswa simulasi yang **memenuhi seluruh syarat TP/Final**. Jika belum ada siswa layak, jangan mengubah nilai siswa nyata hanya untuk memunculkan tombol. Uji PDF, nilai 0, QR, idempotensi, revisi & arsip, akses siswa berbeda, serta tautan QR localhost.
+6. Sebelum dipakai untuk sertifikat nyata, atur domain HTTPS permanen untuk `site_url` agar QR tidak berisi tautan localhost. Perubahan domain/URL tetap memerlukan persetujuan pemilik dan uji hosting tersendiri.
+
+Jika impor DDL gagal di tengah, jangan mengulang tanpa audit keadaan parsial dan backup; MariaDB DDL mungkin melakukan implicit commit. Tidak ada reset/hapus data.
