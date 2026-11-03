@@ -367,3 +367,9 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Admin: buat remedial, susulan normal, susulan remedial; tolak jadwal masa lalu/bentrok/jeda utama belum selesai. Tetapkan peserta susulan yang berhak, tidak dapat menyelundupkan siswa Gen lain; peserta yang sudah ditetapkan tidak terhapus.
 - Siswa: normal batal -> hanya susulan normal terdaftar; tidak hadir -> hanya susulan normal setelah jendela utama tutup; normal sah <KKM -> remedial; remedial batal -> susulan remedial; normal sah ≥KKM -> tidak bisa lanjut. Perubahan peserta/jadwal setelah ujian digunakan harus ditolak. Skor terbaik dan 0.00 sah tetap dibedakan dari NULL.
 - Pengujian otomatis mencakup PHP lint, tes Service dan SQLite sintetis; uji MySQL/MariaDB lokal/XAMPP, browser fullscreen, keamanan URL dan peran tetap wajib sebelum PASS pengguna.
+
+### A8-6 — Uji navigasi daftar/detail Pra-Semester
+1. URL Guru tanpa `paketId` harus hanya menunjukkan filter Gen dan tabel paket; **tidak** boleh ada form KKM/soal di bawahnya. Klik **Kelola soal** membuka halaman detail tanpa tabel pemilihan paket, berisi KKM, daftar soal, dan form; breadcrumb **Kembali ke daftar** mempertahankan Gen.
+2. URL Admin tanpa `paketId` harus hanya menunjukkan filter Gen/Mapel/Semester/Status dan tabel jadwal; **tidak** boleh ada form jadwal atau daftar peserta di bawahnya. Klik **Atur jadwal** membuka halaman detail tanpa tabel utama; breadcrumb dan kembali mempertahankan seluruh filter.
+3. POST simpan soal/KKM, jadwal utama/tambahan, dan peserta susulan tetap berfungsi dan kembali ke halaman detail. Uji 403 akses Guru ke paket Gen lain, status kosong, responsif HP, dan CSRF.
+4. SQL **tetap V4-0009** yang sudah terpasang; tidak mengimpor ulang atau mengubah data lokal untuk perbaikan UI ini.
