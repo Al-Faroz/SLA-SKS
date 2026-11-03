@@ -26,3 +26,9 @@
 - Guru G1 mengelola bank minimal 30 soal mencakup setiap BAB dan KKM tersendiri Pra-Semester (default Admin/khusus Guru). Admin menjadwalkan ujian utama, remedial tersendiri dan susulan.
 - Siswa yang ujian Pra-Semester-nya dibatalkan **harus mendapat jadwal susulan Admin**, bukan akses ulang mandiri. Siswa tidak hadir dapat ditetapkan oleh Admin untuk susulan. Susulan boleh diulang bila dibatalkan lagi dengan audit. Pembatalan remedial → susulan untuk remedial yang sama; satu remedial sah setelah hasil normal sah <KKM.
 - **Pembaruan keputusan 3 November 2026:** Pra-Semester **bukan gerbang sertifikat dan tidak dicetak di sertifikat**. Isu yang sebelumnya ditunda sudah diputuskan pemilik; keputusan ini berlaku untuk pengembangan berikutnya.
+
+## Status implementasi A13-2 (3 November 2026)
+
+Setelah Pusat Bantuan A13-1, dump SQL lokal `sla_sks_v4 (17).sql` dibuat 03-11-2026 16.02 di MariaDB 10.4.32 telah diberikan dan diaudit (68 tabel; `schema_version` akhir `V4-0011-SERTIFIKAT`). Tidak ada tabel `pengumuman`, `faq`, atau `riwayat_informasi`. A13-2 menambahkan patch additive `V4-0012_PENGUMUMAN_FAQ.sql` dan CRUD non-destruktif Pengumuman global serta FAQ Admin. Semua login hanya membaca konten Terbit; Admin dapat mengelola keduanya; Guru hanya Pengumuman yang dia buat. Tidak ada data siswa/akun nyata dalam patch/repository. **Impor patch dan pengujian XAMPP oleh pemilik belum dilakukan**, sehingga status belum FIX.
+
+Tahap berikutnya: Notifikasi internal untuk peristiwa sah menurut Master 12/14/16, badge belum dibaca dan kontrol hanya penerima sendiri. Sebelum SQL berikutnya, minta **dump XAMPP baru yang dibuat setelah V4-0012 berhasil diimpor**, bukan memakai dump versi sebelum patch.
