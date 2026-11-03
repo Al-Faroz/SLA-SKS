@@ -7,14 +7,16 @@ namespace App\Controllers;
 use App\Services\AuthService;
 use App\Services\KelayakanSertifikatService;
 use App\Services\NavigasiService;
+use App\Services\SertifikatAsetService;
+use App\Services\SertifikatPenerbitanService;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 use Throwable;
 
-/** A11-1: halaman kesiapan saja; penerbitan PDF/QR belum diaktifkan. */
+/** Pemeriksaan akademik dan penerbitan sertifikat berizin. */
 final class AdminSertifikat extends BaseController
 {
-    protected $helpers = ['url'];
+    protected $helpers = ['url','form'];
 
     private static function angka(mixed $nilai, int $maks): ?int
     {
@@ -49,6 +51,12 @@ final class AdminSertifikat extends BaseController
                 throw new DomainException('Paket aktif tidak tersedia.');
             }
             $data = $terpilih === null ? null : $svc->rekap($paketId,$halaman);
+            $asetAktif = (new SertifikatAsetService())->aktif();
+            $sudahTerbit = $data === null ? [] :
+                (new SertifikatPenerbitanService())->aktifUntukPaket(
+                    (int)$paketId,
+                    array_map(static fn (array $r): int => (int)$r['siswa_id'],$data['baris'])
+                );
             $akun = (new AuthService())->penggunaSaatIni();
             return $this->response->setHeader('Cache-Control','private, no-store, max-age=0')
                 ->setBody(view('admin/sertifikat_kelayakan',[
@@ -60,6 +68,8 @@ final class AdminSertifikat extends BaseController
                     'terpilih'=>$terpilih,
                     'rekap'=>$data,
                     'identitas'=>$svc->identitas(),
+                    'asetAktif'=>$asetAktif,
+                    'sudahTerbit'=>$sudahTerbit,
                 ]));
         } catch (DomainException $e) {
             if ($this->request->getGet() !== []) {

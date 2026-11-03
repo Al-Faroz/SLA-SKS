@@ -134,3 +134,20 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 - `TemplateWordSoalService` dan `PratinjauWordSoalService` mendukung `pra_semester` menggunakan BAB per nomor; `RenderWordSoalService` tetap digunakan tanpa fork renderer. `PraSemesterWordService` mengatur HMAC template, upload privat, sidik jari, review, impor append-only transaksional, riwayat dan penjagaan bank terpakai.
 - Route Guru: `GET /guru/pra-semester/{paketId}/word?jumlah=30`, `POST .../word/pratinjau`, `GET .../word/review/{id}`, `POST .../word/review/{id}/konfirmasi`. Semua wajib auth Guru G1, CSRF pada POST, sumber file privat.
 - Endpoint gambar siswa `GET /siswa/pra-semester/{paketId}/{token}/media/{wordId}/{rid}` wajib auth siswa dan pengecekan snapshot attempt; tidak mengembalikan bank/kunci jawaban.
+
+### A11-2 — Endpoint implementasi sertifikat (3 November 2026)
+
+| Metode | Endpoint | Peran |
+|---|---|---|
+| GET | `/admin/sertifikat` | Admin: kelayakan, penerbitan/unduh/revisi satu siswa |
+| GET,POST | `/admin/sertifikat/aset`, `/admin/sertifikat/aset/{jenis}` | Admin: daftar/unggah PNG/JPG privat |
+| GET | `/admin/sertifikat/aset/{id}/gambar` | Admin: preview gambar berizin |
+| GET | `/admin/sertifikat/template/pratinjau/{id}` | Admin: PDF dummy A4 landscape, `id=0` fallback |
+| POST | `/admin/sertifikat/aset/{id}/aktifkan` | Admin: pointer template/TTD, preview BG wajib |
+| POST | `/admin/sertifikat/{paketId}/siswa/{siswaId}/terbit` | Admin: cek ulang TP Final, idempoten |
+| POST | `/admin/sertifikat/{paketId}/siswa/{siswaId}/revisi` | Admin: alasan, konten berubah, versi/QR baru |
+| GET | `/admin/sertifikat/{id}/unduh` | Admin: PDF privat berizin |
+| GET | `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Siswa: hanya PDF milik sendiri |
+| GET | `/verifikasi/{kode}` | Publik: token acak + throttle, whitelist informasi |
+
+Service: `SertifikatAsetService`, `SertifikatPdfService`, `SertifikatPenerbitanService`, `KelayakanSertifikatService`. Pembuatan PDF dilakukan di luar transaksi DB; sebelum commit dikunci `siswa` dan diperiksa ulang kelayakan dan checksum konten. Transaction rollback hanya membersihkan PDF **baru**, versi lama tetap aman. PHP Dompdf menggunakan data-URI tanpa remote request/embedded PHP; QR endroid tidak memuat PII. Tidak mengubah root `index.php`/`.htaccess`.

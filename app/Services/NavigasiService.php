@@ -18,6 +18,8 @@ final class NavigasiService
                 'aktif' => $aktif === 'pembelajaran'];
             $menu[] = ['label' => 'Laporan Akademik', 'path' => 'siswa/laporan',
                 'aktif' => $aktif === 'laporan'];
+            $menu[] = ['label' => 'Sertifikat', 'path' => 'siswa/sertifikat',
+                'aktif' => $aktif === 'sertifikat'];
         }
         if ($peran === 'guru') {
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
@@ -46,7 +48,7 @@ final class NavigasiService
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
-                'sertifikat' => ['Pemeriksaan Sertifikat', 'admin/sertifikat'],
+                'sertifikat' => ['Sertifikat', 'admin/sertifikat'],
                 'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'pra_semester' => ['Jadwal Pra-Semester', 'admin/pra-semester'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],

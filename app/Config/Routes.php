@@ -9,6 +9,7 @@ $routes->get('/', 'Publik::beranda');
 $routes->get('masuk', 'Akun::masuk');
 $routes->post('masuk', 'Akun::prosesMasuk');
 $routes->get('kebijakan-privasi', 'Publik::kebijakanPrivasi');
+$routes->get('verifikasi/(:segment)', 'VerifikasiSertifikat::index/$1');
 
 // Semua mutasi memerlukan CSRF (Filter global) dan session.
 $routes->get('ganti-sandi', 'Akun::gantiSandi', ['filter' => 'auth']);
@@ -25,6 +26,8 @@ $routes->post('peran/ganti', 'Akun::prosesGantiPeran', ['filter' => 'auth']);
 $routes->get('siswa', 'Akun::berandaSiswa', ['filter' => 'auth:siswa']);
 $routes->get('siswa/pembelajaran', 'SiswaPembelajaran::mapel', ['filter' => 'auth:siswa']);
 $routes->get('siswa/laporan', 'SiswaLaporan::index', ['filter' => 'auth:siswa']);
+$routes->get('siswa/sertifikat', 'SiswaSertifikat::index', ['filter' => 'auth:siswa']);
+$routes->get('siswa/sertifikat/(:num)/unduh', 'SiswaSertifikat::unduh/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/laporan/(:num)', 'SiswaLaporan::detail/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/mapel/(:num)', 'SiswaPembelajaran::semester/$1', ['filter' => 'auth:siswa']);
 $routes->get('siswa/semester/(:num)', 'SiswaPembelajaran::paket/$1', ['filter' => 'auth:siswa']);
@@ -199,6 +202,15 @@ $routes->post('admin/mapel-guru', 'AdminReferensi::buatMapel', ['filter' => 'aut
 $routes->post('admin/mapel-guru/(:num)/gen/(:num)/guru', 'AdminReferensi::tetapkanGuru/$1/$2', ['filter' => 'auth:admin']);
 $routes->get('admin/identitas', 'AdminIdentitas::index', ['filter' => 'auth:admin']);
 $routes->get('admin/sertifikat', 'AdminSertifikat::index', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/aset', 'AdminSertifikatAset::index', ['filter' => 'auth:admin']);
+$routes->post('admin/sertifikat/aset/(:segment)', 'AdminSertifikatAset::unggah/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/aset/(:num)/gambar', 'AdminSertifikatAset::gambar/$1', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/template/pratinjau/(:num)', 'AdminSertifikatAset::pratinjau/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/sertifikat/aset/(:num)/aktifkan', 'AdminSertifikatAset::aktifkan/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/sertifikat/(:num)/siswa/(:num)/terbit', 'AdminSertifikatTerbit::terbit/$1/$2', ['filter' => 'auth:admin']);
+$routes->post('admin/sertifikat/(:num)/siswa/(:num)/revisi', 'AdminSertifikatTerbit::revisi/$1/$2', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat/(:num)/unduh', 'AdminSertifikatTerbit::unduh/$1', ['filter' => 'auth:admin']);
+
 $routes->post('admin/identitas', 'AdminIdentitas::simpan', ['filter' => 'auth:admin']);
 
 $routes->set404Override('\App\Controllers\Publik::tidakDitemukan');

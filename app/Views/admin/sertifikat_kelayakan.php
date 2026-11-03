@@ -14,6 +14,9 @@
                 Pra-Semester bukan syarat dan nilainya tidak dicantumkan dalam sertifikat.</p>
         </div>
     </header>
+    <?php if ($sukses = session()->getFlashdata('sukses_sertifikat')): ?>
+        <div class="a-alert a-alert--sukses" role="status"><?= esc($sukses) ?></div>
+    <?php endif ?>
     <?php if ($pesan = session()->getFlashdata('galat_sertifikat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
     <?php endif ?>
@@ -32,15 +35,21 @@
             </div>
             <div class="a-sertifikat__status-item">
                 <span>Tanda Tangan PNG dan Template</span>
-                <strong>Belum dikonfigurasi</strong>
-                <p class="a-help">Unggah, pratinjau, aktivasi template, dan arsip TTD
-                    dikerjakan pada A11-2. TTD wajib sebelum sertifikat terbit.</p>
+                <strong><?= isset($asetAktif['ttd']) ? 'TTD aktif — siap'
+                    : 'TTD belum aktif' ?></strong>
+                <p class="a-help">Background:
+                    <?= isset($asetAktif['background']) ? 'Template unggahan aktif' :
+                        'Template bawaan (fallback)' ?>.
+                    TTD PNG wajib untuk penerbitan.</p>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url(
+                    'admin/sertifikat/aset'),'attr') ?>">Kelola Template &amp; TTD</a>
             </div>
         </div>
         <div class="a-alert" role="status">
-            <strong>Tahap A11-1 hanya memeriksa kelayakan akademik.</strong>
-            Belum ada penerbitan, nomor, berkas PDF, atau kode QR yang dibuat.
-            Syarat penerbitan administratif diperiksa ulang saat proses A11-2 tersedia.
+            Penerbitan memerlukan semua TP NonEsensial selesai dan Nilai TP Final,
+            identitas madrasah lengkap serta TTD PNG aktif.
+            Pra-Semester tidak menjadi syarat dan nilainya tidak dicetak.
+            Perubahan isi cetak harus melalui revisi satu per satu; versi lama tetap arsip.
         </div>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="pilih-paket-sertifikat">
@@ -87,6 +96,7 @@
                                 <th scope="col">Nilai TP Final</th>
                                 <th scope="col">Kelayakan Akademik</th>
                                 <th scope="col">Keterangan</th>
+                                <th scope="col">Sertifikat / Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,6 +127,53 @@
                                                     <?php endforeach ?>
                                                 </ul>
                                             </details>
+                                        <?php endif ?>
+                                    </td>
+                                    <td class="a-sertifikat__aksi">
+                                        <?php $terbit = $sudahTerbit[(int)$baris['siswa_id']] ?? null; ?>
+                                        <?php if ($terbit !== null): ?>
+                                            <span class="a-sertifikat__badge a-sertifikat__badge--layak">
+                                                Versi <?= (int)$terbit['versi'] ?> berlaku
+                                            </span>
+                                            <a class="a-btn a-btn--sekunder" href="<?= esc(
+                                                site_url('admin/sertifikat/'.(int)$terbit['id'].'/unduh'),'attr') ?>">
+                                                Unduh PDF
+                                            </a>
+                                            <?php if ($baris['layak_akademik'] && $identitas['lengkap']
+                                                && isset($asetAktif['ttd'])): ?>
+                                                <details class="a-sertifikat__alasan">
+                                                    <summary>Revisi sertifikat</summary>
+                                                    <form method="post" class="a-form"
+                                                        action="<?= esc(site_url('admin/sertifikat/'
+                                                            .(int)$rekap['paket']['id'].'/siswa/'
+                                                            .(int)$baris['siswa_id'].'/revisi'),'attr') ?>">
+                                                        <?= csrf_field() ?>
+                                                        <div class="a-field">
+                                                            <label class="a-label" for="alasan-revisi-<?= (int)$baris['siswa_id'] ?>">
+                                                                Alasan revisi (5–225 karakter)
+                                                            </label>
+                                                            <input class="a-input" type="text" name="alasan"
+                                                                id="alasan-revisi-<?= (int)$baris['siswa_id'] ?>"
+                                                                minlength="5" maxlength="225" required>
+                                                        </div>
+                                                        <button class="a-btn a-btn--utama" type="submit">
+                                                            Terbitkan Revisi
+                                                        </button>
+                                                    </form>
+                                                </details>
+                                            <?php endif ?>
+                                        <?php elseif ($baris['layak_akademik'] && $identitas['lengkap']
+                                            && isset($asetAktif['ttd'])): ?>
+                                            <form method="post" action="<?= esc(site_url(
+                                                'admin/sertifikat/'.(int)$rekap['paket']['id']
+                                                .'/siswa/'.(int)$baris['siswa_id'].'/terbit'),'attr') ?>">
+                                                <?= csrf_field() ?>
+                                                <button class="a-btn a-btn--utama" type="submit">
+                                                    Terbitkan Sertifikat
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <span class="a-help">Menunggu seluruh syarat.</span>
                                         <?php endif ?>
                                     </td>
                                 </tr>
