@@ -7,6 +7,9 @@ on:
       - 'database/sql/README.md'
       - 'app/Services/AturanWaktuUjianService.php'
       - 'app/Services/SusunButirUjianService.php'
+      - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'tests/unit/PraSemesterImplementasiTest.php'
+      - 'tests/unit/PraSemesterDatabaseTest.php'
       - 'tests/unit/AturanWaktuUjianServiceTest.php'
       - 'tests/unit/SusunButirUjianServiceTest.php'
       - 'tests/integration/SqlUjianSchemaCheck.php'
@@ -41,7 +44,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mysqli, pdo_mysql, mbstring, intl, gd, zip, xml, dom, fileinfo
+          extensions: mysqli, pdo_mysql, sqlite3, pdo_sqlite, mbstring, intl, gd, zip, xml, dom, fileinfo
           coverage: none
       - name: Composer install
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -51,10 +54,15 @@ jobs:
           php -l app/Services/SusunButirUjianService.php
           php -l tests/unit/AturanWaktuUjianServiceTest.php
           php -l tests/unit/SusunButirUjianServiceTest.php
+          php -l app/Services/MesinPraSemesterSiswaService.php
+          php -l tests/unit/PraSemesterImplementasiTest.php
+          php -l tests/unit/PraSemesterDatabaseTest.php
           php -l tests/integration/SqlUjianSchemaCheck.php
       - name: Unit test waktu Ketat dan acak opsi
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php
           vendor/bin/phpunit --no-coverage tests/unit/SusunButirUjianServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterImplementasiTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
       - name: Impor patch SQL pada MariaDB sintetis
         run: php tests/integration/SqlUjianSchemaCheck.php
