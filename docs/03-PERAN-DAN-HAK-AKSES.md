@@ -106,3 +106,7 @@ Beranda `/guru` menunjukkan indikator kerja hanya untuk penugasan aktif `penugas
 ### A12-3 — Dashboard Siswa (3 November 2026)
 
 Beranda `/siswa` memakai filter `auth:siswa` dan pemeriksaan ulang role/status di `DashboardSiswaService`. Semua paket berasal dari `KatalogPembelajaranSiswaService` yang memeriksa Gen, penugasan, semester mulai dan gerbang semester sebelumnya. Kode TP tujuan navigasi juga harus lolos `daftarTp` dengan `akses.buka`. Tidak menerima `siswa_id` atau `paket_id` dari GET; tidak membaca nama/NISN siswa lain, kunci, jawaban, token ujian, atau identitas autentikasi. Hanya SELECT; mengunjungi dashboard tidak memulai TP, percobaan maupun mengubah skor. Pengampu Guru dan Admin tidak mewarisi hak dashboard siswa pada akun multi-role.
+
+### A12-4 — Otorisasi dan privasi Dashboard Admin (3 November 2026)
+
+`GET /admin` menggunakan filter `auth:admin` serta pemeriksaan role aktif/status/`wajib_ganti_sandi` di `DashboardAdminService`. Dashboard hanya melakukan SELECT agregat dan pemeriksaan berkas TTD privat (keberadaan + checksum); tidak memuat nama, NISN, password, hash, token, PDF/TTD mentah atau jawaban siswa pada HTML ringkasan. Foto belum disetujui dihitung hanya bila masih ditunjuk oleh `profil_pengelola.foto_menunggu_id` dan status `foto_profil=menunggu`; sertifikat historis `digantikan` tidak dihitung. Link tindakan mengarah ke halaman Admin yang telah dilindungi sendiri. Header `Cache-Control: private, no-store` wajib. Pada akun multi-role yang sedang berperan Guru/Pimpinan, tidak boleh melihat Dashboard Admin.
