@@ -2292,3 +2292,34 @@ html[data-theme="light"] .a-app--prototipe .a-laporan .a-laporan__pra {
     background:linear-gradient(135deg,#E7F7F1,#EBF1FF);
     border-color:#A6D2C5;
 }
+
+/* A11-1 — Status akademik untuk sertifikat; tidak sama dengan diterbitkan. */
+html[data-theme] .a-app--prototipe .a-sertifikat .a-sertifikat__status-item {
+    background:var(--eg-pane-soft);
+    border-color:var(--eg-line);
+    box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-sertifikat .a-sertifikat__scroll {
+    background:var(--eg-table);
+    border:1px solid var(--eg-line);
+}
+html[data-theme="dark"] .a-app--prototipe .a-sertifikat__badge--layak {
+    color:#9EF2C9;
+    border-color:rgba(89,220,166,.5);
+    background:rgba(25,111,76,.27);
+}
+html[data-theme="dark"] .a-app--prototipe .a-sertifikat__badge--tahan {
+    color:#FFE2A6;
+    border-color:rgba(230,177,93,.43);
+    background:rgba(149,99,30,.21);
+}
+html[data-theme="light"] .a-app--prototipe .a-sertifikat__badge--layak {
+    color:#17563D;
+    border-color:#8FCDA9;
+    background:#E3F7E9;
+}
+html[data-theme="light"] .a-app--prototipe .a-sertifikat__badge--tahan {
+    color:#805414;
+    border-color:#D9B883;
+    background:#FFF2D9;
+}

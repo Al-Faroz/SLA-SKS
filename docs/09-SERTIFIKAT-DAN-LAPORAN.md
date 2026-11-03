@@ -47,3 +47,11 @@ Penyuntingan CP oleh Admin dan isian BAB oleh Guru bukan tindakan menerbitkan/me
 - **Progres semester** = TP NonEsensial berstatus tuntas **dan** mempunyai Sumatif selesai sah dibagi seluruh TP NonEsensial nonarsip pada paket. Semester sebelum `semester_mulai` ditandai **Dilewati**, bukan 100%; semester tanpa TP NonEsensial tidak otomatis 100%.
 - Panel **Hasil Pra-Semester** mandiri menampilkan KKM, skor normal/remedial sah, nilai terbaik, status; angka `0,00` bukan NULL. Tidak ada Nilai Akhir Semester maupun dependensi sertifikat pada Pra-Semester.
 - A10-1 tidak mengubah peran Guru, penerbitan sertifikat, monitoring tingkat madrasah di dashboard akhir, tabel SQL, ataupun histori siswa. Tes otomatis dan uji browser diperlukan sebelum penerimaan.
+
+### A11-1 — Pemeriksaan kelayakan sertifikat sebelum penerbitan (3 November 2026)
+
+- Admin membuka `GET /admin/sertifikat` untuk **memeriksa** per Gen–Mapel–Semester dan melihat seluruh siswa pada paket yang ditugaskan. Ini belum proses penerbitan atau pratinjau PDF final.
+- Status **Layak akademik** hanya berarti seluruh TP NonEsensial semester yang tidak diarsipkan telah `tuntas`, masing-masing mempunyai percobaan Sumatif `selesai_sah`, nilai TP final **tidak NULL**, Sumatif tersimpan, serta komponen Resume/HOTS final bila jalur `belajar_wajib`. Skor 0,00 sah; nilai di bawah KKM tidak otomatis menggagalkan TP yang tuntas.
+- Semester dilewati dan paket tanpa TP NonEsensial **tidak dinyatakan layak secara otomatis**. TP Esensial tetap tercatat pada daftar ATP/sertifikat tetapi tidak mempunyai nilai dan tidak menjadi syarat aktivitas siswa.
+- Periksa identitas Madrasah dari `pengaturan` yang sudah ada; **TTD PNG dan template/riwayat** baru akan diimplementasikan dalam A11-2, sehingga status kelayakan akademik **bukan** izin mengunduh sertifikat. Tidak ada tombol terbit, nomor/QR/PDF atau SQL baru pada A11-1.
+- **Pra-Semester tidak diperiksa sama sekali** dalam kelayakan akademik dan tidak masuk data cetak, sesuai keputusan final pemilik. Pemeriksaan izin Admin server-side; tidak ada proses tulis pada halaman ini.

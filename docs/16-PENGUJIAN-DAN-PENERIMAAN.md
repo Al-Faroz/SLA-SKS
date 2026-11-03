@@ -449,3 +449,18 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 | A10-008 | Browser desktop, laptop, HP Dark/Light dan Mode Dokumentasi | Daftar, progress bar, tabel horizontal, pesan kosong dan navigasi terbaca pada 360/390/768/1100px |
 
 Integrasi otomatis A10 memakai **SQLite sintetis** di `tests/unit/LaporanAkademikDatabaseTest.php` dan PHP lint; pengujian browser XAMPP tetap wajib sebelum status FIX. Dump privat tidak diunggah ke repo.
+
+### A11-1 — Regresi kesiapan sertifikat sebelum penerbitan (3 November 2026)
+
+| ID | Skenario | Hasil wajib |
+|---|---|---|
+| A11-001 | Semua TP NonEsensial tuntas, Sumatif sah dan nilai TP Final termasuk nilai 0 | **Layak akademik**, walaupun tidak ada data/jadwal Pra-Semester |
+| A11-002 | TP `tuntas` tetapi tidak mempunyai percobaan Sumatif `selesai_sah` | **Belum layak**; Sumatif bukan hanya status progres |
+| A11-003 | Sumatif sah tetapi nilai TP Sementara/NULL atau komponen belajar wajib masih kosong | **Belum layak**; tampil alasan penilaian |
+| A11-004 | Semester sebelum mulai siswa atau paket tanpa TP NonEsensial | **Belum layak**, bukan otomatis 100% |
+| A11-005 | Admin melihat Gen/semester aktif dan halaman kedua | Paket nonaktif tidak dipilih; siswa Gen lain tidak tercampur; pager benar |
+| A11-006 | Guru, Siswa, Pimpinan atau Admin tidak aktif mengakses | Ditolak server; tidak ada data NISN atau PDF privat |
+| A11-007 | Identitas lengkap tetapi TTD belum dikonfigurasi | Tetap **belum ada penerbitan**; jangan membuat nomor, PDF atau token QR |
+| A11-008 | Filter dan tampilan Dark/Light, HP, Mode Dokumentasi | Tabel dan alasan terbaca, tidak ada tombol semu |
+
+Tes SQLite sintetis di `tests/unit/KelayakanSertifikatDatabaseTest.php` dan lint workflow `QA A11-1 Kelayakan Sertifikat`. Ini kriteria **A11-1 saja**, belum menggantikan E2E-045 sampai E2E-057 penerbitan/versi/QR serta uji browser XAMPP.

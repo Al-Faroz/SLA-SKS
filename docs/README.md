@@ -69,3 +69,5 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 
 - **[Checkpoint A10 — keputusan final sertifikat tanpa gerbang Pra-Semester (3 November 2026)](CHECKPOINT-A10-KEPUTUSAN-SERTIFIKAT-2026-11-03.md)**. Pra-Semester hanya checkpoint sebelum Ujian Semester yang sesungguhnya; **tidak wajib untuk sertifikat dan nilainya tidak dicetak**. Termasuk audit baca-saja dump lokal v4 (15) dan enam skenario penerimaan sertifikat; **belum ada kode sertifikat atau SQL baru**.
  - **[Checkpoint A10-1 — Laporan Akademik Siswa & Monitoring Pimpinan (3 November 2026)](CHECKPOINT-A10-1-LAPORAN-SISWA-PIMPINAN-2026-11-03.md)**. Implementasi halaman laporan Siswa pribadi dan monitoring Pimpinan read-only; progres TP sah, nilai 0/NULL, Pra-Semester mandiri; SQL tidak berubah. Menunggu regresi GitHub Actions dan uji XAMPP.
+
+- **[Checkpoint A11-1 — Pemeriksaan Kelayakan Sertifikat (3 November 2026)](CHECKPOINT-A11-1-KELAYAKAN-SERTIFIKAT-2026-11-03.md)**. Pemeriksaan akademik Admin per siswa/Gen–Mapel–Semester berdasarkan TP tuntas, Sumatif sah dan nilai Final; **tanpa gerbang Pra-Semester**. Belum ada PDF/QR/terbit, dan **tidak ada SQL baru**.

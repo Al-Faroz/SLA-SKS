@@ -323,3 +323,9 @@ Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`
 2. `siswa/laporan/{paketId}`: progres TP NonEsensial (kartu angka dan progress bar), rincian skor sah per BAB/TP dalam tabel gulir horizontal, kemudian **Hasil Pra-Semester pada kartu berbeda**; nilai kosong/0 ditampilkan dengan benar dan tidak ada tombol ubah.
 3. `pimpinan/laporan`: filter paket Gen–Mapel–Semester, tabel paginasi semua siswa, progres sah dan tombol pratinjau. `pimpinan/laporan/{paket}/siswa/{id}`: memakai tampilan detail read-only yang sama, dibatasi Gen.
 4. Tampilkan keadaan belum ada paket/siswa/TP/ujian, tanpa membuat nilai atau skor dummy. Pada 360/390px, komponen metrik berubah menjadi satu kolom dan tabel yang lebar tetap bisa digulir, bukan memperkecil tulisan sampai tak terbaca.
+
+### A11-1 — Layar pemeriksaan sertifikat Admin (3 November 2026)
+
+- Menu **Admin → Pemeriksaan Sertifikat** mempunyai filter paket Gen–Mapel–Semester aktif, tabel siswa paginasi dan dua angka per siswa: TP NonEsensial tuntas dengan Sumatif sah serta Nilai TP Final. Gunakan badge teks **Layak akademik** atau **Belum layak**, serta `details` yang dapat dibuka untuk melihat seluruh alasan, bukan hanya warnanya.
+- Card **Kesiapan Administratif** menampilkan kelengkapan identitas madrasah, tautan ke pengaturan identitas, dan pemberitahuan **TTD PNG/template belum tersedia pada A11-1**. Jangan menampilkan tombol *Terbitkan*, *Unduh Sertifikat*, atau QR yang tidak berfungsi. Penerbitan penuh baru pada A11-2.
+- Kondisi paket kosong, siswa kosong, semester dilewati, TP belum Final, data belum lengkap, dan parameter filter tidak sah ditangani. Tabel menggunakan `a-tbl` dan `a-tabel-gulir` dengan scroll horizontal di HP; Dark/Light/Mode Dokumentasi tidak mengubah akses.

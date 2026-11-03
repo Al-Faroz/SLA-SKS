@@ -46,6 +46,7 @@ final class NavigasiService
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
+                'sertifikat' => ['Pemeriksaan Sertifikat', 'admin/sertifikat'],
                 'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'pra_semester' => ['Jadwal Pra-Semester', 'admin/pra-semester'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],

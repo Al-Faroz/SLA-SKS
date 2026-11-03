@@ -490,3 +490,9 @@ Layout panel `app/Views/layouts/panel.php` **wajib memberi versi pada URL** `pub
 - Metrik `a-laporan__ringkasan` grid **4/2/1** kolom untuk desktop/tablet/HP; progress HTML native memiliki label numerik dan bukan grafik yang disimpulkan dari nilai rata-rata.
 - Tabel akademik menggunakan `a-tbl` + `a-tabel-gulir` dan `a-laporan__scroll`; detail 12 kolom minimum 1560px digulir horizontal, monitoring minimum 710px. Fokus keyboard terlihat.
 - Kartu Pra-Semester dibuat berbeda agar nilai mandiri tidak terbaca sebagai komponen TP atau Nilai Akhir Semester. Gunakan teks status disertai label, jangan warna saja.
+
+### A11-1 — Komponen pemeriksaan sertifikat Admin (3 November 2026)
+
+- Scope `a-sertifikat`: dua kartu status administratif responsif, `a-sertifikat__filter` untuk pemilihan paket, `a-sertifikat__scroll` + `a-tbl` untuk lima kolom pemeriksaan dan alasan.
+- Badge `a-sertifikat__badge--layak` / `--tahan` adalah **status kelayakan akademik**, bukan status PDF sudah terbit. Warna wajib didampingi teks dan outline. Alasan dibuka lewat `details/summary` keyboard native, `focus-visible` jelas, dan tidak mengungkap NISN.
+- Gunakan token Emerald Glass yang tersedia, bukan komponen CSS atau framework baru. Pada HP status administratif menjadi satu kolom dan tabel panjang digulir horizontal.
