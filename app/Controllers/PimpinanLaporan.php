@@ -65,8 +65,12 @@ final class PimpinanLaporan extends BaseController
                     'pilihan'=>$paket,'terpilih'=>$terpilih,'monitor'=>$monitor,
                 ]));
         } catch (DomainException $e) {
-            return redirect()->to(site_url('pimpinan/laporan'))
-                ->with('galat_laporan','Filter tidak valid atau tidak diizinkan.');
+            if ($this->request->getGet() !== []) {
+                return redirect()->to(site_url('pimpinan/laporan'))
+                    ->with('galat_laporan','Filter tidak valid atau tidak diizinkan.');
+            }
+            return $this->response->setStatusCode(403)
+                ->setBody(view('publik/ditolak',['judul'=>'Monitoring tidak tersedia']));
         } catch (Throwable $e) {
             log_message('error','A10 monitoring Pimpinan: {error}',['error'=>$e->getMessage()]);
             return $this->response->setStatusCode(500)
@@ -77,12 +81,11 @@ final class PimpinanLaporan extends BaseController
     public function detail(int $paketId, int $siswaId): ResponseInterface|string
     {
         try {
-            $svc=new LaporanAkademikService();
-            // Role aktif Pimpinan wajib; Service tidak menerima akses dari role lain.
-            $laporan=$svc->laporan($siswaId,$paketId);
-            if (($this->data()['peranAktif'] ?? '') !== 'Pimpinan') {
+            $akun=(new AuthService())->penggunaSaatIni();
+            if (($akun['peran_aktif'] ?? null) !== 'pimpinan') {
                 throw new DomainException('Pratinjau laporan tidak diizinkan.');
             }
+            $laporan=(new LaporanAkademikService())->laporan($siswaId,$paketId);
             return $this->response->setHeader('Cache-Control','private, no-store')
                 ->setBody(view('laporan/detail',$this->data()+[
                     'laporan'=>$laporan,
