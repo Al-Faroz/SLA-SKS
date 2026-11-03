@@ -596,3 +596,16 @@ GitHub Actions `QA A12-4 Dashboard Admin` memakai SQLite anonim + lint + regresi
 | A12-419 | Reload dan navigasi semua 14 layar | Tidak membuat/mengubah nilai, akun, penugasan, CP, jadwal, TTD atau sertifikat hanya dari kunjungan GET |
 
 Tes otomatis `AdminUiAuditTest.php` memeriksa keberadaan token dan struktur HTML di CI serta regresi database anonim Dashboard Admin; hasil ini **bukan pengganti uji screenshot** setelah pull XAMPP. Tidak ada SQL.
+
+### A12-4 QA lanjutan 2 — formulir dan Profil dari screenshot XAMPP (3 November 2026)
+
+| ID | Skenario | Hasil wajib |
+|---|---|---|
+| A12-420 | Tambah Pengelola desktop/HP | Pilihan peran tiga label sejajar desktop, satu kolom HP; syarat maksimal 2 peran dan validasi server tetap |
+| A12-421 | Tambah Pengelola/Siswa, input sandi dan CTA | Tombol Buat Akun berada di baris tindakan sendiri; tidak menutup petunjuk sandi, tidak mengubah POST/CSRF |
+| A12-422 | Gen & Tahun Ajaran | Kolom Gen: Form→Daftar Gen; kolom Tahun: Form→Daftar Tahun. Daftar Tahun tidak didorong ke bawah oleh tinggi Form Gen; responsive HP |
+| A12-423 | Identitas Madrasah | Input singkat dua kolom desktop, alamat full-width, CTA di bawah; field wajib, dirty-check, validasi angka/email tetap |
+| A12-424 | Profil Admin/Guru/Pimpinan | Foto disetujui dan menunggu tetap terbaca; file JPG/PNG dan petunjuk unggah berdampingan desktop, bertumpuk HP |
+| A12-425 | Profil Siswa, multi-peran, unggah foto | Akses profil Siswa tidak menampilkan upload staf; proses upload tetap meminta persetujuan Admin, ganti sandi/peran tidak berubah |
+
+Regresi statis PHP menegaskan struktur form/CSRF/elemen CSS, sedangkan screenshot XAMPP Dark/Light dan mobile tetap diperlukan sebelum FIX. Tidak ada perubahan SQL atau penyimpanan data.
