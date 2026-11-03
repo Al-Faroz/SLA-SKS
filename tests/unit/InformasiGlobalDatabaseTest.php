@@ -108,7 +108,7 @@ final class InformasiGlobalDatabaseTest extends TestCase
         self::ditolak(fn()=> $this->svc('guru',201)->simpan('pengumuman',
             self::isi('terbit')+['versi'=>'1'],$id));
         self::ditolak(fn()=> $this->svc('guru',201)->arsipkan('pengumuman',$id,1));
-        self::assertSame('draf',$this->db->table('pengumuman')->where('id',$id)->get()->getRow('status'));
+        self::assertSame('draf',$this->db->table('pengumuman')->where('id',$id)->get()->getRowArray()['status']);
         self::assertSame(1,$this->db->table('riwayat_informasi')->countAllResults());
     }
 
@@ -137,7 +137,7 @@ final class InformasiGlobalDatabaseTest extends TestCase
             'judul'=>'Baru','isi'=>'Isi baru','status'=>'draf','versi'=>'1'],$id);
         self::ditolak(fn()=> $this->svc()->simpan('pengumuman',[
             'judul'=>'Timpa','isi'=>'Usang','status'=>'terbit','versi'=>'1'],$id));
-        self::assertSame('Baru',$this->db->table('pengumuman')->where('id',$id)->get()->getRow('judul'));
+        self::assertSame('Baru',$this->db->table('pengumuman')->where('id',$id)->get()->getRowArray()['judul']);
         self::assertSame(2,$this->db->table('riwayat_informasi')->countAllResults());
     }
 
@@ -145,7 +145,7 @@ final class InformasiGlobalDatabaseTest extends TestCase
     {
         $id=$this->svc()->simpan('pengumuman',self::isi());
         self::ditolak(fn()=> $this->svc()->simpan('pengumuman',self::isi()+['versi'=>'1'],$id));
-        self::assertSame('1',(string)$this->db->table('pengumuman')->where('id',$id)->get()->getRow('versi'));
+        self::assertSame('1',(string)$this->db->table('pengumuman')->where('id',$id)->get()->getRowArray()['versi']);
         self::assertSame(1,$this->db->table('riwayat_informasi')->countAllResults());
     }
 
