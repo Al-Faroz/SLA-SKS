@@ -181,7 +181,6 @@ final class SertifikatPdfService
     .kop .alamat { font-size: 8.6pt; margin-top: 1mm; color: #43695D; }
     .garis-emas { width: 36mm; height: 1.6pt; margin: 1.5mm auto 0; background: #B28C49; }
     .judul { margin: 2mm 0; text-align: center; }
-    .judul .atas { margin: 0; font-size: 7.5pt; letter-spacing: 2pt; color: #8D7140; }
     h1 {
         margin: .4mm 0 .8mm; color: #173E33;
         font: bold 19pt DejaVu Serif, serif; letter-spacing: 1.2pt;
@@ -227,7 +226,7 @@ final class SertifikatPdfService
     .tp-table .tp-row { page-break-inside: avoid; }
     .footer { margin-top: 4mm; padding-top: 2mm; border-top: 1px solid #CADFD1; page-break-inside: avoid; }
     .card--full .footer {
-        position: fixed; bottom: 12mm;
+        position: fixed; bottom: 4mm;
         left: 18mm; width: 260mm;
         margin-top: 0;
     }
@@ -261,7 +260,6 @@ $watermark
         <div class="garis-emas"></div>
     </header>
     <section class="judul">
-        <p class="atas">DOKUMEN HASIL PEMBELAJARAN</p>
         <h1>SERTIFIKAT PEMBELAJARAN</h1>
         <p class="nomor">Nomor: $nomorSertifikat</p>
     </section>
