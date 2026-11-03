@@ -129,3 +129,8 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 - `AdminPraSemester::simpanSesi` POST `/admin/pra-semester/{paketId}/sesi` dan `AdminPraSemester::tambahPeserta` POST `/admin/pra-semester/{paketId}/sesi/{sesiId}/peserta`, wajib filter `auth:admin` + validasi Service dan CSRF.
 - `MesinPraSemesterSiswaService` mengikat attempt ke sesi resmi, menjalankan gerbang TP/bank/KKM dan menghitung nomor percobaan, tahap, durasi individual serta snapshot soal tanpa mengubah record nilai lama.
 - Filter list berbasis GET/Query Builder: Guru `gen` dalam penugasan G1; Admin `gen,mapel,semester,status` (belum/draf/siap/ditutup). Tidak melakukan filter palsu di browser. Reset membuka daftar penuh, bukan mengubah record.
+
+### A8-7 — Word Pra-Semester
+- `TemplateWordSoalService` dan `PratinjauWordSoalService` mendukung `pra_semester` menggunakan BAB per nomor; `RenderWordSoalService` tetap digunakan tanpa fork renderer. `PraSemesterWordService` mengatur HMAC template, upload privat, sidik jari, review, impor append-only transaksional, riwayat dan penjagaan bank terpakai.
+- Route Guru: `GET /guru/pra-semester/{paketId}/word?jumlah=30`, `POST .../word/pratinjau`, `GET .../word/review/{id}`, `POST .../word/review/{id}/konfirmasi`. Semua wajib auth Guru G1, CSRF pada POST, sumber file privat.
+- Endpoint gambar siswa `GET /siswa/pra-semester/{paketId}/{token}/media/{wordId}/{rid}` wajib auth siswa dan pengecekan snapshot attempt; tidak mengembalikan bank/kunci jawaban.
