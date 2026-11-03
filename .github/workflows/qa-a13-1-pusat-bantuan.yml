@@ -6,6 +6,7 @@ on:
       - 'app/Services/PanduanBantuanService.php'
       - 'app/Controllers/Bantuan.php'
       - 'app/Views/bantuan/index.php'
+      - 'app/Views/layouts/panel.php'
       - 'app/Config/Routes.php'
       - 'app/Services/NavigasiService.php'
       - 'public/assets/css/app.css'
