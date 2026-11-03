@@ -61,13 +61,15 @@ final class AdminPraSemester extends BaseController
                     }
                 }
             }
-            return view('admin/pra_semester', [
+            return view($paketId === null
+                ? 'admin/pra_semester'
+                : 'admin/pra_semester_detail', [
                 'judul'=>'Jadwal Pra-Semester',
                 'namaPengguna'=>$akun['nama'], 'peranAktif'=>'Admin',
                 'tautanNavigasi'=>NavigasiService::untuk('admin','pra_semester'),
-                'daftar'=>$service->daftar($raw),
+                'daftar'=>$paketId === null ? $service->daftar($raw) : [],
                 'filter'=>$filter,
-                'opsiFilter'=>$service->opsiFilter(),
+                'opsiFilter'=>$paketId === null ? $service->opsiFilter() : [],
                 'pilih'=>$paketId !== null ? $service->lihat($paketId) : null,
                 'terpasangSesi'=>$adaSesi,
                 'daftarSesi'=>$daftarSesi,
@@ -92,7 +94,7 @@ final class AdminPraSemester extends BaseController
                 $this->request->getPost('mulai'),
                 $this->request->getPost('akhir'),
                 $this->request->getPost('durasi'));
-            return redirect()->to(site_url('admin/pra-semester') . $this->suffixFilter())
+            return redirect()->to($url)
                 ->with('sukses','Jadwal ujian utama dan durasi per peserta berhasil disimpan.');
         } catch (DomainException $e) {
             return redirect()->to($url)->withInput()->with('galat',$e->getMessage());
