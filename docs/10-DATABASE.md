@@ -30,7 +30,7 @@
 - Bobot efektif TP NonEsensial: **20/20/60** bila gagal Diagnostik, atau **0/0/100** bila lulus.
 - Minimal soal tayang/bank: Diagnostik 10, Sumatif 30, Pra-Semester 30. Sumatif/Pra-Semester: satu remedial bila skor di bawah KKM.
 - Media pembelajaran: checkpoint client-side **4 menit** dan saat perubahan tahap/selesai, validasi server. YouTube/audio selesai pada min(waktu Guru,90% durasi). PDF ≤15MB dan ≤40 halaman.
-- Keamanan ujian: jeda fullscreen 90/180 detik, insiden ketiga **menghentikan percobaan** (mandiri: akses ulang; Pra-Semester: batal), heartbeat koneksi 20 detik/jeda 300 detik. Parameter/ madrasah, sertifikat, foto, login dan audit lama tidak dihapus.
+- Keamanan ujian: jeda fullscreen 90/180 detik, insiden ketiga **menghentikan percobaan** (mandiri: akses ulang; Pra-Semester: batal), heartbeat koneksi 20 detik/jeda kumulatif 600 detik (keputusan A8-11). Parameter/ madrasah, sertifikat, foto, login dan audit lama tidak dihapus.
 
 ## 5. Paket SQL instalasi dan update
 **Instalasi lokal v4:** dari dump v3 26 Oktober 2026 bangun satu SQL privat `sla_sks_v4_LOKAL_PRIVAT.sql` yang menjalankan `CREATE DATABASE sla_sks_v4` pada DB **baru dan belum ada** lalu memulihkan data v3 dan menerapkan revisi skema berurutan `V4-0001`. `sla_sks_v3` tidak disentuh. **JANGAN COMMIT** file privat (nama/NISN/hash/sesi/jawaban). Repository hanya boleh berisi DDL/patch tanpa data pribadi dan dokumentasi.
@@ -40,7 +40,7 @@ Langkah: backup DB v3 dan `writable/`, impor v4 di phpMyAdmin/CLI, cek `schema_v
 ## 5A. Kontrak tambahan model v2.4
 - Implementasi masih bertahap: kode CI4 v3 yang membaca TP→banyak Materi serta Diagnostik sebagai nilai final **belum otomatis kompatibel** dengan skema v4.
 - SQL v4 tidak menghapus snapshot, data ujian atau progres sebelumnya; perlakuan data uji historis v3 harus transparan.
-- Versi dokumen v2.5 mengganti ketentuan v2.4 yang bertentangan; jadwal Pra-Semester mengikuti **keputusan final 3 November 2026** pada Master 07; hanya persyaratan sertifikat yang masih ditunda dan tidak boleh diinferensikan.
+- Versi dokumen v2.5 mengganti ketentuan v2.4 yang bertentangan; jadwal Pra-Semester mengikuti **keputusan final 3 November 2026** pada Master 07; keputusan sertifikat final 3 November 2026: Pra-Semester bukan syarat dan nilainya tidak dicetak (lihat Master 09).
 
 ## 6. Pemeriksaan lintas DB dan target
 Karena MySQL lokal dan MariaDB hosting **berbeda mesin**, semua enum, CHECK constraint, generated column, index, JSON, collation dan DDL alter harus diuji pada **versi spesifik keduanya**, bukan dianggap identik. Catat versi yang lulus tes pada `15-INSTALASI-DAN-OPERASIONAL.md`. Ukuran data kecil tidak menghapus kebutuhan FK, transaksi, indeks, atau audit.
