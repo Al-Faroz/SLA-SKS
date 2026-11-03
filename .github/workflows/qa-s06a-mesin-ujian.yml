@@ -29,6 +29,7 @@ on:
       - 'tests/unit/AturanWaktuUjianServiceTest.php'
       - 'tests/unit/SusunButirUjianServiceTest.php'
       - 'tests/integration/SqlUjianSchemaCheck.php'
+      - 'tests/integration/SqlPraSesiSchemaCheck.php'
       - '.github/workflows/qa-s06a-mesin-ujian.yml'
   workflow_dispatch:
 
@@ -87,6 +88,7 @@ jobs:
           php -l app/Config/Routes.php
           php -l tests/unit/PraSemesterRemedialSusulanTest.php
           php -l tests/integration/SqlUjianSchemaCheck.php
+          php -l tests/integration/SqlPraSesiSchemaCheck.php
       - name: Unit test waktu Ketat dan acak opsi
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php
@@ -95,4 +97,6 @@ jobs:
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PraSemesterRemedialSusulanTest.php
       - name: Impor patch SQL pada MariaDB sintetis
-        run: php tests/integration/SqlUjianSchemaCheck.php
+        run: |
+          php tests/integration/SqlUjianSchemaCheck.php
+          php tests/integration/SqlPraSesiSchemaCheck.php
