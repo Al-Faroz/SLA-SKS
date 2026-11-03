@@ -90,11 +90,35 @@ final class AturanWaktuUjianServiceTest extends TestCase
         self::assertNull($s['skor'] ?? null);
     }
 
-    public function testTimeoutKoneksiLimaMenitDibatalkan(): void
+    public function testTimeoutKoneksiSepuluhMenitDibatalkan(): void
     {
+        self::assertSame(600, Waktu::JEDA_KONEKSI_TOTAL);
         $s = Waktu::rekonsiliasi(Waktu::awal(900, 1000), 1320);
-        self::assertSame('dibatalkan_menunggu_guru', $s['status']);
+        self::assertSame('jeda_koneksi', $s['status']); // 5 menit belum batal
+
+        $s = Waktu::rekonsiliasi($s, 1619); // 599 detik jeda
+        self::assertSame('jeda_koneksi', $s['status']);
         self::assertFalse(Waktu::bolehMenjawab($s));
+
+        $s = Waktu::rekonsiliasi($s, 1620); // 600 detik jeda
+        self::assertSame('dibatalkan_menunggu_guru', $s['status']);
+        self::assertNull($s['skor'] ?? null);
+        self::assertFalse(Waktu::bolehMenjawab($s));
+    }
+
+    public function testBatasSepuluhMenitAdalahKumulatifBukanPerKejadian(): void
+    {
+        $s = Waktu::rekonsiliasi(Waktu::awal(1800, 1000), 1260);
+        self::assertSame('jeda_koneksi', $s['status']);
+        $s = Waktu::pulih($s, 1260);
+        self::assertSame(240, $s['jeda_koneksi_total_detik']);
+
+        $s = Waktu::heartbeat($s, 1270);
+        $s = Waktu::rekonsiliasi($s, 1649);
+        self::assertSame('jeda_koneksi', $s['status']); // 240 + 359 = 599
+        $s = Waktu::rekonsiliasi($s, 1650);
+        self::assertSame('dibatalkan_menunggu_guru', $s['status']); // 240 + 360 = 600
+        self::assertNull($s['skor'] ?? null);
     }
 
     public function testWaktuHabisMenuntutFinalisasiAtomikDanMenolakJawaban(): void
