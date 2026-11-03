@@ -171,7 +171,7 @@ final class SertifikatPenerbitanDatabaseTest extends TestCase
             $s->revisi(1,11,'Koreksi nilai TP');
             self::fail('Revisi tanpa perubahan cetak dilarang.');
         } catch (\DomainException $e) {
-            self::assertStringContainsString('tidak perlu revisi',$e->getMessage());
+            self::assertStringContainsString('Tidak perlu revisi',$e->getMessage());
         }
         $this->db->table('nilai_tp')->where('progres_tp_id',201)->update([
             'nilai_tp'=>50,'nilai_sumatif'=>50,
@@ -197,7 +197,7 @@ final class SertifikatPenerbitanDatabaseTest extends TestCase
 
     public function testTanpaTtdAktifPenerbitanDitolak(): void
     {
-        $this->db->table('sertifikat_aset_aktif')->delete();
+        $this->db->table('sertifikat_aset_aktif')->where('jenis','ttd')->delete();
         $this->expectException(\DomainException::class);
         $this->svc()->terbit(1,11);
     }
