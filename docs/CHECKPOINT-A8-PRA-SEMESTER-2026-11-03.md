@@ -25,3 +25,11 @@
 2. Admin buka `/admin/pra-semester`, tetapkan jendela boleh mulai dan durasi per mapel. Uji menolak bank belum siap, tabrakan dalam satu Gen/semester, dan waktu masa lalu.
 3. Siswa yang seluruh TP NonEsensial selesai buka `/siswa/semester/{paketId}` → Pra-Semester. Uji jendela, fullscreen dan waktu individual. Uji 1 skor 0.00 sah dan pembatalan tanpa skor.
 4. Jalankan QA otomatis dan query baca-saja di atas pada XAMPP; catat kesalahan untuk iterasi berikutnya. Jangan kirim data pribadi/sandi ke GitHub.
+
+
+## Kelanjutan A8-4: kontrak kesempatan dan penilaian (3 November 2026)
+- Ditambahkan `PenilaianPraSemesterService` (pure, tanpa SQL): memastikan satu ujian normal sah, satu remedial sah hanya setelah nilai normal sah <KKM; skor 0.00 sah; ujian batal tidak bernilai; skor terbaik final; status nilai sementara saat remedial belum selesai; histori salah ditolak.
+- Ditambahkan `AturanJadwalPraSemesterService` (pure): fase awal, tidak hadir ditunjuk Admin, susulan normal bagi ujian dibatalkan, jadwal remedial setelah skor awal sah <KKM, susulan remedial jika pembatalan saat remedial, pembatalan berulang, dan percobaan aktif dapat dilanjutkan walau jendela mulai tutup.
+- Tes regresi: `tests/unit/PraSemesterRemedialSusulanTest.php`, dimasukkan dalam QA A8 dan S06A untuk PHP 8.2.
+- **Batas mutlak:** dump terbaru ditemukan di Library bernama `sla_sks_v4 (12).sql`, dibuat 2 Nov 2026 pukul 13.29 waktu dump, **lebih awal** dari patch simulasi/percobaan yang dinyatakan PASS. Tidak cukup untuk mengaudit SQL berikutnya. Belum dibuat SQL, tidak ada perubahan/DELETE data siswa, tidak ada penjadwalan remedial/susulan di database/UI yang diklaim aktif.
+- Setelah pengguna mengunggah ekspor `sla_sks_v4` terbaru **pasca patch terakhir**, verifikasi DDL/indeks/FK, `schema_version`, count agregat tabel relevan, lalu buat patch SQL additive bernomor, adapter jadwal peserta, UI Admin dan mesin susulan/remedial. Pastikan tetap kompatibel MySQL/MariaDB tanpa CI4 Migration/Seeder.
