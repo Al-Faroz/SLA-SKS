@@ -11,6 +11,7 @@ use App\Services\PenilaianGuruService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
+use RuntimeException;
 use Throwable;
 
 /** G10/G11: role filter, validasi form dan PRG; otorisasi ulang di Service. */
@@ -48,11 +49,25 @@ final class GuruPenilaian extends BaseController
             $index = $this->angka($this->request->getGet('pilihan'), 'pilihan', 10000);
             $dipilih = PetaTpService::pilihPenugasan($pilihan, $index);
             $halaman = $this->angka($this->request->getGet('halaman'), 'halaman') ?? 1;
-            $data = $svc->antrean($dipilih, $halaman);
+            $semester = $this->angka($this->request->getGet('semester'), 'semester', 6) ?? 0;
+            $bab = $this->angka($this->request->getGet('bab'), 'bab') ?? 0;
+            $jenis = $this->request->getGet('jenis') ?? 'semua';
+            if (!is_string($jenis) || !in_array($jenis,['semua','resume','hots'],true)
+                || $halaman < 1) {
+                throw new DomainException('Filter antrean tidak valid.');
+            }
+            $daftarBab = $svc->daftarBab($dipilih,$semester);
+            $filter = $dipilih === null ? null : array_merge($dipilih,[
+                'semester'=>$semester,'bab'=>$bab,'jenis'=>$jenis,
+            ]);
+            $data = $svc->antrean($filter, $halaman);
             $akun = (new AuthService())->penggunaSaatIni();
         } catch (DomainException $e) {
             if ($this->request->getGet('pilihan') !== null
-                || $this->request->getGet('halaman') !== null) {
+                || $this->request->getGet('halaman') !== null
+                || $this->request->getGet('semester') !== null
+                || $this->request->getGet('bab') !== null
+                || $this->request->getGet('jenis') !== null) {
                 return redirect()->to(site_url('guru/penilaian'))
                     ->with('nilai_galat',
                         'Filter antrean tidak valid. Gunakan pilihan Gen–Mapel yang tersedia.');
@@ -82,6 +97,10 @@ final class GuruPenilaian extends BaseController
             'penugasan'=>$pilihan,
             'pilihan_aktif'=>$index ?? 0,
             'dipilih'=>$dipilih,
+            'semester'=>$semester,
+            'bab'=>$bab,
+            'jenis'=>$jenis,
+            'daftarBab'=>$daftarBab,
             'antrean'=>$data,
         ]);
     }
