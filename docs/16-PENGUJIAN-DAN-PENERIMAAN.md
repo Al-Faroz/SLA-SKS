@@ -360,3 +360,10 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - `0.00` adalah nilai sah, tidak dianggap kosong. KKM berubah antarattempt, dua normal sah, remedial tanpa normal sah, attempt dibatalkan tetapi ada skor → ditolak oleh domain service.
 - Percobaan masih berjalan/jeda boleh dilanjutkan dengan token sama setelah jendela boleh mulai ditutup. Jendela mulai baru tidak mengubah timer individual yang sedang berjalan.
 - Regresi otomatis: `tests/unit/PraSemesterRemedialSusulanTest.php` melalui QA A8/S06A. Tes integrasi DB, role, jadwal susulan dan remedial **masih diperlukan** setelah ada dump XAMPP pascapatch terakhir, bukan dinyatakan PASS berdasarkan unit test saja.
+
+### A8-5 — Uji penerimaan implementasi
+- Filter Guru: hanya paket Gen yang ditugaskan, nilai Gen lain ditolak/tidak muncul; tanpa filter semua paket hak Guru tampil. Filter Admin: kombinasi Gen, Mapel, Semester 1–6, status ujian, semua dapat di-reset; percobaan injeksi query tidak diterima.
+- Impor `V4-0009` sekali setelah backup; cek `schema_version`, dua tabel tambahan, kolom FK nullable, indeks unik, dan jumlah attempt/soal/riwayat **tetap**. Tidak boleh mencoba impor dump privat ke CI.
+- Admin: buat remedial, susulan normal, susulan remedial; tolak jadwal masa lalu/bentrok/jeda utama belum selesai. Tetapkan peserta susulan yang berhak, tidak dapat menyelundupkan siswa Gen lain; peserta yang sudah ditetapkan tidak terhapus.
+- Siswa: normal batal -> hanya susulan normal terdaftar; tidak hadir -> hanya susulan normal setelah jendela utama tutup; normal sah <KKM -> remedial; remedial batal -> susulan remedial; normal sah ≥KKM -> tidak bisa lanjut. Perubahan peserta/jadwal setelah ujian digunakan harus ditolak. Skor terbaik dan 0.00 sah tetap dibedakan dari NULL.
+- Pengujian otomatis mencakup PHP lint, tes Service dan SQLite sintetis; uji MySQL/MariaDB lokal/XAMPP, browser fullscreen, keamanan URL dan peran tetap wajib sebelum PASS pengguna.
