@@ -61,6 +61,7 @@ final class NavigasiService
             $menu[] = ['label' => 'Monitoring Akademik', 'path' => 'pimpinan/laporan',
                 'aktif' => $aktif === 'laporan'];
         }
+        $menu[] = ['label' => 'Bantuan', 'path' => 'bantuan', 'aktif' => $aktif === 'bantuan'];
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
 
         return $menu;
