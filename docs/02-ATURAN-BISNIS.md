@@ -33,14 +33,14 @@
 - **Penyiapan Guru:** TP **Esensial maupun NonEsensial sama-sama wajib memiliki tepat satu Materi/media yang lengkap**. **Alur siswa:** Jenis TP hanya menentukan akses dan kewajiban aktivitas di sisi siswa. Pada alur siswa saat ini Esensial tidak memiliki aktivitas/penilaian wajib; NonEsensial menjalankan Diagnostik → (bila gagal: Materi → Resume → HOTS) → Sumatif. Materi Esensial tidak boleh dihapus hanya karena tidak diakses siswa.
 - Diagnostik min 10 adalah gate bukan nilai TP. Sumatif min 30. Nilai gagal Diagnostik 20/20/60 (Resume/HOTS/Sumatif), lulus 100% Sumatif. Admin menentukan KKM default dan Guru dapat menetapkan khusus.
 - Sumatif < KKM memperoleh satu remedial; gunakan nilai tertinggi. Setelah aktivitas dan kesempatan sah terkait selesai, **TP selesai meskipun nilai masih < KKM**. Progres semester hanya TP NonEsensial.
-- Pra-Semester dijadwalkan tanggal/jam oleh Admin secara serentak setelah semua TP NonEsensial selesai; nilai tersendiri. **Tidak ada nilai akhir semester.**
+- Pra-Semester dijadwalkan Admin **per Gen–Mapel–Semester**, serentak bagi peserta paket yang sama setelah semua TP NonEsensial selesai; tiap mapel memiliki jendela mulai dan durasi individual tersendiri; nilai tersendiri. **Tidak ada nilai akhir semester.**
 - Resume/HOTS Simpan Draf manual, Kirim Final, penilaian Guru. TP Siap tanpa penggunaan boleh disunting; begitu ada penggunaan siswa, konten dan snapshot yang digunakannya dilindungi.
 
 ## 4. Keputusan final tentang ujian
 - Profil pengamanan pengerjaan Ketat (fullscreen, waktu, koneksi) dipakai pada Diagnostik, Sumatif dan Pra-Semester, **tetapi kegagalan tes mandiri ditangani dengan permintaan akses ulang Guru, bukan pembatalan**. Pembatalan hanya untuk Pra-Semester. PG lima pilihan A–E dengan satu kunci; aturan operasional lengkap pada dokumen 07.
 - Diagnostik minimal 10, Sumatif minimal 30, Pra-Semester minimal 30 soal gabungan seluruh BAB semester.
 - Sumatif dan Pra-Semester memberikan **satu remedial jika skor Sumatif/Pra-Semester normal selesai sah di bawah KKM**, mengambil skor tertinggi. **Diagnostik/Sumatif yang tidak selesai** tidak menghasilkan skor, bukan pembatalan dan bukan remedial; siswa meminta akses ulang Guru sesuai tahap yang gagal tanpa menghabiskan kesempatan sah. **Pembatalan ujian hanya berlaku untuk Pra-Semester**.
-- Admin mengatur jendela Pra-Semester serentak; akses siswa tanpa seluruh TP NonEsensial selesai ditolak.
+- Admin mengatur jendela boleh mulai, durasi dan jadwal susulan/remedial Pra-Semester per paket Gen–Mapel–Semester; akses tanpa seluruh TP NonEsensial selesai ditolak.
 
 ## 5. Keputusan final tentang sertifikat
 - Daftar nilai sertifikat berisi seluruh TP: Esensial tanpa nilai, NonEsensial dengan nilai; **tidak ada rata-rata nilai akhir semester**.
@@ -65,7 +65,7 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 ## 8. Keputusan lintas modul v2.5
 1. CP operasional satu Mapel → Semester → BAB → TP, nomor BAB berlanjut antardua semester kelas sama. Nama singkat 50, deskripsi 225, kode `KODEMAPEL.KELAS.BAB.TP`.
 2. Esensial dan NonEsensial keduanya mempunyai **satu Materi** yang disiapkan Guru; Esensial tanpa nilai siswa sesuai alur saat ini. Diagnostik menjadi gate dan Sumatif wajib 30 untuk jalur NonEsensial.
-3. Pra-Semester tanggal serentak Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
+3. Pra-Semester memiliki jendela boleh mulai dan durasi individual per Gen–Mapel–Semester dari Admin setelah semua TP NonEsensial selesai. Guru bisa ekspor semua siswa/TP dan Pra-Semester walaupun baru satu nilai.
 4. Excel ATP **manual** tanpa macro dan tanpa tombol Proses sudah dipilih; penyusunan BAB/TP dilakukan melalui isian langsung pada workbook atau aplikasi, serta divalidasi server saat impor. KBC, izin Gen–Mapel, Word PG A–E tetap.
 
 ## 9. Aturan final hak sunting CP, BAB, TP (2 November 2026)
