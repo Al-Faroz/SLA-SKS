@@ -2261,3 +2261,34 @@ html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-table :is(th[scope="ro
     transition:none;
   }
 }
+
+/* A10-1 — laporan akademik tetap mengikuti Emerald Glass Dark/Light. */
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__pilihan,
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__metrik {
+    background:var(--eg-pane-soft);
+    border-color:var(--eg-line);
+    box-shadow:inset 0 1px 0 var(--eg-sheen);
+    color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__metrik :is(dt,span) {
+    color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__metrik :is(dd,strong) {
+    color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__scroll {
+    background:var(--eg-table);
+    border:1px solid var(--eg-line);
+}
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__identitas-tp small,
+html[data-theme] .a-app--prototipe .a-laporan .a-laporan__hint {
+    color:var(--e-muted);
+}
+html[data-theme="dark"] .a-app--prototipe .a-laporan .a-laporan__pra {
+    background:linear-gradient(130deg,rgba(15,85,69,.72),rgba(27,65,93,.57));
+    border-color:rgba(104,209,184,.38);
+}
+html[data-theme="light"] .a-app--prototipe .a-laporan .a-laporan__pra {
+    background:linear-gradient(135deg,#E7F7F1,#EBF1FF);
+    border-color:#A6D2C5;
+}
