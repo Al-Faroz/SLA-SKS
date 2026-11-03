@@ -139,6 +139,24 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
         <?php endif ?>
     </section>
 
+    <section class="a-card a-jarak-atas" aria-labelledby="judul-tindak-lanjut">
+        <h2 id="judul-tindak-lanjut">Penugasan Guru dan Antrean Penilaian</h2>
+        <div class="a-dashboard-pimpinan__operasional">
+            <div>
+                <strong><?= (int)$ring['guru_ditugaskan'] ?> /
+                    <?= (int)$ring['pasangan_gen_mapel'] ?></strong>
+                <span>Pasangan Gen–Mapel memiliki Guru yang ditugaskan</span>
+            </div>
+            <div>
+                <strong><?= (int)$ring['antrean_penilaian'] ?></strong>
+                <span>Jawaban final Resume/HOTS yang belum dinilai Guru</span>
+            </div>
+        </div>
+        <p class="a-help">Angka antrean berasal dari jawaban final yang belum berskor,
+            bukan semua draf siswa. Pimpinan hanya memantau; penilaian dilakukan
+            Guru melalui menu Antrean Penilaian.</p>
+    </section>
+
     <section class="a-card a-jarak-atas" aria-labelledby="judul-paket-monitor">
         <h2 id="judul-paket-monitor">Ringkasan per Gen–Mapel–Semester</h2>
         <p class="a-help">Nilai Pra-Semester berdiri sendiri sebagai checkpoint,
@@ -160,6 +178,7 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
                         <th scope="col">TP Selesai Sah</th>
                         <th scope="col">Nilai Final</th>
                         <th scope="col">Sertifikat</th>
+                        <th scope="col">Antrean Resume/HOTS</th>
                         <th scope="col">Pra-Semester</th>
                         <th scope="col">Aksi</th>
                     </tr></thead>
@@ -184,6 +203,7 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
                             </td>
                             <td><?= (int)$p['nilai_final'] ?></td>
                             <td><?= (int)$p['sertifikat_berlaku'] ?></td>
+                            <td><?= (int)$p['antrean_penilaian'] ?></td>
                             <td>
                                 <?php $status=$p['pra_status']; ?>
                                 <?= esc(match ($status) {
