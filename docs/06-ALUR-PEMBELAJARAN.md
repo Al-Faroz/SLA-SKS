@@ -38,7 +38,7 @@ flowchart TD
 
 ## 4. Progres semester
 `progres = TP_NonEsensial_SELESAI / seluruh_TP_NonEsensial_di_ATP_semester × 100%`. TP Esensial **tidak masuk penyebut atau pembilang**. Jangan tampilkan 100% bila struktur semester belum dinyatakan siap/terkunci atau masih ada TP NonEsensial wajib yang belum selesai; tidak boleh menganggap draf yang belum diterbitkan tidak termasuk rencana.
-- Jika semua TP NonEsensial telah selesai, siswa **menunggu jadwal Pra-Semester**. Ujian Pra-Semester tidak dikerjakan kapan saja: Admin menetapkan tanggal dan waktu serentak bagi seluruh siswa di paket semester yang sama. Hanya siswa dengan seluruh TP NonEsensial selesai dapat memulai.
+- Jika semua TP NonEsensial telah selesai, siswa **menunggu jadwal Pra-Semester**. Ujian Pra-Semester tidak dikerjakan kapan saja: Admin menetapkan jendela **boleh mulai** yang serentak bagi peserta paket Gen–Mapel–Semester yang sama, dengan durasi individual dimulai saat masing-masing siswa mengerjakan. Hanya siswa dengan seluruh TP NonEsensial selesai dapat memulai.
 - Hasil Pra-Semester adalah nilai tersendiri dan **tidak membentuk nilai akhir semester**. Aturan kelayakan sertifikat terkait waktu ujian Pra-Semester belum diputuskan; jangan membuat gate tambahan otomatis.
 
 ## 5. Status dan UI
