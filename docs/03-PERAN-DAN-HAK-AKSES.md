@@ -24,7 +24,7 @@ Satu akun staf boleh memiliki dua role saja: Admin+Guru, Admin+Pimpinan, Guru+Pi
 | Menilai resume/tugas | Tidak | **Ya, Gen–Mapelnya** | Tidak | Tidak |
 | Mengajukan koreksi nilai oleh guru pengganti | Tidak | **Ya, Gen–Mapelnya** | Tidak | Tidak |
 | Menyetujui koreksi akademik | **Ya**, bukan usulan sendiri | Tidak | Tidak | Tidak |
-| Memberi izin akses ulang Diagnostik/Sumatif; menangani pembatalan khusus Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
+| Memberi izin akses ulang Diagnostik/Sumatif; melihat pembatalan Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
 | Menyetel logo aplikasi/favikon, TTD PNG dan template | **Ya** | Tidak | Tidak | Baca |
 | Mengelola pengumuman global | **Ya** | **Ya** | Baca | Baca |
 | Mengelola FAQ dan teks Kebijakan Privasi sekolah | **Ya** | Tidak | FAQ baca / privasi publik | FAQ baca / privasi publik |
@@ -69,7 +69,7 @@ Pemeriksaan izin dilakukan di Controller **dan** Service: `peran_aktif`, status 
 - Siswa hanya melihat TP yang telah Siap sesuai urutan semester; Pimpinan hanya membaca laporan/progres.
 
 ## 7. Hak akses tambahan pola BAB–TP v2.5
-- **Admin:** mengelola KKM default, tanggal/jam ujian Pra-Semester serentak, identitas referensi kurikulum/CP; tidak mengubah nilai Guru secara langsung.
+- **Admin:** mengelola KKM default, jadwal utama/remedial/susulan dan durasi per Gen–Mapel–Semester, identitas referensi kurikulum/CP; tidak mengubah nilai Guru secara langsung.
 - **Guru:** G1 berwenang memberi akses ulang Diagnostik/Sumatif mandiri sesuai percobaan yang tidak selesai; tidak menyamakan akses ulang dengan remedial nilai. Pembatalan hanya Pra-Semester.
 - **Guru:** G1 per Gen–Mapel tetap; boleh mengisi ATP lewat aplikasi/Excel, mengelola BAB dan TP Esensial/NonEsensial, tepat satu Materi untuk setiap TP Esensial dan NonEsensial, bank soal TP dan Pra-Semester, penilaian, dan **Export Nilai** seluruh siswa Gen–Mapel termasuk hasil parsial.
 - **Siswa:** mengakses BAB/TP sesuai Gen/semester; hanya TP NonEsensial memerlukan Diagnostik, Materi jika gagal, Resume/HOTS jika wajib, Sumatif dan remedial. Pra-Semester dibuka oleh jadwal Admin setelah semua TP NonEsensial selesai.
