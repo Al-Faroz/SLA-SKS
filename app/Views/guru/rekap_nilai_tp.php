@@ -7,7 +7,7 @@ $statusNilai = static fn (array $baris): string =>
     \App\Services\RekapNilaiTpGuruService::labelNilai(
         $baris['status_nilai'] ?? null, $baris['jenis_tp'] === 'esensial');
 ?>
-<div class="a-page">
+<div class="a-page a-rekap-page a-rekap-page--tp">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
@@ -26,6 +26,13 @@ $statusNilai = static fn (array $baris): string =>
     <?php if ($pesan = session()->getFlashdata('rekap_galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
     <?php endif ?>
+
+    <nav class="a-rekap-switch" aria-label="Jenis rekap nilai">
+        <a class="a-rekap-switch__link is-aktif" aria-current="page"
+            href="<?= esc(site_url('guru/rekap-nilai'), 'attr') ?>">Nilai TP</a>
+        <a class="a-rekap-switch__link"
+            href="<?= esc(site_url('guru/rekap-nilai/pra-semester'), 'attr') ?>">Nilai Pra-Semester</a>
+    </nav>
 
     <section class="a-card" aria-labelledby="filter-rekap">
         <h2 id="filter-rekap">Filter Rekap Nilai TP</h2>
@@ -101,11 +108,19 @@ $statusNilai = static fn (array $baris): string =>
             <p class="a-help"><strong><?= esc((string) $dipilih['nama_gen']) ?></strong> ·
                 <?= esc((string) $dipilih['nama_mapel']) ?>.
                 Hasil berdasarkan data yang telah tersimpan di server, tanpa menghitung ulang nilai historis.</p>
-            <dl class="a-siswa-materi-ringkas">
-                <div><dt>Siswa Gen</dt><dd><?= (int) $rekap['jumlah_siswa'] ?></dd></div>
-                <div><dt>Nilai Final</dt><dd><?= (int) $rekap['jumlah_final'] ?></dd></div>
-                <div><dt>Nilai Sementara</dt><dd><?= (int) $rekap['jumlah_sementara'] ?></dd></div>
-                <div><dt>Belum Ada Nilai</dt><dd><?= (int) $rekap['jumlah_belum'] ?></dd></div>
+            <dl class="a-rekap-metrik" aria-label="Ringkasan nilai semester">
+                <div class="a-rekap-metrik__item">
+                    <dt>Siswa dalam Gen</dt><dd><?= (int) $rekap['jumlah_siswa'] ?></dd>
+                </div>
+                <div class="a-rekap-metrik__item a-rekap-metrik__item--final">
+                    <dt>Nilai Final</dt><dd><?= (int) $rekap['jumlah_final'] ?></dd>
+                </div>
+                <div class="a-rekap-metrik__item a-rekap-metrik__item--sementara">
+                    <dt>Nilai Sementara</dt><dd><?= (int) $rekap['jumlah_sementara'] ?></dd>
+                </div>
+                <div class="a-rekap-metrik__item a-rekap-metrik__item--belum">
+                    <dt>Belum Ada Nilai</dt><dd><?= (int) $rekap['jumlah_belum'] ?></dd>
+                </div>
             </dl>
             <p class="a-help">Angka Final/Sementara/Belum Ada menghitung pasangan siswa–TP
                 NonEsensial sesuai filter, bukan jumlah siswa unik. TP Esensial tidak memiliki nilai.
@@ -152,9 +167,10 @@ $statusNilai = static fn (array $baris): string =>
                     Pilih jenis TP atau BAB lain, atau pastikan data telah tersedia.
                 </div>
             <?php else: ?>
-                <div class="a-table-wrap" tabindex="0" role="region"
+                <p class="a-rekap-scroll-hint">Geser tabel ke samping untuk melihat seluruh komponen nilai.</p>
+                <div class="a-tabel-gulir a-rekap-scroll" tabindex="0" role="region"
                     aria-label="Tabel nilai TP dapat digulir secara horizontal">
-                    <table class="a-table">
+                    <table class="a-tbl a-rekap-table a-rekap-table--tp">
                         <thead><tr>
                             <th scope="col">Siswa</th>
                             <th scope="col">BAB / TP</th>
@@ -170,15 +186,17 @@ $statusNilai = static fn (array $baris): string =>
                         <tbody>
                             <?php foreach ($rekap['baris'] as $r): ?>
                                 <tr>
-                                    <th scope="row"><?= esc((string) $r['nama_siswa']) ?></th>
-                                    <td>
-                                        <span class="a-help">BAB <?= (int) ($r['nomor_bab'] ?? 0) ?> ·
+                                    <th scope="row" class="a-rekap-table__siswa">
+                                        <?= esc((string) $r['nama_siswa']) ?>
+                                    </th>
+                                    <td class="a-rekap-table__tp">
+                                        <span class="a-rekap-table__meta">BAB <?= (int) ($r['nomor_bab'] ?? 0) ?> ·
                                             <?= esc((string) ($r['nama_bab'] ?? 'Belum ditetapkan')) ?></span>
                                         <a href="<?= esc(site_url('guru/tp/' . (int) $r['tp_id']), 'attr') ?>">
                                             <?= esc((string) $r['kode_tp']) ?></a>
-                                        <span class="a-help"><?= esc((string) $r['nama_tp']) ?></span>
+                                        <span class="a-rekap-table__nama-tp"><?= esc((string) $r['nama_tp']) ?></span>
                                     </td>
-                                    <td><?= $r['jenis_tp'] === 'esensial' ? 'Esensial' : 'NonEsensial' ?></td>
+                                    <td><span class="a-rekap-status a-rekap-status--netral"><?= $r['jenis_tp'] === 'esensial' ? 'Esensial' : 'NonEsensial' ?></span></td>
                                     <td><?= $r['jenis_tp'] === 'esensial' ? 'Informasi saja'
                                         : esc(str_replace('_', ' ', (string) ($r['status_progres'] ?? 'Belum mulai'))) ?></td>
                                     <td><?= $r['jenis_tp'] === 'esensial' ? '—'
@@ -188,9 +206,22 @@ $statusNilai = static fn (array $baris): string =>
                                             default => 'Belum diketahui',
                                         }) ?></td>
                                     <?php foreach (['nilai_resume','nilai_hots','nilai_sumatif','nilai_tp'] as $kolom): ?>
-                                        <td><?= esc($formatNilai($r, $kolom)) ?></td>
+                                        <?php $angkaNilai = $formatNilai($r, $kolom); ?>
+                                        <td class="a-rekap-table__angka">
+                                            <?php if (in_array($angkaNilai, ['Belum ada', 'Dilewati', '—'], true)): ?>
+                                                <span class="a-rekap-table__kosong"><?= esc($angkaNilai) ?></span>
+                                            <?php else: ?>
+                                                <strong><?= esc($angkaNilai) ?></strong>
+                                            <?php endif ?>
+                                        </td>
                                     <?php endforeach ?>
-                                    <td><?= esc($statusNilai($r)) ?></td>
+                                    <td>
+                                        <span class="a-rekap-status <?= ($r['status_nilai'] ?? '') === 'final'
+                                            ? 'a-rekap-status--final' : (($r['status_nilai'] ?? '') === 'sementara'
+                                            ? 'a-rekap-status--sementara' : 'a-rekap-status--netral') ?>">
+                                            <?= esc($statusNilai($r)) ?>
+                                        </span>
+                                    </td>
                                 </tr>
                             <?php endforeach ?>
                         </tbody>

@@ -33,3 +33,9 @@ Tanggal: 3 November 2026
 2. Guru → Rekap Nilai → Nilai TP: default NonEsensial, uji Esensial/Semua, BAB, unduh Excel sesuai filter dan semua semester.
 3. Guru → Rekap Nilai → Nilai Pra-Semester: tabel seluruh siswa, status nilai, unduh XLSX terpisah, tanpa data TP.
 4. Uji Gen–Mapel di luar penugasan, nilai kosong dan skor 0.00. Laporan status browser setelah uji manual, tanpa rekayasa histori.
+
+## A9-2 — Revisi visual berdasarkan 4 screenshot Guru (3 November 2026)
+
+- Temuan utama: `a-table` pada dua rekap tidak terhubung ke design-system tabel `a-tbl` sehingga semua kolom terjepit; daftar `a-siswa-materi-ringkas` keliru dipakai untuk empat metrik `dl`; sidebar pada Mode Dokumentasi membentangkan submenu di bawah baris menu atas. Detail penilaian masih terlalu datar dan form sempit sebelah kiri.
+- Perbaikan presentasi (tanpa query/SQL): `rekap_nilai_tp.php`, `rekap_nilai_pra_semester.php`, `antrean_penilaian.php`, `nilai_kegiatan.php`, `app.css` dan `emerald-glass.css`. Filter/nomor/siswa/score/tautan/aksi tidak diubah.
+- Tes statis `A9TampilanGuruTest.php`, workflow QA A9 memvalidasi perubahan. Pengujian browser XAMPP perlu mengonfirmasi empat halaman dengan theme Dark/Light, Mode Dokumentasi aktif, serta scroll tabel responsif.

@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page">
+<div class="a-page a-penilaian-page">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
@@ -67,16 +67,19 @@
                 action="<?= esc(site_url('guru/penilaian/' . $tugas['jenis']
                     . '/' . (int) $tugas['id']), 'attr') ?>">
                 <?= csrf_field() ?>
-                <div class="a-field">
-                    <label class="a-label" for="nilai">Nilai (0–100)</label>
-                    <input class="a-input" type="number" name="nilai" id="nilai" min="0" max="100"
-                        step="1" inputmode="numeric" required
-                        value="<?= esc((string) old('nilai'), 'attr') ?>">
-                </div>
-                <div class="a-field">
-                    <label class="a-label" for="umpan-balik">Umpan balik Guru (opsional)</label>
-                    <textarea id="umpan-balik" name="umpan_balik" maxlength="1000"
-                        rows="5"><?= esc((string) old('umpan_balik')) ?></textarea>
+                <div class="a-penilaian-form-grid">
+                    <div class="a-field">
+                        <label class="a-label" for="nilai">Nilai (0–100)</label>
+                        <input class="a-input" type="number" name="nilai" id="nilai" min="0" max="100"
+                            step="1" inputmode="numeric" required
+                            value="<?= esc((string) old('nilai'), 'attr') ?>">
+                        <p class="a-help">Masukkan bilangan bulat sesuai hasil penilaian.</p>
+                    </div>
+                    <div class="a-field">
+                        <label class="a-label" for="umpan-balik">Umpan balik Guru (opsional)</label>
+                        <textarea id="umpan-balik" name="umpan_balik" maxlength="1000"
+                            rows="5"><?= esc((string) old('umpan_balik')) ?></textarea>
+                    </div>
                 </div>
                 <div class="a-penilaian-aksi">
                     <button class="a-btn a-btn--utama" type="submit" data-nilai-simpan>
