@@ -234,6 +234,12 @@
                         </table>
                     </div>
                 <?php endif ?>
+                <?php if ($pilih['ujian_status'] !== 'siap' || $pilih['paket_status'] !== 'aktif'): ?>
+                    <div class="a-alert" role="status">
+                        Aktifkan paket dan simpan jadwal utama setelah bank soal siap
+                        sebelum membuat sesi remedial atau susulan.
+                    </div>
+                <?php else: ?>
                 <form method="post" class="a-form a-pra-sesi-form"
                     action="<?= esc(site_url('admin/pra-semester/'
                         . (int)$pilih['paket_id'] . '/sesi'),'attr') ?>">
@@ -268,6 +274,7 @@
                         Simpan Jadwal Tambahan
                     </button>
                 </form>
+                <?php endif ?>
             </section>
             <?php if ($sesiTerpilih !== null): ?>
                 <section class="a-card a-jarak-atas" aria-labelledby="pra-peserta-susulan">
