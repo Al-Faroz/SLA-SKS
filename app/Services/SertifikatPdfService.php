@@ -152,8 +152,8 @@ final class SertifikatPdfService
             .'<th>Jenis</th><th>Nilai TP</th></tr></thead><tbody>'.$rows.'</tbody></table>'
             .'<table class="foot"><tr><td>'.$qrHtml
             .'<div class="catatan">Verifikasi keaslian melalui QR</div></td>'
-            .'<td><div class="catatan">TP Esensial tanpa nilai.<br>Pra-Semester tidak dicetak.'
-            .'<br>Tidak ada Nilai Akhir Semester.</div></td>'
+            .'<td><div class="catatan">Dokumen ini mencatat pencapaian tujuan'
+            .' pembelajaran pada mata pelajaran dan semester yang tercantum.</div></td>'
             .'<td><div>'.self::teks($sekolah['kota_penerbitan']??'').', '
             .self::teks($snapshot['tanggal']??'').'</div><div>Kepala Madrasah</div>'
             .$ttdHtml.'<div class="nama">'.self::teks($sekolah['kepala_madrasah_nama']??'')
