@@ -86,7 +86,7 @@ final class InformasiGlobalDatabaseTest extends TestCase
         self::assertSame(1,$this->svc('guru',201)->daftar('pengumuman',true)['jumlah']);
         self::assertSame(0,$this->svc('guru',202)->daftar('pengumuman',true)['jumlah']);
         self::assertSame(1,$this->svc()->daftar('pengumuman',true)['jumlah']);
-        self::assertSame('buat',$this->db->table('riwayat_informasi')->get()->getRow('aksi'));
+        self::assertSame('buat',$this->db->table('riwayat_informasi')->get()->getRowArray()['aksi']);
     }
 
     public function testTerbitBerlakuGlobalSemuaPeranTanpaSegmentasi(): void
@@ -98,7 +98,7 @@ final class InformasiGlobalDatabaseTest extends TestCase
             self::assertSame($id,(int)$data['data'][0]['id']);
             self::assertNotNull($data['data'][0]['diterbitkan_pada']);
         }
-        self::assertSame('terbit',$this->db->table('riwayat_informasi')->get()->getRow('aksi'));
+        self::assertSame('terbit',$this->db->table('riwayat_informasi')->get()->getRowArray()['aksi']);
     }
 
     public function testGuruTidakMengeditMilikAdminAtauGuruLain(): void
