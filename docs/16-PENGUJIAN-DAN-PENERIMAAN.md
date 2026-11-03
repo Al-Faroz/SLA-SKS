@@ -581,3 +581,18 @@ Regresi A12-3 wajib memverifikasi bahwa penambahan metadata TP tujuan **tidak me
 | A12-411 | UI laptop, HP 360/390px, Dark/Light, Dokumentasi | Grid, angka, teks tindakan, alert dan shortcut responsif; tidak bertumpuk |
 
 GitHub Actions `QA A12-4 Dashboard Admin` memakai SQLite anonim + lint + regresi Dashboard Pimpinan. Uji visual angka pada XAMPP tetap wajib. Tidak ada migrasi, seeder atau SQL pembaruan.
+
+### A12-4 QA lanjutan — audit screenshot halaman Admin (3 November 2026)
+
+| ID | Uji | Hasil wajib |
+|---|---|---|
+| A12-412 | Konfirmasi reset sandi pada DARK/LIGHT | Nama, Username/NISN, Status terbaca pada panel kontras; tombol bahaya, CSRF dan pembatasan reset sendiri tetap |
+| A12-413 | Daftar Pengelola/Siswa pada desktop ≥1100px | Form tambah di atas; tabel 5 kolom memenuhi lebar kontainer; tombol Ubah/Reset/Status tidak saling bertumpuk |
+| A12-414 | Daftar Pengelola/Siswa pada HP 360/390px | Form satu kolom dan tabel responsif berupa kartu; aksi dapat disentuh dan pager tidak terpotong |
+| A12-415 | Tambah Mapel & Guru per Gen | Form dua kolom dan tidak menyisakan ruang horizontal besar; penugasan G1/riwayat sama; banner historis K2 tidak mengacaukan alur |
+| A12-416 | Filter CP cari/mapel/kurikulum/status, ekspor XLSX | Tombol filter dan tabel terpisah, tidak overlap; fitur GET, 5 isian CP dan riwayat tetap |
+| A12-417 | Identitas Madrasah situs web opsional | Label tidak menduplikasi kata '(opsional)' |
+| A12-418 | Dashboard Admin 3 Gen × 20 Mapel, 3 G1 | 57 ditampilkan sebagai kombinasi potensial belum ditugaskan, bukan mengklaim 57 kelas wajib tanpa sumber |
+| A12-419 | Reload dan navigasi semua 14 layar | Tidak membuat/mengubah nilai, akun, penugasan, CP, jadwal, TTD atau sertifikat hanya dari kunjungan GET |
+
+Tes otomatis `AdminUiAuditTest.php` memeriksa keberadaan token dan struktur HTML di CI serta regresi database anonim Dashboard Admin; hasil ini **bukan pengganti uji screenshot** setelah pull XAMPP. Tidak ada SQL.
