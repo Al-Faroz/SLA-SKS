@@ -106,6 +106,8 @@ final class PratinjauWordSoalService
                 $opsi = [];
                 $benar = [];
                 $media = ['gambar' => 0, 'rumus' => 0, 'tabel' => 0, 'arab' => 0];
+                $babId = null;
+                $nomorBab = null;
                 for ($j = 0; $j < 6; ++$j) {
                     $row = $rows->item($index + $j);
                     $cells = $xp->query('./w:tc', $row);
@@ -131,6 +133,15 @@ final class PratinjauWordSoalService
                         ++$media['arab'];
                     }
                     if ($j === 0) {
+                        if ($pra) {
+                            $rawBab = trim(self::teks($xp, $cells->item(2)));
+                            if (!preg_match('/^BAB[[:space:]]+([0-9]{1,3})$/iu', $rawBab, $match)
+                                || !array_key_exists((int)$match[1], $babNomorKeId)) {
+                                throw new DomainException('Soal ' . ($i+1) . ': nomor BAB tidak tersedia dalam paket.');
+                            }
+                            $nomorBab = (int)$match[1];
+                            $babId = (int)$babNomorKeId[$nomorBab];
+                        }
                         $soal = $isi;
                     } else {
                         $opsi[$expected] = $isi;
@@ -145,7 +156,15 @@ final class PratinjauWordSoalService
                     throw new DomainException('Soal ' . ($i + 1) . ': wajib tepat satu kunci ✓.');
                 }
                 $hasil[] = ['nomor' => $i + 1, 'pertanyaan' => $soal,
-                    'opsi' => $opsi, 'kunci' => $benar[0], 'konten' => $media];
+                    'opsi' => $opsi, 'kunci' => $benar[0], 'konten' => $media,
+                    'bab_id' => $babId, 'nomor_bab' => $nomorBab];
+            }
+            if ($pra) {
+                $tercakup = array_unique(array_column($hasil, 'nomor_bab'));
+                $kurang = array_diff(array_keys($babNomorKeId), $tercakup);
+                if ($kurang !== []) {
+                    throw new DomainException('Semua BAB wajib mempunyai soal. Belum tercakup: BAB ' . implode(', ', $kurang));
+                }
             }
             return ['jenis' => $jenis, 'jumlah' => $n, 'soal' => $hasil,
                 'pemeriksaan_identitas' => $identitasDiperiksa,
