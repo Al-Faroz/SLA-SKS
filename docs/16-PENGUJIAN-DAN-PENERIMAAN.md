@@ -373,3 +373,9 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 2. URL Admin tanpa `paketId` harus hanya menunjukkan filter Gen/Mapel/Semester/Status dan tabel jadwal; **tidak** boleh ada form jadwal atau daftar peserta di bawahnya. Klik **Atur jadwal** membuka halaman detail tanpa tabel utama; breadcrumb dan kembali mempertahankan seluruh filter.
 3. POST simpan soal/KKM, jadwal utama/tambahan, dan peserta susulan tetap berfungsi dan kembali ke halaman detail. Uji 403 akses Guru ke paket Gen lain, status kosong, responsif HP, dan CSRF.
 4. SQL **tetap V4-0009** yang sudah terpasang; tidak mengimpor ulang atau mengubah data lokal untuk perbaikan UI ini.
+
+### A8-7 — QA Word Pra-Semester
+- Guru mengunduh template 30 soal dengan BAB semester; unggah DOCX 30 soal berisi PG A–E dan kunci ✓, metadata HMAC benar atau identitas tampak yang masih sesuai. Pratinjau menampilkan jumlah dan asal BAB, gambar, tabel, rumus/Arab/Drive.
+- Tolak BAB asing/di luar semester, semua soal hanya satu BAB, paket/Guru lain, opsi kosong/kunci salah, file macro, >15 MB, dan perubahan BAB/bank setelah review; tidak membuat soal parsial. Soal manual tidak boleh tertimpa oleh impor. Impor ulang dokumen identik tidak menambah soal.
+- Setelah ada attempt Pra-Semester, semua impor ditolak, dan hasil siswa/riwayat tidak berubah. Browser siswa harus menampilkan konten rich dan gambar lewat media proxy berotorisasi; token/akun siswa lain mendapat 404.
+- Uji automated `tests/unit/PraSemesterWordTest.php`, `PraSemesterDatabaseTest.php`, regresi Word Diagnostik/Sumatif, serta SQL MariaDB sintetis `V4-0010`; uji XAMPP manual tetap wajib sebelum dinyatakan FIX.
