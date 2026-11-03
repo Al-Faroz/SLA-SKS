@@ -5,7 +5,7 @@
         <div>
             <p class="a-proto-eyebrow">Ruang kerja / Administrasi</p>
             <h1>Dashboard Admin</h1>
-            <p class="a-proto-muted">Selamat datang, <strong><?= esc($namaPengguna) ?></strong>. Berikut ringkasan data induk akademik yang tersedia saat ini.</p>
+            <p class="a-proto-muted">Selamat datang, <strong><?= esc($namaPengguna) ?></strong>. Berikut ringkasan referensi, kegiatan akademik, dan pekerjaan administrasi yang terpantau.</p>
         </div>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/referensi'), 'attr') ?>">Kelola Gen <span aria-hidden="true">↗</span></a>
     </header>
@@ -49,6 +49,114 @@
             </article>
         </div>
     </section>
+
+    <section class="a-card a-dashboard-admin__section a-jarak-atas"
+        aria-labelledby="admin-ringkasan-operasional">
+        <div class="a-proto-section-head">
+            <div>
+                <h2 id="admin-ringkasan-operasional">Ringkasan Operasional</h2>
+                <p>Jumlah dari data tersimpan, bukan angka contoh.
+                    TP Siap/Draf adalah status konten Guru, bukan nilai siswa.</p>
+            </div>
+        </div>
+        <div class="a-dashboard-admin__metrics">
+            <article class="a-dashboard-admin__metric">
+                <span>Akun aktif</span>
+                <strong><?= (int)$ringkasan['akun_aktif'] ?></strong>
+                <small>Semua peran dengan status akun aktif</small>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>Siswa terdaftar</span>
+                <strong><?= (int)$ringkasan['siswa'] ?></strong>
+                <a href="<?= esc(site_url('admin/siswa'),'attr') ?>">Kelola siswa</a>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>TP Siap</span>
+                <strong><?= (int)$ringkasan['tp_siap'] ?></strong>
+                <small>Konten siap tersimpan, dikelola Guru G1</small>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>TP Draf</span>
+                <strong><?= (int)$ringkasan['tp_draf'] ?></strong>
+                <small>Masih disiapkan Guru, tidak otomatis gagal</small>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>Foto menunggu persetujuan</span>
+                <strong><?= (int)$ringkasan['foto_menunggu'] ?></strong>
+                <a href="<?= esc(site_url('admin/foto-profil'),'attr') ?>">Tinjau antrean</a>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>Sertifikat berlaku</span>
+                <strong><?= (int)$ringkasan['sertifikat_berlaku'] ?></strong>
+                <a href="<?= esc(site_url('admin/sertifikat'),'attr') ?>">Periksa sertifikat</a>
+            </article>
+        </div>
+    </section>
+
+    <div class="a-dashboard-admin__health a-jarak-atas">
+        <section class="a-card a-dashboard-admin__section" aria-labelledby="admin-perhatian">
+            <h2 id="admin-perhatian">Perhatian Admin</h2>
+            <p class="a-help">Hanya kondisi yang dapat diperiksa dari data.
+                Penugasan Guru dan persetujuan foto tetap diproses melalui halaman resminya.</p>
+            <?php if ($ringkasan['perhatian'] === []): ?>
+                <div class="a-alert" role="status">
+                    Tidak ada penugasan kosong, foto menunggu, atau kendala TTD
+                    yang terdeteksi oleh pemeriksaan ini. Ini bukan audit
+                    keamanan dan kesehatan server menyeluruh.
+                </div>
+            <?php else: ?>
+                <ul class="a-dashboard-admin__attention">
+                    <?php foreach ($ringkasan['perhatian'] as $item): ?>
+                        <li>
+                            <span><?= esc($item['pesan']) ?></span>
+                            <a class="a-btn a-btn--sekunder"
+                                href="<?= esc(site_url($item['path']),'attr') ?>">
+                                <?= esc($item['label']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach ?>
+                </ul>
+            <?php endif ?>
+        </section>
+
+        <section class="a-card a-dashboard-admin__section" aria-labelledby="admin-kesiapan">
+            <h2 id="admin-kesiapan">Kesiapan Aset dan Operasional</h2>
+            <div class="a-dashboard-admin__facts">
+                <div>
+                    <span>Tanda tangan sertifikat</span>
+                    <?php if ($ringkasan['ttd_status'] === 'siap'): ?>
+                        <strong>Aktif dan terverifikasi</strong>
+                    <?php elseif ($ringkasan['ttd_status'] === 'berkas_tidak_valid'): ?>
+                        <strong>Berkas perlu diperiksa</strong>
+                    <?php else: ?>
+                        <strong>Belum aktif</strong>
+                    <?php endif ?>
+                    <a href="<?= esc(site_url('admin/sertifikat/aset'),'attr') ?>">Kelola aset</a>
+                </div>
+                <div>
+                    <span>Ruang disk tersisa pada volume writable/</span>
+                    <strong>
+                        <?php if ($ringkasan['disk_sisa_byte'] === null): ?>
+                            Tidak dapat diukur
+                        <?php else: ?>
+                            <?= esc(number_format((float)$ringkasan['disk_sisa_byte'] / 1073741824,2,',','.')) ?> GB
+                        <?php endif ?>
+                    </strong>
+                    <small>Angka kapasitas, bukan pemeriksaan ambang aman hosting</small>
+                </div>
+                <div>
+                    <span>Status cron</span>
+                    <strong>Belum diperiksa otomatis</strong>
+                    <small>Jadwal tugas server tidak dinilai dari kunjungan halaman</small>
+                </div>
+                <div>
+                    <span>Status backup</span>
+                    <strong>Belum diverifikasi</strong>
+                    <small>Pastikan backup database dan writable/ secara terpisah</small>
+                </div>
+            </div>
+        </section>
+    </div>
 
     <div class="a-proto-dashboard-grid">
         <section class="a-card a-proto-panel" aria-labelledby="judul-akses-cepat">
