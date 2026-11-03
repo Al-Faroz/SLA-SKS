@@ -35,3 +35,7 @@ Bank ujian gabungan seluruh BAB pada semester, minimal 30 soal. Mesin, fullscree
 - Status TP Siap bukan gerbang penguncian. Guru G1 boleh menyunting KKM tunggal, soal dan konten TP Siap selama belum ada siswa yang menggunakan TP; validasi kesiapan dan snapshot aktif diulang sebelum tersedia kepada siswa.
 - Setelah minimal satu siswa memakai TP, konten akademik TP terkunci dan **hasil/percobaan/nilai tidak boleh diubah oleh perubahan konten TP**. Koreksi nilai siswa yang diatur tersendiri tetap terpisah, tidak membuka hak sunting TP. KKM Diagnostik dan Sumatif tetap satu nilai.
 - CP boleh disunting Admin kapan saja; perubahan CP tidak memicu perhitungan ulang nilai siswa atau perubahan bobot 20/20/60 maupun 100% Sumatif.
+
+
+### Penilaian Pra-Semester dan pembatalan (3 November 2026)
+KKM Pra-Semester: default Admin atau nilai khusus Guru untuk paket Gen–Mapel–Semester (tidak menyalin KKM salah satu TP). Nilai awal hanya dari percobaan `selesai_sah`; bila di bawah KKM tersedia **satu remedial sah** dengan jadwal tersendiri oleh Admin. Skor terbaik menjadi nilai Pra-Semester mandiri, tanpa Nilai Akhir Semester. Percobaan batal/tidak hadir tidak memiliki nilai, tidak memotong jatah sah, dan hanya boleh dikerjakan lagi pada **susulan Admin**. Batal saat remedial memerlukan **susulan remedial**, tanpa tambahan jatah sah.
