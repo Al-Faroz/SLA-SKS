@@ -58,3 +58,7 @@ Perbaikan pada branch **`fix/a12-3-ui-dashboard-siswa-20261103`** (Draft PR #118
 - Tambahan tes untuk judul TP berizin, semester dilewati dan TP status Draf yang **tidak boleh tampil sebagai tujuan belajar**.
 
 A12-3 dinilai **berfungsi pada screenshot tetapi masih memerlukan QA visual ulang setelah PR #118**. Jangan menganggap perubahan ini memperbaiki status ujian siswa simulasi tanpa audit histori progres tersendiri.
+
+### Hasil QA otomatis revisi UI
+
+GitHub Actions `QA A12-3 Dashboard Siswa`, run **41647071674**, hasil **SUCCESS**: PHP lint seluruh berkas terkait PASS, `DashboardSiswaDatabaseTest.php` **8 tes/47 assertions**, regresi Katalog **10 tes/38 assertions**, regresi Laporan Akademik **6 tes/34 assertions**. Tes baru memverifikasi kode/judul TP Siap berizin muncul pada hero/kartu, sedangkan TP yang masih Draf tidak ditampilkan dan tombol tetap menuju daftar Semester. SQL tidak diubah. Status: **tes otomatis PASS, pemeriksaan visual browser hasil perubahan pada XAMPP masih diperlukan**.
