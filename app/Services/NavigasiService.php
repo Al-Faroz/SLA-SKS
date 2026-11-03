@@ -54,6 +54,10 @@ final class NavigasiService
             }
         }
 
+        if ($peran === 'pimpinan') {
+            $menu[] = ['label' => 'Monitoring Akademik', 'path' => 'pimpinan/laporan',
+                'aktif' => $aktif === 'laporan'];
+        }
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
 
         return $menu;
