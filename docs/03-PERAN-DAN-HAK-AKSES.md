@@ -110,3 +110,9 @@ Beranda `/siswa` memakai filter `auth:siswa` dan pemeriksaan ulang role/status d
 ### A12-4 — Otorisasi dan privasi Dashboard Admin (3 November 2026)
 
 `GET /admin` menggunakan filter `auth:admin` serta pemeriksaan role aktif/status/`wajib_ganti_sandi` di `DashboardAdminService`. Dashboard hanya melakukan SELECT agregat dan pemeriksaan berkas TTD privat (keberadaan + checksum); tidak memuat nama, NISN, password, hash, token, PDF/TTD mentah atau jawaban siswa pada HTML ringkasan. Foto belum disetujui dihitung hanya bila masih ditunjuk oleh `profil_pengelola.foto_menunggu_id` dan status `foto_profil=menunggu`; sertifikat historis `digantikan` tidak dihitung. Link tindakan mengarah ke halaman Admin yang telah dilindungi sendiri. Header `Cache-Control: private, no-store` wajib. Pada akun multi-role yang sedang berperan Guru/Pimpinan, tidak boleh melihat Dashboard Admin.
+
+### A13-1 — Bantuan dasar sesuai peran aktif (3 November 2026)
+
+`GET /bantuan` berlaku hanya untuk akun sudah login dengan status aktif dan sandi awal telah diganti. AuthFilter `auth` dan `Bantuan::index` mengecek sesi/peran aktif; panduan `PanduanBantuanService::untukPeran()` hanya mengembalikan pertanyaan dan tautan GET yang sesuai **peran aktif** (bukan gabungan role staf). Guru tidak memperoleh panduan tautan Admin, Siswa tidak melihat tautan Guru/Admin, dan Pimpinan hanya menuju monitoring baca-saja atau Profil. Semua target tetap menerapkan otorisasi normal server ketika diklik. Halaman Bantuan tidak menerima ID siswa/Gen sebagai query, tidak melakukan mutasi, dan memakai `Cache-Control: private, no-store`.
+
+Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master**, bukan sistem FAQ yang dapat diubah Admin. Pengumuman global, FAQ resmi terkelola, notifikasi internal dan kontak resmi Hubungi Admin tetap terpisah hingga struktur/sumbernya diverifikasi lewat dump SQL XAMPP terbaru. Tidak ada perubahan izin pada tiga layanan tersebut.
