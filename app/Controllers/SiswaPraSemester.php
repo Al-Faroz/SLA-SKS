@@ -53,17 +53,13 @@ final class SiswaPraSemester extends BaseController
 
     public function halaman(int $paketId): ResponseInterface|string
     {
-        if (!$this->desktop()) {
-            return $this->response->setStatusCode(403)
-                ->setHeader('Cache-Control','private, no-store')
-                ->setBody('Pra-Semester memerlukan desktop/laptop dan browser fullscreen.');
-        }
         try {
             $data = $this->engine()->ruang($paketId);
             $this->response->setHeader('Cache-Control','private, no-store')
                 ->setHeader('Referrer-Policy','no-referrer');
             return view('siswa/pra_semester_ujian',$data + [
                 'judul'=>'Pra-Semester','csrfName'=>csrf_token(),'csrfValue'=>csrf_hash(),
+                'desktop'=>$this->desktop(),
             ]);
         } catch (DomainException $e) {
             return $this->response->setStatusCode(404)->setBody(
