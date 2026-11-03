@@ -2394,3 +2394,26 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
         width:100%;
     }
 }
+
+/* A11-2 — aksi terbit/revisi per siswa, tidak menghimpit tabel. */
+.a-sertifikat .a-sertifikat__table { min-width:1240px; }
+.a-sertifikat .a-sertifikat__table thead th:nth-child(6) { min-width:270px; }
+.a-sertifikat .a-sertifikat__aksi { min-width:265px; }
+.a-sertifikat .a-sertifikat__aksi > *+* { margin-top:8px; }
+.a-sertifikat .a-sertifikat__aksi .a-btn { margin:5px 0; }
+.a-sertifikat .a-sertifikat__aksi form { max-width:280px; }
+.a-sertifikat .a-sertifikat__aksi details { margin-top:9px; }
+.a-sertifikat .a-sertifikat__aksi summary {
+    padding:5px 0;
+    font-size:12px;
+}
+.a-sertifikat .a-sertifikat__aksi input {
+    width:100%;
+    max-width:270px;
+}
+.a-sertifikat .a-sertifikat__status-item .a-btn { white-space:normal; text-align:center; }
+.a-sertifikat .a-alert { overflow-wrap:break-word; }
+.a-sertifikat .a-sertifikat__table a:not(.a-btn) {
+    text-decoration:underline;
+    text-underline-offset:3px;
+}
