@@ -162,14 +162,20 @@ final class SertifikatPdfService
         position: fixed; top: -8mm; left: -9mm;
         width: 297mm; height: 210mm; z-index: -2;
     }
-    .card {
-        background: rgba(255,255,255,.91);
+    .page-frame {
+        position: fixed; top: 0; left: 0;
+        width: 278mm; height: 192mm;
         border: 1px solid #8BB9A7;
-        padding: 7mm 9mm;
-        position: relative;
+        background: rgba(255,255,255,.91);
+        z-index: -1;
     }
-    .card--full { height: 192mm; }
-    .card--flow { min-height: 170mm; }
+    .card {
+        position: relative;
+        padding: 7mm 9mm;
+        background: transparent;
+        border: 0;
+    }
+    .card--full, .card--flow { height: auto; }
     .kop { text-align: center; border-bottom: 1.5pt solid #246D54; padding-bottom: 3mm; }
     .kop .identitas { font: bold 17pt DejaVu Serif, serif; line-height: 1.24; }
     .kop .alamat { font-size: 8.6pt; margin-top: 1.5mm; color: #43695D; }
@@ -221,7 +227,9 @@ final class SertifikatPdfService
     .tp-table .tp-row { page-break-inside: avoid; }
     .footer { margin-top: 9mm; padding-top: 4mm; border-top: 1px solid #CADFD1; page-break-inside: avoid; }
     .card--full .footer {
-        position: absolute; bottom: 8mm; left: 9mm; right: 9mm; margin-top: 0;
+        position: fixed; bottom: 12mm;
+        left: 18mm; width: 260mm;
+        margin-top: 0;
     }
     .footer td { width: 33.333%; vertical-align: top; text-align: center; padding: 0 2mm; }
     .footer .qr-cell { text-align: left; }
@@ -244,6 +252,7 @@ final class SertifikatPdfService
 </head>
 <body>
 $backgroundHtml
+<div class="page-frame" aria-hidden="true"></div>
 $watermark
 <main class="$kelasHalaman">
     <header class="kop">
