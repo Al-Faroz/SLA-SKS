@@ -316,3 +316,10 @@ Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`
 - Detail Penilaian: formulir skor dan umpan balik dua kolom seimbang pada desktop, satu kolom di HP. Petunjuk snapshot memakai aksen emerald; jawaban siswa aksen biru-violet pada Dark/Light, **termasuk ketika Mode Dokumentasi aktif**.
 - Mode Dokumentasi `data-documentation="on"` memindahkan sidebar ke bagian atas untuk screenshot panjang. Submenu Rekap Nilai menjadi popover `details` pada hover/fokus keyboard, bukan baris bertumpuk yang memperpanjang header. Mode panel normal tetap mempertahankan sidebar.
 - Perubahan hanya presentation layer. Kontrol filter, ekspor, paginasi, penilaian, CSRF, otorisasi, data, dan SQL tidak dimodifikasi.
+
+### A10-1 — Tiga halaman laporan akademik (3 November 2026)
+
+1. `siswa/laporan`: daftar paket Mapel–Semester **yang telah terbuka**, berupa kartu responsif; jangan memberikan tombol ke semester yang terkunci/dilewati.
+2. `siswa/laporan/{paketId}`: progres TP NonEsensial (kartu angka dan progress bar), rincian skor sah per BAB/TP dalam tabel gulir horizontal, kemudian **Hasil Pra-Semester pada kartu berbeda**; nilai kosong/0 ditampilkan dengan benar dan tidak ada tombol ubah.
+3. `pimpinan/laporan`: filter paket Gen–Mapel–Semester, tabel paginasi semua siswa, progres sah dan tombol pratinjau. `pimpinan/laporan/{paket}/siswa/{id}`: memakai tampilan detail read-only yang sama, dibatasi Gen.
+4. Tampilkan keadaan belum ada paket/siswa/TP/ujian, tanpa membuat nilai atau skor dummy. Pada 360/390px, komponen metrik berubah menjadi satu kolom dan tabel yang lebar tetap bisa digulir, bukan memperkecil tulisan sampai tak terbaca.
