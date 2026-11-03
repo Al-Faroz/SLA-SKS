@@ -117,3 +117,7 @@ Validasi bisnis pada file PDF Materi hanya **jumlah halaman 6–40** dan **ukura
 
 ### Proteksi Pra-Semester (3 November 2026)
 Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah tampil dalam respons siswa. Admin hanya boleh jadwal/durasi per paket, bukan soal/nilai. Pemeriksaan kelayakan seluruh TP, status bank, jendela boleh mulai, peserta remedial/susulan dan perangkat dilakukan **di server dalam transaksi sebelum attempt dibuat**, bukan hanya pada UI. Bank/KKM/durasi yang digunakan dalam ujian tidak boleh berubah saat sudah ada percobaan. Audit jadwal, pembatalan otomatis, susulan berulang, partisipasi siswa, dan izin berjenjang dipertahankan. Token, jawaban, soal/kunci tidak disertakan pada file ekspor publik atau log yang tidak berizin.
+
+### A8-7 — Keamanan Word Pra-Semester
+- DOCX maksimum 15 MB; validasi berkas ZIP/OOXML, batas jumlah part, tolak macro, HMAC identitas, opsi/kunci, nomor BAB terdaftar. Renderer hanya menghasilkan HTML whitelist, sumber eksternal tidak dieksekusi. Staging dan gambar di bawah `writable/private/` dengan larangan akses langsung.
+- Konfirmasi melock paket dan ujian, memverifikasi checksum, masa berlaku, kepemilikan Guru, sidik jari BAB/bank serta belum ada attempt siswa. Semua INSERT dan audit berada dalam transaksi; error rollback. Gambar siswa harus melewati autentikasi dan snapshot token, bukan URL file asli.
