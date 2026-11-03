@@ -46,3 +46,11 @@ Workflow `QA A12-4 Dashboard Admin` run **41649314078**: **SUCCESS**. Lint PHP (
 6. Login sebagai Guru/Siswa/Pimpinan: rute `/admin` harus ditolak. Reload beranda tidak boleh mengubah progres, nilai, sertifikat maupun foto.
 
 Status: implementasi dan QA sintetis PASS, **menunggu verifikasi XAMPP pemilik**. Tahap berikutnya adalah meninjau sisa fungsi Tahap 12 (notifikasi/pengumuman/FAQ dan E2E akhir), bukan menghidupkan kembali fitur bisnis yang dibatalkan.
+
+## Audit UI Admin dari 14 screenshot XAMPP — PR #120
+
+Pemilik mengirim seluruh rangkaian screenshot operasional Admin setelah pull A12-4 dan meminta `Analisa, Teliti & Perbaiki`. Observasi screenshot: beranda Admin menunjukkan 3 Gen × 20 Mapel = 60 kemungkinan, 3 pasangan G1 terisi dan 57 sisanya belum diisi; akun aktif 49, siswa 29, TP Siap 3, TP Draf 37, foto menunggu 0, sertifikat berlaku 1, TTD terverifikasi, sisa disk 25,31 GB. **Angka ditampilkan tanpa mengarang audit SQL baru**. Data disimpan di lokal pengguna, foto/NISN/screenshot tidak dipush.
+
+Ditemukan masalah kontras kritis pada detail reset sandi (CSS lama #f6faf8 vs teks terang), tabel Pengelola/Siswa terjepit form kiri 340px, form Tambah Mapel terlalu sempit, aksi filter CP terlalu dekat tabel, label situs web opsional berulang, banner warisan K2 tetap muncul, dan peringatan '57 pasangan wajib' berpotensi menyesatkan. Branch `fix/a12-4-audit-ui-admin-20261103` memperbaiki semua ini di **Draft PR #120**. Status penugasan G1 dan angka total tetap sama; yang diperjelas hanya istilah **kombinasi potensial**. Endpoint POST, CSRF, nilai, riwayat dan kebijakan bisnis tidak diubah.
+
+Layar referensi Gen/tahun, edit CP, KKM, ujian Pra, antrean foto kosong dan profil tidak memiliki kelainan visual yang cukup untuk mengubah fungsinya. Unit test statis UI dan regresi Dashboard Admin dijalankan pada GitHub Actions; uji tampilan Dark/Light, desktop/HP dan klik tautan tetap dilakukan pemilik sesudah pull. Tidak perlu impor SQL.
