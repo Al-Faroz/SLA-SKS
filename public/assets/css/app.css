@@ -3029,3 +3029,44 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-bantuan__butir > summary {padding:14px;}
     .a-bantuan__jawaban {padding:12px 14px 15px;}
 }
+
+/* A13-2 — Pengumuman Global dan FAQ resmi dari Admin. */
+.a-informasi__kartu {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+    margin-top:15px;
+}
+.a-informasi__item {min-width:0;}
+.a-informasi__item h2 {margin:6px 0 14px;font-size:1.14rem;line-height:1.4;overflow-wrap:anywhere;}
+.a-informasi__isi {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;font-size:.9rem;}
+.a-informasi__kosong {padding:20px 6px;color:var(--e-text-muted,var(--e-text));}
+.a-informasi__kosong h2 {font-size:1.15rem;margin:0 0 8px;}
+.a-informasi__pagination {
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;
+    margin-top:18px;
+}
+.a-informasi__pagination > span {font-size:.88rem;margin-right:auto;}
+.a-informasi__arsip {display:inline-block;margin:3px 2px 3px 0;}
+.a-informasi .a-tabel td {vertical-align:middle;}
+.a-informasi .a-tabel .a-btn {min-height:38px;white-space:nowrap;}
+.a-informasi__editor {max-width:940px;}
+.a-informasi__editor .a-form {display:grid;gap:14px;}
+.a-informasi__editor .a-field {min-width:0;}
+.a-informasi__editor textarea {min-height:175px;width:100%;resize:vertical;}
+.a-informasi__aksi {display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.a-informasi__kepala {
+    display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+}
+.a-informasi__kepala h2 {margin:0 0 8px;font-size:1.14rem;}
+.a-informasi__kepala .a-btn {flex-shrink:0;}
+.a-bantuan__faq-resmi .a-bantuan__pertanyaan {margin-top:16px;}
+@media(max-width:820px) {
+    .a-informasi__kartu {grid-template-columns:minmax(0,1fr);}
+}
+@media(max-width:620px) {
+    .a-informasi__kepala {flex-direction:column;}
+    .a-informasi__pagination {justify-content:flex-start;}
+    .a-informasi__pagination > span {width:100%;}
+    .a-informasi__editor .a-form {gap:12px;}
+}
