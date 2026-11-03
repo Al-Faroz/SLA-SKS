@@ -11,7 +11,8 @@
 </header>
 <?php if ($pesan = session()->getFlashdata('galat')): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div><?php endif ?>
 <?php if ($pesan = session()->getFlashdata('sukses')): ?><div class="a-alert" role="status"><?= esc($pesan) ?></div><?php endif ?>
-<div class="a-dua-kolom">
+<div class="a-referensi-grid">
+    <div class="a-referensi-grid__kolom">
 <section class="a-card a-page__editor" aria-labelledby="judul-gen">
     <h2 id="judul-gen">Tambahkan Gen</h2>
     <form method="post" action="<?= esc(site_url('admin/referensi/gen'), 'attr') ?>" class="a-form">
@@ -28,6 +29,14 @@
         <button class="a-btn a-btn--utama" type="submit">Tambahkan Gen</button>
     </form>
 </section>
+<section class="a-card" aria-labelledby="judul-daftar-gen"><h2 id="judul-daftar-gen">Daftar Gen</h2>
+    <?php if ($angkatan === []): ?><div class="a-empty" role="status"><strong>Belum ada Gen.</strong><p>Isi formulir Tambahkan Gen di atas.</p></div>
+    <?php else: ?><div class="a-tabel-gulir"><table class="a-tbl"><thead><tr><th scope="col">Kode</th><th scope="col">Nama</th><th scope="col">Semester mulai</th></tr></thead><tbody>
+    <?php foreach ($angkatan as $item): ?><tr><td><?= esc($item['kode']) ?></td><td><?= esc($item['nama']) ?></td><td><?= (int) $item['semester_mulai'] ?></td></tr><?php endforeach ?>
+    </tbody></table></div><?php endif ?>
+</section>
+    </div>
+    <div class="a-referensi-grid__kolom">
 <section class="a-card a-page__editor" aria-labelledby="judul-tahun">
     <h2 id="judul-tahun">Tambahkan tahun ajaran</h2>
     <form method="post" action="<?= esc(site_url('admin/referensi/tahun-ajaran'), 'attr') ?>" class="a-form">
@@ -36,20 +45,13 @@
         <button class="a-btn a-btn--utama" type="submit">Tambahkan tahun ajaran</button>
     </form>
 </section>
-</div>
-<div class="a-dua-kolom a-jarak-atas a-page__daftar">
-<section class="a-card" aria-labelledby="judul-daftar-gen"><h2 id="judul-daftar-gen">Daftar Gen</h2>
-    <?php if ($angkatan === []): ?><div class="a-empty" role="status"><strong>Belum ada Gen.</strong><p>Isi formulir Tambahkan Gen di atas.</p></div>
-    <?php else: ?><div class="a-tabel-gulir"><table class="a-tbl"><thead><tr><th scope="col">Kode</th><th scope="col">Nama</th><th scope="col">Semester mulai</th></tr></thead><tbody>
-    <?php foreach ($angkatan as $item): ?><tr><td><?= esc($item['kode']) ?></td><td><?= esc($item['nama']) ?></td><td><?= (int) $item['semester_mulai'] ?></td></tr><?php endforeach ?>
-    </tbody></table></div><?php endif ?>
-</section>
 <section class="a-card" aria-labelledby="judul-daftar-tahun"><h2 id="judul-daftar-tahun">Daftar tahun ajaran</h2>
     <?php if ($tahun === []): ?><div class="a-empty" role="status"><strong>Belum ada tahun ajaran.</strong><p>Isi formulir Tambahkan tahun ajaran di atas.</p></div>
     <?php else: ?><div class="a-tabel-gulir"><table class="a-tbl"><thead><tr><th scope="col">Tahun ajaran</th></tr></thead><tbody>
     <?php foreach ($tahun as $item): ?><tr><td><?= esc($item['nama']) ?></td></tr><?php endforeach ?>
     </tbody></table></div><?php endif ?>
 </section>
+    </div>
 </div>
 </div>
 <?= $this->endSection() ?>
