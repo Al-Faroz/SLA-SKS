@@ -352,3 +352,11 @@ Pratinjau PDF di Admin memakai **data dummy** (dua BAB, empat TP), bukan siswa s
 - Cakupan 0/0 ditampilkan **Belum ada target**, bukan 0% atau 100%. Grafik meter native `progress` disertai rasio serta angka teks; tidak ada grafik tanpa alternatif. Tidak ada Nilai Akhir Semester atau gabungan nilai Pra-Semester.
 - Responsif 360/390/768/1100px: kartu KPI grid 5/3/2/1 kolom sesuai ruang, filter 3 kolom desktop/1 HP, tabel lebar boleh scroll horizontal, fokus keyboard terlihat, mode Dark/Light/Dokumentasi tetap tersedia.
 - Tidak menampilkan data NISN, jawaban siswa, token ujian, maupun tombol POST/mutasi untuk Pimpinan. Filter rusak, halaman kosong, paket tanpa TP, role salah, dan kegagalan server mendapat penjelasan yang sesuai.
+
+### A12-2 — Dashboard Guru per penugasan G1 (3 November 2026)
+
+- GET `/guru` kini menampilkan ringkasan pekerjaan, bukan sekadar status akun aktif. Filter utama memilih **Gen–Mapel penugasan Guru aktif** (bukan semua Gen) dan Semester (semua/1–6). Reset dan tautan ke Peta ATP/semester mempertahankan pilihan.
+- KPI: Paket Semester aktif, TP Siap, TP Draf, jumlah TP dengan Materi aktif bukan tepat satu (Esensial dan NonEsensial sama-sama wajib satu Materi), antrean final Resume/HOTS belum dinilai, siswa unik per paket berstatus perlu bantuan, dan percobaan Diagnostik/Sumatif sedang berjalan. Antrean membedakan NULL (belum dinilai) dari skor 0 (sudah dinilai).
+- Card aksi Guru mempunyai tautan nyata ke **Antrean Penilaian**, **Permintaan Akses Ulang**, **Peta ATP**, dan **Pra-Semester**. Tabel Semester memecah semua indikator per paket, tombol Buka Semester berizin G1.
+- Tidak mengklaim satu Materi aktif berarti media/kesiapan final sudah lengkap; langkah itu tetap diuji melalui Pemeriksaan Kesiapan TP. Tidak menggabungkan nilai TP dan Pra-Semester serta tidak menghitung nilai akhir semester.
+- Kondisi tidak ada penugasan, tidak ada paket pada semester filter, filter invalid, dan role ditolak mempunyai pesan khusus. Kartu dan tabel responsif Dark/Light, HP scroll tabel, fokus keyboard. Tidak ada angka dummy pada aplikasi.
