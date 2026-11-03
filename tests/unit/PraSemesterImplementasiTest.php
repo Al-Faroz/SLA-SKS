@@ -111,15 +111,40 @@ final class PraSemesterImplementasiTest extends TestCase
         $root=dirname(__DIR__,2);
         $r=(string)file_get_contents($root.'/app/Config/Routes.php');
         $bank=(string)file_get_contents($root.'/app/Views/guru/pra_semester.php');
+        $bankDetail=(string)file_get_contents($root.'/app/Views/guru/pra_semester_detail.php');
         $jadwal=(string)file_get_contents($root.'/app/Views/admin/pra_semester.php');
+        $jadwalDetail=(string)file_get_contents($root.'/app/Views/admin/pra_semester_detail.php');
+        $guruCtrl=(string)file_get_contents($root.'/app/Controllers/GuruPraSemester.php');
+        $adminCtrl=(string)file_get_contents($root.'/app/Controllers/AdminPraSemester.php');
         $ujian=(string)file_get_contents($root.'/app/Views/siswa/pra_semester_ujian.php');
         $js=(string)file_get_contents($root.'/public/assets/js/diagnostik-ujian.js');
         self::assertStringContainsString('GuruPraSemester::simpanSoal',$r);
         self::assertStringContainsString('AdminPraSemester::simpan',$r);
         self::assertStringContainsString('SiswaPraSemester::mulai',$r);
         self::assertStringContainsString('SiswaPraSemester::jawab',$r);
-        self::assertStringContainsString('Simpan Soal',$bank);
-        self::assertStringContainsString('Simpan Jadwal Utama',$jadwal);
+        // Indeks hanya daftar+filter. Form hanya ada di URL detail paket.
+        self::assertStringContainsString('name="gen"',$bank);
+        self::assertStringContainsString('Kelola soal',$bank);
+        self::assertStringNotContainsString('Simpan Soal',$bank);
+        self::assertStringNotContainsString('KKM khusus Guru',$bank);
+        self::assertStringContainsString('Simpan Soal',$bankDetail);
+        self::assertStringContainsString('Kembali ke daftar',$bankDetail);
+        self::assertStringNotContainsString('Pilih Gen dan Semester',$bankDetail);
+        self::assertStringContainsString("?'guru/pra_semester'", $guruCtrl);
+        self::assertStringContainsString("'guru/pra_semester_detail'", $guruCtrl);
+
+        foreach (['gen','mapel','semester','status'] as $namaFilter) {
+            self::assertStringContainsString('name="'.$namaFilter.'"',$jadwal);
+        }
+        self::assertStringContainsString('Atur jadwal',$jadwal);
+        self::assertStringNotContainsString('Simpan Jadwal Utama',$jadwal);
+        self::assertStringNotContainsString('Tambah jadwal remedial atau susulan',$jadwal);
+        self::assertStringContainsString('Simpan Jadwal Utama',$jadwalDetail);
+        self::assertStringContainsString('Tambah jadwal remedial atau susulan',$jadwalDetail);
+        self::assertStringContainsString('Kembali ke daftar',$jadwalDetail);
+        self::assertStringNotContainsString('Daftar Pra-Semester</h2>',$jadwalDetail);
+        self::assertStringContainsString("'admin/pra_semester_detail'", $adminCtrl);
+        self::assertStringContainsString('redirect()->to($url)',$adminCtrl);
         self::assertStringContainsString('data-ujian-jenis="pra_semester"',$ujian);
         self::assertStringContainsString('if (!$desktop)', $ujian); // jadwal HP boleh dibaca
         $siswaCtrl=(string)file_get_contents($root.'/app/Controllers/SiswaPraSemester.php');
