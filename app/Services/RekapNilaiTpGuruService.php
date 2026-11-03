@@ -91,6 +91,24 @@ final class RekapNilaiTpGuruService
         return $baris;
     }
 
+    /** Hanya BAB dalam paket Gen–Mapel dan semester penugasan Guru. */
+    public function daftarBab(?array $pilihan, int $semester): array
+    {
+        $guru = $this->guruId();
+        if ($pilihan === null) return [];
+        if ($semester < 1 || $semester > 6) {
+            throw new DomainException('Semester rekap tidak valid.');
+        }
+        [$gen,$mapel] = $this->cakupan($pilihan,$guru);
+        return $this->db->table('bab b')
+            ->select('b.id,b.nomor_bab,b.nama_bab')
+            ->join('paket_semester p','p.id=b.paket_semester_id')
+            ->where('p.angkatan_id',$gen)->where('p.mapel_id',$mapel)
+            ->where('p.semester',$semester)
+            ->orderBy('b.nomor_bab','ASC')->orderBy('b.id','ASC')
+            ->get()->getResultArray();
+    }
+
     /** Nilai nol adalah nilai sah; NULL berarti belum ada. */
     public static function tampilNilai(mixed $angka, bool $esensial = false): string
     {
@@ -128,11 +146,14 @@ final class RekapNilaiTpGuruService
      * @return array{baris:array,total:int,halaman:int,jumlah_halaman:int,
      *     jumlah_siswa:int,jumlah_final:int,jumlah_sementara:int,jumlah_belum:int}
      */
-    public function rekap(?array $pilihan, int $semester, int $halaman = 1, int $perHalaman = 25): array
+    public function rekap(?array $pilihan, int $semester, int $halaman = 1,
+        int $perHalaman = 25, string $jenisTp = 'semua', ?int $babId = null): array
     {
         $guruId = $this->guruId();
         if ($semester < 1 || $semester > 6 || $halaman < 1 || $halaman > 100000
-            || $perHalaman < 1 || $perHalaman > 500) {
+            || $perHalaman < 1 || $perHalaman > 500
+            || !in_array($jenisTp,['semua','esensial','non_esensial'],true)
+            || ($babId !== null && $babId < 1)) {
             throw new DomainException('Semester atau halaman rekap tidak valid.');
         }
         $hasil = [
@@ -142,6 +163,12 @@ final class RekapNilaiTpGuruService
         ];
         if ($pilihan === null) return $hasil;
         [$gen, $mapel] = $this->cakupan($pilihan, $guruId);
+        if ($babId !== null) {
+            $allowed = array_map('intval',array_column($this->daftarBab($pilihan,$semester),'id'));
+            if (!in_array($babId,$allowed,true)) {
+                throw new DomainException('BAB bukan milik Gen–Mapel dan semester Guru.');
+            }
+        }
         // Query baca-saja. Join nilai memakai progres siswa yang sama,
         // tidak memakai TP dari Gen lain maupun status 'siap' sebagai gate rekap.
         $dari = ' FROM paket_semester p'
@@ -157,6 +184,14 @@ final class RekapNilaiTpGuruService
             . ' WHERE g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id'
             . ' AND g.guru_id=?)';
         $args = [$gen, $mapel, $semester, $guruId];
+        if ($jenisTp !== 'semua') {
+            $dari .= ' AND t.jenis_tp=?';
+            $args[] = $jenisTp;
+        }
+        if ($babId !== null) {
+            $dari .= ' AND t.bab_id=?';
+            $args[] = $babId;
+        }
         $jumlah = $this->db->query(
             'SELECT COUNT(*) AS total,'
             . ' SUM(CASE WHEN t.jenis_tp=\'non_esensial\''
