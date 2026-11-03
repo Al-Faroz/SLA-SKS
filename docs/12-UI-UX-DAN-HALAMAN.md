@@ -305,3 +305,14 @@ Keputusan pemilik: **tidak menempatkan area pengelolaan di bawah tabel daftar**.
 3. `guru/penilaian/resume/{id}` dan `guru/penilaian/hots/{id}`: Petunjuk dari Materi versi siswa serta Jawaban siswa adalah **dua kartu berbeda** dengan background kontras lembut berbeda pada Emerald Glass dark/light. Konten snapshot tidak boleh ditimpa tampilan.
 4. `guru/rekap-nilai`: filter Gen–Mapel, Semester, Jenis TP, BAB. Jenis TP **NonEsensial default** karena TP Esensial tidak dinilai; filter juga berlaku saat ekspor. Nilai NULL dan 0 dibedakan.
 5. `guru/rekap-nilai/pra-semester`: halaman tersendiri untuk seluruh siswa Gen dan skor sah ujian Pra-Semester, dengan unduhan XLSX tersendiri; tidak membentuk nilai akhir semester.
+
+### A9-2 — Audit visual berdasarkan tangkapan layar Guru (3 November 2026)
+
+Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`, `guru/penilaian`, serta detail `guru/penilaian/hots/{id}`/`resume/{id}`.
+
+- Rekap Nilai TP: empat metrik **Siswa Gen, Final, Sementara, Belum Ada Nilai** ditata dengan grid responsif, bukan daftar vertikal. Tabel 10 kolom menggunakan komponen `a-tbl` dan `a-tabel-gulir` Emerald Glass dengan lebar minimum dan scroll horizontal; nama siswa dan identitas BAB/TP boleh menjadi dua baris tetapi kolom nilai tidak terhimpit.
+- Rekap Nilai Pra-Semester: tabel 7 kolom juga memakai komponen tabel yang benar; nama siswa, KKM, normal, remedial, nilai terbaik dan status lebih terbaca. Filter Gen–Mapel dan Semester terbagi dua kolom seimbang pada desktop dan satu pada HP. Navigasi dua jenis rekap memakai komponen tab tautan konsisten.
+- Antrean Penilaian: empat filter punya proporsi adaptif dengan field Gen–Mapel lebih lebar; pada laptop dua kolom, pada HP satu kolom. Tabel/aksi/hasil filter dan parameter asli tidak berubah.
+- Detail Penilaian: formulir skor dan umpan balik dua kolom seimbang pada desktop, satu kolom di HP. Petunjuk snapshot memakai aksen emerald; jawaban siswa aksen biru-violet pada Dark/Light, **termasuk ketika Mode Dokumentasi aktif**.
+- Mode Dokumentasi `data-documentation="on"` memindahkan sidebar ke bagian atas untuk screenshot panjang. Submenu Rekap Nilai menjadi popover `details` pada hover/fokus keyboard, bukan baris bertumpuk yang memperpanjang header. Mode panel normal tetap mempertahankan sidebar.
+- Perubahan hanya presentation layer. Kontrol filter, ekspor, paginasi, penilaian, CSRF, otorisasi, data, dan SQL tidak dimodifikasi.
