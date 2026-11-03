@@ -281,3 +281,10 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - Tabel `admin/pra-semester` menggunakan tampilan sama dengan **filter Gen, Mapel, Semester, Status ujian**, baris terpilih, jendela WIB dan durasi, tombol Atur jadwal, kosong/reset dan hitungan hasil.
 - Kedua halaman: label input, aksi nyata GET, tabel horizontal scroll pada HP, fokus keyboard, warna dan spacing dari design system. Halaman Admin detail memiliki form jadwal remedial/susulan dan tabel calon peserta khusus susulan.
 - Siswa hanya melihat tombol mulai jika ada jendela/tahap sesuai dan perangkat desktop memenuhi fullscreen; hasil sebelumnya tetap dapat dilihat. Seluruh perilaku dikendalikan server.
+
+### A8-6 — Pemisahan halaman daftar dan pengelolaan Pra-Semester (3 November 2026)
+Keputusan pemilik: **tidak menempatkan area pengelolaan di bawah tabel daftar**.
+- **Guru** `GET /guru/pra-semester`: hanya tabel paket + filter Gen. Tombol **Kelola soal** membuka `GET /guru/pra-semester/{paketId}`, halaman detail tersendiri berisi ringkasan, KKM, daftar soal, serta formulir tambah/sunting soal. Tidak merender tabel semua paket dalam halaman detail.
+- **Admin** `GET /admin/pra-semester`: hanya daftar paket + filter Gen, Mapel, Semester, Status. Tombol **Atur jadwal** membuka `GET /admin/pra-semester/{paketId}`, halaman detail tersendiri untuk jadwal utama, remedial, susulan, dan peserta susulan. Tidak merender tabel semua paket dalam halaman detail.
+- Kedua halaman detail menyediakan breadcrumb dan **Kembali ke daftar**, mempertahankan query filter daftar sebelumnya. Setelah POST sukses/gagal pengguna tetap di halaman detail paket yang sama.
+- Tidak mengubah aturan bisnis, akses Guru G1, data/SQL, warna UI global atau endpoint POST.
