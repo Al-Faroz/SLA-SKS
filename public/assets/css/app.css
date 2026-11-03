@@ -2498,3 +2498,34 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 @media(max-width:560px) {
     .a-dashboard-pimpinan__operasional {grid-template-columns:1fr;}
 }
+
+/* A12-2 — Dashboard Guru: ringkas, operasional, dan responsif. */
+.a-dashboard-guru__filter {
+    display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+    gap:12px;align-items:end;margin-top:12px;
+}
+.a-dashboard-guru__filter-actions {grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;}
+.a-dashboard-guru__metrics {
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;
+}
+.a-dashboard-guru__metric {
+    min-width:0;display:flex;flex-direction:column;gap:9px;
+}
+.a-dashboard-guru__metric > span {opacity:.85;font-size:.88rem;}
+.a-dashboard-guru__metric > strong {
+    font-size:clamp(1.5rem,2.6vw,2.1rem);
+    font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums;
+}
+.a-dashboard-guru__metric > small {font-size:.8rem;opacity:.8;line-height:1.45;}
+.a-dashboard-guru__actions {display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;}
+.a-dashboard-guru__scroll {max-width:100%;}
+.a-dashboard-guru__table {min-width:980px;font-variant-numeric:tabular-nums;}
+.a-dashboard-guru__table td:last-child {white-space:nowrap;}
+@media(max-width:800px){
+    .a-dashboard-guru__metrics {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:580px){
+    .a-dashboard-guru__filter,.a-dashboard-guru__metrics {grid-template-columns:1fr;}
+    .a-dashboard-guru__actions .a-btn {flex:1;text-align:center;}
+    .a-dashboard-guru__filter-actions .a-btn {flex:1;text-align:center;}
+}
