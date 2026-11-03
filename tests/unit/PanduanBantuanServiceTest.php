@@ -112,6 +112,8 @@ final class PanduanBantuanServiceTest extends TestCase
         $routes=self::sumber('app/Config/Routes.php');
         $nav=self::sumber('app/Services/NavigasiService.php');
         $ctrl=self::sumber('app/Controllers/Bantuan.php');
+        $panel=self::sumber('app/Views/layouts/panel.php');
+        self::assertStringContainsString("str_contains(\$jalurIkon, 'bantuan') => 'book-open'",$panel);
         self::assertStringContainsString(
             "\$routes->get('bantuan', 'Bantuan::index', ['filter' => 'auth']);",$routes);
         self::assertStringContainsString("'label' => 'Bantuan'",$nav);
