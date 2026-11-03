@@ -2615,3 +2615,65 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
 @media(prefers-reduced-motion:reduce) {
     .a-dashboard-siswa__segment,.a-dashboard-siswa__progress {transition:none!important;animation:none!important;}
 }
+
+/* A12-3 UI QA dari screenshot XAMPP — satu semester, ruang dan navigasi TP. */
+.a-dashboard-siswa__next {
+    display:flex;flex-direction:column;gap:5px;
+    margin:12px 0 4px;padding:11px 14px;max-width:670px;
+    border-radius:10px;border-left:3px solid #58c3a2;
+    background:rgba(64,165,125,.10);
+}
+.a-dashboard-siswa__next span,
+.a-dashboard-siswa__tp-hint span {
+    font-size:.8rem;opacity:.83;
+}
+.a-dashboard-siswa__next strong,
+.a-dashboard-siswa__tp-hint strong {
+    font-size:.95rem;line-height:1.5;
+    overflow-wrap:anywhere;
+}
+.a-dashboard-siswa__tp-hint {
+    display:flex;flex-direction:column;gap:3px;
+    margin:12px 0 2px;
+}
+.a-dashboard-siswa__paket-info,
+.a-dashboard-siswa__paket-activity {min-width:0;}
+.a-dashboard-siswa__paket-activity {
+    display:flex;flex-direction:column;align-items:flex-start;
+    gap:10px;margin-top:auto;
+}
+.a-dashboard-siswa__paket-activity .a-dashboard-siswa__segments,
+.a-dashboard-siswa__paket-activity .a-dashboard-siswa__progress {
+    width:100%;
+}
+.a-dashboard-siswa__paket:only-child {
+    grid-column:1 / -1;
+    display:grid;
+    grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
+    align-items:center;
+    gap:24px;
+}
+.a-dashboard-siswa__paket:only-child .a-dashboard-siswa__paket-activity {
+    margin-top:0;
+    border-left:1px solid var(--a-border,rgba(100,176,140,.35));
+    padding-left:24px;
+}
+.a-dashboard-siswa__paket-head {align-items:center;}
+.a-dashboard-siswa__segment {
+    min-height:13px;
+    background:rgba(151,184,169,.34);
+    border-color:rgba(164,210,188,.47);
+}
+.a-dashboard-siswa__segment--selesai {
+    background:#4fbd94;
+    border-color:#42a982;
+}
+@media(max-width:810px) {
+    .a-dashboard-siswa__paket:only-child {
+        display:flex;flex-direction:column;align-items:stretch;gap:12px;
+    }
+    .a-dashboard-siswa__paket:only-child .a-dashboard-siswa__paket-activity {
+        border-left:0;padding-left:0;border-top:1px solid var(--a-border,rgba(100,176,140,.35));
+        padding-top:12px;
+    }
+}
