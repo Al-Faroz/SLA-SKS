@@ -222,18 +222,33 @@ final class SusunButirUjianService
             $hurufLama = self::HURUF;
             self::acakAman($hurufLama);
             $opsi = [];
+            $htmlOpsi = [];
             $kunci = null;
+            $raw = $soal['konten_terstruktur_json'] ?? null;
+            $rich = is_string($raw) && $raw !== '' ? json_decode($raw,true) : null;
+            if ($raw !== null && $raw !== '' && !is_array($rich)) {
+                throw new DomainException('Konten kaya Word Pra-Semester rusak.');
+            }
             foreach (self::HURUF as $j => $baru) {
                 $asal = $hurufLama[$j];
                 $opsi[$baru] = (string)$soal['opsi_' . strtolower($asal)];
+                if (is_array($rich) && isset($rich['html_opsi'][$asal])) {
+                    $htmlOpsi[$baru] = (string)$rich['html_opsi'][$asal];
+                }
                 if ($asal === $soal['kunci']) $kunci = $baru;
             }
+            $konten = is_array($rich) ? [
+                'html_pertanyaan'=>(string)($rich['html_pertanyaan'] ?? ''),
+                'html_opsi'=>$htmlOpsi,
+                'word_source_id'=>$rich['word_source_id'] ?? null,
+            ] : null;
             $hasil[] = [
                 'soal_asal_id'=>null,
                 'soal_pra_semester_id'=>(int)$soal['id'],
                 'posisi'=>$i+1,
                 'pertanyaan'=>(string)$soal['pertanyaan'],
-                'konten_terstruktur_json'=>null,
+                'konten_terstruktur_json'=>$konten === null ? null
+                    : json_encode($konten,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR),
                 'opsi_acak_json'=>json_encode($opsi,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR),
                 'kunci_acak'=>$kunci,
             ];
