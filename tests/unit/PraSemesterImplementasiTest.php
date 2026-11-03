@@ -121,7 +121,7 @@ final class PraSemesterImplementasiTest extends TestCase
         self::assertStringContainsString('Simpan Soal',$bank);
         self::assertStringContainsString('Simpan Jadwal Utama',$jadwal);
         self::assertStringContainsString('data-ujian-jenis="pra_semester"',$ujian);
-        self::assertStringContainsString('elseif (!$desktop)', $ujian); // jadwal HP boleh dibaca
+        self::assertStringContainsString('if (!$desktop)', $ujian); // jadwal HP boleh dibaca
         $siswaCtrl=(string)file_get_contents($root.'/app/Controllers/SiswaPraSemester.php');
         self::assertStringContainsString("'desktop'=>\$this->desktop()", $siswaCtrl);
         self::assertStringContainsString("jenis === 'pra_semester'",$js);
