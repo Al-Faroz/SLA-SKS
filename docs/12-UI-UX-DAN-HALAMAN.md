@@ -275,3 +275,9 @@ Jika satu modul mempunyai daftar kelompok dan rincian yang panjang, gunakan pola
 - Guru: kartu bank Pra-Semester pada setiap paket, daftar soal dikelompokkan menurut BAB, indikator jumlah sah/30 dan BAB yang belum terwakili, editor PG A–E serta pengaturan KKM khusus tanpa mencampur KKM TP. Tampil readonly sesudah pernah digunakan siswa.
 - Admin: tabel paket Gen–Mapel–Semester, masing-masing pengaturan **jendela boleh mulai** dan **durasi** yang berbeda, serta status belum dijadwalkan/belum mulai/berlangsung/ditutup; jadwal remedial/susulan dan peserta terpilih menjadi tindakan lanjutan setelah skema tersedia.
 - Siswa: kartu Pra-Semester terkunci hingga semua TP NonEsensial tuntas; tampil jadwal per mapel dan durasi yang **mulai dihitung saat peserta memulai**, bukan saat jam jadwal dibuka. Setelah ujian berjalan, jendela jadwal boleh berakhir sementara timer tetap berjalan. Pembatalan memerlukan jadwal susulan Admin; tidak ada tombol mengulang mandiri.
+
+### A8-5 — Penyempurnaan UI Pra-Semester
+- Tabel `guru/pra-semester` menggunakan tampilan `a-tbl` / `a-pra-table` Emerald Glass, status paket dan bank, **filter Gen** (pilihan terbatas ke penugasan G1), tombol Kelola soal, kosong dan hitungan hasil.
+- Tabel `admin/pra-semester` menggunakan tampilan sama dengan **filter Gen, Mapel, Semester, Status ujian**, baris terpilih, jendela WIB dan durasi, tombol Atur jadwal, kosong/reset dan hitungan hasil.
+- Kedua halaman: label input, aksi nyata GET, tabel horizontal scroll pada HP, fokus keyboard, warna dan spacing dari design system. Halaman Admin detail memiliki form jadwal remedial/susulan dan tabel calon peserta khusus susulan.
+- Siswa hanya melihat tombol mulai jika ada jendela/tahap sesuai dan perangkat desktop memenuhi fullscreen; hasil sebelumnya tetap dapat dilihat. Seluruh perilaku dikendalikan server.
