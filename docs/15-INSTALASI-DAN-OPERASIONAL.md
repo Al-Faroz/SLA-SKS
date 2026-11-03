@@ -108,3 +108,7 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 6. Sebelum dipakai untuk sertifikat nyata, atur domain HTTPS permanen untuk `site_url` agar QR tidak berisi tautan localhost. Perubahan domain/URL tetap memerlukan persetujuan pemilik dan uji hosting tersendiri.
 
 Jika impor DDL gagal di tengah, jangan mengulang tanpa audit keadaan parsial dan backup; MariaDB DDL mungkin melakukan implicit commit. Tidak ada reset/hapus data.
+
+### A12-4 — Batas indikator operasional di Dashboard Admin (3 November 2026)
+
+Dashboard Admin menampilkan sisa ruang disk dari `disk_free_space(WRITEPATH)` pada volume penyimpanan `writable/`. Angka tersebut bukan prediksi aman hosting atau ukuran sisa kuota shared hosting, dan bisa tidak tersedia jika lingkungan menolak pembacaan. **Status cron dan backup sengaja ditampilkan `Belum diperiksa`** hingga tersedia pemeriksaan terintegrasi yang benar-benar dijalankan. Prosedur backup SQL dan berkas `writable/private/` tetap manual sesuai SOP; jangan menandai PASS hanya karena kartu dashboard bisa dimuat. TTD yang diaktifkan diperiksa dengan hash SHA-256 saat dashboard dibaca, tanpa membeberkan isi/metadata privat kepada pengguna. Tidak memerlukan perubahan .env, instalasi tugas terjadwal, ataupun SQL.
