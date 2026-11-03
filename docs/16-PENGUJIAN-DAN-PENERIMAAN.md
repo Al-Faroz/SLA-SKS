@@ -626,3 +626,22 @@ Regresi statis PHP menegaskan struktur form/CSRF/elemen CSS, sedangkan screensho
 | A13-110 | Reload dan navigasi, Dark/Light, lebar 360/390/768/1100px | Detail/summary bekerja dengan mouse/keyboard tanpa JS, tidak mengubah status akademik |
 
 Workflow `QA A13-1 Pusat Bantuan Peran` menjalankan PHP lint dan `tests/unit/PanduanBantuanServiceTest.php` serta regresi UI Admin. **Pengumuman, FAQ terkelola Admin, Notifikasi internal, dan Hubungi Admin belum termasuk A13-1** karena perubahan SQL dan sumber resmi harus diverifikasi pada dump XAMPP terbaru menurut AGENTS. Belum ada E2E browser otomatis; uji XAMPP manual tetap wajib untuk FIX.
+
+### A13-2 — QA Pengumuman dan FAQ resmi (3 November 2026)
+
+| ID | Skenario | Kriteria PASS |
+|---|---|---|
+| A13-201 | Impor patch V4-0012 pada database v4 setelah backup | Tabel Pengumuman/FAQ/Riwayat, FK dan penanda versi ada, data lama utuh |
+| A13-202 | Admin/Guru menyimpan Pengumuman Draf | Hanya tampak di kelola berizin, tidak bocor pada daftar publik |
+| A13-203 | Pengumuman Terbit | Admin/Guru/Siswa/Pimpinan membaca konten yang sama tanpa target Gen/role |
+| A13-204 | Guru menebak ID Pengumuman Guru lain/Admin | Editor, simpan dan arsip ditolak Service; audit/konten utuh |
+| A13-205 | Admin menyunting Pengumuman Guru | Perubahan versi dan audit aktor benar, tetap global |
+| A13-206 | Mengirim formulir dari tab yang tertinggal versinya | Ditolak tanpa menimpa versi baru |
+| A13-207 | Mengarsipkan Pengumuman/FAQ | Tidak tampil di publik; record dan riwayat tetap ada |
+| A13-208 | Guru/Siswa/Pimpinan mencoba kelola FAQ | Ditolak filter dan Service; hanya Admin dapat mengelola |
+| A13-209 | FAQ Admin Draf/Terbit/Arsip dan urutan | Hanya Terbit muncul pada `/bantuan`, urut dan berpaginasi |
+| A13-210 | Input kosong, panjang berlebihan, status/urutan invalid, HTML | Ditolak server; konten HTML ditampilkan sebagai teks |
+| A13-211 | Akun tidak login/nonaktif/sandi sementara/role salah | Akses ditolak, tidak ada data draf yang bocor |
+| A13-212 | Dark/Light, 360/390/768/1100px, keyboard | Tabel scroll, panel terbaca, FAQ bisa dibuka via keyboard, pesan kosong benar |
+
+Workflow `QA A13-2 Pengumuman dan FAQ` menjalankan PHP lint, PHPUnit `InformasiGlobalDatabaseTest.php` dengan SQLite anonim, regresi A13-1 `PanduanBantuanServiceTest.php`, serta **impor SQL asli V4-0012 pada MariaDB ephemeral** lewat `SqlA13InformasiSchemaCheck.php`. Pada run awal `41662610185` semuanya PASS: **12 tes/92 assertions**, **9 tes/219 assertions**, SQL MariaDB PASS. Ini bukan uji XAMPP; backup + impor SQL dan browser QA lokal tetap wajib. Notifikasi per penerima, badge unread, Hubungi Admin dan Kebijakan Privasi publik belum ditangani.
