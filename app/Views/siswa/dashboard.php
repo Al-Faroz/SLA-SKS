@@ -24,6 +24,13 @@ $lanjut=$ring['lanjut'];
                 · Mulai dari Semester <?= (int)$ring['siswa']['semester_mulai'] ?></p>
             <h2 id="siswa-lanjut-judul">Langkah Pembelajaran Berikutnya</h2>
             <p><?= esc($lanjut['keterangan']) ?></p>
+            <?php if (!empty($lanjut['tp_berikutnya'])): ?>
+                <div class="a-dashboard-siswa__next" aria-label="Tujuan pembelajaran berikutnya">
+                    <span>TP yang dapat dibuka</span>
+                    <strong><?= esc($lanjut['tp_berikutnya']['kode']) ?> —
+                        <?= esc($lanjut['tp_berikutnya']['judul']) ?></strong>
+                </div>
+            <?php endif ?>
             <a class="a-btn a-btn--utama"
                 href="<?= esc(site_url($lanjut['tautan']),'attr') ?>">
                 <?= esc($lanjut['label']) ?>
@@ -94,6 +101,13 @@ $lanjut=$ring['lanjut'];
                             </span>
                         </div>
                         <h3><?= esc($paket['nama_mapel']) ?></h3>
+                        <?php if (!empty($paket['tp_berikutnya'])): ?>
+                            <p class="a-dashboard-siswa__tp-hint">
+                                <span>TP berikutnya:</span>
+                                <strong><?= esc($paket['tp_berikutnya']['kode']) ?> —
+                                    <?= esc($paket['tp_berikutnya']['judul']) ?></strong>
+                            </p>
+                        <?php endif ?>
                         <p class="a-dashboard-siswa__count">
                             <strong><?= (int)$paket['tp_tuntas'] ?> /
                                 <?= (int)$paket['tp_wajib'] ?></strong>
