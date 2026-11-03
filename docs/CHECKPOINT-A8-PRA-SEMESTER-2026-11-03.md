@@ -84,3 +84,9 @@
 - Audit kode menemukan kasus tepi: `AturanWaktuUjianService::rekonsiliasi()` dapat langsung mengembalikan `dibatalkan_menunggu_guru` jika siswa kehilangan koneksi lebih dari lima menit antara dua permintaan. Status batal sudah benar, tetapi `MesinPraSemesterSiswaService::selaraskan()` sebelumnya hanya membuka segmen audit ketika hasil antara `jeda_koneksi` terlihat.
 - Perbaikan hanya pada pencatatan **segmen audit koneksi** saat transisi langsung berjalan → batal; waktu awal segmen adalah ambang deteksi 20 detik. Tidak mengubah skor, batas waktu, kuota remedial, jadwal, fullscreen, atau status pembatalan.
 - Ditambahkan regresi database sintetis memastikan satu segmen tertutup, skor NULL, tidak membuat audit ganda pada pembacaan status berikutnya. SQL baru: **tidak ada**. Basis data XAMPP dan dump privat tidak disentuh; tes browser nyata tetap terpisah.
+
+### A8-11 — Keputusan terbaru: batas jeda koneksi 10 menit (3 November 2026)
+
+- Pemilik meminta revisi langsung dari **5 menit ke 10 menit**. Kebijakan operasional terkini: **akumulasi jeda koneksi 600 detik**, timeout koneksi tetap 20 detik, jeda fullscreen tetap 90 detik/kejadian dan 180 detik kumulatif. Ini **menggantikan** angka 300 detik yang tercatat pada checkpoint A8-10 di atas; catatan A8-10 tetap disimpan sebagai jejak historis keputusan.
+- Perubahan berada di `AturanWaktuUjianService`, JS ujian, Master 07/16 dan pengujian otomatis waktu serta integrasi Pra-Semester. Karena satu profil keamanan Ketat digunakan bersama, revisi berlaku pada Diagnostik, Sumatif, dan Pra-Semester; konsekuensi ketidakselesaian tetap berbeda sesuai Master 07.
+- Tidak ada patch SQL dan tidak ada perubahan data lokal. Uji browser penuh menunggu siswa simulasi yang memenuhi TP wajib dan jadwal Admin yang sah.

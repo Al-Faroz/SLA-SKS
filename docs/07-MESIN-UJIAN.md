@@ -16,7 +16,7 @@ Pertahankan satu profil keamanan pengerjaan **Ketat** (fullscreen, waktu dan det
 | Jeda fullscreen total | 180 detik | Akumulasi tanpa menghitung waktu tumpang tindih ganda |
 | Jumlah insiden fullscreen | 3 | Insiden ketiga menghentikan percobaan |
 | Timeout heartbeat koneksi | 20 detik | Jeda dihitung sejak last_seen + 20 detik |
-| Total jeda koneksi | 300 detik | Melampaui batas menghentikan percobaan |
+| Total jeda koneksi | 600 detik (10 menit) | Pada batas kumulatif menghentikan percobaan sesuai jenis tes |
 
 `fullscreenchange`, `visibilitychange`, dan `blur` yang berasal dari satu perpindahan fokus dihitung **satu insiden**. Ketika jeda, server menghentikan waktu aktif dan menolak penyimpanan jawaban/kirim sampai pulih. Memulihkan fullscreen memerlukan gesture klik dan validasi server. Waktu, sisa durasi, peristiwa, dan jawaban yang sudah sah disimpan tetap bersumber dari server.
 
@@ -81,3 +81,5 @@ Sebelum mesin membuat percobaan baru, Service menghitung histori **per satu sisw
 ### Konten soal Word Pra-Semester dalam percobaan (A8-7)
 - Saat percobaan dibuat, engine mengacak opsi PG A–E dan **menyimpan snapshot HTML terstruktur tepercaya** (pertanyaan, opsi, word_source_id) dari bank Pra-Semester; kunci tidak dikirim kepada siswa. Konten gambar dari Word diakses melalui endpoint khusus yang memeriksa peran siswa, paket, token percobaan, stage Word telah diterapkan, dan referensi gambar dalam snapshot. Gambar tidak boleh diekspos melalui URL publik langsung ke `writable/`.
 - Materi rich Word di-review Guru sebelum impor dan tidak boleh berubah setelah digunakan siswa. Referensi audio/video Google Drive hanya tautan file, izinnya wajib dicek Guru saat pratinjau; tidak ada klaim pemeriksaan izin secara otomatis.
+
+> **Revisi 3 November 2026 (A8-11):** keputusan pemilik mengganti total jeda koneksi dari 5 menjadi **10 menit (600 detik kumulatif)** untuk semua tes yang memakai profil keamanan Ketat. Deteksi 20 detik, jeda fullscreen dan konsekuensi berbeda antara tes mandiri versus Pra-Semester tidak berubah. Uji tepat pada 599/600 detik serta dua jeda yang dijumlahkan wajib dilaksanakan.

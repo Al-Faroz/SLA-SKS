@@ -314,7 +314,7 @@ final class MesinPraSemesterSiswaService
             return $this->finalisasi($baru,$now,'Waktu pengerjaan individual selesai.');
         }
         if ($baru['status'] !== $s['status']) {
-            // Jika perangkat baru tersambung setelah lebih dari 300 detik,
+            // Jika perangkat baru tersambung setelah jeda koneksi lebih dari 600 detik,
             // rekonsiliasi langsung menghasilkan batal (tanpa respons jeda).
             // Segmen koneksi tetap wajib dicatat pada batas deteksi 20 detik.
             $jedaKoneksiLangsungBatal = $s['status'] === 'berjalan'

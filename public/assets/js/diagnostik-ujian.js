@@ -119,7 +119,7 @@
             show('[data-ujian-jeda]', true);
             setText('[data-ujian-jeda-pesan]', state.status === 'jeda_fullscreen'
                 ? 'Fullscreen terputus. Waktu berhenti. Batas jeda: 90 detik per kejadian, 180 detik total.'
-                : 'Koneksi terputus. Waktu dijeda oleh server setelah 20 detik deteksi; total maksimal 300 detik.');
+                : 'Koneksi terputus. Waktu dijeda oleh server setelah 20 detik deteksi; total maksimal 10 menit (600 detik).');
             return;
         }
         if (state.status === 'berjalan' && full()) {

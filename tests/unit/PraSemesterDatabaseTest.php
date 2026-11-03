@@ -529,16 +529,46 @@ final class PraSemesterDatabaseTest extends TestCase
     }
 
     /**
-     * Klien lama offline >300 detik: satu pemeriksaan langsung batal,
+     * Klien lama offline >600 detik: satu pemeriksaan langsung batal,
      * tetapi riwayat dan segmen koneksi tetap harus utuh tanpa skor.
      */
-    public function testOfflineLamaLangsungBatalTetapMencatatSegmenKoneksiSekali(): void
+    /** Jeda 5–10 menit tetap boleh dipulihkan tanpa kehilangan percobaan. */
+    public function testOfflineLimaMenitLebihBelumBatalDanDapatPulih(): void
     {
         $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
         $token = $mesin->mulai(11,true,true)['token'];
         $id = (int)$this->db->table('percobaan_ujian')
             ->where('token_publik',$token)->get()->getRow('id');
         $waktuLama = time() - 400;
+        $this->db->table('percobaan_ujian')->where('id',$id)->update([
+            'waktu_aktif_terakhir'=>gmdate('Y-m-d H:i:s',$waktuLama),
+            'last_seen_server_at'=>gmdate('Y-m-d H:i:s',$waktuLama),
+        ]);
+
+        $status = $mesin->status(11,$token);
+        self::assertSame('jeda_koneksi',$status['status']);
+        self::assertNull($status['skor']);
+        self::assertSame(1,$this->db->table('segmen_jeda_ujian')
+            ->where('percobaan_ujian_id',$id)->countAllResults());
+        $pulih = $mesin->tindakan(11,$token,'pulih',true);
+        self::assertSame('berjalan',$pulih['status']);
+        self::assertGreaterThanOrEqual(380,$pulih['jeda_koneksi_detik']);
+        self::assertLessThan(600,$pulih['jeda_koneksi_detik']);
+        self::assertSame('berjalan',$mesin->status(11,$token)['status']);
+        self::assertSame(1,$this->db->table('percobaan_ujian')
+            ->where('jenis','pra_semester')->countAllResults());
+        $segmen = $this->db->table('segmen_jeda_ujian')
+            ->where('percobaan_ujian_id',$id)->get()->getRowArray();
+        self::assertNotNull($segmen['berakhir_pada']);
+    }
+
+    public function testOfflineLamaLangsungBatalTetapMencatatSegmenKoneksiSekali(): void
+    {
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $token = $mesin->mulai(11,true,true)['token'];
+        $id = (int)$this->db->table('percobaan_ujian')
+            ->where('token_publik',$token)->get()->getRow('id');
+        $waktuLama = time() - 700;
         $timestampLama = gmdate('Y-m-d H:i:s',$waktuLama);
         $this->db->table('percobaan_ujian')->where('id',$id)->update([
             'waktu_aktif_terakhir'=>$timestampLama,
@@ -555,7 +585,7 @@ final class PraSemesterDatabaseTest extends TestCase
         self::assertSame(gmdate('Y-m-d H:i:s',$waktuLama + 20),
             $segmen[0]['dimulai_pada']);
         self::assertNotNull($segmen[0]['berakhir_pada']);
-        self::assertGreaterThanOrEqual(300,(int)$segmen[0]['durasi_detik']);
+        self::assertGreaterThanOrEqual(600,(int)$segmen[0]['durasi_detik']);
         self::assertNull($this->db->table('percobaan_ujian')
             ->where('id',$id)->get()->getRow('skor'));
 
