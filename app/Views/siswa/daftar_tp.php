@@ -65,5 +65,15 @@
             untuk menjalankan Diagnostik, melihat hasil, atau membaca Materi yang sudah diizinkan.
             Materi berikutnya tetap menunggu persyaratan pembelajaran sebelumnya.</p>
     </section>
+    <section class="a-card a-jarak-atas" aria-labelledby="pra-siswa">
+        <h2 id="pra-siswa">Ujian Pra-Semester</h2>
+        <p class="a-help">Ujian gabungan seluruh BAB semester. Hanya dapat dimulai setelah
+            semua TP NonEsensial selesai dan dalam jadwal yang dibuka Admin.
+            Durasi dihitung sejak masing-masing siswa mulai mengerjakan.</p>
+        <a class="a-btn a-btn--utama"
+            href="<?= esc(site_url('siswa/pra-semester/' . (int)$paket['id']),'attr') ?>">
+            Lihat Jadwal &amp; Status Pra-Semester
+        </a>
+    </section>
 </div>
 <?= $this->endSection() ?>
