@@ -5,6 +5,7 @@ on:
     paths:
       - 'app/Services/SertifikatPdfService.php'
       - 'tests/unit/SertifikatTataLetakPdfTest.php'
+      - 'tests/scripts/a11_check_pdf_layout.py'
       - '.github/workflows/qa-a11-3-layout-sertifikat.yml'
   workflow_dispatch:
 
@@ -49,6 +50,8 @@ jobs:
           pdftotext -layout "$SHORT" - | grep -F 'DEMO.8.2.4'
           pdftotext -layout "$LONG" - | grep -F 'DEMO.8.1.1'
           pdftotext -layout "$LONG" - | grep -F 'DEMO.8.6.24'
+          pdftotext -bbox-layout "$SHORT" /tmp/a11-short-bbox.html
+          python3 tests/scripts/a11_check_pdf_layout.py /tmp/a11-short-bbox.html
           echo 'PASS: PDF A4 landscape, 4 TP satu halaman, semua 24 TP terbaca.'
       - name: Lampirkan contoh layout sintetis untuk QA
         if: always()
