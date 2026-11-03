@@ -148,6 +148,37 @@ final class PraSemesterDatabaseTest extends TestCase
         $mesin->mulai(11,true,true);
     }
 
+    public function testPembatalanPraSemesterTanpaSkorDanTanpaAksesUlangMandiri(): void
+    {
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $token = $mesin->mulai(11,true,true)['token'];
+        for ($i=0; $i<3; $i++) {
+            $s=$mesin->tindakan(11,$token,'keluar_fullscreen',false);
+            if ($i<2) {
+                self::assertSame('jeda_fullscreen',$s['status']);
+                $s=$mesin->tindakan(11,$token,'pulih',true);
+                self::assertSame('berjalan',$s['status']);
+            }
+        }
+        self::assertSame('dibatalkan_menunggu_guru',$s['status']);
+        self::assertNull($s['skor']);
+        self::assertSame('dibatalkan_menunggu_guru',
+            $mesin->status(11,$token)['status']);
+        self::assertNull($this->db->table('percobaan_ujian')
+            ->where('token_publik',$token)->get()->getRow('skor'));
+        $this->expectException(\DomainException::class);
+        $mesin->mulai(11,true,true);
+    }
+
+    public function testBankDanKKMTerkunciSetelahPercobaanPertama(): void
+    {
+        $guru=new PraSemesterGuruService($this->db,$this->actor('guru',10));
+        $mesin=new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $mesin->mulai(11,true,true);
+        $this->expectException(\DomainException::class);
+        $guru->simpanKkm(11,'88');
+    }
+
     public function testGuruG1MengelolaKKMTanpaMengubahTP(): void
     {
         $svc=new PraSemesterGuruService($this->db,$this->actor('guru',10));
