@@ -522,3 +522,7 @@ Gunakan `a-dashboard-pimpinan` dengan `__filter`, `__metrics`, `__metric`, `__me
 ### A12-3 UI QA — Kartu semester tunggal dan identitas TP tujuan (3 November 2026)
 
 `a-dashboard-siswa__paket:only-child` memakai satu kartu selebar grid, dibagi dua bagian internal `__paket-info` dan `__paket-activity` pada layar lebar untuk menghindari ruang kosong besar. Media query sampai 810px mengembalikan tata kolom tunggal tanpa pemisah vertikal. Banyak kartu tetap grid dua kolom. `__next` dan `__tp-hint` menampilkan kode/judul TP **berizin** dengan kontras panel ringan, `overflow-wrap:anywhere`, dan label teks. Segmen belum selesai dibedakan dari latar melalui border yang lebih jelas; angka progres tetap ditampilkan sebagai teks dan role img/progress tetap berlabel.
+
+### A12-4 — Komponen KPI administrasi dan kesiapan (3 November 2026)
+
+CSS scope `a-dashboard-admin__section`, `__metrics`/`__metric`, `__health`, `__attention` dan `__facts` memakai `a-card` dan tombol `a-btn` yang sudah ada. Beranda sebelumnya `a-proto-metric` dan `a-proto-shortcuts` **tidak dihapus**. KPI enam kartu memakai grid 3/2/1; kesehatan dua panel menjadi satu kolom di bawah 1120px; card berisi 2×2 fakta menjadi satu kolom pada HP. Border amber di perhatian bermakna tindakan perlu diperiksa, tetapi label teks tetap wajib. Semua status `belum diperiksa` tidak boleh memakai badge sukses atau klaim PASS.
