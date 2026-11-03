@@ -121,7 +121,7 @@ final class SertifikatPdfService
         // A11-3: pakai tinggi sertifikat penuh hanya saat tabel cukup pendek.
         // Paket dengan banyak TP tetap memakai aliran halaman normal agar footer
         // tidak menutupi baris atau terpotong saat dicetak.
-        $satuHalaman=$jumlahTp<=6 && $jumlahBab<=3
+        $satuHalaman=$jumlahTp<=4 && $jumlahBab<=3
             && $panjangNamaTp<=80
             && mb_strlen((string)($siswa['nama']??''))<=65;
         $kelasHalaman=$satuHalaman?'card card--full':'card card--flow';
@@ -307,6 +307,16 @@ HTML;
         $pdf->loadHtml($html,'UTF-8');
         $pdf->setPaper('A4','landscape');
         $pdf->render();
+        // Jika bahkan dokumen pendek melewati satu halaman (mis. nama panjang),
+        // matikan footer absolut dan gunakan alur dokumen agar tak bertumpuk.
+        if ($satuHalaman && $pdf->getCanvas()->get_page_count() > 1) {
+            $html=str_replace('class="card card--full"',
+                'class="card card--flow"',$html);
+            $pdf=new Dompdf($opt);
+            $pdf->loadHtml($html,'UTF-8');
+            $pdf->setPaper('A4','landscape');
+            $pdf->render();
+        }
         $output=$pdf->output();
         if (!is_string($output) || !str_starts_with($output,'%PDF-')) {
             throw new RuntimeException('PDF sertifikat gagal dibuat.');
