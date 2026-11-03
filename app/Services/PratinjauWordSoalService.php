@@ -14,8 +14,12 @@ use ZipArchive;
  */
 final class PratinjauWordSoalService
 {
-    public static function periksa(string $path, int $tpId, int $guruId, int $paketId, int $versi, string $jenis, string $kunci, ?string $kodeTp = null): array
+    public static function periksa(string $path, int $tpId, int $guruId, int $paketId, int $versi, string $jenis, string $kunci, ?string $kodeTp = null, ?array $babNomorKeId = null): array
     {
+        $pra = $jenis === 'pra_semester';
+        if ($pra && (!$babNomorKeId || min(array_keys($babNomorKeId)) < 1)) {
+            throw new DomainException('BAB paket Pra-Semester belum tersedia.');
+        }
         if (!is_file($path) || filesize($path) > 15 * 1024 * 1024) {
             throw new DomainException('Word tidak tersedia atau melebihi 15 MB.');
         }
@@ -40,6 +44,9 @@ final class PratinjauWordSoalService
                 throw new DomainException('Struktur tabel soal berubah. Pastikan setiap soal memiliki pilihan A–E.');
             }
             $n = (int) (($rows->length - 1) / 6);
+            if ($pra && ($n < 30 || $n < count($babNomorKeId))) {
+                throw new DomainException('Pra-Semester minimal 30 soal serta mencakup semua BAB.');
+            }
             if ($n > 200) {
                 throw new DomainException('Jumlah soal pada dokumen terlalu banyak.');
             }
