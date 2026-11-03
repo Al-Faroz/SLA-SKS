@@ -41,7 +41,7 @@ final class PraSemesterDatabaseTest extends TestCase
             'CREATE TABLE peserta_pra_susulan(id INTEGER PRIMARY KEY AUTOINCREMENT,jadwal_pra_sesi_id INTEGER,siswa_id INTEGER,ditetapkan_oleh INTEGER,ditetapkan_pada TEXT,UNIQUE(jadwal_pra_sesi_id,siswa_id))',
             'CREATE TABLE impor_soal_pra_docx(id TEXT PRIMARY KEY,paket_semester_id INTEGER,guru_id INTEGER,checksum TEXT,status TEXT,data_json TEXT,dibuat_pada TEXT,kedaluwarsa_pada TEXT,diterapkan_pada TEXT)',
             'CREATE TABLE butir_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,soal_asal_id INTEGER,soal_pra_semester_id INTEGER,posisi INTEGER,pertanyaan TEXT,konten_terstruktur_json TEXT,opsi_acak_json TEXT,kunci_acak TEXT)',
-            'CREATE TABLE jawaban_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,butir_percobaan_id INTEGER,opsi_dipilih TEXT,waktu_disimpan TEXT)',
+            'CREATE TABLE jawaban_percobaan(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,butir_percobaan_id INTEGER,opsi_dipilih TEXT,waktu_disimpan TEXT, UNIQUE(percobaan_ujian_id,butir_percobaan_id))',
             'CREATE TABLE riwayat_status_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,status_lama TEXT,status_baru TEXT,alasan TEXT,terjadi_pada TEXT)',
             'CREATE TABLE segmen_jeda_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,jenis TEXT,dimulai_pada TEXT,berakhir_pada TEXT,durasi_detik INTEGER,alasan TEXT)',
             'CREATE TABLE pelanggaran_ujian(id INTEGER PRIMARY KEY AUTOINCREMENT,percobaan_ujian_id INTEGER,kunci_insiden TEXT,kategori TEXT,dihitung INTEGER,alasan TEXT,terjadi_pada TEXT)',
@@ -196,6 +196,63 @@ final class PraSemesterDatabaseTest extends TestCase
             ->where('jenis','pra_semester')->countAllResults());
         $this->expectException(\DomainException::class);
         $mesin->mulai(11,true,true);
+    }
+
+
+    public function testSiswaMenjawabDanMengubahPilihanTanpaDuplikasiLaluSelesaiSah(): void
+    {
+        $mesin = new MesinPraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $mulai = $mesin->mulai(11,true,true);
+        $token = $mulai['token'];
+        $semua = $mesin->status(11,$token);
+        self::assertCount(30,$semua['soal']);
+        self::assertArrayNotHasKey('kunci_acak',$semua['soal'][0]);
+
+        $butir1=(int)$semua['soal'][0]['id'];
+        $butir2=(int)$semua['soal'][1]['id'];
+        $kunci1=(string)$this->db->table('butir_percobaan')
+            ->where('id',$butir1)->get()->getRow('kunci_acak');
+        $kunci2=(string)$this->db->table('butir_percobaan')
+            ->where('id',$butir2)->get()->getRow('kunci_acak');
+        $salah=$kunci1 === 'A' ? 'B' : 'A';
+
+        self::assertTrue($mesin->jawab(11,$token,$butir1,$salah)['tersimpan']);
+        self::assertTrue($mesin->jawab(11,$token,$butir1,$kunci1)['tersimpan']);
+        self::assertTrue($mesin->jawab(11,$token,$butir2,$kunci2)['tersimpan']);
+        self::assertSame(2,$this->db->table('jawaban_percobaan')
+            ->where('percobaan_ujian_id',(int)$this->db->table('percobaan_ujian')
+                ->where('token_publik',$token)->get()->getRow('id'))->countAllResults());
+
+        $status=$mesin->status(11,$token);
+        self::assertSame($kunci1,$status['jawaban'][$butir1]);
+        self::assertSame($kunci2,$status['jawaban'][$butir2]);
+        $selesai=$mesin->tindakan(11,$token,'kirim',true);
+        self::assertSame('selesai_sah',$selesai['status']);
+        self::assertSame(2,(int)$selesai['jumlah_benar']);
+        self::assertSame(6.67,(float)$selesai['skor']);
+        self::assertFalse($mesin->jawab(11,$token,$butir1,$salah)['tersimpan']);
+        self::assertSame('selesai_sah',$mesin->status(11,$token)['status']);
+        self::assertSame(6.67,$mesin->ruang(11)['nilai_terbaik']);
+        self::assertSame('menunggu_remedial',$mesin->ruang(11)['fase']);
+        self::assertFalse($mesin->ruang(11)['boleh_mulai']);
+
+        $this->expectException(\\DomainException::class);
+        $mesin->mulai(11,true,true); // tidak membuka remedial sendiri
+    }
+
+    public function testGerbangSiswaTidakMenganggapProgresTuntasTanpaSumatifSah(): void
+    {
+        $this->db->table('percobaan_ujian')
+            ->where('progres_tp_id',33)->where('jenis','sumatif')->delete();
+        $this->db->table('progres_tp')->where('id',33)->update(['status'=>'tuntas']);
+        $siswa=new PraSemesterSiswaService($this->db,$this->actor('siswa',100));
+        $ctx=$siswa->konteks(11);
+        self::assertFalse($ctx['gerbang']['tp']['siap']);
+        self::assertFalse((new MesinPraSemesterSiswaService(
+            $this->db,$this->actor('siswa',100)))->ruang(11)['boleh_mulai']);
+        $this->expectException(\\DomainException::class);
+        (new MesinPraSemesterSiswaService(
+            $this->db,$this->actor('siswa',100)))->mulai(11,true,true);
     }
 
     public function testPembatalanPraSemesterTanpaSkorDanTanpaAksesUlangMandiri(): void
