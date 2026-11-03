@@ -42,3 +42,14 @@ Sertifikat yang **sudah diterbitkan** tetap disimpan dalam \`writable/private/se
 5. Uji hasil cetak melalui browser/Print PDF, halaman A4 landscape, margin, keterbacaan tabel, dan tidak ada teks saling tumpang tindih.
 
 Tahap ini belum dinyatakan FIX sebelum hasil visual localhost disetujui pemilik.
+
+## Hasil QA final branch A11-3 (3 November 2026)
+
+- Workflow \`QA A11-3 Layout Cetak Sertifikat PDF\` **PASS**, run GitHub Actions **41634475712**: PHP lint PASS; **4 tes/10 assertions** PASS.
+- Sampel **4 TP / 2 BAB** menghasilkan **1 halaman A4 landscape** baik pada pratinjau placeholder maupun saat memakai **QR nyata + TTD PNG sintetis**.
+- Pemeriksaan koordinat dari \`pdftotext -bbox-layout\` menghasilkan celah positif **21,7 pt dan 24,9 pt** antara teks TP terakhir dan footer, sehingga pengujian otomatis tidak hanya menghitung jumlah halaman tetapi juga mendeteksi tumpang tindih teks.
+- Sampel panjang **24 TP** menghasilkan **3 halaman A4 landscape** dan kode TP awal/akhir tetap terbaca; seluruh TP dipertahankan.
+- Regresi \`QA A11-2 Sertifikat PDF QR Versi\` **PASS**, run **41634475723**: 6 tes/28 assertions penerbitan, 8 tes/35 assertions kelayakan, SQL V4-0011 MariaDB 10.4 sintetis PASS. **Tidak ada SQL baru di A11-3**.
+- Kedua PDF preview anonim dihasilkan dan diverifikasi tanpa mengambil data siswa/TTD pengguna. PDF historis pengguna tetap pada penyimpanan lama; belum dilakukan uji browser XAMPP dengan renderer baru.
+
+**Kriteria penutupan:** pemilik menguji menu pratinjau cetak pada branch A11-3 di XAMPP dan menyatakan visual A4/QR/TTD sesuai. Jangan menerbitkan ulang V001 hanya untuk mengejar desain baru.
