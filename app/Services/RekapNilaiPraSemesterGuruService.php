@@ -140,8 +140,10 @@ final class RekapNilaiPraSemesterGuruService
                 'status_label'=>self::labelFase($nilai),
             ];
         }
-        return $hasil + [
-            'ujian_id'=>$ujian !== null ? (int)$ujian['id'] : null,
-        ] + ['total'=>$total]; // kunci hasil lain ditetapkan di bawah
+        $hasil['total'] = $total;
+        $hasil['halaman'] = $halaman;
+        $hasil['jumlah_halaman'] = $pages;
+        $hasil['ujian_id'] = $ujian !== null ? (int)$ujian['id'] : null;
+        return $hasil;
     }
 }
