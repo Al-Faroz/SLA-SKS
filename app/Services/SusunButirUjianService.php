@@ -185,18 +185,23 @@ final class SusunButirUjianService
             if ((int)($soal['aktif'] ?? 0) !== 1) continue;
             $id = (int)($soal['id'] ?? 0);
             $bab = (int)($soal['bab_id'] ?? 0);
-            if ($id < 1 || isset($ids[$id]) || !array_key_exists($bab, $groups)
-                || !in_array($soal['kunci'] ?? null, self::HURUF, true)
-                || trim((string)($soal['pertanyaan'] ?? '')) === '') {
-                throw new DomainException('Bank Pra-Semester memiliki soal yang tidak sah.');
+            if ($id < 1 || isset($ids[$id])) {
+                throw new DomainException('Identitas soal Pra-Semester tidak sah atau berulang.');
             }
             $ids[$id] = true;
+            // Soal dari BAB asing/opsi belum lengkap tidak boleh tayang,
+            // tetapi tidak boleh menggagalkan 30 soal lain yang sudah sah.
+            if (!array_key_exists($bab,$groups)
+                || !in_array($soal['kunci'] ?? null,self::HURUF,true)
+                || trim((string)($soal['pertanyaan'] ?? '')) === '') continue;
+            $opsiSah = true;
             foreach (self::HURUF as $h) {
                 if (trim((string)($soal['opsi_' . strtolower($h)] ?? '')) === '') {
-                    throw new DomainException('Opsi A–E pada bank Pra-Semester belum lengkap.');
+                    $opsiSah = false;
+                    break;
                 }
             }
-            $groups[$bab][] = $soal;
+            if ($opsiSah) $groups[$bab][] = $soal;
         }
         $pilih = [];
         $sisa = [];
