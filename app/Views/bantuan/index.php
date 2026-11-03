@@ -28,7 +28,10 @@
                 Hak akses tetap diperiksa oleh server. Halaman ini berisi panduan penggunaan,
                 bukan pengumuman atau notifikasi dari sekolah.</p>
         </div>
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('profil'),'attr') ?>">Profil &amp; Peran</a>
+        <div class="a-informasi__aksi">
+            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('hubungi-admin'),'attr') ?>">Hubungi Admin</a>
+            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('profil'),'attr') ?>">Profil &amp; Peran</a>
+        </div>
     </section>
 
     <div class="a-bantuan__kelompok a-jarak-atas">

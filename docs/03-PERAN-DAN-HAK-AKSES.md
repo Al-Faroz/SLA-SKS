@@ -128,3 +128,8 @@ Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master
 | Membuat/menyunting/mengarsip FAQ resmi | Ya | Tidak | Tidak | Tidak |
 
 Pembaca hanya memperoleh status `terbit`, tidak melihat draft/arsip. Satu akun staf multi-role tidak menggabungkan hak: saat aktif sebagai Guru ia tidak bisa mengelola FAQ; perubahan peran melalui Profil terlebih dahulu. URL `/admin/pengumuman`, `/guru/pengumuman`, `/admin/faq` memerlukan filter role **dan** otorisasi Service untuk mencegah manipulasi ID. Tidak ada endpoint penghapusan permanen.
+
+
+### A13-3 — Hubungi Admin memakai kontak resmi (3 November 2026)
+
+Seluruh peran **aktif dan login** (Admin, Guru, Siswa, Pimpinan) boleh membuka `GET /hubungi-admin`. Sumber hanya kunci `nama_madrasah`, `alamat_madrasah`, `telepon`, `email`, dan `website` dari tabel `pengaturan` yang diisi Admin pada Identitas Madrasah. Tidak membaca `profil_pengelola`, nomor pribadi Admin/Guru, NIP, NISN atau detail autentikasi. Role aktif diperiksa kembali di Service; tidak ada formulir/tiket/chat/pesan otomatis.

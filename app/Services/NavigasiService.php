@@ -70,6 +70,8 @@ final class NavigasiService
             $menu[] = ['label' => 'Kelola FAQ', 'path' => 'admin/faq', 'aktif' => $aktif === 'faq_kelola'];
         }
         $menu[] = ['label' => 'Bantuan', 'path' => 'bantuan', 'aktif' => $aktif === 'bantuan'];
+        $menu[] = ['label' => 'Hubungi Admin', 'path' => 'hubungi-admin',
+            'aktif' => $aktif === 'hubungi_admin'];
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
 
         return $menu;

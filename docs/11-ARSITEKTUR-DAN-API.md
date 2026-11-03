@@ -189,3 +189,8 @@ Database dari dump XAMPP 03-11-2026 16.02 (MariaDB 10.4.32) dinyatakan belum mem
 | GET/POST | `/admin/faq`, `/admin/faq/tambah`, `/admin/faq/{id}/sunting`, POST `.../{id}/arsip` | Admin |
 
 Rute GET daftar kelola baca saja; simpan dan arsip memakai POST + CSRF global. Arsip terminal, tidak ada hard DELETE, HTML input disimpan plain text dan selalu `esc()` pada View. Untuk A13-2, `NotifikasiService` internal belum diimplementasikan; jangan mengklaim penerbitan Pengumuman memicu notifikasi atau badge unread.
+
+
+### A13-3 — Read model kontak resmi (3 November 2026)
+
+`GET /hubungi-admin` menggunakan `HubungiAdmin::index` dan `KontakResmiMadrasahService::ambil()`, filter `auth` dan pemeriksaan ulang akun aktif, peran serta sandi awal. Service membaca **lima kunci whitelist** tabel `pengaturan`, lalu membangun tautan `tel:`, `mailto:` dan HTTPS/HTTP hanya untuk nilai yang lolos validasi. Nilai lama tidak valid tampil sebagai teks yang di-escape tanpa tautan. Halaman mempunyai status kontak kosong, HTTP `private, no-store`, tidak mengubah database dan tidak mengirim pesan. Tidak ada SQL, migrasi, notifikasi, worker atau koneksi ke profil pribadi.

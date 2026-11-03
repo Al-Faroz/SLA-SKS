@@ -544,3 +544,8 @@ Komponen scoped: `a-admin-akun__form .a-fieldset` grid tiga label peran (hover/f
 ### A13-2 — Komponen Informasi Global (3 November 2026)
 
 Kelas `a-informasi`, `a-informasi__kartu`, `__item`, `__isi`, `__kosong`, `__pagination`, `__arsip`, `__editor`, `__aksi`, `__kepala` dan `a-bantuan__faq-resmi` ditambahkan ke `public/assets/css/app.css`. Kartu dua kolom desktop dan satu kolom ≤820px. Header FAQ dan pagination menjadi stacked pada ≤620px. Teks panjang memakai `white-space:pre-wrap` dan `overflow-wrap:anywhere`. Memakai kembali `a-card`, `a-btn`, `a-tabel`, `a-field`, `a-alert`, `a-badge`, serta `details/summary`; tanpa framework CSS/JS baru. Galeri memakai konten sintetis, tidak menampilkan data pengguna.
+
+
+### A13-3 — Kartu kontak resmi Hubungi Admin (3 November 2026)
+
+`.a-hubungi-admin__daftar` menata `dl` semantik menjadi dua kolom desktop dan satu kolom untuk lebar ≤820px. Setiap `.a-hubungi-admin__butir` menggunakan `--eg-line`, `--eg-pane-soft`, fokus `--eg-focus` dan teks panjang membungkus; `.a-informasi__aksi` yang sudah tersedia digunakan untuk tombol menuju Kontak dan Profil di Bantuan. Tidak ada framework, ikon tambahan, JS, atau CSS global yang mengubah formulir ujian.
