@@ -31,7 +31,7 @@ final class GuruPraSemester extends BaseController
         try {
             $service = new PraSemesterGuruService();
             $filterGen = PraSemesterGuruService::filterGen($this->request->getGet('gen'));
-            $paket = $service->paketGuru($filterGen);
+            $paket = $paketId === null ? $service->paketGuru($filterGen) : [];
             $konteks = $paketId === null ? null : $service->konteks($paketId);
             $soalEdit = null;
             if ($konteks !== null) {
@@ -43,12 +43,15 @@ final class GuruPraSemester extends BaseController
                 }
             }
             $akun = (new AuthService())->penggunaSaatIni();
-            return view('guru/pra_semester', [
+            return view($paketId === null
+                ? 'guru/pra_semester'
+                : 'guru/pra_semester_detail', [
                 'judul'=>'Bank Soal Pra-Semester',
                 'namaPengguna'=>$akun['nama'], 'peranAktif'=>'Guru',
                 'tautanNavigasi'=>NavigasiService::untuk('guru','pra_semester'),
                 'paketGuru'=>$paket,'konteks'=>$konteks,'soalEdit'=>$soalEdit,
-                'filterGen'=>$filterGen,'pilihanGen'=>$service->pilihanGen(),
+                'filterGen'=>$filterGen,
+                'pilihanGen'=>$paketId === null ? $service->pilihanGen() : [],
             ]);
         } catch (DomainException $e) {
             return $this->response->setStatusCode(403)->setBody(
