@@ -40,7 +40,7 @@ Langkah: backup DB v3 dan `writable/`, impor v4 di phpMyAdmin/CLI, cek `schema_v
 ## 5A. Kontrak tambahan model v2.4
 - Implementasi masih bertahap: kode CI4 v3 yang membaca TP→banyak Materi serta Diagnostik sebagai nilai final **belum otomatis kompatibel** dengan skema v4.
 - SQL v4 tidak menghapus snapshot, data ujian atau progres sebelumnya; perlakuan data uji historis v3 harus transparan.
-- Versi dokumen v2.5 mengganti ketentuan v2.4 yang bertentangan; jadwal Pra-Semester dan persyaratan sertifikat yang belum disepakati tidak boleh diinferensikan.
+- Versi dokumen v2.5 mengganti ketentuan v2.4 yang bertentangan; jadwal Pra-Semester mengikuti **keputusan final 3 November 2026** pada Master 07; hanya persyaratan sertifikat yang masih ditunda dan tidak boleh diinferensikan.
 
 ## 6. Pemeriksaan lintas DB dan target
 Karena MySQL lokal dan MariaDB hosting **berbeda mesin**, semua enum, CHECK constraint, generated column, index, JSON, collation dan DDL alter harus diuji pada **versi spesifik keduanya**, bukan dianggap identik. Catat versi yang lulus tes pada `15-INSTALASI-DAN-OPERASIONAL.md`. Ukuran data kecil tidak menghapus kebutuhan FK, transaksi, indeks, atau audit.
