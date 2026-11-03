@@ -496,3 +496,7 @@ Layout panel `app/Views/layouts/panel.php` **wajib memberi versi pada URL** `pub
 - Scope `a-sertifikat`: dua kartu status administratif responsif, `a-sertifikat__filter` untuk pemilihan paket, `a-sertifikat__scroll` + `a-tbl` untuk lima kolom pemeriksaan dan alasan.
 - Badge `a-sertifikat__badge--layak` / `--tahan` adalah **status kelayakan akademik**, bukan status PDF sudah terbit. Warna wajib didampingi teks dan outline. Alasan dibuka lewat `details/summary` keyboard native, `focus-visible` jelas, dan tidak mengungkap NISN.
 - Gunakan token Emerald Glass yang tersedia, bukan komponen CSS atau framework baru. Pada HP status administratif menjadi satu kolom dan tabel panjang digulir horizontal.
+
+### A11-2 — Komponen Sertifikat dan aset Admin (3 November 2026)
+
+Gunakan scope `a-sertifikat`, `a-sertifikat__status` (grid 2/1), `a-sertifikat__filter`, `a-tabel-gulir.a-sertifikat__scroll` dan `a-tbl.a-sertifikat__table`, serta badge status akademik/cetak `a-sertifikat__badge--layak`/`--tahan`. Tabel penerbitan memiliki kolom status/aksi tersendiri, form POST CSRF, alasan revisi di dalam `details`, tidak menumpuk tombol di kolom nilai. Halaman aset memisahkan unggah background dengan TTD, menampilkan status aktif dan tautan pratinjau PDF dummy. Pada HP tabel tetap digulir dan card menjadi satu kolom. Halaman publik QR tidak memakai sidebar/tombol privat dan selalu memperlihatkan teks status berlaku/digantikan.
