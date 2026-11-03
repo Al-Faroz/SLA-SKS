@@ -1947,3 +1947,194 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-filter-rekap-grid { grid-template-columns:minmax(0,1fr); }
     .a-penilaian-filter__aksi .a-btn { flex:1 1 120px; justify-content:center; }
 }
+
+/* A9-2 — perbaikan keterbacaan 4 layar Penilaian & Rekap Guru.
+   Scope khusus agar tabel modul lain tidak berubah. */
+.a-rekap-page .a-rekap-switch {
+    display:flex;
+    gap:9px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:5px 0 18px;
+}
+.a-rekap-page .a-rekap-switch__link {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:40px;
+    padding:8px 14px;
+    border:1px solid var(--a-garis);
+    border-radius:10px;
+    background:var(--a-latar);
+    color:var(--a-teks);
+    font-size:13px;
+    font-weight:750;
+    text-decoration:none;
+}
+.a-rekap-page .a-rekap-switch__link.is-aktif {
+    background:var(--a-primer-gelap);
+    color:#fff;
+    border-color:var(--a-primer-gelap);
+}
+.a-rekap-page .a-rekap-switch__link:focus-visible,
+.a-rekap-page .a-rekap-scroll:focus-visible {
+    outline:3px solid var(--a-sorot);
+    outline-offset:3px;
+}
+.a-rekap-page .a-rekap-metrik {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+    padding:0;
+    margin:16px 0;
+}
+.a-rekap-page .a-rekap-metrik__item {
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:16px 18px;
+    border:1px solid var(--a-garis);
+    border-radius:12px;
+    background:var(--a-latar);
+}
+.a-rekap-page .a-rekap-metrik dt {
+    font-size:13px;
+    font-weight:650;
+    line-height:1.4;
+    color:var(--a-redup);
+}
+.a-rekap-page .a-rekap-metrik dd {
+    margin:0;
+    font-size:clamp(25px,2.6vw,33px);
+    line-height:1.05;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    color:var(--a-teks);
+}
+.a-rekap-page .a-rekap-scroll-hint {
+    font-size:12px;
+    margin:12px 0 8px;
+    color:var(--a-redup);
+}
+.a-rekap-page .a-rekap-scroll {
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-x:contain;
+    border-radius:12px;
+    scrollbar-width:thin;
+}
+.a-rekap-page .a-rekap-table.a-tbl {
+    width:100%;
+    table-layout:fixed;
+    border-collapse:separate;
+    border-spacing:0;
+}
+.a-rekap-page .a-rekap-table--tp { min-width:1480px; }
+.a-rekap-page .a-rekap-table--pra { min-width:900px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(1) { width:205px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(2) { width:280px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(3) { width:130px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(4) { width:118px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(5) { width:150px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(6),
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(7),
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(8),
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(9) { width:103px; }
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(10) { width:170px; }
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(1) { width:265px; }
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(2) { width:86px; }
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(3) { width:75px; }
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(4),
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(5),
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(6) { width:110px; }
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(7) { width:205px; }
+.a-rekap-page .a-rekap-table :is(th,td) {
+    box-sizing:border-box;
+    line-height:1.5;
+    vertical-align:middle;
+}
+.a-rekap-page .a-rekap-table thead th {
+    font-size:12px;
+    font-weight:800;
+    white-space:normal;
+}
+.a-rekap-page .a-rekap-table__siswa {
+    font-size:12px;
+    line-height:1.45;
+    overflow-wrap:break-word;
+}
+.a-rekap-page .a-rekap-table__tp {
+    line-height:1.45;
+    overflow-wrap:break-word;
+}
+.a-rekap-page .a-rekap-table__tp a {
+    display:inline-block;
+    margin:4px 0;
+    font-weight:800;
+    font-size:12px;
+}
+.a-rekap-page .a-rekap-table__meta,
+.a-rekap-page .a-rekap-table__nama-tp {
+    display:block;
+    font-size:11px;
+    line-height:1.5;
+    overflow-wrap:break-word;
+}
+.a-rekap-page .a-rekap-table__angka {
+    text-align:center !important;
+    font-variant-numeric:tabular-nums;
+}
+.a-rekap-page .a-rekap-table--tp thead th:nth-child(n+6):nth-child(-n+9),
+.a-rekap-page .a-rekap-table--pra thead th:nth-child(n+2):nth-child(-n+6) {
+    text-align:center;
+}
+.a-rekap-page .a-rekap-table__angka strong { font-weight:800; }
+.a-rekap-page .a-rekap-table__kosong { font-size:11px; }
+.a-rekap-page .a-rekap-status {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:5px 9px;
+    min-height:25px;
+    border:1px solid var(--a-garis);
+    border-radius:999px;
+    font-size:11px;
+    font-weight:750;
+    line-height:1.35;
+    text-align:center;
+    white-space:normal;
+    background:var(--a-latar);
+    color:var(--a-teks);
+}
+.a-rekap-page .a-filter-rekap-grid--dua {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.a-penilaian-page .a-penilaian-form-grid {
+    display:grid;
+    grid-template-columns:minmax(180px,.55fr) minmax(0,1.45fr);
+    gap:20px;
+    align-items:start;
+}
+.a-penilaian-page .a-form-penilaian .a-field { max-width:none; }
+.a-penilaian-page .a-penilaian-form-grid textarea { min-height:142px; }
+.a-penilaian-page .a-penilaian-filter {
+    grid-template-columns:minmax(230px,1.35fr) minmax(120px,.75fr)
+        minmax(190px,1fr) minmax(150px,.85fr);
+}
+@media (max-width:1100px) {
+    .a-rekap-page .a-rekap-metrik { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .a-penilaian-page .a-penilaian-filter { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:650px) {
+    .a-rekap-page .a-rekap-metrik { grid-template-columns:minmax(0,1fr); }
+    .a-rekap-page .a-filter-rekap-grid--dua,
+    .a-penilaian-page .a-penilaian-filter,
+    .a-penilaian-page .a-penilaian-form-grid {
+        grid-template-columns:minmax(0,1fr);
+    }
+    .a-rekap-page .a-rekap-switch { display:grid;grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .a-rekap-page .a-rekap-switch__link { text-align:center;padding:8px; }
+    .a-rekap-page .a-rekap-scroll-hint { margin-top:10px; }
+}
