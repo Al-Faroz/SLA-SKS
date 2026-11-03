@@ -496,3 +496,22 @@ PHP lint + PHPUnit SQLite sintetik + renderer Dompdf/endroid dijalankan GitHub A
 | A11-306 | Cetak printer PDF dan browser layar HP/desktop | Tidak ada judul yang terpotong, font terlalu kecil, overlap tabel dengan QR atau tanda tangan |
 
 Tes otomatis `tests/unit/SertifikatTataLetakPdfTest.php` membuat PDF sintetis 4/24 TP; workflow `QA A11-3 Layout Cetak Sertifikat PDF` memeriksa A4 landscape, jumlah halaman dan teks TP menggunakan `pdfinfo`/`pdftotext`. **QA visual PDF terbaru di XAMPP masih wajib sebelum menutup A11-3.**
+
+### A12-1 — QA Dashboard Pimpinan berbasis data sah (3 November 2026)
+
+| ID | Skenario | Hasil wajib |
+|---|---|---|
+| A12-101 | Pimpinan membuka `/pimpinan` dengan satu atau beberapa Gen–Mapel–Semester | KPI numerik sesuai data, hanya paket aktif/ditugaskan, tanpa NISN/tombol mutasi |
+| A12-102 | Sumatif normal dan remedial sama-sama `selesai_sah` | Satu pasangan siswa×TP dihitung **sekali**, bukan dua kali |
+| A12-103 | Nilai TP Final 0 dan nilai Sementara/NULL | Nilai Final 0 ikut dihitung; nilai Sementara/NULL tidak |
+| A12-104 | Semester `siswa.semester_mulai` atau Gen lebih tinggi | Siswa semester dilewati tidak masuk pasangan wajib; paket tanpa TP tidak 100% |
+| A12-105 | Sertifikat versi baru dan arsip `digantikan` | Hanya pointer `sertifikat_aktif` yang berstatus berlaku dihitung |
+| A12-106 | Resume/HOTS final skor NULL, draf skor NULL, final skor 0 | Hanya final skor NULL masuk antrean; nilai 0 dianggap sudah dinilai |
+| A12-107 | Penugasan Guru per Gen–Mapel pada beberapa semester | Tidak menghitung pasangan Gen–Mapel dua kali hanya karena paket semester berbeda |
+| A12-108 | Filter Gen/Mapel/Semester dan pagination | Semua KPI mengikuti filter; tabel 12 paket/halaman; tautan Monitoring mempertahankan paket |
+| A12-109 | Filter ID tidak sah/array, akun Guru atau Pimpinan nonaktif | Penolakan server; tidak ada pembacaan lewat role lain |
+| A12-110 | Dark/Light, Mode Dokumentasi, HP 360/390px, keyboard | Label, tabel scroll, progress, dan pesan kosong terbaca |
+| A12-111 | Pra-Semester siap/draf/ditutup/belum tersedia | Status hanya tampil terpisah; tidak memengaruhi TP, nilai, sertifikat |
+| A12-112 | Dataset kosong atau paket tanpa TP NonEsensial | Tidak menampilkan progres sebagai 100%, tidak membuat skor simulasi |
+
+QA otomatis `tests/unit/DashboardPimpinanDatabaseTest.php` menggunakan SQLite anonim sesuai skema dump V4-0011; workflow `QA A12-1 Dashboard Pimpinan` menjalankan lint dan regresi `LaporanAkademikDatabaseTest.php`. Uji browser XAMPP tetap wajib sebelum A12-1 dinyatakan FIX. A12 berikutnya mencakup dashboard Admin/Guru/Siswa serta notifikasi/pengumuman/FAQ, bukan klaim bagian A12-1.

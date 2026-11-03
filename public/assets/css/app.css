@@ -2417,3 +2417,84 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     text-decoration:underline;
     text-underline-offset:3px;
 }
+
+/* A12-1 — Ringkasan Pimpinan (KPI baca-saja dan tabel paket). */
+.a-dashboard-pimpinan__filter {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    align-items:end;
+    gap:12px;
+    margin-top:12px;
+}
+.a-dashboard-pimpinan__filter-actions {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    grid-column:1/-1;
+}
+.a-dashboard-pimpinan__metrics {
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:14px;
+}
+.a-dashboard-pimpinan__metric { min-width:0; display:flex; flex-direction:column; gap:8px; }
+.a-dashboard-pimpinan__metric > span { color:var(--a-text-muted,inherit); font-size:.88rem; }
+.a-dashboard-pimpinan__metric > strong {
+    font-size:clamp(1.32rem,2.15vw,2rem);
+    line-height:1.2;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    overflow-wrap:anywhere;
+}
+.a-dashboard-pimpinan__metric > small { opacity:.83; font-size:.77rem; line-height:1.45; }
+.a-dashboard-pimpinan__meter { display:flex; align-items:center; gap:14px; margin:12px 0; }
+.a-dashboard-pimpinan__meter progress {
+    flex:1; height:14px; min-width:0; accent-color:#40BB91;
+}
+.a-dashboard-pimpinan__meter strong { font-variant-numeric:tabular-nums; min-width:70px; text-align:right; }
+.a-dashboard-pimpinan__note { border-left:3px solid #EAB56A; padding-left:12px; }
+.a-dashboard-pimpinan__scroll { max-width:100%; }
+.a-dashboard-pimpinan__table { min-width:1060px; }
+.a-dashboard-pimpinan__table th[scope="row"] > small {
+    display:block; font-weight:400; opacity:.82; margin-top:4px;
+}
+.a-dashboard-pimpinan__percentage { display:block; font-size:.75rem; opacity:.8; margin-top:3px; }
+.a-dashboard-pimpinan__pager {
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;
+}
+@media (max-width:1200px) {
+    .a-dashboard-pimpinan__metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media (max-width:760px) {
+    .a-dashboard-pimpinan__filter { grid-template-columns:1fr; }
+    .a-dashboard-pimpinan__metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:430px) {
+    .a-dashboard-pimpinan__metrics { grid-template-columns:1fr; }
+    .a-dashboard-pimpinan__filter-actions .a-btn { flex:1; text-align:center; }
+}
+
+.a-dashboard-pimpinan__operasional {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+    margin:14px 0;
+}
+.a-dashboard-pimpinan__operasional > div {
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:14px 16px;
+    border:1px solid var(--a-border,rgba(130,180,155,.34));
+    border-radius:12px;
+    min-width:0;
+}
+.a-dashboard-pimpinan__operasional strong {
+    font-size:clamp(1.3rem,2vw,1.85rem);
+    font-variant-numeric:tabular-nums;
+}
+.a-dashboard-pimpinan__operasional span {font-size:.87rem;opacity:.85;}
+@media(max-width:560px) {
+    .a-dashboard-pimpinan__operasional {grid-template-columns:1fr;}
+}

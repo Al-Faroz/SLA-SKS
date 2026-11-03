@@ -151,3 +151,7 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 | GET | `/verifikasi/{kode}` | Publik: token acak + throttle, whitelist informasi |
 
 Service: `SertifikatAsetService`, `SertifikatPdfService`, `SertifikatPenerbitanService`, `KelayakanSertifikatService`. Pembuatan PDF dilakukan di luar transaksi DB; sebelum commit dikunci `siswa` dan diperiksa ulang kelayakan dan checksum konten. Transaction rollback hanya membersihkan PDF **baru**, versi lama tetap aman. PHP Dompdf menggunakan data-URI tanpa remote request/embedded PHP; QR endroid tidak memuat PII. Tidak mengubah root `index.php`/`.htaccess`.
+
+### A12-1 — Beranda KPI Pimpinan baca-saja (3 November 2026)
+
+`GET /pimpinan` diarahkan ke `PimpinanDashboard::index` dengan `auth:pimpinan` dan validasi tambahan `DashboardPimpinanService`. Filter opsional `gen`, `mapel`, `semester`, `halaman` divalidasi server. Pilihan paket memakai `LaporanAkademikService::paketPimpinan()`, sehingga paket nonaktif dan tidak ditugaskan tidak ikut. KPI agregat memakai pemisahan **target pasangan siswa×TP** (berdasarkan semester mulai) dan **TP tuntas sah** (status tuntas + Sumatif selesai sah), lalu nilai Final dihitung terpisah tanpa menafsirkan 0 sebagai NULL. Sertifikat dihitung dari pointer `sertifikat_aktif` yang status versinya berlaku. Antrean Guru adalah `resume_materi` / `jawaban_hots_materi` berstatus final dan nilai NULL, bukan draft. Semua hanya SELECT, tanpa transaksi mutasi, tanpa pengambilan nama/NISN siswa.
