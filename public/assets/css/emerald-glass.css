@@ -2058,3 +2058,31 @@ html[data-theme] .a-app--prototipe .a-kkm-admin {
   }
 }
 
+/* A9 — Petunjuk snapshot dan jawaban final terpisah secara visual. */
+html[data-theme="dark"] .a-app--prototipe .a-card.a-penilaian-petunjuk {
+    background:linear-gradient(145deg,rgba(9,81,65,.7),rgba(14,55,69,.65));
+    border-color:rgba(104,221,197,.37);
+}
+html[data-theme="dark"] .a-app--prototipe .a-card.a-card--jawaban-siswa {
+    background:linear-gradient(145deg,rgba(55,53,101,.64),rgba(21,62,75,.7));
+    border-color:rgba(187,167,247,.38);
+}
+html[data-theme="light"] .a-app--prototipe .a-card.a-penilaian-petunjuk {
+    background:linear-gradient(145deg,#E8F8F3,#E9F3FB);
+    border-color:#9DCBBC;
+}
+html[data-theme="light"] .a-app--prototipe .a-card.a-card--jawaban-siswa {
+    background:linear-gradient(145deg,#F0EEFC,#EEF7FB);
+    border-color:#B5B2DA;
+}
+html[data-theme] .a-app--prototipe .a-side__submenu .a-side__tautan {
+    font-size:.84rem;
+    opacity:.96;
+}
+html[data-theme] .a-app--prototipe .a-side__group-trigger {
+    display:flex;
+    align-items:center;
+}
+html[data-theme] .a-app--prototipe.a-app--is-collapsed .a-side__submenu {
+    display:none;
+}
