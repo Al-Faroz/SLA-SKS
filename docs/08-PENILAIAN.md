@@ -46,7 +46,7 @@ KKM Pra-Semester: default Admin atau nilai khusus Guru untuk paket Gen–Mapel�
 - Hanya percobaan `selesai_sah` dapat menghasilkan nilai; `0.00` merupakan nilai sah, **bukan** `NULL`. Pembatalan tidak pernah mendapat skor.
 - Satu nilai normal sah membuka nilai Pra-Semester **sementara** bila <KKM (menunggu satu remedial sah terjadwal), atau **final** bila ≥KKM.
 - Satu remedial sah (setelah normal sah <KKM) membuat `nilai_terbaik = MAX(skor_normal_sah, skor_remedial_sah)` dan status **final**. Susulan normal/remedial tidak menambah jatah kesempatan sah. Tetap nilai mandiri, tidak menghitung rata-rata akhir semester.
-- Logika nilai dan kesempatan dipusatkan pada `PenilaianPraSemesterService` (pure); adapter rekap/ekspor Guru belum diaktifkan sampai audit dump yang lebih baru dari patch simulasi terakhir.
+- Logika nilai dan kesempatan dipusatkan pada `PenilaianPraSemesterService` (pure). Adapter rekap/ekspor Guru telah dikodekan pada A9 menggunakan uji database sintetis; penerimaan terhadap database XAMPP tetap mensyaratkan audit dump lokal terbaru dan uji browser.
 
 ### A9 — Tata Rekap Nilai terpisah dan penyaringan Guru (3 November 2026)
 
