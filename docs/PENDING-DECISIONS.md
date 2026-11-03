@@ -8,8 +8,10 @@
 - Pra-Semester pada tanggal dan jam serentak Admin setelah semua NonEsensial selesai, bank gabungan BAB, pola Sumatif, nilai berdiri sendiri. Tidak ada nilai akhir semester. Export Nilai Guru dapat dilakukan dari satu skor TP.
 - Database baru `sla_sks_v4` terpisah dari `sla_sks_v3`, sumber privat tak dikirim ke repo; semua versi/progres lama dipertahankan sebagai historis.
 
-## Keputusan yang sengaja ditunda
-- Apakah siswa wajib menuntaskan Pra-Semester **sebelum sertifikat diterbitkan**, dan apakah nilainya perlu dicetak di daftar nilai sertifikat. Belum menjadi gate atau kolom default; menunggu pembahasan pemilik.
+## Keputusan yang telah ditetapkan pada 3 November 2026
+- **Tidak:** siswa **tidak wajib menuntaskan Pra-Semester** untuk mendapatkan sertifikat. Syarat sertifikat tetap seluruh TP NonEsensial selesai, nilai wajib TP final, serta identitas dan TTD siap.
+- **Tidak:** nilai Pra-Semester **tidak dicetak** di sertifikat. Nilai mandiri ini hanya ditampilkan pada rekap/laporan/ekspor Pra-Semester yang terpisah.
+- **Alasan:** Pra-Semester berfungsi sebagai checkpoint akademik sebelum Ujian Semester yang sesungguhnya. Penjelasan tujuan ini tidak menambah modul Ujian Semester atau Nilai Akhir Semester.
 
 ## Belum dikerjakan setelah tahap dokumentasi/DB
 - Template Excel ATP v2.5 resmi telah tersedia pada branch fitur setelah #68; langkah yang tersisa adalah generator unduh kontekstual dan parser/impor BAB–TP.
@@ -23,4 +25,4 @@
 - Jadwal dan durasi **per Gen–Mapel–Semester**, tidak global. Admin menetapkan jendela boleh mulai dan durasi pengerjaan. Durasi individual dihitung **sejak siswa memulai**, jendela berakhir tidak memotong durasi siswa yang sudah berjalan.
 - Guru G1 mengelola bank minimal 30 soal mencakup setiap BAB dan KKM tersendiri Pra-Semester (default Admin/khusus Guru). Admin menjadwalkan ujian utama, remedial tersendiri dan susulan.
 - Siswa yang ujian Pra-Semester-nya dibatalkan **harus mendapat jadwal susulan Admin**, bukan akses ulang mandiri. Siswa tidak hadir dapat ditetapkan oleh Admin untuk susulan. Susulan boleh diulang bila dibatalkan lagi dengan audit. Pembatalan remedial → susulan untuk remedial yang sama; satu remedial sah setelah hasil normal sah <KKM.
-- Isu nilai di sertifikat **ditunda di luar A8**, tidak menjadi penghambat Pra-Semester.
+- **Pembaruan keputusan 3 November 2026:** Pra-Semester **bukan gerbang sertifikat dan tidak dicetak di sertifikat**. Isu yang sebelumnya ditunda sudah diputuskan pemilik; keputusan ini berlaku untuk pengembangan berikutnya.
