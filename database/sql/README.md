@@ -367,3 +367,40 @@ Sumber audit baca-saja **dump privat** `sla_sks_v4 (15).sql` (03-11-2026 pukul 0
 7. Jika DDL gagal sebagian, **jangan jalankan ulang**: MariaDB dapat melakukan implicit commit; inspeksi tabel/marker dan pulihkan dari backup yang telah dibuat.
 
 Berkas aset/PDF historis berada pada `writable/private/sertifikat/aset/` dan `writable/private/sertifikat/pdf/`. Backup dump SQL **saja tidak cukup**. Pada hosting nyata QR memerlukan domain HTTPS permanen; hasil uji localhost tidak dianggap sertifikat siap digunakan publik.
+
+## V4-0012 — Pengumuman Global dan FAQ A13-2 (3 November 2026)
+
+**Acuan terverifikasi:** dump SQL XAMPP privat `sla_sks_v4 (17).sql`, phpMyAdmin 5.2.1, **03 Nov 2026 pukul 16.02**, MariaDB **10.4.32**, database `sla_sks_v4`. Dump berisi **68 tabel**, tidak ada `pengumuman`, `faq`, atau `riwayat_informasi`, dan `schema_version` terakhir `V4-0011-SERTIFIKAT` sudah tercatat. Berkas dump privat **tidak** boleh diunggah ke GitHub.
+
+### Langkah impor di XAMPP
+
+1. **Sebelum apa pun**, backup `sla_sks_v4` ke berkas SQL privat dan folder `writable/`. Jangan mengganti dump aktif, jangan mengimpor ulang instalasi.
+2. Buka phpMyAdmin → pilih **database `sla_sks_v4`** → tab SQL. Jalankan baca-saja:
+   ```sql
+   SELECT versi, diterapkan_pada FROM schema_version ORDER BY diterapkan_pada DESC;
+   SHOW TABLES LIKE 'pengumuman';
+   SHOW TABLES LIKE 'faq';
+   SHOW TABLES LIKE 'riwayat_informasi';
+   ```
+   Versi `V4-0011-SERTIFIKAT` harus ada, `V4-0012-PENGUMUMAN-FAQ` belum ada, dan tiga tabel baru belum ada. **Bila hasil berbeda, hentikan impor dan laporkan; jangan mengulang/menimpa.**
+3. Buka tab Import pada database yang sama; pilih **hanya** `database/sql/updates/V4-0012_PENGUMUMAN_FAQ.sql` dari folder hasil pull GitHub dan impor **sekali**. Tidak memakai CI4 migration/seeder.
+4. Periksa **baca-saja**:
+   ```sql
+   SELECT versi, diterapkan_pada
+   FROM schema_version WHERE versi = 'V4-0012-PENGUMUMAN-FAQ';
+   SHOW CREATE TABLE pengumuman;
+   SHOW CREATE TABLE faq;
+   SHOW CREATE TABLE riwayat_informasi;
+   SELECT COUNT(*) AS jumlah_pengumuman FROM pengumuman;
+   SELECT COUNT(*) AS jumlah_faq FROM faq;
+   SELECT COUNT(*) AS jumlah_riwayat FROM riwayat_informasi;
+   ```
+   Awal tiga tabel berisi 0 baris; jangan menambahkan pengumuman/FAQ palsu dalam SQL.
+5. Login sebagai Admin → `/admin/pengumuman`, `/admin/faq`; Guru → `/guru/pengumuman`; semua akun login → `/pengumuman` dan `/bantuan`. Buat **konten pengujian tanpa identitas siswa nyata**, simpan Draf lalu Terbit, periksa tampilan antar peran. Arsipkan hanya data yang memang Anda buat untuk uji.
+6. Periksa pergantian peran: Guru tidak boleh mengubah konten Pengumuman milik Guru lain; Siswa/Pimpinan hanya baca. Uji isi mirip HTML sebagai **teks biasa**, pagination, dark/light, HP, reload, status gagal simpan, dan login anonim.
+
+**Sifat patch:** hanya tiga `CREATE TABLE` dengan FK pengguna dan satu `INSERT schema_version`; tidak mengubah data siswa, akun, ujian, nilai, progres, sertifikat atau jadwal. Riwayat sebelum/sesudah disimpan ke `riwayat_informasi` setiap kali ada CREATE/UPDATE/ARSIP lewat Service. Status `draf`, `terbit`, `arsip`; arsip terminal, tidak DELETE. Teks di-escape saat dirender.
+
+**Jika impor gagal:** DDL MySQL/MariaDB melakukan *implicit commit*, sehingga membuat satu tabel tidak otomatis di-rollback saat pernyataan berikutnya gagal. **Jangan langsung impor ulang atau DROP hasil impor parsial.** Catat pesan gagal, `SHOW TABLES`, `schema_version`, lalu lakukan inspeksi berdasarkan backup. Patch versi ini tidak boleh dijalankan dua kali.
+
+**Batas:** `notifikasi` internal per penerima, kebijakan privasi resmi publik, dan Hubungi Admin sebagai kontak sekolah belum dibangun pada A13-2. Perubahan SQL berikutnya kembali mewajibkan dump XAMPP **terbaru sesudah patch V4-0012** sesuai AGENTS.md.

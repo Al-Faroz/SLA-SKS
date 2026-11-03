@@ -129,3 +129,12 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 - Penerbitan dan revisi hanya POST+CSRF+Admin aktif; validasi paket, Gen, NISN dan kelayakan TP di Service; percobaan Sumatif `selesai_sah` wajib. Simpan snapshot immutable + checksum, perbarui pointer aktif transaksional; sertifikat lama `digantikan` tanpa dihapus.
 - Backup wajib memuat DB **dan** seluruh `writable/private/sertifikat/`; perubahan template aktif tidak mengubah PDF historis. Larang direktori private/SQL tersaji via front-controller ROOT, termasuk encoded-path dan dotfiles.
 - QR pada XAMPP menunjuk localhost dan hanya untuk pengujian; dokumen produksi memerlukan domain HTTPS permanen untuk verifikasi stabil.
+
+### A13-2 — Audit, transaksi dan isolasi Pengumuman/FAQ (3 November 2026)
+
+- Semua login aktif yang sudah mengganti sandi awal dapat membaca Pengumuman dan FAQ berstatus `terbit`, tanpa segmentasi Gen atau role. Draf dan Arsip tidak boleh keluar dari Service pembaca.
+- Admin mengelola semua Pengumuman dan FAQ; Guru hanya Pengumuman yang dibuatnya sendiri; Pimpinan/Siswa hanya baca. Filter role di Routes dan otorisasi ulang pada `InformasiGlobalService`; staf dua peran tidak menggabungkan hak.
+- Setiap POST memakai CSRF global, panjang judul/isi, status, urutan divalidasi di server. Teks disimpan plain dan di-`esc()` dalam semua View.
+- Penyuntingan/pengarsipan memakai row lock MySQL/MariaDB `FOR UPDATE`, `versi` untuk menolak permintaan tab lama, dan transaksi yang menyimpan perubahan bersama `riwayat_informasi` serta `log_aktivitas`. Arsip terminal, tidak DELETE.
+- Dump SQL privat yang menjadi acuan tidak dipublikasikan. Patch `V4-0012` hanya DDL + penanda versi, tidak menyisipkan akun/siswa nyata atau sandi.
+- Belum ada modul Notifikasi internal per penerima, badge belum dibaca, ataupun email/WhatsApp/push.

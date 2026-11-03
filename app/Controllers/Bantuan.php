@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
+use App\Services\InformasiGlobalService;
 use App\Services\NavigasiService;
 use App\Services\PanduanBantuanService;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -31,6 +32,10 @@ final class Bantuan extends BaseController
 
             $peran = (string) ($akun['peran_aktif'] ?? '');
             $panduan = PanduanBantuanService::untukPeran($peran);
+            $nomorFaq = $this->request->getGet('halaman_faq');
+            $halamanFaq = is_scalar($nomorFaq) && ctype_digit((string) $nomorFaq)
+                ? min(100000, max(1, (int) $nomorFaq)) : 1;
+            $faqResmi = (new InformasiGlobalService())->daftar('faq', false, $halamanFaq, 10);
 
             return $this->response
                 ->setHeader('Cache-Control', 'private, no-store')
@@ -41,6 +46,7 @@ final class Bantuan extends BaseController
                     'peranAktif' => $panduan['nama_peran'],
                     'tautanNavigasi' => NavigasiService::untuk($peran, 'bantuan'),
                     'panduan' => $panduan,
+                    'faqResmi' => $faqResmi,
                 ]));
         } catch (DomainException $e) {
             return $this->response

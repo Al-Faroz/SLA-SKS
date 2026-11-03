@@ -110,3 +110,14 @@ Jadwal remedial/susulan dan peserta terpilih memerlukan tabel/relasi baru dengan
 
 Sumber audit: dump XAMPP privat `sla_sks_v4 (15).sql` diekspor 03-11-2026 09.32, MariaDB 10.4.32, 64 tabel, `schema_version` terakhir V4-0010-BANK-WORD-PRA; **belum ada** tabel sertifikat. Patch additive `database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql` menambah `sertifikat_aset` (gambar immutable), `sertifikat_aset_aktif` (pointer 1 per jenis), `sertifikat` (snapshot PDF/QR berversi) dan `sertifikat_aktif` (pointer 1 per siswa/paket). FK ke `siswa`, `paket_semester`, `pengguna`; UNIQUE versi siswa/paket, nomor, token verifikasi, nama PDF, serta pointer aktif.
 Semua perubahan hanya INSERT sertifikat dan UPDATE status versi sebelumnya saat revisi sah; **tanpa DELETE siswa, progres, nilai atau sertifikat lama**. Berkas PDF, background dan TTD di `writable/private/sertifikat/`. SQL impor sekali setelah backup DB dan `writable/`. DDL harus diuji pada MariaDB XAMPP sebelum dinyatakan PASS, tidak cukup tes SQLite.
+
+### V4-0012 — Penyimpanan Pengumuman dan FAQ terkelola (3 November 2026)
+
+Sumber audit: dump XAMPP privat `sla_sks_v4 (17).sql` dibuat 03-11-2026 16.02, MariaDB 10.4.32. Terdapat 68 tabel, `schema_version` terakhir `V4-0011-SERTIFIKAT`; tabel `pengumuman`, `faq`, dan `riwayat_informasi` belum ada. Dump privat tidak disalin ke repository.
+
+Patch `database/sql/updates/V4-0012_PENGUMUMAN_FAQ.sql` menambahkan secara additive:
+- `pengumuman`: judul maksimal 150, isi teks, status `draf/terbit/arsip`, pembuat/pengubah FK `pengguna.id`, versi, waktu buat/ubah/terbit/arsip. Index status–waktu dan pembuat.
+- `faq`: pertanyaan maksimal 240, jawaban teks, urutan `SMALLINT UNSIGNED`, status dan metadata pembuat/pengubah/versi/waktu serupa. Index status–urutan dan pembuat.
+- `riwayat_informasi`: jenis `pengumuman/faq`, objek ID, aksi `buat/sunting/terbit/arsip`, FK aktor, peran aktif, snapshot JSON sebelum/sesudah, timestamp UTC. Tidak memakai FK polimorfik terhadap tabel sasaran; Service memeriksa objek dan transaksi.
+
+Penanda `schema_version` = `V4-0012-PENGUMUMAN-FAQ`. Tidak menghapus/mengubah data existing, dan tidak membuat akun/contoh siswa. Karena DDL bersifat implicit commit, **backup dulu, impor sekali**, jika gagal jangan ulang tanpa audit. Langkah rinci ada di `database/sql/README.md`. Tidak memakai Migration/Seeder. Modul Notifikasi internal penerima belum termasuk patch ini.

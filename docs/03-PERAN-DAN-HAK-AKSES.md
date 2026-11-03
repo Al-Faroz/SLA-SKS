@@ -116,3 +116,15 @@ Beranda `/siswa` memakai filter `auth:siswa` dan pemeriksaan ulang role/status d
 `GET /bantuan` berlaku hanya untuk akun sudah login dengan status aktif dan sandi awal telah diganti. AuthFilter `auth` dan `Bantuan::index` mengecek sesi/peran aktif; panduan `PanduanBantuanService::untukPeran()` hanya mengembalikan pertanyaan dan tautan GET yang sesuai **peran aktif** (bukan gabungan role staf). Guru tidak memperoleh panduan tautan Admin, Siswa tidak melihat tautan Guru/Admin, dan Pimpinan hanya menuju monitoring baca-saja atau Profil. Semua target tetap menerapkan otorisasi normal server ketika diklik. Halaman Bantuan tidak menerima ID siswa/Gen sebagai query, tidak melakukan mutasi, dan memakai `Cache-Control: private, no-store`.
 
 Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master**, bukan sistem FAQ yang dapat diubah Admin. Pengumuman global, FAQ resmi terkelola, notifikasi internal dan kontak resmi Hubungi Admin tetap terpisah hingga struktur/sumbernya diverifikasi lewat dump SQL XAMPP terbaru. Tidak ada perubahan izin pada tiga layanan tersebut.
+
+### A13-2 — Pengumuman global dan FAQ resmi (3 November 2026)
+
+| Aksi | Admin | Guru | Siswa | Pimpinan |
+|---|---|---|---|---|
+| Membaca Pengumuman berstatus Terbit | Ya | Ya | Ya | Ya |
+| Membuat Pengumuman global | Ya | Ya | Tidak | Tidak |
+| Menyunting/mengarsip Pengumuman | Seluruhnya | **Miliknya sendiri** | Tidak | Tidak |
+| Membaca FAQ resmi berstatus Terbit pada Bantuan | Ya | Ya | Ya | Ya |
+| Membuat/menyunting/mengarsip FAQ resmi | Ya | Tidak | Tidak | Tidak |
+
+Pembaca hanya memperoleh status `terbit`, tidak melihat draft/arsip. Satu akun staf multi-role tidak menggabungkan hak: saat aktif sebagai Guru ia tidak bisa mengelola FAQ; perubahan peran melalui Profil terlebih dahulu. URL `/admin/pengumuman`, `/guru/pengumuman`, `/admin/faq` memerlukan filter role **dan** otorisasi Service untuk mencegah manipulasi ID. Tidak ada endpoint penghapusan permanen.

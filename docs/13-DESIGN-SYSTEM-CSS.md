@@ -540,3 +540,7 @@ Komponen scoped: `a-admin-akun__form .a-fieldset` grid tiga label peran (hover/f
 ### A13-1 — Komponen Pusat Bantuan (3 November 2026)
 
 `a-bantuan`, `__pengenalan`, `__kelompok`, `__panel`, `__pertanyaan`, `__butir`, `__jawaban` didefinisikan dalam `public/assets/css/app.css`. Kartu pertanyaan memakai `details/summary` native, border token `--eg-line`, permukaan `--eg-pane-soft`, dan fokus keyboard yang terlihat (outline). Tombol hanya memakai kelas `a-btn` yang telah ada, memanfaatkan URL `site_url()` ter-escape. Desktop dua kolom topik dengan panel ganjil terakhir melebar, ≤900px satu kolom, ≤620px tombol dan teks fleksibel. Tidak menambahkan Bootstrap, dependensi JS atau ikon font; elemen yang dibuka bekerja bahkan bila JavaScript mati. Tidak menampilkan notifikasi/pesan saat ujian.
+
+### A13-2 — Komponen Informasi Global (3 November 2026)
+
+Kelas `a-informasi`, `a-informasi__kartu`, `__item`, `__isi`, `__kosong`, `__pagination`, `__arsip`, `__editor`, `__aksi`, `__kepala` dan `a-bantuan__faq-resmi` ditambahkan ke `public/assets/css/app.css`. Kartu dua kolom desktop dan satu kolom ≤820px. Header FAQ dan pagination menjadi stacked pada ≤620px. Teks panjang memakai `white-space:pre-wrap` dan `overflow-wrap:anywhere`. Memakai kembali `a-card`, `a-btn`, `a-tabel`, `a-field`, `a-alert`, `a-badge`, serta `details/summary`; tanpa framework CSS/JS baru. Galeri memakai konten sintetis, tidak menampilkan data pengguna.
