@@ -112,8 +112,14 @@ final class PraSemesterGuruService
 
     private function examTerkunci(int $paketId, int $guruId): array
     {
-        $row = $this->db->table('ujian_pra_semester')
-            ->where('paket_semester_id', $paketId)->get()->getRowArray();
+        // Lock konsisten dengan MesinPraSemesterSiswaService::mulai()
+        // dan PraSemesterJadwalService::simpan() untuk mencegah
+        // edit soal tepat ketika siswa memulai ujian.
+        $lock = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
+        $row = $this->db->query(
+            'SELECT * FROM ujian_pra_semester WHERE paket_semester_id=?' . $lock,
+            [$paketId]
+        )->getRowArray();
         if ($row) return $row;
         $this->db->table('ujian_pra_semester')->insert([
             'paket_semester_id' => $paketId,
@@ -201,8 +207,11 @@ final class PraSemesterGuruService
         $this->db->transBegin();
         try {
             $this->paket($paketId);
-            $exam = $this->db->table('ujian_pra_semester')
-                ->where('paket_semester_id', $paketId)->get()->getRowArray();
+            $lock = $this->db->DBDriver === 'SQLite3' ? '' : ' FOR UPDATE';
+            $exam = $this->db->query(
+                'SELECT * FROM ujian_pra_semester WHERE paket_semester_id=?' . $lock,
+                [$paketId]
+            )->getRowArray();
             if (!$exam) throw new DomainException('Bank soal belum tersedia.');
             $this->cekBelumDipakai((int) $exam['id']);
             $row = $this->db->table('soal_pra_semester')
