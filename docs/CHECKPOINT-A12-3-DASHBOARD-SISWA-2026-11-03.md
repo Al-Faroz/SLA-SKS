@@ -62,3 +62,7 @@ A12-3 dinilai **berfungsi pada screenshot tetapi masih memerlukan QA visual ulan
 ### Hasil QA otomatis revisi UI
 
 GitHub Actions `QA A12-3 Dashboard Siswa`, run **41647071674**, hasil **SUCCESS**: PHP lint seluruh berkas terkait PASS, `DashboardSiswaDatabaseTest.php` **8 tes/47 assertions**, regresi Katalog **10 tes/38 assertions**, regresi Laporan Akademik **6 tes/34 assertions**. Tes baru memverifikasi kode/judul TP Siap berizin muncul pada hero/kartu, sedangkan TP yang masih Draf tidak ditampilkan dan tombol tetap menuju daftar Semester. SQL tidak diubah. Status: **tes otomatis PASS, pemeriksaan visual browser hasil perubahan pada XAMPP masih diperlukan**.
+
+## Penerimaan revisi UI oleh pemilik (3 November 2026)
+
+Pemilik menyatakan **A12-3 Dashboard Siswa + PR #118 FIX** setelah pengujian lokal. Bukti pengujian otomatis revisi: `QA A12-3 Dashboard Siswa` run 41647071674 PASS (8 tes/47 assertions Dashboard, 10/38 Katalog, 6/34 Laporan), dan pemeriksaan layar didasarkan pada screenshot XAMPP serta konfirmasi pemilik. Status ini mencakup tampilan dan perilaku yang telah diuji, **bukan** klaim semua browser/konfigurasi hosting telah lolos. Tahap berikutnya adalah A12-4 Dashboard Admin pada PR terpisah.

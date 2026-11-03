@@ -163,6 +163,8 @@ final class Akun extends BaseController
         if ($peran === 'admin') {
             $data['uiPrototipe'] = true;
             $data['ringkasan'] = (new DashboardAdminService())->ringkasan();
+            // Jumlah dan status administratif tidak boleh tersimpan di cache bersama.
+            $this->response->setHeader('Cache-Control', 'private, no-store');
 
             return view('admin/beranda_prototipe', $data);
         }
