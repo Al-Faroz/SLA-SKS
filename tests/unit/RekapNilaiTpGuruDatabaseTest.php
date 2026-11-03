@@ -203,7 +203,9 @@ final class RekapNilaiTpGuruDatabaseTest extends TestCase
         self::assertIsString($view);
         self::assertStringContainsString("'GuruRekapNilai::index'", $route);
         self::assertStringContainsString("'auth:guru'", $route);
-        self::assertStringContainsString('Rekap Nilai TP', $nav);
+        self::assertStringContainsString("'label'=>'Rekap Nilai'", $nav);
+        self::assertStringContainsString("'label'=>'Nilai TP'", $nav);
+        self::assertStringContainsString("'label'=>'Nilai Pra-Semester'", $nav);
         self::assertStringContainsString('teksKomponen', $view);
         self::assertStringNotContainsString('Nilai Akhir Semester', $view);
     }

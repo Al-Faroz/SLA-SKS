@@ -17,10 +17,11 @@ final class GuruRekapNilai extends BaseController
 {
     protected $helpers = ['url'];
 
-    private function angka(?string $nilai, string $nama, int $maks): ?int
+    private function angka(mixed $nilai, string $nama, int $maks): ?int
     {
         if ($nilai === null || $nilai === '') return null;
-        if (!ctype_digit($nilai) || strlen($nilai) > 7 || (int) $nilai > $maks) {
+        if (!is_string($nilai) || !ctype_digit($nilai)
+            || strlen($nilai) > 7 || (int) $nilai > $maks) {
             throw new DomainException('Parameter ' . $nama . ' tidak valid.');
         }
         return (int) $nilai;
@@ -50,11 +51,17 @@ final class GuruRekapNilai extends BaseController
             $index = $this->angka($this->request->getGet('pilihan'),'pilihan',10000);
             $semester = $this->angka($this->request->getGet('semester'),'semester',6) ?? 1;
             $halaman = $this->angka($this->request->getGet('halaman'),'halaman',100000) ?? 1;
-            if ($semester < 1 || $halaman < 1) {
+            $jenisTp = $this->request->getGet('jenis_tp') ?? 'non_esensial';
+            $bab = $this->angka($this->request->getGet('bab'),'bab',100000) ?? 0;
+            if (!is_string($jenisTp) || !in_array($jenisTp,
+                ['non_esensial','esensial','semua'],true)
+                || $semester < 1 || $halaman < 1) {
                 throw new DomainException('Semester/halaman rekap tidak valid.');
             }
             $dipilih = PetaTpService::pilihPenugasan($pilihan, $index);
-            $hasil = $svc->rekap($dipilih, $semester, $halaman);
+            $daftarBab = $svc->daftarBab($dipilih,$semester);
+            $hasil = $svc->rekap($dipilih, $semester, $halaman, 25,
+                $jenisTp,$bab > 0 ? $bab : null);
             return view('guru/rekap_nilai_tp', [
                 'judul'=>'Rekap Nilai TP Guru',
                 'namaPengguna'=>$akun['nama'],
@@ -64,12 +71,17 @@ final class GuruRekapNilai extends BaseController
                 'pilihan_aktif'=>$index ?? 0,
                 'dipilih'=>$dipilih,
                 'semester'=>$semester,
+                'jenisTp'=>$jenisTp,
+                'bab'=>$bab,
+                'daftarBab'=>$daftarBab,
                 'rekap'=>$hasil,
             ]);
         } catch (DomainException $e) {
             if ($this->request->getGet('pilihan') !== null
                 || $this->request->getGet('semester') !== null
-                || $this->request->getGet('halaman') !== null) {
+                || $this->request->getGet('halaman') !== null
+                || $this->request->getGet('bab') !== null
+                || $this->request->getGet('jenis_tp') !== null) {
                 return redirect()->to(site_url('guru/rekap-nilai'))
                     ->with('rekap_galat','Filter rekap tidak valid atau tidak diizinkan.');
             }

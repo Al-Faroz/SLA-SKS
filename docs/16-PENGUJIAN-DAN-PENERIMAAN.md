@@ -405,3 +405,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Uji batas: setelah 300 detik jeda koneksi ujian belum dihentikan; pada 599 detik tetap jeda; pada 600 detik berlaku konsekuensi sesuai jenis tes. Dua jeda yang terpisah tetap dijumlahkan, bukan mendapat 600 detik baru tiap kejadian.
 - Regresi integrasi Pra-Semester: offline sekitar 400 detik membuka `jeda_koneksi` dan masih dapat pulih tanpa membuat attempt baru; offline sekitar 700 detik dapat langsung membatalkan ujian dengan skor NULL dan tepat satu segmen audit koneksi yang tertutup. Diagnostik/Sumatif yang terhenti tetap menggunakan **izin akses ulang Guru**, bukan pembatalan Pra-Semester.
 - Periksa juga pesan jeda pada `public/assets/js/diagnostik-ujian.js` menyebut 10 menit. Tidak ada SQL, reset data, perubahan jadwal Admin, atau kebijakan waktu individual ujian pada tahap ini. Uji browser aktual tetap diperlukan.
+
+### A9 — Regresi filter, menu rekap terpisah dan unduhan (3 November 2026)
+
+- G10 antrean: kombinasi Gen–Mapel, Semester, BAB, Resume/HOTS benar-benar diterapkan ke query server (bukan CSS hiding), 403/galat untuk BAB lintas Gen, urutan tertua, pager memelihara filter, reset jelas, tidak ada label `Perlu dicek xx%` dalam kolom Jenis tabel.
+- G11 detail: petunjuk snapshot versi siswa dan jawaban siswa muncul pada kartu berbeda dengan latar berbeda dalam Dark/Light; teks di-escape, kemiripan hanya indikator pada detail, penyimpanan nilai tetap 0–100 dan CSRF.
+- A9 TP: NonEsensial terpilih secara default; Esensial/semua dan BAB hanya menampilkan pasangan siswa–TP yang sesuai. Ekspor mengikuti filter dan tetap memasukkan semua siswa pada sheet roster; tidak pernah mencampur nilai Pra-Semester.
+- A9 Pra-Semester: semua siswa Gen muncul meski belum ujian; hanya `selesai_sah` bernilai, normal 0.00 adalah skor sah, normal < KKM sementara, remedial sah mengambil terbaik, batal tetap tanpa skor. Ekspor XLSX terpisah, sel kosong bukan nol, teks diawali `=` disimpan sebagai string dan Guru Gen lain ditolak.
+- Pemeriksaan otomatis dilakukan di SQLite/MariaDB sintetis dan PHP lint. **Uji XAMPP nyata belum dinyatakan PASS tanpa dump lokal terbaru dan browser Guru**; data siswa, histori ujian, .env, dan jadwal tidak boleh diubah untuk memaksanya.

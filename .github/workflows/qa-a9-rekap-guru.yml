@@ -1,0 +1,70 @@
+name: QA A9 Penilaian dan Rekap Nilai Guru
+
+on:
+  pull_request:
+    paths:
+      - 'app/Controllers/GuruPenilaian.php'
+      - 'app/Controllers/GuruRekapNilai.php'
+      - 'app/Controllers/GuruRekapPraSemester.php'
+      - 'app/Controllers/GuruEksporNilai.php'
+      - 'app/Controllers/GuruEksporPraSemester.php'
+      - 'app/Services/PenilaianGuruService.php'
+      - 'app/Services/RekapNilaiTpGuruService.php'
+      - 'app/Services/RekapNilaiPraSemesterGuruService.php'
+      - 'app/Services/EksporNilaiGuruService.php'
+      - 'app/Services/EksporNilaiPraSemesterGuruService.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/layouts/panel.php'
+      - 'app/Views/guru/antrean_penilaian.php'
+      - 'app/Views/guru/nilai_kegiatan.php'
+      - 'app/Views/guru/rekap_nilai_tp.php'
+      - 'app/Views/guru/rekap_nilai_pra_semester.php'
+      - 'tests/unit/A9FilterGuruTest.php'
+      - 'tests/unit/PraSemesterDatabaseTest.php'
+      - '.github/workflows/qa-a9-rekap-guru.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rekap-penilaian:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan folder CI4
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP syntax
+        run: |
+          for f in \
+            app/Controllers/GuruPenilaian.php \
+            app/Controllers/GuruRekapNilai.php \
+            app/Controllers/GuruRekapPraSemester.php \
+            app/Controllers/GuruEksporNilai.php \
+            app/Controllers/GuruEksporPraSemester.php \
+            app/Services/PenilaianGuruService.php \
+            app/Services/RekapNilaiTpGuruService.php \
+            app/Services/RekapNilaiPraSemesterGuruService.php \
+            app/Services/EksporNilaiGuruService.php \
+            app/Services/EksporNilaiPraSemesterGuruService.php \
+            app/Services/NavigasiService.php \
+            app/Config/Routes.php \
+            app/Views/layouts/panel.php \
+            app/Views/guru/antrean_penilaian.php \
+            app/Views/guru/nilai_kegiatan.php \
+            app/Views/guru/rekap_nilai_tp.php \
+            app/Views/guru/rekap_nilai_pra_semester.php \
+            tests/unit/A9FilterGuruTest.php \
+            tests/unit/PraSemesterDatabaseTest.php; do php -l "$f"; done
+      - name: PHPUnit A9 dan regresi Pra-Semester
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/A9FilterGuruTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php

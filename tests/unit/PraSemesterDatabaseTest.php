@@ -597,6 +597,98 @@ final class PraSemesterDatabaseTest extends TestCase
         self::assertFalse($mesin->ruang(11)['boleh_mulai']);
     }
 
+    /** A9: rekap tersendiri memasukkan semua siswa dan nilai 0 sah. */
+    public function testRekapNilaiPraSemesterBerdiriSendiriDanTerjagaHakGuru(): void
+    {
+        $pilihan=['angkatan_id'=>1,'mapel_id'=>1];
+        $svc=new \App\Services\RekapNilaiPraSemesterGuruService(
+            $this->db,$this->actor('guru',10)
+        );
+        $this->db->table('pengguna')->insert([
+            'id'=>200,'nama'=>'Siswa Tanpa Ujian','status'=>'aktif',
+        ]);
+        $this->db->table('siswa')->insert([
+            'id'=>2,'pengguna_id'=>200,'angkatan_id'=>1,'semester_mulai'=>4,
+        ]);
+        $awal=$svc->rekap($pilihan,4);
+        self::assertSame(2,$awal['total']);
+        self::assertCount(2,$awal['baris']);
+        self::assertNull($awal['baris'][0]['nilai_terbaik']);
+        self::assertSame('Belum mengikuti ujian',$awal['baris'][0]['status_label']);
+
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'selesai_sah',
+            'kkm'=>75,'skor'=>0,
+        ]);
+        $normal=$svc->rekap($pilihan,4);
+        self::assertSame(0.0,$normal['baris'][0]['nilai_terbaik']);
+        self::assertSame('sementara',$normal['baris'][0]['status_nilai']);
+        self::assertNull($normal['baris'][1]['nilai_terbaik']);
+
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'remedial','nomor_percobaan'=>2,'status'=>'selesai_sah',
+            'kkm'=>75,'skor'=>80,
+        ]);
+        $remedial=$svc->rekap($pilihan,4);
+        self::assertSame(0.0,$remedial['baris'][0]['skor_normal']);
+        self::assertSame(80.0,$remedial['baris'][0]['nilai_terbaik']);
+        self::assertSame('final',$remedial['baris'][0]['status_nilai']);
+        self::assertSame('Final',$remedial['baris'][0]['status_label']);
+
+        $this->expectException(\DomainException::class);
+        (new \App\Services\RekapNilaiPraSemesterGuruService(
+            $this->db,$this->actor('guru',11)
+        ))->rekap($pilihan,4);
+    }
+
+    /** A9: XLSX Pra-Semester tidak boleh membentuk formula dari nama siswa. */
+    public function testEksporPraSemesterTerpisahDanTeksSiswaBukanFormula(): void
+    {
+        $this->db->table('pengguna')->where('id',100)
+            ->update(['nama'=>'=SUM(1,1)']);
+        $this->db->table('percobaan_ujian')->insert([
+            'ujian_pra_semester_id'=>51,'siswa_id'=>1,'jenis'=>'pra_semester',
+            'tahap'=>'normal','nomor_percobaan'=>1,'status'=>'selesai_sah',
+            'kkm'=>75,'skor'=>0,
+        ]);
+        $svc=new \App\Services\EksporNilaiPraSemesterGuruService(
+            $this->db,$this->actor('guru',10)
+        );
+        $hasil=$svc->unduh([
+            'angkatan_id'=>1,'mapel_id'=>1,
+            'nama_gen'=>'Gen Uji','nama_mapel'=>'SKI',
+            'kode_gen'=>'GU','kode_mapel'=>'SKI',
+        ],4);
+        self::assertStringContainsString('NILAI_PRA_SEMESTER_',$hasil['nama']);
+        self::assertGreaterThan(500,strlen($hasil['isi']));
+        $tmp=tempnam(sys_get_temp_dir(),'pra-a9-');
+        self::assertIsString($tmp);
+        try {
+            file_put_contents($tmp,$hasil['isi']);
+            $reader=new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $book=$reader->load($tmp);
+            try {
+                self::assertSame(['NILAI PRA-SEMESTER'],
+                    $book->getSheetNames());
+                $sheet=$book->getActiveSheet();
+                self::assertSame('=SUM(1,1)',$sheet->getCell('B9')->getValue());
+                self::assertSame(
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING,
+                    $sheet->getCell('B9')->getDataType()
+                );
+                self::assertSame(0.0,(float)$sheet->getCell('G9')->getValue());
+                self::assertSame('Sementara — menunggu remedial',
+                    $sheet->getCell('H9')->getValue());
+            } finally {
+                $book->disconnectWorksheets();
+            }
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
     public function testWordPraSemesterImporAppendDanIdempotenDenganSiswaBelumMenggunakan(): void
     {
         $guru = new \App\Services\PraSemesterWordService(

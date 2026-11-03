@@ -27,7 +27,7 @@
                 Hubungi Admin untuk menetapkan Guru pengampu.</div>
         <?php else: ?>
             <form method="get" action="<?= esc(site_url('guru/penilaian'), 'attr') ?>"
-                class="a-penilaian-filter">
+                class="a-form a-penilaian-filter" id="filter-antrean">
                 <div class="a-field">
                     <label class="a-label" for="pilihan">Gen – Mata Pelajaran</label>
                     <select class="a-input" id="pilihan" name="pilihan">
@@ -38,8 +38,51 @@
                         <?php endforeach ?>
                     </select>
                 </div>
-                <button class="a-btn a-btn--sekunder" type="submit">Terapkan filter</button>
+                <div class="a-field">
+                    <label class="a-label" for="semester">Semester</label>
+                    <select class="a-input" id="semester" name="semester">
+                        <option value="0" <?= $semester === 0 ? 'selected' : '' ?>>Semua semester</option>
+                        <?php for ($s=1;$s<=6;$s++): ?>
+                            <option value="<?= $s ?>" <?= $semester === $s ? 'selected' : '' ?>>Semester <?= $s ?></option>
+                        <?php endfor ?>
+                    </select>
+                </div>
+                <div class="a-field">
+                    <label class="a-label" for="bab">BAB</label>
+                    <select class="a-input" id="bab" name="bab">
+                        <option value="0" <?= $bab === 0 ? 'selected' : '' ?>>Semua BAB</option>
+                        <?php foreach ($daftarBab as $item): ?>
+                            <option value="<?= (int)$item['id'] ?>" <?= $bab === (int)$item['id'] ? 'selected' : '' ?>>
+                                <?= esc('Semester '.$item['semester'].' · BAB '.$item['nomor_bab'].' — '.$item['nama_bab']) ?>
+                            </option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="a-field">
+                    <label class="a-label" for="jenis">Jenis Tugas</label>
+                    <select class="a-input" id="jenis" name="jenis">
+                        <option value="semua" <?= $jenis === 'semua' ? 'selected' : '' ?>>Resume dan HOTS</option>
+                        <option value="resume" <?= $jenis === 'resume' ? 'selected' : '' ?>>Resume</option>
+                        <option value="hots" <?= $jenis === 'hots' ? 'selected' : '' ?>>HOTS</option>
+                    </select>
+                </div>
+                <div class="a-penilaian-filter__aksi">
+                    <button class="a-btn a-btn--utama" type="submit">Terapkan Filter</button>
+                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Reset</a>
+                </div>
             </form>
+            <script>
+            (() => {
+                const form=document.getElementById('filter-antrean');
+                if (!form) return;
+                for (const id of ['pilihan','semester']) {
+                    form.querySelector('#'+id)?.addEventListener('change', () => {
+                        form.querySelector('#bab').value='0';
+                        form.submit();
+                    });
+                }
+            })();
+            </script>
         <?php endif ?>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="antrean-pengumpulan">
@@ -70,10 +113,6 @@
                                         <?= esc($r['materi_judul']) ?></span>
                                 </td>
                                 <td><span class="a-badge"><?= esc(strtoupper($r['jenis'])) ?></span>
-                                    <?php if ((float) $r['kemiripan'] >= 60): ?>
-                                        <span class="a-badge" title="Indikasi kesamaan teks, perlu pemeriksaan Guru">
-                                            Perlu dicek <?= esc((string)$r['kemiripan']) ?>%</span>
-                                    <?php endif ?>
                                 </td>
                                 <td><a class="a-btn a-btn--sekunder"
                                     href="<?= esc(site_url('guru/penilaian/' . $r['jenis']
@@ -86,7 +125,10 @@
         <?php endif ?>
         <?php if ($antrean['jumlah_halaman'] > 1): ?>
             <nav class="a-penilaian-pager" aria-label="Halaman antrean penilaian">
-                <?php $query = '?pilihan=' . (int) $pilihan_aktif . '&halaman='; ?>
+                <?php $query = '?' . http_build_query([
+                    'pilihan'=>$pilihan_aktif,'semester'=>$semester,
+                    'bab'=>$bab,'jenis'=>$jenis,
+                ]) . '&halaman='; ?>
                 <?php if ($antrean['halaman'] > 1): ?>
                     <a class="a-btn a-btn--sekunder"
                         href="<?= esc(site_url('guru/penilaian') . $query . ($antrean['halaman'] - 1), 'attr') ?>">Sebelumnya</a>

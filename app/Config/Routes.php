@@ -97,6 +97,8 @@ $routes->post('admin/pra-semester/(:num)', 'AdminPraSemester::simpan/$1', ['filt
 $routes->post('admin/pra-semester/(:num)/sesi', 'AdminPraSemester::simpanSesi/$1', ['filter' => 'auth:admin']);
 $routes->post('admin/pra-semester/(:num)/sesi/(:num)/peserta', 'AdminPraSemester::tambahPeserta/$1/$2', ['filter' => 'auth:admin']);
 $routes->get('guru/rekap-nilai', 'GuruRekapNilai::index', ['filter' => 'auth:guru']);
+$routes->get('guru/rekap-nilai/pra-semester', 'GuruRekapPraSemester::index', ['filter' => 'auth:guru']);
+$routes->get('guru/rekap-nilai/pra-semester/unduh', 'GuruEksporPraSemester::unduh', ['filter' => 'auth:guru']);
 $routes->get('guru/rekap-nilai/unduh', 'GuruEksporNilai::unduh', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);

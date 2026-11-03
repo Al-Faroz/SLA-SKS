@@ -26,7 +26,8 @@ Guru aktif Gen–Mapel menerima antrean Resume/HOTS final tertua, menilai sesuai
 Bank ujian gabungan seluruh BAB pada semester, minimal 30 soal. Mesin, fullscreen, jeda dan satu remedial mengikuti pola Sumatif. Skor terbaik adalah **nilai Pra-Semester mandiri**. Jendela boleh mulai dan durasi individual ditentukan Admin per Gen–Mapel–Semester, dan hanya siswa yang menyelesaikan seluruh TP NonEsensial berhak mengikutinya; peserta paket sama mengikuti jendela yang sama.
 
 ## 5. Ekspor Nilai Guru
-- Guru dapat mengekspor **seluruh siswa dalam Gen–Mapel yang diampu** dengan identitas minimal yang berwenang, kode/nama TP, nilai masing-masing TP NonEsensial, penanda TP Esensial tanpa nilai, dan nilai Pra-Semester.
+- Rekap Nilai Guru menggunakan **dua halaman dan dua berkas ekspor terpisah** di bawah menu `Rekap Nilai`: **Nilai TP** dan **Nilai Pra-Semester**. Data dan sheet kedua kategori **tidak dicampur dalam satu ekspor**.
+- Guru dapat mengekspor **seluruh siswa dalam Gen–Mapel yang diampu** dengan identitas minimal yang berwenang. Ekspor Nilai TP berisi kode/nama TP, nilai TP NonEsensial, serta penanda TP Esensial tanpa nilai jika secara eksplisit dipilih. Ekspor Pra-Semester berisi nilai ujian normal, remedial, nilai terbaik, dan status nilai per siswa/semester.
 - Export **kapan saja**, termasuk saat baru terdapat **satu nilai TP** atau sebagian siswa belum memiliki nilai. Nilai yang belum tersedia berupa kosong/penanda belum ada, **bukan nol**; hasil sementara dibedakan dari final.
 - Kolom **Nilai Akhir Semester tidak ada**. Izin filter dan sanitasi formula injection XLSX/CSV wajib; hash, sandi dan riwayat ujian privat tidak diekspor.
 
@@ -45,4 +46,12 @@ KKM Pra-Semester: default Admin atau nilai khusus Guru untuk paket Gen–Mapel�
 - Hanya percobaan `selesai_sah` dapat menghasilkan nilai; `0.00` merupakan nilai sah, **bukan** `NULL`. Pembatalan tidak pernah mendapat skor.
 - Satu nilai normal sah membuka nilai Pra-Semester **sementara** bila <KKM (menunggu satu remedial sah terjadwal), atau **final** bila ≥KKM.
 - Satu remedial sah (setelah normal sah <KKM) membuat `nilai_terbaik = MAX(skor_normal_sah, skor_remedial_sah)` dan status **final**. Susulan normal/remedial tidak menambah jatah kesempatan sah. Tetap nilai mandiri, tidak menghitung rata-rata akhir semester.
-- Logika nilai dan kesempatan dipusatkan pada `PenilaianPraSemesterService` (pure); adapter rekap/ekspor Guru belum diaktifkan sampai audit dump yang lebih baru dari patch simulasi terakhir.
+- Logika nilai dan kesempatan dipusatkan pada `PenilaianPraSemesterService` (pure). Adapter rekap/ekspor Guru telah dikodekan pada A9 menggunakan uji database sintetis; penerimaan terhadap database XAMPP tetap mensyaratkan audit dump lokal terbaru dan uji browser.
+
+### A9 — Tata Rekap Nilai terpisah dan penyaringan Guru (3 November 2026)
+
+- Menu Guru: **Rekap Nilai** → **Nilai TP** dan **Nilai Pra-Semester**. Tidak menggabungkan hasil Pra-Semester ke file XLSX TP. Halaman Penilaian Resume/HOTS tetap berbeda dari kedua halaman rekap.
+- Antrean Penilaian: filter penugasan **Gen–Mapel**, Semester, BAB, dan Jenis Tugas (Resume/HOTS). Indikator kemiripan persentase tidak ditampilkan lagi pada kolom Jenis di tabel antrean; pada detail dapat tetap dilihat Guru. Petunjuk dari Materi snapshot dan jawaban final siswa ditampilkan dalam dua kartu berlatar berbeda.
+- Rekap Nilai TP: filter Gen–Mapel, Semester, Jenis TP dan BAB. **Default NonEsensial**; Esensial dan Semua tersedia sebagai pilihan. File Excel TP mengikuti filter; unduh semua semester mengikuti jenis TP, tetapi tidak memakai BAB khusus semester. Skor 0 sah, nilai yang belum ada kosong.
+- Rekap Nilai Pra-Semester: per siswa dan semester, percobaan hanya `selesai_sah` menghasilkan skor. Nilai terbaik berasal dari `PenilaianPraSemesterService`, bukan rata-rata akhir semester. Hasil bisa kosong, Sementara, Final, menunggu susulan/remedial. Semua siswa Gen tetap masuk.
+- Implementasi A9 hanya baca, filter, dan ekspor. Tidak ada perubahan SQL, aturan nilai, tahapan ujian maupun jadwal Admin. Sebelum penerimaan hasil pada database lokal, tetap wajib audit dump XAMPP terbaru sesuai `AGENTS.md`.

@@ -24,22 +24,31 @@
     <?php if (session()->getFlashdata('nilai_sukses')): ?>
         <div class="a-alert" role="status"><?= esc(session()->getFlashdata('nilai_sukses')) ?></div>
     <?php endif ?>
-    <section class="a-card" aria-labelledby="jawaban-penilaian">
-        <h2 id="jawaban-penilaian">Jawaban final · <?= esc($tugas['materi_judul_snapshot']) ?></h2>
-        <p class="a-help">Versi konten terpin #<?= (int) $tugas['versi_konten_tp_id'] ?> ·
-            Dikirim <?= esc((string) $tugas['dikirim_pada']) ?> UTC.
-            Jawaban final tidak dapat diubah siswa.</p>
-        <h3>Petunjuk dari Materi versi siswa</h3>
+    <section class="a-card a-penilaian-petunjuk" aria-labelledby="petunjuk-penilaian">
+        <div class="a-penilaian-bagian__heading">
+            <span class="a-badge">Acuan tugas</span>
+            <h2 id="petunjuk-penilaian">Petunjuk dari Materi versi siswa</h2>
+        </div>
+        <p class="a-help">Materi <?= esc((string)$tugas['materi_judul_snapshot']) ?> ·
+            Snapshot konten #<?= (int)$tugas['versi_konten_tp_id'] ?>.
+            Petunjuk asli saat siswa mengerjakan, bukan hasil perubahan terbaru Guru.</p>
         <div class="a-penilaian-isi"><?= nl2br(esc((string) $tugas['petunjuk'])) ?></div>
+    </section>
+    <section class="a-card a-card--jawaban-siswa a-jarak-atas" aria-labelledby="jawaban-penilaian">
+        <div class="a-penilaian-bagian__heading">
+            <span class="a-badge">Jawaban final</span>
+            <h2 id="jawaban-penilaian">Jawaban siswa</h2>
+        </div>
+        <p class="a-help">Dikirim <?= esc((string) $tugas['dikirim_pada']) ?> UTC.
+            Jawaban final siswa tidak dapat diubah.</p>
+        <div class="a-penilaian-isi"><?= nl2br(esc((string) $tugas['isi'])) ?></div>
         <?php if ((float) $tugas['kemiripan'] >= 60): ?>
             <div class="a-alert" role="status">
-                <strong>Perlu dicek:</strong> kemiripan <?= esc((string)$tugas['kemiripan']) ?>%
+                <strong>Perlu diperiksa:</strong> kemiripan <?= esc((string)$tugas['kemiripan']) ?>%
                 dengan jawaban lain pada Materi dan snapshot yang sama.
-                Indikator ini bukan bukti kecurangan dan tidak mengubah nilai secara otomatis.
+                Ini hanya indikator dan tidak mengubah nilai secara otomatis.
             </div>
         <?php endif ?>
-        <h3>Jawaban siswa</h3>
-        <div class="a-penilaian-isi"><?= nl2br(esc((string) $tugas['isi'])) ?></div>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="nilai-kegiatan">
         <h2 id="nilai-kegiatan">Nilai Guru</h2>

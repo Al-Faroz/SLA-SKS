@@ -1891,3 +1891,59 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-pra-filter--admin .a-pra-filter__actions { grid-column:auto; }
     .a-pra-filter__actions .a-btn { flex:1; }
 }
+
+/* A9 — Filter Penilaian/Rekap terstruktur dan navigasi submenu native. */
+.a-penilaian-filter,
+.a-filter-rekap-grid {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    align-items:end;
+}
+.a-penilaian-filter .a-field,
+.a-filter-rekap-grid .a-field {
+    min-width:0;
+    max-width:none;
+    flex:none;
+}
+.a-penilaian-filter__aksi {
+    grid-column:1 / -1;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.a-side__group { min-width:0; }
+.a-side__group-trigger { cursor:pointer; list-style:none; }
+.a-side__group-trigger::-webkit-details-marker { display:none; }
+.a-side__group-chevron {
+    margin-left:auto;
+    width:15px;
+    height:15px;
+    transition:transform .2s ease;
+}
+.a-side__group[open] .a-side__group-chevron { transform:rotate(180deg); }
+.a-side__submenu { display:grid; gap:4px; padding:5px 4px 5px 20px; }
+.a-app--prototipe .a-side__subtautan {
+    min-height:38px;
+    font-size:.85rem;
+    padding:8px 12px;
+}
+.a-app--is-collapsed .a-side__submenu,
+.a-app--is-collapsed .a-side__group-chevron { display:none; }
+.a-penilaian-bagian__heading {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+.a-penilaian-bagian__heading h2 { margin:0; }
+@media (max-width:1040px) {
+    .a-penilaian-filter,
+    .a-filter-rekap-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:620px) {
+    .a-penilaian-filter,
+    .a-filter-rekap-grid { grid-template-columns:minmax(0,1fr); }
+    .a-penilaian-filter__aksi .a-btn { flex:1 1 120px; justify-content:center; }
+}

@@ -47,6 +47,29 @@ $peranAktif = $peranAktif ?? '';
         </div>
         <nav class="a-side__menu" aria-label="Menu peran aktif">
             <?php foreach ($tautanNavigasi as $tautan): ?>
+                <?php if (isset($tautan['submenu']) && is_array($tautan['submenu'])): ?>
+                    <details class="a-side__group" <?= !empty($tautan['aktif']) ? 'open' : '' ?>>
+                        <summary class="a-side__tautan a-side__group-trigger<?= !empty($tautan['aktif']) ? ' is-aktif' : '' ?>"
+                            title="<?= esc((string)$tautan['label'],'attr') ?>"
+                            aria-label="<?= esc((string)$tautan['label'],'attr') ?>">
+                            <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#chart-no-axes-combined"></use></svg>
+                            <span class="a-side__teks"><?= esc((string)$tautan['label']) ?></span>
+                            <svg class="a-icon a-side__group-chevron" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#chevron-down"></use></svg>
+                        </summary>
+                        <div class="a-side__submenu">
+                            <?php foreach ($tautan['submenu'] as $anak): ?>
+                                <?php if (!isset($anak['path'],$anak['label'])) continue; ?>
+                                <a class="a-side__tautan a-side__subtautan<?= !empty($anak['aktif']) ? ' is-aktif' : '' ?>"
+                                    href="<?= esc(site_url(ltrim((string)$anak['path'],'/')),'attr') ?>"
+                                    <?= !empty($anak['aktif']) ? 'aria-current="page"' : '' ?>
+                                    title="<?= esc((string)$anak['label'],'attr') ?>">
+                                    <span class="a-side__teks"><?= esc((string)$anak['label']) ?></span>
+                                </a>
+                            <?php endforeach ?>
+                        </div>
+                    </details>
+                    <?php continue; ?>
+                <?php endif ?>
                 <?php if (! isset($tautan['path'], $tautan['label'])) { continue; } ?>
                 <?php
                     $jalurIkon = strtolower((string) $tautan['path']);
