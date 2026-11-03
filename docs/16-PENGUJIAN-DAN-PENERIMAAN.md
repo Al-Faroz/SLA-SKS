@@ -41,7 +41,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-031 | Blur+visibility+fullscreen dari satu aksi | Tidak dihitung tiga insiden |
 | E2E-032 | Fullscreen keluar 3 kali | Diagnostik/Sumatif: tes tidak selesai tanpa skor dan menunggu **izin akses ulang Guru**; Pra-Semester: pembatalan tanpa skor |
 | E2E-033 | Heartbeat terlambat 20 detik | Waktu aktif berhenti tepat ambang berdasarkan jam server, walau rekonsiliasi terlambat |
-| E2E-034 | Jeda koneksi 300 detik | Tes mandiri: akses ulang Guru; Pra-Semester: batal; tidak memotong kuota sah |
+| E2E-034 | Jeda koneksi kumulatif 600 detik | Tes mandiri: akses ulang Guru; Pra-Semester: batal; tidak memotong kuota sah |
 | E2E-035 | Insiden fullscreen dan koneksi bersamaan | Tidak menghitung waktu ganda |
 | E2E-036 | Refresh ujian dan klik ganda | Tidak mengulang attempt atau menambah jawaban ganda |
 | E2E-037 | Siswa mengirim jawaban saat jeda | Ditolak server |
@@ -395,6 +395,6 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 
 ### A8-10 — Audit pembatalan langsung setelah offline panjang (3 November 2026)
 
-- Buat percobaan Pra-Semester berjalan dalam fixture SQLite anonim, putuskan heartbeat lebih dari total batas 300 detik, lalu lakukan **satu** pembacaan status server. Hasil wajib `dibatalkan_menunggu_guru`, skor NULL, serta tepat satu segmen `koneksi` yang dimulai pada `last_seen_server_at + 20 detik` dan berakhir ketika pembatalan terdeteksi.
+- Buat percobaan Pra-Semester berjalan dalam fixture SQLite anonim, putuskan heartbeat lebih dari total batas 600 detik, lalu lakukan **satu** pembacaan status server. Hasil wajib `dibatalkan_menunggu_guru`, skor NULL, serta tepat satu segmen `koneksi` yang dimulai pada `last_seen_server_at + 20 detik` dan berakhir ketika pembatalan terdeteksi.
 - Permintaan status kedua harus idempoten: tidak menambah segmen, nilai atau percobaan; siswa tetap menunggu jadwal susulan Admin. Kasus masuk `tests/unit/PraSemesterDatabaseTest.php` dan alur CI S06A/A8.
-- Tidak mengubah kebijakan pengamanan Master 07: koneksi 20 detik dan jeda kumulatif maksimal 300 detik. Uji browser XAMPP tetap perlu dilakukan pada akun simulasi berhak dan jadwal Admin sah.
+- Tidak mengubah kebijakan pengamanan Master 07: koneksi 20 detik dan jeda kumulatif maksimal 600 detik. Uji browser XAMPP tetap perlu dilakukan pada akun simulasi berhak dan jadwal Admin sah.
