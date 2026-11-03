@@ -413,3 +413,11 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - A9 TP: NonEsensial terpilih secara default; Esensial/semua dan BAB hanya menampilkan pasangan siswa–TP yang sesuai. Ekspor mengikuti filter dan tetap memasukkan semua siswa pada sheet roster; tidak pernah mencampur nilai Pra-Semester.
 - A9 Pra-Semester: semua siswa Gen muncul meski belum ujian; hanya `selesai_sah` bernilai, normal 0.00 adalah skor sah, normal < KKM sementara, remedial sah mengambil terbaik, batal tetap tanpa skor. Ekspor XLSX terpisah, sel kosong bukan nol, teks diawali `=` disimpan sebagai string dan Guru Gen lain ditolak.
 - Pemeriksaan otomatis dilakukan di SQLite/MariaDB sintetis dan PHP lint. **Uji XAMPP nyata belum dinyatakan PASS tanpa dump lokal terbaru dan browser Guru**; data siswa, histori ujian, .env, dan jadwal tidak boleh diubah untuk memaksanya.
+
+### A9-2 — Pemeriksaan UI Guru dari screenshot (3 November 2026)
+
+- Rekap TP: empat metrik berjejer 4/2/1 sesuai lebar; tabel kelas `a-tbl`, scrollbar horizontal, kolom nama siswa/BAB/TP serta empat nilai tetap terpisah; skor 0/NULL tidak diperlakukan sebagai satu nilai.
+- Rekap Pra-Semester: filter Gen–Mapel dan Semester memenuhi lebar panel tanpa kolom kosong yang tak diperlukan, tabel status/KKM/Normal/Remedial/Nilai Terbaik dapat dibaca, halaman/ekspor dan nilai tidak berubah.
+- Penilaian: empat filter tetap berfungsi pada resolusi laptop dan HP; detail Petunjuk/Jawaban berbeda warna walau `data-documentation=on`, form skor dan umpan balik tampil dua kolom di desktop.
+- Dokumentasi full-page: menu Rekap Nilai dengan submenu tidak membuat baris ketiga header. Di sidebar normal tetap dapat mengakses kedua submenu.
+- Otomatis: `tests/unit/A9TampilanGuruTest.php` memeriksa class tabel, kartu metrik, pembagian form, menu, dan selector Mode Dokumentasi. Pengujian visual browser nyata Dark/Light, layar 360/390/768/1100+ dan mode Dokumentasi tetap tugas QA localhost pemilik.
