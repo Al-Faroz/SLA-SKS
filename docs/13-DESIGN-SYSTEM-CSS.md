@@ -514,3 +514,7 @@ Gunakan `a-dashboard-pimpinan` dengan `__filter`, `__metrics`, `__metric`, `__me
 ### A12-2 — Komponen ringkasan Dashboard Guru (3 November 2026)
 
 `a-dashboard-guru` menambahkan grid filter dua kolom, `__metrics` 3/2/1 sesuai breakpoint, `__metric` untuk angka tabular, `__actions` untuk tautan aksi yang nyata, dan `__scroll`/`__table` untuk tabel semester. Tetap memakai komponen `a-card`, `a-input`, `a-btn`, `a-help`, `a-alert` yang sudah berlaku; nilai dan keadaan dijelaskan dengan teks, bukan warna semata. Tabel minimal lebar agar informasi tidak bertumpuk, tetapi dapat digulir melalui keyboard pada HP. Tanpa JS/framework baru.
+
+### A12-3 — Komponen Dashboard Siswa (3 November 2026)
+
+`a-dashboard-siswa`: `__hero` untuk langkah berikutnya, `__hero-stats`, `__metrics`/`__metric` (indikator numerik tabular), `__paket-grid`/`__paket`, `__segments`/`__segment--selesai`, `__progress` native untuk paket panjang, dan `__links` untuk laporan/sertifikat. Pertahankan kartu Emerald Glass serta tombol primer indigo-violet dari sistem, jangan menambahkan framework/animasi berat. Segmen progres memiliki teks jumlah selesai/target yang wajib dapat dibaca tanpa warna; native progress mempunyai label aksesibel. Jika target 0, tidak render segmen penuh atau grafik 100%. Pada `prefers-reduced-motion` nonaktifkan animasi progres; tidak ada animasi pada halaman ujian. Contoh galeri harus menggunakan angka sintetis dan tidak mengubah nilai/histori.
