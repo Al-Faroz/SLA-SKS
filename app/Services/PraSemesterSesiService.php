@@ -218,6 +218,7 @@ final class PraSemesterSesiService
         $rows=$this->db->table('siswa s')->select('s.id,p.nama')
             ->join('pengguna p','p.id=s.pengguna_id')
             ->where('s.angkatan_id',(int)$ujian['angkatan_id'])
+            ->where('s.semester_mulai <=',(int)$ujian['semester'])
             ->where('p.status','aktif')
             ->orderBy('p.nama')->get()->getResultArray();
         $sudah=$this->db->table('peserta_pra_susulan')
@@ -287,6 +288,7 @@ final class PraSemesterSesiService
                 $siswa=$this->db->table('siswa')->select('id')
                     ->where('id',$siswaId)
                     ->where('angkatan_id',(int)$ujian['angkatan_id'])
+                    ->where('semester_mulai <=',(int)$ujian['semester'])
                     ->get()->getRowArray();
                 if (!$siswa) throw new DomainException('Siswa tidak berada di Gen ini.');
                 $fase=PenilaianPraSemesterService::ringkas(
