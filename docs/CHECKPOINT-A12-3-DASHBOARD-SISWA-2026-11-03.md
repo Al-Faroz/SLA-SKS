@@ -46,3 +46,15 @@ Tidak ada patch SQL, migrasi, seeder atau mutasi database. Sumber tabel telah ad
 8. **Tidak perlu impor SQL** atau membuat nilai/percobaan palsu hanya untuk mengisi dashboard.
 
 Status: implementasi dan QA sintetis awal PASS, **menunggu uji angka/tampilan XAMPP** sebelum FIX. Berikutnya A12-4 Dashboard Admin/QA indikator sesuai Master.
+
+## Koreksi UI A12-3 dari tangkapan layar XAMPP (3 November 2026)
+
+Pada screenshot Siswa Simulasi 05 beranda berhasil ditampilkan, tanpa error pada struktur, KPI maupun progress: satu mapel/semester terbuka, target 2 TP NonEsensial, 0 TP selesai, 0 nilai Final, bantuan 0, sertifikat 0. Tidak ada bukti visual yang cukup untuk menganggap bantuan seharusnya 1 hanya karena nama akun simulasi.
+
+Perbaikan pada branch **`fix/a12-3-ui-dashboard-siswa-20261103`** (Draft PR #118 berlapis di atas A12-3):
+- Satu kartu Semester pada desktop memenuhi lebar kontainer dan memakai layout dua bidang: mapel/status di kiri, progres/tombol di kanan. HP kembali satu kolom; lebih dari satu paket tetap grid.
+- Hero dan kartu menunjukkan **kode dan judul TP yang benar-benar dapat dibuka**, diambil dari Katalog resmi dengan `akses.buka=true` (tidak boleh mengungkap TP Draf/terkunci). Jika tidak ada TP berizin, tautan tetap menuju Semester.
+- Kontras segmen diperjelas tanpa mengganti angka nilai, aturan Sumatif, peran, gerbang semester atau syarat sertifikat. Tidak ada perubahan SQL.
+- Tambahan tes untuk judul TP berizin, semester dilewati dan TP status Draf yang **tidak boleh tampil sebagai tujuan belajar**.
+
+A12-3 dinilai **berfungsi pada screenshot tetapi masih memerlukan QA visual ulang setelah PR #118**. Jangan menganggap perubahan ini memperbaiki status ujian siswa simulasi tanpa audit histori progres tersendiri.
