@@ -396,12 +396,24 @@ final class MesinPraSemesterSiswaService
                 ->where('id',$butirId)->where('percobaan_ujian_id',(int)$row['id'])
                 ->countAllResults();
             if ($ada !== 1) throw new DomainException('Butir bukan milik percobaan siswa.');
-            $this->db->query(
-                'INSERT INTO jawaban_percobaan(percobaan_ujian_id,butir_percobaan_id,opsi_dipilih,waktu_disimpan) '
-                . 'VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE opsi_dipilih=VALUES(opsi_dipilih),'
-                . 'waktu_disimpan=VALUES(waktu_disimpan)',
-                [(int)$row['id'],$butirId,$pilih,self::iso($now)]
-            );
+            // MariaDB menggunakan kunci unik (attempt,butir) untuk UPSERT atomik.
+            // SQLite hanya dipakai fixture QA sintetis, tidak untuk instalasi SLA-SKS.
+            if ($this->db->DBDriver === 'SQLite3') {
+                $this->db->query(
+                    'INSERT INTO jawaban_percobaan(percobaan_ujian_id,butir_percobaan_id,opsi_dipilih,waktu_disimpan) '
+                    . 'VALUES(?,?,?,?) ON CONFLICT(percobaan_ujian_id,butir_percobaan_id) '
+                    . 'DO UPDATE SET opsi_dipilih=excluded.opsi_dipilih,'
+                    . 'waktu_disimpan=excluded.waktu_disimpan',
+                    [(int)$row['id'],$butirId,$pilih,self::iso($now)]
+                );
+            } else {
+                $this->db->query(
+                    'INSERT INTO jawaban_percobaan(percobaan_ujian_id,butir_percobaan_id,opsi_dipilih,waktu_disimpan) '
+                    . 'VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE opsi_dipilih=VALUES(opsi_dipilih),'
+                    . 'waktu_disimpan=VALUES(waktu_disimpan)',
+                    [(int)$row['id'],$butirId,$pilih,self::iso($now)]
+                );
+            }
             return self::info($s) + ['tersimpan'=>true,'butir_id'=>$butirId,'opsi'=>$pilih];
         });
     }

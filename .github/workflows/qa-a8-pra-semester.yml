@@ -8,6 +8,8 @@ on:
       - 'app/Services/PraSemesterJadwalService.php'
       - 'app/Services/PraSemesterSiswaService.php'
       - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Controllers/SiswaPembelajaran.php'
+      - 'app/Views/siswa/daftar_tp.php'
       - 'app/Services/SusunButirUjianService.php'
       - 'app/Services/NavigasiService.php'
       - 'app/Controllers/GuruPraSemester.php'
@@ -52,6 +54,7 @@ jobs:
       - name: Validasi sintaks service dan test
         run: |
           php -l app/Services/AturanPraSemesterService.php
+          php -l app/Controllers/SiswaPembelajaran.php
           php -l tests/unit/AturanPraSemesterServiceTest.php
           for phpfile in app/Services/{PraSemesterGuruService,PraSemesterJadwalService,PraSemesterSiswaService,MesinPraSemesterSiswaService,SusunButirUjianService,NavigasiService}.php app/Controllers/{GuruPraSemester,AdminPraSemester,SiswaPraSemester}.php app/Views/{guru/pra_semester,admin/pra_semester,siswa/pra_semester_ujian,siswa/daftar_tp}.php app/Config/Routes.php tests/unit/PraSemesterImplementasiTest.php; do php -l "$phpfile"; done
           php -l tests/unit/PraSemesterDatabaseTest.php

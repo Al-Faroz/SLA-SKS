@@ -70,8 +70,24 @@ final class SiswaPembelajaran extends BaseController
 
     public function paket(int $paketId): ResponseInterface|string
     {
-        return $this->halaman(static fn (): array =>
-            (new KatalogPembelajaranSiswaService())->daftarTp($paketId), 'siswa/daftar_tp');
+        return $this->halaman(static function () use ($paketId): array {
+            $data = (new KatalogPembelajaranSiswaService())->daftarTp($paketId);
+            // Kelayakan dibaca dari mesin resmi yang mengikat satu siswa,
+            // Gen, bank, seluruh TP wajib, jadwal dan histori kesempatan.
+            // Token/kunci/soal percobaan tidak diteruskan ke katalog.
+            $ruang = (new \App\Services\MesinPraSemesterSiswaService())->ruang($paketId);
+            $data['praSemester'] = [
+                'ujian' => $ruang['ujian'],
+                'gerbang' => $ruang['gerbang'],
+                'fase' => $ruang['fase'],
+                'boleh_mulai' => $ruang['boleh_mulai'],
+                'nilai_terbaik' => $ruang['nilai_terbaik'],
+                'status_nilai' => $ruang['status_nilai'],
+                'kkm' => $ruang['kkm'],
+                'jadwal_aktif' => $ruang['jadwal_aktif'],
+            ];
+            return $data;
+        }, 'siswa/daftar_tp');
     }
 
     public function tp(int $tpId): ResponseInterface|string
