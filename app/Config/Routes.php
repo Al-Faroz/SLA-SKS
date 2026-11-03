@@ -198,6 +198,7 @@ $routes->get('admin/mapel-guru', 'AdminReferensi::mapel', ['filter' => 'auth:adm
 $routes->post('admin/mapel-guru', 'AdminReferensi::buatMapel', ['filter' => 'auth:admin']);
 $routes->post('admin/mapel-guru/(:num)/gen/(:num)/guru', 'AdminReferensi::tetapkanGuru/$1/$2', ['filter' => 'auth:admin']);
 $routes->get('admin/identitas', 'AdminIdentitas::index', ['filter' => 'auth:admin']);
+$routes->get('admin/sertifikat', 'AdminSertifikat::index', ['filter' => 'auth:admin']);
 $routes->post('admin/identitas', 'AdminIdentitas::simpan', ['filter' => 'auth:admin']);
 
 $routes->set404Override('\App\Controllers\Publik::tidakDitemukan');
