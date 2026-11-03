@@ -248,7 +248,9 @@ final class SertifikatPenerbitanService
         $this->db->transBegin();
         try {
             // Kunci siswa, serialkan semua penerbitan bersamaan untuk pasangan ini.
-            $this->db->query('SELECT id FROM siswa WHERE id=? FOR UPDATE',[$sid]);
+            $lockSql='SELECT id FROM siswa WHERE id=?';
+            if ($this->db->DBDriver !== 'SQLite3') $lockSql.=' FOR UPDATE';
+            $this->db->query($lockSql,[$sid]);
             $terkini=$this->aktif($sid,$pid);
             if (($terkini['id']??null)!==($r['lama']['id']??null)
                 || ($terkini['konten_sha256']??null)!==($r['lama']['konten_sha256']??null)) {
