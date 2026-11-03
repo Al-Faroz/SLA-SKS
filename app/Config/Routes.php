@@ -18,6 +18,31 @@ $routes->post('keluar', 'Akun::keluar', ['filter' => 'auth']);
 $routes->get('profil', 'Akun::profil', ['filter' => 'auth']);
 // A13-1: panduan login-only untuk peran aktif; bukan FAQ terkelola.
 $routes->get('bantuan', 'Bantuan::index', ['filter' => 'auth']);
+
+$routes->get('pengumuman', 'Informasi::pengumuman', ['filter' => 'auth']);
+// A13-2: semua login hanya baca global. Admin/Guru menulis, hanya Admin kelola FAQ.
+// Controller juga memeriksa role dan kepemilikan pada Service; POST memakai CSRF global.
+$routes->get('admin/pengumuman', 'Informasi::adminPengumuman', ['filter' => 'auth:admin']);
+$routes->get('admin/pengumuman/tambah', 'Informasi::adminPengumumanForm', ['filter' => 'auth:admin']);
+$routes->post('admin/pengumuman/tambah', 'Informasi::adminSimpanPengumuman', ['filter' => 'auth:admin']);
+$routes->get('admin/pengumuman/(:num)/sunting', 'Informasi::adminPengumumanForm/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pengumuman/(:num)/sunting', 'Informasi::adminSimpanPengumuman/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/pengumuman/(:num)/arsip', 'Informasi::adminArsipPengumuman/$1', ['filter' => 'auth:admin']);
+
+$routes->get('guru/pengumuman', 'Informasi::guruPengumuman', ['filter' => 'auth:guru']);
+$routes->get('guru/pengumuman/tambah', 'Informasi::guruPengumumanForm', ['filter' => 'auth:guru']);
+$routes->post('guru/pengumuman/tambah', 'Informasi::guruSimpanPengumuman', ['filter' => 'auth:guru']);
+$routes->get('guru/pengumuman/(:num)/sunting', 'Informasi::guruPengumumanForm/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pengumuman/(:num)/sunting', 'Informasi::guruSimpanPengumuman/$1', ['filter' => 'auth:guru']);
+$routes->post('guru/pengumuman/(:num)/arsip', 'Informasi::guruArsipPengumuman/$1', ['filter' => 'auth:guru']);
+
+$routes->get('admin/faq', 'Informasi::adminFaq', ['filter' => 'auth:admin']);
+$routes->get('admin/faq/tambah', 'Informasi::adminFaqForm', ['filter' => 'auth:admin']);
+$routes->post('admin/faq/tambah', 'Informasi::adminSimpanFaq', ['filter' => 'auth:admin']);
+$routes->get('admin/faq/(:num)/sunting', 'Informasi::adminFaqForm/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/faq/(:num)/sunting', 'Informasi::adminSimpanFaq/$1', ['filter' => 'auth:admin']);
+$routes->post('admin/faq/(:num)/arsip', 'Informasi::adminArsipFaq/$1', ['filter' => 'auth:admin']);
+
 $routes->post('profil/kontak', 'Profil::simpanKontak', ['filter' => 'auth']);
 $routes->post('profil/foto', 'Profil::unggahFoto', ['filter' => 'auth']);
 $routes->get('profil/foto/(:num)', 'Profil::mediaFoto/$1', ['filter' => 'auth']);
