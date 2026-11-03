@@ -62,7 +62,7 @@ $routes->get('siswa/tp/(:num)/sumatif/(:segment)/status', 'SiswaSumatif::status/
 $routes->post('siswa/tp/(:num)/sumatif/(:segment)/jawab', 'SiswaSumatif::jawab/$1/$2', ['filter' => 'auth:siswa']);
 $routes->post('siswa/tp/(:num)/sumatif/(:segment)/tindakan', 'SiswaSumatif::tindakan/$1/$2', ['filter' => 'auth:siswa']);
 $routes->get('siswa/tp/(:num)/sumatif/media/(:segment)/(:segment)/(:segment)', 'SiswaSumatif::media/$1/$2/$3/$4', ['filter' => 'auth:siswa']);
-$routes->get('guru', 'Akun::berandaGuru', ['filter' => 'auth:guru']);
+$routes->get('guru', 'GuruDashboard::index', ['filter' => 'auth:guru']);
 $routes->get('guru/peta-atp', 'GuruPetaTp::index', ['filter' => 'auth:guru']);
 // G05 — gerbang ATP Excel enam semester, tanpa aksi impor di detail semester.
 $routes->get('guru/peta-atp/impor', 'GuruAtpImpor::index', ['filter' => 'auth:guru']);

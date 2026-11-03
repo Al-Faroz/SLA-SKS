@@ -510,3 +510,7 @@ Mode `card--full` hanya untuk maksimal empat TP dan tiga BAB yang dapat muat tan
 ### A12-1 — Komponen Dashboard Pimpinan (3 November 2026)
 
 Gunakan `a-dashboard-pimpinan` dengan `__filter`, `__metrics`, `__metric`, `__meter`, `__operasional`, `__scroll`, `__table`, dan `__pager` bersama `a-card`, `a-btn`, `a-input`, `a-tbl`, `a-alert` bawaan Emerald Glass. Tidak ada dependensi Bootstrap, React, Vue maupun chart library. Indikator `progress` dilengkapi persentase numerik; jika tidak ada target, tampilkan teks bukan grafik 100%. Badge/warna tidak menggantikan angka. Tabel memiliki `role=region`, label dan `tabindex=0` untuk digulir dengan keyboard. Jaga kontras Dark/Light dan Mode Dokumentasi.
+
+### A12-2 — Komponen ringkasan Dashboard Guru (3 November 2026)
+
+`a-dashboard-guru` menambahkan grid filter dua kolom, `__metrics` 3/2/1 sesuai breakpoint, `__metric` untuk angka tabular, `__actions` untuk tautan aksi yang nyata, dan `__scroll`/`__table` untuk tabel semester. Tetap memakai komponen `a-card`, `a-input`, `a-btn`, `a-help`, `a-alert` yang sudah berlaku; nilai dan keadaan dijelaskan dengan teks, bukan warna semata. Tabel minimal lebar agar informasi tidak bertumpuk, tetapi dapat digulir melalui keyboard pada HP. Tanpa JS/framework baru.

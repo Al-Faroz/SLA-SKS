@@ -98,3 +98,7 @@ Seluruh layanan menegakkan Gen–Mapel dan peran aktif di Controller **dan Servi
 ### A12-1 — Dashboard baca-saja Pimpinan (3 November 2026)
 
 Beranda `/pimpinan` menghitung KPI paket aktif/ditugaskan, Gen/Mapel/semester, siswa yang wajib TP, hasil TP tuntas dengan Sumatif sah, Nilai TP Final, sertifikat berlaku, dan antrean Resume/HOTS final belum dinilai. Service menegakkan akun Pimpinan aktif selain filter rute; tidak boleh mengakses jalur ini dengan role Guru/Admin/Siswa, termasuk staf multi-role yang sedang memakai role lain. Tombol dashboard hanya GET menuju Monitoring A10-1. Status Pra-Semester ditampilkan mandiri dan **tidak** menjadi gerbang sertifikat atau nilai akhir semester. Tidak ada hak menilai, menerbitkan sertifikat, atau mengubah jadwal dari beranda.
+
+### A12-2 — Akses Dashboard Guru (3 November 2026)
+
+Beranda `/guru` menunjukkan indikator kerja hanya untuk penugasan aktif `penugasan_guru_gen.guru_id` milik role aktif Guru; tidak boleh membaca Gen–Mapel lain melalui parameter `pilihan`/Semester yang dibuat sendiri. Filter role dan otorisasi Service sama-sama wajib. Dashboard **GET baca-saja**, aksi Penilaian/Kelola TP/Akses Ulang diarahkan ke halaman yang telah memiliki otorisasi G1 sendiri. Siswa yang perlu bantuan dihitung agregat tanpa menampilkan NISN/teks jawaban, dan Sumatif/Pra-Semester tetap berbeda. Tidak ada penyatuan hak Guru–Pimpinan untuk staf multi-role.

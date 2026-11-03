@@ -75,3 +75,5 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 - **[Checkpoint A11-3 — QA tata letak sertifikat PDF A4 (3 November 2026)](CHECKPOINT-A11-3-TATA-LETAK-SERTIFIKAT-A4-2026-11-03.md)**. Perbaikan visual dari PDF hasil cetak XAMPP: bingkai tinggi penuh untuk 2 BAB/4 TP, tipografi lebih besar, QR/TTD seimbang, footer aman untuk tabel panjang; tidak mengubah PDF/nomor/QR historis dan tidak ada SQL baru.
 
 - **[Checkpoint A12-1 — Dashboard Akademik Pimpinan (3 November 2026)](CHECKPOINT-A12-1-DASHBOARD-PIMPINAN-2026-11-03.md)**. Beranda baca-saja dengan KPI siswa, paket, TP+Sumatif sah, Nilai Final, Guru, antrean Resume/HOTS, sertifikat berlaku, dan status Pra terpisah. Filter/paginasi dan QA SQLite. SQL tidak berubah, menunggu uji XAMPP.
+
+- **[Checkpoint A12-2 — Dashboard Guru G1 (3 November 2026)](CHECKPOINT-A12-2-DASHBOARD-GURU-2026-11-03.md)**. Ringkasan penugasan Gen–Mapel, TP Siap/Draf, Materi aktif, antrean Resume/HOTS, siswa perlu bantuan dan ujian mandiri berjalan. Tanpa SQL; menunggu uji XAMPP sebelum FIX.

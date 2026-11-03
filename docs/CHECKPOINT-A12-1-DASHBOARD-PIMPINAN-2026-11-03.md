@@ -48,3 +48,7 @@ GitHub Actions `QA A12-1 Dashboard Pimpinan` run 41637788372: **SUCCESS**; PHP l
 6. Login sebagai Guru/Admin/Siswa: tidak boleh mengakses beranda Pimpinan. Periksa bahwa tidak ada perubahan otomatis pada nilai/TP/sertifikat akibat membuka dashboard.
 
 Status A12-1 menunggu uji visual dan angka XAMPP pemilik sebelum dinyatakan FIX. Tahap lanjut setelah FIX: Dashboard Guru, Siswa, Admin dan notifikasi/pengumuman/FAQ bertahap mengikuti Master 12 serta QA E2E.
+
+## Verifikasi pengguna di XAMPP (3 November 2026)
+
+Pemilik mengirim tangkapan layar `/pimpinan` setelah pull dan menyatakan untuk melanjutkan apabila tampilan sesuai. Pemeriksaan visual: filter Gen–Mapel–Semester, KPI, progress, penugasan Guru, antrean, tabel dan tombol Monitoring terpasang rapi; **A12-1 dinyatakan FIX untuk UI dan agregasi yang terlihat**, tanpa mengklaim audit ulang dump SQL saat itu. Angka yang tampak konsisten: 27+2=29 siswa unik per dua Gen; 6+2=8 TP sah dari 54+4=58 target (13,8%); Nilai Final 5+2=7; Sertifikat 0+1=1; antrean 4+0=4. Penugasan 1/2 konsisten dengan satu Gen DEMO belum dipasangi Guru. A12-2 dilanjutkan pada branch terpisah; tidak mengubah dashboard Pimpinan yang dinyatakan FIX.
