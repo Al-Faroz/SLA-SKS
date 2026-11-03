@@ -81,3 +81,7 @@ Equation Word umum ditampilkan melalui MathML (pecahan, superscript, subscript, 
 - **Setelah sunting TP Siap yang belum digunakan**: validasi kesiapan tetap wajib. Snapshot konten aktif dan metadata diperbarui atomik/otomatis sesuai kebutuhan siswa baru tanpa memaksa Guru melewati prosedur koreksi berversi; tidak membuat status Siap menunjuk konten yang belum lengkap. Penetapan detil transaksi/schema menunggu audit dump terbaru pada tahap kode.
 - **CP**: dikelola Admin, dapat disunting walaupun TP/siswa telah menggunakannya, tidak mencampuri nilai/ujian/progres siswa. Form hanya lima isian sesuai Master 04.
 - **V4-0006 permohonan koreksi TP** dalam branch lama **dibatalkan sebagai syarat fitur**, dan **jangan impor SQL V4-0006** demi implementasi baru. Bila sudah ada tabelnya di lokal, jangan drop/reset tanpa izin. Kode alur kategori lama harus dicabut/ditutup ketika fitur baru diterapkan.
+
+
+### Bank Pra-Semester (3 November 2026)
+Bank Pra-Semester beridentitas **Gen–Mapel–Semester**, bukan TP, dan sepenuhnya milik Guru G1 aktif. Minimal 30 soal pilihan ganda A–E yang aktif/sah, seluruh BAB semester terwakili. Soal memiliki `bab_id` wajib; bank diatur sebelum Admin menjadwalkan dan **dibekukan setelah percobaan siswa pertama** demi integritas histori. KKM Pra-Semester diatur khusus oleh Guru atau mengikuti `kkm_default` Admin, bukan menyalin KKM suatu TP. Admin mengisi durasi per mapel saat penjadwalan, tidak mengedit soal/kunci.
