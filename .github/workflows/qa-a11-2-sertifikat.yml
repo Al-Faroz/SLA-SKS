@@ -1,0 +1,67 @@
+name: QA A11-2 Sertifikat PDF QR Versi
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/SertifikatAsetService.php'
+      - 'app/Services/SertifikatPdfService.php'
+      - 'app/Services/SertifikatPenerbitanService.php'
+      - 'app/Services/KelayakanSertifikatService.php'
+      - 'app/Controllers/AdminSertifikat.php'
+      - 'app/Controllers/AdminSertifikatAset.php'
+      - 'app/Controllers/AdminSertifikatTerbit.php'
+      - 'app/Controllers/SiswaSertifikat.php'
+      - 'app/Controllers/VerifikasiSertifikat.php'
+      - 'app/Views/admin/sertifikat_aset.php'
+      - 'app/Views/admin/sertifikat_kelayakan.php'
+      - 'app/Views/siswa/sertifikat.php'
+      - 'app/Views/publik/verifikasi_sertifikat.php'
+      - 'app/Config/Routes.php'
+      - 'app/Services/NavigasiService.php'
+      - 'tests/unit/SertifikatPenerbitanDatabaseTest.php'
+      - 'database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql'
+      - '.github/workflows/qa-a11-2-sertifikat.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Setup writable
+        run: mkdir -p writable/private/sertifikat/aset writable/private/sertifikat/pdf writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP A11-2
+        run: |
+          for f in \
+            app/Services/SertifikatAsetService.php \
+            app/Services/SertifikatPdfService.php \
+            app/Services/SertifikatPenerbitanService.php \
+            app/Services/KelayakanSertifikatService.php \
+            app/Controllers/AdminSertifikat.php \
+            app/Controllers/AdminSertifikatAset.php \
+            app/Controllers/AdminSertifikatTerbit.php \
+            app/Controllers/SiswaSertifikat.php \
+            app/Controllers/VerifikasiSertifikat.php \
+            app/Views/admin/sertifikat_aset.php \
+            app/Views/admin/sertifikat_kelayakan.php \
+            app/Views/siswa/sertifikat.php \
+            app/Views/publik/verifikasi_sertifikat.php \
+            app/Config/Routes.php \
+            app/Services/NavigasiService.php \
+            tests/unit/SertifikatPenerbitanDatabaseTest.php; do
+            php -l "$f"
+          done
+      - name: PHPUnit sertifikat aset, PDF, QR dan histori
+        run: vendor/bin/phpunit --no-coverage tests/unit/SertifikatPenerbitanDatabaseTest.php
+      - name: PHPUnit A11-1 kelayakan
+        run: vendor/bin/phpunit --no-coverage tests/unit/KelayakanSertifikatDatabaseTest.php
