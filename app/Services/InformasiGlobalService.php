@@ -207,6 +207,9 @@ final class InformasiGlobalService
                 if ($sebelum['status'] === 'arsip') {
                     throw new DomainException('Arsip tidak dapat disunting atau diterbitkan kembali.');
                 }
+                if ($sebelum['status'] === 'terbit' && $isian['status'] !== 'terbit') {
+                    throw new DomainException('Pengumuman/FAQ terbit tidak dapat kembali menjadi draf. Gunakan Arsipkan.');
+                }
                 $versi = filter_var($input['versi'] ?? null, FILTER_VALIDATE_INT);
                 if ($versi === false || (int) $versi !== (int) $sebelum['versi']) {
                     throw new DomainException('Informasi berubah di tab lain. Muat ulang sebelum menyimpan.');
