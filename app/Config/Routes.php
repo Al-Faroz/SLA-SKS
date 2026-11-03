@@ -23,7 +23,7 @@ $routes->get('admin/foto-profil', 'Profil::tinjauFoto', ['filter' => 'auth:admin
 $routes->post('admin/foto-profil/(:num)/setujui', 'Profil::setujuiFoto/$1', ['filter' => 'auth:admin']);
 $routes->post('peran/ganti', 'Akun::prosesGantiPeran', ['filter' => 'auth']);
 
-$routes->get('siswa', 'Akun::berandaSiswa', ['filter' => 'auth:siswa']);
+$routes->get('siswa', 'SiswaDashboard::index', ['filter' => 'auth:siswa']);
 $routes->get('siswa/pembelajaran', 'SiswaPembelajaran::mapel', ['filter' => 'auth:siswa']);
 $routes->get('siswa/laporan', 'SiswaLaporan::index', ['filter' => 'auth:siswa']);
 $routes->get('siswa/sertifikat', 'SiswaSertifikat::index', ['filter' => 'auth:siswa']);

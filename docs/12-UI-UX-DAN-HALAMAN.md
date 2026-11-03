@@ -360,3 +360,12 @@ Pratinjau PDF di Admin memakai **data dummy** (dua BAB, empat TP), bukan siswa s
 - Card aksi Guru mempunyai tautan nyata ke **Antrean Penilaian**, **Permintaan Akses Ulang**, **Peta ATP**, dan **Pra-Semester**. Tabel Semester memecah semua indikator per paket, tombol Buka Semester berizin G1.
 - Tidak mengklaim satu Materi aktif berarti media/kesiapan final sudah lengkap; langkah itu tetap diuji melalui Pemeriksaan Kesiapan TP. Tidak menggabungkan nilai TP dan Pra-Semester serta tidak menghitung nilai akhir semester.
 - Kondisi tidak ada penugasan, tidak ada paket pada semester filter, filter invalid, dan role ditolak mempunyai pesan khusus. Kartu dan tabel responsif Dark/Light, HP scroll tabel, fokus keyboard. Tidak ada angka dummy pada aplikasi.
+
+### A12-3 — Beranda Siswa berbasis progres akademik nyata (3 November 2026)
+
+- GET `/siswa` menggantikan halaman status akun dengan **Dashboard Pembelajaran Saya**, menggunakan satu tombol utama yang mengarah ke TP terbuka berikutnya (atau semester/pembelajaran jika TP masih menunggu Guru). Tidak ada tombol Mulai Ujian palsu.
+- Hero menampilkan Gen dan **semester mulai**, tidak mengarang kalender semester berjalan. KPI mapel yang ditugaskan, jumlah semester yang sudah boleh diakses, TP tuntas sah/target, nilai TP Final, TP memerlukan bantuan dan sertifikat berlaku. Skor Final 0 tidak boleh disulap menjadi belum ada.
+- Daftar paket yang dapat dibuka saja, dengan progres **bersegmen** jika jumlah TP wajib ≤12 atau native progress bila lebih besar, status teks, rasio jumlah dan aksi berizin. Esensial tidak dihitung. Paket 0 TP wajib tidak dianggap 100%; tampilkan pesan jelas.
+- Link Laporan Akademik dan Sertifikat ditempatkan terpisah. Pra-Semester sebagai checkpoint di laporan, tanpa kontribusi pada nilai TP, sertifikat atau rata-rata akhir semester.
+- Dark/Light, HP 360/390/768/1100px, Mode Dokumentasi dan keyboard: KPI 5/3/2/1 kolom, paket dua kolom/HP satu kolom, alt teks jumlah progres untuk pembaca layar, fokus tombol jelas. Data belum ada, semesternya terkunci, semua TP selesai, role salah, dan server gagal mempunyai keluaran yang jujur.
+- Rak lencana resmi S11 belum diaktifkan di A12-3 karena belum ada mekanisme penetapan lencana yang disetujui dan dilengkapi data; tidak menggunakan placeholder seolah-olah lencana benar-benar diterbitkan. Pencapaian yang ditampilkan adalah **angka akademik sah**, bukan poin/ranking fiktif.

@@ -1,0 +1,49 @@
+name: QA A12-3 Dashboard Siswa
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/DashboardSiswaService.php'
+      - 'app/Controllers/SiswaDashboard.php'
+      - 'app/Views/siswa/dashboard.php'
+      - 'app/Config/Routes.php'
+      - 'tests/unit/DashboardSiswaDatabaseTest.php'
+      - 'docs/CHECKPOINT-A12-3-DASHBOARD-SISWA-2026-11-03.md'
+      - 'docs/06-ALUR-PEMBELAJARAN.md'
+      - 'docs/12-UI-UX-DAN-HALAMAN.md'
+      - '.github/workflows/qa-a12-3-dashboard-siswa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan writable
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          for f in \
+            app/Services/DashboardSiswaService.php \
+            app/Controllers/SiswaDashboard.php \
+            app/Views/siswa/dashboard.php \
+            app/Config/Routes.php \
+            tests/unit/DashboardSiswaDatabaseTest.php; do
+            php -l "$f"
+          done
+      - name: PHPUnit dashboard Siswa dan akses katalog
+        run: vendor/bin/phpunit --no-coverage tests/unit/DashboardSiswaDatabaseTest.php
+      - name: PHPUnit katalog gerbang semester resmi
+        run: vendor/bin/phpunit --no-coverage tests/unit/KatalogPembelajaranSiswaDatabaseTest.php
+      - name: PHPUnit laporan siswa dan nilai sah
+        run: vendor/bin/phpunit --no-coverage tests/unit/LaporanAkademikDatabaseTest.php

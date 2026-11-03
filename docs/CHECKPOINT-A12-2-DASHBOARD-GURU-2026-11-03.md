@@ -36,3 +36,7 @@ Sumber skema dari dump privat terakhir yang diterima di percakapan proyek `sla_s
 6. Tidak perlu impor SQL atau mengubah nilai dummy/hasil sertifikat yang telah terbit.
 
 **Status:** implementasi + unit/regresi PASS awal; menunggu hasil browser dan angka XAMPP pemilik. Setelah dinyatakan FIX, lanjut A12-3 Dashboard Siswa/Admin secara bertahap, kemudian notifikasi/pengumuman/FAQ dan E2E akhir.
+
+## Penerimaan pengguna di XAMPP (3 November 2026)
+
+Pemilik mengirim tangkapan layar beranda Guru setelah pull branch A12-2 dan meminta dilanjutkan apabila sesuai. Pemeriksaan visual: filter Gen–Mapel dan semester, KPI, tabel per semester, serta aksi Guru terbaca dan tertata pada Emerald Glass. Angka konsisten: **1 paket aktif, 6 TP (1 Siap + 5 Draf), 5 TP Materi perlu diperiksa, antrean 4 (2 Resume + 2 HOTS), bantuan 0, ujian mandiri berjalan 0**. Makna 'Materi perlu diperiksa' adalah TP dengan jumlah Materi aktif tidak tepat satu, bukan diagnosis seluruh kesiapan media. Pengujian otomatis A12-2 sebelumnya PASS; berdasarkan penerimaan UI ini **A12-2 dinyatakan FIX**, tanpa mengklaim inspeksi ulang database langsung atau semua breakpoint browser.

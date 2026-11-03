@@ -155,3 +155,11 @@ Service: `SertifikatAsetService`, `SertifikatPdfService`, `SertifikatPenerbitanS
 ### A12-1 — Beranda KPI Pimpinan baca-saja (3 November 2026)
 
 `GET /pimpinan` diarahkan ke `PimpinanDashboard::index` dengan `auth:pimpinan` dan validasi tambahan `DashboardPimpinanService`. Filter opsional `gen`, `mapel`, `semester`, `halaman` divalidasi server. Pilihan paket memakai `LaporanAkademikService::paketPimpinan()`, sehingga paket nonaktif dan tidak ditugaskan tidak ikut. KPI agregat memakai pemisahan **target pasangan siswa×TP** (berdasarkan semester mulai) dan **TP tuntas sah** (status tuntas + Sumatif selesai sah), lalu nilai Final dihitung terpisah tanpa menafsirkan 0 sebagai NULL. Sertifikat dihitung dari pointer `sertifikat_aktif` yang status versinya berlaku. Antrean Guru adalah `resume_materi` / `jawaban_hots_materi` berstatus final dan nilai NULL, bukan draft. Semua hanya SELECT, tanpa transaksi mutasi, tanpa pengambilan nama/NISN siswa.
+
+### A12-3 — Endpoint Dashboard Siswa dan kontrak data (3 November 2026)
+
+`GET /siswa` diarahkan ke `SiswaDashboard::index` dengan `auth:siswa`. `DashboardSiswaService` memeriksa role aktif dan status lalu menggunakan `KatalogPembelajaranSiswaService::daftarMapel()/daftarSemester()/daftarTp()` sebagai satu-satunya sumber paket dan tautan TP yang **boleh dibuka**. Tidak ada parameter `siswa_id` atau `paket_id` dari GET untuk penentuan hak akses.
+
+Agregasi hanya `SELECT` terhadap TP NonEsensial nonarsip, `progres_tp` milik siswa yang diautentikasi, percobaan Sumatif `selesai_sah` (setidaknya satu), dan `nilai_tp` Final non-NULL; sertifikat dihitung hanya dari `sertifikat_aktif` berstatus `berlaku`. Nilai 0 valid. Paket tidak memiliki TP wajib menghasilkan progres null, bukan 100%. Link lanjut belajar hanya berasal dari `akses.buka` katalog. Nama siswa/NISN, kunci ujian, token, dan jawaban tidak masuk DTO dashboard. HTTP no-store; tidak menulis progres, nilai, ujian, atau sertifikat.
+
+Pra-Semester tetap di `/siswa/laporan`, terpisah dari kemajuan TP dan sertifikat. Tidak menambahkan API baru untuk lencana atau pengumuman pada A12-3.

@@ -2529,3 +2529,89 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-dashboard-guru__actions .a-btn {flex:1;text-align:center;}
     .a-dashboard-guru__filter-actions .a-btn {flex:1;text-align:center;}
 }
+
+/* A12-3 — Dashboard Pembelajaran Siswa, native progress dan lencana status. */
+.a-dashboard-siswa__hero {
+    display:grid;grid-template-columns:minmax(0,2fr) minmax(210px,1fr);
+    gap:22px;align-items:center;
+    background:linear-gradient(135deg,rgba(24,135,96,.12),transparent 66%);
+}
+.a-dashboard-siswa__hero h2 {margin:.4rem 0;}
+.a-dashboard-siswa__hero p {max-width:680px;}
+.a-dashboard-siswa__hero .a-btn {margin-top:10px;display:inline-flex;}
+.a-dashboard-siswa__hero-stats {
+    min-width:0;padding:18px;
+    border:1px solid var(--a-border,rgba(100,176,140,.35));
+    border-radius:14px;display:flex;flex-direction:column;gap:10px;
+}
+.a-dashboard-siswa__hero-stats > span {font-size:.9rem;opacity:.85;}
+.a-dashboard-siswa__hero-stats > strong {
+    font-size:clamp(1.5rem,3vw,2.3rem);
+    font-variant-numeric:tabular-nums;line-height:1.1;
+}
+.a-dashboard-siswa__hero-stats > small {font-size:.8rem;opacity:.8;line-height:1.45;}
+.a-dashboard-siswa__metrics {
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;
+}
+.a-dashboard-siswa__metric {
+    min-width:0;display:flex;flex-direction:column;gap:8px;
+}
+.a-dashboard-siswa__metric > span {opacity:.82;font-size:.88rem;}
+.a-dashboard-siswa__metric > strong {
+    font-size:clamp(1.55rem,2.7vw,2.1rem);
+    font-variant-numeric:tabular-nums;
+}
+.a-dashboard-siswa__metric > small {opacity:.79;font-size:.78rem;line-height:1.45;}
+.a-dashboard-siswa__paket-grid {
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;margin-top:15px;
+}
+.a-dashboard-siswa__paket {
+    min-width:0;padding:18px;display:flex;flex-direction:column;
+    border:1px solid var(--a-border,rgba(100,176,140,.35));
+    border-radius:14px;gap:10px;
+    background:rgba(78,160,130,.04);
+}
+.a-dashboard-siswa__paket-head {display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;}
+.a-dashboard-siswa__status {font-size:.77rem;opacity:.83;line-height:1.5;}
+.a-dashboard-siswa__paket h3 {font-size:1.1rem;margin:0;}
+.a-dashboard-siswa__count {display:flex;align-items:baseline;gap:9px;margin:4px 0;}
+.a-dashboard-siswa__count strong {font-size:1.7rem;font-variant-numeric:tabular-nums;}
+.a-dashboard-siswa__count span {font-size:.83rem;opacity:.85;}
+.a-dashboard-siswa__segments {display:flex;gap:5px;width:100%;min-height:12px;}
+.a-dashboard-siswa__segment {
+    flex:1;min-width:0;border-radius:5px;
+    background:rgba(127,155,144,.3);
+    border:1px solid rgba(110,145,132,.35);
+}
+.a-dashboard-siswa__segment--selesai {
+    background:#4fb994;border-color:#3da583;
+}
+.a-dashboard-siswa__progress {
+    display:block;width:100%;height:13px;accent-color:#4fb994;
+}
+.a-dashboard-siswa__paket > .a-btn {align-self:flex-start;margin-top:auto;}
+.a-dashboard-siswa__links {
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:15px;margin-top:12px;
+}
+.a-dashboard-siswa__links > div {
+    min-width:0;padding:15px;border-radius:12px;
+    border:1px solid var(--a-border,rgba(100,176,140,.35));
+}
+.a-dashboard-siswa__links h3 {font-size:1.05rem;margin-top:0;}
+@media(max-width:1150px) {
+    .a-dashboard-siswa__metrics {grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media(max-width:810px) {
+    .a-dashboard-siswa__hero {grid-template-columns:1fr;}
+    .a-dashboard-siswa__metrics {grid-template-columns:repeat(2,minmax(0,1fr));}
+    .a-dashboard-siswa__paket-grid,.a-dashboard-siswa__links {grid-template-columns:1fr;}
+}
+@media(max-width:480px) {
+    .a-dashboard-siswa__metrics {grid-template-columns:1fr;}
+    .a-dashboard-siswa__paket > .a-btn {align-self:stretch;text-align:center;justify-content:center;}
+}
+@media(prefers-reduced-motion:reduce) {
+    .a-dashboard-siswa__segment,.a-dashboard-siswa__progress {transition:none!important;animation:none!important;}
+}
