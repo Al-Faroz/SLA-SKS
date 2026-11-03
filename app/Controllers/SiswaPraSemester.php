@@ -106,4 +106,22 @@ final class SiswaPraSemester extends BaseController
             $paketId,$token,$aksi,$this->request->getPost('fullscreen') === 'ya'
         ));
     }
+    /** Media DOCX privat: cek token + siswa + snapshot, tanpa membuka kunci soal. */
+    public function gambarWord(int $paketId,string $token,string $sourceId,string $rid): ResponseInterface
+    {
+        try {
+            $image=$this->engine()->gambarWord($paketId,$token,$sourceId,$rid);
+            return $this->response->setHeader('Content-Type',$image['mime'])
+                ->setHeader('Cache-Control','private, no-store')
+                ->setHeader('X-Content-Type-Options','nosniff')
+                ->setHeader('Referrer-Policy','no-referrer')
+                ->setBody($image['data']);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(404)->setBody('Gambar tidak tersedia.');
+        } catch (Throwable $e) {
+            log_message('error','Media Word Pra-Semester: {error}',['error'=>$e->getMessage()]);
+            return $this->response->setStatusCode(404)->setBody('Gambar tidak tersedia.');
+        }
+    }
+
 }
