@@ -89,11 +89,12 @@ final class AdminPraSemester extends BaseController
     {
         $url=site_url('admin/pra-semester/'.$paketId);
         try {
-            $jenis=$this->request->getPost('jenis');
-            $tahap=$this->request->getPost('tahap');
-            if (!is_string($jenis) || !is_string($tahap)) {
-                throw new DomainException('Jenis dan tahap jadwal wajib dipilih.');
+            $tipe=$this->request->getPost('sesi_tipe');
+            if (!is_string($tipe) || !in_array($tipe,
+                ['remedial/remedial','susulan/normal','susulan/remedial'],true)) {
+                throw new DomainException('Pilih jenis ujian remedial atau susulan yang sah.');
             }
+            [$jenis,$tahap]=explode('/',$tipe,2);
             (new PraSemesterSesiService())->buat($paketId,$jenis,$tahap,
                 $this->request->getPost('mulai'),$this->request->getPost('akhir'),
                 $this->request->getPost('durasi'));
