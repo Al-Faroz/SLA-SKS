@@ -65,7 +65,8 @@ final class PratinjauWordSoalService
                     || (int) ($id['tp_id'] ?? 0) !== $tpId || (int) ($id['guru_id'] ?? 0) !== $guruId
                     || (int) ($id['paket_id'] ?? 0) !== $paketId
                     || (int) ($id['struktur_versi'] ?? 0) !== $versi
-                    || ($id['jenis'] ?? '') !== $jenis || (int) ($id['jumlah'] ?? 0) !== $n) {
+                    || ($id['jenis'] ?? '') !== $jenis || (int) ($id['jumlah'] ?? 0) !== $n
+                    || ($pra && (array)($id['bab_nomor'] ?? []) !== array_keys($babNomorKeId))) {
                     throw new DomainException('Identitas TP atau jumlah soal pada Word tidak cocok.');
                 }
                 $identitasDiperiksa = 'tanda_tangan';
@@ -73,7 +74,7 @@ final class PratinjauWordSoalService
                 // Microsoft Word dapat membuang customXml yang tak diregistrasikan oleh generator lama.
                 // Jangan menghukum Guru atas Save biasa: otorisasi TP/Guru sudah dicek dari server,
                 // dan kita pastikan judul + kode TP dalam bagian identitas dokumen sesuai halaman.
-                if ($kodeTp === null || trim($kodeTp) === '') {
+                if (!$pra && ($kodeTp === null || trim($kodeTp) === '')) {
                     throw new DomainException('Identitas TP belum dapat diperiksa oleh server.');
                 }
                 $namaUjianBenar = false;
@@ -85,10 +86,10 @@ final class PratinjauWordSoalService
                         if ($teks === null) {
                             continue;
                         }
-                        if (str_contains(mb_strtoupper($teks), 'BANK SOAL ' . strtoupper($jenis))) {
+                        if (str_contains(mb_strtoupper($teks), 'BANK SOAL ' . ($pra ? 'PRA-SEMESTER' : strtoupper($jenis)))) {
                             $namaUjianBenar = true;
                         }
-                        if (preg_match('/^TP\\s*:\\s*' . preg_quote($kodeTp, '/') . '(?:\\s|—|-|$)/iu', $teks)) {
+                        if ($pra ? (bool)preg_match('/^Paket\\s*:\\s*PRA-' . $paketId . '(?:\\s|$)/iu', $teks) : (bool)preg_match('/^TP\\s*:\\s*' . preg_quote((string)$kodeTp, '/') . '(?:\\s|—|-|$)/iu', $teks)) {
                             $kodeTpBenar = true;
                         }
                     }
