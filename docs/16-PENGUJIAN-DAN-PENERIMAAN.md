@@ -435,3 +435,17 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 
 **Dasar keputusan:** Pra-Semester berfungsi sebagai checkpoint sebelum Ujian Semester yang sesungguhnya, bukan gate sertifikat atau nilai tercetak. Tidak menginstruksikan pembuatan modul Ujian Semester baru. Tes sertifikat ini merupakan **kriteria penerimaan mendatang**, bukan klaim bahwa implementasi PDF/QR telah tersedia di branch A9 atau XAMPP.
 
+### A10-1 — Pengujian Laporan Akademik dan Monitoring Pimpinan (3 November 2026)
+
+| ID | Kondisi | Hasil yang wajib |
+|---|---|---|
+| A10-001 | Siswa melihat daftar laporan | Hanya paket Mapel–Semester aktif, ditugaskan, dan telah terbuka menurut katalog; semester berikutnya tetap terkunci |
+| A10-002 | Siswa mengubah id paket/identitas siswa atau membuka laporan Gen lain | Ditolak server; rute siswa tidak menerima `siswa_id`, tidak mengungkap data siswa lain |
+| A10-003 | Pimpinan memilih Gen–Mapel–Semester dan halaman siswa berikutnya | Total siswa dan pagination benar, progres berdasarkan TP NonEsensial+Sumatif selesai sah, tanpa duplikasi akibat join ujian |
+| A10-004 | TP Esensial, TP berstatus tuntas tanpa Sumatif sah, semester dilewati atau tanpa TP wajib | Esensial tanpa skor; tuntas tanpa Sumatif tidak dihitung; dilewati dan tanpa TP tidak otomatis 100% |
+| A10-005 | Nilai 0 dan remedial sah | 0,00 tetap angka; Sumatif normal/remedial tampil terpisah; nilai TP tersimpan tidak dihitung ulang |
+| A10-006 | Pra-Semester belum diikuti/batal/normal+remedial sah | NULL tetap kosong, hasil sah ditampilkan terpisah, tidak ada Nilai Akhir Semester dan tidak menunda sertifikat |
+| A10-007 | Akun Guru/Admin, Pimpinan pratinjau siswa Gen yang tidak sesuai, akses tanpa role benar | Ditolak; GET-only; tidak menyimpan perubahan nilai, progres atau histori |
+| A10-008 | Browser desktop, laptop, HP Dark/Light dan Mode Dokumentasi | Daftar, progress bar, tabel horizontal, pesan kosong dan navigasi terbaca pada 360/390/768/1100px |
+
+Integrasi otomatis A10 memakai **SQLite sintetis** di `tests/unit/LaporanAkademikDatabaseTest.php` dan PHP lint; pengujian browser XAMPP tetap wajib sebelum status FIX. Dump privat tidak diunggah ke repo.

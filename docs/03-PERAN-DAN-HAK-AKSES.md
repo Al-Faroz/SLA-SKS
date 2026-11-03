@@ -88,3 +88,9 @@ Seluruh layanan menegakkan Gen–Mapel dan peran aktif di Controller **dan Servi
 - **Admin:** jadwalkan jendela **mulai** dan durasi tiap Gen–Mapel–Semester secara terpisah; jadwalkan remedial dan satu atau lebih susulan, tetapkan peserta susulan yang dibatalkan/tidak hadir, audit perubahan. Tidak membuat/mengoreksi nilai atau bank soal Guru.
 - **Siswa:** hanya dapat memulai ketika jendela Admin untuk tahap/identitasnya berlangsung dan seluruh TP NonEsensial paket selesai; setelah mulai memiliki durasi pengerjaan individual. Siswa yang dibatalkan tidak dapat memulai lagi tanpa masuk jadwal susulan Admin. **Pimpinan:** hanya baca hasil.
 - Rumusan historis "Guru menangani pembatalan Pra-Semester" berarti **melihat/memonitor insiden**, bukan memberi izin ulang yang menggantikan jadwal Admin.
+
+### A10-1 — Hak akses laporan akademik (3 November 2026)
+
+- **Siswa:** membuka `GET /siswa/laporan` dan `GET /siswa/laporan/{paketId}`, hanya untuk `siswa_id` milik akun login dan semester yang sudah boleh dibuka menurut katalog. Tidak menerima ID siswa dari URL, tidak menulis progres/nilai, dan tidak memberi akses ke materi/ujian di luar alur pembelajaran.
+- **Pimpinan:** membuka `GET /pimpinan/laporan` untuk memilih Gen–Mapel–Semester ditugaskan, daftar siswa dan progres baca-saja; `GET /pimpinan/laporan/{paketId}/siswa/{siswaId}` adalah pratinjau laporan, dengan verifikasi Gen siswa sama dengan Gen paket. Pimpinan tidak berhak mengubah skor, memperpanjang ujian atau melakukan POST penilaian.
+- Nilai yang ditampilkan TP dan Pra-Semester berdiri sendiri. Halaman laporan tidak menjadi jalan memintas hak Guru G1, identitas siswa lain, atau syarat sertifikat. Server menolak perubahan peran aktif atau pemalsuan id.

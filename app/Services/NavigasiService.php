@@ -16,6 +16,8 @@ final class NavigasiService
         if ($peran === 'siswa') {
             $menu[] = ['label' => 'Pembelajaran', 'path' => 'siswa/pembelajaran',
                 'aktif' => $aktif === 'pembelajaran'];
+            $menu[] = ['label' => 'Laporan Akademik', 'path' => 'siswa/laporan',
+                'aktif' => $aktif === 'laporan'];
         }
         if ($peran === 'guru') {
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
@@ -52,6 +54,10 @@ final class NavigasiService
             }
         }
 
+        if ($peran === 'pimpinan') {
+            $menu[] = ['label' => 'Monitoring Akademik', 'path' => 'pimpinan/laporan',
+                'aktif' => $aktif === 'laporan'];
+        }
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
 
         return $menu;

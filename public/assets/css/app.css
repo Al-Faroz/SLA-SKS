@@ -2138,3 +2138,158 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-rekap-page .a-rekap-switch__link { text-align:center;padding:8px; }
     .a-rekap-page .a-rekap-scroll-hint { margin-top:10px; }
 }
+
+/* A10-1 — Laporan Akademik Siswa dan Monitoring Pimpinan, scoped. */
+.a-laporan .a-laporan__daftar {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(225px,1fr));
+    gap:16px;
+    margin-top:16px;
+}
+.a-laporan .a-laporan__pilihan,
+.a-laporan .a-laporan__metrik {
+    border:1px solid var(--a-garis,rgba(130,195,166,.25));
+    border-radius:14px;
+    padding:17px;
+    background:var(--a-latar,rgba(24,81,66,.24));
+}
+.a-laporan .a-laporan__pilihan {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+}
+.a-laporan .a-laporan__pilihan h3,
+.a-laporan .a-laporan__pilihan p {
+    margin:0;
+}
+.a-laporan .a-laporan__pilihan .a-btn { margin-top:auto; }
+.a-laporan .a-laporan__filter {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:end;
+    gap:12px;
+}
+.a-laporan .a-laporan__filter .a-field {
+    flex:1 1 360px;
+    max-width:680px;
+    min-width:0;
+}
+.a-laporan .a-laporan__ringkasan {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+    margin:16px 0;
+}
+.a-laporan .a-laporan__metrik {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-width:0;
+    overflow-wrap:anywhere;
+}
+.a-laporan .a-laporan__metrik :is(span,dt) {
+    color:var(--a-redup,inherit);
+    font-size:13px;
+    line-height:1.4;
+}
+.a-laporan .a-laporan__metrik :is(strong,dd) {
+    margin:0;
+    font-size:clamp(23px,2.4vw,30px);
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+}
+.a-laporan .a-laporan__scroll {
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    border-radius:12px;
+    scrollbar-width:thin;
+    overscroll-behavior-x:contain;
+}
+.a-laporan .a-laporan__tabel {
+    width:100%;
+    min-width:710px;
+    border-collapse:separate;
+    border-spacing:0;
+}
+.a-laporan .a-laporan__tabel--detail {
+    min-width:1560px;
+    table-layout:fixed;
+}
+.a-laporan .a-laporan__tabel--detail th:first-child {
+    width:260px;
+}
+.a-laporan .a-laporan__tabel--detail :is(th,td) {
+    vertical-align:middle;
+    line-height:1.5;
+}
+.a-laporan .a-laporan__tabel--detail thead th {
+    font-size:12px;
+    white-space:normal;
+}
+.a-laporan .a-laporan__identitas-tp :is(small,strong,span) {
+    display:block;
+    overflow-wrap:break-word;
+    line-height:1.5;
+    font-size:12px;
+}
+.a-laporan .a-laporan__identitas-tp small {
+    opacity:.78;
+    font-size:11px;
+}
+.a-laporan .a-laporan__angka {
+    text-align:center;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+}
+.a-laporan .a-laporan__hint {
+    font-size:12px;
+    opacity:.8;
+    margin:10px 0 8px;
+}
+.a-laporan .a-laporan__progres {
+    display:flex;
+    align-items:center;
+    gap:11px;
+    min-width:150px;
+}
+.a-laporan .a-laporan__progres progress {
+    display:block;
+    width:100%;
+    height:11px;
+    accent-color:#38BC91;
+}
+.a-laporan .a-laporan__progres strong {
+    white-space:nowrap;
+    min-width:54px;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+}
+.a-laporan .a-laporan__progres--besar { max-width:520px; }
+.a-laporan .a-laporan__status {
+    margin-bottom:0;
+    font-size:14px;
+}
+.a-laporan .a-laporan__scroll:focus-visible {
+    outline:3px solid #51DDAC;
+    outline-offset:3px;
+}
+@media (max-width:1050px) {
+    .a-laporan .a-laporan__ringkasan {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+@media (max-width:600px) {
+    .a-laporan .a-laporan__ringkasan {
+        grid-template-columns:minmax(0,1fr);
+    }
+    .a-laporan .a-laporan__filter .a-field,
+    .a-laporan .a-laporan__filter .a-btn {
+        width:100%;
+        flex-basis:100%;
+    }
+    .a-laporan .a-laporan__daftar {
+        grid-template-columns:minmax(0,1fr);
+    }
+}

@@ -483,3 +483,10 @@ Layout panel `app/Views/layouts/panel.php` **wajib memberi versi pada URL** `pub
 - Filter `a-penilaian-filter` empat kolom adaptif dan `a-filter-rekap-grid--dua` untuk Pra-Semester. Form nilai `a-penilaian-form-grid` memberi kolom lebar untuk umpan balik.
 - Selector `html[data-documentation="on"]` mengubah submenu `a-side__submenu` menjadi menu popover terikat `a-side__group`, tersembunyi ketika tidak dihover/difokuskan, tidak menambah baris navigasi dan tetap bisa diakses dengan keyboard.
 - Kedua kartu detail Penilaian yang menggunakan `a-penilaian-petunjuk` dan `a-card--jawaban-siswa` harus tetap memiliki latar berbeda **meski Mode Dokumentasi menghilangkan efek kaca**. Semua CSS bersifat scoped ke halaman Guru.
+
+### A10-1 — Tampilan laporan akademik dengan Emerald Glass (3 November 2026)
+
+- Gunakan scope `a-laporan`, kartu `a-laporan__pilihan` dan `a-laporan__metrik` dengan token `--eg-pane-soft` dan `--eg-line`, default Dark dan kompatibel Light.
+- Metrik `a-laporan__ringkasan` grid **4/2/1** kolom untuk desktop/tablet/HP; progress HTML native memiliki label numerik dan bukan grafik yang disimpulkan dari nilai rata-rata.
+- Tabel akademik menggunakan `a-tbl` + `a-tabel-gulir` dan `a-laporan__scroll`; detail 12 kolom minimum 1560px digulir horizontal, monitoring minimum 710px. Fokus keyboard terlihat.
+- Kartu Pra-Semester dibuat berbeda agar nilai mandiri tidak terbaca sebagai komponen TP atau Nilai Akhir Semester. Gunakan teks status disertai label, jangan warna saja.
