@@ -2086,3 +2086,178 @@ html[data-theme] .a-app--prototipe .a-side__group-trigger {
 html[data-theme] .a-app--prototipe.a-app--is-collapsed .a-side__submenu {
     display:none;
 }
+
+/* A9-2 — Koreksi visual dari QA screenshot Rekap dan Penilaian Guru.
+   Tabel sebelumnya memakai .a-table (tidak mendapat token .a-tbl). */
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-switch__link {
+  background:var(--eg-pane-soft);
+  color:var(--e-text);
+  border-color:var(--eg-line);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-switch__link.is-aktif {
+  background:var(--eg-cta-gradient);
+  border-color:var(--eg-cta-border);
+  color:#FFF;
+  box-shadow:var(--eg-cta-shadow);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-switch__link:hover:not(.is-aktif) {
+  background:var(--e-soft-hover);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik__item {
+  background:var(--eg-pane-soft);
+  border-color:var(--eg-line);
+  box-shadow:inset 0 1px 0 var(--eg-sheen);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik dt {
+  color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik dd {
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik__item--final {
+  border-color:rgba(76,213,155,.48);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik__item--final dd {
+  color:var(--eg-state-positive,#6AEFC2);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik__item--sementara {
+  border-color:rgba(230,188,88,.45);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-metrik__item--sementara dd {
+  color:var(--eg-state-caution,#FFD166);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-table__kosong,
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-table__meta,
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-table__nama-tp {
+  color:var(--e-muted);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-scroll {
+  border-color:var(--eg-line);
+  background:var(--eg-table);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-status {
+  color:var(--e-text);
+  background:var(--eg-pane-soft);
+  border-color:var(--eg-line);
+}
+html[data-theme="dark"] .a-app--prototipe .a-rekap-status--final {
+  color:#A2F5CE;
+  background:rgba(20,122,81,.27);
+  border-color:rgba(80,222,172,.48);
+}
+html[data-theme="dark"] .a-app--prototipe .a-rekap-status--sementara {
+  color:#FFE4A3;
+  background:rgba(147,101,26,.24);
+  border-color:rgba(240,190,102,.40);
+}
+html[data-theme="light"] .a-app--prototipe .a-rekap-status--final {
+  color:#126145;
+  background:#E2F5E9;
+  border-color:#87C9A3;
+}
+html[data-theme="light"] .a-app--prototipe .a-rekap-status--sementara {
+  color:#865615;
+  background:#FFF1D5;
+  border-color:#C9A66C;
+}
+/* Petunjuk & jawaban harus jelas beda WARNA sekalipun
+   Mode Dokumentasi menonaktifkan kaca pada semua kartu. */
+html[data-theme="dark"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk,
+html[data-theme="dark"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk {
+  background:linear-gradient(130deg,#104C3B,#11392F);
+  border-color:rgba(83,222,177,.56);
+  box-shadow:inset 4px 0 0 #43D6A1,0 8px 24px rgba(0,0,0,.09);
+}
+html[data-theme="dark"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa,
+html[data-theme="dark"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa {
+  background:linear-gradient(130deg,#2A315C,#1B3951);
+  border-color:rgba(169,159,241,.51);
+  box-shadow:inset 4px 0 0 #AB9BFF,0 8px 24px rgba(0,0,0,.09);
+}
+html[data-theme="light"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk,
+html[data-theme="light"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk {
+  background:linear-gradient(140deg,#E4F6EC,#E6F1F7);
+  border-color:#86C9AF;
+  box-shadow:inset 4px 0 0 #208B65;
+}
+html[data-theme="light"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa,
+html[data-theme="light"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa {
+  background:linear-gradient(140deg,#EDE9FA,#E8F1FA);
+  border-color:#B5ACDF;
+  box-shadow:inset 4px 0 0 #7061AE;
+}
+html[data-theme] .a-app--prototipe .a-penilaian-page .a-penilaian-bagian__heading {
+  gap:10px;
+  margin-bottom:10px;
+}
+html[data-theme] .a-app--prototipe .a-penilaian-page .a-penilaian-isi {
+  border-color:var(--eg-line);
+  background:var(--eg-pane-soft);
+}
+html[data-theme] .a-app--prototipe .a-penilaian-page .a-penilaian-bagian__heading .a-badge {
+  font-size:11px;
+  letter-spacing:.02em;
+  font-weight:800;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-table :is(th[scope="row"],td) {
+  vertical-align:middle;
+}
+
+/* Dokumentasi full-page mengubah sidebar menjadi menu horizontal.
+   Submenu tidak boleh memperpanjang/menumpuk bar navigasi. */
+@media (min-width:768px) {
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group {
+    position:relative;
+    flex:0 0 auto;
+    min-width:0;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group-trigger {
+    display:inline-flex;
+    width:auto;
+    gap:7px;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu {
+    display:grid;
+    position:absolute;
+    z-index:45;
+    top:calc(100% + 6px);
+    right:0;
+    left:auto;
+    min-width:200px;
+    padding:7px;
+    gap:4px;
+    background:#103D30;
+    border:1px solid rgba(126,231,188,.38);
+    border-radius:12px;
+    box-shadow:0 16px 30px rgba(0,0,0,.25);
+    visibility:hidden;
+    opacity:0;
+    pointer-events:none;
+    transform:translateY(-4px);
+    transition:opacity .15s ease,transform .15s ease;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group[open]:hover .a-side__submenu,
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group[open]:focus-within .a-side__submenu {
+    visibility:visible;
+    opacity:1;
+    pointer-events:auto;
+    transform:none;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu .a-side__subtautan {
+    display:flex;
+    width:100%;
+    min-height:38px;
+    color:#EAF8F0;
+    justify-content:flex-start;
+    padding:8px 10px;
+  }
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu .a-side__teks {
+    display:inline;
+    white-space:nowrap;
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu {
+    transition:none;
+  }
+}
