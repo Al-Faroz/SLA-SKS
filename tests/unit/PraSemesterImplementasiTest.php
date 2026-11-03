@@ -130,7 +130,7 @@ final class PraSemesterImplementasiTest extends TestCase
         self::assertStringContainsString('Simpan Soal',$bankDetail);
         self::assertStringContainsString('Kembali ke daftar',$bankDetail);
         self::assertStringNotContainsString('Pilih Gen dan Semester',$bankDetail);
-        self::assertStringContainsString("?'guru/pra_semester'", $guruCtrl);
+        self::assertStringContainsString("'guru/pra_semester'", $guruCtrl);
         self::assertStringContainsString("'guru/pra_semester_detail'", $guruCtrl);
 
         foreach (['gen','mapel','semester','status'] as $namaFilter) {
