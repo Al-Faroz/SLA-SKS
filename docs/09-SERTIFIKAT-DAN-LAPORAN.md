@@ -39,3 +39,11 @@ Semua tampilan termasuk Pimpinan dibatasi pembacaan yang diizinkan; data nilai a
 
 ## Perlindungan laporan/sertifikat pada penyuntingan akademik (2 November 2026)
 Penyuntingan CP oleh Admin dan isian BAB oleh Guru bukan tindakan menerbitkan/mencabut sertifikat atau menghitung ulang nilai. TP Siap hanya dapat disunting Guru G1 sebelum digunakan siswa; sesudah ada aktivitas siswa, konten TP terkunci. Seluruh riwayat nilai, PDF sertifikat dan QR yang sudah ada tetap dilindungi. Keputusan ini **tidak menambahkan mekanisme koreksi sertifikat baru**.
+
+### A10-1 — Laporan Akademik Siswa dan Monitoring Pimpinan (3 November 2026)
+
+- Siswa memiliki **Daftar Laporan** untuk paket pembelajaran yang sudah terbuka dan **Detail Laporan** sendiri per Mapel–Semester; Pimpinan memiliki **Monitoring** siswa per paket Gen–Mapel–Semester serta pratinjau individual baca-saja.
+- Detail menampilkan seluruh BAB/TP nonarsip menurut ATP. TP Esensial ditampilkan tanpa skor; NonEsensial menampilkan jalur Diagnostik, skor Diagnostik yang sah, Resume/HOTS bila relevan, Sumatif normal/remedial sah, Sumatif terbaik tersimpan, status progres, nilai TP dan status Final/Sementara. Tidak ada kalkulasi atau penyimpanan ulang nilai.
+- **Progres semester** = TP NonEsensial berstatus tuntas **dan** mempunyai Sumatif selesai sah dibagi seluruh TP NonEsensial nonarsip pada paket. Semester sebelum `semester_mulai` ditandai **Dilewati**, bukan 100%; semester tanpa TP NonEsensial tidak otomatis 100%.
+- Panel **Hasil Pra-Semester** mandiri menampilkan KKM, skor normal/remedial sah, nilai terbaik, status; angka `0,00` bukan NULL. Tidak ada Nilai Akhir Semester maupun dependensi sertifikat pada Pra-Semester.
+- A10-1 tidak mengubah peran Guru, penerbitan sertifikat, monitoring tingkat madrasah di dashboard akhir, tabel SQL, ataupun histori siswa. Tes otomatis dan uji browser diperlukan sebelum penerimaan.
