@@ -17,6 +17,23 @@ final class AdminPraSemester extends BaseController
 {
     protected $helpers = ['url','form'];
 
+    private function suffixFilter(): string
+    {
+        try {
+            $f=PraSemesterJadwalService::filterDaftar([
+                'gen'=>$this->request->getGet('gen'),
+                'mapel'=>$this->request->getGet('mapel'),
+                'semester'=>$this->request->getGet('semester'),
+                'status'=>$this->request->getGet('status') ?? '',
+            ]);
+            $query=http_build_query(array_filter($f,
+                static fn(mixed $value): bool => $value !== null && $value !== ''));
+            return $query === '' ? '' : '?'.$query;
+        } catch (DomainException) {
+            return '';
+        }
+    }
+
     public function index(?int $paketId = null): ResponseInterface|string
     {
         try {
@@ -69,13 +86,13 @@ final class AdminPraSemester extends BaseController
 
     public function simpan(int $paketId): RedirectResponse
     {
-        $url=site_url('admin/pra-semester/' . $paketId);
+        $url=site_url('admin/pra-semester/' . $paketId) . $this->suffixFilter();
         try {
             (new PraSemesterJadwalService())->simpan($paketId,
                 $this->request->getPost('mulai'),
                 $this->request->getPost('akhir'),
                 $this->request->getPost('durasi'));
-            return redirect()->to(site_url('admin/pra-semester'))
+            return redirect()->to(site_url('admin/pra-semester') . $this->suffixFilter())
                 ->with('sukses','Jadwal ujian utama dan durasi per peserta berhasil disimpan.');
         } catch (DomainException $e) {
             return redirect()->to($url)->withInput()->with('galat',$e->getMessage());
@@ -87,7 +104,7 @@ final class AdminPraSemester extends BaseController
     }
     public function simpanSesi(int $paketId): RedirectResponse
     {
-        $url=site_url('admin/pra-semester/'.$paketId);
+        $url=site_url('admin/pra-semester/'.$paketId) . $this->suffixFilter();
         try {
             $tipe=$this->request->getPost('sesi_tipe');
             if (!is_string($tipe) || !in_array($tipe,
@@ -110,7 +127,9 @@ final class AdminPraSemester extends BaseController
 
     public function tambahPeserta(int $paketId, int $sesiId): RedirectResponse
     {
-        $url=site_url('admin/pra-semester/'.$paketId).'?sesi='.$sesiId;
+        $base=site_url('admin/pra-semester/'.$paketId);
+        $suffix=$this->suffixFilter();
+        $url=$base.'?sesi='.$sesiId.($suffix === '' ? '' : '&'.substr($suffix,1));
         try {
             $ids=$this->request->getPost('siswa_id');
             if (!is_array($ids)) throw new DomainException('Pilih peserta susulan yang sah.');
