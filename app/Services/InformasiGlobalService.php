@@ -107,6 +107,9 @@ final class InformasiGlobalService
             && (int) $row['dibuat_oleh'] !== (int) $akun['id'])) {
             throw new DomainException('Informasi tidak ditemukan atau tidak dapat Anda kelola.');
         }
+        if ($row['status'] === 'arsip') {
+            throw new DomainException('Informasi sudah diarsipkan dan tidak dapat disunting.');
+        }
         return $row;
     }
 
