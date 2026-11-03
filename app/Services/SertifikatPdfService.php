@@ -83,13 +83,23 @@ final class SertifikatPdfService
         $identitas=static fn (string $key): string => self::teks($sekolah[$key]??'');
         $rows='';
         $babLama=null;
+        $jumlahBab=0;
+        $jumlahTp=0;
+        $panjangNamaTp=0;
         foreach ($tp as $item) {
             if (!is_array($item)) continue;
+            $jumlahTp++;
+            $panjangNamaTp=max(
+                $panjangNamaTp,
+                mb_strlen((string)($item['nama_tp']??''))
+            );
             $nomor=(string)($item['nomor_bab']??'');
             if ($babLama!==$nomor) {
-                $rows.='<tr class="bab"><td colspan="4">BAB '
-                    .self::teks($nomor).' — '.self::teks($item['nama_bab']??'')
-                    .'</td></tr>';
+                $jumlahBab++;
+                $rows.='<tr class="bab-row"><td colspan="4">'
+                    .'<span class="bab-label">BAB '.self::teks($nomor).'</span>'
+                    .' <span class="bab-nama">— '
+                    .self::teks($item['nama_bab']??'').'</span></td></tr>';
                 $babLama=$nomor;
             }
             $esensial=($item['jenis_tp']??'')==='esensial';
@@ -97,68 +107,203 @@ final class SertifikatPdfService
                 ($item['nilai_tp']??null)===null ? '—'
                     : number_format((float)$item['nilai_tp'],2,',','.')
             );
-            $rows.='<tr><td>'.self::teks($item['kode_tp']??'')
-                .'</td><td>'.self::teks($item['nama_tp']??'')
-                .'</td><td>'.($esensial?'Esensial':'NonEsensial')
+            $rows.='<tr class="tp-row"><td class="kode">'
+                .self::teks($item['kode_tp']??'')
+                .'</td><td class="tujuan">'
+                .self::teks($item['nama_tp']??'')
+                .'</td><td class="jenis">'.($esensial?'Esensial':'NonEsensial')
                 .'</td><td class="num">'.self::teks($nilai).'</td></tr>';
         }
-        if ($rows==='') $rows='<tr><td colspan="4">Belum ada TP.</td></tr>';
-        $backgroundCss=$latar!==''?'<img class="background" src="'.$latar.'" alt="">':'';
-        $ttdHtml=$tandaTangan!==''?'<img class="ttd" src="'.$tandaTangan.'" alt="Tanda tangan kepala madrasah">':'<div class="ttd-kosong">Contoh area TTD</div>';
-        $qrHtml=$qr!==''?'<img class="qr" src="'.$qr.'" alt="QR verifikasi">':'<div class="qr-kosong">Pratinjau Tanpa QR</div>';
-        $watermark=$pratinjau?'<div class="watermark">PRATINJAU — BUKAN SERTIFIKAT TERBIT</div>':'';
-        $html='<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><style>
-            @page { size:A4 landscape; margin:12mm 14mm 13mm; }
-            body { font-family:DejaVu Sans,sans-serif; color:#15382E; font-size:9px; margin:0; }
-            .background { position:fixed; top:-12mm; left:-14mm; width:297mm; height:210mm; z-index:-2; }
-            .watermark { position:fixed; top:90mm; left:18mm; transform:rotate(-15deg);
-                color:rgba(170,30,30,.25); font-size:24px; font-weight:800; z-index:5; }
-            .card { background:rgba(255,255,255,.90); border:1px solid #8CBAA7; padding:10mm 11mm; }
-            .kop { text-align:center; padding-bottom:6px; border-bottom:2px solid #207957; }
-            .kop .sekolah { font-size:15px; font-weight:bold; line-height:1.4; }
-            .kop .sub { font-size:8px; color:#365C50; }
-            h1 { text-align:center; letter-spacing:2px; font-size:17px; margin:10px 0 3px; }
-            .nomor { text-align:center; font-size:10px; margin:0 0 10px; }
-            table { width:100%; border-collapse:collapse; }
-            .data th { text-align:left; width:23mm; padding:2px; font-weight:normal; }
-            .data td { padding:2px; font-weight:bold; }
-            .nilai { margin-top:10px; font-size:8.4px; }
-            .nilai th { background:#DAEBE3; border:1px solid #C4DED0; padding:5px; text-align:left; }
-            .nilai td { border:1px solid #C4DED0; padding:4px; vertical-align:top; }
-            .nilai tr.bab td { background:#ECF4EE; font-weight:bold; }
-            .nilai .num { text-align:center; width:20mm; white-space:nowrap; }
-            .nilai thead { display:table-header-group; }
-            .nilai tr { page-break-inside:avoid; }
-            .foot { width:100%; margin-top:13px; page-break-inside:avoid; }
-            .foot td { vertical-align:top; text-align:center; width:33.3%; }
-            .foot .qr { width:27mm; height:27mm; }
-            .foot .ttd { height:19mm; max-width:48mm; object-fit:contain; }
-            .foot .sign { padding-top:5px; }
-            .foot .nama { font-weight:bold; text-decoration:underline; }
-            .qr-kosong,.ttd-kosong { border:1px dashed #9CAFA9; padding:12px 4px; }
-            .catatan { font-size:7px; color:#4C675F; }
-            </style></head><body>'.$backgroundCss.$watermark.
-            '<main class="card"><div class="kop"><div class="sekolah">'
-            .$identitas('nama_madrasah').'</div><div class="sub">'
-            .$identitas('alamat_madrasah').'</div></div>'
-            .'<h1>SERTIFIKAT PEMBELAJARAN</h1><p class="nomor">Nomor: '
-            .self::teks($snapshot['nomor']??'PRATINJAU').'</p>'
-            .'<table class="data"><tr><th>Nama Siswa</th><td>: '
-            .self::teks($siswa['nama']??'').'</td><th>NISN</th><td>: '
-            .self::teks($siswa['nisn']??'—').'</td></tr>'
-            .'<tr><th>Mata Pelajaran</th><td>: '.self::teks($paket['nama_mapel']??'')
-            .'</td><th>Semester</th><td>: '.self::teks($paket['semester']??'').'</td></tr>'
-            .'</table><table class="nilai"><thead><tr><th>Kode TP</th><th>Tujuan Pembelajaran</th>'
-            .'<th>Jenis</th><th>Nilai TP</th></tr></thead><tbody>'.$rows.'</tbody></table>'
-            .'<table class="foot"><tr><td>'.$qrHtml
-            .'<div class="catatan">Verifikasi keaslian melalui QR</div></td>'
-            .'<td><div class="catatan">Dokumen ini mencatat pencapaian tujuan'
-            .' pembelajaran pada mata pelajaran dan semester yang tercantum.</div></td>'
-            .'<td><div>'.self::teks($sekolah['kota_penerbitan']??'').', '
-            .self::teks($snapshot['tanggal']??'').'</div><div>Kepala Madrasah</div>'
-            .$ttdHtml.'<div class="nama">'.self::teks($sekolah['kepala_madrasah_nama']??'')
-            .'</div><div>NIP: '.self::teks($sekolah['kepala_madrasah_nip']??'').'</div></td>'
-            .'</tr></table></main></body></html>';
+        if ($rows==='') {
+            $rows='<tr class="tp-row"><td colspan="4">Belum ada TP.</td></tr>';
+        }
+
+        // A11-3: pakai tinggi sertifikat penuh hanya saat tabel cukup pendek.
+        // Paket dengan banyak TP tetap memakai aliran halaman normal agar footer
+        // tidak menutupi baris atau terpotong saat dicetak.
+        $satuHalaman=$jumlahTp<=4 && $jumlahBab<=3
+            && $panjangNamaTp<=80
+            && mb_strlen((string)($siswa['nama']??''))<=65;
+        $kelasHalaman=$satuHalaman?'card card--full':'card card--flow';
+
+        $backgroundHtml=$latar!==''?'<img class="background" src="'.$latar.'" alt="">':'';
+        $ttdHtml=$tandaTangan!==''
+            ? '<img class="ttd" src="'.$tandaTangan.'" alt="Tanda tangan kepala madrasah">'
+            : '<div class="ttd-kosong">Contoh area TTD</div>';
+        $qrHtml=$qr!==''
+            ? '<img class="qr" src="'.$qr.'" alt="QR verifikasi sertifikat">'
+            : '<div class="qr-kosong">Pratinjau tanpa QR</div>';
+        $watermark=$pratinjau
+            ? '<div class="watermark">PRATINJAU · BUKAN SERTIFIKAT TERBIT</div>'
+            : '';
+
+        $namaSekolah=self::teks($sekolah['nama_madrasah']??'');
+        $alamatSekolah=self::teks($sekolah['alamat_madrasah']??'');
+        $nomorSertifikat=self::teks($snapshot['nomor']??'PRATINJAU');
+        $namaSiswa=self::teks($siswa['nama']??'');
+        $nisnSiswa=self::teks($siswa['nisn']??'—');
+        $namaMapel=self::teks($paket['nama_mapel']??'');
+        $semester=self::teks($paket['semester']??'');
+        $kota=self::teks($sekolah['kota_penerbitan']??'');
+        $tanggal=self::teks($snapshot['tanggal']??'');
+        $kepala=self::teks($sekolah['kepala_madrasah_nama']??'');
+        $nip=self::teks($sekolah['kepala_madrasah_nip']??'');
+
+        $html=<<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<style>
+    @page { size: A4 landscape; margin: 8mm 9mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: DejaVu Sans, sans-serif; font-size: 9pt; color: #193E34; }
+    .background {
+        position: fixed; top: -8mm; left: -9mm;
+        width: 297mm; height: 210mm; z-index: -2;
+    }
+    .page-frame {
+        position: fixed; top: 0; left: 0;
+        width: 278mm; height: 192mm;
+        border: 1px solid #8BB9A7;
+        background: rgba(255,255,255,.91);
+        z-index: -1;
+    }
+    .card {
+        position: relative;
+        padding: 7mm 9mm;
+        background: transparent;
+        border: 0;
+    }
+    .card--full, .card--flow { height: auto; }
+    .kop { text-align: center; border-bottom: 1.5pt solid #246D54; padding-bottom: 2mm; }
+    .kop .identitas { font: bold 16pt DejaVu Serif, serif; line-height: 1.24; }
+    .kop .alamat { font-size: 8.6pt; margin-top: 1mm; color: #43695D; }
+    .garis-emas { width: 36mm; height: 1.6pt; margin: 1.5mm auto 0; background: #B28C49; }
+    .judul { margin: 2mm 0; text-align: center; }
+    h1 {
+        margin: .4mm 0 .8mm; color: #173E33;
+        font: bold 19pt DejaVu Serif, serif; letter-spacing: 1.2pt;
+    }
+    .nomor { margin: 0; font-size: 9pt; color: #3E6657; }
+    table { border-collapse: collapse; width: 100%; }
+    .biodata {
+        margin: 1mm 0 2mm; table-layout: fixed;
+        background: #F3F8F5; border: 1px solid #D1E1D7;
+    }
+    .biodata td {
+        width: 50%; padding: 1.1mm 4mm;
+        vertical-align: top; border-bottom: 1px solid #E3ECE6;
+    }
+    .biodata .label { display: block; font-size: 7.4pt; color: #537568; letter-spacing: .45pt; }
+    .biodata .isi { display: block; font-size: 10pt; font-weight: bold; margin-top: .3mm; line-height: 1.2; }
+    .biodata .isi--nama { font-size: 12pt; color: #123D30; }
+    .label-tabel {
+        margin: .4mm 0 1mm; font-size: 8.5pt;
+        font-weight: bold; letter-spacing: 1.1pt; color: #275E4B;
+    }
+    .tp-table { table-layout: fixed; border: 1px solid #BCD5C8; font-size: 8.7pt; }
+    .tp-table thead { display: table-header-group; }
+    .tp-table th {
+        background: #DCEAE2; color: #1D4A3C;
+        font-size: 8.5pt; text-align: left; padding: 1.4mm 2.2mm;
+        border: 1px solid #BCD5C8;
+    }
+    .tp-table td {
+        vertical-align: top; line-height: 1.2;
+        border: 1px solid #D2E1D8; padding: 1.2mm 2mm;
+        overflow-wrap: break-word;
+    }
+    .tp-table .kode { width: 17%; white-space: nowrap; }
+    .tp-table .tujuan { width: 51%; }
+    .tp-table .jenis { width: 20%; }
+    .tp-table .num { width: 12%; text-align: center; white-space: nowrap; font-weight: bold; }
+    .tp-table .bab-row td {
+        background: #E9F2EA; font-weight: bold; color: #225842;
+        padding: 1.2mm 2.3mm; page-break-after: avoid;
+    }
+    .tp-table .bab-label { font-weight: bold; }
+    .tp-table .tp-row { page-break-inside: avoid; }
+    .footer { margin-top: 4mm; padding-top: 2mm; border-top: 1px solid #CADFD1; page-break-inside: avoid; }
+    .card--full .footer {
+        position: fixed; bottom: 4mm;
+        left: 18mm; width: 260mm;
+        margin-top: 0;
+    }
+    .footer td { width: 33.333%; vertical-align: top; text-align: center; padding: 0 2mm; }
+    .footer .qr-cell { text-align: left; }
+    .footer .qr { width: 23mm; height: 23mm; display: block; }
+    .footer .qr-caption { margin: 1mm 0 0; font-size: 7.2pt; color: #466D5D; }
+    .footer .catatan { padding-top: 5mm; font-size: 8pt; line-height: 1.65; color: #536F63; }
+    .footer .tanggal { font-size: 8.8pt; margin-bottom: 1mm; }
+    .footer .jabatan { font-size: 8.7pt; margin-bottom: 1.5mm; }
+    .footer .ttd { height: 16mm; max-width: 48mm; }
+    .footer .ttd-kosong { padding: 5mm 3mm; border: 1px dashed #8DA99B; font-size: 8pt; }
+    .footer .nama { margin-top: .6mm; font-size: 9pt; font-weight: bold; text-decoration: underline; }
+    .footer .nip { margin-top: .5mm; font-size: 8pt; }
+    .qr-kosong { padding: 4mm 1mm; border: 1px dashed #8DA99B; text-align: center; font-size: 8pt; }
+    .watermark {
+        position: fixed; top: 88mm; left: 20mm; font-size: 23pt;
+        font-weight: bold; color: rgba(158,36,36,.28);
+        transform: rotate(-15deg); z-index: 5;
+    }
+</style>
+</head>
+<body>
+$backgroundHtml
+<div class="page-frame" aria-hidden="true"></div>
+$watermark
+<main class="$kelasHalaman">
+    <header class="kop">
+        <div class="identitas">$namaSekolah</div>
+        <div class="alamat">$alamatSekolah</div>
+        <div class="garis-emas"></div>
+    </header>
+    <section class="judul">
+        <h1>SERTIFIKAT PEMBELAJARAN</h1>
+        <p class="nomor">Nomor: $nomorSertifikat</p>
+    </section>
+    <table class="biodata" aria-label="Identitas penerima sertifikat">
+        <tr>
+            <td><span class="label">NAMA SISWA</span><span class="isi isi--nama">$namaSiswa</span></td>
+            <td><span class="label">NISN</span><span class="isi">$nisnSiswa</span></td>
+        </tr>
+        <tr>
+            <td><span class="label">MATA PELAJARAN</span><span class="isi">$namaMapel</span></td>
+            <td><span class="label">SEMESTER</span><span class="isi">$semester</span></td>
+        </tr>
+    </table>
+    <div class="label-tabel">RINCIAN TUJUAN PEMBELAJARAN</div>
+    <table class="tp-table">
+        <colgroup><col style="width:17%"><col style="width:51%"><col style="width:20%"><col style="width:12%"></colgroup>
+        <thead><tr>
+            <th>Kode TP</th><th>Tujuan Pembelajaran</th><th>Jenis</th><th>Nilai TP</th>
+        </tr></thead>
+        <tbody>$rows</tbody>
+    </table>
+    <footer class="footer">
+        <table><tr>
+            <td class="qr-cell">
+                $qrHtml
+                <div class="qr-caption">Pindai QR untuk memeriksa keaslian</div>
+            </td>
+            <td class="catatan">
+                Dokumen ini mencatat hasil tujuan pembelajaran
+                pada mata pelajaran dan semester yang tercantum.
+            </td>
+            <td class="tanda">
+                <div class="tanggal">$kota, $tanggal</div>
+                <div class="jabatan">Kepala Madrasah</div>
+                $ttdHtml
+                <div class="nama">$kepala</div>
+                <div class="nip">NIP: $nip</div>
+            </td>
+        </tr></table>
+    </footer>
+</main>
+</body>
+</html>
+HTML;
         $opt=new Options();
         $opt->set('isRemoteEnabled',false);
         $opt->set('isPhpEnabled',false);
@@ -169,6 +314,16 @@ final class SertifikatPdfService
         $pdf->loadHtml($html,'UTF-8');
         $pdf->setPaper('A4','landscape');
         $pdf->render();
+        // Jika bahkan dokumen pendek melewati satu halaman (mis. nama panjang),
+        // matikan footer absolut dan gunakan alur dokumen agar tak bertumpuk.
+        if ($satuHalaman && $pdf->getCanvas()->get_page_count() > 1) {
+            $html=str_replace('class="card card--full"',
+                'class="card card--flow"',$html);
+            $pdf=new Dompdf($opt);
+            $pdf->loadHtml($html,'UTF-8');
+            $pdf->setPaper('A4','landscape');
+            $pdf->render();
+        }
         $output=$pdf->output();
         if (!is_string($output) || !str_starts_with($output,'%PDF-')) {
             throw new RuntimeException('PDF sertifikat gagal dibuat.');
@@ -190,8 +345,12 @@ final class SertifikatPdfService
             'tp'=>[
                 ['nomor_bab'=>1,'nama_bab'=>'BAB Contoh','kode_tp'=>'SIM.8.1.1',
                     'nama_tp'=>'TP Esensial','jenis_tp'=>'esensial','nilai_tp'=>null],
-                ['nomor_bab'=>1,'nama_bab'=>'BAB Contoh','kode_tp'=>'SIM.8.1.2',
-                    'nama_tp'=>'TP NonEsensial','jenis_tp'=>'non_esensial','nilai_tp'=>88],
+                ['nomor_bab'=>1,'nama_bab'=>'BAB Contoh Pertama','kode_tp'=>'SIM.8.1.2',
+                    'nama_tp'=>'Penerapan Keteladanan','jenis_tp'=>'non_esensial','nilai_tp'=>90],
+                ['nomor_bab'=>2,'nama_bab'=>'BAB Contoh Kedua','kode_tp'=>'SIM.8.2.1',
+                    'nama_tp'=>'Kajian Sejarah','jenis_tp'=>'esensial','nilai_tp'=>null],
+                ['nomor_bab'=>2,'nama_bab'=>'BAB Contoh Kedua','kode_tp'=>'SIM.8.2.2',
+                    'nama_tp'=>'Refleksi Pembelajaran','jenis_tp'=>'non_esensial','nilai_tp'=>82],
             ],
         ];
         return $this->render($snapshot,$background,$ttd,'',true);

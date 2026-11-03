@@ -337,3 +337,9 @@ Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`
 - Siswa → Sertifikat Saya: daftar sertifikat aktif maupun yang `digantikan` dengan unduhan PDF hanya miliknya. Jika kosong, tampil pesan tanpa tombol palsu.
 - Publik → Verifikasi QR: halaman sederhana responsif, status berlaku/digantikan, rujukan nomor versi pengganti, daftar TP/jenis/nilai yang boleh dipublikasikan; tanpa NISN, TTD, PDF atau kontak. Tidak ada tombol cabut/hapus.
 - CSS tetap Emerald Glass kustom; tabel berkolom lebar boleh digulir di HP. Uji 360/390/768/1100px, dark/light, Mode Dokumentasi, invalid/missing upload, gagal render, ulang submit, dan historis.
+
+### A11-3 — QA layout PDF hasil sertifikat (3 November 2026)
+
+Sertifikat resmi cetak **A4 landscape** harus mengisi bidang cetak secara proporsional, bukan menempatkan seluruh bingkai pada dua pertiga teratas. Hirarki visual: identitas madrasah, judul/nomor, identitas penerima, tabel BAB/TP, lalu QR verifikasi dan area TTD kepala madrasah. Nama siswa serta nilai harus lebih mudah dibaca pada kertas, tetap dengan bahasa formal dan tanpa teks teknis internal penilaian.
+
+Pratinjau PDF di Admin memakai **data dummy** (dua BAB, empat TP), bukan siswa sebenarnya. Untuk paket dengan banyak TP, legibilitas dan kelengkapan semua baris diutamakan daripada menekan tulisan kecil agar tetap satu halaman. Jika diperlukan, konten lanjut ke halaman berikutnya secara aman dan tanda tangan tidak boleh menutupi tabel. Tidak menambahkan tombol regenerate otomatis PDF yang sudah terbit.
