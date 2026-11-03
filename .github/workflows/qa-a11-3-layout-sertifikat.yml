@@ -38,6 +38,10 @@ jobs:
           LONG=writable/cache/a11-preview-duapuluhempat-tp.pdf
           pdfinfo "$SHORT"
           pdfinfo "$LONG" | grep -E 'Pages:|Page size:'
+          echo "--- Halaman 1, contoh 4 TP ---"
+          pdftotext -f 1 -l 1 -layout "$SHORT" - | tail -40
+          echo "--- Halaman 2, contoh 4 TP (jika ada) ---"
+          pdftotext -f 2 -l 2 -layout "$SHORT" - | tail -40 || true
           test "$(pdfinfo "$SHORT" | awk '/^Pages:/ {print $2}')" = "1"
           pdfinfo "$SHORT" | grep -Eq 'A4|841[.,]89 x 595[.,]28'
           pdfinfo "$LONG" | grep -Eq 'A4|841[.,]89 x 595[.,]28'
@@ -47,6 +51,7 @@ jobs:
           pdftotext -layout "$LONG" - | grep -F 'DEMO.8.6.24'
           echo 'PASS: PDF A4 landscape, 4 TP satu halaman, semua 24 TP terbaca.'
       - name: Lampirkan contoh layout sintetis untuk QA
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: a11-3-contoh-layout-sertifikat
