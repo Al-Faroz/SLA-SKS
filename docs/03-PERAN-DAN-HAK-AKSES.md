@@ -102,3 +102,7 @@ Beranda `/pimpinan` menghitung KPI paket aktif/ditugaskan, Gen/Mapel/semester, s
 ### A12-2 — Akses Dashboard Guru (3 November 2026)
 
 Beranda `/guru` menunjukkan indikator kerja hanya untuk penugasan aktif `penugasan_guru_gen.guru_id` milik role aktif Guru; tidak boleh membaca Gen–Mapel lain melalui parameter `pilihan`/Semester yang dibuat sendiri. Filter role dan otorisasi Service sama-sama wajib. Dashboard **GET baca-saja**, aksi Penilaian/Kelola TP/Akses Ulang diarahkan ke halaman yang telah memiliki otorisasi G1 sendiri. Siswa yang perlu bantuan dihitung agregat tanpa menampilkan NISN/teks jawaban, dan Sumatif/Pra-Semester tetap berbeda. Tidak ada penyatuan hak Guru–Pimpinan untuk staf multi-role.
+
+### A12-3 — Dashboard Siswa (3 November 2026)
+
+Beranda `/siswa` memakai filter `auth:siswa` dan pemeriksaan ulang role/status di `DashboardSiswaService`. Semua paket berasal dari `KatalogPembelajaranSiswaService` yang memeriksa Gen, penugasan, semester mulai dan gerbang semester sebelumnya. Kode TP tujuan navigasi juga harus lolos `daftarTp` dengan `akses.buka`. Tidak menerima `siswa_id` atau `paket_id` dari GET; tidak membaca nama/NISN siswa lain, kunci, jawaban, token ujian, atau identitas autentikasi. Hanya SELECT; mengunjungi dashboard tidak memulai TP, percobaan maupun mengubah skor. Pengampu Guru dan Admin tidak mewarisi hak dashboard siswa pada akun multi-role.
