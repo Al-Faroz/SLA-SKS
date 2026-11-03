@@ -94,7 +94,8 @@ $lanjut=$ring['lanjut'];
             <div class="a-dashboard-siswa__paket-grid">
                 <?php foreach ($ring['paket'] as $paket): ?>
                     <article class="a-dashboard-siswa__paket">
-                        <div class="a-dashboard-siswa__paket-head">
+                        <div class="a-dashboard-siswa__paket-info">
+                            <div class="a-dashboard-siswa__paket-head">
                             <span class="a-badge">Semester <?= (int)$paket['semester'] ?></span>
                             <span class="a-dashboard-siswa__status">
                                 <?= esc($paket['status']) ?>
@@ -108,6 +109,8 @@ $lanjut=$ring['lanjut'];
                                     <?= esc($paket['tp_berikutnya']['judul']) ?></strong>
                             </p>
                         <?php endif ?>
+                        </div>
+                        <div class="a-dashboard-siswa__paket-activity">
                         <p class="a-dashboard-siswa__count">
                             <strong><?= (int)$paket['tp_tuntas'] ?> /
                                 <?= (int)$paket['tp_wajib'] ?></strong>
@@ -147,6 +150,7 @@ $lanjut=$ring['lanjut'];
                             href="<?= esc(site_url($paket['tautan']),'attr') ?>">
                             <?= esc($paket['label_aksi']) ?>
                         </a>
+                        </div>
                     </article>
                 <?php endforeach ?>
             </div>
