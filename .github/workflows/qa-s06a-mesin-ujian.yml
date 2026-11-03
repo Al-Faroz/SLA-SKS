@@ -8,6 +8,8 @@ on:
       - 'app/Services/AturanWaktuUjianService.php'
       - 'app/Services/SusunButirUjianService.php'
       - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Controllers/SiswaPembelajaran.php'
+      - 'app/Views/siswa/daftar_tp.php'
       - 'tests/unit/PraSemesterImplementasiTest.php'
       - 'tests/unit/PraSemesterDatabaseTest.php'
       - 'app/Services/PraSemesterWordService.php'
@@ -83,6 +85,8 @@ jobs:
           php -l tests/unit/AturanWaktuUjianServiceTest.php
           php -l tests/unit/SusunButirUjianServiceTest.php
           php -l app/Services/MesinPraSemesterSiswaService.php
+          php -l app/Controllers/SiswaPembelajaran.php
+          php -l app/Views/siswa/daftar_tp.php
           php -l tests/unit/PraSemesterImplementasiTest.php
           php -l tests/unit/PraSemesterDatabaseTest.php
           php -l app/Services/PraSemesterWordService.php
