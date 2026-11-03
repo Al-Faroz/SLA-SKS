@@ -532,3 +532,22 @@ QA otomatis `tests/unit/DashboardPimpinanDatabaseTest.php` menggunakan SQLite an
 | A12-210 | UI Dark/Light, 360/390/768/1100px dan Mode Dokumentasi | KPI, filter, link Buka Semester, scroll keyboard aman |
 
 Workflow `QA A12-2 Dashboard Guru` menjalankan `DashboardGuruDatabaseTest.php` SQLite sintetis, regresi Penilaian Guru dan Keputusan Akses Ulang, serta PHP lint. Hasil perlu ditinjau pada PR; **uji browser XAMPP tetap diperlukan sebelum FIX**. Tidak ada perubahan SQL.
+
+### A12-3 — QA Dashboard Siswa dan gerbang pembelajaran (3 November 2026)
+
+| ID | Skenario | Hasil wajib |
+|---|---|---|
+| A12-301 | Siswa Gen A mulai Semester 4, memiliki paket 4 dan 5 | Hanya paket yang lolos gerbang katalog; semester 5 belum terbuka sebelum semua TP wajib semester 4 sah |
+| A12-302 | Siswa pindahan mulai Semester 5 | Semester 4 dilewati, tidak dihitung sebagai target dan tidak diberi tautan |
+| A12-303 | TP status tuntas tetapi Sumatif belum `selesai_sah`; Diagnostik selesai sah | **Bukan** TP tuntas sah, tidak membuka TP/semester berikutnya |
+| A12-304 | Sumatif normal/remedial sama-sama sah pada TP sama | Dihitung satu kali, tidak menggandakan TP maupun progres |
+| A12-305 | Nilai TP Final 0, Sementara 70, final tetapi Sumatif belum sah | Hanya Final untuk TP tuntas sah ikut KPI, 0 termasuk sah |
+| A12-306 | Paket hanya Esensial/tanpa TP NonEsensial | Progres null dan pesan tidak ada target, bukan 100% |
+| A12-307 | TP perlu bantuan dan hanya TP berikutnya yang boleh dibuka | Status bantuan jelas; tautan lanjut belajar berasal dari `akses.buka` katalog, bukan memulai ujian |
+| A12-308 | Sertifikat berlaku dan arsip digantikan | KPI hanya pointer versi berlaku, tidak menghitung arsip |
+| A12-309 | Gen belum memiliki paket atau tidak memiliki semester terbuka | State kosong informatif, link ke daftar pembelajaran, tanpa progres fiktif |
+| A12-310 | Guru/Admin/Pimpinan, siswa nonaktif, atau Gen lain | Akses ditolak; tidak membuka paket/TP Gen lain atau data siswa lain |
+| A12-311 | Reload/tutup dashboard | Tidak membuat progres, attempt, nilai, atau sertifikat |
+| A12-312 | Dark/Light, Mode Dokumentasi, HP/desktop | Segmen/progress tidak bertumpuk, teks dan tombol tetap terbaca/fokus keyboard |
+
+Pengujian otomatis `tests/unit/DashboardSiswaDatabaseTest.php` menggunakan SQLite in-memory anonim, ditambah regresi Katalog Pembelajaran serta Laporan Akademik di workflow `QA A12-3 Dashboard Siswa`. Tidak ada SQL baru; hasil visual harus diuji pemilik pada XAMPP sebelum A12-3 dinyatakan FIX.
