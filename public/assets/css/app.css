@@ -2825,3 +2825,134 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
         grid-column:1;justify-self:stretch;
     }
 }
+
+/* A12-4 UI QA-2 — tata form Pengelola, referensi dan Profil. */
+.a-admin-akun .a-admin-akun__form .a-fieldset {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px 10px;
+    align-items:center;
+}
+.a-admin-akun .a-admin-akun__form .a-fieldset > label {
+    display:inline-flex;
+    gap:9px;
+    align-items:center;
+    min-height:43px;
+    padding:8px 12px;
+    border:1px solid var(--eg-line,var(--a-garis));
+    border-radius:9px;
+    background:var(--eg-pane-soft,transparent);
+    cursor:pointer;
+}
+.a-admin-akun .a-admin-akun__form .a-fieldset > label:focus-within {
+    outline:2px solid var(--eg-focus,#30b98d);
+    outline-offset:2px;
+}
+.a-admin-akun .a-admin-akun__form .a-fieldset > label input {
+    margin:0;
+    accent-color:var(--eg-focus,#30b98d);
+    flex:0 0 auto;
+}
+.a-admin-akun .a-admin-akun__form .a-fieldset > .a-help {
+    grid-column:1/-1;
+    margin:5px 0 0;
+}
+.a-admin-akun .a-admin-akun__form .a-form > button {
+    grid-column:1/-1;
+    justify-self:start;
+    align-self:start;
+    width:auto;
+    min-height:43px;
+}
+.a-referensi-grid {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:start;
+    gap:16px;
+}
+.a-referensi-grid__kolom {
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:16px;
+    min-width:0;
+}
+.a-referensi-grid__kolom > .a-page__editor {
+    width:100%;
+}
+.a-referensi-grid__kolom > .a-card {
+    min-width:0;
+}
+.a-identitas-editor.a-page__editor--luas {
+    width:100%;
+    max-width:none;
+}
+.a-identitas-editor .a-identitas-editor__form {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:15px 18px;
+    align-items:start;
+}
+.a-identitas-editor .a-identitas-editor__form > .a-identitas-editor__lebar,
+.a-identitas-editor .a-identitas-editor__form > [data-dirty-status],
+.a-identitas-editor .a-identitas-editor__form > [data-dirty-submit] {
+    grid-column:1/-1;
+}
+.a-identitas-editor .a-identitas-editor__form > [data-dirty-submit] {
+    justify-self:start;
+}
+.a-profil__foto {
+    display:grid;
+    grid-template-columns:minmax(155px,200px) minmax(0,1fr);
+    column-gap:22px;
+    row-gap:12px;
+    align-items:start;
+}
+.a-profil__foto > h2 {
+    grid-column:1/-1;
+    margin-bottom:0;
+}
+.a-profil__foto > .a-profil__galeri {
+    grid-column:1;
+    grid-row:2 / span 2;
+    margin:0;
+    align-self:start;
+}
+.a-profil__foto > .a-help {
+    grid-column:2;
+    grid-row:2;
+    margin:0;
+}
+.a-profil__foto > .a-form {
+    grid-column:2;
+    grid-row:3;
+    min-width:0;
+}
+.a-profil__foto > .a-form input[type="file"] {
+    max-width:100%;
+}
+@media(max-width:960px) {
+    .a-referensi-grid {grid-template-columns:minmax(0,1fr);}
+}
+@media(max-width:800px) {
+    .a-profil__foto {grid-template-columns:minmax(0,1fr);}
+    .a-profil__foto > :is(h2,.a-profil__galeri,.a-help,.a-form) {
+        grid-column:1;
+        grid-row:auto;
+    }
+}
+@media(max-width:620px) {
+    .a-admin-akun .a-admin-akun__form .a-fieldset {
+        grid-template-columns:minmax(0,1fr);
+    }
+    .a-admin-akun .a-admin-akun__form .a-form > button {
+        justify-self:stretch;
+        width:100%;
+    }
+    .a-identitas-editor .a-identitas-editor__form {
+        grid-template-columns:minmax(0,1fr);
+    }
+    .a-identitas-editor .a-identitas-editor__form > [data-dirty-submit] {
+        justify-self:stretch;
+    }
+}

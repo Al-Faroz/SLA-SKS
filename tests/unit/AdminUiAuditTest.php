@@ -79,4 +79,61 @@ final class AdminUiAuditTest extends TestCase
         self::assertStringContainsString('Terapkan filter',$view);
         self::assertStringContainsString('csrf_field()',$view);
     }
+    public function testPilihanPeranPengelolaRingkasDanSubmitTidakTertukar(): void
+    {
+        $view=self::sumber('app/Views/admin/akun_daftar.php');
+        $css=self::sumber('public/assets/css/app.css');
+        self::assertStringContainsString('name="peran[]"',$view);
+        self::assertStringContainsString('Maksimal dua peran',$view);
+        self::assertStringContainsString(
+            '.a-admin-akun .a-admin-akun__form .a-fieldset {',$css);
+        self::assertStringContainsString(
+            'grid-template-columns:repeat(3,minmax(0,1fr));',$css);
+        self::assertStringContainsString(
+            '.a-admin-akun .a-admin-akun__form .a-form > button {',$css);
+        self::assertStringContainsString('csrf_field()',$view);
+    }
+
+    public function testFormDanDaftarReferensiBeradaDalamKolomSendiri(): void
+    {
+        $view=self::sumber('app/Views/admin/referensi.php');
+        $css=self::sumber('public/assets/css/app.css');
+        self::assertStringContainsString('a-referensi-grid__kolom',$view);
+        self::assertSame(2,substr_count($view,'class="a-referensi-grid__kolom"'));
+        $first=strpos($view,'judul-gen');
+        $listGen=strpos($view,'judul-daftar-gen');
+        $year=strpos($view,'judul-tahun');
+        $listYear=strpos($view,'judul-daftar-tahun');
+        self::assertTrue($first<$listGen && $listGen<$year && $year<$listYear);
+        self::assertStringContainsString('.a-referensi-grid__kolom {',$css);
+        self::assertSame(2,substr_count($view,'csrf_field()'));
+    }
+
+    public function testIdentitasMadrasahMemakaiGridDenganAlamatLebarDanDataDirty(): void
+    {
+        $view=self::sumber('app/Views/admin/identitas.php');
+        $css=self::sumber('public/assets/css/app.css');
+        self::assertStringContainsString('a-identitas-editor__form',$view);
+        self::assertStringContainsString('a-identitas-editor__lebar',$view);
+        self::assertStringContainsString(
+            '.a-identitas-editor .a-identitas-editor__form {',$css);
+        self::assertStringContainsString('data-dirty-submit',$view);
+        self::assertStringContainsString('csrf_field()',$view);
+        self::assertStringContainsString('labelTampil',$view);
+    }
+
+    public function testProfilFotoKonsistenDanTetapButuhPersetujuanAdmin(): void
+    {
+        $view=self::sumber('app/Views/akun/profil.php');
+        $css=self::sumber('public/assets/css/app.css');
+        self::assertStringContainsString('a-profil__foto',$view);
+        self::assertStringContainsString('.a-profil__foto > .a-profil__galeri {',$css);
+        self::assertStringContainsString('grid-column:2;',$css);
+        self::assertStringContainsString(
+            'Unggah foto untuk persetujuan',$view);
+        self::assertStringContainsString('csrf_field()',$view);
+        self::assertStringContainsString('foto_menunggu_id',$view);
+        self::assertStringContainsString('Ganti sandi',$view);
+    }
+
 }
