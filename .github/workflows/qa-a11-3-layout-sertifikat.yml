@@ -37,13 +37,16 @@ jobs:
           command -v pdfinfo || (sudo apt-get update -qq && sudo apt-get install -y poppler-utils)
           SHORT=writable/cache/a11-preview-empat-tp.pdf
           LONG=writable/cache/a11-preview-duapuluhempat-tp.pdf
+          QR=writable/cache/a11-preview-empat-tp-qr-ttd.pdf
           pdfinfo "$SHORT"
           pdfinfo "$LONG" | grep -E 'Pages:|Page size:'
+          pdfinfo "$QR" | grep -E 'Pages:|Page size:'
           echo "--- Halaman 1, contoh 4 TP ---"
           pdftotext -f 1 -l 1 -layout "$SHORT" - | tail -40
           echo "--- Halaman 2, contoh 4 TP (jika ada) ---"
           pdftotext -f 2 -l 2 -layout "$SHORT" - | tail -40 || true
           test "$(pdfinfo "$SHORT" | awk '/^Pages:/ {print $2}')" = "1"
+          test "$(pdfinfo "$QR" | awk '/^Pages:/ {print $2}')" = "1"
           pdfinfo "$SHORT" | grep -Eq 'A4|841[.,]89 x 595[.,]28'
           pdfinfo "$LONG" | grep -Eq 'A4|841[.,]89 x 595[.,]28'
           pdftotext -layout "$SHORT" - | grep -F 'DEMO.8.1.1'
@@ -51,8 +54,10 @@ jobs:
           pdftotext -layout "$LONG" - | grep -F 'DEMO.8.1.1'
           pdftotext -layout "$LONG" - | grep -F 'DEMO.8.6.24'
           pdftotext -bbox-layout "$SHORT" /tmp/a11-short-bbox.html
+          pdftotext -bbox-layout "$QR" /tmp/a11-qr-bbox.html
+          python3 tests/scripts/a11_check_pdf_layout.py /tmp/a11-qr-bbox.html
           python3 tests/scripts/a11_check_pdf_layout.py /tmp/a11-short-bbox.html
-          echo 'PASS: PDF A4 landscape, 4 TP satu halaman, semua 24 TP terbaca.'
+          echo 'PASS: PDF A4 landscape, 4 TP (dummy maupun QR+TTD) satu halaman, semua 24 TP terbaca.'
       - name: Lampirkan contoh layout sintetis untuk QA
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,4 +66,5 @@ jobs:
           path: |
             writable/cache/a11-preview-empat-tp.pdf
             writable/cache/a11-preview-duapuluhempat-tp.pdf
+            writable/cache/a11-preview-empat-tp-qr-ttd.pdf
           retention-days: 7
