@@ -138,6 +138,8 @@ $routes->get('admin', 'Akun::berandaAdmin', ['filter' => 'auth:admin']);
 $routes->get('admin/kkm', 'AdminKkm::index', ['filter' => 'auth:admin']);
 $routes->post('admin/kkm', 'AdminKkm::simpan', ['filter' => 'auth:admin']);
 $routes->get('pimpinan', 'Akun::berandaPimpinan', ['filter' => 'auth:pimpinan']);
+$routes->get('pimpinan/laporan', 'PimpinanLaporan::index', ['filter' => 'auth:pimpinan']);
+$routes->get('pimpinan/laporan/(:num)/siswa/(:num)', 'PimpinanLaporan::detail/$1/$2', ['filter' => 'auth:pimpinan']);
 // K2B v2.3 — satu autentikasi, dua ruang administrasi akun.
 $routes->get('admin/pengguna', 'Akun::pengguna', ['filter' => 'auth:admin']); // kompatibilitas tautan K1
 $routes->get('admin/pengelola', 'AdminPengguna::pengelola', ['filter' => 'auth:admin']);
