@@ -121,3 +121,11 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 ### A8-7 — Keamanan Word Pra-Semester
 - DOCX maksimum 15 MB; validasi berkas ZIP/OOXML, batas jumlah part, tolak macro, HMAC identitas, opsi/kunci, nomor BAB terdaftar. Renderer hanya menghasilkan HTML whitelist, sumber eksternal tidak dieksekusi. Staging dan gambar di bawah `writable/private/` dengan larangan akses langsung.
 - Konfirmasi melock paket dan ujian, memverifikasi checksum, masa berlaku, kepemilikan Guru, sidik jari BAB/bank serta belum ada attempt siswa. Semua INSERT dan audit berada dalam transaksi; error rollback. Gambar siswa harus melewati autentikasi dan snapshot token, bukan URL file asli.
+
+### A11-2 — Proteksi sertifikat, TTD dan QR (3 November 2026)
+
+- Gambar template hanya PNG/JPEG valid; TTD wajib PNG. Periksa ekstensi, MIME melalui `finfo` dan decoder gambar, dimensi/rasio/ukuran; re-encode dengan GD agar metadata aktif tidak ikut. Berkas disimpan `writable/private/sertifikat/aset` dengan nama acak/checksum, bukan URL publik. TTD sumber hanya GET berizin Admin; PDF privat dapat diunduh Admin atau Siswa pemilik saja. Tidak menggunakan iframe URL terbuka untuk sumber PNG.
+- PDF Dompdf dengan `isRemoteEnabled=false`, `isPhpEnabled=false`, sanitasi HTML, QR hanya menyimpan URL token acak. Token 24 byte acak (hex48), indeks UNIQUE, tidak memuat PII; informasi publik diproyeksikan secara whitelist tanpa NISN, TTD, kontak, PDF, alasan revisi. Per-IP verifikasi menggunakan throttler server.
+- Penerbitan dan revisi hanya POST+CSRF+Admin aktif; validasi paket, Gen, NISN dan kelayakan TP di Service; percobaan Sumatif `selesai_sah` wajib. Simpan snapshot immutable + checksum, perbarui pointer aktif transaksional; sertifikat lama `digantikan` tanpa dihapus.
+- Backup wajib memuat DB **dan** seluruh `writable/private/sertifikat/`; perubahan template aktif tidak mengubah PDF historis. Larang direktori private/SQL tersaji via front-controller ROOT, termasuk encoded-path dan dotfiles.
+- QR pada XAMPP menunjuk localhost dan hanya untuk pengujian; dokumen produksi memerlukan domain HTTPS permanen untuk verifikasi stabil.
