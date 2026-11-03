@@ -97,7 +97,7 @@ final class DashboardAdminService
                 'label'=>'Kelola referensi','path'=>'admin/referensi'];
         }
         if ($belum>0) {
-            $perhatian[]=['pesan'=>$belum.' pasangan Gen–Mapel belum memiliki penugasan Guru.',
+            $perhatian[]=['pesan'=>$belum.' kombinasi potensial Gen–Mapel belum ditetapkan Guru (dari seluruh Gen × Mapel).',
                 'label'=>'Periksa pengampu','path'=>'admin/mapel-guru'];
         }
         if ($fotoMenunggu>0) {
