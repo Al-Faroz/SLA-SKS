@@ -11,6 +11,7 @@ on:
       - 'app/Views/siswa/laporan_daftar.php'
       - 'app/Views/pimpinan/laporan.php'
       - 'app/Views/laporan/detail.php'
+      - 'app/Views/akun/beranda.php'
       - 'public/assets/css/app.css'
       - 'public/assets/css/emerald-glass.css'
       - 'tests/unit/LaporanAkademikDatabaseTest.php'
@@ -45,6 +46,7 @@ jobs:
             app/Views/siswa/laporan_daftar.php \
             app/Views/pimpinan/laporan.php \
             app/Views/laporan/detail.php \
+            app/Views/akun/beranda.php \
             tests/unit/LaporanAkademikDatabaseTest.php; do
             php -l "$f"
           done
