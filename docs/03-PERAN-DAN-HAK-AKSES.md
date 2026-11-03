@@ -81,3 +81,10 @@ Seluruh layanan menegakkan Gen–Mapel dan peran aktif di Controller **dan Servi
 - **Guru BAB**: editor isian BAB yang sudah ada dapat dibuka sesuai penugasan G1; jangan menutupnya hanya karena satu TP dalam BAB `siap`. Tidak menambah operasi pemindahan TP antar-BAB.
 - **Guru TP**: cek penugasan G1 dan bukti penggunaan siswa pada objek TP; boleh sunting Draf maupun Siap-belum-digunakan. Tolak seluruh mutasi konten pada TP yang pernah digunakan siswa, bukan sekadar yang `status=siap`.
 - **Admin** tidak ikut memberi approval atas edit CP/BAB/TP pada jalur ini; operasi koreksi nilai siswa dan perlindungan sertifikat tidak berubah.
+
+
+### Pembagian kewenangan Pra-Semester (3 November 2026)
+- **Guru G1:** kelola bank soal semester dan KKM khusus Pra-Semester dalam Gen–Mapel sendiri, lihat status/jawaban dan pembatalan milik siswanya; **tidak** menjadwalkan atau menyetujui susulan.
+- **Admin:** jadwalkan jendela **mulai** dan durasi tiap Gen–Mapel–Semester secara terpisah; jadwalkan remedial dan satu atau lebih susulan, tetapkan peserta susulan yang dibatalkan/tidak hadir, audit perubahan. Tidak membuat/mengoreksi nilai atau bank soal Guru.
+- **Siswa:** hanya dapat memulai ketika jendela Admin untuk tahap/identitasnya berlangsung dan seluruh TP NonEsensial paket selesai; setelah mulai memiliki durasi pengerjaan individual. Siswa yang dibatalkan tidak dapat memulai lagi tanpa masuk jadwal susulan Admin. **Pimpinan:** hanya baca hasil.
+- Rumusan historis "Guru menangani pembatalan Pra-Semester" berarti **melihat/memonitor insiden**, bukan memberi izin ulang yang menggantikan jadwal Admin.
