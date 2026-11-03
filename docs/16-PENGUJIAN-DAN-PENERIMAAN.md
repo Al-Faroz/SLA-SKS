@@ -398,3 +398,10 @@ Semua kasus memerlukan bukti tes nyata pada XAMPP sebelum dinyatakan PASS. Pengu
 - Buat percobaan Pra-Semester berjalan dalam fixture SQLite anonim, putuskan heartbeat lebih dari total batas 600 detik, lalu lakukan **satu** pembacaan status server. Hasil wajib `dibatalkan_menunggu_guru`, skor NULL, serta tepat satu segmen `koneksi` yang dimulai pada `last_seen_server_at + 20 detik` dan berakhir ketika pembatalan terdeteksi.
 - Permintaan status kedua harus idempoten: tidak menambah segmen, nilai atau percobaan; siswa tetap menunggu jadwal susulan Admin. Kasus masuk `tests/unit/PraSemesterDatabaseTest.php` dan alur CI S06A/A8.
 - Tidak mengubah kebijakan pengamanan Master 07: koneksi 20 detik dan jeda kumulatif maksimal 600 detik. Uji browser XAMPP tetap perlu dilakukan pada akun simulasi berhak dan jadwal Admin sah.
+
+### A8-11 — Perubahan batas jeda koneksi 10 menit (3 November 2026)
+
+- Keputusan terbaru pemilik: batas **jeda koneksi kumulatif** pada profil keamanan Ketat diubah dari **300 menjadi 600 detik (10 menit)**, berlaku untuk Diagnostik, Sumatif TP dan Pra-Semester. Timeout heartbeat/deteksi putus koneksi tetap **20 detik**; jeda fullscreen dan batas tiga insiden tidak berubah. Ketentuan sebelumnya yang menyebut 300 detik pada bagian A8-10 telah digantikan oleh aturan ini.
+- Uji batas: setelah 300 detik jeda koneksi ujian belum dihentikan; pada 599 detik tetap jeda; pada 600 detik berlaku konsekuensi sesuai jenis tes. Dua jeda yang terpisah tetap dijumlahkan, bukan mendapat 600 detik baru tiap kejadian.
+- Regresi integrasi Pra-Semester: offline sekitar 400 detik membuka `jeda_koneksi` dan masih dapat pulih tanpa membuat attempt baru; offline sekitar 700 detik dapat langsung membatalkan ujian dengan skor NULL dan tepat satu segmen audit koneksi yang tertutup. Diagnostik/Sumatif yang terhenti tetap menggunakan **izin akses ulang Guru**, bukan pembatalan Pra-Semester.
+- Periksa juga pesan jeda pada `public/assets/js/diagnostik-ujian.js` menyebut 10 menit. Tidak ada SQL, reset data, perubahan jadwal Admin, atau kebijakan waktu individual ujian pada tahap ini. Uji browser aktual tetap diperlukan.
