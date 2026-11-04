@@ -105,17 +105,10 @@ final class KelayakanSertifikatService
         } else {
             throw new DomainException('Hak pemeriksaan sertifikat tidak sah.');
         }
-        if ($siswaId<1 || $paketId<1) {
-            throw new DomainException('Siswa/paket sertifikat tidak ditemukan.');
-        }
-        $halaman=1;
-        do {
-            $rekap=$this->rekapInternal($paketId,$halaman,100);
-            foreach ($rekap['baris'] as $r) {
-                if ((int)$r['siswa_id']===$siswaId) return $r;
-            }
-            $halaman++;
-        } while ($halaman <= (int)$rekap['jumlah_halaman']);
+        // Memeriksa satu siswa langsung di SQL, bukan memuat semua
+        // siswa Gen satu per satu. Hak pemilik diverifikasi di atas.
+        $rekap=$this->rekapInternal($paketId,1,1,$siswaId);
+        if ($rekap['baris']!==[]) return $rekap['baris'][0];
         throw new DomainException('Siswa tidak terdaftar pada Gen paket ini.');
     }
 
@@ -160,7 +153,7 @@ final class KelayakanSertifikatService
     }
 
     /** Hanya dipanggil setelah pemeriksaan hak dari rekap() atau periksaSiswa(). */
-    private function rekapInternal(int $paketId,int $halaman,int $perHalaman): array
+    private function rekapInternal(int $paketId,int $halaman,int $perHalaman,?int $hanyaSiswa=null): array
     {
         if ($halaman < 1 || $halaman > 100000
             || $perHalaman < 1 || $perHalaman > 100) {
@@ -179,15 +172,18 @@ final class KelayakanSertifikatService
         $wajib = array_values(array_filter($semuaTp,
             static fn (array $tp): bool => $tp['jenis_tp'] === 'non_esensial'
         ));
-        $total = $this->db->table('siswa')
-            ->where('angkatan_id',(int)$paket['angkatan_id'])->countAllResults();
-        $pages = max(1,(int)ceil($total/$perHalaman));
-        $halaman = min($pages,$halaman);
-        $siswa = $this->db->table('siswa s')
+        $hitung=$this->db->table('siswa')
+            ->where('angkatan_id',(int)$paket['angkatan_id']);
+        if ($hanyaSiswa!==null) $hitung->where('id',$hanyaSiswa);
+        $total=$hitung->countAllResults();
+        $pages=max(1,(int)ceil($total/$perHalaman));
+        $halaman=min($pages,$halaman);
+        $daftar=$this->db->table('siswa s')
             ->select('s.id,s.semester_mulai,u.nama')
             ->join('pengguna u','u.id=s.pengguna_id')
-            ->where('s.angkatan_id',(int)$paket['angkatan_id'])
-            ->orderBy('u.nama','ASC')->orderBy('s.id','ASC')
+            ->where('s.angkatan_id',(int)$paket['angkatan_id']);
+        if ($hanyaSiswa!==null) $daftar->where('s.id',$hanyaSiswa);
+        $siswa=$daftar->orderBy('u.nama','ASC')->orderBy('s.id','ASC')
             ->get($perHalaman,($halaman-1)*$perHalaman)->getResultArray();
 
         // Seluruh nilai dan percobaan diambil per halaman, bukan N+1 per siswa.
