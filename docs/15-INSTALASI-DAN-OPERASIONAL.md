@@ -112,3 +112,12 @@ Jika impor DDL gagal di tengah, jangan mengulang tanpa audit keadaan parsial dan
 ### A12-4 — Batas indikator operasional di Dashboard Admin (3 November 2026)
 
 Dashboard Admin menampilkan sisa ruang disk dari `disk_free_space(WRITEPATH)` pada volume penyimpanan `writable/`. Angka tersebut bukan prediksi aman hosting atau ukuran sisa kuota shared hosting, dan bisa tidak tersedia jika lingkungan menolak pembacaan. **Status cron dan backup sengaja ditampilkan `Belum diperiksa`** hingga tersedia pemeriksaan terintegrasi yang benar-benar dijalankan. Prosedur backup SQL dan berkas `writable/private/` tetap manual sesuai SOP; jangan menandai PASS hanya karena kartu dashboard bisa dimuat. TTD yang diaktifkan diperiksa dengan hash SHA-256 saat dashboard dibaca, tanpa membeberkan isi/metadata privat kepada pengguna. Tidak memerlukan perubahan .env, instalasi tugas terjadwal, ataupun SQL.
+
+
+### A14-1 — SOP uji HTTP anonim XAMPP setelah perubahan `.htaccess` (4 November 2026)
+
+Sesudah review dan pull branch A14-1, jalankan dari `G:\\xampp\\htdocs\\sla-sks` dengan PHP CLI XAMPP:
+```bat
+php scripts/qa/http_security_smoke.php http://localhost/sla-sks/
+```
+Tidak memerlukan kredensial, dump SQL, reset DB, HTTP POST atau perubahan `.env`. Script menguji aset statis publik (harus 200), berkas internal (403/404), route panel anonim (redirect login/401/403), dan Kebijakan Privasi (200 jika versi resmi berlaku, 503 jika belum diterbitkan). Hasil FAIL harus diperbaiki sebelum hosting. **Jangan membuka URL pembaruan ATP di browser untuk menguji penolakan**, karena pada server yang mengabaikan `.htaccess` hal tersebut dapat menjalankan skrip; pengujian otomatis hanya memakai URL tanpa efek mutasi. Pastikan Apache XAMPP mengaktifkan `mod_rewrite` dan izin `AllowOverride` secara benar; jangan mengubah root atau URL jika status gagal tanpa analisis. QA di GitHub Actions tidak menggantikan tes XAMPP dan hosting.

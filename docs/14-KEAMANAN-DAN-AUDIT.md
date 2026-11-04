@@ -158,3 +158,10 @@ Adapter kelak harus membuktikan aktor penerima lewat relasi sah dan role aktif; 
 ### A13-6/A13-7 — proteksi setelah dump (18)
 
 Catatan "belum tersedia dump" di atas bersifat historis. Dump privat (18) telah diperiksa tanpa disimpan di GitHub. SQL V4-0013 hanya additive, mengikat penerima dan pengelola kepada `pengguna`. Notifikasi hanya untuk penerima dan peran aktif; jumlah unread dan daftar tidak memuat informasi orang lain. Klik tautan mengecek ulang sumber, termasuk G1 Guru; POST penandaan dibaca memerlukan CSRF dan kepemilikan notifikasi, tanpa mengubah penilaian. Isi notifikasi tidak menyertakan NISN, skor, atau jawaban. Kebijakan Privasi resmi diterbitkan hanya Admin, mempertahankan versi/riwayat lama, dengan checksum dan escaping saat publik. Checkbox konfirmasi tidak menggantikan pengesahan sekolah. Belum ada naskah yang diunggah atau diterbitkan otomatis.
+
+
+### A14-1 — Penutupan jalur HTTP ke skrip ROOT (4 November 2026)
+
+Implementasi sekarang melindungi direktori tambahan `scripts/`, `tools/`, `builds/`, `uploads/` dan berkas root seperti `AGENTS.md`, `composer.json`, `README.md`, dotfiles, SQL/backup, selain direktori privat yang sudah ditolak sebelumnya. Hanya `public/assets/` dan aset publik terpilih diizinkan lewat path statis; PHP/shell pada direktori aset ditolak oleh `.htaccess`. Dua skrip pembaruan template ATP juga memeriksa `PHP_SAPI === 'cli'` sebelum memuat library. Posisi `index.php` dan `.htaccess` **tetap ROOT**.
+
+Pemeriksaan dapat dijalankan tanpa identitas/login melalui `php scripts/qa/http_security_smoke.php http://localhost/sla-sks/`. Alat ini hanya menguji GET dan membuang body respons; **tidak pernah memanggil URL PHP skrip pemeliharaan** yang dapat mengubah template jika konfigurasi server salah. Hasil HTTP 403/404 pada contoh URL bukan jaminan semua traversal/alias/symlink aman; uji HTTP Apache nyata dan konfigurasi shared hosting tetap wajib sebelum go-live.

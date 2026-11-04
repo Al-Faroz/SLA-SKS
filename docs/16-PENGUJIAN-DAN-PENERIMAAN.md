@@ -724,3 +724,11 @@ Tes tahap ini di `tests/unit/A13KontrakNotifikasiPrivasiTest.php`. Workflow yang
 ### A13-6/A13-7 — verifikasi implementasi V4-0013
 
 Setelah audit dump (18), `tests/unit/A13NotifikasiPrivasiDatabaseTest.php` menguji otorisasi, pemisahan peran, idempoten, perubahan penugasan Guru, mark read, Draf/Terbit, histori versi dan batas tanggal berlaku. `tests/integration/SqlA13NotifikasiPrivasiSchemaCheck.php` mengimpor patch SQL asli V4-0013 pada MariaDB sintetis, memeriksa FK, kunci unik, dan marker versi. Workflow QA menguji lint, kontrak, SQLite, dan regresi layanan akademik. Uji E2E XAMPP masih wajib untuk penilaian Resume/HOTS, permintaan/izin akses ulang, TP Siap, sertifikat, pembatalan Pra-Semester, login semua peran, unggah naskah resmi, tampilan HP/Dark/Light, CSRF, retry. Pemicu koreksi nilai belum dapat dinyatakan selesai karena Service koreksi nilai sesuai v2.5 belum ada.
+
+
+### A14-1 — Penerimaan keamanan ROOT dan HTTP anonim (4 November 2026)
+
+Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login dan aset CSS/JS/icon masih 200; (2) `/.env`, `/app/Config/Database.php`, `/vendor/autoload.php`, `/writable/`, `/database/sql/`, `/docs/`, `/scripts/`, `/tools/`, `/AGENTS.md` dan arsip/dotfiles ditolak 403/404; (3) seluruh panel Admin/Guru/Siswa/Pimpinan, Profil, Notifikasi dan Bantuan dari sesi anonim tidak menampilkan data (302 menuju login atau 401/403); (4) Kebijakan Privasi publik 503 jika belum disahkan/terbit atau 200 jika sudah; (5) PHP pemeliharaan template tak dapat dijalankan non-CLI. `scripts/qa/http_security_smoke.php` memeriksa contoh secara read-only, tidak mencetak isi respons dan tidak memanggil file PHP pemeliharaan. `tests/unit/A14RootHttpProtectionTest.php` memeriksa source guards. Workflow `QA A14-1 Pengamanan ROOT dan HTTP Anonim` menjalankan lint, regresi akses anonim, dan uji Apache mod_rewrite dengan file `.env` sintetis. PASS CI bukan PASS XAMPP; prosedur lokal tetap diperlukan.
+
+
+**Hasil CI A14-1 (4 November 2026):** PHP lint 4 berkas PASS; PHPUnit 8 tes/68 assertions PASS; Apache + mod_rewrite pada dokumen ROOT simulasi 41 URL anonim PASS/0 FAIL. Pengujian XAMPP lokal masih membutuhkan perintah CLI smoke pada Master 15; tidak ada klaim hosting produksi sudah diverifikasi.
