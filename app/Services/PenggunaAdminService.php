@@ -46,6 +46,12 @@ final class PenggunaAdminService
         return bin2hex(random_bytes(16));
     }
 
+    /** @param list<string> $peran */
+    public static function tipeResetSandi(array $peran): string
+    {
+        return in_array('admin', $peran, true) ? 'acak' : 'default';
+    }
+
     private function admin(): array
     {
         $akun = (new AuthService($this->db))->penggunaSaatIni();
@@ -275,7 +281,7 @@ final class PenggunaAdminService
             // gunakan sandi DEFAULT yang diketik Admin saat konfirmasi.
             // Tidak ada password default universal di repo/dump lama,
             // sehingga nilainya tidak boleh dikarang atau disimpan plaintext.
-            $isAdmin = in_array('admin', $peran, true);
+            $isAdmin = self::tipeResetSandi($peran) === 'acak';
             if ($isAdmin) {
                 if ($sandiDefault !== null && $sandiDefault !== '') {
                     throw new DomainException('Reset akun Admin tidak menerima sandi default manual.');
