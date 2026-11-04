@@ -101,8 +101,8 @@ final class PengumumanGuruGenMariaDbTest extends TestCase
 
     public function testScopeMariaDbSesuaiPenugasanGenDanPeranPembuat(): void
     {
-        self::assertSame(['Global','Rangkap admin'],
-            array_map('strval',array_column(self::daftar('pimpinan',888)['data'],'judul')));
+        self::assertEqualsCanonicalizing(['Global','Rangkap admin'],
+            array_column(self::daftar('pimpinan',888)['data'],'judul'));
         $g10=self::daftar('siswa',300);
         self::assertSame(4,$g10['jumlah']);
         self::assertEqualsCanonicalizing(
