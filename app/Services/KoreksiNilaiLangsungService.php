@@ -119,22 +119,32 @@ final class KoreksiNilaiLangsungService
         return $hasil;
     }
 
-    public function pratinjau(string $jenis,int $id,int $nilaiBaru): array
+    public function pratinjau(string $jenis,int $id,?int $nilaiBaru=null): array
     {
         $guruId=$this->guru();
         // PenilaianGuruService memverifikasi checksum snapshot, hak G1,
         // versi materi, status jawaban dan menampilkan penilai awal.
         $tugas=(new PenilaianGuruService($this->db,$this->akun))->lihat($jenis,$id);
         $r=$this->sumber($jenis,$id,$guruId);
-        return ['tugas'=>$tugas,'dampak'=>self::dampak($r,$jenis,$nilaiBaru)];
+        if ($tugas['nilai']===null) {
+            throw new DomainException('Nilai awal belum disimpan Guru.');
+        }
+        return ['tugas'=>$tugas,
+            'dampak'=>self::dampak($r,$jenis,$nilaiBaru??(int)$tugas['nilai'])];
     }
 
     /** @return array{versi:int,berubah:bool,nilai_tp_baru:?float} */
-    public function proses(string $jenis,int $id,int $nilaiBaru): array
+    public function proses(string $jenis,int $id,int $nilaiBaru,int $nilaiAwalForm): array
     {
         $guruId=$this->guru();
         PenilaianGuruService::skor($nilaiBaru);
+        PenilaianGuruService::skor($nilaiAwalForm);
         $tugas=(new PenilaianGuruService($this->db,$this->akun))->lihat($jenis,$id);
+        // Melindungi formulir/tab lama: skor yang dilihat Guru saat membuka
+        // formulir wajib tetap sama ketika tombol Proses digunakan.
+        if ($tugas['nilai']===null || (int)$tugas['nilai']!==$nilaiAwalForm) {
+            throw new DomainException('Nilai sudah berubah di tempat lain. Buka ulang Koreksi Nilai.');
+        }
         $this->db->transBegin();
         try {
             $lock=$this->db->DBDriver==='SQLite3'?'':' FOR UPDATE';
@@ -153,8 +163,9 @@ final class KoreksiNilaiLangsungService
             if ((int)$r['guru_g1']!==$guruId) {
                 throw new DomainException('Guru pengampu sudah berubah.');
             }
-            if ((int)$r['nilai_sumber']!==(int)$tugas['nilai']) {
-                throw new DomainException('Skor telah berubah di sesi lain; muat ulang.');
+            if ((int)$r['nilai_sumber']!==$nilaiAwalForm
+                || (int)$r['nilai_sumber']!==(int)$tugas['nilai']) {
+                throw new DomainException('Nilai sudah berubah di tempat lain. Buka ulang Koreksi Nilai.');
             }
             $d=self::dampak($r,$jenis,$nilaiBaru);
             if ($d['nilai_awal']===$d['nilai_baru']) {
