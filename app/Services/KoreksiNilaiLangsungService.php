@@ -66,7 +66,8 @@ final class KoreksiNilaiLangsungService
                 .'n.id AS nilai_tp_id,n.jalur,n.nilai_resume,n.nilai_hots,'
                 .'n.nilai_sumatif,n.nilai_tp,n.status_nilai')
             ->join('progres_tp pr','pr.id=x.progres_tp_id')
-            ->join('tp t','t.id=pr.tp_id AND t.id=(SELECT tp_id FROM materi WHERE id=x.materi_id)')
+            ->join('materi m','m.id=x.materi_id AND m.tp_id=pr.tp_id')
+            ->join('tp t','t.id=pr.tp_id')
             ->join('paket_semester p','p.id=t.paket_semester_id'
                 .' AND p.id=pr.paket_semester_id')
             ->join('siswa s','s.id=pr.siswa_id AND s.angkatan_id=p.angkatan_id')
@@ -190,12 +191,8 @@ final class KoreksiNilaiLangsungService
             $now=gmdate('Y-m-d H:i:s');
             // Kolom legacy V4-0014 hanya menyimpan sejarah; status langsung
             // disetujui tanpa akun Admin atau antrean pengajuan.
-            $sudahCetak=$d['nilai_tp_lama']!==null
-                && $d['nilai_tp_baru']!==$d['nilai_tp_lama']
-                && $this->db->table('sertifikat_aktif')
-                    ->where('siswa_id',(int)$r['siswa_id'])
-                    ->where('paket_semester_id',(int)$r['paket_id'])
-                    ->countAllResults()>0;
+            // Sertifikat disinkronkan otomatis ketika siswa mengakses.
+            // Tidak ada permohonan revisi/flag tindak lanjut Admin.
             $this->db->table('permohonan_koreksi_nilai')->insert([
                 'jenis'=>$jenis,'sumber_id'=>$id,
                 'progres_tp_id'=>(int)$r['progres_tp_id'],
@@ -205,7 +202,7 @@ final class KoreksiNilaiLangsungService
                 'nilai_tp_awal'=>$d['nilai_tp_lama'],
                 'nilai_tp_usulan'=>$d['nilai_tp_baru'],
                 'status_nilai_awal'=>$d['status_nilai'],
-                'perlu_tinjau_sertifikat'=>$sudahCetak?1:0,
+                'perlu_tinjau_sertifikat'=>0,
                 'alasan'=>'Koreksi langsung oleh Guru G1',
                 'guru_id'=>$guruId,'status'=>'disetujui',
                 'dibuat_pada'=>$now,'diputus_pada'=>$now,
