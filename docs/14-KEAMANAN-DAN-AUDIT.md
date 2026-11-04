@@ -143,3 +143,7 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 ### A13-3 — Privasi kontak resmi (3 November 2026)
 
 `GET /hubungi-admin` dilindungi filter login dan verifikasi ulang role di `KontakResmiMadrasahService`. Query `pengaturan` hanya memilih kunci kontak sekolah resmi; informasi pribadi `profil_pengelola` dan data akademik tidak dimuat. Semua nilai HTML di-escape, termasuk atribut URL; tautan eksternal hanya HTTP(S) sah, email valid dan telepon yang dinormalisasi. Nilai legacy invalid hanya teks. No-store, tanpa mutasi, tiket, audit event palsu, data siswa maupun notifikasi otomatis.
+
+
+### A13-5 — Anti-kebocoran Pengumuman lintas Gen (4 November 2026)
+Pengumuman yang dibuat di peran Admin tampil global; yang dibuat di peran Guru hanya tampil kepada **Siswa** pada Gen yang saat ini ditugaskan kepada Guru tersebut. Catatan awal `riwayat_informasi` menentukan asal peran (termasuk akun rangkap Admin/Guru), bukan hak yang dimiliki saat membaca atau `diubah_oleh` sesudah Admin menyunting. Pengumuman tanpa catatan asal yang konsisten tidak ditampilkan ke pembaca. Query `EXISTS` memeriksa siswa terdaftar Gen, penugasan Guru–Gen, akun Guru aktif dan role Guru. Tidak ada pengambilan data dari parameter URL; status Draf/Arsip tidak ditampilkan; hitungan dan paginasi memakai filter server yang identik. Admin tetap boleh mengelola semua, Guru hanya miliknya. Bila penugasan Guru berubah, cakupan siswa berubah pada pembacaan berikutnya (riwayat lama tetap disimpan). Tidak menambah notifikasi otomatis atau tabel penerima.
