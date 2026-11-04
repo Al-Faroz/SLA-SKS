@@ -61,3 +61,14 @@ KKM Pra-Semester: default Admin atau nilai khusus Guru untuk paket Gen–Mapel�
 - **Pra-Semester bukan syarat penerbitan sertifikat**, dan **nilainya tidak dicetak dalam sertifikat**. Ketuntasan TP NonEsensial dan seluruh nilai wajib TP yang sudah Final tetap prasyarat sertifikat sesuai Master 09.
 - Hasil Pra-Semester yang belum ada, batal, masih sementara, atau mengalami remedial **tidak memblokir sertifikat** dan perubahan hasilnya tidak memicu revisi PDF/QR.
 - Fungsi Pra-Semester adalah checkpoint akademik sebelum Ujian Semester yang sesungguhnya; keputusan ini tidak mengesahkan perhitungan Nilai Akhir Semester maupun menambahkan mesin Ujian Semester baru.
+
+
+### A14-2 — Pengajuan dan keputusan koreksi nilai Guru (4 November 2026)
+
+Implementasi khusus **nilai Resume/HOTS yang sudah dinilai pada TP NonEsensial dengan progres Tuntas dan nilai Sumatif tersedia**. Tidak membuka fitur ubah soal/kunci/TP, dan **tidak** memakai tabel lama `permohonan_koreksi_tp` kategori A/B/C. Guru G1 yang sedang ditugaskan dapat melihat jawaban/snapshot final, skor penilai historis dan pratinjau nilai TP memakai rumus resmi 20/20/60; alasan akademik wajib, nilai usulan 0–100 integer. Pengajuan menjadi **Diajukan** tanpa mengubah nilai. Satu sumber skor hanya boleh mempunyai satu pengajuan terbuka; pengajuan yang sudah diputus memiliki nomor versi berurutan.
+
+Admin aktif **yang bukan akun Guru pengusul** dapat menyetujui/menolak beserta catatan wajib. Sebelum persetujuan, Service memeriksa ulang Guru G1, status sumber, ID dan snapshot TP, skor lama, status nilai TP serta bobot hasil hitung. Persetujuan atomik memperbarui skor sumber dan komponen/total `nilai_tp`, tanpa mengganti `dinilai_oleh` dan umpan balik historis; penolakan tidak mengubah nilai. Keduanya menyimpan audit, versi dan riwayat sebelum/sesudah serta notifikasi per penerima. Nilai TP tetap berstatus Final atau Sementara sesuai kalkulator sah; progres TP Tuntas **tidak diubah**.
+
+Jika ada sertifikat aktif dan nilai TP yang tercetak berubah, koreksi ditandai **Perlu Tinjau Sertifikat**. Admin perlu menerbitkan versi pengganti satu per satu melalui Master 09; PDF/QR historis tidak dihapus, ditimpa, dicabut atau diperbarui otomatis.
+
+**Batas tahap ini:** koreksi angka hasil mesin Diagnostik, Sumatif dan Pra-Semester **belum dilaksanakan**. Perlu audit terpisah atas butir/attempt `selesai_sah`, bukan menyunting bank soal atau mengubah nilai secara bebas.
