@@ -14,7 +14,7 @@
     <header class="a-page__heading a-proto-heading">
         <div><p class="a-proto-eyebrow">Admin · Naskah Disahkan</p>
             <h1><?= $terbit?'Versi Kebijakan yang Telah Diterbitkan':($id?'Sunting Draf Kebijakan':'Tambah Draf Kebijakan') ?></h1>
-            <p class="a-proto-muted">Aplikasi tidak membuat isi Kebijakan Privasi otomatis. Masukkan hanya teks yang disahkan oleh madrasah. Simpan Draf, periksa, lalu terbitkan secara terpisah.</p>
+            <p class="a-proto-muted">Naskah contoh umum telah disiapkan untuk mempermudah penyusunan. Periksa dan sesuaikan isinya dengan praktik madrasah; pengesahan resmi tetap diperlukan sebelum diterbitkan.</p>
         </div>
     </header>
     <?php if ($pesan=session()->getFlashdata('sukses')): ?><div class="a-alert" role="status"><?= esc($pesan) ?></div><?php endif ?>
@@ -24,10 +24,16 @@
         <form method="post" action="<?= esc(site_url($prefix),'attr') ?>" class="a-form" <?= $terbit?'':'data-dirty-form' ?>>
             <?= csrf_field() ?>
             <?php if ($id): ?><input type="hidden" name="revisi_draf" value="<?= (int)$baris['revisi_draf'] ?>"><?php endif ?>
+            <?php if (!$id): ?>
+                <div class="a-alert a-alert--info" role="note">
+                    <strong>Draf contoh — belum menjadi Kebijakan Privasi resmi.</strong>
+                    <p>Naskah di bawah dapat disunting oleh Admin. Periksa kembali pengelolaan data, kontak, retensi, dan prosedur madrasah sebelum pengesahan dan publikasi.</p>
+                </div>
+            <?php endif ?>
             <div class="a-field">
                 <label class="a-label" for="versi-privasi">Versi dokumen</label>
                 <input id="versi-privasi" name="versi" type="text" maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9._-]*" required
-                       value="<?= esc(old('versi',$baris['versi']??''),'attr') ?>" <?= $terbit?'readonly':'' ?>>
+                       value="<?= esc(old('versi',$baris['versi']??'A15-2026.11'),'attr') ?>" <?= $terbit?'readonly':'' ?>>
             </div>
             <div class="a-field">
                 <label class="a-label" for="tanggal-privasi">Tanggal berlaku (WIB)</label>
@@ -36,7 +42,7 @@
             </div>
             <div class="a-field">
                 <label class="a-label" for="teks-privasi">Naskah Kebijakan Privasi resmi</label>
-                <textarea id="teks-privasi" name="teks" rows="18" maxlength="50000" required <?= $terbit?'readonly':'' ?>><?= esc(old('teks',$baris['teks']??'')) ?></textarea>
+                <textarea id="teks-privasi" name="teks" rows="18" maxlength="50000" required <?= $terbit?'readonly':'' ?>><?= esc(old('teks',$baris['teks']??\App\Services\KebijakanPrivasiContohService::naskah())) ?></textarea>
                 <p class="a-help">Teks biasa, maksimal 50.000 karakter. HTML tidak dijalankan pada halaman publik.</p>
             </div>
             <?php if (!$terbit): ?>
