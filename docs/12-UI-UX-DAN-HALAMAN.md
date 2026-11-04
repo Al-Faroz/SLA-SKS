@@ -465,3 +465,7 @@ Perbaikan **hanya tata letak** pada Guru → Peta ATP, Kelola ATP Excel, Semeste
 - Satu Materi TP: judul + jenis media, URL/file sesuai jenis, waktu minimal pada baris tersendiri, kemudian petunjuk Resume dan HOTS berdampingan desktop/bertumpuk HP. Tidak mengubah POST, CSRF, atau aturan isian/penguncian TP terpakai.
 - BAB/TP: tinggi tombol, gap toolbar/baris aksi, pemisah footer dialog. Modal tetap native, akses keyboard dan URL tetap; tidak ada fitur pindah TP.
 - Tema Emerald Glass Dark/Light serta CTA Indigo–Violet dipertahankan. Viewport 360/390/768/1100px, sidebar ringkas/luas, fokus keyboard, validasi dan tabel perlu diuji browser XAMPP. CSS di-scope a-guru-*, tidak mengubah Admin/Siswa/Pimpinan.
+
+### Koreksi A14-4 — Tabel Kelola Pengumuman dan FAQ (4 November 2026)
+
+Tabel **Admin → Kelola Pengumuman**, **Admin → Kelola FAQ** dan **Guru → Kelola Pengumuman** wajib menggunakan komponen tabel baku `a-tbl a-tbl--cards` (bukan `a-tabel` yang tidak memiliki aturan desain). Tabel mengisi lebar kontainer dan memiliki proporsi kolom terpisah: Pengumuman 5 kolom (Judul, Status, Versi, Diperbarui UTC, Aksi) dan FAQ 6 kolom (Pertanyaan, Status, Urutan, Versi, Diperbarui UTC, Aksi). Sunting dan Arsipkan berdekatan, tidak menempel pada kolom tanggal/versi. Pada <=980px baris menjadi kartu terlabel per sel, dengan label, tombol, dan isi tetap terbaca di HP. Tombol Tambah, POST Arsipkan/CSRF, paginasi, draf/terbit/arsip, serta hak Guru per Gen **tidak diubah**. Dark/Light memakai token Emerald Glass resmi. Validasi browser pada XAMPP tetap diperlukan.

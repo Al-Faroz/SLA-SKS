@@ -14,6 +14,7 @@ on:
       - 'database/sql/updates/V4-0012_PENGUMUMAN_FAQ.sql'
       - 'database/sql/README.md'
       - 'tests/unit/InformasiGlobalDatabaseTest.php'
+      - 'tests/unit/InformasiTabelUiTest.php'
       - 'tests/integration/SqlA13InformasiSchemaCheck.php'
       - '.github/workflows/qa-a13-2-pengumuman-faq.yml'
   workflow_dispatch:
@@ -65,11 +66,14 @@ jobs:
             app/Config/Routes.php \
             app/Services/NavigasiService.php \
             tests/unit/InformasiGlobalDatabaseTest.php \
+            tests/unit/InformasiTabelUiTest.php \
             tests/integration/SqlA13InformasiSchemaCheck.php; do
             php -l "$f"
           done
       - name: Uji service SQLite anonim, hak akses, draf, audit dan paginasi
         run: vendor/bin/phpunit --no-coverage tests/unit/InformasiGlobalDatabaseTest.php
+      - name: Regresi tabel FAQ dan Pengumuman Admin/Guru responsif
+        run: vendor/bin/phpunit --no-coverage tests/unit/InformasiTabelUiTest.php
       - name: Regresi A13-1 panduan Bantuan
         run: vendor/bin/phpunit --no-coverage tests/unit/PanduanBantuanServiceTest.php
       - name: SQL V4-0012 pada MariaDB sementara
