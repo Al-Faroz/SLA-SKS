@@ -49,7 +49,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | S09 | Resume | Editor teks, `Simpan draf` manual, `Kirim final` | Draf belum disimpan, gagal simpan, sudah terkirim |
 | S10 | HOTS | Pertanyaan tugas, editor, `Simpan draf`, `Kirim final` | Batas karakter, locked setelah kirim |
 | S11 | Pencapaian | Lencana saat ini dan histori paket | Kosong, telah dilihat |
-| S12 | Nilai saya | Nilai TP, cara tuntas, sementara/final, rata-rata | Menunggu Guru, nilai setelah koreksi |
+| S12 | Nilai saya | Nilai TP per TP, jalur tuntas, sementara/final; Pra-Semester terpisah, tanpa rerata akhir semester | Menunggu Guru, nilai setelah koreksi |
 | S13 | Sertifikat | Sertifikat berlaku, arsip `digantikan`, unduh PDF | TTD belum ada, belum memenuhi syarat, koreksi identitas |
 
 ## 4. Katalog layar Guru
