@@ -24,7 +24,13 @@ final class PanduanBantuanService
             'pertanyaan' => [
                 [
                     'tanya' => 'Bagaimana mengubah sandi akun?',
-                    'jawab' => 'Gunakan Profil & Peran lalu pilih Ganti sandi. Saat login pertama, penggantian sandi sementara diwajibkan sebelum membuka layanan akademik.',
+                    'jawab' => 'Guru, Pimpinan, dan Siswa disarankan mengganti sandi awal, tetapi tetap dapat masuk dan menggunakan layanan. Formulir Ganti sandi ada langsung di Profil & Peran. Akun dengan peran Admin tetap wajib mengganti sandi awal sebelum menggunakan layanan.',
+                    'path' => 'profil',
+                    'aksi' => 'Buka Profil & Peran',
+                ],
+                [
+                    'tanya' => 'Bagaimana reset sandi oleh Admin bekerja?',
+                    'jawab' => 'Untuk Guru, Pimpinan dan Siswa, Admin mereset ke sandi default yang ditetapkan pada formulir reset, bukan sandi acak. Untuk akun yang memiliki peran Admin, reset menghasilkan sandi acak dan pengguna wajib menggantinya. Semua sesi lama dibatalkan.',
                     'path' => 'profil',
                     'aksi' => 'Buka Profil & Peran',
                 ],
