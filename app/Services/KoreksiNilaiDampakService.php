@@ -46,6 +46,11 @@ final class KoreksiNilaiDampakService
         }
         PenilaianGuruService::skor($nilaiSumberLama);
         PenilaianGuruService::skor($nilaiSumberUsulan);
+        if (!is_finite($sumatifTerbaik)
+            || ($resume !== null && !is_finite($resume))
+            || ($hots !== null && !is_finite($hots))) {
+            throw new DomainException('Komponen nilai harus angka terbatas.');
+        }
 
         $nilaiAktual = $komponen === 'resume' ? $resume : $hots;
         if ($nilaiAktual === null || $nilaiAktual !== (float)$nilaiSumberLama) {
