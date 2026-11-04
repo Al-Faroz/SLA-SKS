@@ -83,6 +83,8 @@ jobs:
         run: |
           php scripts/qa/http_security_smoke.php http://127.0.0.1/ || {
             echo 'Galat Apache runner (konfigurasi sintetis, tanpa kredensial):'
-            sudo tail -n 90 /var/log/apache2/error.log
+            sudo tail -n 50 /var/log/apache2/error.log
+            echo 'Log runtime CI4 runner sintetis:'
+            sudo find /var/www/sla-sks/writable/logs -maxdepth 1 -type f -name 'log-*.log' -exec tail -n 90 {} \;
             exit 1
           }
