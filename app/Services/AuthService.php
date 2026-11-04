@@ -34,6 +34,20 @@ final class AuthService
         ], true);
     }
 
+    /**
+     * Penanda database warisan: 1 berarti sandi awal belum diganti.
+     * Hanya pemegang peran Admin yang terkena pemaksaan.
+     *
+     * @param list<string> $daftarPeran
+     * @return array{wajib:bool,disarankan:bool}
+     */
+    public static function kebijakanSandi(array $daftarPeran, int $belumDiganti): array
+    {
+        $belum = $belumDiganti !== 0;
+        $admin = in_array('admin', $daftarPeran, true);
+        return ['wajib' => $admin && $belum, 'disarankan' => ! $admin && $belum];
+    }
+
     private function waktu(): string
     {
         return gmdate('Y-m-d H:i:s');
@@ -90,12 +104,10 @@ final class AuthService
         // penggantian adalah ANJURAN, bukan pengunci akses akademik.
         // Akun yang memiliki peran Admin (termasuk rangkap Admin+Guru)
         // tetap wajib mengganti sandi awal demi keamanan Admin.
-        $belumDiganti = (int) ($pengguna['wajib_ganti_sandi'] ?? 0) !== 0;
-        $memilikiPeranAdmin = in_array('admin', $tersedia, true);
-        $pengguna['sandi_direkomendasikan'] = $belumDiganti && ! $memilikiPeranAdmin;
-        if (! $memilikiPeranAdmin) {
-            $pengguna['wajib_ganti_sandi'] = 0;
-        }
+        $kebijakanSandi = self::kebijakanSandi($tersedia,
+            (int) ($pengguna['wajib_ganti_sandi'] ?? 0));
+        $pengguna['sandi_direkomendasikan'] = $kebijakanSandi['disarankan'];
+        $pengguna['wajib_ganti_sandi'] = $kebijakanSandi['wajib'] ? 1 : 0;
 
         return $pengguna;
     }
