@@ -18,7 +18,15 @@
     <div>
         <p class="a-proto-eyebrow">Informasi · Editor</p>
         <h1><?= $baru ? 'Tambah' : 'Sunting' ?> <?= esc($nama) ?></h1>
-        <p class="a-proto-muted">Simpan sebagai Draf untuk menyiapkan isi, atau Terbit untuk menampilkan kepada semua akun login. Semua perubahan tercatat di audit.</p>
+        <p class="a-proto-muted">Simpan sebagai Draf atau Terbit.
+            <?php if ($jenis === 'faq'): ?>
+                FAQ Terbit dapat dibaca semua akun aktif melalui Bantuan.
+            <?php elseif ($peran === 'guru'): ?>
+                Pengumuman Guru Terbit hanya dibaca Siswa pada Gen yang Anda ampu saat ini.
+            <?php else: ?>
+                Pengumuman yang dibuat sebagai Admin Terbit berlaku global; suntingan Admin atas pengumuman Guru tidak mengubah sasaran Gen asalnya.
+            <?php endif ?>
+            Semua perubahan tercatat di audit.</p>
     </div>
     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url($prefix),'attr') ?>">Kembali ke daftar</a>
 </header>
@@ -54,7 +62,7 @@
                 <?php if ($baru || $baris['status'] === 'draf'): ?>
                     <option value="draf" <?= $status === 'draf' ? 'selected' : '' ?>>Draf — hanya pengelola</option>
                 <?php endif ?>
-                <option value="terbit" <?= $status === 'terbit' ? 'selected' : '' ?>>Terbit — semua akun login</option>
+                <option value="terbit" <?= $status === 'terbit' ? 'selected' : '' ?>>Terbit — <?= $jenis === 'faq' || $peran === 'admin' ? 'sesuai asal penerbit / FAQ resmi' : 'Siswa Gen yang diampu' ?></option>
             </select>
         </div>
         <?php if (!$baru): ?><p class="a-help">Versi <?= (int)$baris['versi'] ?>. Jika informasi diubah lewat tab lain, simpan akan ditolak agar tidak menimpa perubahan baru.</p><?php endif ?>
