@@ -20,7 +20,10 @@ final class SiswaSertifikat extends BaseController
     {
         try {
             $a=(new AuthService())->penggunaSaatIni();
-            $data=(new SertifikatPenerbitanService())->daftarSaya();
+            $svc=new SertifikatPenerbitanService();
+            // Hanya paket pemilik; penerbitan/pembaruan versi saat akses.
+            $otomatis=$svc->sinkronkanSaya();
+            $data=$svc->daftarSaya();
             return $this->response->setHeader('Cache-Control','private, no-store')
                 ->setBody(view('siswa/sertifikat',[
                     'judul'=>'Sertifikat Pembelajaran',
@@ -28,6 +31,7 @@ final class SiswaSertifikat extends BaseController
                     'peranAktif'=>'Siswa',
                     'tautanNavigasi'=>NavigasiService::untuk('siswa','sertifikat'),
                     'sertifikat'=>$data,
+                    'otomatis'=>$otomatis,
                 ]));
         } catch (Throwable $e) {
             log_message('error','Daftar sertifikat siswa: {error}',['error'=>$e->getMessage()]);

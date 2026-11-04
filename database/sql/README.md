@@ -441,6 +441,9 @@ Berkas aset/PDF historis berada pada `writable/private/sertifikat/aset/` dan `wr
 
 ## V4-0014 — Koreksi Nilai Siswa A14-2 (4 November 2026)
 
+**STATUS XAMPP TERKINI (4 November 2026): V4-0013 dan V4-0014 sudah berhasil diimpor oleh pemilik (16:02:43 dan 16:02:59 WIB). JANGAN DIIMPOR ULANG.** Catatan impor di bawah khusus instalasi lain yang belum memiliki kedua patch. Keputusan final tidak memakai persetujuan Admin: kedua tabel V4-0014 dipertahankan sebagai **audit koreksi langsung Guru G1** (status terminal `disetujui`, tanpa Admin) dan sertifikat personal diterbitkan/diperbarui otomatis pada akses siswa. **Tidak ada patch SQL baru, jangan ubah SQL historis.**
+
+
 **Acuan audit:** dump SQL XAMPP privat \`sla_sks_v4 (19).sql\`, phpMyAdmin 5.2.1, waktu **04 Nov 2026 09.28**, MariaDB **10.4.32**, database \`sla_sks_v4\`. Dump memuat **71 tabel** dengan marker sampai **\`V4-0012-PENGUMUMAN-FAQ\`**. V4-0013 **BELUM** tercatat dan tabel \`notifikasi\`/\`kebijakan_privasi\` tidak ada dalam dump. Tidak ada tabel koreksi nilai siswa.
 
 **Jangan menganggap A13-6/A13-7 sudah terpasang dalam database hanya karena kode/QA HTTP-nya FIX.** Modul Koreksi Nilai membutuhkan V4-0013 untuk notifikasi dan V4-0014 untuk transaksi permohonan.

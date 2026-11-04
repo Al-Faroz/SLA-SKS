@@ -220,4 +220,68 @@ final class SertifikatPenerbitanDatabaseTest extends TestCase
         self::assertStringStartsWith('%PDF-',$pdf);
         self::assertGreaterThan(1800,strlen($pdf));
     }
+
+    public function testAksesSiswaOtomatisMenerbitkanKemudianRevisiTanpaAdmin(): void
+    {
+        $s=new SertifikatPenerbitanService($this->db,self::actor(101,'siswa'));
+        $awal=$s->sinkronkanSaya();
+        self::assertSame(1,$awal['diperbarui']);
+        self::assertSame(0,$awal['galat']);
+        $list=$s->daftarSaya();
+        self::assertCount(1,$list);
+        $idAwal=(int)$list[0]['id'];
+        $qrAwal=$this->db->table('sertifikat')->where('id',$idAwal)
+            ->get()->getRow('kode_verifikasi');
+        self::assertSame(101,(int)$this->db->table('sertifikat')
+            ->where('id',$idAwal)->get()->getRow('diterbitkan_oleh'));
+        self::assertSame(0,$s->sinkronkanSaya()['diperbarui']);
+        self::assertSame(1,$this->db->table('sertifikat')->countAllResults());
+        $this->db->table('nilai_tp')->where('progres_tp_id',201)->update([
+            'nilai_tp'=>30,'nilai_sumatif'=>30,
+        ]);
+        $revisi=$s->sinkronkanSaya();
+        self::assertSame(1,$revisi['diperbarui']);
+        $list=$s->daftarSaya();
+        self::assertCount(2,$list);
+        self::assertSame('berlaku',$list[0]['status']);
+        self::assertSame('digantikan',$list[1]['status']);
+        self::assertSame(2,(int)$list[0]['versi']);
+        self::assertSame('digantikan',$s->verifikasi($qrAwal)['status']);
+        self::assertFileExists($s->pdfBerizin($idAwal)['path']);
+        self::assertFileExists($s->pdfBerizin((int)$list[0]['id'])['path']);
+        self::assertSame(0,$s->sinkronkanSaya()['diperbarui']);
+        self::assertSame(2,$this->db->table('sertifikat')->countAllResults());
+    }
+
+    public function testAksesSiswaTidakLayakTetapBukaDaftarTanpaSertifikatFiktif(): void
+    {
+        $s=new SertifikatPenerbitanService($this->db,self::actor(102,'siswa'));
+        $hasil=$s->sinkronkanSaya();
+        self::assertSame(0,$hasil['diperbarui']);
+        self::assertSame(1,$hasil['belum_layak']);
+        self::assertSame(0,$hasil['galat']);
+        self::assertSame([],$s->daftarSaya());
+    }
+
+    public function testAksesSiswaTanpaTtdTetapAmanDanTidakMenerbitkan(): void
+    {
+        $this->db->table('sertifikat_aset_aktif')->where('jenis','ttd')->delete();
+        $s=new SertifikatPenerbitanService($this->db,self::actor(101,'siswa'));
+        self::assertSame(1,$s->sinkronkanSaya()['belum_layak']);
+        self::assertSame(0,$this->db->table('sertifikat')->countAllResults());
+    }
+
+    public function testAksiManualSiswaDanAktivasiOtomatisAdminDitolak(): void
+    {
+        $s=new SertifikatPenerbitanService($this->db,self::actor(101,'siswa'));
+        try {
+            $s->terbit(1,11);
+            self::fail('Siswa tidak boleh memakai API manual penerbitan.');
+        }catch(\DomainException $e){
+            self::assertNotSame('',$e->getMessage());
+        }
+        $this->expectException(\DomainException::class);
+        $this->svc()->sinkronkanSaya();
+    }
+
 }

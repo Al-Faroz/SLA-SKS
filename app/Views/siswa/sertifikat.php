@@ -9,15 +9,27 @@
         <div>
             <p class="a-proto-eyebrow">Siswa · Sertifikat Pembelajaran</p>
             <h1>Sertifikat Saya</h1>
-            <p class="a-proto-muted">Unduh sertifikat yang sudah diterbitkan Admin.
-                Versi lama tetap tersedia sebagai arsip jika ada revisi.</p>
+            <p class="a-proto-muted">Sertifikat personal terbit otomatis setelah seluruh nilai TP siap.
+                Jika nilai berubah, versi terbaru dibuat otomatis saat halaman ini dibuka.
+                Versi lama tetap tersedia sebagai arsip.</p>
         </div>
     </header>
+    <?php if (($otomatis['diperbarui']??0)>0): ?>
+        <div class="a-alert" role="status">
+            <?= (int)$otomatis['diperbarui'] ?> sertifikat diterbitkan atau diperbarui otomatis.
+        </div>
+    <?php endif ?>
+    <?php if (($otomatis['galat']??0)>0): ?>
+        <div class="a-alert a-alert--bahaya" role="alert">
+            Sebagian sertifikat belum dapat diperbarui. Periksa kembali nanti atau laporkan kepada pengelola.
+        </div>
+    <?php endif ?>
     <section class="a-card a-jarak-atas" aria-labelledby="daftar-sertifikat">
         <h2 id="daftar-sertifikat">Daftar Sertifikat</h2>
         <?php if ($sertifikat===[]): ?>
-            <div class="a-alert" role="status">Belum ada sertifikat yang diterbitkan untuk akun ini.
-                Sertifikat tidak harus menunggu hasil Pra-Semester.</div>
+            <div class="a-alert" role="status">Belum ada sertifikat yang tersedia. Selesaikan TP NonEsensial dan
+                tunggu seluruh penilaian wajib Final; identitas madrasah serta TTD harus siap.
+                Hasil Pra-Semester bukan syarat penerbitan.</div>
         <?php else: ?>
             <div class="a-tabel-gulir a-sertifikat__scroll" role="region" tabindex="0"
                 aria-label="Daftar sertifikat dapat digulir">

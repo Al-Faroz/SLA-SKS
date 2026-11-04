@@ -22,8 +22,8 @@ Satu akun staf boleh memiliki dua role saja: Admin+Guru, Admin+Pimpinan, Guru+Pi
 | Mengubah TP Siap yang sudah digunakan siswa | Tidak | **Tidak; konten terkunci** | Tidak | Tidak |
 | Menyunting isian BAB yang ada | Tidak | **Ya, G1 Gen–Mapel; tidak terkunci hanya karena TP-nya Siap** | Tidak | Tidak |
 | Menilai resume/tugas | Tidak | **Ya, Gen–Mapelnya** | Tidak | Tidak |
-| Mengajukan koreksi nilai oleh guru pengganti | Tidak | **Ya, Gen–Mapelnya** | Tidak | Tidak |
-| Menyetujui koreksi akademik | **Ya**, bukan usulan sendiri | Tidak | Tidak | Tidak |
+| Koreksi langsung nilai Resume/HOTS siswa | Tidak | **Ya, Guru G1 aktif Gen–Mapel**, diaudit | Tidak | Tidak |
+| Menyetujui koreksi nilai Guru | **Tidak diperlukan** | **Langsung Proses**, tanpa persetujuan | Tidak | Tidak |
 | Memberi izin akses ulang Diagnostik/Sumatif; melihat pembatalan Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
 | Menyetel logo aplikasi/favikon, TTD PNG dan template | **Ya** | Tidak | Tidak | Baca |
 | Mengelola Pengumuman | Semua; publikasi Admin global | Hanya miliknya; publikasi untuk siswa Gen yang diampu | Baca Admin dan Guru pengampu Gen-nya | Baca Admin saja |
@@ -48,11 +48,10 @@ Sumber kewenangan Guru adalah relasi `penugasan_guru_gen(angkatan_id, mapel_id, 
 
 Setiap paket/TP/soal/materi memiliki konteks Gen pemilik yang tidak dapat dilompati dengan mengubah ID URL. Guru pengampu aktif G1 dapat meneruskan Draf maupun menyunting TP Siap **yang belum digunakan siswa** pada Gen–Mapel yang dialihkan. TP yang sudah digunakan siswa tetap terkunci; nilai, versi, audit dan penilai lama tetap utuh. Gen lain tidak terpengaruh. Bila pengampu Gen–Mapel kosong, siswa masih boleh melanjutkan TP Siap historis yang sudah tersedia; penilaian baru menunggu Guru.
 
-## 4. Aturan self-approval yang dibatasi tepat sasaran
-- Sunting CP oleh Admin, sunting BAB oleh Guru, dan sunting TP Siap yang belum digunakan siswa **bukan** proses pengajuan. Tidak ada pemeriksaan self-approval untuk ketiga aksi langsung itu.
-- Bila masih terdapat proses koreksi nilai siswa yang benar-benar memerlukan keputusan Admin, akun pengusul yang sama tidak boleh memutus usulannya sendiri.
-- Admin A secara langsung **mengedit biodata administratif** siswa: tidak ada konsep usulan Guru/approval ganda. Admin A dapat menerbitkan revisi identitas sertifikat berdasarkan perbaikan tersebut; dicatat otomatis.
-- Tidak disyaratkan minimal dua Admin. Aturan self-approval hanya berlaku pada proses persetujuan akademik yang memang tersisa (misalnya koreksi nilai), bukan edit CP/BAB/TP belum digunakan.
+## 4. Koreksi langsung tanpa self-approval
+- Perubahan skor Resume/HOTS oleh Guru G1 Gen–Mapel melalui tombol **Koreksi Nilai → ubah skor → Proses** adalah tindakan berwenang langsung; **bukan permohonan akademik** dan tidak memerlukan dua akun/Admin, termasuk pada akun staf multi-peran.
+- Hak koreksi hanya berlaku ketika akun sedang memakai role **Guru**, status aktif, dan menjadi G1 untuk Gen–Mapel siswa tersebut. Guru lain di luar penugasan tidak dapat melihat, mengedit, atau mengaksesnya dengan mengganti ID URL.
+- Admin tetap berwenang atas biodata, pengaturan sekolah dan aset sertifikat, **bukan** pemberi persetujuan koreksi nilai.
 
 ## 5. Proteksi server
 Pemeriksaan izin dilakukan di Controller **dan** Service: `peran_aktif`, status akun, `penugasan_guru_gen` + Gen/Mapel objek, `siswa_id` untuk siswa, status TP, dan versi objek. Guru tidak boleh mengakses siswa mapel lain dengan mengganti ID URL. Pimpinan tidak boleh melakukan POST mutasi maupun lewat API. Peran aktif bukan bukti kepemilikan. Semua percobaan akses ilegal dilog sewajarnya.
@@ -60,7 +59,7 @@ Pemeriksaan izin dilakukan di Controller **dan** Service: `peran_aktif`, status 
 ## 6. Peta navigasi per role
 - **Siswa:** Beranda → Mapel → Semester → TP → TP → Diagnostik/Materi/Resume/Tugas/Sumatif → Nilai → Sertifikat; Pengumuman, Notifikasi, Bantuan, Profil.
 - **Guru:** Beranda → Pilih Gen–Mapel → Semester/ATP → Struktur TP & CP → Excel Peta & Media → Bank Soal → Checklist Siap → Antrean Penilaian → Permintaan Akses Ulang → Monitoring → Laporan; Pengumuman.
-- **Admin:** Beranda → Pengelola → Siswa → Gen → Mapel/Guru per Gen → Referensi CP → Koreksi Nilai (bila diperlukan) → Pengaturan (Identitas/Aset/Template/TTD) → Pengumuman/FAQ → Sertifikat → Log → Pemeliharaan → Laporan.
+- **Admin:** Beranda → Pengelola → Siswa → Gen → Mapel/Guru per Gen → Referensi CP → Pengaturan (Identitas/Aset/Template/TTD) → Pengumuman/FAQ → Sertifikat → Log → Pemeliharaan → Laporan.
 - **Pimpinan:** Beranda → Progres → Siswa → Mutu TP/Guru → Ujian → Sertifikat/Laporan → Pratinjau baca-saja.
 
 ### Hak baru yang sama dalam v2.4

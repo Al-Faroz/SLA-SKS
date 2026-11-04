@@ -174,7 +174,13 @@ final class PenilaianGuruService
         if ($halaman < 1 || $halaman > 100000) {
             throw new DomainException('Halaman antrean tidak valid.');
         }
-        $where = ' AND r.nilai IS NULL AND r.dinilai_oleh IS NULL';
+        $statusFilter = (string)($filter['status_penilaian'] ?? 'belum');
+        if (!in_array($statusFilter,['belum','sudah'],true)) {
+            throw new DomainException('Status penilaian tidak sah.');
+        }
+        $where = $statusFilter==='sudah'
+            ? ' AND r.nilai IS NOT NULL AND r.dinilai_oleh IS NOT NULL'
+            : ' AND r.nilai IS NULL AND r.dinilai_oleh IS NULL';
         $args = [];
         $jenisFilter = (string)($filter['jenis'] ?? 'semua');
         $semester = (int)($filter['semester'] ?? 0);

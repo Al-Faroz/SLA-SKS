@@ -21,3 +21,7 @@ Progres semester hanya TP NonEsensial. **Pra-Semester** setelah seluruh TP NonEs
 - [Panduan pengembang](AGENTS.md)
 
 **SQL:** `sla_sks_v4` dibuat BARU dari dump lokal terakhir; `sla_sks_v3` tidak dihapus. Dump privat berisi identitas dan hash sandi hanya dibagikan kepada pemilik, **tidak masuk GitHub**. CI4 migration/seeder dilarang. `index.php` dan `.htaccess` tetap di ROOT dan `.env` tidak diubah tanpa izin.
+
+
+## Keputusan final 4 November 2026 — Penilaian dan sertifikat pribadi
+Guru pengampu **G1 Gen–Mapel** mengoreksi skor Resume/HOTS yang telah dinilai melalui **Koreksi Nilai → ubah skor → Proses** secara langsung tanpa pengajuan/approval Admin. Semua perubahan menjaga jejak audit versi dan nilai TP dihitung ulang otomatis bila tersedia. **Sertifikat pribadi siswa** otomatis diterbitkan pada akses menu ketika layak dan otomatis diperbarui pada akses berikutnya bila snapshot cetak berubah. Nomor, QR dan PDF versi lama tetap diarsipkan sebagai Digantikan. Admin hanya mengelola template/TTD/identitas, bukan menerbitkan satu per satu. PR implementasi #131 masih Draft sampai pengujian XAMPP; **V4-0013/V4-0014 sudah diimpor dan tidak boleh diimpor ulang**.

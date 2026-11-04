@@ -52,13 +52,17 @@ final class GuruPenilaian extends BaseController
             $semester = $this->angka($this->request->getGet('semester'), 'semester', 6) ?? 0;
             $bab = $this->angka($this->request->getGet('bab'), 'bab') ?? 0;
             $jenis = $this->request->getGet('jenis') ?? 'semua';
+            $statusPenilaian = $this->request->getGet('status_penilaian') ?? 'belum';
             if (!is_string($jenis) || !in_array($jenis,['semua','resume','hots'],true)
+                || !is_string($statusPenilaian)
+                || !in_array($statusPenilaian,['belum','sudah'],true)
                 || $halaman < 1) {
                 throw new DomainException('Filter antrean tidak valid.');
             }
             $daftarBab = $svc->daftarBab($dipilih,$semester);
             $filter = $dipilih === null ? null : array_merge($dipilih,[
                 'semester'=>$semester,'bab'=>$bab,'jenis'=>$jenis,
+                'status_penilaian'=>$statusPenilaian,
             ]);
             $data = $svc->antrean($filter, $halaman);
             $akun = (new AuthService())->penggunaSaatIni();
@@ -67,7 +71,8 @@ final class GuruPenilaian extends BaseController
                 || $this->request->getGet('halaman') !== null
                 || $this->request->getGet('semester') !== null
                 || $this->request->getGet('bab') !== null
-                || $this->request->getGet('jenis') !== null) {
+                || $this->request->getGet('jenis') !== null
+                || $this->request->getGet('status_penilaian') !== null) {
                 return redirect()->to(site_url('guru/penilaian'))
                     ->with('nilai_galat',
                         'Filter antrean tidak valid. Gunakan pilihan Gen–Mapel yang tersedia.');
@@ -100,6 +105,7 @@ final class GuruPenilaian extends BaseController
             'semester'=>$semester,
             'bab'=>$bab,
             'jenis'=>$jenis,
+            'status_penilaian'=>$statusPenilaian,
             'daftarBab'=>$daftarBab,
             'antrean'=>$data,
         ]);

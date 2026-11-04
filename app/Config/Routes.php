@@ -145,13 +145,9 @@ $routes->get('guru/rekap-nilai/pra-semester', 'GuruRekapPraSemester::index', ['f
 $routes->get('guru/rekap-nilai/pra-semester/unduh', 'GuruEksporPraSemester::unduh', ['filter' => 'auth:guru']);
 $routes->get('guru/rekap-nilai/unduh', 'GuruEksporNilai::unduh', ['filter' => 'auth:guru']);
 // A14-2: permohonan koreksi nilai Resume/HOTS terpisah dari koreksi konten TP.
-$routes->get('guru/koreksi-nilai', 'GuruKoreksiNilai::index', ['filter'=>'auth:guru']);
-$routes->get('guru/koreksi-nilai/permohonan/(:num)', 'GuruKoreksiNilai::detail/$1', ['filter'=>'auth:guru']);
+// Koreksi langsung Guru G1; tidak ada permohonan atau keputusan Admin.
 $routes->get('guru/koreksi-nilai/(:segment)/(:num)', 'GuruKoreksiNilai::form/$1/$2', ['filter'=>'auth:guru']);
-$routes->post('guru/koreksi-nilai/(:segment)/(:num)', 'GuruKoreksiNilai::ajukan/$1/$2', ['filter'=>'auth:guru']);
-$routes->get('admin/koreksi-nilai', 'AdminKoreksiNilai::index', ['filter'=>'auth:admin']);
-$routes->get('admin/koreksi-nilai/(:num)', 'AdminKoreksiNilai::detail/$1', ['filter'=>'auth:admin']);
-$routes->post('admin/koreksi-nilai/(:num)/keputusan', 'AdminKoreksiNilai::putuskan/$1', ['filter'=>'auth:admin']);
+$routes->post('guru/koreksi-nilai/(:segment)/(:num)', 'GuruKoreksiNilai::proses/$1/$2', ['filter'=>'auth:guru']);
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
@@ -254,8 +250,6 @@ $routes->post('admin/sertifikat/aset/(:segment)', 'AdminSertifikatAset::unggah/$
 $routes->get('admin/sertifikat/aset/(:num)/gambar', 'AdminSertifikatAset::gambar/$1', ['filter' => 'auth:admin']);
 $routes->get('admin/sertifikat/template/pratinjau/(:num)', 'AdminSertifikatAset::pratinjau/$1', ['filter' => 'auth:admin']);
 $routes->post('admin/sertifikat/aset/(:num)/aktifkan', 'AdminSertifikatAset::aktifkan/$1', ['filter' => 'auth:admin']);
-$routes->post('admin/sertifikat/(:num)/siswa/(:num)/terbit', 'AdminSertifikatTerbit::terbit/$1/$2', ['filter' => 'auth:admin']);
-$routes->post('admin/sertifikat/(:num)/siswa/(:num)/revisi', 'AdminSertifikatTerbit::revisi/$1/$2', ['filter' => 'auth:admin']);
 $routes->get('admin/sertifikat/(:num)/unduh', 'AdminSertifikatTerbit::unduh/$1', ['filter' => 'auth:admin']);
 
 $routes->post('admin/identitas', 'AdminIdentitas::simpan', ['filter' => 'auth:admin']);

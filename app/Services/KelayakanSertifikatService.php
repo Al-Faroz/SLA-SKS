@@ -85,13 +85,32 @@ final class KelayakanSertifikatService
      */
     public function periksaSiswa(int $siswaId,int $paketId): array
     {
-        $this->adminId();
+        $a=($this->akun)();
+        if ($siswaId<1 || $paketId<1) {
+            throw new DomainException('Siswa/paket sertifikat tidak ditemukan.');
+        }
+        if (($a['peran_aktif']??null)==='admin') {
+            $this->adminId();
+        } elseif (($a['peran_aktif']??null)==='siswa'
+            && ($a['status']??null)==='aktif'
+            && (int)($a['wajib_ganti_sandi']??1)===0
+            && (int)($a['id']??0)>0) {
+            // Siswa tidak dapat meminta pemeriksaan kelayakan siswa lain.
+            $pemilik=$this->db->table('siswa')
+                ->where('id',$siswaId)->where('pengguna_id',(int)$a['id'])
+                ->countAllResults();
+            if ($pemilik!==1) {
+                throw new DomainException('Hanya sertifikat pribadi sendiri yang boleh diperiksa.');
+            }
+        } else {
+            throw new DomainException('Hak pemeriksaan sertifikat tidak sah.');
+        }
         if ($siswaId<1 || $paketId<1) {
             throw new DomainException('Siswa/paket sertifikat tidak ditemukan.');
         }
         $halaman=1;
         do {
-            $rekap=$this->rekap($paketId,$halaman,100);
+            $rekap=$this->rekapInternal($paketId,$halaman,100);
             foreach ($rekap['baris'] as $r) {
                 if ((int)$r['siswa_id']===$siswaId) return $r;
             }
@@ -137,6 +156,12 @@ final class KelayakanSertifikatService
     public function rekap(int $paketId, int $halaman = 1, int $perHalaman = 25): array
     {
         $this->adminId();
+        return $this->rekapInternal($paketId,$halaman,$perHalaman);
+    }
+
+    /** Hanya dipanggil setelah pemeriksaan hak dari rekap() atau periksaSiswa(). */
+    private function rekapInternal(int $paketId,int $halaman,int $perHalaman): array
+    {
         if ($halaman < 1 || $halaman > 100000
             || $perHalaman < 1 || $perHalaman > 100) {
             throw new DomainException('Halaman pemeriksaan tidak sah.');

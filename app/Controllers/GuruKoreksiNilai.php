@@ -5,121 +5,78 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Services\AuthService;
-use App\Services\KoreksiNilaiService;
+use App\Services\KoreksiNilaiLangsungService;
 use App\Services\NavigasiService;
-use App\Services\PenilaianGuruService;
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
 use DomainException;
 use Throwable;
 
+/** Koreksi langsung Guru G1; tidak ada pengajuan atau keputusan Admin. */
 final class GuruKoreksiNilai extends BaseController
 {
     protected $helpers=['url','form'];
 
-    private function konteks(string $judul): array
-    {
-        $akun=(new AuthService())->penggunaSaatIni();
-        return ['judul'=>$judul,'namaPengguna'=>$akun['nama'],
-            'peranAktif'=>'Guru',
-            'tautanNavigasi'=>NavigasiService::untuk('guru','koreksi_nilai')];
-    }
-
-    private static function halaman(mixed $raw): int
-    {
-        return is_string($raw)&&preg_match('/^[1-9][0-9]{0,5}$/D',$raw)
-            ?(int)$raw:1;
-    }
-
-    public function index(): ResponseInterface|string
-    {
-        try {
-            $svc=new KoreksiNilaiService();
-            return view('koreksi_nilai/daftar',$this->konteks('Pengajuan Koreksi Nilai')+[
-                'data'=>$svc->daftar('guru',self::halaman($this->request->getGet('halaman'))),
-                'role'=>'guru',
-            ]);
-        }catch(Throwable $e){
-            log_message('error','Daftar koreksi Guru: {jenis}',['jenis'=>get_class($e)]);
-            return $this->response->setStatusCode(503)->setBody(
-                'Koreksi nilai belum tersedia. Periksa SQL V4-0013 dan V4-0014.');
-        }
-    }
-
     public function form(string $jenis,int $id): ResponseInterface|string
     {
         try {
-            $tugas=(new PenilaianGuruService())->lihat($jenis,$id);
-            if ($tugas['nilai']===null) {
-                throw new DomainException('Nilai awal belum tersimpan. Gunakan Penilaian Guru.');
-            }
-            $usulanRaw=$this->request->getGet('nilai_usulan');
-            $usulan=$usulanRaw===null?(int)$tugas['nilai']:(
-                is_string($usulanRaw)
-                && preg_match('/^(?:100|[1-9]?[0-9])$/D',$usulanRaw)
-                ?(int)$usulanRaw:-1
-            );
-            if ($usulan<0 || $usulan>100) {
-                throw new DomainException('Nilai usulan harus 0–100.');
-            }
-            $p=(new KoreksiNilaiService())->pratinjauGuru($jenis,$id,$usulan);
-            return view('koreksi_nilai/form_guru',$this->konteks('Ajukan Koreksi Nilai')+[
-                'tugas'=>$tugas,'konteks'=>$p['tugas'],'dampak'=>$p['dampak'],
-                'usulan'=>$usulan,
+            $svc=new KoreksiNilaiLangsungService();
+            // NILAI LAMA berasal dari snapshot final yang diverifikasi Service.
+            $p=$svc->pratinjau($jenis,$id,
+                $this->pilihNilai($svc,$jenis,$id));
+            $akun=(new AuthService())->penggunaSaatIni();
+            return view('koreksi_nilai/form_guru',[
+                'judul'=>'Koreksi Nilai',
+                'namaPengguna'=>$akun['nama'],
+                'peranAktif'=>'Guru',
+                'tautanNavigasi'=>NavigasiService::untuk('guru','penilaian'),
+                'tugas'=>$p['tugas'],
+                'dampak'=>$p['dampak'],
             ]);
         }catch(DomainException $e){
-            return $this->response->setStatusCode(403)->setBody(
-                view('publik/ditolak',[
-                    'judul'=>'Koreksi nilai ditolak',
+            return $this->response->setStatusCode(403)
+                ->setBody(view('publik/ditolak',[
+                    'judul'=>'Koreksi Nilai tidak tersedia',
                     'pesan'=>$e->getMessage(),
                     'tautanPath'=>'guru/penilaian',
-                    'labelTautan'=>'Kembali ke antrean penilaian',
+                    'labelTautan'=>'Kembali ke Penilaian',
                 ]));
         }catch(Throwable $e){
-            log_message('error','Pratinjau koreksi nilai: {jenis}',['jenis'=>get_class($e)]);
-            return $this->response->setStatusCode(503)->setBody(
-                'Pratinjau belum dapat dibuka. Periksa SQL V4-0013/V4-0014.');
+            log_message('error','Tampilan koreksi langsung: {error}',['error'=>$e->getMessage()]);
+            return $this->response->setStatusCode(503)
+                ->setBody('Koreksi nilai belum bisa dibuka. Periksa struktur SQL V4-0014 dan log aplikasi.');
         }
     }
 
-    public function ajukan(string $jenis,int $id): RedirectResponse
+    private function pilihNilai(KoreksiNilaiLangsungService $svc,string $jenis,int $id): int
     {
-        $asal=site_url('guru/koreksi-nilai/'.$jenis.'/'.$id);
-        $score=$this->request->getPost('nilai_usulan');
-        $alasan=$this->request->getPost('alasan');
-        if (!is_string($score)||!preg_match('/^(?:100|[1-9]?[0-9])$/D',$score)
-            ||!is_string($alasan)) {
-            return redirect()->to($asal)->withInput()->with('galat',
-                'Nilai harus bilangan bulat 0–100 dan alasan harus diisi.');
+        // GET hanya membaca nilai lama; tidak mengubah atau menulis data.
+        $r=(new \App\Services\PenilaianGuruService())->lihat($jenis,$id);
+        if ($r['nilai']===null) {
+            throw new DomainException('Nilai awal belum disimpan Guru.');
         }
-        try{
-            $pid=(new KoreksiNilaiService())->ajukan($jenis,$id,(int)$score,$alasan);
-            return redirect()->to(site_url('guru/koreksi-nilai/permohonan/'.$pid))
-                ->with('sukses','Pengajuan dikirim ke Admin. Nilai belum berubah.');
-        }catch(DomainException $e){
-            return redirect()->to($asal.'?nilai_usulan='.$score)->withInput()
-                ->with('galat',$e->getMessage());
-        }catch(Throwable $e){
-            log_message('error','Ajukan koreksi Guru: {jenis}',['jenis'=>get_class($e)]);
-            return redirect()->to($asal)->withInput()->with('galat',
-                'Pengajuan gagal disimpan. Periksa koneksi atau patch SQL.');
-        }
+        return (int)$r['nilai'];
     }
 
-    public function detail(int $id): ResponseInterface|string
+    public function proses(string $jenis,int $id): RedirectResponse
     {
+        $url=site_url('guru/penilaian/'.$jenis.'/'.$id);
+        $n=$this->request->getPost('nilai');
+        if(!is_string($n)||preg_match('/^(?:100|[1-9]?[0-9])$/D',$n)!==1){
+            return redirect()->to($url)->with('nilai_galat','Nilai koreksi wajib bilangan bulat 0–100.');
+        }
         try{
-            $svc=new KoreksiNilaiService();
-            return view('koreksi_nilai/detail',$this->konteks('Detail Koreksi Nilai')+[
-                'baris'=>$svc->permohonan($id),
-                'riwayat'=>$svc->riwayatPermohonan($id),
-                'role'=>'guru',
-            ]);
+            $hasil=(new KoreksiNilaiLangsungService())->proses($jenis,$id,(int)$n);
+            return redirect()->to($url)->with('nilai_sukses',
+                $hasil['berubah']
+                    ?'Koreksi nilai berhasil diproses. Riwayat tersimpan dan nilai TP telah diperbarui jika tersedia.'
+                    :'Nilai tidak berubah karena sama dengan skor sebelumnya.');
         }catch(DomainException $e){
-            return $this->response->setStatusCode(403)->setBody('Permohonan tidak tersedia bagi akun Guru ini.');
+            return redirect()->to($url)->with('nilai_galat',$e->getMessage());
         }catch(Throwable $e){
-            log_message('error','Detail koreksi Guru: {jenis}',['jenis'=>get_class($e)]);
-            return $this->response->setStatusCode(503)->setBody('Detail koreksi belum dapat dibuka.');
+            log_message('error','Proses koreksi langsung: {error}',['error'=>$e->getMessage()]);
+            return redirect()->to($url)->with('nilai_galat',
+                'Koreksi belum dapat diproses. Periksa koneksi dan log server.');
         }
     }
 }

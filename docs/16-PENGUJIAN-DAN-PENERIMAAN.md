@@ -47,9 +47,9 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-037 | Siswa mengirim jawaban saat jeda | Ditolak server |
 | E2E-038 | Guru memberi izin setelah tes mandiri tidak selesai | Hanya akses ulang tahap Diagnostik/Sumatif yang gagal; satu izin dipakai sekali; tanpa keputusan langsung_belajar/tunda_tinjauan baru, tanpa skor palsu |
 | E2E-039 | Guru memberi nilai resume/HOTS | Skor 0–100; status sementara diperbarui |
-| E2E-040 | Guru pengganti mengusulkan koreksi nilai | Menunggu Admin; tidak mengubah nilai sebelum sah |
-| E2E-041 | Admin menyetujui koreksi valid | Nilai, agregat, audit berubah sekali |
-| E2E-042 | Nilai sumber berubah ketika permohonan menunggu | Optimistic conflict; tidak menimpa |
+| E2E-040 | Guru G1 mengoreksi skor Resume/HOTS | Koreksi Nilai → ubah skor → Proses; nilai langsung sah, audit versi tercatat |
+| E2E-041 | Koreksi langsung selesai | Skor, nilai TP dan audit berubah atomik satu kali; tanpa persetujuan Admin |
+| E2E-042 | Nilai sumber berubah saat Guru memproses | Optimistic conflict; tidak menimpa perubahan terbaru |
 | E2E-043 | Ditemukan kesalahan soal/kunci pada TP yang sudah digunakan | Soal/kunci TP tetap terkunci; bila diperlukan pembetulan nilai siswa gunakan mekanisme koreksi **nilai** yang terpisah dengan audit/snapshot, bukan edit TP |
 | E2E-044 | Koreksi nilai siswa yang sah berakibat skor di bawah KKM | Hanya nilai/indikator penilaian yang diperbarui sesuai kewenangan, bukan konten soal/KKM TP; status TP Selesai tetap berdasar aktivitas, riwayat tidak dihapus |
 | E2E-045 | Semua TP tuntas tapi tugas menunggu nilai | Sertifikat ditahan; pesan menunggu guru |
@@ -734,14 +734,11 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 **Hasil CI A14-1 (4 November 2026):** PHP lint 4 berkas PASS; PHPUnit 8 tes/68 assertions PASS; Apache + mod_rewrite pada dokumen ROOT simulasi 41 URL anonim PASS/0 FAIL. Pengujian XAMPP lokal masih membutuhkan perintah CLI smoke pada Master 15; tidak ada klaim hosting produksi sudah diverifikasi.
 
 
-### A14-2 — Kasus penerimaan Koreksi Nilai Siswa (4 November 2026)
+### A14-2 — Penerimaan revisi final koreksi langsung dan sertifikat personal otomatis (4 November 2026)
 
-- Guru G1 mengajukan perubahan skor Resume/HOTS final, dengan alasan valid, sumber dan TP sudah Final/Sementara; pratinjau bobot 20/20/60 benar dan nilai 0 sah.
-- Sebelum Admin menyetujui: **tidak ada perubahan** skor, nilai TP, penilai asli atau sertifikat. Pengajuan ulang identik idempoten; pengajuan terbuka kedua ditolak.
-- Admin lain dapat menyetujui atau menolak: persetujuan mengubah sumber dan nilai TP atomik, penolakan tidak mengubah nilai. Status/versi dan riwayat sebelum/sesudah tersimpan, pesan/notifikasi sesuai penerima.
-- Admin yang memakai akun sama dengan Guru pengusul tidak dapat menyetujui; Guru Gen lain tidak dapat membaca/menulis pengajuan. Perubahan sumber atau pindah penugasan G1 setelah pengajuan **menghalangi** keputusan yang sudah basi.
-- Sertifikat aktif dan skor TP berubah: tanda **Perlu Tinjau Sertifikat** tampil; revisi dilakukan Admin satu per satu melalui alur lama, PDF historis tetap. Koreksi nilai tidak mengubah progres TP dan tidak memasukkan Pra-Semester ke sertifikat.
-- Uji SQL MariaDB V4-0014 sintetis memeriksa FK, unique pengajuan terbuka/versi dan audit. SQLite sintetis menguji transaksi, role dan kegagalan. Uji browser XAMPP, Dark/Light, HP serta data uji tetap wajib setelah backup dan impor **V4-0013 dahulu** lalu V4-0014. Jangan menyebut modul FIX sebelum pengujian lokal.
-
-
-**Hasil CI A14-2 (4 November 2026):** Workflow run `41802560315` lulus PHP lint 13 berkas + skrip integration, PHPUnit enam suite **43 tes/203 assertions PASS**, serta patch SQL V4-0014 MariaDB sintetis PASS (schema, FK, unique generated, versi, audit). Hasil ini belum menggantikan uji pengguna di XAMPP MariaDB 10.4, pengujian status akun nyata, integrasi notifikasi V4-0013, UI desktop/HP, maupun revisi sertifikat manual. Penolakan permohonan usang aman walau skor/penugasan berubah, tanpa mengubah nilai.
+- Guru G1 aktif melihat skor Resume/HOTS siswa Gen–Mapel yang diampu. **Koreksi Nilai → ubah skor → Proses** langsung mengubah skor dan nilai TP dalam satu transaksi; **tanpa Admin, persetujuan, atau alasan wajib**. Koreksi berulang sah, tiap perubahan memiliki versi dan riwayat skor lama/baru, penilai awal tetap utuh; nilai 0 sah.
+- Guru G1 lain di luar penugasan, Admin/Siswa/Pimpinan tidak dapat mengakses endpoint mutasi. Konflik skor/snapshot/penugasan berubah ditolak, tanpa overwrite. Nilai dan riwayat lama aman.
+- Bila siswa membuka Sertifikat tanpa memenuhi syarat akademik/TTD: tidak diterbitkan; halaman tetap berguna. Jika memenuhi syarat: otomatis terbit satu versi, tidak ada tombol manual Admin. Akses ulang tanpa perubahan: tetap versi sama.
+- Setelah koreksi skor TP yang tercetak, beberapa koreksi sebelum akses tidak menghasilkan banyak PDF; **akses berikutnya** menghasilkan satu PDF/nomor/QR pengganti dan menandai versi sebelumnya Digantikan. Akses PDF historis berizin; QR historis tetap dapat diverifikasi dengan status Digantikan.
+- Perubahan nilai Pra-Semester tidak mengubah sertifikat. Tidak ada SQL baru: V4-0014 yang sudah diimpor dimanfaatkan untuk audit koreksi langsung tanpa menghapus data versi/permohonan lama.
+- QA PHPUnit sintetis, lint, pemeriksaan akses/privasi, MySQL/MariaDB, serta pengujian browser XAMPP dan PDF tetap wajib sebelum FIX.
