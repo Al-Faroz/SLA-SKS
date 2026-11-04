@@ -80,4 +80,9 @@ jobs:
           sudo apache2ctl configtest
           sudo service apache2 restart
       - name: Audit akses URL anonim (GET baca-saja)
-        run: php scripts/qa/http_security_smoke.php http://127.0.0.1/
+        run: |
+          php scripts/qa/http_security_smoke.php http://127.0.0.1/ || {
+            echo 'Galat Apache runner (konfigurasi sintetis, tanpa kredensial):'
+            sudo tail -n 90 /var/log/apache2/error.log
+            exit 1
+          }
