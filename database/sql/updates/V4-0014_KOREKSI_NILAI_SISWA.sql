@@ -18,6 +18,7 @@ CREATE TABLE `permohonan_koreksi_nilai` (
   `nilai_tp_awal` decimal(5,2) DEFAULT NULL,
   `nilai_tp_usulan` decimal(5,2) DEFAULT NULL,
   `status_nilai_awal` enum('sementara','final') NOT NULL,
+  `perlu_tinjau_sertifikat` tinyint(1) NOT NULL DEFAULT 0,
   `alasan` varchar(500) NOT NULL,
   `guru_id` bigint(20) UNSIGNED NOT NULL,
   `status` enum('diajukan','disetujui','ditolak') NOT NULL DEFAULT 'diajukan',
