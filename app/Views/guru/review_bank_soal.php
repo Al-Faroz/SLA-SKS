@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page a-review-word-page">
+<div class="a-page a-review-word-page a-guru-review-word">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Peta ATP</a>
         <span aria-hidden="true">/</span>
