@@ -9,9 +9,9 @@
     <header class="a-page__heading a-proto-heading">
         <div>
             <p class="a-proto-eyebrow">Guru · Penilaian per Gen–Mapel</p>
-            <h1>Antrean Penilaian Resume &amp; HOTS</h1>
-            <p class="a-proto-muted">Daftar final yang belum mendapat skor Guru, urutan pengiriman tertua.
-                Nilai yang sudah tersimpan tidak dapat diubah dari halaman ini.</p>
+            <h1>Penilaian Resume &amp; HOTS</h1>
+            <p class="a-proto-muted">Pilih Belum Dinilai untuk memberi skor atau Sudah Dinilai untuk memperbaiki
+                skor secara langsung melalui tombol Koreksi Nilai.</p>
         </div>
     </header>
     <?php if (session()->getFlashdata('nilai_galat')): ?>
@@ -66,6 +66,13 @@
                         <option value="hots" <?= $jenis === 'hots' ? 'selected' : '' ?>>HOTS</option>
                     </select>
                 </div>
+                <div class="a-field">
+                    <label class="a-label" for="status-penilaian">Status Penilaian</label>
+                    <select class="a-input" id="status-penilaian" name="status_penilaian">
+                        <option value="belum" <?= $status_penilaian==='belum'?'selected':'' ?>>Belum Dinilai</option>
+                        <option value="sudah" <?= $status_penilaian==='sudah'?'selected':'' ?>>Sudah Dinilai / Koreksi Nilai</option>
+                    </select>
+                </div>
                 <div class="a-penilaian-filter__aksi">
                     <button class="a-btn a-btn--utama" type="submit">Terapkan Filter</button>
                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Reset</a>
@@ -86,12 +93,11 @@
         <?php endif ?>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="antrean-pengumpulan">
-        <h2 id="antrean-pengumpulan">Jawaban final belum dinilai</h2>
-        <p class="a-help"><?= (int) $antrean['total'] ?> tugas menunggu penilaian.
+        <h2 id="antrean-pengumpulan"><?= $status_penilaian==='sudah'?'Nilai yang dapat dikoreksi':'Jawaban final belum dinilai' ?></h2>
+        <p class="a-help"><?= (int) $antrean['total'] ?> <?= $status_penilaian==='sudah'?'tugas sudah dinilai':'tugas menunggu penilaian' ?>.
             Halaman <?= (int) $antrean['halaman'] ?> dari <?= (int) $antrean['jumlah_halaman'] ?>.</p>
         <?php if ($antrean['baris'] === []): ?>
-            <div class="a-alert" role="status">Belum ada Resume atau HOTS yang perlu dinilai
-                untuk penugasan ini.</div>
+            <div class="a-alert" role="status"><?= $status_penilaian==='sudah'?'Belum ada nilai Resume/HOTS yang dapat dikoreksi.':'Belum ada Resume/HOTS yang perlu dinilai.' ?></div>
         <?php else: ?>
             <div class="a-tabel-gulir">
                 <table class="a-tbl a-penilaian-tabel">
@@ -114,9 +120,16 @@
                                 </td>
                                 <td><span class="a-badge"><?= esc(strtoupper($r['jenis'])) ?></span>
                                 </td>
-                                <td><a class="a-btn a-btn--sekunder"
-                                    href="<?= esc(site_url('guru/penilaian/' . $r['jenis']
-                                        . '/' . (int) $r['id']), 'attr') ?>">Nilai jawaban</a></td>
+                                <td>
+                                    <?php if ($status_penilaian==='sudah'): ?>
+                                        <strong class="a-help">Skor <?= (int)$r['nilai'] ?>/100</strong>
+                                        <a class="a-btn a-btn--sekunder"
+                                            href="<?= esc(site_url('guru/koreksi-nilai/'.$r['jenis'].'/'.(int)$r['id']),'attr') ?>">Koreksi Nilai</a>
+                                    <?php else: ?>
+                                        <a class="a-btn a-btn--sekunder"
+                                            href="<?= esc(site_url('guru/penilaian/'.$r['jenis'].'/'.(int)$r['id']),'attr') ?>">Nilai jawaban</a>
+                                    <?php endif ?>
+                                </td>
                             </tr>
                         <?php endforeach ?>
                     </tbody>
@@ -128,6 +141,7 @@
                 <?php $query = '?' . http_build_query([
                     'pilihan'=>$pilihan_aktif,'semester'=>$semester,
                     'bab'=>$bab,'jenis'=>$jenis,
+                    'status_penilaian'=>$status_penilaian,
                 ]) . '&halaman='; ?>
                 <?php if ($antrean['halaman'] > 1): ?>
                     <a class="a-btn a-btn--sekunder"
