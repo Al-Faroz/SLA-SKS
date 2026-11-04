@@ -433,3 +433,5 @@ Di keempat sidebar, lima pilihan disatukan dalam grup `details/summary` **Inform
 Guru/Pimpinan/Siswa mendapat anjuran keamanan sekali pada respons login menuju Dashboard dan pengingat pada Profil sampai sandi berhasil diganti; tidak ada paksaan ke halaman Ganti Sandi. Form sandi berada **langsung pada Profil**, mengikuti CSRF, konfirmasi dua isian, error/sukses dan penggantian sesi. Admin tetap memakai alur Ganti Sandi khusus dengan kewajiban awal. Layar Reset Sandi Admin memisahkan mode acak Admin versus sandi default manual non-Admin, memvalidasi dua isian dan tidak memperlihatkan sandi default lagi di halaman hasil.
 
 FAQ resmi tetap dikelola Admin dari database; 28 draf jawaban pengguna tersedia sebagai bahan salin/tinjau di `docs/DRAF-FAQ-RESMI-SLA-SKS-2026-11-04.md`, **tidak otomatis diterbitkan**.
+
+ Group pada sidebar yang sedang diminimalkan **harus memperluas sidebar terlebih dahulu** ketika dipilih (klik/Enter), agar submenunya benar-benar dapat diakses. Tombol ringkas tetap menyimpan preferensi pengguna.
