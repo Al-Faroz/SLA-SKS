@@ -1,0 +1,78 @@
+name: QA A14-1 Pengamanan ROOT dan HTTP Anonim
+
+on:
+  pull_request:
+    paths:
+      - '.htaccess'
+      - 'scripts/**'
+      - 'tools/**'
+      - 'tests/unit/A14RootHttpProtectionTest.php'
+      - '.github/workflows/qa-a14-1-pengamanan-root-http.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: Lint dan kontrak konfigurasi root
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, curl, sqlite3, pdo_sqlite, gd, dom, xml, zip, fileinfo
+          coverage: none
+      - run: mkdir -p writable/cache writable/logs writable/session writable/private writable/uploads writable/debugbar
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l scripts/perbarui_template_atp_v25_2.php
+          php -l scripts/perbarui_template_atp_v25_3.php
+          php -l scripts/qa/http_security_smoke.php
+          php -l tests/unit/A14RootHttpProtectionTest.php
+      - name: PHPUnit kontrak keamanan
+        run: vendor/bin/phpunit --no-coverage tests/unit/A14RootHttpProtectionTest.php
+      - name: Regresi anon dan filter peran
+        run: |
+          vendor/bin/phpunit --no-coverage tests/feature/K1AksesAnonimTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/AuthFilterPeranAktifTest.php
+
+  apache-smoke:
+    name: HTTP Apache nyata (data sintetis, tanpa DB)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, curl, sqlite3, pdo_sqlite, gd, dom, xml, zip, fileinfo
+          coverage: none
+      - run: mkdir -p writable/cache writable/logs writable/session writable/private writable/uploads writable/debugbar
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Apache dan mod_php untuk simulasi root XAMPP
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq apache2 libapache2-mod-php8.3 php8.3-intl php8.3-mbstring php8.3-curl php8.3-xml php8.3-zip php8.3-gd
+          sudo a2enmod rewrite
+          cat > /tmp/sla-sks-a14.conf <<EOF
+          <VirtualHost *:80>
+              ServerName 127.0.0.1
+              DocumentRoot "$GITHUB_WORKSPACE"
+              <Directory "$GITHUB_WORKSPACE">
+                  Options FollowSymLinks
+                  AllowOverride All
+                  Require all granted
+              </Directory>
+          </VirtualHost>
+          EOF
+          sudo cp /tmp/sla-sks-a14.conf /etc/apache2/sites-available/000-default.conf
+          # Khusus runner CI: konfigurasi tanpa kredensial.
+          printf '%s\n' 'CI_ENVIRONMENT = production' \
+             'app.baseURL = "http://127.0.0.1/"' \
+             'app.indexPage = ""' > .env
+          sudo apache2ctl configtest
+          sudo service apache2 restart
+      - name: Audit akses URL anonim (GET baca-saja)
+        run: php scripts/qa/http_security_smoke.php http://127.0.0.1/
