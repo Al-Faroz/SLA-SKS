@@ -80,6 +80,18 @@
       renderSidebar();
       save('sla-sks-sidebar', collapsed ? 'collapsed' : 'expanded');
     });
+    // A13-4: submenu tidak boleh menjadi tombol mati saat sidebar ringkas.
+    // Klik/Enter pada grup terlebih dahulu memperluas sidebar. Jika grup
+    // sudah berstatus open (anak aktif), cegah toggle menutupnya lagi.
+    panel.querySelectorAll('.a-side__group > summary').forEach((summary) => {
+      summary.addEventListener('click', (event) => {
+        if (!panel.classList.contains('a-app--is-collapsed')) return;
+        const group = summary.closest('details');
+        const alreadyOpen = Boolean(group?.open);
+        collapse.click();
+        if (alreadyOpen) event.preventDefault();
+      });
+    });
     mobile.addEventListener('change', renderSidebar);
     renderSidebar();
   });
