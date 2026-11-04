@@ -69,7 +69,7 @@ jobs:
           EOF
           sudo cp /tmp/sla-sks-a14.conf /etc/apache2/sites-available/000-default.conf
           # Khusus runner CI: konfigurasi tanpa kredensial.
-          printf '%s\n' 'CI_ENVIRONMENT = production' \
+          printf '%s\n' 'CI_ENVIRONMENT = testing' \
              'app.baseURL = "http://127.0.0.1/"' \
              'app.indexPage = ""' > .env
           # Apache www-data tidak dapat melintasi /home/runner/work.
