@@ -403,6 +403,17 @@ final class KesiapanTpService
                 'catatan' => 'TP #' . $tpId . ' diterbitkan dalam versi ' . $versiId . '.',
                 'waktu' => $waktu,
             ]);
+            if (($cek['tp']['jenis_tp'] ?? '') === 'non_esensial') {
+                $siswa=$this->db->table('siswa s')
+                    ->select('s.pengguna_id')
+                    ->join('pengguna u','u.id=s.pengguna_id')
+                    ->where('s.angkatan_id',(int)$cek['paket']['angkatan_id'])
+                    ->where('u.status','aktif')->get()->getResultArray();
+                foreach ($siswa as $penerima) {
+                    NotifikasiService::catat($this->db,'tp_siap_tersedia',
+                        (int)$penerima['pengguna_id'],$tpId,$nomorBerikutnya);
+                }
+            }
             if ($this->db->transStatus() === false) {
                 throw new RuntimeException('Transaksi publikasi TP gagal.');
             }
