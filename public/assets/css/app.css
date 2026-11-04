@@ -3047,9 +3047,67 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     margin-top:18px;
 }
 .a-informasi__pagination > span {font-size:.88rem;margin-right:auto;}
-.a-informasi__arsip {display:inline-block;margin:3px 2px 3px 0;}
-.a-informasi .a-tabel td {vertical-align:middle;}
-.a-informasi .a-tabel .a-btn {min-height:38px;white-space:nowrap;}
+/* A14-4: tabel kelola FAQ/Pengumuman memakai komponen a-tbl resmi.
+   Persentase berbeda untuk 5 kolom Pengumuman dan 6 kolom FAQ. */
+.a-informasi__tabel.a-tbl {
+    width:100%;
+    min-width:790px;
+    table-layout:fixed;
+}
+.a-informasi__tabel :is(th,td) {
+    vertical-align:middle;
+}
+.a-informasi__tabel thead th {
+    white-space:nowrap;
+}
+.a-informasi__tabel tbody th[scope="row"] {
+    font-weight:700;
+    overflow-wrap:anywhere;
+}
+.a-informasi__tabel--pengumuman thead th:nth-child(1) {width:38%;}
+.a-informasi__tabel--pengumuman thead th:nth-child(2) {width:12%;}
+.a-informasi__tabel--pengumuman thead th:nth-child(3) {width:8%;}
+.a-informasi__tabel--pengumuman thead th:nth-child(4) {width:20%;}
+.a-informasi__tabel--pengumuman thead th:nth-child(5) {width:22%;}
+.a-informasi__tabel--faq thead th:nth-child(1) {width:35%;}
+.a-informasi__tabel--faq thead th:nth-child(2) {width:11%;}
+.a-informasi__tabel--faq thead th:nth-child(3) {width:8%;}
+.a-informasi__tabel--faq thead th:nth-child(4) {width:7%;}
+.a-informasi__tabel--faq thead th:nth-child(5) {width:19%;}
+.a-informasi__tabel--faq thead th:nth-child(6) {width:20%;}
+.a-informasi__tabel time {
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+}
+.a-informasi__row-actions {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+.a-informasi__row-actions .a-btn {
+    min-height:40px;
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+    white-space:nowrap;
+}
+.a-informasi__arsip {display:inline-flex;margin:0;}
+html[data-theme] .a-app--prototipe .a-page .a-informasi__tabel.a-tbl {
+    font-size:13px;
+}
+@media (max-width:980px) {
+    .a-informasi__tabel.a-tbl--cards {
+        min-width:0;
+        table-layout:auto;
+    }
+    .a-informasi__tabel.a-tbl--cards tbody :is(th,td) {
+        text-align:left;
+    }
+    .a-informasi__tabel.a-tbl--cards time {
+        white-space:normal;
+    }
+}
 .a-informasi__editor {max-width:940px;}
 .a-informasi__editor .a-form {display:grid;gap:14px;}
 .a-informasi__editor .a-field {min-width:0;}
