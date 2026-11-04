@@ -1,0 +1,84 @@
+name: QA A14-2 Koreksi Nilai Resmi
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KoreksiNilaiService.php'
+      - 'app/Services/KoreksiNilaiDampakService.php'
+      - 'app/Services/NotifikasiService.php'
+      - 'app/Controllers/GuruKoreksiNilai.php'
+      - 'app/Controllers/AdminKoreksiNilai.php'
+      - 'app/Config/Routes.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Views/koreksi_nilai/**'
+      - 'database/sql/updates/V4-0014_KOREKSI_NILAI_SISWA.sql'
+      - 'tests/unit/KoreksiNilai*Test.php'
+      - 'tests/integration/SqlA14KoreksiNilaiSchemaCheck.php'
+      - '.github/workflows/qa-a14-2-koreksi-nilai.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phpunit:
+    name: PHP Lint dan Regresi Akademik
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: sqlite3, pdo_sqlite, mbstring, intl, gd, dom, xml, zip, fileinfo
+          coverage: none
+      - run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Syntax PHP
+        run: |
+          for f in app/Services/KoreksiNilaiService.php app/Services/KoreksiNilaiDampakService.php \
+                   app/Services/NotifikasiService.php app/Controllers/GuruKoreksiNilai.php \
+                   app/Controllers/AdminKoreksiNilai.php app/Config/Routes.php \
+                   app/Services/NavigasiService.php app/Views/koreksi_nilai/daftar.php \
+                   app/Views/koreksi_nilai/form_guru.php app/Views/koreksi_nilai/detail.php \
+                   app/Views/guru/nilai_kegiatan.php tests/unit/KoreksiNilaiDampakTest.php \
+                   tests/unit/KoreksiNilaiDatabaseTest.php; do
+            php -l "$f"
+          done
+      - name: PHPUnit A14-2 dan regresi A13/A11
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/KoreksiNilaiDampakTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/KoreksiNilaiDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PenilaianGuruDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/NilaiTpLangsungBelajarTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/SertifikatPenerbitanDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/A13NotifikasiPrivasiDatabaseTest.php
+
+  mariadb-sql:
+    name: SQL V4-0014 MariaDB (tanpa dump privat)
+    runs-on: ubuntu-24.04
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: ci_test
+          MARIADB_DATABASE: sla_a14_koreksi_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      SLA_TEST_DB_DSN: 'mysql:dbname=sla_a14_koreksi_test;host=127.0.0.1;port=3306;charset=utf8mb4'
+      SLA_TEST_DB_USER: root
+      SLA_TEST_DB_PASS: ci_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mysqli, mbstring, intl, dom, xml
+          coverage: none
+      - run: php -l tests/integration/SqlA14KoreksiNilaiSchemaCheck.php
+      - run: php tests/integration/SqlA14KoreksiNilaiSchemaCheck.php

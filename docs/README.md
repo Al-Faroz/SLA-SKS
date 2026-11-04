@@ -99,3 +99,5 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 
 
 - **[Checkpoint A14-1 — Pengamanan ROOT dan QA HTTP anonim (4 November 2026)](CHECKPOINT-A14-1-HTTP-ROOT-2026-11-04.md)**. Perketatan `.htaccess` untuk skrip CLI, berkas sensitif dan executable assets; pemeriksaan HTTP anonim baca-saja via CLI XAMPP; tidak mengubah database, URL, atau struktur ROOT. PR #129 masih Draft sampai uji Apache dan XAMPP.
+
+- **[Checkpoint A14-2 — Koreksi Nilai Siswa (4 November 2026)](CHECKPOINT-A14-2-KOREKSI-NILAI-SISWA-2026-11-04.md)**. Audit dump privat (19): 71 tabel, marker V4-0012; V4-0013 belum tercatat. SQL additive V4-0014 untuk koreksi Resume/HOTS dengan permohonan Guru G1, keputusan Admin non-self, nilai lama/baru, audit, notifikasi dan penanda revisi sertifikat. **Urutan impor wajib V4-0013 kemudian V4-0014**, masing-masing sekali sesudah backup. PR #130 Draft, menunggu QA browser XAMPP.

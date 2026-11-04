@@ -732,3 +732,16 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 
 
 **Hasil CI A14-1 (4 November 2026):** PHP lint 4 berkas PASS; PHPUnit 8 tes/68 assertions PASS; Apache + mod_rewrite pada dokumen ROOT simulasi 41 URL anonim PASS/0 FAIL. Pengujian XAMPP lokal masih membutuhkan perintah CLI smoke pada Master 15; tidak ada klaim hosting produksi sudah diverifikasi.
+
+
+### A14-2 — Kasus penerimaan Koreksi Nilai Siswa (4 November 2026)
+
+- Guru G1 mengajukan perubahan skor Resume/HOTS final, dengan alasan valid, sumber dan TP sudah Final/Sementara; pratinjau bobot 20/20/60 benar dan nilai 0 sah.
+- Sebelum Admin menyetujui: **tidak ada perubahan** skor, nilai TP, penilai asli atau sertifikat. Pengajuan ulang identik idempoten; pengajuan terbuka kedua ditolak.
+- Admin lain dapat menyetujui atau menolak: persetujuan mengubah sumber dan nilai TP atomik, penolakan tidak mengubah nilai. Status/versi dan riwayat sebelum/sesudah tersimpan, pesan/notifikasi sesuai penerima.
+- Admin yang memakai akun sama dengan Guru pengusul tidak dapat menyetujui; Guru Gen lain tidak dapat membaca/menulis pengajuan. Perubahan sumber atau pindah penugasan G1 setelah pengajuan **menghalangi** keputusan yang sudah basi.
+- Sertifikat aktif dan skor TP berubah: tanda **Perlu Tinjau Sertifikat** tampil; revisi dilakukan Admin satu per satu melalui alur lama, PDF historis tetap. Koreksi nilai tidak mengubah progres TP dan tidak memasukkan Pra-Semester ke sertifikat.
+- Uji SQL MariaDB V4-0014 sintetis memeriksa FK, unique pengajuan terbuka/versi dan audit. SQLite sintetis menguji transaksi, role dan kegagalan. Uji browser XAMPP, Dark/Light, HP serta data uji tetap wajib setelah backup dan impor **V4-0013 dahulu** lalu V4-0014. Jangan menyebut modul FIX sebelum pengujian lokal.
+
+
+**Hasil CI A14-2 (4 November 2026):** Workflow run `41802560315` lulus PHP lint 13 berkas + skrip integration, PHPUnit enam suite **43 tes/203 assertions PASS**, serta patch SQL V4-0014 MariaDB sintetis PASS (schema, FK, unique generated, versi, audit). Hasil ini belum menggantikan uji pengguna di XAMPP MariaDB 10.4, pengujian status akun nyata, integrasi notifikasi V4-0013, UI desktop/HP, maupun revisi sertifikat manual. Penolakan permohonan usang aman walau skor/penugasan berubah, tanpa mengubah nilai.

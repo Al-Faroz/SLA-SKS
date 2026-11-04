@@ -57,3 +57,10 @@ Pada branch `feature/a13-6-a13-7-kontrak-pra-db-20261104`, tahap yang aman disel
 ## Pembaruan setelah dump (18) diterima — 4 November 2026
 
 Dump terbaru `sla_sks_v4 (18).sql` telah diaudit: 71 tabel pada MariaDB 10.4.32 dan marker V4-0012 sudah terpasang. Gerbang SQL pada catatan pra-audit **terpenuhi**. Branch `feature/a13-6-a13-7-implementasi-20261104`/PR #128 menambahkan patch V4-0013, aplikasi Notifikasi Internal dan pengelola Kebijakan Privasi. Masih menunggu impor SQL dan QA browser XAMPP; naskah Kebijakan Privasi yang disahkan madrasah belum disediakan sehingga halaman publik belum akan menampilkan teks. Jalur koreksi nilai yang sah belum dikaitkan ke notifikasi. Jangan menyatakan kedua modul FIX sebelum uji lokal.
+
+
+## A14-2 — Implementasi koreksi nilai siswa setelah dump (19), 4 November 2026
+
+Dump lokal `sla_sks_v4 (19).sql` (04-11-2026 09.28) telah diaudit: 71 tabel, MariaDB 10.4.32, `schema_version` terakhir **V4-0012**, belum ada V4-0013, `notifikasi`, `kebijakan_privasi` ataupun tabel koreksi nilai siswa. Jadi status **FIX kode A13-6/A13-7 tidak membuktikan SQL V4-0013 sudah diimpor**. Lakukan pemeriksaan read-only sebelum impor.
+
+A14-2 pada PR #130 (Draft, stacked di atas A14-1 #129) membuat tabel koreksi nilai siswa terpisah dari `permohonan_koreksi_tp` legacy dan Service/Controller/UI Guru+Admin dengan pemberitahuan. Batas tahap yang belum selesai: koreksi nilai ujian otomatis, pembuktian browser XAMPP, dan kemungkinan revisi sertifikat manual bila koreksi mengubah isi cetak. Jangan ubah kebijakan bahwa konten TP yang sudah digunakan siswa terkunci dan tidak ada self-approval.
