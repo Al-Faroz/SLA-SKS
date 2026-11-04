@@ -61,17 +61,30 @@ final class NavigasiService
             $menu[] = ['label' => 'Monitoring Akademik', 'path' => 'pimpinan/laporan',
                 'aktif' => $aktif === 'laporan'];
         }
-        $menu[] = ['label' => 'Pengumuman', 'path' => 'pengumuman', 'aktif' => $aktif === 'pengumuman'];
-        if ($peran === 'guru' || $peran === 'admin') {
-            $menu[] = ['label' => 'Kelola Pengumuman', 'path' => $peran . '/pengumuman',
-                'aktif' => $aktif === 'pengumuman_kelola'];
+        // A13-4: satu grup informasi untuk menjaga sidebar ringkas, tetap role-scoped.
+        $informasi = [
+            ['label' => 'Pengumuman', 'path' => 'pengumuman',
+                'aktif' => $aktif === 'pengumuman'],
+        ];
+        if (in_array($peran, ['admin', 'guru'], true)) {
+            $informasi[] = ['label' => 'Kelola Pengumuman',
+                'path' => $peran . '/pengumuman', 'aktif' => $aktif === 'pengumuman_kelola'];
         }
         if ($peran === 'admin') {
-            $menu[] = ['label' => 'Kelola FAQ', 'path' => 'admin/faq', 'aktif' => $aktif === 'faq_kelola'];
+            $informasi[] = ['label' => 'Kelola FAQ',
+                'path' => 'admin/faq', 'aktif' => $aktif === 'faq_kelola'];
         }
-        $menu[] = ['label' => 'Bantuan', 'path' => 'bantuan', 'aktif' => $aktif === 'bantuan'];
-        $menu[] = ['label' => 'Hubungi Admin', 'path' => 'hubungi-admin',
+        $informasi[] = ['label' => 'Bantuan', 'path' => 'bantuan',
+            'aktif' => $aktif === 'bantuan'];
+        $informasi[] = ['label' => 'Hubungi Admin', 'path' => 'hubungi-admin',
             'aktif' => $aktif === 'hubungi_admin'];
+        $menu[] = [
+            'label' => 'Informasi & Bantuan',
+            'ikon' => 'book-open',
+            'aktif' => in_array($aktif,
+                ['pengumuman', 'pengumuman_kelola', 'faq_kelola', 'bantuan', 'hubungi_admin'], true),
+            'submenu' => $informasi,
+        ];
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
 
         return $menu;
