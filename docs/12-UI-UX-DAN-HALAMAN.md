@@ -30,7 +30,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 ### Alur tampilan v2.4 sebelum katalog layar
 1. **Admin – Pengelola dan Siswa:** dua menu sidebar terpisah. Tiap daftar mempunyai header ringkas (judul + jumlah), area pencarian/filter, toolbar **Tambah / Import / Export**, tabel yang mudah dipindai, aksi per baris **Lihat/Ubah/Reset Sandi/Nonaktif**, loading/kosong/galat dan konfirmasi aksi. Tombol hanya muncul jika endpoint siap.
 2. **Impor XLSX:** pilih jenis pengguna → unduh template → unggah → validasi dan pratinjau (jumlah baris baru/diubah/ditolak, sumber kesalahan per baris/kolom) → konfirmasi → hasil akhir. Tidak mengubah data saat pratinjau; tidak otomatis menghapus akun yang tak muncul di file.
-3. **Reset sandi:** tombol berada pada baris **Pengelola atau Siswa**, bukan reset massal. Konfirmasi menampilkan akun tujuan; sesudah server berhasil, sandi sementara acak ditampilkan sekali dengan kontrol salin dan anjuran penyampaian privat; sesi lama dicabut, login berikutnya wajib ubah sandi. Jangan menaruhnya pada query string atau unduhan.
+3. **Reset sandi:** tombol berada pada baris **Pengelola atau Siswa**, bukan reset massal. Untuk akun yang memiliki peran Admin, konfirmasi menghasilkan sandi acak dan tampil sekali; ganti sandi tetap wajib. Untuk Guru/Pimpinan/Siswa, konfirmasi meminta sandi default yang diputuskan Admin dan tidak mengulang nilainya pada hasil; login dapat langsung dilanjutkan, ganti sandi dianjurkan dalam Profil. Seluruh sesi lama dicabut. Sandi tidak masuk URL, unduhan atau audit.
 4. **Guru:** sebelum TP/soal/penilaian, pilih **Gen–Mapel yang benar-benar diampu**. Judul, breadcrumb, filter dan daftar selalu menampilkan konteks Gen sehingga tidak tertukar. Gen yang tidak ditugaskan tidak ditampilkan dan akses URL langsung ditolak.
 5. **Profil:** akun staf mengedit foto/kontak pribadi/sandi sendiri; bukan nama resmi, peran, NIP atau Gen. Siswa hanya melihat profil profesional Guru pengampunya; kontak dan data autentikasi Guru disembunyikan.
 6. **Konsistensi visual:** panel terinspirasi referensi TailDash dan publik/login terinspirasi UIdeck Appwind dengan komposisi lebih kompak. Desain disesuaikan warna SLA-SKS, tidak menyalin template atau memakai Tailwind sebagai dependency.
@@ -111,7 +111,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 ## 7. Halaman bersama yang sering terlupakan
 | ID | Nama | Perilaku |
 |---|---|---|
-| U01 | Ganti sandi | Wajib pada login pertama; tidak membuka modul lain sampai selesai |
+| U01 | Ganti sandi | Admin wajib pada login pertama/reset; Guru/Pimpinan/Siswa dianjurkan dan dapat mengganti langsung di Profil tanpa pemaksaan |
 | U02 | Profil sendiri | Admin/Guru/Pimpinan dapat ubah foto, kontak pribadi, sandi; nama resmi, NIP, role dan penugasan baca saja (Admin berwenang mengelola) |
 | U02G | Profil Guru untuk siswa | Hanya Guru aktif yang ditugaskan pada Gen siswa; nama, foto disetujui, daftar mapel; **tanpa NIP/telepon pribadi/data keamanan** |
 | U02S | Profil siswa | Siswa melihat biodata dan Gen sendiri, dapat ganti sandi; koreksi identitas resmi oleh Admin |
