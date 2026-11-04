@@ -125,3 +125,8 @@ Penanda `schema_version` = `V4-0012-PENGUMUMAN-FAQ`. Tidak menghapus/mengubah da
 
 ### A13-5 — Filter baca Pengumuman Guru melalui relasi yang sudah ada (4 November 2026)
 **Tidak mengubah DDL atau data**: cakupan pembaca menggunakan `pengumuman.dibuat_oleh` dan audit awal `riwayat_informasi` untuk mengenali peran penulis saat pembuatan, lalu mencocokkan `siswa.pengguna_id`, `siswa.angkatan_id`, `penugasan_guru_gen.guru_id` dan `penugasan_guru_gen.angkatan_id`. Pemberitahuan Guru mengikuti Gen yang diampu saat pembacaan, tidak snapshot saat terbit. Hak baca akun terautentikasi dihitung server-side tanpa mempercayai Gen dari query string. Indeks/kolom existing digunakan, tanpa patch SQL baru atau impor ulang V4-0012.
+
+
+### Gerbang DB A13-6/A13-7 — 4 November 2026
+
+Pembuatan tabel/indeks/versi baru untuk Notifikasi internal dan Kebijakan Privasi berversi **ditunda** sampai dump XAMPP terbaru yang dibuat **setelah V4-0012-PENGUMUMAN-FAQ** benar-benar tersedia. Audit wajib: header timestamp/DB server, `schema_version`, DDL/indeks/FK tabel pengguna, siswa, penugasan, progres TP, ujian/keputusan, penilaian, sertifikat, `pengaturan`, log aktivitas, pengumuman dan FAQ serta ringkasan agregat aman. Jangan menyalin dump privat ke repository. Rancangan SQL additive, nomor versi berikutnya, pengujian impor dan petunjuk rollback hanya ditentukan setelah audit. **Tidak ada SQL baru pada branch persiapan ini.**

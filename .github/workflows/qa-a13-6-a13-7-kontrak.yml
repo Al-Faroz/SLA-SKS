@@ -1,0 +1,39 @@
+name: QA A13-6 A13-7 Kontrak Pra-DB
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/NotifikasiKontrakService.php'
+      - 'app/Services/KebijakanPrivasiValidasiService.php'
+      - 'tests/unit/A13KontrakNotifikasiPrivasiTest.php'
+      - '.github/workflows/qa-a13-6-a13-7-kontrak.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pure-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: sqlite3, pdo_sqlite, mbstring, intl, gd, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Writable paths
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint kontrak
+        run: |
+          php -l app/Services/NotifikasiKontrakService.php
+          php -l app/Services/KebijakanPrivasiValidasiService.php
+          php -l tests/unit/A13KontrakNotifikasiPrivasiTest.php
+      - name: Test kontrak tanpa koneksi database
+        run: vendor/bin/phpunit --no-coverage tests/unit/A13KontrakNotifikasiPrivasiTest.php
+      - name: Regresi informasi yang sudah FIX
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/InformasiGlobalDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/KontakResmiMadrasahServiceTest.php

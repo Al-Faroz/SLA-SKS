@@ -46,3 +46,10 @@ Pemilik mengubah kebijakan reset dan sandi awal: akun pemegang **Admin** saja ya
 
 ## Keputusan final A13-5 — Pengumuman Guru per Gen (4 November 2026)
 Pemilik menyatakan modul lain A13-4 FIX, tetapi cakupan Pengumuman Guru harus diperbaiki: **hanya akun Siswa pada Gen yang diampu Guru pembuat**, bukan Guru lain, Pimpinan, maupun siswa Gen lain. Pengumuman Admin tetap global. Tidak ada fitur pemilihan target manual; relasi penugasan `penugasan_guru_gen` dan siswa pada Gen menjadi filter live. Klasifikasi Admin/Guru mengikuti peran aktif saat membuat pengumuman dan disimpan di audit awal agar akun rangkap maupun sunting Admin tidak mengubah sasaran. Kelola, arsip, FAQ, laporan dan hak akademik tidak berubah. Branch perbaikan di atas A13-4, SQL V4-0012 historis **tidak diubah**, dan uji lokal dibutuhkan sebelum FIX.
+
+
+## Status A13-6 dan A13-7 — 4 November 2026
+
+Pemilik meminta kedua modul dikerjakan. Gerbang `AGENTS.md` untuk penulisan database **belum dipenuhi**: dump lokal pasca V4-0012 tidak tersedia sebagai berkas yang dapat dibaca dalam konteks saat ini; dump lama pra V4-0012 tidak boleh dianggap terbaru. Teks kebijakan privasi resmi yang disahkan sekolah juga belum disediakan, sehingga jangan membuat/menebak pernyataan hukum atau mengklaim halaman sudah berlaku.
+
+Pada branch `feature/a13-6-a13-7-kontrak-pra-db-20261104`, tahap yang aman diselesaikan lebih dulu: `NotifikasiKontrakService` (katalog event, validasi role, key idempoten), `KebijakanPrivasiValidasiService` (versi, tanggal berlaku, teks, checksum dan konfirmasi), tes unit dan dokumen integrasi. **Tidak ada DDL, patch SQL, penerbitan, notifikasi operasional, menu palsu, migrasi, seeder, perubahan .env atau root.** Langkah berikutnya setelah dump dan naskah resmi: integrasi A13-6 lalu A13-7 per tahap/PR dengan QA MariaDB dan XAMPP. Kedua fitur masih **BELUM FIX**.
