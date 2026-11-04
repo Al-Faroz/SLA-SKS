@@ -286,4 +286,24 @@ final class PenilaianGuruDatabaseTest extends TestCase
         self::assertSame(1, $result['halaman']);
     }
 
+
+    public function testFilterSudahDinilaiMemudahkanGuruMenemukanNilaiUntukKoreksi(): void
+    {
+        $svc=$this->svc();
+        $svc->simpan('resume',1,75,'Skor awal yang perlu diperiksa.');
+        $dinilai=$svc->antrean([
+            'angkatan_id'=>1,'mapel_id'=>5,'jenis'=>'resume',
+            'status_penilaian'=>'sudah',
+        ]);
+        self::assertSame(1,$dinilai['total']);
+        self::assertSame(1,(int)$dinilai['baris'][0]['id']);
+        self::assertSame(75,(int)$dinilai['baris'][0]['nilai']);
+        self::assertSame(1,$this->svc(202)->antrean([
+            'angkatan_id'=>2,'mapel_id'=>5,'status_penilaian'=>'belum',
+        ])['total']);
+        self::assertSame(0,$this->svc(202)->antrean([
+            'angkatan_id'=>2,'mapel_id'=>5,'status_penilaian'=>'sudah',
+        ])['total']);
+    }
+
 }
