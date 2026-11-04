@@ -121,6 +121,12 @@ $peranAktif = $peranAktif ?? '';
             </div>
         </header>
         <main class="a-main__konten" id="konten-utama">
+            <?php if ($saranSandi = session()->getFlashdata('anjuran_sandi')): ?>
+                <div class="a-alert a-alert--info a-sandi-pengingat" role="status">
+                    <?= esc($saranSandi) ?>
+                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('profil'), 'attr') ?>">Buka Profil</a>
+                </div>
+            <?php endif ?>
             <?= $this->renderSection('konten') ?>
         </main>
     </div>
