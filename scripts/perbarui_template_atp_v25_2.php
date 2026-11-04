@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+// Alat pemeliharaan template: hanya dari CLI. Pertahanan kedua jika
+// rewrite/.htaccess pada hosting tidak dijalankan.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit;
+}
+
 /**
  * Satu kali konversi berkas template resmi dalam repository.
  * Jangan jalankan pada workbook yang telah diisi Guru.
