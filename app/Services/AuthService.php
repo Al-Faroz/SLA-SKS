@@ -85,6 +85,18 @@ final class AuthService
         $pengguna['peran_aktif'] = $peran;
         $pengguna['daftar_peran'] = $tersedia;
 
+        // Revisi 04-11-2026: flag lama tetap disimpan sebagai penanda
+        // "belum mengganti sandi awal". Untuk semua akun tanpa peran Admin,
+        // penggantian adalah ANJURAN, bukan pengunci akses akademik.
+        // Akun yang memiliki peran Admin (termasuk rangkap Admin+Guru)
+        // tetap wajib mengganti sandi awal demi keamanan Admin.
+        $belumDiganti = (int) ($pengguna['wajib_ganti_sandi'] ?? 0) !== 0;
+        $memilikiPeranAdmin = in_array('admin', $tersedia, true);
+        $pengguna['sandi_direkomendasikan'] = $belumDiganti && ! $memilikiPeranAdmin;
+        if (! $memilikiPeranAdmin) {
+            $pengguna['wajib_ganti_sandi'] = 0;
+        }
+
         return $pengguna;
     }
 
