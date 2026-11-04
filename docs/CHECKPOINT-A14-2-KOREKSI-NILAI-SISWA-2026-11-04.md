@@ -27,3 +27,12 @@ Tahap ini hanya untuk nilai **Resume/HOTS yang sudah dinilai dan TP NonEsensial 
 - Jangan menjalankan patch bila kondisi tabel/marker parsial; jangan DROP tabel maupun memodifikasi data riil demi tes. Uji hanya akun simulasi.
 
 **Status:** implementasi di Draft PR #130; belum dinyatakan FIX sampai SQL dan alur browser diverifikasi di localhost.
+
+
+## Hasil QA GitHub Actions — 4 November 2026
+
+- Workflow `QA A14-2 Koreksi Nilai Resmi` run **41802560315**: dua job **PASS**.
+- Syntax lint: 13 berkas PHP dan satu skrip SQL integration test **PASS**.
+- PHPUnit: `KoreksiNilaiDampakTest` **7 tes/39 assertions**, `KoreksiNilaiDatabaseTest` **10 tes/45 assertions**, `PenilaianGuruDatabaseTest` **11/52**, `NilaiTpLangsungBelajarTest` **3/12**, `SertifikatPenerbitanDatabaseTest` **6/28**, `A13NotifikasiPrivasiDatabaseTest` **6/27**. Total **43 tes/203 assertions PASS**.
+- Patch V4-0014 pada MariaDB 10.11 sementara dari berkas SQL repo **PASS** (tabel, FK, kunci unik generated, nomor versi, riwayat). Ini bukan impor langsung pada XAMPP MariaDB 10.4; uji XAMPP tetap diperlukan.
+- Perbaikan keamanan setelah QA awal: Admin dapat **menolak** permohonan usang tanpa mengubah skor sumber, sehingga pengajuan lain tidak terjebak kunci unik; persetujuan tetap memeriksa ulang skor/penugasan/snapshot. Pengujian untuk kondisi ini termasuk 43 PASS.
