@@ -56,15 +56,15 @@
             <div class="a-alert" role="status">Nilai sudah tersimpan: <strong><?= (int) $tugas['nilai'] ?>/100</strong>.
                 Penilai asli ID #<?= (int) $tugas['dinilai_oleh'] ?>, pada
                 <?= esc((string) $tugas['dinilai_pada']) ?> UTC.
-                Perubahan nilai memerlukan jalur koreksi akademik.</div>
+                Guru G1 dapat memperbaiki skor langsung dengan jejak audit.</div>
             <p class="a-help">Umpan balik:</p>
             <div class="a-penilaian-isi"><?= nl2br(esc((string) ($tugas['umpan_balik'] ?? ''))) ?></div>
             <div class="a-penilaian-aksi">
                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/koreksi-nilai/'
-                    . $tugas['jenis'] . '/' . (int)$tugas['id']),'attr') ?>">Ajukan Koreksi Nilai</a>
+                    . $tugas['jenis'] . '/' . (int)$tugas['id']),'attr') ?>">Koreksi Nilai</a>
             </div>
             <p class="a-help">Perubahan tidak dilakukan dari penilaian awal.
-                Guru mengajukan alasan akademik dan Admin yang berbeda memutuskan.</p>
+                Guru G1 langsung memproses koreksi; sistem menyimpan nilai lama/baru dan menghitung ulang TP.</p>
         <?php else: ?>
             <p class="a-help">Skor wajib berupa bilangan bulat 0–100.
                 Umpan balik boleh kosong, maksimal 1.000 karakter.
