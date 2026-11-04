@@ -66,16 +66,6 @@ final class NotifikasiKontrakService
             'judul' => 'Versi sertifikat diperbarui',
             'pesan' => 'Buka menu Sertifikat untuk melihat versi yang berlaku.',
         ],
-        'permohonan_koreksi_nilai' => [
-            'peran' => ['admin'],
-            'judul' => 'Permohonan koreksi nilai',
-            'pesan' => 'Ada permohonan koreksi akademik yang perlu ditinjau sesuai hak Admin.',
-        ],
-        'keputusan_koreksi_nilai' => [
-            'peran' => ['guru'],
-            'judul' => 'Keputusan koreksi nilai',
-            'pesan' => 'Periksa hasil keputusan permohonan koreksi sesuai hak Anda.',
-        ],
     ];
 
     /** @return list<string> */
