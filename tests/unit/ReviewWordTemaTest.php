@@ -20,7 +20,7 @@ final class ReviewWordTemaTest extends TestCase
         $view = self::sumber('app/Views/guru/review_bank_soal.php');
         $css = self::sumber('public/assets/css/emerald-glass.css');
 
-        self::assertStringContainsString('class="a-page a-review-word-page"', $view);
+        self::assertMatchesRegularExpression('/class="a-page a-review-word-page(?:\\s|")/', $view);
         self::assertStringContainsString('class="a-word-review-item"', $view);
         self::assertStringContainsString('a-review-word__kunci-benar', $view);
         self::assertStringContainsString('a-review-word__kunci-lain', $view);
