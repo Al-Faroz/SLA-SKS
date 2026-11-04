@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Services\BabService;
+use CodeIgniter\HTTP\RedirectResponse;
+use DomainException;
+
+/** Aksi POST Guru membuat BAB di paket semester yang sudah ada. */
+final class GuruBab extends BaseController
+{
+    public function buat(): RedirectResponse
+    {
+        $paket = $this->request->getPost('paket_id');
+        $nama = $this->request->getPost('nama_bab');
+        $deskripsi = $this->request->getPost('deskripsi_bab');
+        $pilihan = $this->request->getPost('pilihan');
+        $nomor = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) < 6
+            ? (int) $pilihan : 0;
+        $tujuan = site_url('guru/peta-atp') . '?pilihan=' . $nomor;
+        // Redirect ke semester asal modal; nomor hanya dipakai untuk navigasi.
+        // ID objek dan hak G1 tetap divalidasi ulang oleh Service.
+        $semesterPost = $this->request->getPost('semester');
+        if (is_string($semesterPost) && ctype_digit($semesterPost)
+            && (int) $semesterPost >= 1 && (int) $semesterPost <= 6) {
+            $tujuan = site_url('guru/peta-atp/semester/' . (int) $semesterPost) . '?pilihan=' . $nomor;
+        }
+
+        if (! is_string($paket) || ! ctype_digit($paket) || strlen($paket) > 18
+            || ! is_string($nama) || ! is_string($deskripsi)) {
+            return redirect()->to($tujuan)->with('galat', 'Data BAB tidak valid.');
+        }
+        try {
+            (new BabService())->buat((int) $paket, $nama, $deskripsi);
+        } catch (DomainException $e) {
+            return redirect()->to($tujuan)->with('galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Gagal menyimpan BAB pada paket: ' . get_class($e));
+            return redirect()->to($tujuan)->with('galat', 'BAB belum tersimpan. Periksa data atau hubungi Admin.');
+        }
+        return redirect()->to($tujuan)->with('sukses', 'BAB berhasil ditambahkan.');
+    }
+    public function sunting(int $id): RedirectResponse
+    {
+        $nama = $this->request->getPost('nama_bab');
+        $deskripsi = $this->request->getPost('deskripsi_bab');
+        $pilihan = $this->request->getPost('pilihan');
+        $semester = $this->request->getPost('semester');
+        $nomor = is_string($pilihan) && ctype_digit($pilihan) && strlen($pilihan) < 6
+            ? (int) $pilihan : 0;
+        $tujuan = site_url('guru/peta-atp') . '?pilihan=' . $nomor;
+        if (is_string($semester) && ctype_digit($semester)
+            && (int) $semester >= 1 && (int) $semester <= 6) {
+            $tujuan = site_url('guru/peta-atp/semester/' . (int) $semester) . '?pilihan=' . $nomor;
+        }
+        if (!is_string($nama) || !is_string($deskripsi)) {
+            return redirect()->to($tujuan)->with('galat', 'Isian BAB tidak valid.');
+        }
+        try {
+            (new BabService())->sunting($id, $nama, $deskripsi);
+            return redirect()->to($tujuan)->with('sukses', 'BAB berhasil diperbarui.');
+        } catch (DomainException $e) {
+            return redirect()->to($tujuan)->with('galat', $e->getMessage());
+        } catch (\Throwable $e) {
+            log_message('error', 'Sunting BAB gagal: ' . get_class($e));
+            return redirect()->to($tujuan)->with('galat', 'BAB belum tersimpan. Periksa log server.');
+        }
+    }
+}

@@ -1,0 +1,127 @@
+name: QA V2.5 Sunting Langsung CP BAB TP
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/qa-edit-cp-bab-tp-v25.yml'
+      - 'database/sql/updates/V4-0007_CP_LIMA_ISIAN.sql'
+      - 'database/sql/qa/V4-0007_CP_LIMA_ISIAN_READONLY.sql'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-lint-unit:
+    name: PHP lint dan unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Siapkan folder writable CI4 yang tidak masuk Git
+        run: mkdir -p writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint seluruh PHP aplikasi dan pengujian
+        shell: bash
+        run: |
+          set -euo pipefail
+          find app tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Unit regression lengkap
+        run: vendor/bin/phpunit --no-coverage tests/unit
+
+  penguncian-mysql:
+    name: Uji penguncian siswa di MySQL
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mysqli, mbstring, intl, gd, zip, xml, dom, fileinfo
+          coverage: none
+      - name: Instal dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Buat database QA kosong dan impor fixture sintetis
+        run: |
+          mysql --protocol=tcp -h 127.0.0.1 -u root -e "CREATE DATABASE sla_sks_qa_sunting CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+          mysql --protocol=tcp -h 127.0.0.1 -u root sla_sks_qa_sunting < tests/fixtures/sunting_tp_guard_mysql.sql
+      - name: Uji gerbang penggunaan TP sejak progres pertama
+        env:
+          SLA_QA_DB: sla_sks_qa_sunting
+        run: vendor/bin/phpunit --no-coverage tests/integration/SuntingTpGuardDatabaseTest.php
+
+  cp-sql-mariadb:
+    name: Patch CP V4-0007 MariaDB ${{ matrix.version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['10.4', '10.11']
+    services:
+      mariadb:
+        image: mariadb:${{ matrix.version }}
+        env:
+          MARIADB_ROOT_PASSWORD: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -u root -ptesting --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pasang klien MariaDB
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq mariadb-client
+      # Service MariaDB pada runner bersifat QA lokal dan tidak membuka TLS.
+      # Klien runner baru kadang mewajibkan TLS: nonaktifkan SSL hanya untuk
+      # koneksi TCP loopback di job ini, bukan untuk koneksi produksi.
+      - name: Siapkan data CP historis sintetis
+        run: |
+          mariadb --skip-ssl -h 127.0.0.1 -u root -ptesting -e "CREATE DATABASE sla_cp_qa CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
+          mariadb --skip-ssl -h 127.0.0.1 -u root -ptesting sla_cp_qa <<'SQL'
+          CREATE TABLE schema_version (
+            versi VARCHAR(40) PRIMARY KEY,
+            diterapkan_pada TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          ) ENGINE=InnoDB;
+          CREATE TABLE ref_cp_versi (
+            id BIGINT UNSIGNED PRIMARY KEY,
+            otoritas VARCHAR(150) NOT NULL,
+            nomor_dokumen VARCHAR(120) NOT NULL,
+            sumber_url VARCHAR(1024) NOT NULL,
+            tanggal_berlaku DATE NOT NULL
+          ) ENGINE=InnoDB;
+          INSERT INTO ref_cp_versi
+            VALUES (1, 'Sumber historis', 'Nomor sebelumnya', 'https://example.org/arsip', '2026-07-01');
+          SQL
+      - name: Terapkan patch dua kali, periksa baris lama dan NULL baru
+        shell: bash
+        run: |
+          set -euo pipefail
+          DB="mariadb --skip-ssl -h 127.0.0.1 -u root -ptesting sla_cp_qa"
+          $DB < database/sql/updates/V4-0007_CP_LIMA_ISIAN.sql
+          $DB < database/sql/updates/V4-0007_CP_LIMA_ISIAN.sql
+          $DB -e "INSERT INTO ref_cp_versi (id) VALUES (2)"
+          test "$($DB -N -e "SELECT COUNT(*) FROM ref_cp_versi WHERE id=1 AND otoritas='Sumber historis' AND nomor_dokumen='Nomor sebelumnya' AND tanggal_berlaku='2026-07-01'")" = "1"
+          test "$($DB -N -e "SELECT COUNT(*) FROM ref_cp_versi WHERE id=2 AND otoritas IS NULL AND nomor_dokumen IS NULL AND sumber_url IS NULL AND tanggal_berlaku IS NULL")" = "1"
+          test "$($DB -N -e "SELECT COUNT(*) FROM schema_version WHERE versi='V4-0007-CP-LIMA-ISIAN'")" = "1"
+          echo "Patch V4-0007 MariaDB ${{ matrix.version }}: idempoten, histori utuh, metadata baru opsional"

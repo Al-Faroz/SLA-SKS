@@ -86,13 +86,20 @@ final class KatalogPembelajaranSiswaService
      * @return array{kode:string,label:string,buka:bool}
      */
     public static function statusTp(int $semester, int $semesterMulai, int $urutan,
-        string $statusDb, bool $punyaVersi, bool $pertama): array
+        string $statusDb, bool $punyaVersi, bool $pertama,
+        string $jenis = 'non_esensial', bool $semesterTerbuka = false): array
     {
         if ($semester < $semesterMulai) {
             return ['kode' => 'dilewati', 'label' => 'Dilewati (semester awal)', 'buka' => false];
         }
-        if ($semester > $semesterMulai) {
+        if ($semester > $semesterMulai && ! $semesterTerbuka) {
             return ['kode' => 'terkunci', 'label' => 'Menunggu semester sebelumnya', 'buka' => false];
+        }
+        if ($jenis === 'esensial') {
+            return ['kode' => 'esensial', 'label' => 'Esensial — tanpa aktivitas siswa', 'buka' => false];
+        }
+        if ($jenis !== 'non_esensial') {
+            return ['kode' => 'terkunci', 'label' => 'Jenis TP belum valid', 'buka' => false];
         }
         if (!$pertama || $urutan < 1) {
             return ['kode' => 'terkunci', 'label' => 'Selesaikan TP sebelumnya', 'buka' => false];
@@ -103,22 +110,119 @@ final class KatalogPembelajaranSiswaService
         return ['kode' => 'pratinjau', 'label' => 'Siap — lihat rincian TP', 'buka' => true];
     }
 
+    /**
+     * Status 'tuntas' saja tidak membuktikan Sumatif sudah diselesaikan:
+     * rilis Diagnostik lama pernah menuliskan 'tuntas' saat lulus.
+     * Hanya bukti percobaan Sumatif selesai sah pada progres siswa
+     * yang boleh membuka TP/semester selanjutnya.
+     *
+     * @param list<int> $tpIds
+     * @return array<int,bool>
+     */
+    private function tpTuntasSah(array $tpIds, int $siswaId): array
+    {
+        if ($tpIds === []) {
+            return [];
+        }
+        $rows = $this->db->table('progres_tp p')
+            ->distinct()->select('p.tp_id')
+            ->join('percobaan_ujian u', 'u.progres_tp_id=p.id')
+            ->where('p.siswa_id', $siswaId)
+            ->where('p.status', 'tuntas')
+            ->where('u.jenis', 'sumatif')
+            ->where('u.status', 'selesai_sah')
+            ->whereIn('p.tp_id', $tpIds)
+            ->get()->getResultArray();
+        $hasil = [];
+        foreach ($rows as $item) {
+            $hasil[(int) $item['tp_id']] = true;
+        }
+        return $hasil;
+    }
+
     /** @return list<array<string,mixed>> */
-    private function tpUntukPaket(int $paketId, int $semester, int $mulai): array
+    private function tpUntukPaket(int $paketId, int $semester, int $mulai,
+        int $siswaId): array
     {
         $baris = $this->db->table('tp t')
-            ->select('t.id,t.kode_tp,t.judul,t.urutan_atp,t.status,' .
+            ->select('t.id,t.kode_tp,t.judul,t.urutan_atp,t.status,t.jenis_tp,' .
+                't.bab_id,b.nomor_bab,b.nama_bab,b.deskripsi_bab,' .
                 '(SELECT COUNT(*) FROM versi_konten_tp v WHERE v.tp_id=t.id) AS jumlah_versi', false)
+            ->join('bab b', 'b.id=t.bab_id AND b.paket_semester_id=t.paket_semester_id')
             ->where('t.paket_semester_id', $paketId)
+            ->where('t.status !=', 'arsip')
             ->orderBy('t.urutan_atp', 'ASC')->orderBy('t.id', 'ASC')->get()->getResultArray();
-        $pertamaId = $baris === [] ? 0 : (int) $baris[0]['id'];
+        $ids = array_map(static fn (array $tp): int => (int) $tp['id'], $baris);
+        $tuntas = $this->tpTuntasSah($ids, $siswaId);
+        // TP Esensial tidak menghalangi atau membuka langkah NonEsensial.
+        // Hanya progres tuntas milik siswa yang membuka TP berikutnya.
+        $sebelumnyaTuntas = true;
         foreach ($baris as &$tp) {
+            $jenis = (string) $tp['jenis_tp'];
             $tp['akses'] = self::statusTp($semester, $mulai, (int) $tp['urutan_atp'],
                 (string) $tp['status'], (int) $tp['jumlah_versi'] > 0,
-                (int) $tp['id'] === $pertamaId);
+                $sebelumnyaTuntas, $jenis, true);
+            if ($jenis !== 'esensial' && ! isset($tuntas[(int) $tp['id']])) {
+                $sebelumnyaTuntas = false;
+            }
         }
         unset($tp);
         return $baris;
+    }
+
+    /** Semester selanjutnya hanya boleh dibuka setelah seluruh TP wajib sebelumnya tuntas. */
+    private function semesterTuntas(int $paketId, int $siswaId): bool
+    {
+        $tp = $this->db->table('tp')
+            ->select('id,jenis_tp')->where('paket_semester_id', $paketId)
+            ->where('status !=', 'arsip')->get()->getResultArray();
+        $ids = [];
+        foreach ($tp as $item) {
+            $jenis = (string) $item['jenis_tp'];
+            if (! in_array($jenis, ['esensial', 'non_esensial'], true)) {
+                return false; // Jenis historis tak dikenal bukan TP selesai.
+            }
+            if ($jenis === 'non_esensial') {
+                $ids[] = (int) $item['id'];
+            }
+        }
+        // Semester tanpa TP wajib tidak otomatis dianggap 100% tuntas.
+        if ($ids === []) {
+            return false;
+        }
+        return count($this->tpTuntasSah($ids, $siswaId)) === count($ids);
+    }
+
+    /**
+     * Otorisasi server-side untuk halaman semester dan URL paket langsung.
+     * Paket harus aktif, diberikan ke Gen siswa, dan seluruh semester wajib
+     * sebelumnya sudah tuntas. Semester sebelum mulai selalu dilewati.
+     *
+     * @param list<array<string,mixed>> $paketMapel
+     */
+    private function semesterBoleh(int $target, int $mulai, int $siswaId, array $paketMapel): bool
+    {
+        if ($target < $mulai || $target > 6) {
+            return false;
+        }
+        $idPerSemester = [];
+        foreach ($paketMapel as $paket) {
+            $n = (int) $paket['semester'];
+            if (isset($idPerSemester[$n])) {
+                return false; // Penugasan ganda ambigu, jangan buka akses.
+            }
+            $idPerSemester[$n] = (int) $paket['id'];
+        }
+        if (! isset($idPerSemester[$target])) {
+            return false;
+        }
+        for ($semester = $mulai; $semester < $target; ++$semester) {
+            if (! isset($idPerSemester[$semester])
+                || ! $this->semesterTuntas($idPerSemester[$semester], $siswaId)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** @return array{siswa:array<string,mixed>,mapel:list<array<string,mixed>>} */
@@ -158,12 +262,14 @@ final class KatalogPembelajaranSiswaService
                     break;
                 }
             }
+            $boleh = $paket !== null && $this->semesterBoleh(
+                $nomor, (int) $siswa['mulai_efektif'], (int) $siswa['id'], $semua
+            );
             $state = $nomor < (int) $siswa['mulai_efektif'] ? 'Dilewati'
-                : ($nomor > (int) $siswa['mulai_efektif'] ? 'Menunggu semester sebelumnya'
-                    : ($paket === null ? 'Belum ada paket aktif' : 'Lihat daftar TP'));
+                : ($boleh ? 'Lihat daftar TP'
+                    : ($paket === null ? 'Belum ada paket aktif' : 'Menunggu semester sebelumnya'));
             $semesters[] = ['nomor' => $nomor, 'paket_id' => $paket === null ? null : (int) $paket['id'],
-                'label_status' => $state, 'buka' => $paket !== null
-                    && $nomor === (int) $siswa['mulai_efektif']];
+                'label_status' => $state, 'buka' => $boleh];
         }
         return ['siswa' => $siswa, 'mapel' => $semua[0], 'semester' => $semesters];
     }
@@ -172,14 +278,39 @@ final class KatalogPembelajaranSiswaService
     public function daftarTp(int $paketId): array
     {
         $siswa = $this->siswa();
-        foreach ($this->paket((int) $siswa['angkatan_id']) as $paket) {
+        $semua = $this->paket((int) $siswa['angkatan_id']);
+        foreach ($semua as $paket) {
             if ((int) $paket['id'] === $paketId) {
-                if ((int) $paket['semester'] !== (int) $siswa['mulai_efektif']) {
+                $paketMapel = array_values(array_filter($semua,
+                    static fn (array $p): bool =>
+                        (int) $p['mapel_id'] === (int) $paket['mapel_id']));
+                if (! $this->semesterBoleh(
+                    (int) $paket['semester'], (int) $siswa['mulai_efektif'],
+                    (int) $siswa['id'], $paketMapel
+                )) {
                     throw new DomainException('Semester ini belum tersedia untuk pembelajaran Anda.');
                 }
+                $tp = $this->tpUntukPaket($paketId,
+                    (int) $paket['semester'], (int) $siswa['mulai_efektif'],
+                    (int) $siswa['id']);
+                // BAB asli dari database, bukan hasil memecah kode TP.
+                // Status akses tetap dihitung untuk seluruh urutan TP NonEsensial.
+                $bab = [];
+                foreach ($tp as $item) {
+                    $id = (int) $item['bab_id'];
+                    if (!isset($bab[$id])) {
+                        $bab[$id] = [
+                            'id' => $id,
+                            'nomor' => (int) $item['nomor_bab'],
+                            'nama' => (string) $item['nama_bab'],
+                            'deskripsi' => (string) ($item['deskripsi_bab'] ?? ''),
+                            'tp' => [],
+                        ];
+                    }
+                    $bab[$id]['tp'][] = $item;
+                }
                 return ['siswa' => $siswa, 'paket' => $paket,
-                    'tp' => $this->tpUntukPaket($paketId,
-                        (int) $paket['semester'], (int) $siswa['mulai_efektif'])];
+                    'tp' => $tp, 'bab' => array_values($bab)];
             }
         }
         throw new DomainException('Paket semester tidak tersedia untuk Gen Anda.');

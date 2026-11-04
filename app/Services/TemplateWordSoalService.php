@@ -16,8 +16,18 @@ final class TemplateWordSoalService
 {
     public static function buat(array $identitas, string $jenis, int $jumlah, string $kunci): string
     {
-        if (! in_array($jenis, ['diagnostik', 'sumatif'], true) || $jumlah < 1 || $jumlah > 200) {
-            throw new DomainException('Jenis atau jumlah soal tidak valid (1–200).');
+        if (! in_array($jenis, ['diagnostik', 'sumatif', 'pra_semester'], true)) {
+            throw new DomainException('Jenis bank soal tidak valid.');
+        }
+        $minimal = $jenis === 'diagnostik' ? 10 : 30;
+        $pra = $jenis === 'pra_semester';
+        $babNomor = array_map('intval', (array)($identitas['bab_nomor'] ?? []));
+        if ($pra && ($babNomor === [] || count(array_unique($babNomor)) !== count($babNomor)
+            || min($babNomor) < 1 || max($babNomor) > 999 || count($babNomor) > $jumlah)) {
+            throw new DomainException('Template Pra-Semester harus memiliki nomor BAB valid dari paket.');
+        }
+        if ($jumlah < $minimal || $jumlah > 200) {
+            throw new DomainException('Template ' . ucfirst($jenis) . ' harus memiliki ' . $minimal . '–200 soal.');
         }
         if (strlen($kunci) < 32) {
             throw new RuntimeException('Kunci tanda tangan template belum dikonfigurasi dengan aman.');
@@ -32,7 +42,9 @@ final class TemplateWordSoalService
             'jumlah' => $jumlah,
             'struktur_versi' => (int) ($identitas['struktur_versi'] ?? 0),
         ];
-        if (min($meta['tp_id'], $meta['guru_id'], $meta['paket_id'], $meta['struktur_versi']) < 1) {
+        if ($pra) $meta['bab_nomor'] = $babNomor;
+        if (($pra && ($meta['tp_id'] !== 0 || min($meta['guru_id'],$meta['paket_id'],$meta['struktur_versi']) < 1))
+            || (!$pra && min($meta['tp_id'], $meta['guru_id'], $meta['paket_id'], $meta['struktur_versi']) < 1)) {
             throw new DomainException('Identitas template tidak lengkap.');
         }
         $payload = json_encode($meta, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
@@ -87,7 +99,7 @@ final class TemplateWordSoalService
         };
 
         $body = $p('SLA-SKS  /  FORMULIR BANK SOAL', 'eyebrow') .
-            $p('BANK SOAL ' . strtoupper($jenis), 'title') .
+            $p('BANK SOAL ' . ($pra ? 'PRA-SEMESTER' : strtoupper($jenis)), 'title') .
             $p('Learning Management System · MTs Fase D', 'subtitle') .
             $p('IDENTITAS PEMBELAJARAN', 'heading');
         foreach ([
@@ -96,14 +108,17 @@ final class TemplateWordSoalService
             'Mata Pelajaran' => (string) ($identitas['mapel'] ?? ''),
             'Kurikulum' => (string) ($identitas['kurikulum'] ?? ''),
             'Semester' => (string) ($identitas['semester'] ?? ''),
-            'TP' => (string) ($identitas['kode_tp'] ?? '') . ' — ' . (string) ($identitas['judul_tp'] ?? ''),
+            ($pra ? 'Paket' : 'TP') => $pra ? ('PRA-' . $meta['paket_id']) :
+                ((string) ($identitas['kode_tp'] ?? '') . ' — ' . (string) ($identitas['judul_tp'] ?? '')),
             'Jumlah soal' => (string) $jumlah,
         ] as $label => $nilai) {
             $body .= $p($label . '  :  ' . $nilai, 'identity');
         }
         $body .= $p('PETUNJUK PENGISIAN', 'heading');
         foreach ([
-            '1. Identitas Gen, Guru, Mapel, Kurikulum, Semester, TP dan jenis ujian telah diisi otomatis oleh sistem.',
+            $pra
+                ? '1. Identitas Gen, Guru, Mapel, Semester dan Paket telah diisi otomatis oleh sistem.'
+                : '1. Identitas Gen, Guru, Mapel, Kurikulum, Semester, TP dan jenis ujian telah diisi otomatis oleh sistem.',
             '2. Jangan mengubah label Bagian / Soal n / A–E atau urutan baris. Isi hanya kolom Isi dan Benar.',
             '3. Setiap soal wajib mempunyai lima pilihan A–E yang terisi. Beri tanda ✓ pada tepat satu pilihan benar.',
             '4. Gambar, teks Arab/RTL, aksara Jawa/Unicode, Equation Word (Insert → Equation) dan tabel termasuk tabel bersarang boleh ditempatkan pada kolom Isi soal maupun pilihan.',
@@ -113,14 +128,18 @@ final class TemplateWordSoalService
         ] as $petunjuk) {
             $body .= $p($petunjuk, 'hint');
         }
+        if ($pra) {
+            $body .= $p('DAFTAR NOMOR BAB SEMESTER: ' . implode(', ', $babNomor), 'hint');
+            $body .= $p('PENTING: Kolom ketiga pada baris Soal n adalah nomor BAB, contohnya BAB 8. Setiap soal harus sesuai BAB asalnya. Boleh mengganti BAB hanya dengan nomor yang tercantum di atas. Kolom ketiga pada baris A–E hanya untuk tanda ✓ kunci jawaban.', 'hint');
+        }
         $body .= $p('DAFTAR SOAL PILIHAN GANDA', 'heading') .
             $p('Isi kolom Isi dan berikan satu tanda ✓ pada kolom Benar untuk setiap nomor.');
         $table = '<w:tbl><w:tblPr><w:tblW w:w="9200" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblBorders>' .
             '<w:top w:val="single"/><w:left w:val="single"/><w:bottom w:val="single"/>' .
             '<w:right w:val="single"/><w:insideH w:val="single"/><w:insideV w:val="single"/>' .
-            '</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="1900"/><w:gridCol w:w="6300"/><w:gridCol w:w="1000"/></w:tblGrid>' . $row('Bagian', 'Isi', 'Benar', 'header');
+            '</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="1900"/><w:gridCol w:w="6300"/><w:gridCol w:w="1000"/></w:tblGrid>' . $row('Bagian', 'Isi', $pra ? 'BAB / Benar' : 'Benar', 'header');
         for ($n = 1; $n <= $jumlah; $n++) {
-            $table .= $row('Soal ' . $n, '', '', 'question', true);
+            $table .= $row('Soal ' . $n, '', $pra ? ('BAB ' . $babNomor[($n-1)%count($babNomor)]) : '', 'question', true);
             foreach (['A', 'B', 'C', 'D', 'E'] as $pilihan) {
                 $table .= $row($pilihan, '', '', $n % 2 === 0 ? 'option-b' : 'option-a', $pilihan !== 'E');
             }

@@ -7,9 +7,40 @@ on:
       - 'database/sql/README.md'
       - 'app/Services/AturanWaktuUjianService.php'
       - 'app/Services/SusunButirUjianService.php'
+      - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Controllers/SiswaPembelajaran.php'
+      - 'app/Views/siswa/daftar_tp.php'
+      - 'tests/unit/PraSemesterImplementasiTest.php'
+      - 'tests/unit/PraSemesterDatabaseTest.php'
+      - 'app/Services/PraSemesterWordService.php'
+      - 'app/Services/TemplateWordSoalService.php'
+      - 'app/Services/PratinjauWordSoalService.php'
+      - 'app/Services/RenderWordSoalService.php'
+      - 'app/Views/guru/pra_semester_word_review.php'
+      - 'tests/unit/PraSemesterWordTest.php'
+      - 'database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql'
+      - 'app/Services/PraSemesterJadwalService.php'
+      - 'app/Services/PraSemesterGuruService.php'
+      - 'app/Controllers/AdminPraSemester.php'
+      - 'app/Controllers/GuruPraSemester.php'
+      - 'app/Views/admin/pra_semester.php'
+      - 'app/Views/admin/pra_semester_detail.php'
+      - 'app/Views/guru/pra_semester.php'
+      - 'app/Views/guru/pra_semester_detail.php'
+      - 'public/assets/css/app.css'
+      - 'app/Services/AturanJadwalPraSemesterService.php'
+      - 'app/Services/PenilaianPraSemesterService.php'
+      - 'app/Services/PraSemesterSesiService.php'
+      - 'app/Services/MesinPraSemesterSiswaService.php'
+      - 'app/Views/siswa/pra_semester_ujian.php'
+      - 'app/Controllers/AdminPraSemester.php'
+      - 'app/Config/Routes.php'
+      - 'database/sql/updates/V4-0009_PRA_SESI_TERJADWAL.sql'
+      - 'tests/unit/PraSemesterRemedialSusulanTest.php'
       - 'tests/unit/AturanWaktuUjianServiceTest.php'
       - 'tests/unit/SusunButirUjianServiceTest.php'
       - 'tests/integration/SqlUjianSchemaCheck.php'
+      - 'tests/integration/SqlPraSesiSchemaCheck.php'
       - '.github/workflows/qa-s06a-mesin-ujian.yml'
   workflow_dispatch:
 
@@ -41,8 +72,10 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mysqli, pdo_mysql, mbstring, intl, gd, zip, xml, dom, fileinfo
+          extensions: mysqli, pdo_mysql, sqlite3, pdo_sqlite, mbstring, intl, gd, zip, xml, dom, fileinfo
           coverage: none
+      - name: Siapkan penyimpanan Word privat pada CI
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
       - name: Composer install
         run: composer install --no-interaction --prefer-dist --no-progress
       - name: PHP lint
@@ -51,10 +84,45 @@ jobs:
           php -l app/Services/SusunButirUjianService.php
           php -l tests/unit/AturanWaktuUjianServiceTest.php
           php -l tests/unit/SusunButirUjianServiceTest.php
+          php -l app/Services/MesinPraSemesterSiswaService.php
+          php -l app/Controllers/SiswaPembelajaran.php
+          php -l app/Views/siswa/daftar_tp.php
+          php -l tests/unit/PraSemesterImplementasiTest.php
+          php -l tests/unit/PraSemesterDatabaseTest.php
+          php -l app/Services/PraSemesterWordService.php
+          php -l app/Services/TemplateWordSoalService.php
+          php -l app/Services/PratinjauWordSoalService.php
+          php -l app/Services/RenderWordSoalService.php
+          php -l app/Views/guru/pra_semester_word_review.php
+          php -l tests/unit/PraSemesterWordTest.php
+          php -l app/Services/PraSemesterJadwalService.php
+          php -l app/Services/PraSemesterGuruService.php
+          php -l app/Controllers/AdminPraSemester.php
+          php -l app/Controllers/GuruPraSemester.php
+          php -l app/Views/admin/pra_semester.php
+          php -l app/Views/admin/pra_semester_detail.php
+          php -l app/Views/guru/pra_semester.php
+          php -l app/Views/guru/pra_semester_detail.php
+          php -l app/Services/AturanJadwalPraSemesterService.php
+          php -l app/Services/PenilaianPraSemesterService.php
+          php -l app/Services/PraSemesterSesiService.php
+          php -l app/Services/MesinPraSemesterSiswaService.php
+          php -l app/Views/siswa/pra_semester_ujian.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/PraSemesterRemedialSusulanTest.php
           php -l tests/integration/SqlUjianSchemaCheck.php
+          php -l tests/integration/SqlPraSesiSchemaCheck.php
       - name: Unit test waktu Ketat dan acak opsi
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/AturanWaktuUjianServiceTest.php
           vendor/bin/phpunit --no-coverage tests/unit/SusunButirUjianServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterImplementasiTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterDatabaseTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterWordTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/TemplateWordSoalServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/ReviewWordSoalTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/PraSemesterRemedialSusulanTest.php
       - name: Impor patch SQL pada MariaDB sintetis
-        run: php tests/integration/SqlUjianSchemaCheck.php
+        run: |
+          php tests/integration/SqlUjianSchemaCheck.php
+          php tests/integration/SqlPraSesiSchemaCheck.php

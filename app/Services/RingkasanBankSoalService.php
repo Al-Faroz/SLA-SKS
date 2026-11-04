@@ -44,7 +44,7 @@ final class RingkasanBankSoalService
     public static function susun(array $tp, array $hitung): array
     {
         $hasil = [];
-        foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 5]] as $jenis => [$kolom, $minimal]) {
+        foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 30]] as $jenis => [$kolom, $minimal]) {
             $target = (int) ($tp[$kolom] ?? 0);
             $aktif = max(0, (int) ($hitung[$jenis] ?? 0));
             $hasil[$jenis] = [

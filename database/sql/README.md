@@ -305,3 +305,184 @@ masalah hak akses yang sah.
 **Kondisi saat ini: XAMPP lokal, belum deploy ke hosting.** Pekerjaan SQL berikutnya hanya boleh dimulai sesudah menerima dan memeriksa dump terbaru setelah patch terakhir. Dump TERBARU yang telah diterima dan diperiksa untuk audit ini ialah `sla_sks_v3 (3).sql` (203.295 byte, 52 tabel; header phpMyAdmin 25-10-2026 pukul 11.01, sementara metadata Windows Properties 17.01 pada hari yang sama). `jawaban_hots_materi` **sudah ada (14 kolom)** bersama `resume_materi` (14 kolom) dan bank Guru `tugas_hots_materi` (5 kolom). **Jangan impor ulang SQL 0017 atau 0018** pada kondisi tersebut. Perbedaan waktu pada header dan Windows tidak boleh ditafsirkan sebagai perbedaan file ataupun bukti zona waktu tertentu.
 
 Sebelum SQL baru: jalankan `qa/audit_kontrak_database_readonly.sql` di DB yang benar, verifikasi metadata dan `schema_version`; bandingkan SQL historis serta query Service; backup DB+`writable/`. Jangan impor ulang 0017 atau 0018 jika objek telah ada. Semua perubahan skema harus patch **bernomor baru**, additive, diuji terhadap seluruh tabel nyata dan diputuskan setelah dump terbaru. Jangan me-reset database, menimpa data siswa, atau menaruh dump privat di repo.
+
+## Transisi khusus v2.5 / database BARU sla_sks_v4 (26 Oktober 2026)
+- Data sumber terakhir adalah dump privat pemilik `sla_sks_v3 (4).sql`. Database **`sla_sks_v3` tidak dihapus**. Arsip pengujian dan file `writable/` harus dicadangkan.
+- File privat **`sla_sks_v4_LOKAL_PRIVAT.sql`** (dibagikan langsung ke pemilik, bukan repository) sudah berisi DDL dan baris v3 penting serta patch perubahan v4. Ia menjalankan `CREATE DATABASE sla_sks_v4`; **v4 harus belum ada**.
+- File publik `updates/V4-0001_POLA_BAB_TP_PRA_SEMESTER.sql` **hanya patch skema** untuk clone v3 kosong-perubahan yang sudah tersedia dalam DB `sla_sks_v4`; tidak berisi data pribadi. **JANGAN IMPOR patch ini lagi setelah mengimpor dump privat v4**, karena patch sudah digabung dan perubahan hanya untuk sekali pakai.
+- Kode aplikasi MVC/Service/UI saat ini belum kompatibel penuh dengan v4. Jangan mengubah `.env` secara otomatis; cek SQL `schema_version`, FK, CP mapel dan 4 materi historis dalam arsip di [audit v4](../../docs/AUDIT-DATABASE-V3-KE-V4-2026-10-26.md).
+- Tidak memakai migration/seeder. Uji MariaDB lokal dan MySQL target berbeda, bukan klaim impor telah PASS.
+
+## V4-0009 — Jadwal Remedial dan Susulan Pra-Semester (3 November 2026)
+
+**Basis audit:** dump lokal privat `sla_sks_v4 (13).sql`, header 03-11-2026 pukul 04.32, MariaDB 10.4.32, versi terakhir `V4-0008-KEPUTUSAN-UJIAN-BATAL`. **Jangan commit dump privat.**
+
+1. Backup **database `sla_sks_v4` dan direktori `writable/`**, jangan reset atau impor ulang dump.
+2. Pada phpMyAdmin pilih database `sla_sks_v4`, jalankan pemeriksaan read-only awal dari `database/sql/qa/V4-0009_PRA_SESI_READONLY.sql`.
+3. Pastikan versi `V4-0008-KEPUTUSAN-UJIAN-BATAL` sudah ada dan `V4-0009-PRA-SESI-TERJADWAL` belum ada.
+4. Impor file **`database/sql/updates/V4-0009_PRA_SESI_TERJADWAL.sql` tepat sekali**, bukan Migration/Seeder.
+5. Jalankan bagian pemeriksaan **SETELAH impor** dari QA read-only: harus terdapat `jadwal_pra_sesi`, `peserta_pra_susulan`, kolom nullable `percobaan_ujian.jadwal_pra_sesi_id`, dan `schema_version V4-0009`. Jumlah attempt/hasil historis tidak boleh berubah oleh update ini.
+6. Baru setelah berhasil, uji jadwal utama, remedial dan susulan lewat browser peran Admin/Guru/Siswa. Jika impor gagal, **jangan** mengulang secara membabi buta; simpan pesan galat dan lakukan audit patch parsial.
+
+SQL ini aditif, tidak menghapus data siswa, tidak mengubah root CI4, URL, atau .env. Tidak boleh diimpor pada database selain `sla_sks_v4` yang telah diaudit.
+
+## V4-0010 — Word Pra-Semester (A8-7, 3 November 2026)
+Berdasarkan basis `V4-0009` yang telah dikonfirmasi berhasil diimpor pengguna. Patch ini **bukan** pengganti V4-0009 dan tidak mereset data.
+
+1. Backup database `sla_sks_v4` dan folder `writable/private/` sebelum impor.
+2. Pastikan `schema_version` mengandung `V4-0009-PRA-SESI-TERJADWAL`, dan **belum** mengandung `V4-0010-BANK-WORD-PRA`.
+3. Di phpMyAdmin pilih database `sla_sks_v4`, impor **sekali** `database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql`.
+4. Jalankan pemeriksaan baca-saja `database/sql/qa/V4-0010_BANK_WORD_PRA_READONLY.sql`. Harus muncul tabel `impor_soal_pra_docx` dan versi `V4-0010-BANK-WORD-PRA`. Jumlah soal/percobaan lama tetap sama.
+5. Guru membuka `/index.php/guru/pra-semester/{paketId}`, memilih jumlah 30–200 untuk template, mengisi setiap BAB, soal, kunci ✓, kemudian Unggah → Review → Konfirmasi. Upload ke staging privat berumur dua jam.
+
+Tidak memakai Migration/Seeder. Jangan mengunggah dump atau kunci HMAC ke repo. Jika terjadi galat impor, periksa objek yang sudah terbentuk, **jangan** langsung menjalankan ulang SQL.
+
+## V4-0011-SERTIFIKAT — Sertifikat PDF/QR dan aset privat (3 November 2026)
+
+Sumber audit baca-saja **dump privat** `sla_sks_v4 (15).sql` (03-11-2026 pukul 09.32, MariaDB 10.4.32, versi terakhir `V4-0010-BANK-WORD-PRA`). Kode penerbitan sertifikat A11-2 memerlukan empat tabel baru. **Tidak ada data siswa asli atau template TTD dalam patch.**
+
+1. **BACKUP database `sla_sks_v4` dan seluruh `writable/`** sebelum impor. Jangan impor ulang dump instalasi atau SQL historis.
+2. Jalankan baca-saja:
+   ```sql
+   SELECT versi FROM schema_version
+    WHERE versi IN ('V4-0010-BANK-WORD-PRA','V4-0011-SERTIFIKAT')
+    ORDER BY versi;
+   SELECT table_name FROM information_schema.tables
+    WHERE table_schema=DATABASE()
+      AND table_name IN ('sertifikat_aset','sertifikat_aset_aktif',
+                         'sertifikat','sertifikat_aktif');
+   ```
+   Syarat: marker V4-0010 ada, marker V4-0011 belum ada, empat tabel baru belum ada. Jika berbeda, **jangan impor**; audit dahulu.
+3. Via phpMyAdmin database `sla_sks_v4`, impor **sekali** `database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql`. **Tidak memakai CI4 Migration/Seeder**.
+4. Verifikasi:
+   ```sql
+   SELECT versi FROM schema_version WHERE versi='V4-0011-SERTIFIKAT';
+   SELECT COUNT(*) AS jumlah_sertifikat FROM sertifikat;
+   SELECT COUNT(*) AS jumlah_aset FROM sertifikat_aset;
+   SELECT COUNT(*) AS jumlah_pointer_aktif FROM sertifikat_aktif;
+   ```
+   Pada pemasangan awal ketiga jumlah harus 0. Data siswa, TP, nilai dan attempt tidak diubah.
+5. Login Admin, lengkapi identitas, unggah dan aktifkan **TTD PNG**. Background boleh fallback; template unggahan harus dipratinjau dulu sebelum aktif. Pastikan `writable/private/sertifikat/` dapat ditulis tetapi **HTTP langsung ditolak**.
+6. Uji penerbitan hanya untuk siswa **simulasi dengan syarat akademik yang benar-benar terpenuhi**, bukan dengan mengubah nilai asli demi melewati gate. Periksa PDF A4 landscape, QR localhost, download pemilik saja, revisi dengan alasan dan arsip digantikan.
+7. Jika DDL gagal sebagian, **jangan jalankan ulang**: MariaDB dapat melakukan implicit commit; inspeksi tabel/marker dan pulihkan dari backup yang telah dibuat.
+
+Berkas aset/PDF historis berada pada `writable/private/sertifikat/aset/` dan `writable/private/sertifikat/pdf/`. Backup dump SQL **saja tidak cukup**. Pada hosting nyata QR memerlukan domain HTTPS permanen; hasil uji localhost tidak dianggap sertifikat siap digunakan publik.
+
+## V4-0012 — Pengumuman Global dan FAQ A13-2 (3 November 2026)
+
+**Acuan terverifikasi:** dump SQL XAMPP privat `sla_sks_v4 (17).sql`, phpMyAdmin 5.2.1, **03 Nov 2026 pukul 16.02**, MariaDB **10.4.32**, database `sla_sks_v4`. Dump berisi **68 tabel**, tidak ada `pengumuman`, `faq`, atau `riwayat_informasi`, dan `schema_version` terakhir `V4-0011-SERTIFIKAT` sudah tercatat. Berkas dump privat **tidak** boleh diunggah ke GitHub.
+
+### Langkah impor di XAMPP
+
+1. **Sebelum apa pun**, backup `sla_sks_v4` ke berkas SQL privat dan folder `writable/`. Jangan mengganti dump aktif, jangan mengimpor ulang instalasi.
+2. Buka phpMyAdmin → pilih **database `sla_sks_v4`** → tab SQL. Jalankan baca-saja:
+   ```sql
+   SELECT versi, diterapkan_pada FROM schema_version ORDER BY diterapkan_pada DESC;
+   SHOW TABLES LIKE 'pengumuman';
+   SHOW TABLES LIKE 'faq';
+   SHOW TABLES LIKE 'riwayat_informasi';
+   ```
+   Versi `V4-0011-SERTIFIKAT` harus ada, `V4-0012-PENGUMUMAN-FAQ` belum ada, dan tiga tabel baru belum ada. **Bila hasil berbeda, hentikan impor dan laporkan; jangan mengulang/menimpa.**
+3. Buka tab Import pada database yang sama; pilih **hanya** `database/sql/updates/V4-0012_PENGUMUMAN_FAQ.sql` dari folder hasil pull GitHub dan impor **sekali**. Tidak memakai CI4 migration/seeder.
+4. Periksa **baca-saja**:
+   ```sql
+   SELECT versi, diterapkan_pada
+   FROM schema_version WHERE versi = 'V4-0012-PENGUMUMAN-FAQ';
+   SHOW CREATE TABLE pengumuman;
+   SHOW CREATE TABLE faq;
+   SHOW CREATE TABLE riwayat_informasi;
+   SELECT COUNT(*) AS jumlah_pengumuman FROM pengumuman;
+   SELECT COUNT(*) AS jumlah_faq FROM faq;
+   SELECT COUNT(*) AS jumlah_riwayat FROM riwayat_informasi;
+   ```
+   Awal tiga tabel berisi 0 baris; jangan menambahkan pengumuman/FAQ palsu dalam SQL.
+5. Login sebagai Admin → `/admin/pengumuman`, `/admin/faq`; Guru → `/guru/pengumuman`; semua akun login → `/pengumuman` dan `/bantuan`. Buat **konten pengujian tanpa identitas siswa nyata**, simpan Draf lalu Terbit, periksa tampilan antar peran. Arsipkan hanya data yang memang Anda buat untuk uji.
+6. Periksa pergantian peran: Guru tidak boleh mengubah konten Pengumuman milik Guru lain; Siswa/Pimpinan hanya baca. Uji isi mirip HTML sebagai **teks biasa**, pagination, dark/light, HP, reload, status gagal simpan, dan login anonim.
+
+**Sifat patch:** hanya tiga `CREATE TABLE` dengan FK pengguna dan satu `INSERT schema_version`; tidak mengubah data siswa, akun, ujian, nilai, progres, sertifikat atau jadwal. Riwayat sebelum/sesudah disimpan ke `riwayat_informasi` setiap kali ada CREATE/UPDATE/ARSIP lewat Service. Status `draf`, `terbit`, `arsip`; arsip terminal, tidak DELETE. Teks di-escape saat dirender.
+
+**Jika impor gagal:** DDL MySQL/MariaDB melakukan *implicit commit*, sehingga membuat satu tabel tidak otomatis di-rollback saat pernyataan berikutnya gagal. **Jangan langsung impor ulang atau DROP hasil impor parsial.** Catat pesan gagal, `SHOW TABLES`, `schema_version`, lalu lakukan inspeksi berdasarkan backup. Patch versi ini tidak boleh dijalankan dua kali.
+
+**Batas:** `notifikasi` internal per penerima, kebijakan privasi resmi publik, dan Hubungi Admin sebagai kontak sekolah belum dibangun pada A13-2. Perubahan SQL berikutnya kembali mewajibkan dump XAMPP **terbaru sesudah patch V4-0012** sesuai AGENTS.md.
+
+
+## V4-0013 — Notifikasi Internal dan Kebijakan Privasi A13-6/A13-7 (4 November 2026)
+
+**Acuan terbaru:** dump privat `sla_sks_v4 (18).sql` bertanggal **04 Nov 2026 03.59**, MariaDB **10.4.32**, database **`sla_sks_v4`**. Terdapat 71 tabel; `schema_version` memuat **`V4-0012-PENGUMUMAN-FAQ`** dan belum memuat V4-0013. Tabel `pengguna`, `pengguna_peran`, `siswa`, `penugasan_guru_gen`, `pengaturan`, `log_aktivitas`, `pengumuman`, `faq`, `riwayat_informasi`, sertifikat, penilaian, dan ujian telah diperiksa struktur/indeks/FK-nya. Dump privat **jangan di-push ke GitHub**.
+
+1. **Backup** database `sla_sks_v4` dan seluruh folder `writable/` ke lokasi aman. `git pull` saja tidak menambah tabel.
+2. Di phpMyAdmin pilih database **`sla_sks_v4`** dan jalankan SQL **baca saja**:
+   ```sql
+   SELECT versi, diterapkan_pada FROM schema_version
+   WHERE versi IN ('V4-0012-PENGUMUMAN-FAQ','V4-0013-NOTIFIKASI-PRIVASI');
+   SHOW TABLES LIKE 'notifikasi';
+   SHOW TABLES LIKE 'kebijakan_privasi';
+   SHOW TABLES LIKE 'riwayat_kebijakan_privasi';
+   ```
+   **Harus** ada versi V4-0012, **belum** ada V4-0013, dan **belum** ada ketiga tabel baru. Jika berbeda, **hentikan** dan lakukan audit; jangan impor ulang.
+3. Tab **Import** → pilih **hanya `database/sql/updates/V4-0013_NOTIFIKASI_PRIVASI.sql`**, lalu impor **sekali** pada database yang sama. Tanpa Migration/Seeder, tanpa mengimpor dump lama.
+4. Verifikasi **baca saja**:
+   ```sql
+   SELECT versi, diterapkan_pada FROM schema_version
+   WHERE versi='V4-0013-NOTIFIKASI-PRIVASI';
+   SHOW CREATE TABLE notifikasi;
+   SHOW CREATE TABLE kebijakan_privasi;
+   SHOW CREATE TABLE riwayat_kebijakan_privasi;
+   SELECT COUNT(*) AS jumlah_notifikasi FROM notifikasi;
+   SELECT COUNT(*) AS jumlah_kebijakan FROM kebijakan_privasi;
+   SELECT COUNT(*) AS jumlah_riwayat FROM riwayat_kebijakan_privasi;
+   ```
+   Tiga tabel awalnya **kosong**. Jangan isi data siswa atau naskah privasi palsu melalui SQL.
+5. Tarik branch A13-6/7, masuk sebagai Siswa/Guru/Admin/Pimpinan. Menu Notifikasi dan badge header menampilkan masing-masing pengguna/peran; uji penilaian Resume/HOTS, permintaan/izin akses ulang, publikasi TP NonEsensial, penerbitan sertifikat **hanya pada data simulasi**, lalu cek item dan tombol **Tandai dibaca**. Perubahan status transaksi harus menghasilkan tepat satu notifikasi untuk peristiwa yang sama. Guru Gen lain dan akun lain tidak boleh melihat item.
+6. Admin → **Kebijakan Privasi**: buat Draf, sunting, periksa; **jangan menerbitkan sebelum teks resmi disahkan madrasah**. Setelah naskah resmi ada, pilih versi dan tanggal berlaku, konfirmasi lalu terbitkan. Halaman `/kebijakan-privasi` dapat dibuka tanpa login; sebelum ada naskah terbit yang berlaku akan menjawab 503 “Belum diterbitkan”.
+7. Uji ganti peran dan penugasan, login anonim, CSRF, input HTML sebagai teks, Dark/Light dan HP.
+
+**Sifat patch:** tiga `CREATE TABLE` additive + satu penanda `schema_version`; tidak ada `DROP`, `DELETE`, `UPDATE` tabel lama, perubahan .env atau tabel akademik. Jika gagal setelah satu atau dua DDL, MariaDB sudah melakukan implicit commit. **Jangan mengimpor ulang atau DROP tabel parsial**: catat galat dan hasil `SHOW TABLES`, lalu pulihkan dengan metode aman dari backup setelah pemeriksaan. PR masih Draft sampai QA XAMPP PASS.
+
+## V4-0014 — Koreksi Nilai Siswa A14-2 (4 November 2026)
+
+**STATUS XAMPP TERKINI (4 November 2026): V4-0013 dan V4-0014 sudah berhasil diimpor oleh pemilik (16:02:43 dan 16:02:59 WIB). JANGAN DIIMPOR ULANG.** Catatan impor di bawah khusus instalasi lain yang belum memiliki kedua patch. Keputusan final tidak memakai persetujuan Admin: kedua tabel V4-0014 dipertahankan sebagai **audit koreksi langsung Guru G1** (status terminal `disetujui`, tanpa Admin) dan sertifikat personal diterbitkan/diperbarui otomatis pada akses siswa. **Tidak ada patch SQL baru, jangan ubah SQL historis.**
+
+
+**Acuan audit:** dump SQL XAMPP privat \`sla_sks_v4 (19).sql\`, phpMyAdmin 5.2.1, waktu **04 Nov 2026 09.28**, MariaDB **10.4.32**, database \`sla_sks_v4\`. Dump memuat **71 tabel** dengan marker sampai **\`V4-0012-PENGUMUMAN-FAQ\`**. V4-0013 **BELUM** tercatat dan tabel \`notifikasi\`/\`kebijakan_privasi\` tidak ada dalam dump. Tidak ada tabel koreksi nilai siswa.
+
+**Jangan menganggap A13-6/A13-7 sudah terpasang dalam database hanya karena kode/QA HTTP-nya FIX.** Modul Koreksi Nilai membutuhkan V4-0013 untuk notifikasi dan V4-0014 untuk transaksi permohonan.
+
+### Urutan impor aman
+
+1. **Backup** seluruh DB \`sla_sks_v4\` beserta \`writable/\` (termasuk PDF historis sertifikat) dan simpan di luar GitHub.
+2. Pilih database \`sla_sks_v4\` di phpMyAdmin lalu jalankan **baca saja**:
+
+   \`\`\`sql
+   SELECT versi,diterapkan_pada FROM schema_version
+   WHERE versi IN (
+      'V4-0012-PENGUMUMAN-FAQ',
+      'V4-0013-NOTIFIKASI-PRIVASI',
+      'V4-0014-KOREKSI-NILAI-SISWA'
+   );
+   SHOW TABLES LIKE 'notifikasi';
+   SHOW TABLES LIKE 'kebijakan_privasi';
+   SHOW TABLES LIKE 'riwayat_kebijakan_privasi';
+   SHOW TABLES LIKE 'permohonan_koreksi_nilai';
+   SHOW TABLES LIKE 'riwayat_koreksi_nilai';
+   \`\`\`
+
+   Jika marker dan tabel saling tidak konsisten atau sebagian sudah ada, **STOP**, jangan impor ulang maupun menghapus tabel.
+3. Bila **V4-0013 belum ada dan ketiga tabelnya belum ada**, impor **\`V4-0013_NOTIFIKASI_PRIVASI.sql\` satu kali**, verifikasi tabel + marker V4-0013. Jika marker V4-0013 sudah ada beserta ketiga tabelnya, **jangan impor ulang**.
+4. Jika marker V4-0014 belum ada dan kedua tabel koreksi belum ada, impor **hanya \`V4-0014_KOREKSI_NILAI_SISWA.sql\` satu kali**. Penerapan V4-0014 sebelum V4-0013 **tidak diizinkan**.
+5. Verifikasi **baca saja**:
+
+   \`\`\`sql
+   SELECT versi,diterapkan_pada FROM schema_version
+   WHERE versi IN ('V4-0013-NOTIFIKASI-PRIVASI','V4-0014-KOREKSI-NILAI-SISWA');
+   SHOW CREATE TABLE permohonan_koreksi_nilai;
+   SHOW CREATE TABLE riwayat_koreksi_nilai;
+   SELECT COUNT(*) AS permohonan FROM permohonan_koreksi_nilai;
+   SELECT COUNT(*) AS riwayat FROM riwayat_koreksi_nilai;
+   \`\`\`
+
+   Kedua tabel koreksi awalnya kosong; tabel nilai dan sertifikat lama **tidak boleh direset**.
+6. Uji dengan data **simulasi** yang sudah ada atau yang disiapkan secara terpisah dan aman: Guru G1 membuka tugas Resume/HOTS yang telah dinilai untuk TP Tuntas → Ajukan Koreksi (nilai 0–100 dan alasan 10–500 karakter) → Admin **akun berbeda** melihat permohonan → setujui/tolak → Guru dan Siswa melihat notifikasi serta rekap nilai hasil koreksi. Cek perbedaan nilai TP dan status sertifikat sebelum/sesudah, tidak mengubah nilai nyata sembarangan.
+7. Uji penolakan: Guru Gen lain, akun sama Admin+Guru, pengajuan ganda, perubahan penugasan, nilai sumber berubah di sela keputusan, dan nilai mesin Sumatif/Diagnostik/Pra-Semester tidak punya tombol koreksi dalam modul ini. Periksa form, status kosong/galat/sukses, Dark/Light dan HP.
+
+**Sifat SQL:** dua CREATE TABLE additive + satu INSERT marker; **tanpa** DROP/DELETE/TRUNCATE/UPDATE data lama, tanpa Migration/Seeder, tanpa mengubah \`.env\`. DDL MariaDB melakukan *implicit commit*. Bila ada galat di tengah impor, **jangan jalankan ulang patch**, catat pesan dan kondisi tabel/marker untuk rekonsiliasi aman dari backup. PR #130 masih Draft sampai QA XAMPP.

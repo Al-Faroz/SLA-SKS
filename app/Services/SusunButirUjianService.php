@@ -21,17 +21,28 @@ final class SusunButirUjianService
      */
     public static function diagnostik(array $snapshot): array
     {
+        return self::pilih($snapshot, 'diagnostik', 'diag_tayang', 10);
+    }
+
+    /** Sumatif dan remedial sama-sama menggunakan bank sumatif pada snapshot terpin. */
+    public static function sumatif(array $snapshot): array
+    {
+        return self::pilih($snapshot, 'sumatif', 'sum_tayang', 30);
+    }
+
+    private static function pilih(array $snapshot, string $jenis, string $kolomTayang, int $minimal): array
+    {
         $tp = $snapshot['tp'] ?? [];
-        $jumlahTayang = (int) ($tp['diag_tayang'] ?? 0);
+        $jumlahTayang = (int) ($tp[$kolomTayang] ?? 0);
         $bank = $snapshot['soal'] ?? [];
         if (($snapshot['format'] ?? null) !== 'SLA-SKS-TP-V1'
-            || !is_array($bank) || $jumlahTayang < 10 || $jumlahTayang > 65535) {
-            throw new DomainException('Snapshot Diagnostik tidak memenuhi kontrak.');
+            || !is_array($bank) || $jumlahTayang < $minimal || $jumlahTayang > 65535) {
+            throw new DomainException('Snapshot bank soal ' . ucfirst($jenis) . ' tidak memenuhi kontrak.');
         }
         $kandidat = [];
         $idUnik = [];
         foreach ($bank as $soal) {
-            if (!is_array($soal) || ($soal['jenis'] ?? null) !== 'diagnostik'
+            if (!is_array($soal) || ($soal['jenis'] ?? null) !== $jenis
                 || (int) ($soal['aktif'] ?? 1) !== 1) {
                 continue;
             }
@@ -39,7 +50,7 @@ final class SusunButirUjianService
             if ($id < 1 || isset($idUnik[$id])
                 || !in_array($soal['kunci'] ?? null, self::HURUF, true)
                 || trim((string) ($soal['pertanyaan'] ?? '')) === '') {
-                throw new DomainException('Ada soal Diagnostik tidak sah pada snapshot.');
+                throw new DomainException('Ada soal ' . ucfirst($jenis) . ' tidak sah pada snapshot.');
             }
             $idUnik[$id] = true;
             foreach (self::HURUF as $huruf) {
@@ -151,6 +162,98 @@ final class SusunButirUjianService
             'jumlah_benar' => $benar, 'jumlah_soal' => count($butir),
             'skor' => round($benar * 100 / count($butir), 2),
         ];
+    }
+
+    /**
+     * Pra-Semester mengambil minimal satu soal sah dari SETIAP BAB,
+     * kemudian mengisi sisa soal dari bank aktif. Semua urutan/opsi diacak
+     * di server dan snapshot butir disimpan pada percobaan.
+     *
+     * @param list<array<string,mixed>> $bank
+     * @param list<int> $babIds
+     * @return list<array<string,mixed>>
+     */
+    public static function praSemester(array $bank, array $babIds, int $jumlahTayang): array
+    {
+        if ($jumlahTayang < 30 || $jumlahTayang > 200 || $babIds === []
+            || count($babIds) > $jumlahTayang || count(array_unique($babIds)) !== count($babIds)) {
+            throw new DomainException('Jumlah soal tayang atau daftar BAB Pra-Semester tidak sah.');
+        }
+        $groups = array_fill_keys($babIds, []);
+        $ids = [];
+        foreach ($bank as $soal) {
+            if ((int)($soal['aktif'] ?? 0) !== 1) continue;
+            $id = (int)($soal['id'] ?? 0);
+            $bab = (int)($soal['bab_id'] ?? 0);
+            if ($id < 1 || isset($ids[$id])) {
+                throw new DomainException('Identitas soal Pra-Semester tidak sah atau berulang.');
+            }
+            $ids[$id] = true;
+            // Soal dari BAB asing/opsi belum lengkap tidak boleh tayang,
+            // tetapi tidak boleh menggagalkan 30 soal lain yang sudah sah.
+            if (!array_key_exists($bab,$groups)
+                || !in_array($soal['kunci'] ?? null,self::HURUF,true)
+                || trim((string)($soal['pertanyaan'] ?? '')) === '') continue;
+            $opsiSah = true;
+            foreach (self::HURUF as $h) {
+                if (trim((string)($soal['opsi_' . strtolower($h)] ?? '')) === '') {
+                    $opsiSah = false;
+                    break;
+                }
+            }
+            if ($opsiSah) $groups[$bab][] = $soal;
+        }
+        $pilih = [];
+        $sisa = [];
+        foreach ($groups as $items) {
+            if ($items === []) throw new DomainException('Setiap BAB harus terwakili pada bank aktif.');
+            self::acakAman($items);
+            $pilih[] = array_shift($items);
+            foreach ($items as $r) $sisa[] = $r;
+        }
+        if (count($pilih) + count($sisa) < $jumlahTayang) {
+            throw new DomainException('Jumlah soal aktif kurang dari jumlah tayang.');
+        }
+        self::acakAman($sisa);
+        $pilih = array_merge($pilih, array_slice($sisa,0,$jumlahTayang-count($pilih)));
+        self::acakAman($pilih);
+        $hasil = [];
+        foreach ($pilih as $i => $soal) {
+            $hurufLama = self::HURUF;
+            self::acakAman($hurufLama);
+            $opsi = [];
+            $htmlOpsi = [];
+            $kunci = null;
+            $raw = $soal['konten_terstruktur_json'] ?? null;
+            $rich = is_string($raw) && $raw !== '' ? json_decode($raw,true) : null;
+            if ($raw !== null && $raw !== '' && !is_array($rich)) {
+                throw new DomainException('Konten kaya Word Pra-Semester rusak.');
+            }
+            foreach (self::HURUF as $j => $baru) {
+                $asal = $hurufLama[$j];
+                $opsi[$baru] = (string)$soal['opsi_' . strtolower($asal)];
+                if (is_array($rich) && isset($rich['html_opsi'][$asal])) {
+                    $htmlOpsi[$baru] = (string)$rich['html_opsi'][$asal];
+                }
+                if ($asal === $soal['kunci']) $kunci = $baru;
+            }
+            $konten = is_array($rich) ? [
+                'html_pertanyaan'=>(string)($rich['html_pertanyaan'] ?? ''),
+                'html_opsi'=>$htmlOpsi,
+                'word_source_id'=>$rich['word_source_id'] ?? null,
+            ] : null;
+            $hasil[] = [
+                'soal_asal_id'=>null,
+                'soal_pra_semester_id'=>(int)$soal['id'],
+                'posisi'=>$i+1,
+                'pertanyaan'=>(string)$soal['pertanyaan'],
+                'konten_terstruktur_json'=>$konten === null ? null
+                    : json_encode($konten,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR),
+                'opsi_acak_json'=>json_encode($opsi,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR),
+                'kunci_acak'=>$kunci,
+            ];
+        }
+        return $hasil;
     }
 
     /** Fisher–Yates dengan random_int (sumber acak kriptografis PHP). */

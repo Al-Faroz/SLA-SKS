@@ -6,6 +6,7 @@
  */
 $nilai = is_array($nilai ?? null) ? $nilai : [];
 $galatKolom = (string) ($galatKolom ?? '');
+$wajibKegiatan = (string) ($jenisTp ?? 'non_esensial') !== 'esensial';
 $jenisMateri = (string) ($nilai['jenis'] ?? 'youtube');
 if (! in_array($jenisMateri, ['youtube', 'pdf', 'gambar', 'audio'], true)) {
     $jenisMateri = 'youtube';
@@ -75,7 +76,7 @@ $batasServer = min(
         aria-describedby="materi-file-info materi-file-server materi-file-error">
     <p class="a-help" id="materi-file-info" data-materi-file-info>
         <?= esc(match ($jenisMateri) {
-            'pdf' => 'PDF maksimal 15 MB dan 40 halaman. Pilih dokumen PDF yang dapat dibuka.',
+            'pdf' => 'PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB. Pilih dokumen PDF yang dapat dibuka.',
             'gambar' => 'Gambar JPG, PNG atau WebP maksimal 10 MB.',
             'audio' => 'Audio MP3 atau M4A maksimal 10 MB.',
             default => 'Pilih media untuk menampilkan batas berkas.',
@@ -88,7 +89,7 @@ $batasServer = min(
     </p>
     <p class="a-error" id="materi-file-error" data-materi-file-error aria-live="polite"></p>
 </div>
-<div class="a-field">
+<div class="a-field a-materi-waktu">
     <label class="a-label" for="materi-waktu">Minimal waktu belajar (menit) <span aria-hidden="true">*</span></label>
     <input class="a-input" id="materi-waktu" name="min_waktu_menit" type="number"
         min="0" max="1092.25" step="0.01" required
@@ -96,13 +97,13 @@ $batasServer = min(
         <?= $galatKolom === 'min_waktu_menit' ? 'aria-invalid="true"' : '' ?>>
     <p class="a-help">Masukkan waktu dalam menit; contoh 1.5. Nilai disimpan sebagai detik.</p>
 </div>
-<div class="a-field">
-    <label class="a-label" for="materi-resume">Petunjuk Resume <span aria-hidden="true">*</span></label>
+<div class="a-field a-materi-resume">
+    <label class="a-label" for="materi-resume">Petunjuk Resume <?= $wajibKegiatan ? '<span aria-hidden="true">*</span>' : '(opsional Esensial)' ?></label>
     <textarea class="a-input" id="materi-resume" name="petunjuk_resume" rows="4"
-        maxlength="20000" required <?= $galatKolom === 'petunjuk_resume' ? 'aria-invalid="true"' : '' ?>><?= esc((string) ($nilai['petunjuk_resume'] ?? '')) ?></textarea>
+        maxlength="20000" <?= $wajibKegiatan ? 'required' : '' ?> <?= $galatKolom === 'petunjuk_resume' ? 'aria-invalid="true"' : '' ?>><?= esc((string) ($nilai['petunjuk_resume'] ?? '')) ?></textarea>
 </div>
-<div class="a-field">
-    <label class="a-label" for="materi-hots">Petunjuk tugas HOTS <span aria-hidden="true">*</span></label>
+<div class="a-field a-materi-hots">
+    <label class="a-label" for="materi-hots">Petunjuk tugas HOTS <?= $wajibKegiatan ? '<span aria-hidden="true">*</span>' : '(opsional Esensial)' ?></label>
     <textarea class="a-input" id="materi-hots" name="petunjuk_hots" rows="4"
-        maxlength="20000" required <?= $galatKolom === 'petunjuk_hots' ? 'aria-invalid="true"' : '' ?>><?= esc((string) ($nilai['petunjuk_hots'] ?? '')) ?></textarea>
+        maxlength="20000" <?= $wajibKegiatan ? 'required' : '' ?> <?= $galatKolom === 'petunjuk_hots' ? 'aria-invalid="true"' : '' ?>><?= esc((string) ($nilai['petunjuk_hots'] ?? '')) ?></textarea>
 </div>

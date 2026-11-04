@@ -7,6 +7,11 @@
     const $ = sel => root.querySelector(sel);
     const url = root.dataset.ujianUrl;
     const tp = root.dataset.ujianTp;
+    const jenis = root.dataset.ujianJenis === 'pra_semester' ? 'pra_semester'
+        : (root.dataset.ujianJenis === 'sumatif' ? 'sumatif' : 'diagnostik');
+    const namaUjian = jenis === 'pra_semester' ? 'Pra-Semester'
+        : (jenis === 'sumatif' ? 'Sumatif' : 'Diagnostik');
+    const langsungBelajar = root.dataset.ujianLangsungBelajar === 'ya';
     const csrfName = root.dataset.csrfName;
     let csrf = root.dataset.csrfHash;
     let token = root.dataset.ujianToken || '';
@@ -46,7 +51,11 @@
         let decoded;
         try { decoded = await response.json(); }
         catch (_) { throw new Error('Koneksi atau sesi gagal. Muat ulang ruang ujian jika diperlukan.'); }
-        if (typeof decoded.csrf === 'string') csrf = decoded.csrf;
+        if (typeof decoded.csrf === 'string') {
+            csrf = decoded.csrf;
+            const permintaanCsrf = $('[data-ujian-akses-ulang] input[name="' + csrfName + '"]');
+            if (permintaanCsrf) permintaanCsrf.value = csrf;
+        }
         if (!response.ok || !decoded.ok) throw new Error(decoded.pesan || 'Permintaan tidak diterima server.');
         return decoded.data;
     }
@@ -65,11 +74,36 @@
             show('[data-ujian-sambutan]', false);
             show('[data-ujian-hasil]', true);
             setText('[data-ujian-hasil-judul]',
-                state.status === 'selesai_sah' ? 'Hasil Diagnostik' : 'Menunggu keputusan Guru');
-            setText('[data-ujian-hasil-pesan]', state.status === 'selesai_sah'
-                ? (state.skor >= state.kkm ? 'KKM tercapai: TP tuntas.'
-                    : 'KKM belum tercapai: lanjutkan jalur Materi/Resume/HOTS ketika tersedia.')
-                : 'Percobaan dibatalkan tanpa skor. Hubungi Guru pengampu.');
+                state.status === 'selesai_sah' ? 'Hasil ' + namaUjian
+                    : (jenis === 'diagnostik' && langsungBelajar
+                        ? 'Keputusan historis Guru: Langsung Belajar'
+                        : (jenis === 'pra_semester' ? 'Ujian Pra-Semester dibatalkan'
+                            : 'Tes tidak selesai — akses ulang diperlukan')));
+            let pesanHasil = jenis === 'diagnostik' && langsungBelajar
+                ? 'Keputusan historis Guru: lanjut jalur belajar. Selesaikan Materi, Resume final, HOTS final, kemudian Sumatif.'
+                : 'Tes tidak selesai tanpa skor sah. Kembali ke Rincian TP untuk meminta akses ulang kepada Guru.';
+            if (jenis === 'pra_semester') {
+                pesanHasil = state.status === 'selesai_sah'
+                    ? (state.tahap === 'remedial'
+                        ? 'Remedial Pra-Semester selesai sah. Nilai akhir menggunakan skor terbaik antara ujian normal dan remedial.'
+                        : (state.skor < state.kkm
+                            ? 'Ujian normal selesai sah. Remedial menunggu jadwal Admin.'
+                            : 'Pra-Semester selesai sah. Nilai tersimpan sebagai nilai mandiri.'))
+                    : 'Ujian Pra-Semester dibatalkan tanpa skor. Tunggu jadwal susulan Admin; tidak tersedia akses ulang mandiri.';
+            } else if (state.status === 'selesai_sah' && jenis === 'diagnostik') {
+                pesanHasil = state.skor >= state.kkm
+                    ? 'Diagnostik memenuhi KKM. Materi/Resume/HOTS boleh dilewati; Sumatif tetap wajib.'
+                    : 'Diagnostik belum memenuhi KKM. Selesaikan satu Materi, Resume dan HOTS final sebelum Sumatif.';
+            } else if (state.status === 'selesai_sah') {
+                pesanHasil = state.perlu_remedial
+                    ? 'Skor tes awal di bawah KKM. Satu remedial Sumatif tersedia.'
+                    : (state.tahap === 'remedial'
+                        ? 'Remedial selesai. Nilai Sumatif menggunakan skor tertinggi.'
+                        : 'Sumatif selesai sah. Periksa nilai TP di halaman rincian.');
+            }
+            setText('[data-ujian-hasil-pesan]', pesanHasil);
+            show('[data-ujian-remedial]', jenis === 'sumatif'
+                && state.status === 'selesai_sah' && state.perlu_remedial === true);
             setText('[data-ujian-hasil-skor]',
                 state.status === 'selesai_sah' ? 'Skor: ' + state.skor
                     + ' · KKM: ' + state.kkm + ' · Benar: ' + state.jumlah_benar : '');
@@ -85,7 +119,7 @@
             show('[data-ujian-jeda]', true);
             setText('[data-ujian-jeda-pesan]', state.status === 'jeda_fullscreen'
                 ? 'Fullscreen terputus. Waktu berhenti. Batas jeda: 90 detik per kejadian, 180 detik total.'
-                : 'Koneksi terputus. Waktu dijeda oleh server setelah 20 detik deteksi; total maksimal 300 detik.');
+                : 'Koneksi terputus. Waktu dijeda oleh server setelah 20 detik deteksi; total maksimal 10 menit (600 detik).');
             return;
         }
         if (state.status === 'berjalan' && full()) {
@@ -189,6 +223,10 @@
         return result;
     }
     async function gestureFullscreen() {
+        if ((jenis === 'sumatif' || jenis === 'pra_semester')
+            && /android|iphone|ipad|ipod|mobile|tablet|windows phone/i.test(navigator.userAgent)) {
+            throw new Error(namaUjian + ' hanya tersedia di desktop/laptop, bukan HP atau tablet.');
+        }
         if (!didukung()) throw new Error('Perangkat/browser tidak mendukung fullscreen. Gunakan desktop/laptop yang mendukungnya.');
         if (navigator.onLine === false) throw new Error('Perangkat offline. Sambungkan internet dahulu.');
         if (!full()) await document.documentElement.requestFullscreen();
@@ -249,7 +287,7 @@
     });
     $('[data-ujian-kirim]')?.addEventListener('click',async ()=>{
         if (!aktif || !full() || memintaFinal) return;
-        if (!window.confirm('Kirim semua jawaban tersimpan dan akhiri Diagnostik?')) return;
+        if (!window.confirm('Kirim semua jawaban tersimpan dan akhiri ' + namaUjian + '?')) return;
         memintaFinal = true;
         try {
             const result=await req('POST','/'+token+'/tindakan',{aksi:'kirim',fullscreen:'ya'});

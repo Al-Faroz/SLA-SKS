@@ -55,7 +55,7 @@ if ($materi['berkas_id'] !== null) {
             <?= csrf_field() ?>
             <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
             <div class="a-materi-form-fields">
-                <?= view('guru/_materi_fields', ['nilai' => $nilaiSunting, 'galatKolom' => $kolomSuntingGalat]) ?>
+                <?= view('guru/_materi_fields', ['nilai' => $nilaiSunting, 'galatKolom' => $kolomSuntingGalat, 'jenisTp' => (string) ($tp['jenis_tp'] ?? 'non_esensial')]) ?>
             </div>
             <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Simpan perubahan Materi</button>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Kembali ke daftar Materi</a>

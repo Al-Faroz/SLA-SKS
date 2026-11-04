@@ -1,0 +1,46 @@
+name: QA A12-2 Dashboard Guru
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/DashboardGuruService.php'
+      - 'app/Controllers/GuruDashboard.php'
+      - 'app/Views/guru/dashboard.php'
+      - 'app/Config/Routes.php'
+      - 'tests/unit/DashboardGuruDatabaseTest.php'
+      - '.github/workflows/qa-a12-2-dashboard-guru.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan writable
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP Lint
+        run: |
+          for f in \
+            app/Services/DashboardGuruService.php \
+            app/Controllers/GuruDashboard.php \
+            app/Views/guru/dashboard.php \
+            app/Config/Routes.php \
+            tests/unit/DashboardGuruDatabaseTest.php; do
+            php -l "$f"
+          done
+      - name: PHPUnit Dashboard Guru dengan data anonim
+        run: vendor/bin/phpunit --no-coverage tests/unit/DashboardGuruDatabaseTest.php
+      - name: Regresi antrean penilaian Guru
+        run: vendor/bin/phpunit --no-coverage tests/unit/PenilaianGuruDatabaseTest.php
+      - name: Regresi keputusan akses ulang
+        run: vendor/bin/phpunit --no-coverage tests/unit/KeputusanUjianBatalDatabaseTest.php

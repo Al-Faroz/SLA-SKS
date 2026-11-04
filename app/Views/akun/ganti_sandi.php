@@ -1,9 +1,9 @@
 <?= $this->extend('layouts/publik') ?>
 <?= $this->section('konten') ?>
 <section class="a-card a-baca" aria-labelledby="judul-sandi">
-    <?php if ($wajib): ?><span class="a-badge a-badge--tunggu">Wajib pada login pertama</span><?php endif ?>
+    <?php if ($wajib): ?><span class="a-badge a-badge--tunggu">Wajib untuk akun Admin</span><?php endif ?>
     <h1 id="judul-sandi">Ganti sandi</h1>
-    <p><?= $wajib ? 'Untuk keamanan akun, buat sandi baru sebelum menggunakan menu aplikasi.' : 'Perbarui sandi akun Anda.' ?></p>
+    <p><?= $wajib ? 'Untuk keamanan akun dengan peran Admin, buat sandi baru sebelum menggunakan menu aplikasi.' : 'Perbarui sandi akun Anda.' ?></p>
     <?php if (session()->getFlashdata('galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
     <?php endif ?>

@@ -128,7 +128,7 @@
         <?php endif ?>
         <?php if ($sukarela): ?>
             <div class="a-alert" role="status">
-                TP sudah Tuntas melalui Diagnostik. Materi ini hanya untuk belajar sukarela,
+                Lulus Diagnostik membuka jalur menuju Sumatif. Materi ini hanya untuk belajar sukarela,
                 sehingga waktu membaca tidak dicatat sebagai tugas atau tambahan nilai.
             </div>
         <?php else: ?>
@@ -155,7 +155,7 @@
         <h2 id="petunjuk-kegiatan">Kegiatan Materi <?= (int) $materi['urutan'] ?></h2>
 
         <?php if ($sukarela): ?>
-            <p class="a-help">TP sudah tuntas dari Diagnostik. Resume dan HOTS berikut hanya petunjuk baca;
+            <p class="a-help">Lulus Diagnostik tidak menghapus kewajiban Sumatif. Resume dan HOTS berikut hanya petunjuk baca;
                 tidak ada pengumpulan atau nilai tambahan.</p>
             <h3>Petunjuk Resume</h3>
             <p class="a-teks-pratinjau"><?= nl2br(esc($materi['petunjuk_resume'])) ?></p>
@@ -262,7 +262,15 @@
                 </p>
             <?php endif ?>
         <?php else: ?>
-            <p class="a-materi-lanjut__keterangan">Ini adalah Materi terakhir pada TP ini.</p>
+            <p class="a-materi-lanjut__keterangan">Ini adalah satu Materi pada TP ini.</p>
+            <?php if (!$sukarela && $kegiatan['media_selesai']
+                && $kegiatan['resume']['status'] === 'final'
+                && $kegiatan['hots']['status'] === 'final'): ?>
+                <a class="a-btn a-btn--utama"
+                    href="<?= esc(site_url('siswa/tp/' . (int) $tp['id']), 'attr') ?>">
+                    Periksa syarat Sumatif <span aria-hidden="true">→</span>
+                </a>
+            <?php endif ?>
         <?php endif ?>
     </nav>
 </div>

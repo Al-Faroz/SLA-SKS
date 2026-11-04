@@ -46,9 +46,14 @@ final class Akun extends BaseController
         }
 
         $akun = $this->servis()->penggunaSaatIni();
-
-        return redirect()->to(site_url($akun && (int) $akun['wajib_ganti_sandi'] !== 0
-            ? 'ganti-sandi' : ($akun['peran_aktif'] ?? 'masuk')));
+        $tujuan = $akun && (int) $akun['wajib_ganti_sandi'] !== 0
+            ? 'ganti-sandi' : ($akun['peran_aktif'] ?? 'masuk');
+        $respons = redirect()->to(site_url($tujuan));
+        if ($akun && ! empty($akun['sandi_direkomendasikan'])) {
+            $respons->with('anjuran_sandi',
+                'Untuk keamanan akun, sebaiknya ubah sandi awal melalui menu Profil & Peran.');
+        }
+        return $respons;
     }
 
     public function keluar(): RedirectResponse
@@ -58,9 +63,14 @@ final class Akun extends BaseController
         return redirect()->to(site_url('masuk'))->with('sukses', 'Anda sudah keluar dengan aman.');
     }
 
-    public function gantiSandi(): string
+    public function gantiSandi(): RedirectResponse|string
     {
         $akun = $this->servis()->penggunaSaatIni();
+        // Selain Admin, form penggantian sandi disatukan di Profil.
+        if ($akun !== null && (int) $akun['wajib_ganti_sandi'] === 0
+            && $akun['peran_aktif'] !== 'admin') {
+            return redirect()->to(site_url('profil'));
+        }
 
         return view('akun/ganti_sandi', [
             'judul' => 'Ganti sandi',
@@ -74,20 +84,25 @@ final class Akun extends BaseController
         $baru = (string) $this->request->getPost('sandi_baru');
         $konfirmasi = (string) $this->request->getPost('sandi_konfirmasi');
 
+        $akunSebelum = $this->servis()->penggunaSaatIni();
+        $formTujuan = $akunSebelum && ((int) $akunSebelum['wajib_ganti_sandi'] !== 0
+            || $akunSebelum['peran_aktif'] === 'admin') ? 'ganti-sandi' : 'profil';
+
         if ($baru !== $konfirmasi) {
-            return redirect()->to(site_url('ganti-sandi'))->with('galat',
+            return redirect()->to(site_url($formTujuan))->with('galat',
                 'Konfirmasi sandi baru tidak sama.');
         }
 
         try {
             $this->servis()->gantiSandi($lama, $baru);
         } catch (DomainException $e) {
-            return redirect()->to(site_url('ganti-sandi'))->with('galat', $e->getMessage());
+            return redirect()->to(site_url($formTujuan))->with('galat', $e->getMessage());
         }
 
         $akun = $this->servis()->penggunaSaatIni();
+        $tujuan = $formTujuan === 'profil' ? 'profil' : ($akun['peran_aktif'] ?? 'masuk');
 
-        return redirect()->to(site_url($akun['peran_aktif'] ?? 'masuk'))
+        return redirect()->to(site_url($tujuan))
             ->with('sukses', 'Sandi berhasil diganti.');
     }
 
@@ -105,6 +120,7 @@ final class Akun extends BaseController
             'daftarPeran' => $akun['daftar_peran'],
             'username' => $akun['username'],
             'dataProfil' => $data,
+            'sandiDisarankan' => ! empty($akun['sandi_direkomendasikan']),
             'tautanNavigasi' => $this->menu($akun['peran_aktif'], 'profil'),
             'uiPrototipe' => true,
         ]);
@@ -163,6 +179,8 @@ final class Akun extends BaseController
         if ($peran === 'admin') {
             $data['uiPrototipe'] = true;
             $data['ringkasan'] = (new DashboardAdminService())->ringkasan();
+            // Jumlah dan status administratif tidak boleh tersimpan di cache bersama.
+            $this->response->setHeader('Cache-Control', 'private, no-store');
 
             return view('admin/beranda_prototipe', $data);
         }

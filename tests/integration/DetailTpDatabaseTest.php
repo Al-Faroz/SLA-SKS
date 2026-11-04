@@ -68,13 +68,14 @@ final class DetailTpDatabaseTest extends TestCase
         $service = $this->guru(1);
         $before = self::$db->table('tp')->where('id', 1)->get()->getRowArray();
         try {
-            $service->simpanDraf(1, 'TP disunting', 'Rumusan valid', 'Indikator valid', (int) $before['struktur_versi']);
+            $service->simpanDraf(1, 'TP disunting', 'Rumusan valid', (int) $before['struktur_versi']);
             $after = self::$db->table('tp')->where('id', 1)->get()->getRowArray();
             self::assertSame('TP disunting', $after['judul']);
+            self::assertSame($before['indikator'], $after['indikator'], 'Data indikator historis tidak boleh tertimpa');
             self::assertSame((int) $before['struktur_versi'] + 1, (int) $after['struktur_versi']);
 
             try {
-                $service->simpanDraf(1, 'Percobaan menimpa', 'Rumusan lain', 'Indikator lain', (int) $before['struktur_versi']);
+                $service->simpanDraf(1, 'Percobaan menimpa', 'Rumusan lain', (int) $before['struktur_versi']);
                 self::fail('Versi lama seharusnya ditolak.');
             } catch (DomainException $e) {
                 self::assertStringContainsString('telah berubah', $e->getMessage());
@@ -92,7 +93,7 @@ final class DetailTpDatabaseTest extends TestCase
     public function testTidakBolehMengeditTpGenGuruLain(): void
     {
         $this->expectException(DomainException::class);
-        $this->guru(1)->simpanDraf(2, 'Judul asing', 'Rumusan', 'Indikator', 1);
+        $this->guru(1)->simpanDraf(2, 'Judul asing', 'Rumusan', 1);
     }
 
     public function testTpSiapTidakBisaDisunting(): void
@@ -101,7 +102,7 @@ final class DetailTpDatabaseTest extends TestCase
         try {
             self::$db->table('tp')->where('id', 2)->update(['status' => 'siap']);
             $this->expectException(DomainException::class);
-            $this->guru(2)->simpanDraf(2, 'Ubah TP Siap', 'Rumusan', 'Indikator', 1);
+            $this->guru(2)->simpanDraf(2, 'Ubah TP Siap', 'Rumusan', 1);
         } finally {
             self::$db->table('tp')->where('id', 2)->update(['status' => $awal['status']]);
         }
@@ -110,7 +111,7 @@ final class DetailTpDatabaseTest extends TestCase
     public function testJudulKosongDitolak(): void
     {
         $this->expectException(DomainException::class);
-        $this->guru(1)->simpanDraf(1, '', 'Rumusan', 'Indikator', 1);
+        $this->guru(1)->simpanDraf(1, '', 'Rumusan', 1);
     }
 
     public function testIdNolDitolak(): void

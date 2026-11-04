@@ -74,6 +74,66 @@ final class GuruSoal extends BaseController
         }
     }
 
+    /**
+     * Pratinjau sementara dari HTML yang sudah melalui sanitasi server.
+     * Tidak menulis bank soal, bukan pengganti tombol Simpan.
+     */
+    public function pratinjau(int $tpId): ResponseInterface
+    {
+        try {
+            $context = (new DetailTpService())->lihat($tpId);
+            if ($context['tp']['status'] !== 'draf') {
+                throw new DomainException('TP sudah Siap dan tidak dapat disunting.');
+            }
+            $post = (array) $this->request->getPost();
+            $jenis = $post['jenis'] ?? null;
+            if (!is_string($jenis) || !in_array($jenis, ['diagnostik', 'sumatif'], true)
+                || !in_array($post['kunci'] ?? null, ['A','B','C','D','E'], true)) {
+                throw new DomainException('Pilih jenis ujian dan satu kunci A–E.');
+            }
+            $source = null;
+            $idRaw = $post['soal_id'] ?? null;
+            if ($idRaw !== null && $idRaw !== '') {
+                if (!is_string($idRaw) || !ctype_digit($idRaw) || (int) $idRaw < 1) {
+                    throw new DomainException('Identitas soal tidak valid.');
+                }
+                $row = (new KelolaSoalGuruService())->lihat($tpId, (int) $idRaw);
+                if ($row['jenis'] !== $jenis || $row['versi_konten_tp_id'] !== null) {
+                    throw new DomainException('Soal bukan bagian bank yang dapat disunting.');
+                }
+                $rich = json_decode((string) ($row['konten_terstruktur_json'] ?? ''), true);
+                $source = is_array($rich) && is_string($rich['word_source_id'] ?? null)
+                    ? $rich['word_source_id'] : null;
+            }
+            $semua = [];
+            foreach (['pertanyaan','opsi_a','opsi_b','opsi_c','opsi_d','opsi_e'] as $name) {
+                if (!is_string($post[$name] ?? null)) {
+                    throw new DomainException('Isi pertanyaan dan semua pilihan wajib tersedia.');
+                }
+                $clean = HtmlSoalGuruService::bersihkan($post[$name], $tpId, $source, true);
+                $semua[$name] = HtmlSoalGuruService::untukGuru($clean['html'], $tpId, $source);
+            }
+            return $this->response->setJSON([
+                'pertanyaan' => $semua['pertanyaan'],
+                'opsi' => ['A' => $semua['opsi_a'], 'B' => $semua['opsi_b'],
+                    'C' => $semua['opsi_c'], 'D' => $semua['opsi_d'], 'E' => $semua['opsi_e']],
+                'kunci' => $post['kunci'],
+                'csrfName' => csrf_token(), 'csrfHash' => csrf_hash(),
+            ]);
+        } catch (DomainException $e) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'errorMessage' => $e->getMessage(),
+                'csrfName' => csrf_token(), 'csrfHash' => csrf_hash(),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Pratinjau soal gagal: {reason}', ['reason' => $e->getMessage()]);
+            return $this->response->setStatusCode(500)->setJSON([
+                'errorMessage' => 'Pratinjau belum dapat ditampilkan.',
+                'csrfName' => csrf_token(), 'csrfHash' => csrf_hash(),
+            ]);
+        }
+    }
+
     public function simpan(int $tpId, string $jenis, int $soalId = 0): ResponseInterface
     {
         try {

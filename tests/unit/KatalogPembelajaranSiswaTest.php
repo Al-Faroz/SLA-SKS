@@ -87,7 +87,7 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         self::assertStringContainsString("->select('id,urutan,judul,jenis')", $service);
         self::assertStringNotContainsString("->table('soal')", $service);
         self::assertStringNotContainsString("->table('berkas')", $service);
-        self::assertStringContainsString('Diagnostik wajib adalah langkah ujian pertama', $view);
+        self::assertStringContainsString('Diagnostik adalah langkah ujian pertama', $view);
         self::assertStringNotContainsString('Mulai Diagnostik</a>', $view);
         self::assertStringContainsString('method="post"', $view);
         self::assertStringContainsString('Aktifkan TP &amp; simpan versi', $view);
@@ -95,6 +95,22 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         foreach (['rumusan', 'indikator', 'materi'] as $key) {
             self::assertStringContainsString($key, $view);
         }
+    }
+
+    public function testKatalogBabDanPetunjukDiagnostikSesuaiV25(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $service = file_get_contents($root . '/app/Services/KatalogPembelajaranSiswaService.php');
+        $daftar = file_get_contents($root . '/app/Views/siswa/daftar_tp.php');
+        $petunjuk = file_get_contents($root . '/app/Views/siswa/diagnostik_petunjuk.php');
+        self::assertIsString($service);
+        self::assertIsString($daftar);
+        self::assertIsString($petunjuk);
+        self::assertStringContainsString('b.id=t.bab_id', $service);
+        self::assertStringContainsString('array_values($bab)', $service);
+        self::assertStringContainsString('foreach ($bab as $kelompok)', $daftar);
+        self::assertStringContainsString('Sumatif tetap wajib', $petunjuk);
+        self::assertStringNotContainsString('TP dinyatakan tuntas', $petunjuk);
     }
 
     public function testNavigasiSiswaDanHalamanResponsifTersedia(): void
@@ -111,4 +127,32 @@ final class KatalogPembelajaranSiswaTest extends TestCase
         self::assertStringContainsString('.a-siswa-kartu-grid', $css);
         self::assertStringContainsString('@media(max-width:520px)', $css);
     }
+    public function testStatusEsensialTidakTerbukaWalauSiap(): void
+    {
+        $state = KatalogPembelajaranSiswaService::statusTp(
+            4, 4, 1, 'siap', true, true, 'esensial', true
+        );
+        self::assertFalse($state['buka']);
+        self::assertSame('esensial', $state['kode']);
+    }
+
+    public function testJenisTpTidakDikenalTidakMembukaAkses(): void
+    {
+        $state = KatalogPembelajaranSiswaService::statusTp(
+            4, 4, 1, 'siap', true, true, '', true
+        );
+        self::assertSame('terkunci', $state['kode']);
+        self::assertFalse($state['buka']);
+    }
+
+    public function testSemesterLanjutanHanyaTerbukaJikaGateServiceMemberiIzin(): void
+    {
+        self::assertFalse(KatalogPembelajaranSiswaService::statusTp(
+            5, 4, 1, 'siap', true, true, 'non_esensial', false
+        )['buka']);
+        self::assertTrue(KatalogPembelajaranSiswaService::statusTp(
+            5, 4, 1, 'siap', true, true, 'non_esensial', true
+        )['buka']);
+    }
+
 }

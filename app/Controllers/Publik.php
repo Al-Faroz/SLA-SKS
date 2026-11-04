@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Services\KebijakanPrivasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -30,14 +31,32 @@ final class Publik extends BaseController
 
     public function kebijakanPrivasi(): ResponseInterface
     {
-        // Konten kebijakan resmi hanya boleh diterbitkan oleh Admin setelah disahkan sekolah.
-        // Jangan mengganti kekosongan ini dengan teks kebijakan buatan pengembang.
-        return $this->response
-            ->setStatusCode(503)
-            ->setHeader('Cache-Control', 'no-store')
-            ->setBody(view('publik/kebijakan_privasi', [
-                'judul' => 'Kebijakan Privasi',
-            ]));
+        // Tanpa login; hanya kebijakan yang telah terbit dan sudah berlaku WIB.
+        // Tidak pernah mengisi halaman dengan janji/teks buatan pengembang.
+        try {
+            $kebijakan = (new KebijakanPrivasiService())->publikAktif();
+            $kontak = ['nama_madrasah'=>'','telepon'=>'','email'=>''];
+            if ($kebijakan !== null) {
+                $rows = db_connect()->table('pengaturan')->select('kunci,nilai')
+                    ->whereIn('kunci',array_keys($kontak))->get()->getResultArray();
+                foreach ($rows as $r) $kontak[$r['kunci']] = (string)($r['nilai']??'');
+            }
+            return $this->response->setStatusCode($kebijakan===null?503:200)
+                ->setHeader('Cache-Control','no-store')
+                ->setHeader('X-Content-Type-Options','nosniff')
+                ->setBody(view('publik/kebijakan_privasi', [
+                    'judul'=>'Kebijakan Privasi',
+                    'kebijakan'=>$kebijakan,
+                    'kontak'=>$kontak,
+                ]));
+        } catch (\Throwable $e) {
+            log_message('error','Kebijakan Privasi publik: {jenis}',['jenis'=>get_class($e)]);
+            return $this->response->setStatusCode(503)
+                ->setHeader('Cache-Control','no-store')
+                ->setBody(view('publik/kebijakan_privasi', [
+                    'judul'=>'Kebijakan Privasi', 'kebijakan'=>null,
+                ]));
+        }
     }
 
     public function tidakDitemukan(): ResponseInterface

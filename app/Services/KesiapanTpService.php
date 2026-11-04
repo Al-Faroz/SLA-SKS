@@ -37,14 +37,28 @@ final class KesiapanTpService
             throw new DomainException('TP atau paket semester tidak tersedia.');
         }
 
-        $cp = $this->db->table('tp_cp tc')
-            ->select('tc.cp_versi_id,tc.utama,v.nomor_versi,v.status AS versi_status,' .
-                'c.kode,c.kurikulum_id,c.mapel_id,f.kode AS fase', false)
-            ->join('ref_cp_versi v', 'v.id=tc.cp_versi_id')
-            ->join('ref_cp c', 'c.id=v.cp_id')
+        // KKM TP draf dihitung dari khusus Guru atau default Admin. Angka
+        // tp.kkm historis (misalnya 75) bukan sumber kebijakan saat draf.
+        // Snapshot TP Siap tetap memakai angka terpin, walau default berubah.
+        if ($tp['status'] === 'draf' && ($tp['jenis_tp'] ?? '') === 'non_esensial') {
+            $tp['kkm'] = (new KkmTpService($this->db))->informasi($tp)['efektif'];
+        }
+
+        // v2.5 memakai SATU CP operasional melalui tp.cp_mapel_id;
+        // tidak lagi mewajibkan tautan tp_cp/CP utama model v2.4.
+        // Satu CP operasional boleh merujuk beberapa elemen versi aktif.
+        $cp = $this->db->table('cp_mapel c')
+            ->select('c.id AS cp_mapel_id,c.kurikulum_id,c.mapel_id,'
+                . 'f.kode AS fase,v.id AS cp_versi_id,v.nomor_versi,'
+                . 'v.status AS versi_status,v.elemen,v.rumusan,r.kode', false)
+            ->join('cp_mapel_elemen e', 'e.cp_mapel_id=c.id')
+            ->join('ref_cp_versi v', 'v.id=e.cp_versi_id')
+            ->join('ref_cp r', 'r.id=v.cp_id AND r.kurikulum_id=c.kurikulum_id'
+                . ' AND r.mapel_id=c.mapel_id AND r.fase_id=c.fase_id')
             ->join('ref_fase f', 'f.id=c.fase_id')
-            ->where('tc.tp_id', $tpId)
-            ->orderBy('tc.id', 'ASC')->get()->getResultArray();
+            ->where('c.id', (int) ($tp['cp_mapel_id'] ?? 0))
+            ->where('v.status', 'aktif')
+            ->orderBy('v.id', 'ASC')->get()->getResultArray();
         $materi = $this->db->table('materi')
             ->where('tp_id', $tpId)->orderBy('urutan', 'ASC')->orderBy('id', 'ASC')
             ->get()->getResultArray();
@@ -149,16 +163,17 @@ final class KesiapanTpService
         $detail = 'guru/tp/' . $id;
         $hasil = [];
         foreach (['kode_tp' => 'Kode TP', 'judul' => 'Judul TP',
-            'rumusan' => 'Rumusan TP', 'indikator' => 'Indikator ketercapaian'] as $field => $label) {
+            'rumusan' => 'Rumusan TP'] as $field => $label) {
             self::tambahCek($hasil, $field, $label,
                 trim((string) ($tp[$field] ?? '')) !== '',
                 'Periksa isian ' . $label . '.', $detail . '#rumusan-tp');
         }
-        $utama = 0;
-        $validCp = count($cp) > 0;
+        $cpId = (int) ($tp['cp_mapel_id'] ?? 0);
+        $validCp = $cpId > 0 && count($cp) > 0;
         foreach ($cp as $row) {
-            $utama += (int) ($row['utama'] ?? 0) === 1 ? 1 : 0;
-            if ($row['versi_status'] !== 'aktif' || ($row['fase'] ?? '') !== 'D'
+            if ((int) ($row['cp_mapel_id'] ?? 0) !== $cpId
+                || $row['versi_status'] !== 'aktif'
+                || ($row['fase'] ?? '') !== 'D'
                 || (int) $row['mapel_id'] !== (int) $paket['mapel_id']
                 || (int) $row['kurikulum_id'] !== (int) $paket['kurikulum_id']) {
                 $validCp = false;
@@ -168,18 +183,29 @@ final class KesiapanTpService
             in_array($paket['status'] ?? '', ['draf', 'aktif'], true),
             'Paket semester arsip tidak boleh menerbitkan TP baru.',
             $detail . '#identitas-tp');
-        self::tambahCek($hasil, 'cp', 'CP resmi aktif dan cocok', $validCp && $utama === 1,
-            'Setiap CP harus aktif, Fase D, sesuai Mapel/Kurikulum, dengan tepat satu CP utama.',
+        self::tambahCek($hasil, 'cp', 'CP operasional aktif dan cocok', $validCp,
+            'TP wajib memiliki satu CP operasional Fase D sesuai Mapel/Kurikulum'
+                . ' dengan sekurangnya satu elemen versi aktif.',
             'guru/peta-atp');
 
-        self::tambahCek($hasil, 'materi', 'Minimal satu Materi', count($materi) >= 1,
-            'TP wajib memiliki paling sedikit satu Materi.', $detail . '#daftar-materi');
+        $jenisTp = (string) ($tp['jenis_tp'] ?? 'non_esensial');
+        $wajibAktivitas = $jenisTp === 'non_esensial';
+        self::tambahCek($hasil, 'jenis-tp', 'Jenis TP valid',
+            in_array($jenisTp, ['esensial', 'non_esensial'], true),
+            'Pilih Esensial atau NonEsensial.', $detail);
+        // Kedua jenis TP harus memiliki satu Materi/media lengkap.
+        // Resume/HOTS dan bank ujian hanya wajib pada TP NonEsensial.
+        self::tambahCek($hasil, 'materi', 'Tepat satu Materi per TP', count($materi) === 1,
+            'TP Esensial maupun NonEsensial wajib memiliki tepat satu Materi lengkap.',
+            $detail . '#daftar-materi');
         foreach ($materi as $idx => $m) {
             $nomor = $idx + 1;
             $benar = (int) ($m['urutan'] ?? 0) === $nomor
                 && trim((string) ($m['judul'] ?? '')) !== ''
-                && trim((string) ($m['petunjuk_resume'] ?? '')) !== ''
-                && trim((string) ($m['petunjuk_hots'] ?? '')) !== ''
+                && (! $wajibAktivitas || (
+                    trim((string) ($m['petunjuk_resume'] ?? '')) !== ''
+                    && trim((string) ($m['petunjuk_hots'] ?? '')) !== ''
+                ))
                 && (int) ($m['min_waktu_detik'] ?? 0) > 0
                 && (in_array($m['jenis'] ?? '', ['pdf', 'audio', 'gambar'], true)
                     ? !empty($m['berkas_id']) : (($m['jenis'] ?? '') === 'youtube'
@@ -189,6 +215,7 @@ final class KesiapanTpService
                 $detail . '/materi/' . ($m['id'] ?? 0) . '/edit');
         }
 
+        if ($wajibAktivitas) {
         foreach ([
             ['kkm', 1, 100, 'KKM'],
             ['resume_min', 10, 1000, 'Minimal karakter Resume'],
@@ -196,22 +223,22 @@ final class KesiapanTpService
             ['diag_durasi', 5, 180, 'Durasi Diagnostik'],
             ['sum_durasi', 5, 180, 'Durasi Sumatif'],
             ['diag_tayang', 10, 65535, 'Jumlah tayang Diagnostik'],
-            ['sum_tayang', 5, 65535, 'Jumlah tayang Sumatif'],
-            ['sum_maks_percobaan', 1, 255, 'Kuota Sumatif'],
+            ['sum_tayang', 30, 65535, 'Jumlah tayang Sumatif'],
+            ['sum_maks_percobaan', 2, 2, 'Kuota Sumatif (normal + satu remedial)'],
         ] as [$name, $min, $max, $label]) {
             $val = (int) ($tp[$name] ?? 0);
             self::tambahCek($hasil, $name, $label, $val >= $min && $val <= $max,
                 'Nilai ' . $label . ' harus berada dalam rentang ' . $min . '–' . $max . '.',
                 $detail . '#kesiapan-tp');
         }
-        $bobot = (int) ($tp['bobot_resume'] ?? -1) + (int) ($tp['bobot_tugas'] ?? -1)
-            + (int) ($tp['bobot_sumatif'] ?? -1);
         self::tambahCek($hasil, 'bobot', 'Bobot penilaian',
-            $bobot === 100 && (int) ($tp['bobot_sumatif'] ?? 0) > 0,
-            'Jumlah bobot Resume, HOTS dan Sumatif harus 100%, Sumatif lebih dari nol.',
+            (int) ($tp['bobot_resume'] ?? 0) === 20
+                && (int) ($tp['bobot_tugas'] ?? 0) === 20
+                && (int) ($tp['bobot_sumatif'] ?? 0) === 60,
+            'Bobot wajib Resume 20%, HOTS 20%, dan Sumatif 60% (jalur belajar).',
             $detail . '#kesiapan-tp');
 
-        foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 5]] as $jenis => [$field, $minimal]) {
+        foreach (['diagnostik' => ['diag_tayang', 10], 'sumatif' => ['sum_tayang', 30]] as $jenis => [$field, $minimal]) {
             $bank = array_values(array_filter($soal, static fn (array $s): bool => $s['jenis'] === $jenis));
             $target = (int) ($tp[$field] ?? 0);
             $jumlah = count($bank);
@@ -238,6 +265,7 @@ final class KesiapanTpService
                 $valid, 'Soal aktif harus unik per urutan, A–E terisi dan satu kunci sah.',
                 $detail . '/bank-soal?jenis=' . $jenis);
         }
+        } // TP Esensial tidak mewajibkan ujian ataupun nilai siswa.
         return $hasil;
     }
 
@@ -246,6 +274,45 @@ final class KesiapanTpService
     {
         $out[] = ['kode' => $kode, 'label' => $label, 'terpenuhi' => $ok,
             'keterangan' => $ok ? 'Memenuhi ketentuan.' : $pesan, 'tautan' => $url];
+    }
+
+    /**
+     * Saat TP pertama diaktifkan, paket baru harus ditugaskan ke Gen yang
+     * benar. Tanpa penugasan_paket siswa tidak dapat melihat paket yang
+     * sudah siap. Tidak menimpa paket/penugasan lama dan tidak mengubah Gen.
+     *
+     * @param array<string,mixed> $paket
+     */
+    private function pastikanPaketDitugaskan(array $paket, int $guruId, string $waktu): void
+    {
+        $konteks = [
+            'angkatan_id' => (int) $paket['angkatan_id'],
+            'mapel_id' => (int) $paket['mapel_id'],
+            'semester' => (int) $paket['semester'],
+            'tahun_ajaran_id' => (int) $paket['tahun_ajaran_id'],
+        ];
+        $paketId = (int) $paket['id'];
+        $sudah = $this->db->table('penugasan_paket')
+            ->where('paket_id', $paketId)->get()->getRowArray();
+        if ($sudah !== null) {
+            foreach ($konteks as $kolom => $nilai) {
+                if ((int) ($sudah[$kolom] ?? 0) !== $nilai) {
+                    throw new DomainException('Penugasan paket lama tidak konsisten. Hubungi Admin.');
+                }
+            }
+            return;
+        }
+        if ($this->db->table('penugasan_paket')->where($konteks)->countAllResults() > 0) {
+            throw new DomainException('Semester/Tahun Ajaran telah ditugaskan ke paket lain.');
+        }
+        $this->db->table('penugasan_paket')->insert(array_merge($konteks, [
+            'paket_id' => $paketId,
+            'diperbarui_oleh' => $guruId,
+            'diperbarui_pada' => $waktu,
+        ]));
+        if ($this->db->transStatus() === false || $this->db->affectedRows() !== 1) {
+            throw new RuntimeException('Penugasan paket aktif ke Gen gagal.');
+        }
     }
 
     /** Publikasi tidak boleh dicoba tanpa tanda tinjau akademik dari Guru. */
@@ -270,8 +337,10 @@ final class KesiapanTpService
             if (!hash_equals($cek['sidik_jari'], $sidikJari)) {
                 throw new DomainException('Konten TP berubah sejak pemeriksaan. Muat ulang, tinjau perubahannya, lalu konfirmasi kembali.');
             }
-            if ($cek['versi_terbit'] !== null) {
-                throw new DomainException('TP sudah memiliki versi publikasi; gunakan prosedur koreksi.');
+            (new SuntingTpService($this->db))->pastikanBelumDipakai($tpId);
+            $nomorBerikutnya = (int) ($cek['versi_terbit']['nomor_versi'] ?? 0) + 1;
+            if ($nomorBerikutnya > 65535) {
+                throw new DomainException('Batas versi publikasi TP tercapai.');
             }
             $akun = (new AuthService())->penggunaSaatIni();
             if ($akun === null || (int) $akun['id'] !== $guruId || $akun['peran_aktif'] !== 'guru') {
@@ -296,7 +365,7 @@ final class KesiapanTpService
             $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
             $waktu = gmdate('Y-m-d H:i:s');
             $this->db->table('versi_konten_tp')->insert([
-                'tp_id' => $tpId, 'nomor_versi' => 1, 'snapshot_json' => $json,
+                'tp_id' => $tpId, 'nomor_versi' => $nomorBerikutnya, 'snapshot_json' => $json,
                 'checksum' => hash('sha256', $json),
                 'disiapkan_oleh' => $guruId, 'disiapkan_pada' => $waktu,
             ]);
@@ -311,20 +380,40 @@ final class KesiapanTpService
             // Materi yang lengkap disiapkan bersamaan dengan TP, bukan saat upload.
             $this->db->table('materi')->where('tp_id', $tpId)->update(['aktif' => 1]);
             $this->db->table('tp')->where('id', $tpId)->where('status', 'draf')
-                ->where('struktur_versi', $strukturVersi)->update(['status' => 'siap']);
+                ->where('struktur_versi', $strukturVersi)->update([
+                    'status' => 'siap',
+                    'kkm' => (int) $cek['tp']['kkm'],
+                ]);
             if ($this->db->affectedRows() !== 1) {
                 throw new DomainException('TP berubah selama publikasi. Muat ulang halaman.');
             }
             if ($cek['paket']['status'] === 'draf') {
                 $this->db->table('paket_semester')->where('id', $cek['paket']['id'])
                     ->where('status', 'draf')->update(['status' => 'aktif']);
+                if ($this->db->affectedRows() !== 1) {
+                    throw new DomainException('Status paket berubah saat penerbitan TP.');
+                }
             }
+            // Penugasan satu paket per Gen–Mapel–Semester–Tahun Ajaran
+            // bersifat idempoten dan disahkan dalam transaksi penerbitan.
+            $this->pastikanPaketDitugaskan($cek['paket'], $guruId, $waktu);
             $this->db->table('log_aktivitas')->insert([
                 'pengguna_id' => $guruId, 'peran_aktif' => 'guru',
                 'peristiwa' => 'tp_disiapkan',
                 'catatan' => 'TP #' . $tpId . ' diterbitkan dalam versi ' . $versiId . '.',
                 'waktu' => $waktu,
             ]);
+            if (($cek['tp']['jenis_tp'] ?? '') === 'non_esensial') {
+                $siswa=$this->db->table('siswa s')
+                    ->select('s.pengguna_id')
+                    ->join('pengguna u','u.id=s.pengguna_id')
+                    ->where('s.angkatan_id',(int)$cek['paket']['angkatan_id'])
+                    ->where('u.status','aktif')->get()->getResultArray();
+                foreach ($siswa as $penerima) {
+                    NotifikasiService::catat($this->db,'tp_siap_tersedia',
+                        (int)$penerima['pengguna_id'],$tpId,$nomorBerikutnya);
+                }
+            }
             if ($this->db->transStatus() === false) {
                 throw new RuntimeException('Transaksi publikasi TP gagal.');
             }

@@ -78,7 +78,10 @@ final class PetaTpDatabaseTest extends TestCase
 
     public function testSemesterBelumDibuatMenghasilkanDataKosong(): void
     {
-        self::assertSame(['paket' => [], 'tp' => []], $this->guru(1)->petaSemester(1, 1, 1));
+        self::assertSame(
+            ['paket' => [], 'bab' => [], 'tp' => [], 'pola_bab' => false],
+            $this->guru(1)->petaSemester(1, 1, 1)
+        );
     }
 
     public function testGuruLainDitolakSaatMembukaGenDiLuarPenugasan(): void

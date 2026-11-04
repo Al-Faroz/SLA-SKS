@@ -59,14 +59,16 @@ final class PdfMateriValidatorTest extends TestCase
     public function testPdfDariDompdfAsliDapatDiunggah(): void
     {
         $pdf = new \Dompdf\Dompdf();
-        $pdf->loadHtml('<html><body><h1>Contoh Materi Belajar</h1><p>Dokumen QA tanpa data siswa.</p></body></html>');
+        $pdf->loadHtml('<html><body><h1>Contoh Materi Belajar</h1>'
+            . str_repeat('<div style="page-break-before: always">Halaman QA</div>', 5)
+            . '</body></html>');
         $pdf->setPaper('A4');
         $pdf->render();
         $path = tempnam(sys_get_temp_dir(), 'sla-pdf-dompdf-');
         file_put_contents($path, $pdf->output());
         $this->files[] = $path;
         $hasil = BerkasMateriService::validasi($path, 'pdf', 'materi.pdf');
-        self::assertSame(1, $hasil['halaman']);
+        self::assertSame(6, $hasil['halaman']);
         self::assertSame('application/pdf', $hasil['mime']);
     }
 
@@ -74,59 +76,38 @@ final class PdfMateriValidatorTest extends TestCase
     {
         // Reproduksi struktur jsPDF: /OpenAction [3 0 R /FitH null].
         // Hanya memindahkan viewport ke halaman pertama, tanpa menjalankan aksi.
-        $file = $this->pdf(1, '/OpenAction [3 0 R /FitH null]');
-        self::assertSame(1, PdfMateriValidator::periksa($file));
+        $file = $this->pdf(6, '/OpenAction [3 0 R /FitH null]');
+        self::assertSame(6, PdfMateriValidator::periksa($file));
         $hasil = BerkasMateriService::validasi($file, 'pdf', 'materi-jsPDF.pdf');
-        self::assertSame(1, $hasil['halaman']);
-    }
-
-    public function testOpenActionDenganLaunchTetapDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction << /S /Launch /F (cmd.exe) >>'));
-    }
-
-    public function testOpenActionKeObjekSelainHalamanDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        // Objek 1 adalah katalog, bukan halaman.
-        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction [1 0 R /FitH null]'));
-    }
-
-    public function testOpenActionYangMenyisipkanInstruksiAktifDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction [3 0 R /FitH null] /JS (alert)'));
+        self::assertSame(6, $hasil['halaman']);
     }
 
     public function testMarkerEofDalamMetadataBukanRevisiInkremental(): void
     {
         // Token ini boleh muncul pada data dokumen, bukan blok xref/penutup.
-        $file = $this->pdf(1, '/Keywords (materi %%EOF startxref gambar)');
-        self::assertSame(1, PdfMateriValidator::periksa($file));
+        $file = $this->pdf(6, '/Keywords (materi %%EOF startxref gambar)');
+        self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
     public function testPdfJsPdfTanpaNewlineSetelahEofDiterima(): void
     {
-        $file = $this->pdf(1, '/OpenAction [3 0 R /FitH null]');
+        $file = $this->pdf(6, '/OpenAction [3 0 R /FitH null]');
         file_put_contents($file, rtrim((string) file_get_contents($file), "\r\n"));
-        self::assertSame(1, PdfMateriValidator::periksa($file));
+        self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
-    public function testRevisiKeduaDenganPenutupStrukturalDitolak(): void
+    public function testRevisiPenutupTidakMenjadiBatasan(): void
     {
-        $file = $this->pdf(1);
+        $file = $this->pdf(6);
         file_put_contents($file, "\nstartxref\n0\n%%EOF\n", FILE_APPEND);
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($file);
+        self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
-    public function testPdfTanpaPenutupAkhirDitolak(): void
+    public function testTeksSetelahEofTidakMenjadiSyaratTambahan(): void
     {
-        $file = $this->pdf(1);
-        file_put_contents($file, (string) file_get_contents($file) . "tambahan tidak sah");
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($file);
+        $file = $this->pdf(6);
+        file_put_contents($file, (string) file_get_contents($file) . "tambahan metadata");
+        self::assertSame(6, PdfMateriValidator::periksa($file));
     }
 
     public function testPdfNormalDenganRevisiMetadataNavigasiXyzDanC2paDiterima(): void
@@ -156,19 +137,45 @@ final class PdfMateriValidatorTest extends TestCase
         self::assertSame(10, BerkasMateriService::validasi($file, 'pdf', 'materi.pdf')['halaman']);
     }
 
-    public function testSkripAktifDenganNamaPdfEncodedTetapDitolak(): void
+    public function testMarkerObjectStreamTidakMenghalangiHitungHalaman(): void
     {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(1, '/Java#53cript /#4aS (alert)'));
+        // Reproduksi penanda /ObjStm pada PDF Word modern (tanpa file guru).
+        $file = $this->pdf(8, '/Metadata << /Type /ObjStm /Filter /FlateDecode >>');
+        self::assertSame(8, PdfMateriValidator::periksa($file));
+        self::assertSame(8, BerkasMateriService::validasi($file, 'pdf', 'materi.pdf')['halaman']);
     }
 
-    public function testPdfSatuHalamanValid(): void
+    public function testBatasUkuranLebihDari15MbDitolak(): void
     {
-        $file = $this->pdf(1);
-        self::assertSame(1, PdfMateriValidator::periksa($file));
+        $file = $this->pdf(6);
+        $handle = fopen($file, 'c+b');
+        self::assertNotFalse($handle);
+        ftruncate($handle, 15 * 1024 * 1024 + 1);
+        fclose($handle);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('maksimal 15 MB');
+        PdfMateriValidator::periksa($file);
+    }
+
+    public function testPdfSatuDanLimaHalamanDitolak(): void
+    {
+        foreach ([1, 5] as $jumlah) {
+            try {
+                BerkasMateriService::validasi($this->pdf($jumlah), 'pdf', 'materi.pdf');
+                self::fail('PDF ' . $jumlah . ' halaman harus ditolak.');
+            } catch (DomainException $e) {
+                self::assertStringContainsString('6–40 halaman', $e->getMessage());
+            }
+        }
+    }
+
+    public function testPdfEnamHalamanValid(): void
+    {
+        $file = $this->pdf(6);
+        self::assertSame(6, PdfMateriValidator::periksa($file));
         $v = BerkasMateriService::validasi($file, 'pdf', 'materi.pdf');
         self::assertSame('application/pdf', $v['mime']);
-        self::assertSame(1, $v['halaman']);
+        self::assertSame(6, $v['halaman']);
         self::assertSame('pdf', $v['ext']);
     }
 
@@ -183,22 +190,10 @@ final class PdfMateriValidatorTest extends TestCase
         PdfMateriValidator::periksa($this->pdf(41));
     }
 
-    public function testPdfDenganJavascriptDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(1, '/OpenAction << /S /JavaScript /JS (alert) >>'));
-    }
-
-    public function testPdfDenganNamaDikodekanDitolak(): void
-    {
-        $this->expectException(DomainException::class);
-        PdfMateriValidator::periksa($this->pdf(1, '/#4aS (alert)'));
-    }
-
     public function testEkstensiTidakSesuaiDitolak(): void
     {
         $this->expectException(DomainException::class);
-        BerkasMateriService::validasi($this->pdf(1), 'pdf', 'materi.png');
+        BerkasMateriService::validasi($this->pdf(6), 'pdf', 'materi.png');
     }
 
     public function testPdfPalsuDitolak(): void

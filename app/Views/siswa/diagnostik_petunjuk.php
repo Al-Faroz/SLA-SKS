@@ -21,8 +21,9 @@
         <h2 id="persiapan-diagnostik">Persiapan ujian</h2>
         <p>Diagnostik merupakan langkah wajib sebelum pembelajaran Materi.
             Satu percobaan normal disediakan. Jika hasilnya memenuhi KKM,
-            TP dinyatakan tuntas; jika belum, pembelajaran Materi, Resume,
-            dan HOTS wajib dijalani secara berurutan.</p>
+            Materi, Resume dan HOTS boleh dilewati, tetapi Sumatif tetap wajib.
+            Jika belum memenuhi KKM, siswa wajib menyelesaikan satu Materi,
+            Resume final dan HOTS final sebelum mengerjakan Sumatif.</p>
         <div class="a-diagnostik-ringkasan">
             <div><strong><?= (int) $jumlah_tayang ?></strong><span>Soal ditayangkan</span></div>
             <div><strong><?= (int) $durasi_menit ?> menit</strong><span>Durasi ujian</span></div>
@@ -41,7 +42,7 @@
                 (<em>fullscreen</em>). HP hanya dapat dipakai bila fullscreen benar-benar berhasil.</li>
             <li>Pastikan koneksi internet stabil dan daya perangkat cukup.</li>
             <li>Selama ujian, keluar dari fullscreen menyebabkan waktu berhenti
-                sementara. Pelanggaran ketiga membatalkan percobaan.</li>
+                sementara. Jika batas insiden terlampaui, tes tidak selesai dan siswa perlu meminta izin akses ulang Guru; bukan pembatalan ujian.</li>
             <li>Batas jeda fullscreen adalah 90 detik per kejadian dan 180 detik
                 total; batas jeda akibat koneksi 300 detik sesuai kebijakan ujian.</li>
             <li>Jawaban dinyatakan tersimpan hanya setelah server mengonfirmasinya.

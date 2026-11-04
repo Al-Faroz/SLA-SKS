@@ -1,0 +1,45 @@
+name: QA A12-1 Dashboard Pimpinan
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/DashboardPimpinanService.php'
+      - 'app/Controllers/PimpinanDashboard.php'
+      - 'app/Views/pimpinan/dashboard.php'
+      - 'app/Config/Routes.php'
+      - 'public/assets/css/app.css'
+      - 'tests/unit/DashboardPimpinanDatabaseTest.php'
+      - '.github/workflows/qa-a12-1-dashboard-pimpinan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan writable
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Syntax PHP dan template
+        run: |
+          for f in \
+            app/Services/DashboardPimpinanService.php \
+            app/Controllers/PimpinanDashboard.php \
+            app/Views/pimpinan/dashboard.php \
+            app/Config/Routes.php \
+            tests/unit/DashboardPimpinanDatabaseTest.php; do
+            php -l "$f"
+          done
+      - name: PHPUnit KPI, peran, filter, Sumatif sah dan nilai Final
+        run: vendor/bin/phpunit --no-coverage tests/unit/DashboardPimpinanDatabaseTest.php
+      - name: PHPUnit monitoring A10-1
+        run: vendor/bin/phpunit --no-coverage tests/unit/LaporanAkademikDatabaseTest.php

@@ -166,7 +166,7 @@ final class AkunXlsxService
                 'Template SLA-SKS ' . self::VERSI_TEMPLATE . ' — ' . ucfirst($jenis),
                 'Isikan data hanya pada sheet ' . ucfirst($jenis) . '. Jangan ubah nama sheet/header.',
                 'Maksimal 300 baris data per impor; satu akun per baris.',
-                'Kolom sandi_awal hanya untuk AKUN BARU, minimal 8 karakter; kosongkan untuk update.',
+                'Kolom sandi_awal hanya untuk AKUN BARU, minimal 8 karakter; kosongkan untuk update. Admin wajib mengganti saat login awal; Guru/Pimpinan/Siswa dianjurkan mengganti melalui Profil.',
                 'Jangan menyimpan file berisi sandi awal di folder publik atau membagikannya lewat grup.',
                 $jenis === 'siswa'
                     ? 'NISN tepat 10 angka dengan format TEKS. kode_gen harus kode Gen yang terdaftar.'

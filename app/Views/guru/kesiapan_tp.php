@@ -26,18 +26,24 @@
         <?php $jumlahLolos = count(array_filter($cek, static fn (array $baris): bool => $baris['terpenuhi'])); ?>
         <div class="a-kesiapan-ringkasan">
             <div><strong><?= $jumlahLolos ?> / <?= count($cek) ?></strong><span>Ketentuan terpenuhi</span></div>
-            <div><strong><?= count($materi) ?></strong><span>Materi/Submateri</span></div>
+            <div><strong><?= count($materi) ?></strong><span>Materi (maksimal satu)</span></div>
             <div><strong><?= count($soal) ?></strong><span>Soal aktif</span></div>
             <div><strong><?= $tp['status'] === 'siap' ? 'Siap' : ($siap ? 'Lengkap' : 'Draf') ?></strong><span>Status pemeriksaan</span></div>
         </div>
         <?php if ($tp['status'] === 'siap'): ?>
             <div class="a-alert" role="status">
-                <strong>TP sudah Siap dan terkunci.</strong>
+                <strong>TP sudah Siap.</strong>
                 <?php if ($versi_terbit): ?>
                     Versi konten <?= (int) $versi_terbit['nomor_versi'] ?> disimpan
                     pada <?= esc((string) $versi_terbit['disiapkan_pada']) ?> (UTC).
                 <?php endif ?>
-                Perubahan selanjutnya hanya melalui prosedur koreksi akademik.
+                <?php if ($suntingDikunci): ?>
+                    TP telah digunakan siswa. Rincian, KKM, Materi, Resume/HOTS,
+                    dan Bank Soal terkunci untuk menjaga riwayat pembelajaran.
+                <?php else: ?>
+                    TP belum digunakan siswa. Guru dapat memilih Sunting TP
+                    pada Rincian TP untuk kembali ke Draf dan menerbitkan versi baru.
+                <?php endif ?>
             </div>
         <?php elseif ($siap): ?>
             <div class="a-alert" role="status">
@@ -52,11 +58,27 @@
         <?php endif ?>
     </section>
 
+    <section class="a-card a-jarak-atas" aria-labelledby="judul-tahapan-final">
+        <h2 id="judul-tahapan-final">Step Progress penyiapan TP</h2>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            Semua langkah penerbitan telah diperiksa. Rincian berikut merupakan
+            status konten yang sudah diterbitkan, bukan izin untuk menyuntingnya.
+            <?php else: ?>
+            Langkah yang belum lengkap dapat dibuka langsung.
+            Status ini berasal dari pemeriksaan Service yang sama dengan keputusan publikasi.
+            <?php endif ?></p>
+        <?= view('guru/_step_progress_tp', ['langkah' => $langkah]) ?>
+    </section>
+
     <section class="a-card a-jarak-atas" aria-labelledby="judul-checklist-akhir">
         <h2 id="judul-checklist-akhir">Daftar pemeriksaan final</h2>
-        <p class="a-help">Pemeriksaan ini meliputi CP resmi, seluruh Materi, media,
-            bank soal Diagnostik/Sumatif, dan pengaturan ujian. Publikasi tetap
-            memerlukan konfirmasi Guru.</p>
+        <p class="a-help">Pemeriksaan meliputi CP resmi, Materi, media,
+            bank soal Diagnostik/Sumatif, dan pengaturan ujian.
+            <?= $tp['status'] === 'siap'
+                ? 'Konten TP sudah diterbitkan; hasil ini adalah informasi pemeriksaan.'
+                : 'Publikasi memerlukan konfirmasi Guru setelah seluruh syarat terpenuhi.' ?></p>
+        <details class="a-tp-kesiapan-detail">
+            <summary class="a-btn a-btn--sekunder">Lihat rincian ketentuan (<?= count($cek) ?> pemeriksaan)</summary>
         <div class="a-tabel-gulir">
             <table class="a-tbl a-tbl--cards a-kesiapan-tabel">
                 <thead>
@@ -83,6 +105,7 @@
                 </tbody>
             </table>
         </div>
+        </details>
     </section>
 
     <?php if ($tp['status'] === 'draf'): ?>
@@ -90,8 +113,8 @@
         <h2 id="judul-konfirmasi-tp">Konfirmasi Guru</h2>
         <?php if ($siap): ?>
             <p>Menyiapkan TP akan membuat snapshot materi, CP, soal, kunci,
-                dan pengaturan. TP terkunci dan tidak dapat dikembalikan
-                ke Draf melalui editor biasa.</p>
+                dan pengaturan. Setelah digunakan siswa, konten TP terkunci. Sebelum digunakan,
+                Guru dapat membuka kembali editor melalui tombol Sunting TP.</p>
             <form class="a-form" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>"
                 method="post" onsubmit="return confirm('TP akan diterbitkan dan dikunci. Lanjutkan?');">
                 <?= csrf_field() ?>

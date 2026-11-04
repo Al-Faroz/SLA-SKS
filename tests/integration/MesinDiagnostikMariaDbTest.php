@@ -35,7 +35,8 @@ final class MesinDiagnostikMariaDbTest extends TestCase
             'CREATE TABLE ref_mapel(id BIGINT UNSIGNED PRIMARY KEY,kode VARCHAR(30),nama VARCHAR(100)) ENGINE=InnoDB',
             'CREATE TABLE paket_semester(id BIGINT UNSIGNED PRIMARY KEY,angkatan_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,semester INT,tahun_ajaran_id INT,nomor_versi INT,status VARCHAR(30)) ENGINE=InnoDB',
             'CREATE TABLE penugasan_paket(id BIGINT UNSIGNED PRIMARY KEY,angkatan_id BIGINT UNSIGNED,mapel_id BIGINT UNSIGNED,semester INT,tahun_ajaran_id INT,paket_id BIGINT UNSIGNED) ENGINE=InnoDB',
-            'CREATE TABLE tp(id BIGINT UNSIGNED PRIMARY KEY,paket_semester_id BIGINT UNSIGNED,kode_tp VARCHAR(64),judul TEXT,urutan_atp INT,status VARCHAR(30),rumusan TEXT,indikator TEXT) ENGINE=InnoDB',
+            'CREATE TABLE bab(id BIGINT UNSIGNED PRIMARY KEY,paket_semester_id BIGINT UNSIGNED,nomor_bab INT,nama_bab VARCHAR(50),deskripsi_bab TEXT) ENGINE=InnoDB',
+            'CREATE TABLE tp(id BIGINT UNSIGNED PRIMARY KEY,paket_semester_id BIGINT UNSIGNED,bab_id BIGINT UNSIGNED DEFAULT 1,kode_tp VARCHAR(64),judul TEXT,urutan_atp INT,status VARCHAR(30),rumusan TEXT,indikator TEXT,jenis_tp VARCHAR(20) NOT NULL DEFAULT \'non_esensial\') ENGINE=InnoDB',
             'CREATE TABLE materi(id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED,urutan INT,judul TEXT,jenis VARCHAR(15),aktif INT) ENGINE=InnoDB',
             'CREATE TABLE versi_konten_tp(id BIGINT UNSIGNED PRIMARY KEY,tp_id BIGINT UNSIGNED,nomor_versi INT,snapshot_json LONGTEXT,checksum CHAR(64)) ENGINE=InnoDB',
             'CREATE TABLE progres_tp(id BIGINT UNSIGNED PRIMARY KEY,siswa_id BIGINT UNSIGNED,tp_id BIGINT UNSIGNED,paket_semester_id BIGINT UNSIGNED,versi_paket_yang_ditugaskan INT,versi_konten_tp_id BIGINT UNSIGNED,status VARCHAR(30),dimulai_pada DATETIME,diubah_pada DATETIME) ENGINE=InnoDB',
@@ -61,6 +62,9 @@ final class MesinDiagnostikMariaDbTest extends TestCase
         ]);
         $this->db->table('penugasan_paket')->insert([
             'id'=>7,'angkatan_id'=>1,'mapel_id'=>4,'semester'=>4,'tahun_ajaran_id'=>1,'paket_id'=>7,
+        ]);
+        $this->db->table('bab')->insertBatch([
+            ['id'=>1,'paket_semester_id'=>7,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 1','deskripsi_bab'=>'Contoh untuk pengujian'],
         ]);
         $this->db->table('tp')->insert([
             'id'=>1,'paket_semester_id'=>7,'kode_tp'=>'TP-SKI-S4-01','judul'=>'Contoh TP',
@@ -142,7 +146,7 @@ final class MesinDiagnostikMariaDbTest extends TestCase
         $end=$engine->tindakan(1,$token,'kirim',true);
         self::assertSame('selesai_sah',$end['status']);
         self::assertSame(100.0,$end['skor']);
-        self::assertSame('tuntas',$this->db->table('progres_tp')
+        self::assertSame('sumatif',$this->db->table('progres_tp')
             ->select('status')->where('id',11)->get()->getRowArray()['status']);
         self::assertArrayNotHasKey('soal',$engine->status(1,$token));
         self::assertSame($token,$engine->mulai(1,true)['token']);

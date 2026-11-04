@@ -8,10 +8,8 @@ use CodeIgniter\Database\BaseConnection;
 use DomainException;
 
 /**
- * Fondasi baca-saja peta ATP v2.4.
- *
- * ATP = urutan TP per paket semester, bukan objek BAB. Semua pembacaan
- * dibatasi penugasan Guru aktif pada pasangan Gen–Mapel yang sama.
+ * Peta ATP: Semester → BAB → TP, dengan fallback baca untuk DB v3.
+ * Semua pembacaan dibatasi penugasan Guru aktif Gen–Mapel.
  */
 final class PetaTpService
 {
@@ -73,7 +71,7 @@ final class PetaTpService
         $guruId = $this->guruId();
 
         return $this->db->table('penugasan_guru_gen g')
-            ->select('g.angkatan_id, g.mapel_id, a.kode AS kode_gen, a.nama AS nama_gen, m.kode AS kode_mapel, m.nama AS nama_mapel')
+            ->select('g.angkatan_id, g.mapel_id, a.semester_mulai, a.kode AS kode_gen, a.nama AS nama_gen, m.kode AS kode_mapel, m.nama AS nama_mapel')
             ->join('ref_angkatan a', 'a.id = g.angkatan_id')
             ->join('ref_mapel m', 'm.id = g.mapel_id')
             ->where('g.guru_id', $guruId)
@@ -84,7 +82,7 @@ final class PetaTpService
     }
 
     /**
-     * @return array{paket:list<array<string,mixed>>,tp:list<array<string,mixed>>}
+     * @return array{paket:list<array<string,mixed>>,bab:list<array<string,mixed>>,tp:list<array<string,mixed>>,pola_bab:bool}
      */
     public function petaSemester(int $genId, int $mapelId, int $semester): array
     {
@@ -115,19 +113,37 @@ final class PetaTpService
             ->get()
             ->getResultArray();
 
+        $polaBab = $this->db->tableExists('bab');
         if ($paket === []) {
-            return ['paket' => [], 'tp' => []];
+            return ['paket' => [], 'bab' => [], 'tp' => [], 'pola_bab' => $polaBab];
         }
 
         $ids = array_map(static fn (array $baris): int => (int) $baris['id'], $paket);
-        $tp = $this->db->table('tp t')
-            ->select('t.id,t.paket_semester_id,t.kode_tp,t.judul,t.rumusan,t.indikator,t.urutan_atp,t.status,t.struktur_versi')
-            ->whereIn('t.paket_semester_id', $ids)
-            ->orderBy('t.paket_semester_id', 'ASC')
-            ->orderBy('t.urutan_atp', 'ASC')
-            ->get()
-            ->getResultArray();
+        $bab = $polaBab
+            ? $this->db->table('bab b')
+                ->select('b.id,b.paket_semester_id,b.nomor_bab,b.nama_bab,b.deskripsi_bab')
+                ->whereIn('b.paket_semester_id', $ids)
+                ->orderBy('b.nomor_bab', 'ASC')
+                ->get()->getResultArray()
+            : [];
 
-        return ['paket' => $paket, 'tp' => $tp];
+        $pilihanKolom = 't.id,t.paket_semester_id,t.kode_tp,t.judul,t.rumusan,t.indikator,t.urutan_atp,t.status,t.struktur_versi';
+        if ($polaBab) {
+            $pilihanKolom .= ',t.bab_id,t.jenis_tp,t.nama_tp,t.deskripsi_tp,t.urutan_dalam_bab';
+        }
+        $daftarTp = $this->db->table('tp t')
+            ->select($pilihanKolom)
+            ->whereIn('t.paket_semester_id', $ids);
+        if ($polaBab) {
+            // TP uji yang diarsipkan tidak menjadi konten ATP aktif v2.5.
+            $daftarTp->where('t.status !=', 'arsip');
+            $daftarTp->orderBy('t.bab_id', 'ASC')
+                ->orderBy('t.urutan_dalam_bab', 'ASC');
+        } else {
+            $daftarTp->orderBy('t.urutan_atp', 'ASC');
+        }
+        $tp = $daftarTp->get()->getResultArray();
+
+        return ['paket' => $paket, 'bab' => $bab, 'tp' => $tp, 'pola_bab' => $polaBab];
     }
 }

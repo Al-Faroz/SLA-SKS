@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 final class MateriFormViewTest extends TestCase
 {
     /** @param array<string,mixed> $nilai */
-    private function render(array $nilai = [], string $galatKolom = ''): string
+    private function render(array $nilai = [], string $galatKolom = '', string $jenisTp = 'non_esensial'): string
     {
         ob_start();
         try {
@@ -45,6 +45,7 @@ final class MateriFormViewTest extends TestCase
         self::assertMatchesRegularExpression('/value="pdf"\\s+selected/', $html);
         self::assertStringContainsString('name="media"', $html);
         self::assertStringContainsString('data-materi-batas-server=', $html);
+        self::assertStringContainsString('PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB', $html);
         self::assertStringContainsString('aria-invalid="true"', $html);
         self::assertStringContainsString('value="10"', $html);
         self::assertStringContainsString('Ringkas materi di PDF.', $html);
@@ -63,6 +64,19 @@ final class MateriFormViewTest extends TestCase
         self::assertMatchesRegularExpression('/value="pdf"[\\s\\S]*?disabled/', $html);
         self::assertStringContainsString('jenis media terkunci', $html);
         self::assertStringContainsString('Kosongkan kolom file', $html);
+    }
+
+    public function testTpEsensialTidakMemaksaResumeHotsPadaForm(): void
+    {
+        $html = $this->render([], '', 'esensial');
+        self::assertSame(2, substr_count($html, '(opsional Esensial)'));
+        foreach (['petunjuk_resume', 'petunjuk_hots'] as $nama) {
+            self::assertSame(1, preg_match(
+                '/<textarea[^>]*name="' . $nama . '"[^>]*>/',
+                $html, $matches
+            ));
+            self::assertStringNotContainsString('required', $matches[0]);
+        }
     }
 
     public function testTeksInputDisanitasiPadaView(): void

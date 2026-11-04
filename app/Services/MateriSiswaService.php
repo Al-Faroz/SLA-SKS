@@ -46,7 +46,7 @@ final class MateriSiswaService
         }
         $katalog = $this->katalog->rincianTp($tpId);
         $p = $this->progres->status($tpId);
-        if ($p === null || !in_array($p['status'], ['belajar', 'tuntas'], true)) {
+        if ($p === null || !in_array($p['status'], ['belajar', 'sumatif', 'tuntas'], true)) {
             throw new DomainException('Selesaikan Diagnostik sah sebelum membuka Materi.');
         }
         // Status tuntas boleh membaca media sukarela, tanpa tugas resmi.
@@ -90,7 +90,7 @@ final class MateriSiswaService
     public function daftar(int $tpId): array
     {
         $ctx = $this->konteks($tpId);
-        $tuntas = $ctx['progres']['status'] === 'tuntas';
+        $tuntas = in_array($ctx['progres']['status'], ['sumatif', 'tuntas'], true);
         $rows = [];
         $rantaiSelesai = true;
         foreach ($ctx['materi'] as $i => $m) {
@@ -148,7 +148,7 @@ final class MateriSiswaService
             }
         }
         $next = $pos !== null ? ($ctx['materi'][$pos + 1] ?? null) : null;
-        $sukarela = $ctx['progres']['status'] === 'tuntas';
+        $sukarela = in_array($ctx['progres']['status'], ['sumatif', 'tuntas'], true);
         $lolosMateriIni = $sukarela || $this->kegiatanSelesai($ctx, $materiId);
         $berikutnya = $next === null ? null : [
             'id' => (int) $next['id'],
@@ -185,7 +185,7 @@ final class MateriSiswaService
             if ((int) $m['id'] !== $materiId) {
                 continue;
             }
-            if ($ctx['progres']['status'] === 'tuntas' || $i === 0) {
+            if (in_array($ctx['progres']['status'], ['sumatif', 'tuntas'], true) || $i === 0) {
                 return $m;
             }
             $semuaSebelumnya = true;

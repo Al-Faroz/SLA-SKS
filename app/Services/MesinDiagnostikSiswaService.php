@@ -52,10 +52,28 @@ final class MesinDiagnostikSiswaService
             ->select('token_publik,status')
             ->where('progres_tp_id', (int) $ctx['progres']['id'])
             ->where('jenis', 'diagnostik')->orderBy('id','DESC')->get(1)->getRowArray();
+        if ($existing !== null
+            && $existing['status'] === 'dibatalkan_menunggu_guru'
+            && $ctx['progres']['status'] === 'diagnostik') {
+            // Keputusan Guru sudah membuka ulang: jangan kirim token yang batal.
+            $existing = null;
+        }
+        $langsungBelajar = false;
+        if ($existing !== null && $existing['status'] === 'dibatalkan_menunggu_guru'
+            && $ctx['progres']['status'] === 'belajar') {
+            $langsungBelajar = $this->db->table('keputusan_ujian_batal k')
+                ->join('percobaan_ujian pu', 'pu.id=k.percobaan_ujian_id')
+                ->where('pu.token_publik', (string) $existing['token_publik'])
+                ->where('pu.progres_tp_id', (int) $ctx['progres']['id'])
+                ->where('pu.jenis', 'diagnostik')
+                ->where('k.keputusan', 'langsung_belajar')
+                ->countAllResults() > 0;
+        }
         return [
             'tp' => $ctx['ctx']['tp'], 'progres' => $ctx['progres'],
             'percobaan' => $existing,
-            'status_akhir' => in_array($ctx['progres']['status'], ['tuntas', 'belajar', 'perlu_bantuan'], true),
+            'langsung_belajar' => $langsungBelajar,
+            'status_akhir' => in_array($ctx['progres']['status'], ['sumatif', 'tuntas', 'belajar', 'perlu_bantuan'], true),
         ];
     }
 
@@ -196,7 +214,9 @@ final class MesinDiagnostikSiswaService
         $lulus = $nilai['skor'] >= (int) $s['kkm'];
         $this->db->table('progres_tp')->where('id', (int) $s['progres_tp_id'])
             ->where('status', 'diagnostik')
-            ->update(['status' => $lulus ? 'tuntas' : 'belajar',
+            // Lulus Diagnostik melewati kewajiban Materi/Resume/HOTS,
+            // tetapi Sumatif tetap WAJIB; jangan menandai TP tuntas di sini.
+            ->update(['status' => $lulus ? 'sumatif' : 'belajar',
                 'diubah_pada' => self::iso($now)]);
         $this->riwayat($id, 'berjalan', 'selesai_sah', $alasan, $now);
         $s['skor'] = $nilai['skor'];
@@ -219,9 +239,17 @@ final class MesinDiagnostikSiswaService
             $existing = $this->db->table('percobaan_ujian')
                 ->where('progres_tp_id', (int) $p['id'])->where('jenis', 'diagnostik')
                 ->orderBy('id', 'DESC')->get(1)->getRowArray();
+            $izin = null;
             if ($existing) {
-                $this->db->transCommit();
-                return ['token' => $existing['token_publik'], 'sudah_ada' => true];
+                if ($existing['status'] !== 'dibatalkan_menunggu_guru') {
+                    $this->db->transCommit();
+                    return ['token' => $existing['token_publik'], 'sudah_ada' => true];
+                }
+                $izin = KeputusanUjianBatalService::izin(
+                    $this->db, (int) $existing['id'], 'ulang_diagnostik');
+                if ($izin === null) {
+                    throw new DomainException('Diagnostik tidak selesai. Minta akses ulang kepada Guru.');
+                }
             }
             $check = (new PetunjukDiagnostikSiswaService($this->db, $this->akunSaatIni))->periksa($tpId);
             if (!$check['boleh_uji'] || $p['status'] !== 'diagnostik') {
@@ -244,7 +272,9 @@ final class MesinDiagnostikSiswaService
             $this->db->table('percobaan_ujian')->insert([
                 'token_publik' => $token, 'progres_tp_id' => (int) $p['id'],
                 'versi_konten_tp_id' => (int) $p['versi_konten_tp_id'],
-                'jenis' => 'diagnostik', 'nomor_percobaan' => 1, 'status' => 'berjalan',
+                'jenis' => 'diagnostik',
+                'nomor_percobaan' => $existing === null ? 1 : (int) $existing['nomor_percobaan'] + 1,
+                'status' => 'berjalan',
                 'profil_keamanan' => 'ketat', 'jumlah_soal' => count($butir),
                 'kkm' => $kkm, 'durasi_detik' => $check['durasi_menit'] * 60,
                 'sisa_detik' => $awal['sisa_detik'], 'waktu_mulai' => self::iso($now),
@@ -259,6 +289,9 @@ final class MesinDiagnostikSiswaService
                     array_merge($item, ['percobaan_ujian_id' => $id]));
             }
             $this->riwayat($id, null, 'berjalan', 'Memulai Diagnostik melalui fullscreen.', $now);
+            if ($izin !== null) {
+                KeputusanUjianBatalService::gunakan($this->db, (int) $izin['id']);
+            }
             if (!$this->db->transStatus()) throw new RuntimeException('Transaksi ujian gagal.');
             $this->db->transCommit();
             return ['token' => $token, 'sudah_ada' => false];
@@ -313,7 +346,7 @@ final class MesinDiagnostikSiswaService
             'jumlah_benar' => $status === 'selesai_sah' ? (int) ($s['jumlah_benar'] ?? 0) : null,
             'kkm' => $status === 'selesai_sah' ? (int) $s['kkm'] : null,
             'pesan' => $status === 'dibatalkan_menunggu_guru'
-                ? 'Percobaan dibatalkan. Menunggu keputusan Guru.' : '',
+                ? 'Tes Diagnostik tidak selesai. Minta akses ulang kepada Guru.' : '',
         ];
     }
 

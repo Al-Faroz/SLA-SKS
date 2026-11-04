@@ -107,13 +107,19 @@ final class BerkasMateriUnggahTest extends TestCase
     }
 
     /** @return UploadedFile PDF sintetis dengan xref valid untuk QA CI. */
-    private function uploadedPdf(bool $skrip = false): UploadedFile
+    private function uploadedPdf(bool $skrip = false, int $jumlahHalaman = 6): UploadedFile
     {
+        $kids = [];
+        for ($i = 0; $i < $jumlahHalaman; ++$i) {
+            $kids[] = ($i + 3) . ' 0 R';
+        }
         $objects = [
             '<< /Type /Catalog /Pages 2 0 R ' . ($skrip ? '/OpenAction << /S /JavaScript /JS (uji) >>' : '') . ' >>',
-            '<< /Type /Pages /Count 1 /Kids [3 0 R] >>',
-            '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>',
+            '<< /Type /Pages /Count ' . $jumlahHalaman . ' /Kids [' . implode(' ', $kids) . '] >>',
         ];
+        for ($i = 0; $i < $jumlahHalaman; ++$i) {
+            $objects[] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >>';
+        }
         $pdf = "%PDF-1.4\n";
         $offsets = [];
         foreach ($objects as $i => $obj) {
@@ -121,11 +127,11 @@ final class BerkasMateriUnggahTest extends TestCase
             $pdf .= ($i + 1) . " 0 obj\n" . $obj . "\nendobj\n";
         }
         $xref = strlen($pdf);
-        $pdf .= "xref\n0 4\n0000000000 65535 f \n";
+        $pdf .= "xref\n0 " . (count($objects) + 1) . "\n0000000000 65535 f \n";
         foreach ($offsets as $off) {
             $pdf .= sprintf("%010d 00000 n \n", $off);
         }
-        $pdf .= "trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n" . $xref . "\n%%EOF\n";
+        $pdf .= "trailer\n<< /Size " . (count($objects) + 1) . " /Root 1 0 R >>\nstartxref\n" . $xref . "\n%%EOF\n";
         file_put_contents($this->tmp, $pdf);
         return new class ($this->tmp, 'materi.pdf', 'application/pdf', filesize($this->tmp), UPLOAD_ERR_OK) extends UploadedFile {
             public function isValid(): bool
@@ -135,23 +141,20 @@ final class BerkasMateriUnggahTest extends TestCase
         };
     }
 
-    public function testTambahPdfMenyimpanJumlahHalamanDanBerkasPrivat(): void
+    public function testUploadPdfPertamaPadaMateriYangSudahAdaMenyimpanMetadata(): void
     {
-        $input = $this->inputMedia();
-        $input['jenis'] = 'pdf';
-        $input['judul'] = 'PDF Materi QA';
-        $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $input, $this->uploadedPdf());
-        $materi = self::$db->table('materi')->where('judul', 'PDF Materi QA')
-            ->where('tp_id', 1)->get()->getRowArray();
-        self::assertNotNull($materi);
+        // Kontrak v2.5: unggah PDF untuk Materi yang sudah ada, bukan
+        // menyisipkan Materi kedua.
+        self::$db->table('materi')->where('id', 1)->update(['jenis' => 'pdf']);
+        $this->service(1)->unggah(1, 1, $this->versiAwal, $this->uploadedPdf());
+        $materi = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
         self::assertSame('pdf', $materi['jenis']);
         $meta = self::$db->table('berkas')->where('id', (int) $materi['berkas_id'])
             ->get()->getRowArray();
-        self::assertSame(1, (int) $meta['halaman']);
+        self::assertSame(6, (int) $meta['halaman']);
         self::assertSame('application/pdf', $meta['mime']);
         self::assertFileExists($this->folder . '/' . $meta['nama_acak']);
-        $media = $this->service(1)->media(1, (int) $materi['id']);
-        self::assertSame('pdf', $media['jenis']);
+        self::assertSame('pdf', $this->service(1)->media(1, 1)['jenis']);
     }
 
     public function testSuntingPdfMenggantiFileTanpaMenghapusBerkasLama(): void
@@ -177,7 +180,7 @@ final class BerkasMateriUnggahTest extends TestCase
         self::assertFileExists($this->folder . '/' . $metaLama['nama_acak']);
         $baru = self::$db->table('berkas')->where('id', (int) $sesudah['berkas_id'])
             ->get()->getRowArray();
-        self::assertSame(1, (int) $baru['halaman']);
+        self::assertSame(6, (int) $baru['halaman']);
         self::assertFileExists($this->folder . '/' . $baru['nama_acak']);
         self::assertSame($this->versiAwal + 2,
             (int) self::$db->table('tp')->where('id', 1)->get()->getRow('struktur_versi'));
@@ -195,9 +198,9 @@ final class BerkasMateriUnggahTest extends TestCase
         $input['judul'] = 'Seharusnya Tidak Tersimpan';
         try {
             $this->service(1)->simpanDenganMedia(
-                1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf(true)
+                1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf(false, 5)
             );
-            self::fail('PDF dengan JavaScript harus ditolak pada penggantian.');
+            self::fail('PDF di bawah 6 halaman harus ditolak pada penggantian.');
         } catch (DomainException $e) {
             $terkini = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
             self::assertSame($idLama, (int) $terkini['berkas_id']);
@@ -209,29 +212,51 @@ final class BerkasMateriUnggahTest extends TestCase
         }
     }
 
-    public function testTolakPdfDenganJavascriptTidakMenyisakanMateri(): void
+    public function testSuntingPdfLimaHalamanTidakMengubahBerkasLama(): void
     {
+        self::$db->table('materi')->where('id', 1)->update(['jenis' => 'pdf']);
+        $this->service(1)->unggah(1, 1, $this->versiAwal, $this->uploadedPdf());
+        $lama = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+        $berkasLama = (int) $lama['berkas_id'];
         $input = $this->inputMedia();
         $input['jenis'] = 'pdf';
+        $input['judul'] = 'Judul Tidak Boleh Tersimpan';
         try {
-            $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $input, $this->uploadedPdf(true));
-            self::fail('PDF dengan skrip harus ditolak.');
+            $this->service(1)->simpanDenganMedia(
+                1, 1, $this->versiAwal + 1, $input, $this->uploadedPdf(false, 5)
+            );
+            self::fail('PDF kurang dari 6 halaman harus ditolak.');
         } catch (DomainException $e) {
-            self::assertSame(0, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
-            self::assertSame(1, self::$db->table('materi')->where('tp_id', 1)->countAllResults());
+            self::assertStringContainsString('6–40 halaman', $e->getMessage());
+            $sesudah = self::$db->table('materi')->where('id', 1)->get()->getRowArray();
+            self::assertSame($berkasLama, (int) $sesudah['berkas_id']);
+            self::assertSame($lama['judul'], $sesudah['judul']);
+            self::assertSame(1, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+            self::assertSame($this->versiAwal + 1,
+                (int) self::$db->table('tp')->where('id', 1)->get()->getRow('struktur_versi'));
         }
     }
 
-    public function testTambahMateriSekaligusUpload(): void
+    public function testPdfDenganJumlahHalamanTidakMemenuhiBatasDitolakValidator(): void
     {
-        $this->service(1)->tambahDenganMedia(1, $this->versiAwal, $this->inputMedia(), $this->uploaded());
-        $baris = self::$db->table('materi')->where('tp_id', 1)
-            ->where('judul', 'Gambar Materi Terbaru')->get()->getRowArray();
-        self::assertNotNull($baris);
-        self::assertSame(0, (int) $baris['aktif']);
-        self::assertSame(120, (int) $baris['min_waktu_detik']);
-        self::assertNotNull($baris['berkas_id']);
-        self::assertSame(1, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+        $pdf = $this->uploadedPdf(false, 5);
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('6–40 halaman');
+        BerkasMateriService::validasi($pdf->getTempName(), 'pdf', 'materi.pdf');
+    }
+
+    public function testTidakBolehMenambahMateriGambarKedua(): void
+    {
+        try {
+            $this->service(1)->tambahDenganMedia(1, $this->versiAwal,
+                $this->inputMedia(), $this->uploaded());
+            self::fail('Materi kedua tidak boleh dibuat.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('satu Materi', $e->getMessage());
+        }
+        self::assertSame(1, self::$db->table('materi')->where('tp_id', 1)->countAllResults());
+        self::assertSame(0, self::$db->table('berkas')->where('tp_id', 1)->countAllResults());
+        self::assertSame([], glob($this->folder . '/*') ?: []);
     }
 
     public function testSuntingMateriSekaligusUpload(): void

@@ -1,0 +1,92 @@
+# Checkpoint A8 — Pra-Semester (3 November 2026)
+
+## Keputusan final
+- Hanya Pra-Semester yang menggunakan istilah **pembatalan ujian**. Diagnostik/Sumatif mandiri memakai **akses ulang Guru** dan sudah PASS di XAMPP (laporan pengguna).
+- Setiap **Gen–Mapel–Semester** memiliki jadwal dan durasi masing-masing. **Jendela Admin hanya menentukan kapan siswa boleh memulai**. Durasi individual dihitung dari saat siswa menekan Mulai hingga durasi aktif habis, tanpa terpotong ketika jendela mulai ditutup. Jeda keamanan berlaku seperti Master 07.
+- Admin menangani **jadwal utama/remedial/susulan**. Siswa dibatalkan harus mendapat susulan Admin; siswa tidak hadir dapat dimasukkan susulan; pembatalan berulang dapat dijadwalkan lagi dengan audit. Guru mengelola bank soal/KKM, tidak memberi izin manual pengganti jadwal. Remedial hanya sekali setelah nilai awal sah <KKM, nilai terbaik.
+- Masalah sertifikat **ditunda**. Tidak ada nilai akhir semester gabungan.
+
+## Implementasi dalam branch ini
+- Dokumen utama 02/03/05/06/07/08/10/11/12/14/16 dan PENDING-DECISIONS telah diselaraskan.
+- `PraSemesterGuruService`: bank soal PG A–E tersendiri untuk setiap paket; soal terkait BAB, minimal 30 soal aktif mencakup semua BAB; KKM default Admin/khusus Guru; bank/KKM tidak berubah setelah dipakai siswa. `GuruPraSemester`, `app/Views/guru/pra_semester.php`, menu dan rute terkait.
+- `PraSemesterJadwalService`: Admin menetapkan jadwal utama WIB dan durasi terpisah per paket; validasi benturan Gen–Semester, bank, KKM, status paket. Jadwal terkunci setelah dipakai siswa. `AdminPraSemester`, `app/Views/admin/pra_semester.php`, menu dan rute terkait.
+- `PraSemesterSiswaService`: izin berbasis Gen dan penugasan paket, seluruh TP NonEsensial tuntas dengan bukti Sumatif sah, bank dan KKM lengkap, jam server, browser. KKM efektif dipin ke attempt pertama agar seluruh peserta sama.
+- `MesinPraSemesterSiswaService`: ujian **utama** 30+ soal acak dengan setiap BAB terwakili, pengacakan opsi A–E, jawaban tersimpan server, timer aktif per peserta, jeda fullscreen/koneksi, pembatalan tanpa skor, finalisasi dan skor sah atomik, tidak membuat ulang attempt selesai/batal.
+- `SiswaPraSemester`, `app/Views/siswa/pra_semester_ujian.php`, tautan dari daftar TP, adaptasi JS ujian agar Pra-Semester tidak memakai notifikasi akses ulang mandiri.
+- `tests/unit/PraSemesterImplementasiTest.php`, `tests/unit/PraSemesterDatabaseTest.php`, workflow QA A8 dan regresi QA S06A, audit baca-saja `database/sql/qa/A8_PRA_SEMESTER_READONLY.sql`.
+
+## Batas yang BELUM selesai
+- **Jadwal remedial dan susulan per peserta** belum dapat diaktifkan pada skema V4-0001 (hanya punya satu jendela utama). Membutuhkan dump XAMPP **setelah** impor patch data simulasi terakhir sebelum SQL update baru dibuat, sesuai AGENTS. **Jangan** mengubah data lokal dengan SQL asumtif. Bank Word Pra-Semester dan ekspor nilai Pra-Semester juga belum diselesaikan.
+- Halaman ujian hanya menjalankan kesempatan **utama**; setelah batal atau skor awal <KKM, sistem tidak membuka attempt lagi sampai jadwal susulan/remedial benar-benar diimplementasikan. Tidak ada tombol palsu.
+- Pengujian CI dan XAMPP masih harus dibuktikan; kode branch belum boleh dinyatakan FIX akhir atau langsung digabung ke main.
+
+## Langkah QA manual
+1. Guru G1 buka `/guru/pra-semester`, pilih paket aktif, tambah soal BAB (minimal 30 dengan semua BAB terwakili), tetapkan KKM.
+2. Admin buka `/admin/pra-semester`, tetapkan jendela boleh mulai dan durasi per mapel. Uji menolak bank belum siap, tabrakan dalam satu Gen/semester, dan waktu masa lalu.
+3. Siswa yang seluruh TP NonEsensial selesai buka `/siswa/semester/{paketId}` → Pra-Semester. Uji jendela, fullscreen dan waktu individual. Uji 1 skor 0.00 sah dan pembatalan tanpa skor.
+4. Jalankan QA otomatis dan query baca-saja di atas pada XAMPP; catat kesalahan untuk iterasi berikutnya. Jangan kirim data pribadi/sandi ke GitHub.
+
+
+## Kelanjutan A8-4: kontrak kesempatan dan penilaian (3 November 2026)
+- Ditambahkan `PenilaianPraSemesterService` (pure, tanpa SQL): memastikan satu ujian normal sah, satu remedial sah hanya setelah nilai normal sah <KKM; skor 0.00 sah; ujian batal tidak bernilai; skor terbaik final; status nilai sementara saat remedial belum selesai; histori salah ditolak.
+- Ditambahkan `AturanJadwalPraSemesterService` (pure): fase awal, tidak hadir ditunjuk Admin, susulan normal bagi ujian dibatalkan, jadwal remedial setelah skor awal sah <KKM, susulan remedial jika pembatalan saat remedial, pembatalan berulang, dan percobaan aktif dapat dilanjutkan walau jendela mulai tutup.
+- Tes regresi: `tests/unit/PraSemesterRemedialSusulanTest.php`, dimasukkan dalam QA A8 dan S06A untuk PHP 8.2.
+- **Batas mutlak:** dump terbaru ditemukan di Library bernama `sla_sks_v4 (12).sql`, dibuat 2 Nov 2026 pukul 13.29 waktu dump, **lebih awal** dari patch simulasi/percobaan yang dinyatakan PASS. Tidak cukup untuk mengaudit SQL berikutnya. Belum dibuat SQL, tidak ada perubahan/DELETE data siswa, tidak ada penjadwalan remedial/susulan di database/UI yang diklaim aktif.
+- Setelah pengguna mengunggah ekspor `sla_sks_v4` terbaru **pasca patch terakhir**, verifikasi DDL/indeks/FK, `schema_version`, count agregat tabel relevan, lalu buat patch SQL additive bernomor, adapter jadwal peserta, UI Admin dan mesin susulan/remedial. Pastikan tetap kompatibel MySQL/MariaDB tanpa CI4 Migration/Seeder.
+
+## A8-5 — Implementasi jadwal operasional dan UI tabel (3 November 2026)
+- Pengguna mengunggah dump terbaru `sla_sks_v4 (13).sql`; audit header dan `schema_version` menunjukkan MariaDB 10.4.32, V4-0008 terakhir, tidak terdapat sesi remedial/susulan. Dump privat tetap di luar repository.
+- Penambahan SQL additive **V4-0009** untuk jadwal khusus, peserta susulan dan relasi percobaan. Berkas audit baca-saja disertakan. SQL **belum diimpor otomatis**; pengguna perlu backup dan impor satu kali di XAMPP.
+- Filter dan tabel Guru/Admin ditata ulang pada Service + Controller + View + CSS. Guru filter Gen; Admin filter Gen, Mapel, Semester, Status. Tidak menyentuh kebijakan UI global lain.
+- Service sesi Admin/roster dan mesin siswa terhubung. Form tambahan dan daftar peserta nyata; jadwal tanpa SQL V4-0009 tetap nonaktif (pesan impor), sedangkan daftar jadwal utama/filter tetap dapat dibuka.
+- Belum menangani impor Word Pra-Semester dan ekspor nilai Pra-Semester ke XLSX; fokus susulan/remedial dan UI tabel terlebih dahulu.
+- Uji XAMPP menunggu pull dan laporan pengguna. Jangan anggap PASS browser/SQL hanya dari CI.
+
+### A8-6 — Pemisahan halaman list/detail (permintaan lanjutan 3 November 2026)
+- Pengguna telah mengonfirmasi SQL V4-0009 berhasil dijalankan di localhost. Tidak ada SQL baru untuk revisi ini.
+- `app/Views/guru/pra_semester.php` hanya daftar dan filter; `app/Views/guru/pra_semester_detail.php` khusus bank soal, KKM, form.
+- `app/Views/admin/pra_semester.php` hanya daftar dan filter; `app/Views/admin/pra_semester_detail.php` khusus jadwal utama/tambahan dan daftar peserta.
+- Controller memilih View berdasarkan ada/tidaknya paketId, URL lama tetap. Setelah jadwal utama disimpan, Admin tetap pada detail untuk menerima pesan sukses.
+- Butuh uji manual localhost untuk breadcrumb, filter dan form; jangan anggap PASS sebelum dilaporkan.
+
+## A8-7 — Template, Pratinjau dan Impor Word Pra-Semester (3 November 2026)
+- Branch: `feature/v25-a8-word-bank-pra-semester-20261103`, Draft PR #103 bertumpuk di atas PR #102. **Jangan merge langsung main** sebelum uji.
+- Existing `TemplateWordSoalService`, `PratinjauWordSoalService`, `RenderWordSoalService` dipakai ulang. Template khusus Pra-Semester 30–200 PG per paket, kolom `BAB n` pada baris soal, kolom kunci ✓ pada baris pilihan, seluruh BAB semester harus terwakili. HMAC template tetap digunakan.
+- Layanan baru `PraSemesterWordService`: file di `writable/private/pra_semester_word/`, staging 2 jam, hash berkas dan sidik jari BAB/bank, konfirmasi transaksional append-only, impor identik tidak menduplikasi, bank terkunci setelah attempt siswa.
+- Halaman `guru/pra-semester/{paketId}` menyediakan unduh, unggah, riwayat; review per nomor berada di `.../word/review/{id}`; tidak ada perubahan halaman daftar/filter. Guru tetap bisa mengedit manual, dan edit manual membersihkan rich HTML lama.
+- Mesin siswa menggunakan snapshot HTML/opsi teracak; proxy gambar di `siswa/pra-semester/{paketId}/{token}/media/{wordId}/{rid}` memverifikasi kepemilikan token dan sumber Word dalam snapshot.
+- SQL **baru** `database/sql/updates/V4-0010_BANK_WORD_PRA_SEMESTER.sql` untuk staging, plus `database/sql/qa/V4-0010_BANK_WORD_PRA_READONLY.sql`. User sebelumnya mengonfirmasi V4-0009 berhasil diimpor. **V4-0010 belum diimpor pada localhost**. Tidak memakai Migration/Seeder, tidak menyertakan dump privat.
+- QA: tes unit `PraSemesterWordTest.php`, integrasi SQLite pada `PraSemesterDatabaseTest.php`, regresi Word TP dan uji SQL MariaDB sintetis via workflow. Uji browser/XAMPP masih wajib untuk dianggap FIX.
+- Belum dikerjakan pada tahap ini: ekspor nilai Pra-Semester; sertifikat tetap ditunda.
+
+### Bukti QA A8-7 Word — 3 November 2026
+- GitHub Actions **QA S06A Fondasi Mesin Ujian Ketat**, commit `bf488577a40380db8d7870565956225045839176`, run `41580942078`: **SUCCESS** setelah perbaikan direktori `writable/private` pada environment CI (tanpa memodifikasi layanan kunci Word produksi).
+- PHPUnit: aturan waktu 11 tes/38 assertions; acak soal 7/108; kontrak Pra-Semester 6/169; SQLite 12/94; **PraSemesterWordTest 8/1.238**; generator Word lama 2/18; review Word lama 3/751; remedial/susulan 16/79. Total 65 tes pada workflow ini, dan kedua DDL MariaDB sintetis V4-0009 serta V4-0010 PASS.
+- QA lain yang sudah terkonfirmasi PASS pada commit sama: `QA Bank Soal Terpadu v2.5`, `QA S06B Diagnostik End to End`, dan `QA Audit Kontrak Database`.
+- **Tetap belum PASS manual XAMPP:** Guru perlu pull branch, backup dan impor hanya V4-0010 (V4-0009 sudah terpasang), mengunduh dan mengisi template 30 butir untuk BAB semester, review sebelum konfirmasi, kemudian Admin menjadwalkan dan siswa menguji tampilan Word.
+
+### A8-8 — Audit dump terbaru dan tahapan tes Siswa (3 November 2026)
+- Pemilik menyatakan **PASS lokal** untuk impor Word, KKM khusus Guru, dan penyimpanan jadwal ujian Pra-Semester. Audit **baca-saja** terhadap dump privat `sla_sks_v4 (14).sql` (03-11-2026 pukul 06.39, MariaDB 10.4.32) mendeteksi `schema_version` hingga V4-0010, satu bank Pra-Semester dengan **35 soal (BAB ID 8:18, BAB ID 9:17)**, satu impor Word `diterapkan`, satu ujian `siap`; jadwal utama 15-12-2026 pukul 09.00–11.00 WIB, durasi individual 60 menit, KKM khusus 86. Tidak ada percobaan Pra-Semester maupun sesi tambahan dalam dump.
+- **Jangan commit dump privat.** Hasil audit hanya agregat, tidak memuat identitas siswa, kunci jawaban, token, hash, atau isi berkas Word.
+- Perubahan kode tanpa SQL baru: `SiswaPembelajaran::paket` menyisipkan ringkasan gerbang dari mesin Pra-Semester; `siswa/daftar_tp.php` menampilkan status yang dapat dipahami siswa. QA SQLite untuk UP-SERT jawaban, status setelah kirim, gerbang Sumatif sah dan larangan akses remedial mandiri; MySQL/MariaDB tetap memakai UPSERT asli.
+- Tahap berikutnya: uji XAMPP oleh pemilik menggunakan jadwal valid, akun siswa berhak dan tidak berhak, lalu susulan/remedial sesuai jadwal Admin. Ekspor nilai Guru menyusul setelah alur siswa terverifikasi.
+
+- **Temuan gerbang khusus Paket ID 1:** terdapat dua TP NonEsensial wajib (TP ID 23 dan 25). Pada dump terbaru, terdapat 11 baris progres TP ID 23 dan **nol progres TP ID 25**. Karena itu tidak ada siswa pada snapshot ini yang memenuhi gerbang **seluruh** TP wajib selesai, terlepas dari kesiapan bank/jadwal. Uji klik Mulai yang berhasil di XAMPP memerlukan penyelesaian sah TP ID 25 melalui aplikasi sesuai jalur belajar (bukan INSERT/UPDATE progres dummy, bypass service, atau reset histori). **Ini blocker data pengujian, bukan alasan melonggarkan kebijakan akademik.**
+
+### A8-9 — Tambahan regresi mesin Siswa (3 November 2026)
+
+- Laporan pengguna: pemeriksaan UI/gerbang Pra-Semester Siswa pada branch A8-8 **PASS**. PASS tersebut bukan klaim bahwa ujian browser sudah berhasil dikerjakan atau remedial sudah diuji di XAMPP.
+- Branch lanjutan `feature/v25-a8-9-qa-mesin-siswa-20261103` menambah 3 skenario integrasi SQLite untuk token silang-siswa, lanjut attempt saat jendela Admin tutup, dan susulan normal setelah siswa absen ditetapkan Admin. Tidak mengubah SQL, data siswa, jadwal ujian, atau layanan produksi.
+- QA CI melalui PR terpisah, belum boleh dianggap PASS sebelum workflow berhasil. Setelah QA otomatis PASS, uji browser menggunakan jadwal uji yang sah dan siswa simulasi yang telah menuntaskan TP NonEsensial secara normal. Ekspor nilai Pra-Semester dan sertifikat belum dikerjakan pada A8-9.
+
+### A8-10 — Audit jeda koneksi Pra-Semester (3 November 2026)
+
+- Audit kode menemukan kasus tepi: `AturanWaktuUjianService::rekonsiliasi()` dapat langsung mengembalikan `dibatalkan_menunggu_guru` jika siswa kehilangan koneksi lebih dari lima menit antara dua permintaan. Status batal sudah benar, tetapi `MesinPraSemesterSiswaService::selaraskan()` sebelumnya hanya membuka segmen audit ketika hasil antara `jeda_koneksi` terlihat.
+- Perbaikan hanya pada pencatatan **segmen audit koneksi** saat transisi langsung berjalan → batal; waktu awal segmen adalah ambang deteksi 20 detik. Tidak mengubah skor, batas waktu, kuota remedial, jadwal, fullscreen, atau status pembatalan.
+- Ditambahkan regresi database sintetis memastikan satu segmen tertutup, skor NULL, tidak membuat audit ganda pada pembacaan status berikutnya. SQL baru: **tidak ada**. Basis data XAMPP dan dump privat tidak disentuh; tes browser nyata tetap terpisah.
+
+### A8-11 — Keputusan terbaru: batas jeda koneksi 10 menit (3 November 2026)
+
+- Pemilik meminta revisi langsung dari **5 menit ke 10 menit**. Kebijakan operasional terkini: **akumulasi jeda koneksi 600 detik**, timeout koneksi tetap 20 detik, jeda fullscreen tetap 90 detik/kejadian dan 180 detik kumulatif. Ini **menggantikan** angka 300 detik yang tercatat pada checkpoint A8-10 di atas; catatan A8-10 tetap disimpan sebagai jejak historis keputusan.
+- Perubahan berada di `AturanWaktuUjianService`, JS ujian, Master 07/16 dan pengujian otomatis waktu serta integrasi Pra-Semester. Karena satu profil keamanan Ketat digunakan bersama, revisi berlaku pada Diagnostik, Sumatif, dan Pra-Semester; konsekuensi ketidakselesaian tetap berbeda sesuai Master 07.
+- Tidak ada patch SQL dan tidak ada perubahan data lokal. Uji browser penuh menunggu siswa simulasi yang memenuhi TP wajib dan jadwal Admin yang sah.

@@ -1,0 +1,47 @@
+name: QA KKM TP dan Identitas Ringkas
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KkmTpService.php'
+      - 'app/Services/KesiapanTpService.php'
+      - 'app/Services/PetaTpService.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Controllers/GuruBankSoal.php'
+      - 'app/Controllers/AdminKkm.php'
+      - 'app/Config/Routes.php'
+      - 'app/Views/guru/bank_soal.php'
+      - 'app/Views/guru/detail_tp.php'
+      - 'app/Views/admin/kkm.php'
+      - 'public/assets/css/emerald-glass.css'
+      - 'tests/unit/KkmTpServiceTest.php'
+      - '.github/workflows/qa-kkm-tp-v25.yml'
+  workflow_dispatch:
+
+jobs:
+  php-lint-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, mbstring, zip, intl, pdo_mysql
+          coverage: none
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint
+        run: |
+          php -l app/Controllers/AdminKkm.php
+          php -l app/Controllers/GuruBankSoal.php
+          php -l app/Services/KkmTpService.php
+          php -l app/Services/KesiapanTpService.php
+          php -l app/Services/PetaTpService.php
+          php -l app/Services/NavigasiService.php
+          php -l app/Config/Routes.php
+          php -l app/Views/admin/kkm.php
+          php -l app/Views/guru/bank_soal.php
+          php -l app/Views/guru/detail_tp.php
+          php -l tests/unit/KkmTpServiceTest.php
+      - name: Unit KKM dan identitas TP
+        run: vendor/bin/phpunit --no-coverage tests/unit/KkmTpServiceTest.php

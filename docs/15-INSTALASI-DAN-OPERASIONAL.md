@@ -82,3 +82,46 @@ Dashboard Admin A11: sisa disk, status permintaan pemeriksaan ujian terjadwal, m
 4. Patch **nomor baru** bersifat additive; sertakan QA baca-saja sebelum/sesudah, uji DDL di MariaDB versi lokal aktual pada skema terisolasi/tersanitasi, pemeriksaan phpMyAdmin, dan rencana pemulihan berbasis backup (DDL tidak otomatis rollback).
 5. Pemilik melakukan backup database dan `writable/`, memilih target serta mengimpor patch sendiri. **Dilarang DROP/TRUNCATE/reset tanpa permintaan dan izin eksplisit**, meskipun masih XAMPP lokal. Jangan mengubah `.env`, root front controller atau URL yang sudah FIX tanpa alasan dan izin.
 6. Ketika hosting benar-benar disiapkan kelak, lakukan pemeriksaan kompatibilitas MariaDB/PHP/Apache/LiteSpeed/HTTPS dan akses privat secara terpisah sebelum upload. SOP hosting pada §3–7 adalah **rencana deployment**, bukan laporan bahwa aplikasi telah diunggah.
+
+## 9. SOP instalasi khusus `sla_sks_v4` (26 Oktober 2026)
+1. Sumber privat: dump `sla_sks_v3 (4).sql`, dibuat 26-10-2026 09:36 oleh MariaDB 10.4.32. Backup ulang `sla_sks_v3` **dan `writable/`** dahulu. Jangan hapus sumber v3.
+2. **Berkas lama `sla_sks_v4_LOKAL_PRIVAT.sql` digantikan R2.** Pemilik telah mengimpor `sla_sks_v4_LOKAL_PRIVAT_DIPERBAIKI_R2.sql` ke DB baru `sla_sks_v4` menggunakan phpMyAdmin dengan 268 kueri. Penanda final `V4-0001-R2`. Jangan mengimpor ulang file lama, R2, atau patch SQL repo pada database v4 yang sudah terpasang; sebelum update berikutnya lakukan backup dan gunakan patch bernomor BARU. DB `sla_sks_v3` tetap tidak disentuh.
+3. **QA awal lokal 27-10-2026 PASS:** 58 tabel, 126 FK, penanda `V4-0001-R2`, 37 pengguna, 17 siswa, 20 mapel, 0 BAB, 4 Materi historis, 2 percobaan historis. Ini hanya QA struktur/jumlah awal, bukan bukti seluruh relasi dan alur UI. Untuk perubahan berikutnya tetap jalankan QA baca-saja plus pengujian CI4.
+4. **Jangan mengalihkan `.env` ke v4 selama kode MVC/Service/UI masih kontrak lama.** Sesudah penerapan kode v2.5 dan QA, pemilik dapat memilih DB v4 lokal dan menjalankan pengujian. URL `http://localhost/sla-sks/`/root index.php tidak berubah.
+5. MySQL lokal dan MariaDB hosting **perlu dua tes terpisah**; belum ada deployment hosting sehingga jangan menyatakan lolos di sana. Dump PII/backup/hash tidak dipush GitHub.
+6. Template ATP Excel **manual tanpa macro** sudah dibuat sebagai berkas lokal; pemasukan template ke `docs/`, generator/validator impor, dan implementasi aplikasi dijadwalkan setelah fondasi dokumen/DB ini.
+
+
+## Catatan transisi keputusan edit CP/BAB/TP (2 November 2026)
+- Revisi 16 Master Document ini **dokumentasi aturan bisnis**, bukan SQL atau patch program; tidak ada alasan mengubah `.env`, konfigurasi localhost, root `index.php`/`.htaccess`, atau data XAMPP hanya untuk menyimpan dokumen.
+- Jalur kategori A/B/C/approval untuk TP Siap pada branch fitur terdahulu **dibatalkan**. **Jangan impor `V4-0006_KOREKSI_TP_SIAP.sql`** untuk menerapkan aturan baru. Jika sudah pernah diimpor pengguna, jangan hapus tabel tanpa dump terbaru, backup dan izin eksplisit.
+- Implementasi form CP **tepat lima field** mungkin perlu pembaruan validasi/SQL untuk membuat metadata lama tidak wajib; audit dump privat XAMPP terbaru terlebih dahulu. Bila skema harus berubah, sediakan patch SQL incremental yang kompatibel MySQL/MariaDB; tidak memakai Migration/Seeder.
+- Setiap implementasi cek G1, status penggunaan siswa, atomisitas penyimpanan/snapshot, akses berkas privat, regresi Word dan pengujian XAMPP sebelum merge.
+
+### Instalasi patch sertifikat V4-0011 (3 November 2026)
+
+1. Backup database `sla_sks_v4` dan folder `writable/` **sebelum pull/impor**. Periksa `SELECT versi FROM schema_version WHERE versi IN ('V4-0010-BANK-WORD-PRA','V4-0011-SERTIFIKAT');`: V4-0010 harus ada, V4-0011 belum ada. Pastikan tidak ada empat tabel sertifikat dalam schema lama.
+2. Pull branch A11-2; impor **sekali** `database/sql/updates/V4-0011-SERTIFIKAT-ASSET-DAN-VERSI.sql` di phpMyAdmin database yang benar. **Jangan menjalankan Migration/Seeder atau mengimpor ulang dump lama**.
+3. Periksa `schema_version`, empat tabel baru, isi awal 0; cek kembali jumlah siswa, TP, progres dan nilai dengan query SELECT biasa (seharusnya tidak berubah).
+4. Login Admin → **Sertifikat → Template & TTD**. Background A4 landscape boleh fallback, TTD PNG wajib; lakukan pratinjau sebelum aktivasi background. Pastikan folder `writable/private/sertifikat/{aset,pdf}` dapat ditulis dan tidak bisa diakses langsung lewat HTTP.
+5. Uji penerbitan hanya memakai akun siswa simulasi yang **memenuhi seluruh syarat TP/Final**. Jika belum ada siswa layak, jangan mengubah nilai siswa nyata hanya untuk memunculkan tombol. Uji PDF, nilai 0, QR, idempotensi, revisi & arsip, akses siswa berbeda, serta tautan QR localhost.
+6. Sebelum dipakai untuk sertifikat nyata, atur domain HTTPS permanen untuk `site_url` agar QR tidak berisi tautan localhost. Perubahan domain/URL tetap memerlukan persetujuan pemilik dan uji hosting tersendiri.
+
+Jika impor DDL gagal di tengah, jangan mengulang tanpa audit keadaan parsial dan backup; MariaDB DDL mungkin melakukan implicit commit. Tidak ada reset/hapus data.
+
+### A12-4 — Batas indikator operasional di Dashboard Admin (3 November 2026)
+
+Dashboard Admin menampilkan sisa ruang disk dari `disk_free_space(WRITEPATH)` pada volume penyimpanan `writable/`. Angka tersebut bukan prediksi aman hosting atau ukuran sisa kuota shared hosting, dan bisa tidak tersedia jika lingkungan menolak pembacaan. **Status cron dan backup sengaja ditampilkan `Belum diperiksa`** hingga tersedia pemeriksaan terintegrasi yang benar-benar dijalankan. Prosedur backup SQL dan berkas `writable/private/` tetap manual sesuai SOP; jangan menandai PASS hanya karena kartu dashboard bisa dimuat. TTD yang diaktifkan diperiksa dengan hash SHA-256 saat dashboard dibaca, tanpa membeberkan isi/metadata privat kepada pengguna. Tidak memerlukan perubahan .env, instalasi tugas terjadwal, ataupun SQL.
+
+
+### A14-1 — SOP uji HTTP anonim XAMPP setelah perubahan `.htaccess` (4 November 2026)
+
+Sesudah review dan pull branch A14-1, jalankan dari `G:\\xampp\\htdocs\\sla-sks` dengan PHP CLI XAMPP:
+```bat
+php scripts/qa/http_security_smoke.php http://localhost/sla-sks/
+```
+Tidak memerlukan kredensial, dump SQL, reset DB, HTTP POST atau perubahan `.env`. Script menguji aset statis publik (harus 200), berkas internal (403/404), route panel anonim (redirect login/401/403), dan Kebijakan Privasi (200 jika versi resmi berlaku, 503 jika belum diterbitkan). Hasil FAIL harus diperbaiki sebelum hosting. **Jangan membuka URL pembaruan ATP di browser untuk menguji penolakan**, karena pada server yang mengabaikan `.htaccess` hal tersebut dapat menjalankan skrip; pengujian otomatis hanya memakai URL tanpa efek mutasi. Pastikan Apache XAMPP mengaktifkan `mod_rewrite` dan izin `AllowOverride` secara benar; jangan mengubah root atau URL jika status gagal tanpa analisis. QA di GitHub Actions tidak menggantikan tes XAMPP dan hosting.
+
+
+### Ketentuan final A14-2 setelah impor V4-0014 — 4 November 2026
+Pemilik sudah mengimpor V4-0013 dan V4-0014 pada 04-11-2026 16:02:43/16:02:59 WIB. **Tidak diperlukan dan tidak boleh ada impor ulang**. Koreksi skor Resume/HOTS langsung oleh Guru G1 tanpa approval Admin. Penerbitan pertama dan versi pengganti sertifikat pribadi dilakukan otomatis saat siswa membuka menu Sertifikat, jika layak, identitas dan TTD siap; Admin hanya mengelola aset/identitas dan melihat audit. PDF/QR histori tetap privat. Akses GET Sertifikat menulis hasil penerbitan hanya pada data akun siswa sendiri; jangan menguji dengan akun siswa nyata sebelum backup DB + `writable/`. Lihat Master 08,09,14,16.

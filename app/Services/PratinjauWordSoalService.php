@@ -14,8 +14,12 @@ use ZipArchive;
  */
 final class PratinjauWordSoalService
 {
-    public static function periksa(string $path, int $tpId, int $guruId, int $paketId, int $versi, string $jenis, string $kunci, ?string $kodeTp = null): array
+    public static function periksa(string $path, int $tpId, int $guruId, int $paketId, int $versi, string $jenis, string $kunci, ?string $kodeTp = null, ?array $babNomorKeId = null): array
     {
+        $pra = $jenis === 'pra_semester';
+        if ($pra && (!$babNomorKeId || min(array_keys($babNomorKeId)) < 1)) {
+            throw new DomainException('BAB paket Pra-Semester belum tersedia.');
+        }
         if (!is_file($path) || filesize($path) > 15 * 1024 * 1024) {
             throw new DomainException('Word tidak tersedia atau melebihi 15 MB.');
         }
@@ -40,6 +44,9 @@ final class PratinjauWordSoalService
                 throw new DomainException('Struktur tabel soal berubah. Pastikan setiap soal memiliki pilihan A–E.');
             }
             $n = (int) (($rows->length - 1) / 6);
+            if ($pra && ($n < 30 || $n < count($babNomorKeId))) {
+                throw new DomainException('Pra-Semester minimal 30 soal serta mencakup semua BAB.');
+            }
             if ($n > 200) {
                 throw new DomainException('Jumlah soal pada dokumen terlalu banyak.');
             }
@@ -58,7 +65,8 @@ final class PratinjauWordSoalService
                     || (int) ($id['tp_id'] ?? 0) !== $tpId || (int) ($id['guru_id'] ?? 0) !== $guruId
                     || (int) ($id['paket_id'] ?? 0) !== $paketId
                     || (int) ($id['struktur_versi'] ?? 0) !== $versi
-                    || ($id['jenis'] ?? '') !== $jenis || (int) ($id['jumlah'] ?? 0) !== $n) {
+                    || ($id['jenis'] ?? '') !== $jenis || (int) ($id['jumlah'] ?? 0) !== $n
+                    || ($pra && (array)($id['bab_nomor'] ?? []) !== array_keys($babNomorKeId))) {
                     throw new DomainException('Identitas TP atau jumlah soal pada Word tidak cocok.');
                 }
                 $identitasDiperiksa = 'tanda_tangan';
@@ -66,7 +74,7 @@ final class PratinjauWordSoalService
                 // Microsoft Word dapat membuang customXml yang tak diregistrasikan oleh generator lama.
                 // Jangan menghukum Guru atas Save biasa: otorisasi TP/Guru sudah dicek dari server,
                 // dan kita pastikan judul + kode TP dalam bagian identitas dokumen sesuai halaman.
-                if ($kodeTp === null || trim($kodeTp) === '') {
+                if (!$pra && ($kodeTp === null || trim($kodeTp) === '')) {
                     throw new DomainException('Identitas TP belum dapat diperiksa oleh server.');
                 }
                 $namaUjianBenar = false;
@@ -78,10 +86,10 @@ final class PratinjauWordSoalService
                         if ($teks === null) {
                             continue;
                         }
-                        if (str_contains(mb_strtoupper($teks), 'BANK SOAL ' . strtoupper($jenis))) {
+                        if (str_contains(mb_strtoupper($teks), 'BANK SOAL ' . ($pra ? 'PRA-SEMESTER' : strtoupper($jenis)))) {
                             $namaUjianBenar = true;
                         }
-                        if (preg_match('/^TP\\s*:\\s*' . preg_quote($kodeTp, '/') . '(?:\\s|—|-|$)/iu', $teks)) {
+                        if ($pra ? (bool)preg_match('/^Paket\\s*:\\s*PRA-' . $paketId . '(?:\\s|$)/iu', $teks) : (bool)preg_match('/^TP\\s*:\\s*' . preg_quote((string)$kodeTp, '/') . '(?:\\s|—|-|$)/iu', $teks)) {
                             $kodeTpBenar = true;
                         }
                     }
@@ -98,6 +106,8 @@ final class PratinjauWordSoalService
                 $opsi = [];
                 $benar = [];
                 $media = ['gambar' => 0, 'rumus' => 0, 'tabel' => 0, 'arab' => 0];
+                $babId = null;
+                $nomorBab = null;
                 for ($j = 0; $j < 6; ++$j) {
                     $row = $rows->item($index + $j);
                     $cells = $xp->query('./w:tc', $row);
@@ -110,6 +120,9 @@ final class PratinjauWordSoalService
                     }
                     $cell = $cells->item(1);
                     $isi = trim(self::teks($xp, $cell));
+                    // Google Drive adalah media eksternal yang dibolehkan,
+                    // tetapi bentuk URL-nya harus menunjuk satu file HTTPS.
+                    SoalMediaDriveService::tautan($isi);
                     if ($isi === '' && self::jumlah($xp, './/*[local-name()="drawing" or local-name()="pict" or local-name()="oMath" or local-name()="tbl"]', $cell) === 0) {
                         throw new DomainException('Soal ' . ($i + 1) . ': ' . $expected . ' masih kosong.');
                     }
@@ -120,6 +133,15 @@ final class PratinjauWordSoalService
                         ++$media['arab'];
                     }
                     if ($j === 0) {
+                        if ($pra) {
+                            $rawBab = trim(self::teks($xp, $cells->item(2)));
+                            if (!preg_match('/^BAB[[:space:]]+([0-9]{1,3})$/iu', $rawBab, $match)
+                                || !array_key_exists((int)$match[1], $babNomorKeId)) {
+                                throw new DomainException('Soal ' . ($i+1) . ': nomor BAB tidak tersedia dalam paket.');
+                            }
+                            $nomorBab = (int)$match[1];
+                            $babId = (int)$babNomorKeId[$nomorBab];
+                        }
                         $soal = $isi;
                     } else {
                         $opsi[$expected] = $isi;
@@ -133,8 +155,20 @@ final class PratinjauWordSoalService
                 if (count($benar) !== 1) {
                     throw new DomainException('Soal ' . ($i + 1) . ': wajib tepat satu kunci ✓.');
                 }
-                $hasil[] = ['nomor' => $i + 1, 'pertanyaan' => $soal,
+                $item = ['nomor' => $i + 1, 'pertanyaan' => $soal,
                     'opsi' => $opsi, 'kunci' => $benar[0], 'konten' => $media];
+                if ($pra) {
+                    $item['bab_id'] = $babId;
+                    $item['nomor_bab'] = $nomorBab;
+                }
+                $hasil[] = $item;
+            }
+            if ($pra) {
+                $tercakup = array_unique(array_column($hasil, 'nomor_bab'));
+                $kurang = array_diff(array_keys($babNomorKeId), $tercakup);
+                if ($kurang !== []) {
+                    throw new DomainException('Semua BAB wajib mempunyai soal. Belum tercakup: BAB ' . implode(', ', $kurang));
+                }
             }
             return ['jenis' => $jenis, 'jumlah' => $n, 'soal' => $hasil,
                 'pemeriksaan_identitas' => $identitasDiperiksa,

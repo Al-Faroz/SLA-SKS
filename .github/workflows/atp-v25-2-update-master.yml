@@ -1,0 +1,44 @@
+name: ATP V25-2 Perbarui Master XLSX
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/perbarui_template_atp_v25_2.php'
+      - 'app/Services/AtpTemplateLayoutService.php'
+      - 'app/Services/AtpDesainWorkbookService.php'
+      - '.github/workflows/atp-v25-2-update-master.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade-master:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feature/v25-atp-tanpa-kode-elemen-20261029'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: zip, mbstring, dom, xml, gd, mysqli
+          tools: composer:v2
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Update official source XLSX V25-1 to V25-2
+        run: php scripts/perbarui_template_atp_v25_2.php
+      - name: Verify header and version by PHP CI test
+        run: vendor/bin/phpunit --no-coverage --filter AtpManualTemplateTest
+      - name: Commit official binary template on same feature branch
+        run: |
+          if git diff --quiet -- docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx; then
+            echo "Official template already up to date."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx
+          git commit -m "chore(atp): commit official V25-2 XLSX without manual TP code and element"
+          git push origin HEAD:feature/v25-atp-tanpa-kode-elemen-20261029

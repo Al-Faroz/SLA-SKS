@@ -47,30 +47,21 @@ final class MateriDrafDatabaseTest extends TestCase
         ];
     }
 
-    public function testTambahSuntingDanUrutMateriDraf(): void
+    public function testV25SatuTpMenolakMateriKeduaTanpaMengubahData(): void
     {
+        // Fixture QA sudah memiliki satu Materi pada TP 1.
         $awal = self::$db->table('tp')->where('id', 1)->get()->getRowArray();
+        $jumlah = self::$db->table('materi')->where('tp_id', 1)->countAllResults();
+        self::assertSame(1, $jumlah);
         try {
             $this->svc()->tambah(1, (int) $awal['struktur_versi'], $this->data());
-            $baru = self::$db->table('materi')->where('tp_id', 1)->where('judul', 'Materi tambahan QA')->get()->getRowArray();
-            self::assertNotNull($baru);
-            self::assertSame(2, (int) $baru['urutan']);
-            self::assertSame(0, (int) $baru['aktif']);
-            self::assertSame(90, (int) $baru['min_waktu_detik']);
-            self::assertSame(32, strlen($baru['row_uuid']));
-            $versi = (int) $awal['struktur_versi'] + 1;
-            $ubah = $this->data();
-            $ubah['judul'] = 'Materi QA disunting';
-            $this->svc()->simpan(1, (int) $baru['id'], $versi, $ubah);
-            self::assertSame('Materi QA disunting', self::$db->table('materi')->where('id', $baru['id'])->get()->getRowArray()['judul']);
-            $this->svc()->geser(1, (int) $baru['id'], $versi + 1, 'naik');
-            self::assertSame(1, (int) self::$db->table('materi')->where('id', $baru['id'])->get()->getRowArray()['urutan']);
-            self::assertSame(2, (int) self::$db->table('materi')->where('id', 1)->get()->getRow('urutan'));
-        } finally {
-            self::$db->table('materi')->where('tp_id', 1)->where('id !=', 1)->delete();
-            self::$db->table('materi')->where('id', 1)->update(['urutan' => 1]);
-            self::$db->table('tp')->where('id', 1)->update(['struktur_versi' => $awal['struktur_versi']]);
+            self::fail('Materi kedua tidak boleh disisipkan dalam kontrak v2.5.');
+        } catch (DomainException $e) {
+            self::assertStringContainsString('satu Materi', $e->getMessage());
         }
+        self::assertSame($jumlah, self::$db->table('materi')->where('tp_id', 1)->countAllResults());
+        self::assertSame((int) $awal['struktur_versi'],
+            (int) self::$db->table('tp')->where('id', 1)->get()->getRow('struktur_versi'));
     }
 
     public function testMenitDesimalMelebihiKapasitasDitolak(): void

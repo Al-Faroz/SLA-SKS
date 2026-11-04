@@ -17,21 +17,23 @@ final class ChecklistKontenTpService
     public static function periksa(array $tp, array $materi, ?int $jumlahTautanCp = null): array
     {
         $hasil = [];
-        foreach (['kode_tp' => 'Kode TP', 'rumusan' => 'Rumusan TP', 'indikator' => 'Indikator ketercapaian'] as $kolom => $label) {
+        foreach (['kode_tp' => 'Kode TP', 'rumusan' => 'Rumusan TP'] as $kolom => $label) {
             $ada = trim((string) ($tp[$kolom] ?? '')) !== '';
             $hasil[] = ['label' => $label, 'terpenuhi' => $ada, 'keterangan' => $ada ? 'Terisi' : 'Belum diisi'];
         }
 
         if ($jumlahTautanCp !== null) {
             $adaCp = $jumlahTautanCp > 0;
-            $hasil[] = ['label' => 'Tautan CP pada TP', 'terpenuhi' => $adaCp,
-                'keterangan' => $adaCp ? $jumlahTautanCp . ' CP tertaut (status/versi/CP utama belum diverifikasi)'
-                    : 'TP belum ditautkan dengan CP'];
+            $hasil[] = ['label' => 'Elemen CP operasional aktif', 'terpenuhi' => $adaCp,
+                'keterangan' => $adaCp ? $jumlahTautanCp . ' elemen CP aktif (pemeriksaan akhir pada tahap publikasi)'
+                    : 'CP operasional belum memiliki elemen aktif'];
         }
 
-        $adaMateri = count($materi) > 0;
-        $hasil[] = ['label' => 'Minimal satu Materi', 'terpenuhi' => $adaMateri,
-            'keterangan' => $adaMateri ? count($materi) . ' Materi terdaftar' : 'Tambahkan Materi terlebih dahulu'];
+        $satuMateri = count($materi) === 1;
+        $hasil[] = ['label' => 'Tepat satu Materi', 'terpenuhi' => $satuMateri,
+            'keterangan' => $satuMateri ? 'Satu Materi terdaftar'
+                : (count($materi) === 0 ? 'Tambahkan satu Materi terlebih dahulu'
+                    : 'TP hanya boleh memiliki satu Materi; perlu peninjauan data lama')];
 
         $urutan = 1;
         foreach ($materi as $item) {
@@ -42,12 +44,13 @@ final class ChecklistKontenTpService
             $resume = trim((string) ($item['petunjuk_resume'] ?? '')) !== '';
             $hots = trim((string) ($item['petunjuk_hots'] ?? '')) !== '';
             $nomorBenar = (int) ($item['urutan'] ?? 0) === $urutan;
-            foreach ([
-                ['Media', $media, 'Sumber media belum tersedia'],
-                ['Petunjuk Resume', $resume, 'Isi petunjuk Resume'],
-                ['Petunjuk HOTS', $hots, 'Isi petunjuk HOTS'],
-                ['Urutan', $nomorBenar, 'Periksa nomor urutan Materi'],
-            ] as [$aspek, $valid, $pesan]) {
+            $aspekWajib = [['Media', $media, 'Sumber media belum tersedia']];
+            if (($tp['jenis_tp'] ?? 'non_esensial') === 'non_esensial') {
+                $aspekWajib[] = ['Petunjuk Resume', $resume, 'Isi petunjuk Resume'];
+                $aspekWajib[] = ['Petunjuk HOTS', $hots, 'Isi petunjuk HOTS'];
+            }
+            $aspekWajib[] = ['Urutan', $nomorBenar, 'Periksa nomor urutan Materi'];
+            foreach ($aspekWajib as [$aspek, $valid, $pesan]) {
                 $hasil[] = ['label' => $nama . ' — ' . $aspek, 'terpenuhi' => $valid,
                     'keterangan' => $valid ? 'Lengkap' : $pesan];
             }

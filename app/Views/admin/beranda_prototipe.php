@@ -5,7 +5,7 @@
         <div>
             <p class="a-proto-eyebrow">Ruang kerja / Administrasi</p>
             <h1>Dashboard Admin</h1>
-            <p class="a-proto-muted">Selamat datang, <strong><?= esc($namaPengguna) ?></strong>. Berikut ringkasan data induk akademik yang tersedia saat ini.</p>
+            <p class="a-proto-muted">Selamat datang, <strong><?= esc($namaPengguna) ?></strong>. Berikut ringkasan referensi, kegiatan akademik, dan pekerjaan administrasi yang terpantau.</p>
         </div>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/referensi'), 'attr') ?>">Kelola Gen <span aria-hidden="true">↗</span></a>
     </header>
@@ -50,6 +50,114 @@
         </div>
     </section>
 
+    <section class="a-card a-dashboard-admin__section a-jarak-atas"
+        aria-labelledby="admin-ringkasan-operasional">
+        <div class="a-proto-section-head">
+            <div>
+                <h2 id="admin-ringkasan-operasional">Ringkasan Operasional</h2>
+                <p>Jumlah dari data tersimpan, bukan angka contoh.
+                    TP Siap/Draf adalah status konten Guru, bukan nilai siswa.</p>
+            </div>
+        </div>
+        <div class="a-dashboard-admin__metrics">
+            <article class="a-dashboard-admin__metric">
+                <span>Akun aktif</span>
+                <strong><?= (int)$ringkasan['akun_aktif'] ?></strong>
+                <small>Semua peran dengan status akun aktif</small>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>Siswa terdaftar</span>
+                <strong><?= (int)$ringkasan['siswa'] ?></strong>
+                <a href="<?= esc(site_url('admin/siswa'),'attr') ?>">Kelola siswa</a>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>TP Siap</span>
+                <strong><?= (int)$ringkasan['tp_siap'] ?></strong>
+                <small>Konten siap tersimpan, dikelola Guru G1</small>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>TP Draf</span>
+                <strong><?= (int)$ringkasan['tp_draf'] ?></strong>
+                <small>Masih disiapkan Guru, tidak otomatis gagal</small>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>Foto menunggu persetujuan</span>
+                <strong><?= (int)$ringkasan['foto_menunggu'] ?></strong>
+                <a href="<?= esc(site_url('admin/foto-profil'),'attr') ?>">Tinjau antrean</a>
+            </article>
+            <article class="a-dashboard-admin__metric">
+                <span>Sertifikat berlaku</span>
+                <strong><?= (int)$ringkasan['sertifikat_berlaku'] ?></strong>
+                <a href="<?= esc(site_url('admin/sertifikat'),'attr') ?>">Periksa sertifikat</a>
+            </article>
+        </div>
+    </section>
+
+    <div class="a-dashboard-admin__health a-jarak-atas">
+        <section class="a-card a-dashboard-admin__section" aria-labelledby="admin-perhatian">
+            <h2 id="admin-perhatian">Perhatian Admin</h2>
+            <p class="a-help">Hanya kondisi yang dapat diperiksa dari data.
+                Penugasan Guru dan persetujuan foto tetap diproses melalui halaman resminya.</p>
+            <?php if ($ringkasan['perhatian'] === []): ?>
+                <div class="a-alert" role="status">
+                    Tidak ada penugasan kosong, foto menunggu, atau kendala TTD
+                    yang terdeteksi oleh pemeriksaan ini. Ini bukan audit
+                    keamanan dan kesehatan server menyeluruh.
+                </div>
+            <?php else: ?>
+                <ul class="a-dashboard-admin__attention">
+                    <?php foreach ($ringkasan['perhatian'] as $item): ?>
+                        <li>
+                            <span><?= esc($item['pesan']) ?></span>
+                            <a class="a-btn a-btn--sekunder"
+                                href="<?= esc(site_url($item['path']),'attr') ?>">
+                                <?= esc($item['label']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach ?>
+                </ul>
+            <?php endif ?>
+        </section>
+
+        <section class="a-card a-dashboard-admin__section" aria-labelledby="admin-kesiapan">
+            <h2 id="admin-kesiapan">Kesiapan Aset dan Operasional</h2>
+            <div class="a-dashboard-admin__facts">
+                <div>
+                    <span>Tanda tangan sertifikat</span>
+                    <?php if ($ringkasan['ttd_status'] === 'siap'): ?>
+                        <strong>Aktif dan terverifikasi</strong>
+                    <?php elseif ($ringkasan['ttd_status'] === 'berkas_tidak_valid'): ?>
+                        <strong>Berkas perlu diperiksa</strong>
+                    <?php else: ?>
+                        <strong>Belum aktif</strong>
+                    <?php endif ?>
+                    <a href="<?= esc(site_url('admin/sertifikat/aset'),'attr') ?>">Kelola aset</a>
+                </div>
+                <div>
+                    <span>Ruang disk tersisa pada volume writable/</span>
+                    <strong>
+                        <?php if ($ringkasan['disk_sisa_byte'] === null): ?>
+                            Tidak dapat diukur
+                        <?php else: ?>
+                            <?= esc(number_format((float)$ringkasan['disk_sisa_byte'] / 1073741824,2,',','.')) ?> GB
+                        <?php endif ?>
+                    </strong>
+                    <small>Angka kapasitas, bukan pemeriksaan ambang aman hosting</small>
+                </div>
+                <div>
+                    <span>Status cron</span>
+                    <strong>Belum diperiksa otomatis</strong>
+                    <small>Jadwal tugas server tidak dinilai dari kunjungan halaman</small>
+                </div>
+                <div>
+                    <span>Status backup</span>
+                    <strong>Belum diverifikasi</strong>
+                    <small>Pastikan backup database dan writable/ secara terpisah</small>
+                </div>
+            </div>
+        </section>
+    </div>
+
     <div class="a-proto-dashboard-grid">
         <section class="a-card a-proto-panel" aria-labelledby="judul-akses-cepat">
             <div class="a-proto-section-head">
@@ -74,9 +182,29 @@
                     <span><strong>Mapel &amp; Guru per Gen</strong><small>Penugasan pengampu</small></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
+                <a href="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4zM8 9h8M8 13h6M8 17h4"/></svg></span>
+                    <span><strong>Kurikulum &amp; CP</strong><small>Tambah, cari, dan sunting CP</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a href="<?= esc(site_url('admin/siswa'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 8h4M19 6v4"/></svg></span>
+                    <span><strong>Data Siswa</strong><small>Akun dan penempatan Gen</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a href="<?= esc(site_url('admin/kkm'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM8 12l3 3 5-6"/></svg></span>
+                    <span><strong>KKM Default</strong><small>Ambang ketuntasan akademik</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
                 <a href="<?= esc(site_url('admin/identitas'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-6 9 6v12H3ZM9 21v-8h6v8M7 10h.01M17 10h.01"/></svg></span>
                     <span><strong>Identitas Madrasah</strong><small>Informasi resmi sekolah</small></span>
+                    <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a href="<?= esc(site_url('admin/foto-profil'), 'attr') ?>">
+                    <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m5 18 5-5 4 3 2-2 3 4"/></svg></span>
+                    <span><strong>Persetujuan Foto</strong><small>Tinjau foto profil pengelola</small></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
             </div>
@@ -88,13 +216,13 @@
             <?php if ($ringkasan['gen'] === 0 || $ringkasan['mapel'] === 0): ?>
                 <p>Data Gen atau mata pelajaran masih kosong. Lengkapi referensi sebelum menetapkan pengampu.</p>
             <?php elseif ($ringkasan['belum_ditugaskan'] > 0): ?>
-                <p>Ada pasangan Gen–Mapel yang belum mempunyai Guru. Penetapan dapat dilakukan satu per satu.</p>
+                <p>Sebagian kombinasi potensial Gen–Mapel belum ditetapkan Guru. Tetapkan pengampu pada kombinasi yang memang digunakan dalam pembelajaran.</p>
             <?php else: ?>
-                <p>Setiap pasangan Gen–Mapel yang terdaftar sudah memiliki Guru pengampu.</p>
+                <p>Semua kombinasi Gen–Mapel yang terhitung dalam ringkasan sudah memiliki Guru pengampu.</p>
             <?php endif ?>
             <div class="a-proto-note">
                 <span class="a-proto-note__mark" aria-hidden="true">i</span>
-                <p>Ringkasan ini hanya menampilkan data referensi. Modul pembelajaran, penilaian, dan laporan akan muncul setelah benar-benar diimplementasikan.</p>
+                <p>Ringkasan berisi data referensi dan penugasan. Kelengkapan TP dan hasil pembelajaran diperiksa pada halaman modul masing-masing.</p>
             </div>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">Periksa penugasan</a>
         </aside>

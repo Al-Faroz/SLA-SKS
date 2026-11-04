@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Akun · Profil</p>
             <h1>Profil saya</h1>
-            <p class="a-proto-muted">Identitas resmi dikelola Admin. Sandi dapat diubah melalui menu yang tersedia.</p>
+            <p class="a-proto-muted">Identitas resmi dikelola Admin. <?= $peranAktifKode === 'admin' ? 'Penggantian sandi Admin tetap mengikuti kebijakan keamanan.' : 'Anda bisa mengganti sandi langsung dari Profil ini.' ?></p>
         </div>
     </header>
     <?php if ($galat = session()->getFlashdata('galat')): ?>
@@ -20,38 +20,7 @@
     <?php endif ?>
 
     <div class="a-profil__grid">
-        <section class="a-card a-profil__identitas" aria-labelledby="judul-identitas">
-            <h2 id="judul-identitas">Identitas akun</h2>
-            <dl class="a-rincian">
-                <dt>Nama resmi</dt><dd><?= esc($namaPengguna) ?></dd>
-                <dt><?= $siswa ? 'NISN / Username' : 'Username / NIP' ?></dt><dd><?= esc($username) ?></dd>
-                <dt>Peran aktif</dt><dd><?= esc($peranAktif) ?></dd>
-                <?php if ($siswa): ?>
-                    <dt>Gen</dt>
-                    <dd><?= $profil['gen'] !== null ? esc($profil['gen']) : 'Belum ditempatkan oleh Admin' ?></dd>
-                    <dt>Semester mulai</dt>
-                    <dd><?= $profil['semester_mulai'] === null ? 'Belum ditentukan' : 'Semester ' . (int) $profil['semester_mulai'] ?></dd>
-                <?php endif ?>
-            </dl>
-            <p class="a-help">Perbaikan nama resmi, NISN, username dan peran hanya dapat dilakukan Admin melalui menu Pengelola/Siswa.</p>
-            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('ganti-sandi'), 'attr') ?>">Ganti sandi</a>
-        </section>
-
         <?php if (! $siswa): ?>
-        <section class="a-card a-profil__privat" aria-labelledby="judul-kontak">
-            <h2 id="judul-kontak">Kontak pribadi</h2>
-            <p class="a-help">Nomor kontak ini hanya digunakan sebagai data privat akun. Tidak ditampilkan dalam profil Guru untuk Siswa.</p>
-            <form method="post" action="<?= esc(site_url('profil/kontak'), 'attr') ?>" class="a-form">
-                <?= csrf_field() ?>
-                <div class="a-field">
-                    <label class="a-label" for="profil-telepon">Nomor telepon pribadi (opsional)</label>
-                    <input type="tel" id="profil-telepon" name="telepon_pribadi" maxlength="25"
-                        autocomplete="tel" value="<?= esc($profil['telepon_pribadi'] ?? '', 'attr') ?>"
-                        placeholder="Contoh: +62 812 3456 7890">
-                </div>
-                <button type="submit" class="a-btn a-btn--utama">Simpan kontak pribadi</button>
-            </form>
-        </section>
         <section class="a-card a-profil__foto" aria-labelledby="judul-foto">
             <h2 id="judul-foto">Foto profil</h2>
             <div class="a-profil__galeri">
@@ -84,6 +53,41 @@
             </form>
         </section>
         <?php endif ?>
+        <section class="a-card a-profil__identitas" aria-labelledby="judul-identitas">
+            <h2 id="judul-identitas">Identitas akun</h2>
+            <dl class="a-rincian">
+                <dt>Nama resmi</dt><dd><?= esc($namaPengguna) ?></dd>
+                <dt><?= $siswa ? 'NISN / Username' : 'Username / NIP' ?></dt><dd><?= esc($username) ?></dd>
+                <dt>Peran aktif</dt><dd><?= esc($peranAktif) ?></dd>
+                <?php if ($siswa): ?>
+                    <dt>Gen</dt>
+                    <dd><?= $profil['gen'] !== null ? esc($profil['gen']) : 'Belum ditempatkan oleh Admin' ?></dd>
+                    <dt>Semester mulai</dt>
+                    <dd><?= $profil['semester_mulai'] === null ? 'Belum ditentukan' : 'Semester ' . (int) $profil['semester_mulai'] ?></dd>
+                <?php endif ?>
+            </dl>
+            <p class="a-help">Perbaikan nama resmi, NISN, username dan peran hanya dapat dilakukan Admin melalui menu Pengelola/Siswa.</p>
+            <?php if ($peranAktifKode === 'admin'): ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('ganti-sandi'), 'attr') ?>">Ganti sandi Admin</a>
+            <?php endif ?>
+        </section>
+
+        <?php if (! $siswa): ?>
+        <section class="a-card a-profil__privat" aria-labelledby="judul-kontak">
+            <h2 id="judul-kontak">Kontak pribadi</h2>
+            <p class="a-help">Nomor kontak ini hanya digunakan sebagai data privat akun. Tidak ditampilkan dalam profil Guru untuk Siswa.</p>
+            <form method="post" action="<?= esc(site_url('profil/kontak'), 'attr') ?>" class="a-form">
+                <?= csrf_field() ?>
+                <div class="a-field">
+                    <label class="a-label" for="profil-telepon">Nomor telepon pribadi (opsional)</label>
+                    <input type="tel" id="profil-telepon" name="telepon_pribadi" maxlength="25"
+                        autocomplete="tel" value="<?= esc($profil['telepon_pribadi'] ?? '', 'attr') ?>"
+                        placeholder="Contoh: +62 812 3456 7890">
+                </div>
+                <button type="submit" class="a-btn a-btn--utama">Simpan kontak pribadi</button>
+            </form>
+        </section>
+        <?php endif ?>
     </div>
 
     <?php if ($siswa): ?>
@@ -113,6 +117,33 @@
                 </div>
             <?php endif ?>
         </section>
+    <?php endif ?>
+
+    <?php if ($peranAktifKode !== 'admin'): ?>
+    <section class="a-card a-profil__sandi a-jarak-atas" aria-labelledby="judul-ganti-sandi-profil">
+        <h2 id="judul-ganti-sandi-profil">Ganti sandi akun</h2>
+        <?php if ($sandiDisarankan): ?>
+            <div class="a-alert a-alert--info" role="status">Anda masih menggunakan sandi awal/default. Demi keamanan, disarankan membuat sandi pribadi, tetapi Anda tetap bisa menggunakan aplikasi tanpa mengubahnya.</div>
+        <?php else: ?>
+            <p class="a-help">Penggantian sandi bersifat pilihan. Gunakan formulir ini jika ingin menggantinya.</p>
+        <?php endif ?>
+        <form method="post" action="<?= esc(site_url('ganti-sandi'), 'attr') ?>" class="a-form">
+            <?= csrf_field() ?>
+            <div class="a-field">
+                <label class="a-label" for="profil-sandi-lama">Sandi saat ini</label>
+                <input id="profil-sandi-lama" name="sandi_lama" type="password" autocomplete="current-password" required>
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="profil-sandi-baru">Sandi baru (8–200 karakter)</label>
+                <input id="profil-sandi-baru" name="sandi_baru" type="password" minlength="8" maxlength="200" autocomplete="new-password" required>
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="profil-sandi-konfirmasi">Ulangi sandi baru</label>
+                <input id="profil-sandi-konfirmasi" name="sandi_konfirmasi" type="password" minlength="8" maxlength="200" autocomplete="new-password" required>
+            </div>
+            <button class="a-btn a-btn--utama" type="submit">Simpan sandi baru</button>
+        </form>
+    </section>
     <?php endif ?>
 
     <?php if (count($daftarPeran) > 1): ?>

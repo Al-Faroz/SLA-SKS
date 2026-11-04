@@ -43,6 +43,8 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
         <?php endif ?>
         <p class="a-help">Gunakan format teks, tabel, dan bahasa Arab pada editor. Klik tombol Gambar pada toolbar SunEditor, pilih file PNG/JPEG, lalu gambar otomatis masuk pada posisi kursor. Untuk rumus kompleks dari Word, pastikan tampilannya tetap benar sebelum menyimpan.</p>
         <form id="form-soal-guru" class="a-form" method="post" action="<?= esc(site_url($tujuan), 'attr') ?>">
+            <input type="hidden" name="jenis" value="<?= esc($jenis, 'attr') ?>">
+            <?php if ($soal): ?><input type="hidden" name="soal_id" value="<?= (int) $soal['id'] ?>"><?php endif ?>
             <?= csrf_field() ?>
             <?php if ($soal): ?><input type="hidden" name="versi" value="<?= esc($soal_versi, 'attr') ?>"><?php endif ?>
             <?php foreach ($raw as $name => $default): ?>
@@ -70,14 +72,21 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
             <p class="a-help a-soal-gambar-info">Untuk gambar: klik tombol <strong>Gambar</strong> di toolbar pertanyaan atau opsi yang sedang Anda sunting, pilih file PNG/JPEG (maksimal 2 MB). Tidak perlu langkah unggah terpisah.</p>
             <p class="a-help" id="status-gambar-soal" role="status" aria-live="polite"></p>
             <div class="a-soal-aksi">
+                <button class="a-btn a-btn--sekunder" type="button" id="pratinjau-soal">Pratinjau Soal</button>
                 <button class="a-btn a-btn--utama" type="submit">Simpan Soal</button>
                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url($uri . '?jenis=' . $jenis), 'attr') ?>">Batal</a>
             </div>
+            <section id="hasil-pratinjau-soal" class="a-card a-jarak-atas" hidden aria-live="polite">
+                <h2>Pratinjau sebelum disimpan</h2>
+                <p class="a-help">Periksa isi dan kunci. Pratinjau ini belum menyimpan perubahan.</p>
+                <div id="pratinjau-soal-isi"></div>
+            </section>
         </form>
     </section>
 </div>
 <link rel="stylesheet" href="<?= esc(base_url('public/assets/vendor/suneditor/suneditor.min.css'), 'attr') ?>">
 <script src="<?= esc(base_url('public/assets/vendor/suneditor/suneditor.min.js'), 'attr') ?>"></script>
 <script src="<?= esc(base_url('public/assets/js/soal-editor.js'), 'attr') ?>"
-    data-upload-url="<?= esc(site_url($uri . '/gambar'), 'attr') ?>"></script>
+    data-upload-url="<?= esc(site_url($uri . '/gambar'), 'attr') ?>"
+    data-preview-url="<?= esc(site_url($uri . '/pratinjau-manual'), 'attr') ?>"></script>
 <?= $this->endSection() ?>

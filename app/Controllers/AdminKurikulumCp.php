@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Services\AuthService;
 use App\Services\CpReferensiService;
 use App\Services\CpDaftarService;
+use App\Services\CpOperasionalService;
 use App\Services\NavigasiService;
 use CodeIgniter\HTTP\RedirectResponse;
 use DomainException;
@@ -43,7 +44,7 @@ final class AdminKurikulumCp extends BaseController
     private function versiInput(): array
     {
         $hasil = [];
-        foreach (['elemen','rumusan','otoritas','nomor_dokumen','sumber_url','tanggal_berlaku'] as $k) {
+        foreach (['elemen','rumusan'] as $k) {
             $hasil[$k] = $this->isian($k);
         }
         return $hasil;
@@ -69,7 +70,8 @@ final class AdminKurikulumCp extends BaseController
             $this->layout('Referensi Kurikulum dan CP'),
             $this->service()->daftar(false),
             (new CpDaftarService())->halaman($filter, $page),
-            ['cpFilterGalat' => $filterGalat]
+            ['cpFilterGalat' => $filterGalat,
+             'cpOperasional' => (new CpOperasionalService())->daftar()]
         ));
     }
 
@@ -110,16 +112,54 @@ final class AdminKurikulumCp extends BaseController
     public function simpanCp(): RedirectResponse
     {
         try {
-            $id = $this->service()->buatCp(
+            $id = $this->service()->simpanLangsung(null,
                 (int) $this->isian('kurikulum_id'),
                 (int) $this->isian('mapel_id'),
                 $this->isian('kode'),
                 $this->versiInput()
             );
             return redirect()->to(site_url('admin/kurikulum-cp/' . $id))
-                ->with('sukses', 'Draf CP berhasil dibuat. Periksa sumber lalu terbitkan jika sudah sesuai.');
+                ->with('sukses', 'CP berhasil disimpan.');
         } catch (DomainException $e) {
             return $this->gagal($e, 'admin/kurikulum-cp');
+        }
+    }
+
+    public function sunting(int $id): string|RedirectResponse
+    {
+        try {
+            $data = $this->service()->detail($id);
+            $opsi = $this->service()->daftar(false);
+            $versi = array_values(array_filter($data['versi'],
+                static fn (array $baris): bool => $baris['status'] === 'aktif'));
+            if ($versi === []) {
+                $versi = array_values(array_filter($data['versi'],
+                    static fn (array $baris): bool => $baris['status'] === 'draf'));
+            }
+            return view('admin/cp_sunting', array_merge(
+                $this->layout('Sunting CP'), $opsi,
+                ['cp' => $data['cp'], 'dataVersi' => $versi[0] ?? []]
+            ));
+        } catch (DomainException $e) {
+            return $this->gagal($e, 'admin/kurikulum-cp');
+        }
+    }
+
+    public function simpanSunting(int $id): RedirectResponse
+    {
+        try {
+            $cpId = $this->service()->simpanLangsung($id,
+                (int) $this->isian('kurikulum_id'), (int) $this->isian('mapel_id'),
+                $this->isian('kode'), $this->versiInput()
+            );
+            return redirect()->to(site_url('admin/kurikulum-cp/' . $cpId))
+                ->with('sukses', 'CP berhasil diperbarui. Riwayat tersimpan.');
+        } catch (DomainException $e) {
+            return $this->gagal($e, 'admin/kurikulum-cp/' . $id . '/sunting');
+        } catch (Throwable $e) {
+            log_message('error', 'Sunting CP gagal: ' . get_class($e));
+            return redirect()->to(site_url('admin/kurikulum-cp/' . $id . '/sunting'))
+                ->with('galat', 'CP belum tersimpan. Periksa log server.');
         }
     }
 
@@ -135,99 +175,4 @@ final class AdminKurikulumCp extends BaseController
         }
     }
 
-    public function versiBaru(int $cpId): string|RedirectResponse
-    {
-        try {
-            $cp = $this->service()->detail($cpId);
-            if (array_filter($cp['versi'], static fn (array $v): bool => $v['status'] === 'draf') !== []) {
-                return redirect()->to(site_url('admin/kurikulum-cp/' . $cpId))
-                    ->with('galat', 'Draf sebelumnya belum diterbitkan. Selesaikan draf tersebut dahulu.');
-            }
-            $asal = $cp['versi'][0] ?? null;
-            return view('admin/cp_form_versi', array_merge($this->layout('Draf versi CP baru'), [
-                'cp' => $cp['cp'], 'dataVersi' => $asal, 'edit' => false,
-                'aksi' => site_url('admin/kurikulum-cp/' . $cpId . '/versi-baru'),
-            ]));
-        } catch (DomainException $e) {
-            return $this->gagal($e, 'admin/kurikulum-cp');
-        }
-    }
-
-    public function simpanVersiBaru(int $cpId): RedirectResponse
-    {
-        try {
-            $this->service()->versiBaru($cpId, $this->versiInput());
-            return redirect()->to(site_url('admin/kurikulum-cp/' . $cpId))
-                ->with('sukses', 'Draf versi CP baru disimpan tanpa mengubah versi resmi sebelumnya.');
-        } catch (DomainException $e) {
-            return $this->gagal($e, 'admin/kurikulum-cp/' . $cpId . '/versi-baru');
-        }
-    }
-
-    public function editDraf(int $id): string|RedirectResponse
-    {
-        try {
-            $version = $this->service()->detailVersi($id);
-            if ($version['status'] !== 'draf') {
-                return redirect()->to(site_url('admin/kurikulum-cp/' . (int) $version['cp_id']))
-                    ->with('galat', 'Versi CP yang telah terbit tidak dapat diedit.');
-            }
-            $cp = $this->service()->detail((int) $version['cp_id']);
-            return view('admin/cp_form_versi', array_merge(
-                $this->layout('Perbaiki draf CP'), [
-                    'cp' => $cp['cp'], 'dataVersi' => $version, 'edit' => true,
-                    'aksi' => site_url('admin/kurikulum-cp/versi/' . $id . '/edit'),
-                ]
-            ));
-        } catch (DomainException $e) {
-            return $this->gagal($e, 'admin/kurikulum-cp');
-        }
-    }
-
-    public function simpanDraf(int $id): RedirectResponse
-    {
-        try {
-            $versi = $this->service()->detailVersi($id);
-            $this->service()->ubahDraf($id, $this->versiInput());
-            return redirect()->to(site_url('admin/kurikulum-cp/' . (int) $versi['cp_id']))
-                ->with('sukses', 'Draf CP berhasil diperbaiki.');
-        } catch (DomainException $e) {
-            return $this->gagal($e, 'admin/kurikulum-cp/versi/' . $id . '/edit');
-        }
-    }
-
-    public function konfirmasiTerbit(int $id): string|RedirectResponse
-    {
-        try {
-            $versi = $this->service()->detailVersi($id);
-            if ($versi['status'] !== 'draf') {
-                return redirect()->to(site_url('admin/kurikulum-cp/' . (int) $versi['cp_id']))
-                    ->with('galat', 'Hanya draf yang boleh diterbitkan.');
-            }
-            $data = $this->service()->detail((int) $versi['cp_id']);
-            return view('admin/cp_terbit_konfirmasi', array_merge(
-                $this->layout('Konfirmasi penerbitan CP'), [
-                    'cp' => $data['cp'], 'versi' => $versi,
-                ]
-            ));
-        } catch (DomainException $e) {
-            return $this->gagal($e, 'admin/kurikulum-cp');
-        }
-    }
-
-    public function terbitkan(int $id): RedirectResponse
-    {
-        try {
-            $versi = $this->service()->detailVersi($id);
-            $this->service()->terbitkan($id);
-            return redirect()->to(site_url('admin/kurikulum-cp/' . (int) $versi['cp_id']))
-                ->with('sukses', 'CP versi resmi diterbitkan; versi sebelumnya tetap tercatat dalam riwayat.');
-        } catch (DomainException $e) {
-            return $this->gagal($e, 'admin/kurikulum-cp');
-        } catch (Throwable $e) {
-            log_message('error', 'Penerbitan CP gagal (' . get_class($e) . ').');
-            return redirect()->to(site_url('admin/kurikulum-cp'))
-                ->with('galat', 'Penerbitan CP gagal disimpan. Periksa log server tanpa membagikan data sensitif.');
-        }
-    }
 }

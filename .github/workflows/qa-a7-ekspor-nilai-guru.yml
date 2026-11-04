@@ -1,0 +1,41 @@
+name: QA A7 Export Nilai Guru XLSX
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/EksporNilaiGuruService.php'
+      - 'app/Services/RekapNilaiTpGuruService.php'
+      - 'app/Controllers/GuruEksporNilai.php'
+      - 'app/Views/guru/rekap_nilai_tp.php'
+      - 'app/Config/Routes.php'
+      - 'tests/unit/EksporNilaiGuruXlsxTest.php'
+      - '.github/workflows/qa-a7-ekspor-nilai-guru.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  xlsx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, pdo_sqlite, mysqli, intl, gd, dom, xml, zip
+          coverage: none
+      - run: mkdir -p writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Periksa sintaks endpoint generator dan pengujian
+        run: |
+          php -l app/Services/EksporNilaiGuruService.php
+          php -l app/Services/RekapNilaiTpGuruService.php
+          php -l app/Controllers/GuruEksporNilai.php
+          php -l app/Views/guru/rekap_nilai_tp.php
+          php -l app/Config/Routes.php
+          php -l tests/unit/EksporNilaiGuruXlsxTest.php
+      - name: Uji XLSX file nyata, privasi G1, formula, nol dan kosong
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/EksporNilaiGuruXlsxTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/RekapNilaiTpGuruDatabaseTest.php

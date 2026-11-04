@@ -18,7 +18,7 @@ final class AturanWaktuUjianService
     public const TIMEOUT_KONEKSI = 20;
     public const JEDA_FULLSCREEN_KEJADIAN = 90;
     public const JEDA_FULLSCREEN_TOTAL = 180;
-    public const JEDA_KONEKSI_TOTAL = 300;
+    public const JEDA_KONEKSI_TOTAL = 600;
     public const PELANGGARAN_FULLSCREEN = 3;
 
     /** @return array<string,int|string|null> */

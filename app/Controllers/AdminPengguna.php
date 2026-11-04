@@ -143,6 +143,7 @@ final class AdminPengguna extends BaseController
                 'jenis' => $jenis,
                 'target' => $target,
                 'akunSendiri' => (int) $admin['id'] === $id,
+                'akunAdmin' => in_array('admin', $target['daftar_peran'], true),
             ]
         ));
     }
@@ -161,16 +162,25 @@ final class AdminPengguna extends BaseController
     {
         try {
             $target = $this->service()->target($jenis, $id);
-            $sandiSementara = $this->service()->resetSandi($jenis, $id);
+            $inputDefault = $this->request->getPost('sandi_default');
+            if (! in_array('admin', $target['daftar_peran'], true)
+                && (! is_string($inputDefault)
+                    || $inputDefault !== $this->request->getPost('sandi_default_konfirmasi'))) {
+                throw new DomainException('Konfirmasi sandi default tidak sama.');
+            }
+            $hasil = $this->service()->resetSandi($jenis, $id,
+                is_string($inputDefault) ? $inputDefault : null);
         } catch (DomainException $e) {
-            return redirect()->to(site_url('admin/' . $jenis))->with('galat', $e->getMessage());
+            return redirect()->to(site_url('admin/' . $jenis . '/' . $id . '/reset-sandi'))
+                ->with('galat', $e->getMessage());
         }
 
         $this->response->setHeader('Cache-Control', 'no-store, private');
         $this->response->setHeader('Pragma', 'no-cache');
         return view('admin/akun_reset_hasil', array_merge(
-            $this->layout('Sandi sementara', $jenis),
-            ['jenis' => $jenis, 'target' => $target, 'sandiSementara' => $sandiSementara]
+            $this->layout('Hasil reset sandi', $jenis),
+            ['jenis' => $jenis, 'target' => $target,
+                'modeReset' => $hasil['mode'], 'sandiSementara' => $hasil['sandiSementara']]
         ));
     }
 }

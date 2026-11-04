@@ -6,6 +6,8 @@ namespace App\Controllers;
 
 use App\Services\AuthService;
 use App\Services\KatalogPembelajaranSiswaService;
+use App\Services\KelayakanSumatifSiswaService;
+use App\Services\NilaiTpService;
 use App\Services\MateriSiswaService;
 use App\Services\NavigasiService;
 use App\Services\ProgresTpSiswaService;
@@ -68,8 +70,24 @@ final class SiswaPembelajaran extends BaseController
 
     public function paket(int $paketId): ResponseInterface|string
     {
-        return $this->halaman(static fn (): array =>
-            (new KatalogPembelajaranSiswaService())->daftarTp($paketId), 'siswa/daftar_tp');
+        return $this->halaman(static function () use ($paketId): array {
+            $data = (new KatalogPembelajaranSiswaService())->daftarTp($paketId);
+            // Kelayakan dibaca dari mesin resmi yang mengikat satu siswa,
+            // Gen, bank, seluruh TP wajib, jadwal dan histori kesempatan.
+            // Token/kunci/soal percobaan tidak diteruskan ke katalog.
+            $ruang = (new \App\Services\MesinPraSemesterSiswaService())->ruang($paketId);
+            $data['praSemester'] = [
+                'ujian' => $ruang['ujian'],
+                'gerbang' => $ruang['gerbang'],
+                'fase' => $ruang['fase'],
+                'boleh_mulai' => $ruang['boleh_mulai'],
+                'nilai_terbaik' => $ruang['nilai_terbaik'],
+                'status_nilai' => $ruang['status_nilai'],
+                'kkm' => $ruang['kkm'],
+                'jadwal_aktif' => $ruang['jadwal_aktif'],
+            ];
+            return $data;
+        }, 'siswa/daftar_tp');
     }
 
     public function tp(int $tpId): ResponseInterface|string
@@ -77,10 +95,21 @@ final class SiswaPembelajaran extends BaseController
         return $this->halaman(static function () use ($tpId): array {
             $data = (new KatalogPembelajaranSiswaService())->rincianTp($tpId);
             $data['progres'] = (new ProgresTpSiswaService())->status($tpId);
+            $data['kesiapanSumatif'] = null;
+            $data['nilaiTp'] = null;
+            $data['aksesUlang'] = null;
+            if ($data['progres'] !== null && $data['progres']['status'] === 'perlu_bantuan') {
+                $data['aksesUlang'] = (new \App\Services\PermintaanAksesUlangSiswaService())->kebutuhan($tpId);
+            }
             if ($data['progres'] !== null
-                && in_array($data['progres']['status'], ['belajar', 'tuntas'], true)) {
+                && in_array($data['progres']['status'], ['belajar', 'sumatif', 'tuntas'], true)) {
                 // Data berasal dari snapshot terpin, bukan versi live milik Guru.
                 $data['materi'] = (new MateriSiswaService())->daftar($tpId)['materi'];
+                // A3: ringkasan baca-saja. Belum membuka percobaan Sumatif.
+                $data['kesiapanSumatif'] = (new KelayakanSumatifSiswaService())->periksa($tpId);
+                if ($data['progres']['status'] === 'tuntas') {
+                    $data['nilaiTp'] = NilaiTpService::untukSiswa($tpId);
+                }
             }
             return $data;
         }, 'siswa/rincian_tp');

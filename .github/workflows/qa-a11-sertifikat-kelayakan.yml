@@ -1,0 +1,46 @@
+name: QA A11-1 Kelayakan Sertifikat
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/KelayakanSertifikatService.php'
+      - 'app/Controllers/AdminSertifikat.php'
+      - 'app/Views/admin/sertifikat_kelayakan.php'
+      - 'app/Config/Routes.php'
+      - 'app/Services/NavigasiService.php'
+      - 'public/assets/css/app.css'
+      - 'public/assets/css/emerald-glass.css'
+      - 'tests/unit/KelayakanSertifikatDatabaseTest.php'
+      - '.github/workflows/qa-a11-sertifikat-kelayakan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kelayakan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Siapkan writable CI4
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Syntax PHP
+        run: |
+          for f in \
+            app/Services/KelayakanSertifikatService.php \
+            app/Controllers/AdminSertifikat.php \
+            app/Views/admin/sertifikat_kelayakan.php \
+            app/Config/Routes.php \
+            app/Services/NavigasiService.php \
+            tests/unit/KelayakanSertifikatDatabaseTest.php; do
+            php -l "$f"
+          done
+      - name: PHPUnit kelayakan Admin A11-1
+        run: vendor/bin/phpunit --no-coverage tests/unit/KelayakanSertifikatDatabaseTest.php

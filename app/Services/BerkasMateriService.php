@@ -159,7 +159,7 @@ final class BerkasMateriService
         if ($tpId < 1 || $versi < 1 || ! $file->isValid() || $file->hasMoved()) {
             throw new DomainException('Berkas unggahan tidak sah.');
         }
-        $data = (new MateriDrafService($this->db))->bersihkan($input);
+        $data = (new MateriDrafService($this->db))->bersihkan($input, $tpId);
         if (! in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
             throw new DomainException('Unggah langsung hanya untuk PDF, Gambar dan Audio.');
         }
@@ -167,6 +167,9 @@ final class BerkasMateriService
         $rincian = $this->detail->lihat($tpId);
         if ($rincian['tp']['status'] !== 'draf') {
             throw new DomainException('TP Siap tidak boleh diubah.');
+        }
+        if (count($rincian['materi']) > 0) {
+            throw new DomainException('Satu TP hanya boleh memiliki satu Materi. Sunting media yang sudah ada.');
         }
         $valid = self::validasi($file->getTempName(), $data['jenis'], $file->getClientName());
         $baru = $this->tulisPrivat($file->getTempName(), $data['jenis'], $valid);
@@ -180,6 +183,9 @@ final class BerkasMateriService
                 || (int) $tp['struktur_versi'] !== $versi
                 || (int) $rincian['tp']['struktur_versi'] !== $versi) {
                 throw new DomainException('TP sudah berubah. Muat ulang formulir Materi.');
+            }
+            if ($this->db->table('materi')->where('tp_id', $tpId)->countAllResults() > 0) {
+                throw new DomainException('Satu TP hanya boleh memiliki satu Materi. Sunting media yang sudah ada.');
             }
             $akhir = $this->db->table('materi')->selectMax('urutan', 'maks')
                 ->where('tp_id', $tpId)->get()->getRowArray();
@@ -228,7 +234,7 @@ final class BerkasMateriService
         if ($tpId < 1 || $materiId < 1 || $versi < 1 || ! $file->isValid() || $file->hasMoved()) {
             throw new DomainException('Unggahan tidak valid.');
         }
-        $data = (new MateriDrafService($this->db))->bersihkan($input);
+        $data = (new MateriDrafService($this->db))->bersihkan($input, $tpId);
         if (! in_array($data['jenis'], ['pdf', 'gambar', 'audio'], true)) {
             throw new DomainException('Berkas harus berupa PDF, Gambar atau Audio.');
         }

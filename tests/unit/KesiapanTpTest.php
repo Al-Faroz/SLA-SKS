@@ -10,17 +10,17 @@ final class KesiapanTpTest extends TestCase
     private static function data(): array
     {
         $tp = [
-            'id' => 1, 'kode_tp' => 'TP-SKI-S4-01', 'judul' => 'Sejarah',
+            'id' => 1, 'cp_mapel_id' => 1, 'kode_tp' => 'TP-SKI-S4-01', 'judul' => 'Sejarah',
             'rumusan' => 'Memahami peristiwa', 'indikator' => 'Menguraikan peristiwa',
             'status' => 'draf', 'struktur_versi' => 1, 'kkm' => 75,
-            'bobot_resume' => 20, 'bobot_tugas' => 30, 'bobot_sumatif' => 50,
+            'bobot_resume' => 20, 'bobot_tugas' => 20, 'bobot_sumatif' => 60,
             'resume_min' => 50, 'tugas_min' => 200, 'diag_tayang' => 10,
-            'sum_tayang' => 20, 'diag_durasi' => 30, 'sum_durasi' => 60,
-            'sum_maks_percobaan' => 3,
+            'sum_tayang' => 30, 'diag_durasi' => 30, 'sum_durasi' => 60,
+            'sum_maks_percobaan' => 2,
         ];
         $paket = ['id' => 10, 'mapel_id' => 2, 'kurikulum_id' => 1, 'status' => 'draf'];
         $cp = [[
-            'cp_versi_id' => 3, 'utama' => 1, 'versi_status' => 'aktif',
+            'cp_mapel_id' => 1, 'cp_versi_id' => 3, 'versi_status' => 'aktif',
             'mapel_id' => 2, 'kurikulum_id' => 1, 'fase' => 'D',
         ]];
         $materi = [[
@@ -30,7 +30,7 @@ final class KesiapanTpTest extends TestCase
             'petunjuk_resume' => 'Tuliskan ringkasan', 'petunjuk_hots' => 'Jelaskan dampaknya',
         ]];
         $soal = [];
-        foreach (['diagnostik' => 10, 'sumatif' => 20] as $jenis => $jumlah) {
+        foreach (['diagnostik' => 10, 'sumatif' => 30] as $jenis => $jumlah) {
             for ($i = 1; $i <= $jumlah; $i++) {
                 $soal[] = [
                     'id' => count($soal) + 1, 'jenis' => $jenis, 'urutan' => $i,
@@ -64,14 +64,41 @@ final class KesiapanTpTest extends TestCase
         self::assertSame('bank-sumatif', self::hasil($result, 'bank-sumatif')['kode']);
     }
 
-    public function testCpBukanFaseAtauAdaDuaUtamaMemblokirPublikasi(): void
+    public function testCpOperasionalHarusCocokDanBolehMultiElemen(): void
     {
         [$tp, $paket, $cp, $materi, $soal] = self::data();
         $cp[0]['fase'] = 'E';
         self::assertFalse(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
         $cp[0]['fase'] = 'D';
-        $cp[] = $cp[0];
+        $cp[0]['cp_mapel_id'] = 99;
         self::assertFalse(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
+        $cp[0]['cp_mapel_id'] = 1;
+        $cp[] = array_replace($cp[0], ['cp_versi_id' => 4]);
+        self::assertTrue(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'cp')['terpenuhi']);
+    }
+
+    public function testIndikatorTidakWajibUntukSiapTpV25(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $tp['indikator'] = '';
+        $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
+        self::assertNotContains('indikator', array_column($hasil, 'kode'));
+        self::assertNotContains(false, array_column($hasil, 'terpenuhi'));
+    }
+
+    public function testTpEsensialWajibMateriTetapiTidakWajibSoalAtauResumeHots(): void
+    {
+        [$tp, $paket, $cp, $materi] = self::data();
+        $tp['jenis_tp'] = 'esensial';
+        $materi[0]['petunjuk_resume'] = '';
+        $materi[0]['petunjuk_hots'] = '';
+        $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, []);
+        self::assertNotContains(false, array_column($hasil, 'terpenuhi'));
+        $materi[0]['url_youtube'] = '';
+        self::assertFalse(self::hasil(
+            KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, []),
+            'materi-1'
+        )['terpenuhi']);
     }
 
     public function testMateriTanpaResumeHotsDanUrutanUtuhDitolak(): void
@@ -81,6 +108,16 @@ final class KesiapanTpTest extends TestCase
         $materi[0]['petunjuk_hots'] = '';
         $materi[0]['urutan'] = 3;
         self::assertFalse(self::hasil(KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal), 'materi-1')['terpenuhi']);
+    }
+
+    public function testSumatifDuaPuluhSembilanSoalDitolakKontrakV25(): void
+    {
+        [$tp, $paket, $cp, $materi, $soal] = self::data();
+        $tp['sum_tayang'] = 29;
+        array_pop($soal);
+        $evaluasi = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
+        self::assertFalse(self::hasil($evaluasi, 'sum_tayang')['terpenuhi']);
+        self::assertFalse(self::hasil($evaluasi, 'bank-sumatif')['terpenuhi']);
     }
 
     public function testJumlahSoalDanKunciTidakValidMenolakSiap(): void
@@ -98,8 +135,9 @@ final class KesiapanTpTest extends TestCase
         $tp['diag_durasi'] = 3;
         $tp['bobot_sumatif'] = 30;
         $tp['kkm'] = 0;
+        $tp['sum_maks_percobaan'] = 3;
         $hasil = KesiapanTpService::evaluasi($tp, $paket, $cp, $materi, $soal);
-        foreach (['diag_durasi', 'bobot', 'kkm'] as $code) {
+        foreach (['diag_durasi', 'bobot', 'kkm', 'sum_maks_percobaan'] as $code) {
             self::assertFalse(self::hasil($hasil, $code)['terpenuhi']);
         }
     }
@@ -141,6 +179,24 @@ final class KesiapanTpTest extends TestCase
         )['terpenuhi']);
     }
 
+    public function testHalamanKesiapanSiapMengikutiGuardPenggunaanSiswa(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $controller = file_get_contents($root . '/app/Controllers/GuruKesiapanTp.php');
+        $view = file_get_contents($root . '/app/Views/guru/kesiapan_tp.php');
+        self::assertIsString($controller);
+        self::assertIsString($view);
+
+        self::assertStringContainsString('(new SuntingTpService())->pastikanBelumDipakai($tpId)', $controller);
+        self::assertStringContainsString("'suntingDikunci' => " . '$suntingDikunci', $controller);
+        self::assertStringContainsString('if ($suntingDikunci)', $view);
+        self::assertStringContainsString('TP telah digunakan siswa.', $view);
+        self::assertStringContainsString('TP belum digunakan siswa.', $view);
+        self::assertStringNotContainsString(
+            'Selama TP belum digunakan siswa, Guru dapat membuka editor normal', $view
+        );
+    }
+
     public function testHanyaSatuChecklistDitampilkanPadaHalamanKesiapan(): void
     {
         $root = dirname(__DIR__, 2);
@@ -159,7 +215,7 @@ final class KesiapanTpTest extends TestCase
 
         self::assertSame(1, substr_count($kesiapan, 'id="judul-checklist-akhir"'));
         self::assertStringContainsString('Daftar pemeriksaan final', $kesiapan);
-        self::assertStringContainsString("if (\$tp['status'] === 'siap')", $detail);
+        self::assertStringContainsString('TP sudah Siap', $detail);
         self::assertStringContainsString("if (\$tp['status'] === 'draf')", $kesiapan);
         self::assertStringNotContainsString("'#checklist-konten-tp'", $service);
         self::assertStringContainsString("'guru/peta-atp'", $service);

@@ -1,4 +1,5 @@
-/* Navigasi panel responsif. Tidak memproses hak akses atau menyimpan data. */
+/* Navigasi panel HP: drawer fokus-terjaga, Escape, backdrop & scroll lock.
+   Tidak memodifikasi rute/peran/menu yang disiapkan server. */
 (() => {
     'use strict';
 
@@ -8,34 +9,79 @@
     const toggle = shell.querySelector('[data-menu-toggle]');
     const backdrop = shell.querySelector('[data-menu-close]');
     const side = shell.querySelector('.a-side');
-    if (!toggle || !backdrop || !side) return;
+    const main = shell.querySelector('.a-main');
+    if (!toggle || !backdrop || !side || !main) return;
 
     const mobile = window.matchMedia('(max-width: 767px)');
+    let locked = false;
+    let previousOverflow = '';
+
+    const focusableMenu = () => [...side.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )].filter((element) => !element.hidden && element.getClientRects().length > 0);
 
     function setOpen(open, restoreFocus = false) {
-        const shouldOpen = open && mobile.matches;
+        const shouldOpen = Boolean(open && mobile.matches);
+        const wasOpen = shell.classList.contains('is-menu-open');
+
+        if (shouldOpen && !locked) {
+            previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            locked = true;
+        }
+        if (!shouldOpen && locked) {
+            document.body.style.overflow = previousOverflow;
+            locked = false;
+        }
+
         shell.classList.toggle('is-menu-open', shouldOpen);
         toggle.setAttribute('aria-expanded', String(shouldOpen));
+        toggle.setAttribute('aria-label', shouldOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
         backdrop.hidden = !shouldOpen;
-        if (restoreFocus && !shouldOpen) toggle.focus();
-        if (shouldOpen) {
-            const firstLink = side.querySelector('a');
-            if (firstLink) firstLink.focus();
+
+        // Inert mencegah Tab dan pembaca layar masuk ke konten di balik drawer.
+        // Pastikan dilepas sebelum fokus dikembalikan ke toggle.
+        main.inert = shouldOpen;
+        if (shouldOpen && !wasOpen) {
+            const first = focusableMenu()[0];
+            if (first) first.focus();
+        } else if (!shouldOpen && restoreFocus && mobile.matches) {
+            toggle.focus();
         }
     }
 
-    toggle.addEventListener('click', () => {
-        setOpen(!shell.classList.contains('is-menu-open'));
-    });
+    toggle.addEventListener('click', () => setOpen(!shell.classList.contains('is-menu-open')));
     backdrop.addEventListener('click', () => setOpen(false, true));
     side.addEventListener('click', (event) => {
-        if (event.target.closest('a')) setOpen(false);
+        if (event.target.closest('a[href]')) setOpen(false, false);
     });
+
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && shell.classList.contains('is-menu-open')) {
+        if (!shell.classList.contains('is-menu-open')) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
             setOpen(false, true);
+            return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const elements = focusableMenu();
+        if (!elements.length) {
+            event.preventDefault();
+            return;
+        }
+
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (event.shiftKey && (document.activeElement === first || !side.contains(document.activeElement))) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && (document.activeElement === last || !side.contains(document.activeElement))) {
+            event.preventDefault();
+            first.focus();
         }
     });
+
     mobile.addEventListener('change', () => setOpen(false));
 })();
 
@@ -113,7 +159,7 @@
         function pesanJenis() {
             switch (jenis.value) {
                 case 'pdf':
-                    return 'PDF maksimal 15 MB dan 40 halaman. File PDF harus dapat dibaca.';
+                    return 'PDF Materi harus memiliki 6–40 halaman, maksimal 15 MB. File PDF harus dapat dibaca.';
                 case 'gambar':
                     return 'JPG, PNG atau WebP maksimal 10 MB.';
                 case 'audio':
@@ -221,6 +267,60 @@
             const judul = form.querySelector('[data-materi-hapus]')?.dataset.judul || 'Materi ini';
             if (!window.confirm('Hapus Materi "' + judul + '" dari TP draf? Tindakan ini tidak bisa dibatalkan. Berkas historis tidak dihapus.')) {
                 event.preventDefault();
+            }
+        });
+    });
+})();
+
+/* G03 — Modal BAB/TP berbasis dialog native, fokus dan Escape bawaan browser. */
+(() => {
+    'use strict';
+    const openButtons = document.querySelectorAll('[data-atp-dialog-open]');
+    if (!openButtons.length) return;
+
+    for (const trigger of openButtons) {
+        trigger.addEventListener('click', () => {
+            const dialog = document.getElementById(trigger.dataset.atpDialogOpen || '');
+            if (!(dialog instanceof HTMLDialogElement) || typeof dialog.showModal !== 'function') return;
+            if (dialog.open) return;
+            dialog.showModal();
+            const first = dialog.querySelector('[name="nama_bab"],[name="nama_tp"]');
+            first?.focus();
+        });
+    }
+    document.querySelectorAll('.a-modal--atp').forEach((dialog) => {
+        dialog.querySelectorAll('[data-atp-dialog-close]').forEach((button) => {
+            button.addEventListener('click', () => dialog.close());
+        });
+        dialog.addEventListener('click', (event) => {
+            if (event.target === dialog) dialog.close(); // Klik bidang backdrop.
+        });
+        dialog.querySelectorAll('[data-atp-dialog-form]').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                if (form.dataset.sedangKirim === '1') {
+                    event.preventDefault();
+                    return;
+                }
+                if (!form.reportValidity()) {
+                    event.preventDefault();
+                    return;
+                }
+                form.dataset.sedangKirim = '1';
+                const submit = form.querySelector('[type="submit"]');
+                if (submit) {
+                    submit.disabled = true;
+                    submit.textContent = 'Menyimpan…';
+                }
+            });
+        });
+    });
+    window.addEventListener('pageshow', () => {
+        document.querySelectorAll('[data-atp-dialog-form][data-sedang-kirim="1"]').forEach((form) => {
+            delete form.dataset.sedangKirim;
+            const submit = form.querySelector('[type="submit"]');
+            if (submit) {
+                submit.disabled = false;
+                submit.textContent = submit.closest('dialog')?.id.startsWith('dialog-bab-') ? 'Simpan BAB' : 'Simpan TP Draf';
             }
         });
     });

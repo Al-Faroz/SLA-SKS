@@ -15,8 +15,8 @@ test('QA SQL audit hanya SELECT (tidak mutasi)', () => {
 });
 test('Master memisahkan bank HOTS Guru dan jawaban siswa',()=>{
   const doc=read('docs/10-DATABASE.md');
-  assert.match(doc,/\|\s*Konten\s*\|[^\n]*tugas_hots_materi/);
-  assert.match(doc,/\|\s*Belajar\s*\|[^\n]*jawaban_hots_materi/);
+  assert.match(doc,/-\s*`tugas_hots_materi`:\s*bank perintah HOTS Guru/);
+  assert.match(doc,/-\s*`jawaban_hots_materi`:\s*pengumpulan HOTS siswa/);
   assert.match(doc,/materi\.petunjuk_hots/);
 });
 test('SOP memerlukan dump terbaru dan mengakui hosting belum deploy',()=>{

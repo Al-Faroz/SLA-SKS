@@ -16,7 +16,8 @@ CREATE TABLE pengguna_peran (
 CREATE TABLE ref_angkatan (
  id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
  kode VARCHAR(20) NOT NULL,
- nama VARCHAR(100) NOT NULL
+ nama VARCHAR(100) NOT NULL,
+ semester_mulai TINYINT UNSIGNED NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 CREATE TABLE ref_mapel (
  id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
@@ -53,6 +54,8 @@ CREATE TABLE tp (
  urutan_atp SMALLINT UNSIGNED NOT NULL,
  status ENUM('draf','siap') NOT NULL,
  struktur_versi INT UNSIGNED NOT NULL,
+ cp_mapel_id BIGINT UNSIGNED NULL,
+ jenis_tp ENUM('esensial','non_esensial') NOT NULL DEFAULT 'non_esensial',
  FOREIGN KEY (paket_semester_id) REFERENCES paket_semester(id)
 ) ENGINE=InnoDB;
 CREATE TABLE berkas (
@@ -91,11 +94,12 @@ INSERT INTO pengguna (id,nama,status,wajib_ganti_sandi,versi_sesi) VALUES
 (1,'Guru Penguji A','aktif',0,1),(2,'Guru Penguji B','aktif',0,1),(3,'Admin Penguji','aktif',0,1),(4,'Guru Wajib Ganti Sandi','aktif',1,1),
 (5,'Guru Tanpa G1','aktif',0,1),(6,'Guru Nonaktif','nonaktif',0,1);
 INSERT INTO pengguna_peran (pengguna_id,peran) VALUES (1,'guru'),(2,'guru'),(3,'admin'),(4,'guru'),(5,'guru'),(6,'guru');
-INSERT INTO ref_angkatan VALUES (1,'GEN-UJI-A','Gen Uji A'),(2,'GEN-UJI-B','Gen Uji B');
+INSERT INTO ref_angkatan (id,kode,nama,semester_mulai) VALUES
+(1,'GEN-UJI-A','Gen Uji A',4),(2,'GEN-UJI-B','Gen Uji B',4);
 INSERT INTO ref_mapel VALUES (1,'MAP-UJI','Mapel Uji');
 INSERT INTO penugasan_guru_gen VALUES (1,1,1,1),(2,2,1,2);
 INSERT INTO paket_semester VALUES (1,1,1,4,1,1,1,'draf'),(2,2,1,4,1,1,1,'draf');
-INSERT INTO tp VALUES
+INSERT INTO tp (id,paket_semester_id,kode_tp,judul,rumusan,indikator,urutan_atp,status,struktur_versi) VALUES
 (1,1,'TP-01','TP untuk Guru A','Rumusan uji','Indikator uji',1,'draf',1),
 (2,2,'TP-02','TP untuk Guru B','Rumusan uji','Indikator uji',1,'draf',1);
 

@@ -31,10 +31,12 @@ final class MateriSiswaDatabaseTest extends TestCase
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,nomor_versi INTEGER,status TEXT)',
             'CREATE TABLE penugasan_paket(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER,tahun_ajaran_id INTEGER,paket_id INTEGER)',
-            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,rumusan TEXT,indikator TEXT,resume_min INTEGER,tugas_min INTEGER)',
+             'CREATE TABLE bab (id INTEGER PRIMARY KEY, paket_semester_id INT, nomor_bab INT, nama_bab TEXT, deskripsi_bab TEXT)',
+            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,bab_id INT DEFAULT 1,kode_tp TEXT,judul TEXT,urutan_atp INTEGER,status TEXT,rumusan TEXT,indikator TEXT,jenis_tp TEXT DEFAULT \'non_esensial\',resume_min INTEGER,tugas_min INTEGER)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,nomor_versi INTEGER,snapshot_json TEXT,checksum TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT,jenis TEXT,aktif INTEGER)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,versi_paket_yang_ditugaskan INTEGER,status TEXT,dimulai_pada TEXT)',
+            'CREATE TABLE percobaan_ujian (id INTEGER PRIMARY KEY, progres_tp_id INT, jenis TEXT, status TEXT)',
             'CREATE TABLE berkas(id INTEGER PRIMARY KEY,tp_id INTEGER,nama_acak TEXT,mime TEXT,ukuran_byte INTEGER,halaman INTEGER)',
             'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dibuat_pada TEXT,diubah_pada TEXT,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,umpan_balik TEXT,dinilai_pada TEXT)',
             'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,materi_id INTEGER,row_uuid TEXT,pertanyaan TEXT,petunjuk TEXT)',
@@ -60,6 +62,9 @@ final class MateriSiswaDatabaseTest extends TestCase
         $this->db->table('penugasan_paket')->insert([
             'id'=>8,'angkatan_id'=>1,'mapel_id'=>5,'semester'=>4,
             'tahun_ajaran_id'=>1,'paket_id'=>8,
+        ]);
+        $this->db->table('bab')->insertBatch([
+            ['id'=>1,'paket_semester_id'=>8,'nomor_bab'=>1,'nama_bab'=>'BAB Contoh 1','deskripsi_bab'=>'Contoh untuk pengujian'],
         ]);
         $this->db->table('tp')->insert([
             'id'=>1,'paket_semester_id'=>8,'kode_tp'=>'TP-1',
@@ -153,6 +158,20 @@ final class MateriSiswaDatabaseTest extends TestCase
         self::assertSame('application/pdf',$media['mime']);
         self::assertSame(filesize($this->file),$media['bytes']);
         self::assertSame($this->file,$media['path']);
+    }
+
+    public function testLulusDiagnostikBolehBacaMateriSukarelaTetapiBelumTuntas(): void
+    {
+        $this->db->table('progres_tp')->where('id', 11)
+            ->update(['status' => 'sumatif']);
+        $semua = $this->svc()->daftar(1)['materi'];
+        self::assertTrue($semua[0]['buka']);
+        self::assertTrue($semua[1]['buka']);
+        self::assertTrue($semua[1]['sukarela']);
+        $detail = $this->svc()->lihat(1, 31);
+        self::assertTrue($detail['sukarela']);
+        self::assertSame(32, $detail['materi_berikutnya']['id']);
+        self::assertSame(0, $this->db->table('progres_materi')->countAllResults());
     }
 
     public function testTPtuntasBolehMembukaSemuaMateriSecaraSukarela(): void
@@ -780,6 +799,51 @@ final class MateriSiswaDatabaseTest extends TestCase
             self::assertStringContainsString('tab lain',$e->getMessage());
         }
         self::assertSame('Teks asli',$k->status(1,31)['resume']['isi']);
+    }
+
+    public function testA3GerbangSumatifMembacaBuktiVersiTerpinTanpaMembuatAttempt(): void
+    {
+        $akun = static fn (): array => [
+            'id'=>101,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+        ];
+        $service = new \App\Services\KelayakanSumatifSiswaService($this->db, $akun);
+        // Snapshot legacy dengan dua Materi tidak boleh dinilai siap untuk v2.5.
+        self::assertFalse($service->periksa(1)['siap']);
+
+        $row = $this->db->table('versi_konten_tp')->where('id',3)->get()->getRowArray();
+        $snapshot = json_decode($row['snapshot_json'], true);
+        $snapshot['materi'] = [$snapshot['materi'][0]];
+        $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->db->table('versi_konten_tp')->where('id',3)->update([
+            'snapshot_json'=>$json, 'checksum'=>hash('sha256',$json),
+        ]);
+
+        self::assertFalse($service->periksa(1)['siap']);
+        $key = ['progres_tp_id'=>11,'materi_id'=>31,'versi_konten_tp_id'=>3];
+        $this->db->table('progres_materi')->insert($key + [
+            'jenis'=>'pdf','status'=>'media_selesai',
+        ]);
+        self::assertFalse($service->periksa(1)['siap']);
+        $this->db->table('resume_materi')->insert($key + [
+            'status'=>'final','isi'=>'Ringkasan uji',
+        ]);
+        self::assertFalse($service->periksa(1)['siap']);
+        $this->db->table('jawaban_hots_materi')->insert($key + [
+            'status'=>'final','isi'=>'Analisis uji',
+        ]);
+        $akhir = $service->periksa(1);
+        self::assertTrue($akhir['siap']);
+        self::assertSame('belajar',$akhir['jalur']);
+        self::assertSame(1,$this->db->table('progres_tp')
+            ->where('id',11)->where('status','belajar')->countAllResults());
+        self::assertSame(0,$this->db->table('percobaan_ujian')->countAllResults());
+
+        $asing = new \App\Services\KelayakanSumatifSiswaService($this->db,
+            static fn (): array => [
+                'id'=>202,'peran_aktif'=>'siswa','status'=>'aktif','wajib_ganti_sandi'=>0,
+            ]);
+        $this->expectException(\DomainException::class);
+        $asing->periksa(1);
     }
 
 }

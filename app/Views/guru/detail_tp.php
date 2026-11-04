@@ -1,213 +1,225 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page">
+<div class="a-page a-tp-satu-materi a-guru-detail-tp">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
         <a href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Peta ATP</a>
         <span aria-hidden="true">/</span>
-        <span aria-current="page">Rincian TP</span>
+        <span aria-current="page">Kelola TP</span>
     </nav>
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Guru · Pembelajaran · Semester <?= (int) $paket['semester'] ?></p>
-            <h1><?= esc($tp['judul']) ?></h1>
-            <p class="a-proto-muted">Rincian TP dalam paket semester versi <?= (int) $paket['nomor_versi'] ?>. Pembacaan dibatasi pada Gen–Mapel yang Anda ampu.</p>
+            <p class="a-proto-eyebrow">Guru · Semester <?= (int) $paket['semester'] ?> · <?= esc($tp['kode_tp']) ?></p>
+            <h1><?= esc(($tp['nama_tp'] ?? '') !== '' ? $tp['nama_tp'] : $tp['judul']) ?></h1>
+            <p class="a-proto-muted"><?= esc(($tp['jenis_tp'] ?? '') === 'esensial' ? 'Esensial' : 'NonEsensial') ?>
+                · <?= esc($tp['status']) ?> · Satu TP = satu Materi</p>
         </div>
     </header>
-    <section class="a-card" aria-labelledby="identitas-tp">
+    <section class="a-card a-tp-identitas-kartu" aria-labelledby="identitas-tp">
         <h2 id="identitas-tp">Identitas TP</h2>
-        <div class="a-tabel-gulir">
-            <table class="a-tbl a-tp-identitas">
-                <tbody>
-                    <tr><th scope="row">Kode TP</th><td><?= esc($tp['kode_tp']) ?></td></tr>
-                    <tr><th scope="row">Urutan ATP</th><td><?= (int) $tp['urutan_atp'] ?></td></tr>
-                    <tr><th scope="row">Semester</th><td><?= (int) $paket['semester'] ?></td></tr>
-                    <tr><th scope="row">Status TP</th><td><span class="a-badge"><?= esc($tp['status']) ?></span></td></tr>
-                    <tr><th scope="row">Jumlah Materi/Submateri</th><td><?= (int) $jumlah_materi ?></td></tr>
-                </tbody>
-            </table>
-        </div>
+        <dl class="a-tp-identitas-ringkas">
+            <div><dt>Kode TP</dt><dd><?= esc($tp['kode_tp']) ?></dd></div>
+            <div><dt>Urutan ATP</dt><dd><?= (int) $tp['urutan_atp'] ?></dd></div>
+            <div><dt>Semester</dt><dd><?= (int) $paket['semester'] ?></dd></div>
+            <div><dt>Status TP</dt><dd><span class="a-badge"><?= esc($tp['status']) ?></span></dd></div>
+            <div><dt>Materi</dt><dd><?= (int) $jumlah_materi ?> dari 1</dd></div>
+        </dl>
     </section>
-    <section class="a-card a-jarak-atas" id="kesiapan-tp" aria-labelledby="kesiapan-tp-judul">
-        <h2 id="kesiapan-tp-judul"><?= $tp['status'] === 'siap' ? 'Status publikasi TP' : 'Pemeriksaan kesiapan TP' ?></h2>
-        <p class="a-help"><?= $tp['status'] === 'siap'
-            ? 'TP telah diterbitkan. Lihat status penguncian dan riwayat versi konten pada halaman kesiapan.'
-            : 'Satu pemeriksaan final untuk CP, Materi, Resume/HOTS, bank soal, media, dan pengaturan sebelum TP diterbitkan.' ?></p>
-        <?php if ($tp['status'] === 'siap'): ?>
-            <div class="a-alert" role="status">TP sudah Siap dan terkunci.
-                Pemeriksaan dan versi konten tetap dapat dilihat.</div>
-            <a class="a-btn a-btn--sekunder"
-                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">Lihat status dan versi TP</a>
-        <?php else: ?>
-            <a class="a-btn a-btn--utama"
-                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">Periksa kesiapan TP Siap</a>
+
+    <section class="a-card a-jarak-atas" id="langkah-tp" aria-labelledby="judul-langkah-tp">
+        <h2 id="judul-langkah-tp">Langkah penyiapan TP</h2>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            TP sudah diterbitkan. Langkah di bawah menunjukkan hasil pemeriksaan konten;
+            penyuntingan tetap mengikuti status penggunaan siswa.
+            <?php else: ?>
+            Setiap langkah memakai hasil pemeriksaan Service. TP belum diterbitkan
+            sebelum semua ketentuan terpenuhi dan Guru menyetujui publikasi.
+            <?php endif ?></p>
+        <?= view('guru/_step_progress_tp', ['langkah' => $langkah]) ?>
+    </section>
+
+    <section class="a-card a-jarak-atas" id="rumusan-tp" aria-labelledby="judul-rumusan-tp">
+        <h2 id="judul-rumusan-tp">1. Data TP</h2>
+        <?php if ($pesan = session()->getFlashdata('sukses')): ?>
+            <div class="a-alert" role="status"><?= esc($pesan) ?></div>
         <?php endif ?>
-    </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="antrean-penilaian">
-        <h2 id="antrean-penilaian">Penilaian siswa</h2>
-        <p class="a-help">Resume dan HOTS final diperiksa oleh Guru aktif berdasarkan Gen–Mapel.
-            Nilai awal tidak dapat ditimpa; koreksi menggunakan alur khusus.</p>
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">
-            Buka Antrean Penilaian</a>
-    </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="bank-soal-tautan">
-        <h2 id="bank-soal-tautan">Bank soal Diagnostik dan Sumatif</h2>
-        <p class="a-help">Lihat jumlah soal aktif untuk TP ini. Kelola soal aktif, sunting soal draf, atau impor Word untuk TP ini.</p>
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal'), 'attr') ?>">Lihat bank soal</a>
-    </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="rumusan-tp">
-        <h2 id="rumusan-tp">Rumusan dan indikator</h2>
-        <?php if (session()->getFlashdata('sukses')): ?>
-            <div class="a-alert" role="status"><?= esc(session()->getFlashdata('sukses')) ?></div>
-        <?php endif ?>
-        <?php if (session()->getFlashdata('galat')): ?>
-            <div class="a-alert a-alert--bahaya" role="alert"><?= esc(session()->getFlashdata('galat')) ?></div>
+        <?php if ($pesan = session()->getFlashdata('galat')): ?>
+            <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
         <?php endif ?>
         <?php if ($tp['status'] === 'draf'): ?>
             <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>" class="a-form">
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                 <div class="a-field">
-                    <label for="tp-judul" class="a-label">Judul TP</label>
-                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="180" required value="<?= esc($tp['judul'], 'attr') ?>">
+                    <label class="a-label" for="tp-judul">Nama TP</label>
+                    <input class="a-input" id="tp-judul" type="text" name="judul" maxlength="50" required
+                           value="<?= esc($tp['judul'], 'attr') ?>">
                 </div>
                 <div class="a-field">
-                    <label for="tp-rumusan" class="a-label">Rumusan TP</label>
-                    <textarea id="tp-rumusan" name="rumusan" rows="5" maxlength="20000" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
+                    <label class="a-label" for="tp-rumusan">Rumusan / deskripsi TP</label>
+                    <textarea id="tp-rumusan" name="rumusan" rows="3" maxlength="225" required><?= esc($tp['rumusan'] ?? '') ?></textarea>
                 </div>
                 <div class="a-field">
-                    <label for="tp-indikator" class="a-label">Indikator ketercapaian</label>
-                    <textarea id="tp-indikator" name="indikator" rows="5" maxlength="20000" required><?= esc($tp['indikator'] ?? '') ?></textarea>
+                    <label class="a-label" for="tp-jenis">Jenis TP</label>
+                    <select id="tp-jenis" name="jenis_tp" required>
+                        <option value="esensial" <?= ($tp['jenis_tp'] ?? '') === 'esensial' ? 'selected' : '' ?>>Esensial</option>
+                        <option value="non_esensial" <?= ($tp['jenis_tp'] ?? '') === 'non_esensial' ? 'selected' : '' ?>>NonEsensial</option>
+                    </select>
                 </div>
-                <button class="a-btn a-btn--utama" type="submit">Simpan draf TP</button>
+                <p class="a-help">Indikator ketercapaian tidak lagi menjadi kolom wajib terpisah.
+                    Informasi lama yang telah tersimpan tetap dipertahankan.</p>
+                <button class="a-btn a-btn--utama" type="submit">Simpan data TP</button>
             </form>
         <?php else: ?>
-            <div class="a-alert" role="status">TP sudah Siap. Perubahan melalui editor draf tidak diizinkan.</div>
-            <h3>Rumusan TP</h3>
             <p><?= nl2br(esc($tp['rumusan'] ?? '')) ?></p>
-            <h3>Indikator</h3>
-            <p><?= nl2br(esc($tp['indikator'] ?? '')) ?></p>
-        <?php endif ?>
-        <?php if ($jumlah_materi === 0): ?>
-            <div class="a-empty" role="status">
-                <strong>Belum ada Materi/Submateri.</strong>
-                <p>Struktur TP sudah terdaftar, tetapi belum memiliki materi. Penyusunan materi akan tersedia dalam tahap berikutnya.</p>
-            </div>
-        <?php endif ?>
-        <p class="a-help">Penyuntingan ini hanya untuk redaksi TP draf. Perubahan urutan ATP, tautan CP, struktur Materi dan publikasi menggunakan alur tersendiri.</p>
-        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Kembali ke Peta ATP</a>
-    </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="daftar-materi">
-        <h2 id="daftar-materi">Daftar Materi/Submateri</h2>
-        <?php if ($materi === []): ?>
-            <div class="a-empty" role="status"><p>Belum ada Materi/Submateri untuk TP ini.</p></div>
-        <?php else: ?>
-            <div class="a-tabel-gulir">
-                <table class="a-tbl a-tbl--cards a-tp-materi-tabel">
-                    <thead>
-                        <tr>
-                            <th scope="col">No.</th>
-                            <th scope="col">Judul</th>
-                            <th scope="col">Jenis</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Pratinjau</th>
-                            <th scope="col">Urutan</th>
-                            <th scope="col">Edit</th>
-                            <th scope="col">Hapus</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($materi as $item): ?>
-                            <tr>
-                                <th scope="row" data-label="No."><?= (int) $item['urutan'] ?></th>
-                                <td data-label="Judul" class="a-tp-materi-judul"><?= esc($item['judul']) ?></td>
-                                <td data-label="Jenis"><?= esc(strtoupper((string) $item['jenis'])) ?></td>
-                                <td data-label="Status"><span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Nonaktif' ?></span></td>
-                                <td class="a-materi-aksi" data-label="Pratinjau">
-                                    <?php if (in_array($item['jenis'], ['pdf', 'gambar', 'audio'], true) && $item['berkas_id'] !== null): ?>
-                                        <a class="a-btn a-btn--sekunder" target="_blank" rel="noopener noreferrer" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>">Pratinjau</a>
-                                    <?php elseif ($item['jenis'] === 'youtube' && ! empty($item['url_youtube'])): ?>
-                                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>">Pratinjau</a>
-                                    <?php else: ?>
-                                        <span class="a-help">Belum ada file</span>
-                                    <?php endif ?>
-                                </td>
-                                <td class="a-materi-aksi" data-label="Urutan">
-                                    <?php if ($tp['status'] === 'draf'): ?>
-                                        <div class="a-materi-urutan">
-                                            <?php foreach (['naik' => 'Naik', 'turun' => 'Turun'] as $arah => $label): ?>
-                                                <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/urut'), 'attr') ?>">
-                                                    <?= csrf_field() ?>
-                                                    <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
-                                                    <input type="hidden" name="arah" value="<?= esc($arah, 'attr') ?>">
-                                                    <button type="submit" class="a-btn a-btn--sekunder"
-                                                        <?= ($arah === 'naik' && (int) $item['urutan'] === 1) || ($arah === 'turun' && (int) $item['urutan'] === count($materi)) ? 'disabled' : '' ?>><?= esc($label) ?></button>
-                                                </form>
-                                            <?php endforeach ?>
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="a-help">Terkunci</span>
-                                    <?php endif ?>
-                                </td>
-                                <td class="a-materi-aksi" data-label="Edit">
-                                    <?php if ($tp['status'] === 'draf'): ?>
-                                        <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/edit'), 'attr') ?>">Sunting</a>
-                                    <?php else: ?>
-                                        <span class="a-help">Terkunci</span>
-                                    <?php endif ?>
-                                </td>
-                                <td class="a-materi-aksi" data-label="Hapus">
-                                    <?php if ($tp['status'] === 'draf'): ?>
-                                        <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/hapus'), 'attr') ?>"
-                                            data-materi-hapus-form>
-                                            <?= csrf_field() ?>
-                                            <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
-                                            <input type="hidden" name="konfirmasi" value="HAPUS">
-                                            <button type="submit" class="a-btn a-btn--sekunder" data-materi-hapus
-                                                data-judul="<?= esc($item['judul'], 'attr') ?>">Hapus</button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span class="a-help">Terkunci</span>
-                                    <?php endif ?>
-                                </td>
-                            </tr>
-                        <?php endforeach ?>
-                    </tbody>
-                </table>
-            </div>
+            <p class="a-help"><?= $suntingDikunci ? 'TP sudah pernah digunakan siswa. Konten akademik terkunci.' : 'TP Siap masih dapat diperbaiki karena belum digunakan siswa. Gunakan Sunting TP.' ?></p>
         <?php endif ?>
     </section>
-    <?php if ($tp['status'] === 'draf'): ?>
-        <section class="a-card a-jarak-atas" aria-labelledby="tambah-materi">
-            <h2 id="tambah-materi">Tambah Materi/Submateri</h2>
-            <?php $pesanMateriGagal = session()->getFlashdata('materi_galat'); ?>
-            <?php $pesanMateriSukses = session()->getFlashdata('materi_sukses'); ?>
-            <?php $nilaiMateriLama = session()->getFlashdata('materi_input_lama'); ?>
-            <?php $kolomMateriGalat = (string) (session()->getFlashdata('materi_field_galat') ?? ''); ?>
-            <?php $nilaiMateriTambah = is_array($nilaiMateriLama) ? $nilaiMateriLama : []; ?>
-            <?php if (is_string($pesanMateriGagal) && $pesanMateriGagal !== ''): ?>
-                <div class="a-alert a-alert--bahaya" role="alert">
-                    <strong>Materi belum disimpan:</strong> <?= esc($pesanMateriGagal) ?>
-                </div>
+
+    <section class="a-card a-jarak-atas" id="materi-tp" aria-labelledby="judul-materi-tp">
+        <span id="daftar-materi"></span>
+        <h2 id="judul-materi-tp">2. Satu Materi TP</h2>
+        <?php if (count($materi) === 1): ?>
+            <?php $item = $materi[0]; ?>
+            <div class="a-tp-materi-ringkas">
+                <strong><?= esc($item['judul']) ?></strong>
+                <span class="a-badge"><?= esc(strtoupper((string) $item['jenis'])) ?></span>
+                <span class="a-badge"><?= (int) $item['aktif'] === 1 ? 'Aktif' : 'Draf — belum terbit' ?></span>
+                <?php if (($item['jenis'] === 'youtube' && ! empty($item['url_youtube']))
+                    || (in_array($item['jenis'], ['pdf', 'audio', 'gambar'], true) && $item['berkas_id'] !== null)): ?>
+                    <a class="a-btn a-btn--sekunder"
+                        href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id'] . '/pratinjau'), 'attr') ?>"
+                        target="_blank" rel="noopener noreferrer">Pratinjau</a>
+                <?php endif ?>
+            </div>
+            <?php if ($tp['status'] === 'draf'): ?>
+                <?php
+                $pesanSuntingGalat = session()->getFlashdata('materi_edit_galat');
+                $pesanSuntingSukses = session()->getFlashdata('materi_edit_sukses');
+                $inputUlang = session()->getFlashdata('materi_edit_input_lama');
+                $kolomSuntingGalat = (string) (session()->getFlashdata('materi_edit_field_galat') ?? '');
+                $nilaiSunting = is_array($inputUlang) ? array_merge($item, $inputUlang) : $item;
+                $nilaiSunting['berkas_id'] = $item['berkas_id'];
+                if ($item['berkas_id'] !== null) {
+                    $nilaiSunting['jenis'] = $item['jenis'];
+                }
+                ?>
+                <h3>Lengkapi satu Materi ini</h3>
+                <p class="a-help">Sunting Materi yang sudah dibuat dari ATP. Tidak perlu menambah Materi
+                    kedua. Isi media dan waktu minimal; Resume/HOTS hanya diwajibkan untuk NonEsensial.</p>
+                <?php if (is_string($pesanSuntingGalat) && $pesanSuntingGalat !== ''): ?>
+                    <div class="a-alert a-alert--bahaya" role="alert">
+                        <strong>Materi belum disimpan:</strong> <?= esc($pesanSuntingGalat) ?>
+                    </div>
+                <?php endif ?>
+                <?php if (is_string($pesanSuntingSukses) && $pesanSuntingSukses !== ''): ?>
+                    <div class="a-alert" role="status"><?= esc($pesanSuntingSukses) ?></div>
+                <?php endif ?>
+                <?php if ($item['berkas_id'] !== null): ?>
+                    <p class="a-help">Berkas tersimpan. Jenis media terkunci; berkas pengganti
+                        harus berjenis sama agar riwayat aman.</p>
+                <?php endif ?>
+                <?php if (is_string($pesanSuntingGalat) && $pesanSuntingGalat !== ''
+                    && in_array(($nilaiSunting['jenis'] ?? ''), ['pdf', 'gambar', 'audio'], true)): ?>
+                    <p class="a-help">Jika penyimpanan file gagal, pilih ulang file dari komputer Anda.</p>
+                <?php endif ?>
+                <form method="post" class="a-form" enctype="multipart/form-data"
+                    data-materi-form data-materi-sudah-upload="<?= $item['berkas_id'] !== null ? '1' : '0' ?>"
+                    action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $item['id']), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
+                    <div class="a-materi-form-fields">
+                        <?= view('guru/_materi_fields', [
+                            'nilai' => $nilaiSunting,
+                            'galatKolom' => $kolomSuntingGalat,
+                            'jenisTp' => (string) ($tp['jenis_tp'] ?? 'non_esensial'),
+                        ]) ?>
+                    </div>
+                    <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Simpan Materi</button>
+                    <p class="a-help" data-materi-status aria-live="polite">Perubahan belum disimpan.</p>
+                </form>
+            <?php else: ?>
+                <p class="a-help"><?= $suntingDikunci ? 'Materi terkunci karena TP sudah digunakan siswa.' : 'Pilih Sunting TP untuk kembali menggunakan editor Materi.' ?></p>
             <?php endif ?>
-            <?php if (is_string($pesanMateriSukses) && $pesanMateriSukses !== ''): ?>
+        <?php elseif ($jumlah_materi === 0 && $tp['status'] === 'draf'): ?>
+            <?php
+            $pesanMateriGagal = session()->getFlashdata('materi_galat');
+            $pesanMateriSukses = session()->getFlashdata('materi_sukses');
+            $nilaiMateriLama = session()->getFlashdata('materi_input_lama');
+            $kolomMateriGalat = (string) (session()->getFlashdata('materi_field_galat') ?? '');
+            $nilaiMateriTambah = is_array($nilaiMateriLama) ? $nilaiMateriLama : [];
+            ?>
+            <div class="a-empty" role="status"><p>TP belum memiliki Materi. Tambahkan tepat satu Materi.</p></div>
+            <?php if ($pesanMateriGagal): ?>
+                <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesanMateriGagal) ?></div>
+            <?php endif ?>
+            <?php if ($pesanMateriSukses): ?>
                 <div class="a-alert" role="status"><?= esc($pesanMateriSukses) ?></div>
             <?php endif ?>
-            <p class="a-help">Pilih YouTube untuk mengisi URL, atau PDF/Gambar/Audio untuk memilih file. Simpan menghasilkan Materi Nonaktif; file dan data Materi hanya disimpan bila semua pemeriksaan berhasil.</p>
-            <?php if (is_string($pesanMateriGagal) && $pesanMateriGagal !== '' && in_array(($nilaiMateriTambah['jenis'] ?? ''), ['pdf', 'gambar', 'audio'], true)): ?>
-                <p class="a-help"><strong>Perlu pilih ulang file:</strong> Demi keamanan, browser tidak dapat mempertahankan pilihan file setelah pengiriman gagal. Judul, waktu, petunjuk Resume dan HOTS tetap dipulihkan.</p>
-            <?php endif ?>
-            <form method="post" class="a-form" enctype="multipart/form-data" data-materi-form data-materi-sudah-upload="0" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
+            <form method="post" class="a-form" enctype="multipart/form-data"
+                data-materi-form data-materi-sudah-upload="0"
+                action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi'), 'attr') ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="struktur_versi" value="<?= (int) $tp['struktur_versi'] ?>">
                 <div class="a-materi-form-fields">
-                    <?= view('guru/_materi_fields', ['nilai' => $nilaiMateriTambah, 'galatKolom' => $kolomMateriGalat]) ?>
+                    <?= view('guru/_materi_fields', [
+                        'nilai' => $nilaiMateriTambah,
+                        'galatKolom' => $kolomMateriGalat,
+                        'jenisTp' => (string) ($tp['jenis_tp'] ?? 'non_esensial'),
+                    ]) ?>
                 </div>
-                <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Tambah Materi draf</button>
+                <button class="a-btn a-btn--utama" type="submit" data-materi-submit>Tambah satu Materi</button>
                 <p class="a-help" data-materi-status aria-live="polite">Belum disimpan.</p>
             </form>
+        <?php else: ?>
+            <div class="a-alert a-alert--bahaya" role="alert">
+                Ditemukan <?= (int) $jumlah_materi ?> Materi pada TP ini.
+                Data perlu diperiksa Admin; jangan menghapus data pembelajaran historis.
+            </div>
+        <?php endif ?>
+    </section>
+
+    <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial'): ?>
+        <section class="a-card a-jarak-atas" id="bank-soal-tautan" aria-labelledby="judul-bank-soal">
+            <h2 id="judul-bank-soal">3. Diagnostik dan Sumatif</h2>
+            <p class="a-help">Diagnostik memerlukan minimal 10 soal, Sumatif minimal 30 soal.
+                Pengelolaan soal melalui editor khusus agar rumus, gambar, dan tabel tetap nyaman.</p>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal'), 'attr') ?>">Kelola Bank Soal</a>
+            <p class="a-help">Diagnostik dan Sumatif dikelola melalui dua tab pada halaman yang sama.</p>
         </section>
     <?php endif ?>
+
+    <section class="a-card a-jarak-atas a-tp-penutup" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
+        <h2 id="judul-kesiapan-tp"><?= $tp['status'] === 'siap' ? 'TP sudah Siap' : 'Langkah akhir · Pemeriksaan kesiapan' ?></h2>
+        <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
+            TP telah diterbitkan. Snapshot konten tersimpan; akses sunting ditentukan
+            oleh apakah TP sudah pernah digunakan siswa.
+            <?php else: ?>
+            Penerbitan memerlukan pemeriksaan final server, konfirmasi Guru,
+            dan penyimpanan snapshot konten.
+            <?php endif ?></p>
+        <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
+            <p class="a-help">Sunting TP membuka editor biasa. TP sementara kembali menjadi Draf dan harus diperiksa serta disiapkan lagi sebelum siswa dapat memulainya. Snapshot lama tetap tersimpan.</p>
+        <?php elseif ($tp['status'] === 'siap'): ?>
+            <p class="a-help">TP telah digunakan siswa; seluruh rincian, KKM, Materi, media, Resume/HOTS dan Bank Soal terkunci.</p>
+        <?php endif ?>
+        <div class="a-tp-penutup__aksi">
+            <?php if ($tp['status'] === 'siap' && ! $suntingDikunci): ?>
+                <form method="post" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/sunting'), 'attr') ?>">
+                    <?= csrf_field() ?>
+                    <button class="a-btn a-btn--utama" type="submit">Sunting TP</button>
+                </form>
+            <?php endif ?>
+            <a class="a-btn a-btn--utama"
+                href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/kesiapan'), 'attr') ?>">
+                <?= $tp['status'] === 'siap' ? 'Lihat status dan versi TP' : 'Periksa kesiapan TP Siap' ?>
+            </a>
+            <?php if (($tp['jenis_tp'] ?? '') === 'non_esensial' && $tp['status'] === 'siap'): ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/penilaian'), 'attr') ?>">Antrean Penilaian</a>
+            <?php endif ?>
+        </div>
+    </section>
 </div>
 <?= $this->endSection() ?>

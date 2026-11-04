@@ -1,35 +1,49 @@
-# 04 — Kurikulum, Fase D, CP, ATP, TP dan Paket Semester
+# 04 — Kurikulum, CP, Semester, BAB, TP dan ATP
 
-> **Master v2.4 (22 Oktober 2026).** Struktur operasional final: **CP → ATP (urutan TP) → TP → Materi/Submateri**. Tidak ada entitas BAB wajib dalam aplikasi. Aturan akademik percepatan SKS tidak diubah.
+> **Master v2.5 · Keputusan 26 Oktober 2026.** Menggantikan model v2.4 tanpa BAB. Kontrak akademik: **Mapel → satu CP operasional → Semester → BAB → TP**. ATP adalah rangkaian BAB/TP yang disusun Guru.
 
-## 1. Kontrak akademik
-- SLA-SKS melayani MTs Fase D kelas VII–IX, Semester 1–6. Semester 1–2 berpadanan tingkat VII, 3–4 tingkat VIII, 5–6 tingkat IX untuk penampilan; **Gen boleh mempunyai semester mulai lebih lanjut** sesuai program SKS dua tahun.
-- **CP** adalah referensi resmi sesuai mata pelajaran, fase dan kurikulum; sumber regulasi mapel dapat berbeda. Admin mengelola naskah/transkripsi resmi, versi dan penerbitannya. Versi yang sudah terbit immutable, versi lama tetap dapat dirujuk objek historis.
-- **TP** adalah tujuan pembelajaran dengan **kode stabil, judul singkat, rumusan yang mengandung kompetensi dan lingkup materi, indikator ketercapaian, urutan, tautan CP**. TP dibuat Guru pengampu per Gen–Mapel; minimal satu versi CP aktif yang relevan, tepat satu CP utama. Satu TP dapat memiliki sejumlah Materi/Submateri berurutan (minimum satu untuk status Siap).
-- **ATP** bukan tabel/objek tingkat baru di antara CP dan TP: ATP adalah **rangkaian TP yang urut menurut semester dan Gen–Mapel**. Pemetaan satu Gen–Mapel mencakup enam semester; jumlah TP/materi tidak ditetapkan secara nasional atau dipaksakan seragam.
-- **BAB buku ajar** boleh dicantumkan sebagai referensi sumber/kelompok topik secara opsional, bukan entitas, status, prasyarat belajar, halaman atau unit penilaian tersendiri.
-- **KBC Kemenag** diintegrasikan secara kontekstual melalui nilai Panca Cinta yang relevan pada materi/aktivitas/soal. KBC tidak membuat hierarki akademik tambahan atau penilaian wajib baru.
+## 1. Hierarki dan cakupan
+- MTs Fase D: semester SLA 1–2 = kelas VII, 3–4 = VIII, 5–6 = IX. Gen/angkatan, guru pengampu dan paket tetap terpisah menurut **Gen–Mapel** (G1). Kebijakan SKS dua tahun dan semester mulai siswa tidak berubah.
+- **Satu CP untuk satu Mapel** pada satu kurikulum/fase yang berlaku. CP dapat mempunyai beberapa elemen/rumusan; ini bukan beberapa CP operasional. Elemen dan versi sumber resmi lama tidak dihapus.
+- Setiap Semester terdiri dari beberapa BAB; BAB mempunyai beberapa TP; setiap TP hanya mempunyai satu jenis, **Esensial** atau **NonEsensial**.
+- **BAB:** `nama_bab` maksimal 50 karakter, `deskripsi_bab` maksimal 225 karakter, `nomor_bab` positif.
+- **TP:** `nama_tp` maksimal 50 karakter, `deskripsi_tp` maksimal 225 karakter berupa bunyi asli tujuan pembelajaran, `jenis_tp`, `kode_tp`, dan `urutan_dalam_bab`. Rumusan akademik lengkap tetap terlihat pada detail, tidak dipotong permanen oleh card.
+- **TP Esensial:** tetap wajib masuk ATP dan memiliki **satu Materi lengkap** sebagai konten akademik Guru; pemakaian/aktivitas serta nilai siswa mengikuti alur siswa (saat ini tidak dihitung progres/nilai).
+- **TP NonEsensial:** juga tepat **1 Materi** lengkap dengan satu media jenis YouTube/audio/gambar/PDF, Resume, HOTS dan bank soal Diagnostik/Sumatif sesuai alur siswa.
 
-## 2. Pengelolaan CP resmi oleh Admin
-1. Admin menentukan kurikulum, mapel dan Fase D dari data referensi; menulis **Elemen CP** dan **Rumusan CP** serta kode unik (boleh dibangkitkan sistem). Data sumber hukum direferensikan dari **sumber kurikulum/dokumen resmi bersama**, tidak wajib diulang setiap kali mengisi satu CP.
-2. Pada form CP **otoritas penerbit, nomor dokumen resmi, URL sumber dan tanggal berlaku tidak menjadi isian wajib per rumusan**. Identitas/sumber tetap dapat ditelusuri di tingkat referensi dokumen, atau sebagai metadata versi opsional yang diwariskan dari referensi; tidak boleh dibuat data resmi fiktif.
-3. Admin menyimpan draf, meninjau, kemudian menerbitkan versi aktif; setiap CP/mapel/fase/kurikulum memiliki satu versi aktif. Perubahan setelah terbit melalui versi baru, tanpa mengubah tautan historis.
-4. Guru dapat mengajukan **tambahan rujukan, koreksi transkripsi, catatan lokal** beserta alasan; Admin memutus setujui/tolak/kembalikan perbaikan. Catatan lokal tidak menggantikan rumusan CP resmi.
-5. Tidak ada role `cp_review` lain; **akun pengusul yang sama tidak boleh menyetujui usulan akademiknya sendiri** meskipun dapat berganti peran Admin/Guru. Administrasi CP biasa oleh Admin tidak mensyaratkan dua Admin.
-6. Seleksi CP pada layar Guru dan Excel hanya dari **versi CP aktif** yang cocok Mapel, Fase D dan Kurikulum; label dan versi terlihat, sumber resmi dapat ditelusuri.
+## 2. Kode dan penomoran
+Kode TP: `KODEMAPEL.KELAS.NOMOR_BAB.NOMOR_TP_DALAM_BAB`, misalnya `BIND.8.1.1`. Dibangkitkan/validasi server dari konteks mapel, tingkat kelas, nomor BAB dan urutan TP dalam BAB; guru tidak mengetik kode yang bertentangan dengan konteks.
+- Nomor BAB berlanjut antara semester 1–2 (kelas VII), 3–4 (VIII) dan 5–6 (IX), lalu kembali dari BAB 1 pada tingkat kelas berikutnya.
+- Nomor TP dalam BAB dimulai dari 1; tidak sama dengan nomor TP global semester.
+- Contoh: `BIND.7.1.1` s.d. `BIND.7.6.6` untuk dua semester kelas VII bila BAB semester genap berlanjut sampai 6. Jumlah riil BAB/TP tidak dibatasi contoh.
+- Unik menurut Gen–Mapel–Tingkat Kelas–Tahun Ajaran–Kurikulum; validasi lintas paket semester berpasangan dilakukan server. Penomoran dan kode TP tetap mengikuti aturan yang sudah ada; perubahan konten TP diizinkan hanya sebelum digunakan siswa. Tidak diperkenalkan fitur memindahkan TP antar-BAB.
 
-## 3. Paket semester per Gen
-- Setiap `paket_semester` memiliki `angkatan_id` (Gen), mapel, semester 1–6, tahun ajaran, kurikulum dan versi. `penugasan_paket` menunjuk paket milik Gen yang sama; hanya satu aktif per Gen–Mapel–Semester–Tahun Ajaran.
-- Satu Guru aktif **per Gen–Mapel** melalui `penugasan_guru_gen`, berlaku untuk semester Gen tersebut. Pergantian Guru memindahkan hak operasional, tidak menimpa penilai/progres/versi lampau. CP resmi dapat dirujuk lintas Gen; **paket, TP, materi, soal tidak otomatis dibagi lintas Gen**.
-- Semester sebelum `COALESCE(siswa.semester_mulai, ref_angkatan.semester_mulai)` ditandai Dilewati dan tidak menghasilkan nilai/sertifikat.
-- TP draf dapat dibuat dan dilengkapi bertahap; hanya **TP Siap/Terkunci** dapat dibuka siswa. Guru tidak harus mengisi enam semester sekaligus.
+## 3. Pengelolaan CP oleh Admin
+**Admin dapat menambah maupun menyunting CP secara langsung kapan saja**, termasuk apabila sudah dipakai BAB, TP Siap, atau siswa; tidak perlu permohonan atau persetujuan lain. CP merupakan referensi akademik, bukan hasil aktivitas siswa. Perubahan CP tidak otomatis mengubah isi TP, Materi, soal, KKM, progres, ataupun nilai. Identitas relasi CP harus tetap konsisten dan audit internal boleh mencatat histori tanpa memaksa Admin menjalani alur versi/reviewer. **Form Tambah dan Sunting CP hanya mempunyai lima isian:** (1) Kurikulum dari dropdown tersimpan, (2) Mata pelajaran dari dropdown tersimpan, (3) Kode CP, (4) Elemen CP, (5) Rumusan CP resmi. Fase D ditentukan sistem. **Otoritas penerbit, Nomor dokumen resmi, URL sumber dokumen, dan Tanggal berlaku tidak ditampilkan maupun diwajibkan untuk menyimpan CP.** Kolom historis yang sudah ada tidak dihapus hanya karena form disederhanakan. Jangan mengarang data referensi hukum.
 
-## 4. Alur Guru yang mengikat
-`Login Guru → pilih Gen–Mapel yang diampu → pilih kurikulum → unduh Excel Peta Pembelajaran 6 Semester → susun TP/CP dan Materi/Submateri → unggah → pratinjau → konfirmasi → lengkapi media/petunjuk Resume/HOTS per Materi → impor Word Diagnostik dan Sumatif per TP → checklist → TP Siap`.
+## 4. Paket, Gen dan ATP Guru
+Satu `paket_semester` per Gen–Mapel–Semester–Tahun Ajaran/Kurikulum/versi. Guru aktif G1 menyusun **semua BAB dan TP, baik Esensial maupun NonEsensial**, langsung di aplikasi **atau impor dari template Excel ATP yang sudah ada dan akan direvisi**. Impor dilakukan dari halaman khusus Guru **Peta ATP → Kelola ATP Excel** (G05), untuk workbook enam semester yang boleh berisi sebagian semester. **Hanya semester dengan paket sah dan tanpa BAB/TP apa pun yang boleh menerima penambahan**. Semester terisi tidak pernah diperbarui dari Excel; unggah ulang identik dibaca sebagai *Tetap* tanpa penulisan. Baris hilang tidak menghapus data. Pratinjau dan konfirmasi atomik tetap wajib.
+- Template awal `docs/PETA_PEMBELAJARAN_6_SEMESTER.xlsx` sudah dipakai sebagai acuan desain. **Keputusan terbaru: Excel ATP manual (.xlsx), tanpa macro dan tombol Proses.** File manual `.xlsx` telah diajukan sebagai template resmi pada branch fitur sesudah PR #68, dengan kontrak rentang sel di `KONTRAK-TEMPLATE-ATP-MANUAL-V25.md`. Guru mengisi BAB dan TP pada 6 sheet semester; Kode TP **tidak diisi Guru** dan selalu dibentuk oleh server saat pratinjau/konfirmasi impor berdasarkan Mapel, Kelas, Nomor BAB, Urutan TP. Generator unduhan akan menambahkan konteks Gen–Mapel/CP dari server.
+- Guru G1 dapat memperbaiki isian BAB yang sudah ada tanpa penguncian otomatis hanya karena salah satu TP berstatus Siap; validasi penomoran BAB/TP yang sudah berlaku tetap dipakai. **Tidak ada fitur baru memindahkan TP antar-BAB.** Guru boleh menyunting TP Draf maupun TP Siap yang belum digunakan satu pun siswa; setelah digunakan siswa, konten TP terkunci. Tidak ada kategori koreksi A/B/C ataupun persetujuan Admin untuk TP yang belum digunakan.
+- Paket, konten, soal dan nilai antargen tidak otomatis dibagikan, walaupun kode TP dapat serupa.
 
-- Excel **membentuk struktur TP dan Materi** di aplikasi; Guru tidak diminta menginput ulang data yang telah dimasukkan melalui Excel.
-- Alternatif penyuntingan draf langsung dalam aplikasi tetap boleh sebagai pelengkap dan tetap menjaga identitas urutan/versi.
-- Publikasi, koreksi kategori A/B/C, dan snapshot berdasarkan **TP**, bukan BAB. Siswa yang telah membuka TP memakai versi konten yang dipin sampai alur tersebut selesai.
+## 5. Validasi publikasi
+**Seluruh TP**, tanpa membedakan Esensial dan NonEsensial, wajib mempunyai tepat satu Materi lengkap dan media sah saat disiapkan. Pembatasan akses siswa/penilaian berada di Service siswa, bukan pada izin membuat/menyimpan Materi Guru. Kesiapan akademik, versi, dan snapshot tetap diaudit. TP lama dengan beberapa materi harus diaudit/diarsip, bukan diam-diam ditetapkan aktif.
 
-## 5. Validasi
-CP harus aktif dan cocok; kode TP unik di dalam paket/semester Gen–Mapel; nomor urut TP dan materi tidak bercelah; tepat satu CP utama; semua relasi diperiksa kembali oleh Service. TP yang telah Siap tidak diubah oleh unggah/edit biasa. Detail impor dan readiness: [05](05-PAKET-TP-DAN-IMPOR.md); SQL: [10](10-DATABASE.md).
+Detail: [05](05-PAKET-TP-DAN-IMPOR.md), [06](06-ALUR-PEMBELAJARAN.md), [10](10-DATABASE.md).
+
+**Keputusan terbaru 31-10-2026 (V25-3):** Guru mengisi Nomor BAB dari dropdown Defined Name, Jenis, Nama, Deskripsi, rencana satu Materi/media, dan Catatan. Urutan TP kolom B dihitung rumus per BAB dan dihitung ulang server; tidak boleh diketik Guru. Kode TP dibangkitkan `KodeTpService`; kolom Elemen CP tidak menjadi input. Sheet REFERENSI CP tetap wajib. V25-1/V25-2 ditolak.
+
+
+### Penyuntingan CP terbit yang sudah digunakan TP — 2 November 2026
+Admin membuka `/admin/kurikulum-cp`, memakai tombol **Sunting CP** dan form lima isian yang sama seperti Tambah CP, lalu **Simpan** tanpa alur pengajuan atau kategori. CP dapat diedit walaupun telah dipakai TP dan siswa. Kaitan `cp_mapel` terhadap TP tetap memakai identitas stabil, bukan teks/kode yang berubah. Riwayat versi atau audit disimpan otomatis sejauh diperlukan oleh skema, **bukan formulir/keputusan tambahan**. Data akademik siswa yang sudah terbentuk tidak dihitung ulang. Bila diperlukan penyesuaian kolom historis database, audit dump privat terbaru pada tahap implementasi sebelum membuat SQL additive.
+
+## 6. Aturan pemilahan CP, BAB, TP dalam editor (final 2 November 2026)
+| Objek | Kewenangan | Kapan bisa disunting | Gerbang yang tidak diperlukan |
+|---|---|---|---|
+| CP | Admin | Kapan saja, termasuk telah dipakai siswa | Persetujuan, kategori A/B/C, pembekuan karena TP Siap |
+| BAB | Guru G1 | Melalui isian BAB yang telah ada; status TP Siap bukan pengunci BAB | Approval Admin, alur koreksi kategori |
+| TP | Guru G1 | Draf serta Siap **sebelum** digunakan siswa | Approval Admin dan kategori A/B/C |
+| TP pernah digunakan siswa | Tidak ada edit konten | Terkunci setelah minimal satu aktivitas siswa yang sah | Tidak ada bypass dengan draf baru/reset progres |
+
+**Batas ruang lingkup:** keputusan ini bukan persetujuan untuk memindahkan TP antar-BAB, mengganti kurikulum paket, merombak penomoran kode TP yang sudah dipakai, atau menghapus histori siswa. Fitur yang tidak disepakati **tidak ditambahkan**. Perbaikan isian BAB tetap mengikuti aturan penomoran yang sudah ada.

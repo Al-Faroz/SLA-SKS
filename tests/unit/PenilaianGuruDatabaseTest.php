@@ -21,7 +21,7 @@ final class PenilaianGuruDatabaseTest extends TestCase
             'failover'=>[],
         ], false);
         foreach ([
-            'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
+            'CREATE TABLE ref_angkatan(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT,semester_mulai INTEGER NOT NULL DEFAULT 1)',
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,kode TEXT,nama TEXT)',
             'CREATE TABLE pengguna(id INTEGER PRIMARY KEY,nama TEXT)',
             'CREATE TABLE siswa(id INTEGER PRIMARY KEY,pengguna_id INTEGER,angkatan_id INTEGER)',
@@ -29,7 +29,7 @@ final class PenilaianGuruDatabaseTest extends TestCase
             'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,snapshot_json TEXT,checksum TEXT)',
-            'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER)',
+            'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,versi_konten_tp_id INTEGER,status TEXT NOT NULL DEFAULT \'belajar\')',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,guru_id INTEGER,angkatan_id INTEGER,mapel_id INTEGER)',
             'CREATE TABLE resume_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,progres_tp_id INTEGER,materi_id INTEGER,versi_konten_tp_id INTEGER,isi TEXT,status TEXT,revisi INTEGER,dikirim_pada TEXT,nilai INTEGER,dinilai_oleh INTEGER,dinilai_pada TEXT,umpan_balik TEXT)',
             'CREATE TABLE tugas_hots_materi(id INTEGER PRIMARY KEY AUTOINCREMENT,materi_id INTEGER,row_uuid TEXT,pertanyaan TEXT,petunjuk TEXT)',
@@ -284,6 +284,26 @@ final class PenilaianGuruDatabaseTest extends TestCase
         self::assertSame(0, $result['total']);
         self::assertSame([], $result['baris']);
         self::assertSame(1, $result['halaman']);
+    }
+
+
+    public function testFilterSudahDinilaiMemudahkanGuruMenemukanNilaiUntukKoreksi(): void
+    {
+        $svc=$this->svc();
+        $svc->simpan('resume',1,75,'Skor awal yang perlu diperiksa.');
+        $dinilai=$svc->antrean([
+            'angkatan_id'=>1,'mapel_id'=>5,'jenis'=>'resume',
+            'status_penilaian'=>'sudah',
+        ]);
+        self::assertSame(1,$dinilai['total']);
+        self::assertSame(1,(int)$dinilai['baris'][0]['id']);
+        self::assertSame(75,(int)$dinilai['baris'][0]['nilai']);
+        self::assertSame(1,$this->svc(202)->antrean([
+            'angkatan_id'=>2,'mapel_id'=>5,'status_penilaian'=>'belum',
+        ])['total']);
+        self::assertSame(0,$this->svc(202)->antrean([
+            'angkatan_id'=>2,'mapel_id'=>5,'status_penilaian'=>'sudah',
+        ])['total']);
     }
 
 }
