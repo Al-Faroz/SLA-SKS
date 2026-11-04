@@ -31,7 +31,7 @@ final class KoreksiNilaiDatabaseTest extends TestCase
             'CREATE TABLE ref_mapel(id INTEGER PRIMARY KEY,nama TEXT)',
             'CREATE TABLE paket_semester(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,semester INTEGER)',
             'CREATE TABLE penugasan_guru_gen(id INTEGER PRIMARY KEY,angkatan_id INTEGER,mapel_id INTEGER,guru_id INTEGER)',
-            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,jenis_tp TEXT)',
+            'CREATE TABLE tp(id INTEGER PRIMARY KEY,paket_semester_id INTEGER,kode_tp TEXT,judul TEXT,jenis_tp TEXT)',
             'CREATE TABLE materi(id INTEGER PRIMARY KEY,tp_id INTEGER,urutan INTEGER,judul TEXT)',
             'CREATE TABLE versi_konten_tp(id INTEGER PRIMARY KEY,tp_id INTEGER,snapshot_json TEXT,checksum TEXT)',
             'CREATE TABLE progres_tp(id INTEGER PRIMARY KEY,siswa_id INTEGER,tp_id INTEGER,
@@ -90,7 +90,8 @@ final class KoreksiNilaiDatabaseTest extends TestCase
             'id'=>1,'angkatan_id'=>100,'mapel_id'=>6,'guru_id'=>20,
         ]);
         $this->db->table('tp')->insert([
-            'id'=>7,'paket_semester_id'=>5,'kode_tp'=>'UJ.7.1.1','jenis_tp'=>'non_esensial',
+            'id'=>7,'paket_semester_id'=>5,'kode_tp'=>'UJ.7.1.1','judul'=>'TP Uji',
+            'jenis_tp'=>'non_esensial',
         ]);
         $this->db->table('materi')->insert([
             'id'=>3,'tp_id'=>7,'urutan'=>1,'judul'=>'Materi Uji',
