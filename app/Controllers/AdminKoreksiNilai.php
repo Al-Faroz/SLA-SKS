@@ -33,7 +33,7 @@ final class AdminKoreksiNilai extends BaseController
                 $this->konteks('Persetujuan Koreksi Nilai')+[
                     'data'=>(new KoreksiNilaiService())->daftar('admin',$page),
                     'role'=>'admin',
-                ]));
+                ]);
         }catch(Throwable $e){
             log_message('error','Daftar koreksi Admin: {jenis}',['jenis'=>get_class($e)]);
             return $this->response->setStatusCode(503)->setBody(
@@ -50,7 +50,7 @@ final class AdminKoreksiNilai extends BaseController
                     'baris'=>$svc->permohonan($id),
                     'riwayat'=>$svc->riwayatPermohonan($id),
                     'role'=>'admin',
-                ]));
+                ]);
         }catch(DomainException $e){
             return $this->response->setStatusCode(404)->setBody('Permohonan koreksi tidak ditemukan.');
         }catch(Throwable $e){
