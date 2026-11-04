@@ -660,3 +660,21 @@ Workflow `QA A13-2 Pengumuman dan FAQ` menjalankan PHP lint, PHPUnit `InformasiG
 | A13-307 | Kunjungan GET dan reload | Tidak mengubah pengaturan atau membuat log/tiket/notifikasi |
 
 CI: PHP lint, PHPUnit SQLite anonim `KontakResmiMadrasahServiceTest.php`, regresi Bantuan A13-1; pengujian XAMPP tetap diperlukan sebelum FIX. **A13-3 tidak memerlukan patch SQL.**
+
+
+### A13-4 — Penerimaan perubahan menu, reset sandi dan FAQ (4 November 2026)
+
+| ID | Skenario | Kriteria PASS |
+|---|---|---|
+| A13-401 | Login pertama/reset Guru, Pimpinan dan Siswa | Masuk langsung ke Dashboard tanpa dipaksa ganti sandi, tersedia anjuran dan form pada Profil |
+| A13-402 | Login pertama/reset akun Admin atau Admin+Guru | Tetap diarahkan ke Ganti Sandi sebelum membuka layanan; hak peran tidak bocor |
+| A13-403 | Admin reset akun Guru/Pimpinan/Siswa | Dua isian sandi default cocok, hash diperbarui, sesi lama tercabut, tidak tampil di hasil/audit, langsung bisa login |
+| A13-404 | Admin reset akun Admin lain / akun dengan peran Admin rangkap | CSPRNG acak tampil sekali, wajib ganti sebelum layanan, reset diri sendiri tetap ditolak |
+| A13-405 | Konfirmasi default berbeda, kosong, lebih pendek dari 8 | Tidak mengubah sandi atau versi sesi, pesan validasi jelas tanpa mempertahankan input |
+| A13-406 | Guru/Pimpinan/Siswa ganti sandi di Profil | Sandi saat ini benar dan konfirmasi cocok, flag anjuran hilang, sesi aktif terbarui |
+| A13-407 | Sidebar empat peran | Grup Informasi & Bantuan tunggal dengan 3–5 item sesuai peran, item aktif terbuka dan dapat dioperasikan keyboard/HP |
+| A13-408 | Guru akses Kelola FAQ/Pengumuman milik orang lain | Ditolak seperti sebelum revisi; grouping hanya UI |
+| A13-409 | FAQ draf 28 butir | Tidak otomatis terbit/masuk DB, Admin dapat menyalin dan menerbitkan sendiri setelah meninjau |
+| A13-410 | Regresi login 5x, CSRF, profil, akun, reset dan G1 | Lockout tetap, akses role dan data pribadi aman, tidak ada mutasi DB selain aksi sah |
+
+Workflow `QA A13-4 Informasi dan Revisi Sandi` menggunakan tes kebijakan role, validasi struktur UI, lint, serta regresi Bantuan/Kontak/akun. CI bukan uji browser XAMPP atau bukti sandi default otomatis berasal dari data lama: sandi awal sebelumnya tidak dapat didekripsi, sehingga Admin memasukkannya saat reset.
