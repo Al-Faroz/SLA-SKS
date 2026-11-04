@@ -15,6 +15,7 @@ on:
       - 'app/Views/akun/ganti_sandi.php'
       - 'app/Views/akun/profil.php'
       - 'app/Views/layouts/panel.php'
+      - 'public/assets/js/theme-init.js'
       - 'tests/unit/A13RevisiAkunNavigasiTest.php'
       - 'tests/unit/PanduanBantuanServiceTest.php'
       - 'tests/unit/KontakResmiMadrasahServiceTest.php'
@@ -60,6 +61,8 @@ jobs:
             tests/unit/KontakResmiMadrasahServiceTest.php; do
             php -l "$file"
           done
+      - name: Periksa sintaks JS sidebar
+        run: node --check public/assets/js/theme-init.js
       - name: Uji kebijakan sandi, reset dan grup menu
         run: vendor/bin/phpunit --no-coverage tests/unit/A13RevisiAkunNavigasiTest.php
       - name: Regresi panduan dan kontak
