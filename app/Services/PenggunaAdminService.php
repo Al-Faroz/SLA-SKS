@@ -46,6 +46,12 @@ final class PenggunaAdminService
         return bin2hex(random_bytes(16));
     }
 
+    /** @param list<string> $peran */
+    public static function tipeResetSandi(array $peran): string
+    {
+        return in_array('admin', $peran, true) ? 'acak' : 'default';
+    }
+
     private function admin(): array
     {
         $akun = (new AuthService($this->db))->penggunaSaatIni();
@@ -240,10 +246,16 @@ final class PenggunaAdminService
             throw new DomainException('Akun tidak termasuk jenis pengguna yang dipilih.');
         }
 
+        // Jenis akun sudah terverifikasi, lampirkan peran untuk menentukan
+        // reset Admin acak vs reset sandi default non-Admin.
+        $akun['daftar_peran'] = $peran;
         return $akun;
     }
 
-    public function resetSandi(string $jenis, int $id): string
+    /**
+     * @return array{mode:'acak'|'default',sandiSementara:?string}
+     */
+    public function resetSandi(string $jenis, int $id, ?string $sandiDefault = null): array
     {
         $admin = $this->admin();
         if ((int) $admin['id'] === $id) {
@@ -264,23 +276,44 @@ final class PenggunaAdminService
                 throw new DomainException('Jenis akun yang dipilih tidak sesuai.');
             }
 
-            // Hanya hash yang disimpan; plaintext tidak masuk sesi, URL maupun log audit.
-            $sementara = self::buatSandiSementara();
+            // Akun berkewenangan Admin, termasuk Admin+Guru/Pimpinan:
+            // sandi acak CSPRNG dan tetap wajib diganti. Selain Admin,
+            // gunakan sandi DEFAULT yang diketik Admin saat konfirmasi.
+            // Tidak ada password default universal di repo/dump lama,
+            // sehingga nilainya tidak boleh dikarang atau disimpan plaintext.
+            $isAdmin = self::tipeResetSandi($peran) === 'acak';
+            if ($isAdmin) {
+                if ($sandiDefault !== null && $sandiDefault !== '') {
+                    throw new DomainException('Reset akun Admin tidak menerima sandi default manual.');
+                }
+                $baru = self::buatSandiSementara();
+            } else {
+                if ($sandiDefault === null || strlen($sandiDefault) < 8
+                    || strlen($sandiDefault) > 200) {
+                    throw new DomainException('Masukkan sandi default yang disetujui madrasah (8–200 karakter).');
+                }
+                $baru = $sandiDefault;
+            }
+
             $this->db->table('pengguna')->where('id', $id)->update([
-                'sandi_hash' => password_hash($sementara, PASSWORD_DEFAULT),
+                'sandi_hash' => password_hash($baru, PASSWORD_DEFAULT),
+                // Penanda belum diganti: wajib bagi Admin, anjuran bagi lainnya.
                 'wajib_ganti_sandi' => 1,
                 'versi_sesi' => (int) $target['versi_sesi'] + 1,
                 'jumlah_gagal' => 0,
                 'terkunci_sampai' => null,
             ]);
             $this->catat((int) $admin['id'], 'reset_sandi_akun',
-                'Reset sandi ' . $jenis . ' ID ' . $id . ' oleh Admin.');
+                'Reset sandi ' . $jenis . ' ID ' . $id . ' oleh Admin ('
+                . ($isAdmin ? 'acak' : 'default manual') . ').');
             if ($this->db->transStatus() === false) {
                 throw new RuntimeException('Reset sandi tidak dapat disimpan.');
             }
 
             $this->db->transCommit();
-            return $sementara;
+            // Jangan mengembalikan sandi manual yang sudah diketahui Admin.
+            return ['mode' => $isAdmin ? 'acak' : 'default',
+                'sandiSementara' => $isAdmin ? $baru : null];
         } catch (Throwable $e) {
             $this->db->transRollback();
             throw $e;

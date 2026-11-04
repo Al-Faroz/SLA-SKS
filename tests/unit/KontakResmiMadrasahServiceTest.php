@@ -110,7 +110,11 @@ final class KontakResmiMadrasahServiceTest extends TestCase
     {
         foreach (['admin', 'guru', 'siswa', 'pimpinan'] as $peran) {
             $menu = NavigasiService::untuk($peran, 'hubungi_admin');
-            $kontak = array_values(array_filter($menu, static fn ($m): bool =>
+            $grup = array_values(array_filter($menu, static fn ($m): bool =>
+                ($m['label'] ?? '') === 'Informasi & Bantuan'));
+            self::assertCount(1, $grup);
+            self::assertTrue($grup[0]['aktif']);
+            $kontak = array_values(array_filter($grup[0]['submenu'], static fn ($m): bool =>
                 ($m['path'] ?? '') === 'hubungi-admin'));
             self::assertCount(1, $kontak);
             self::assertTrue($kontak[0]['aktif']);

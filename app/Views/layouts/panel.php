@@ -52,7 +52,7 @@ $peranAktif = $peranAktif ?? '';
                         <summary class="a-side__tautan a-side__group-trigger<?= !empty($tautan['aktif']) ? ' is-aktif' : '' ?>"
                             title="<?= esc((string)$tautan['label'],'attr') ?>"
                             aria-label="<?= esc((string)$tautan['label'],'attr') ?>">
-                            <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#chart-no-axes-combined"></use></svg>
+                            <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#<?= esc(in_array($tautan['ikon'] ?? '', ['book-open', 'chart-no-axes-combined'], true) ? $tautan['ikon'] : 'chart-no-axes-combined', 'attr') ?>"></use></svg>
                             <span class="a-side__teks"><?= esc((string)$tautan['label']) ?></span>
                             <svg class="a-icon a-side__group-chevron" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#chevron-down"></use></svg>
                         </summary>
@@ -121,6 +121,12 @@ $peranAktif = $peranAktif ?? '';
             </div>
         </header>
         <main class="a-main__konten" id="konten-utama">
+            <?php if ($saranSandi = session()->getFlashdata('anjuran_sandi')): ?>
+                <div class="a-alert a-alert--info a-sandi-pengingat" role="status">
+                    <?= esc($saranSandi) ?>
+                    <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('profil'), 'attr') ?>">Buka Profil</a>
+                </div>
+            <?php endif ?>
             <?= $this->renderSection('konten') ?>
         </main>
     </div>

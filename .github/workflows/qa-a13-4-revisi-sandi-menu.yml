@@ -1,0 +1,76 @@
+name: QA A13-4 Informasi dan Revisi Sandi
+
+on:
+  pull_request:
+    paths:
+      - 'app/Services/AuthService.php'
+      - 'app/Services/PenggunaAdminService.php'
+      - 'app/Services/PanduanBantuanService.php'
+      - 'app/Services/NavigasiService.php'
+      - 'app/Services/AkunXlsxService.php'
+      - 'app/Controllers/Akun.php'
+      - 'app/Controllers/AdminPengguna.php'
+      - 'app/Views/admin/akun_reset_*.php'
+      - 'app/Views/admin/akun_daftar.php'
+      - 'app/Views/akun/ganti_sandi.php'
+      - 'app/Views/akun/profil.php'
+      - 'app/Views/layouts/panel.php'
+      - 'public/assets/js/theme-init.js'
+      - 'tests/unit/A13RevisiAkunNavigasiTest.php'
+      - 'tests/unit/PanduanBantuanServiceTest.php'
+      - 'tests/unit/KontakResmiMadrasahServiceTest.php'
+      - 'docs/DRAF-FAQ-RESMI-SLA-SKS-2026-11-04.md'
+      - '.github/workflows/qa-a13-4-revisi-sandi-menu.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  revisi-akun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: sqlite3, pdo_sqlite, mbstring, intl, gd, dom, xml, zip, fileinfo
+          coverage: none
+      - name: Direktori writable
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint perubahan
+        run: |
+          for file in \
+            app/Services/AuthService.php \
+            app/Services/PenggunaAdminService.php \
+            app/Services/PanduanBantuanService.php \
+            app/Services/NavigasiService.php \
+            app/Services/AkunXlsxService.php \
+            app/Controllers/Akun.php \
+            app/Controllers/AdminPengguna.php \
+            app/Views/admin/akun_reset_konfirmasi.php \
+            app/Views/admin/akun_reset_hasil.php \
+            app/Views/admin/akun_daftar.php \
+            app/Views/akun/ganti_sandi.php \
+            app/Views/akun/profil.php \
+            app/Views/layouts/panel.php \
+            tests/unit/A13RevisiAkunNavigasiTest.php \
+            tests/unit/PanduanBantuanServiceTest.php \
+            tests/unit/KontakResmiMadrasahServiceTest.php; do
+            php -l "$file"
+          done
+      - name: Periksa sintaks JS sidebar
+        run: node --check public/assets/js/theme-init.js
+      - name: Uji kebijakan sandi, reset dan grup menu
+        run: vendor/bin/phpunit --no-coverage tests/unit/A13RevisiAkunNavigasiTest.php
+      - name: Regresi panduan dan kontak
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/PanduanBantuanServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/KontakResmiMadrasahServiceTest.php
+      - name: Regresi akun dan UI Admin
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/K2BAkunTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/K2EProfilTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/AdminUiAuditTest.php

@@ -24,7 +24,7 @@
 - Dua menu Admin, **Pengelola** dan **Siswa**, menggunakan satu sistem `pengguna` dan peran aktif yang sudah ada. Akun siswa tidak merangkap role staf.
 - Keduanya menyediakan tambah/ubah/nonaktif, **import/export XLSX**, serta tombol reset sandi per akun. Ekspor tidak memuat hash, sandi, token, sesi, atau data rahasia.
 - Impor memerlukan template, pemeriksaan kolom/role/Gen/NISN/duplikasi, pratinjau galat per baris, konfirmasi, transaksi dan idempotensi. Baris yang tak ada di file tidak dianggap permintaan menghapus data.
-- Reset sandi oleh Admin menghasilkan sandi sementara **acak**, ditampilkan satu kali melalui alur aman, wajib ganti pada login berikutnya, sesi lama dibatalkan, dan audit tanpa merekam isi sandi.
+- Reset sandi dilakukan **per akun** oleh Admin. Akun yang memiliki peran Admin (termasuk rangkap) mendapat sandi sementara **acak** dan wajib menggantinya pada login berikutnya; Guru/Pimpinan/Siswa memakai sandi **default resmi yang dimasukkan Admin saat reset**, bukan sandi acak, dan hanya **disarankan** menggantinya lewat Profil. Semua sesi lama dibatalkan dan audit tidak merekam sandi. Nilai default tidak ditanam dalam kode atau database sebagai teks biasa.
 - Staf hanya dapat mengubah foto, kontak pribadi dan sandi sendiri. Nama resmi/NIP/peran/penugasan dan biodata siswa dikelola Admin; siswa boleh melihat profil Guru aktif pada Gen-nya (nama, foto disetujui, mapel), bukan kontak pribadi/NIP.
 - Perbaikan NISN dan username login siswa harus atomik dan menjaga `siswa_id`, progres dan histori.
 
