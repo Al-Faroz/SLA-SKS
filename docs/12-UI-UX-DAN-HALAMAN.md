@@ -71,7 +71,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G14 | Pratinjau siswa | Berkas/TP dalam mode baca tanpa progres, banner pratinjau |
 | G15 | Laporan | Pilih laporan mapelnya dan PDF/Excel |
 | G16 | Edit TP Siap belum digunakan | Guru G1 langsung membuka editor TP/Materi/soal saat belum ada siswa yang menggunakan TP; bila telah digunakan, tampilkan status terkunci |
-| G17 | Koreksi nilai/kunci ujian | Usulan nilai guru sebelumnya, peninjauan soal/kunci dan dampak akademik |
+| G17 | Koreksi Nilai | Dari nilai Resume/HOTS final: ubah skor 0–100 lalu **Proses** langsung oleh G1; tampilkan sukses, histori otomatis, tanpa Admin |
 | G18 | Pengumuman | Buat/ubah/arsip Pengumuman untuk siswa Gen pengampu |
 
 ## 5. Katalog layar Admin
@@ -90,11 +90,11 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | A10 | Laporan | Unduh laporan seluruh cakupan |
 | A11 | Pemeliharaan | Kapasitas disk, status cron, akun terkunci, backup manual/SOP |
 | A12 | Referensi CP | Tambah/Sunting CP langsung oleh Admin dengan 5 isian; daftar/filter/ekspor dan histori internal tanpa approval |
-| A13 | Koreksi nilai bila dibutuhkan | Usulan dan keputusan atas nilai yang sudah ada (bukan izin membuka TP yang sudah digunakan siswa) |
+| A13 | Audit Koreksi Nilai | Nilai dikoreksi Guru G1 tanpa persetujuan Admin; Admin hanya memantau audit sesuai hak |
 | A14 | Identitas sekolah | Nama, alamat, NPSN, NSM, telepon, email wajib, web opsional, kepala madrasah |
 | A15 | Logo Aplikasi/Favicon/TTD | Satu upload logo aplikasi digunakan sebagai logo dan favicon; TTD dan template sertifikat tetap aset terlindung terpisah |
 | A16 | Template sertifikat | JPG/PNG A4 landscape, cek upload, preset posisi, pratinjau, aktivasi global/fallback |
-| A17 | Sertifikat dan koreksi biodata | Lihat versi, revisi satu per satu, nomor/QR baru, tanpa cabut/hapus |
+| A17 | Sertifikat dan koreksi biodata | Admin kelola biodata/aset; sertifikat pribadi otomatis diperbarui saat siswa mengakses, QR/nomor versi lama terarsip |
 | A18 | Pengumuman dan FAQ | Kelola pengumuman global dan FAQ login-only |
 | A19 | Kebijakan Privasi | Admin memasukkan teks kebijakan resmi yang disahkan sekolah, versi/tanggal berlaku; halaman baca publik |
 
@@ -123,7 +123,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | P04 | Kebijakan Privasi publik | Teks kebijakan resmi sekolah, versi dan kontak sekolah; tanpa login |
 
 ## 8. Notifikasi internal yang ditampilkan
-Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, izin akses ulang tes mandiri oleh Guru atau keputusan pembatalan Pra-Semester, TP Siap tersedia, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, dan keputusan permohonan akademik yang masih berlaku (misalnya koreksi nilai). Sunting langsung CP/BAB/TP yang belum digunakan bukan permohonan approval. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
+Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, izin akses ulang tes mandiri oleh Guru atau keputusan pembatalan Pra-Semester, TP Siap tersedia, koreksi nilai selesai diterapkan, sertifikat pertama atau pengganti berhasil terbit, tanpa antrean permohonan akademik Guru/Admin untuk koreksi nilai. Sunting langsung CP/BAB/TP yang belum digunakan bukan permohonan approval. Semua hanya dalam aplikasi, tidak melalui email/WhatsApp. Badge `belum dibaca`, daftar dan tautan memeriksa izin kembali saat dibuka.
 
 ## 9. Detail interaksi wajib semua layar
 **Setiap layar wajib memiliki:** tujuan, siapa dapat membuka, data sumber, komponen yang digunakan, form validation, aksi sukses, aksi gagal, akses browser back, loading, kosong, readonly, locked, responsive, uji minimal. Jangan merender tombol Simpan jika tidak ada perubahan kecuali desain memerlukan. Gunakan pesan error yang spesifik: bukan `Terjadi kesalahan` tanpa instruksi. Untuk aksi berisiko tampilkan modal konfirmasi dengan nama objek.
@@ -133,7 +133,7 @@ Sistem menampilkan notifikasi penerima untuk: nilai resume/tugas selesai, izin a
 - **Draf manual:** saat siswa mengetik tampil `Perubahan belum disimpan`; tombol `Simpan draf` mengirim server; saat sukses `Draf tersimpan pukul ...`; navigasi keluar dengan perubahan belum disimpan diberi peringatan. Jangan menjanjikan autosave.
 - **Ujian:** layar S06 tidak menampilkan notifikasi/pengumuman, tombol kirim dikonfirmasi, status offline jelas; hitung waktu di server.
 - **Sertifikat:** preview desain Admin dengan data *dummy* (bukan data siswa nyata), zona aman untuk QR/TTD, indikator upload valid, link lihat PDF sebelumnya bila digantikan.
-- **Pembetulan biodata:** Admin melihat data lama/baru dan jumlah sertifikat yang perlu diperbaiki **satu per satu**, bukan memaksa semua sertifikat diganti otomatis.
+- **Pembetulan biodata:** Admin mengubah biodata yang berwenang; sertifikat pemilik diperbarui otomatis ketika siswa mengaksesnya kembali, bukan lewat antrean revisi Admin.
 
 ### Kriteria khusus UX v2.4
 - **Desktop Admin/Guru:** sidebar sekitar 228–240px, header sekitar 60px, tipografi isi 14–15px, judul halaman 24–26px, kartu 16–20px padding, gap antarkartu 12–16px; tabel/toolbar padat tetapi tetap jelas. Gunakan grid dua kolom bila form atau ringkasan menguntungkan; hindari satu kolom sangat panjang tanpa alasan.
@@ -332,7 +332,7 @@ Empat halaman yang direvisi: `guru/rekap-nilai`, `guru/rekap-nilai/pra-semester`
 
 ### A11-2 — Antarmuka Sertifikat (3 November 2026)
 
-- Admin → Sertifikat: status identitas/TTD aktif, tautan kelola aset, tabel siswa dan aksi berdasarkan kelayakan. Siswa **Layak akademik** hanya mendapatkan tombol **Terbitkan Sertifikat** bila identitas madrasah lengkap dan TTD aktif; setelah terbit terlihat **Unduh PDF** dan panel **Revisi satu per satu** dengan alasan wajib.
+- Admin → Sertifikat: status identitas/TTD aktif, tautan kelola aset, tabel siswa dan aksi berdasarkan kelayakan. Siswa **Layak akademik** akan diterbitkan sertifikat otomatis saat membuka menu Sertifikat bila identitas/TTD siap; Admin hanya melihat status, mengelola aset, dan mengunduh PDF untuk audit. Tidak ada tombol terbit/revisi per siswa.
 - Admin → Template & TTD: dua kartu unggah terpisah, riwayat aset, status aktif, pratinjau gambar berizin, **pratinjau PDF dummy** dan aktivasi versi. Background kosong tetap memakai template fallback; TTD kosong menghalangi penerbitan dan diberi pesan.
 - Siswa → Sertifikat Saya: daftar sertifikat aktif maupun yang `digantikan` dengan unduhan PDF hanya miliknya. Jika kosong, tampil pesan tanpa tombol palsu.
 - Publik → Verifikasi QR: halaman sederhana responsif, status berlaku/digantikan, rujukan nomor versi pengganti, daftar TP/jenis/nilai yang boleh dipublikasikan; tanpa NISN, TTD, PDF atau kontak. Tidak ada tombol cabut/hapus.
@@ -448,6 +448,8 @@ Katalog target Kebijakan Privasi: halaman publik yang sudah ada `/kebijakan-priv
 Menggantikan catatan pra-audit sebelumnya. **Notifikasi** kini menu tersendiri pada empat peran, termasuk tombol header berbadge unread. Daftar penerima menampilkan keadaan kosong, status baca, paginasi, serta tautan ke kegiatan yang diperiksa haknya saat dibuka; sumber yang tak berizin dapat tetap ditandai dibaca melalui POST+CSRF. Tidak tampil pop-up pada layar ujian. Admin mengelola **Kebijakan Privasi** lewat menu pengaturan sendiri: daftar versi, editor naskah, status Draf/Terbit, konfirmasi, dan audit. Grup **Informasi & Bantuan** tetap mempertahankan lima menu yang disepakati pada A13-4. Halaman publik tidak menampilkan naskah sebelum Admin menerbitkan versi yang berlaku. Dark/Light, HP, dan keyboard harus diuji manual di XAMPP.
 
 
-### A14-2 — Koreksi Nilai Siswa (4 November 2026)
+### A14-2 — UI final koreksi langsung dan sertifikat siswa (4 November 2026)
 
-Untuk Guru: `Pengajuan Koreksi Nilai` pada navigasi, tautan **Ajukan Koreksi Nilai** dari detail Resume/HOTS yang sudah dinilai, pratinjau skor sumber/TP, alasan akademik wajib, daftar permohonan sendiri dan riwayat. Nilai tidak dapat disunting langsung dari form penilaian awal. Untuk Admin: `Persetujuan Koreksi Nilai`, daftar permohonan, detail skor sebelum/usulan, alasan Guru, catatan keputusan, **Setujui & Terapkan** atau **Tolak Permohonan**, audit dan penanda revisi sertifikat. Halaman harus memiliki kondisi kosong, penolakan hak, pesan sukses/gagal, input 0–100 (nol sah), persyaratan alasan dan responsif Emerald Glass. Tidak menambahkan tombol/opsi untuk koreksi nilai mesin ujian yang belum diimplementasikan.
+Guru G1 membuka detail penilaian Resume/HOTS yang telah dinilai → **Koreksi Nilai** → satu input skor 0–100 (nilai 0 sah) → **Proses**. Tampil hasil dan kembali ke detail skor; **tanpa pengajuan, alasan wajib atau keputusan Admin**. Sistem menangani penghitungan TP dan riwayat. Tidak membuka koreksi nilai mesin ujian yang tidak diminta.
+
+Siswa membuka **Sertifikat Saya**: sistem otomatis memeriksa paket miliknya, kelayakan TP Final dan identitas/TTD; menerbitkan awal atau membandingkan snapshot dan memperbarui versi **saat diakses**. Daftar memuat versi Berlaku/Digantikan beserta tautan unduhan privat. Jika belum layak, tampil keadaan kosong/informasi; bila gagal render, tampil pesan mudah dipahami dan halaman tetap terbuka. Admin **tidak** mempunyai tombol Terbitkan/Revisi sertifikat per siswa; masih mempunyai pengelolaan aset, identitas, pemeriksaan dan unduh audit.
