@@ -556,3 +556,7 @@ Kelas `a-informasi`, `a-informasi__kartu`, `__item`, `__isi`, `__kosong`, `__pag
 Grup menu `Informasi & Bantuan` memakai komponen `.a-side__group` dan `.a-side__submenu` yang sudah digunakan Rekap Nilai, dengan ikon lokal `book-open` serta status aktif ketika anak dipilih. Menambahkan fokus keyboard pada `summary`/submenu. Form `.a-profil__sandi` dua kolom pada desktop dan satu kolom ≤620px, tombol aksi jelas, tanpa mengubah layout ujian atau import. Pesan pengingat `.a-sandi-pengingat` fleksibel dan tidak menutupi header. Panel reset sandi masih memakai komponen/kontras Dark/Light yang sudah ada. Evaluasi visual manual desktop/HP dan Mode Dokumentasi wajib.
 
  Ketika sidebar ringkas, `theme-init.js` memperluasnya saat `summary` dipilih, mempertahankan grup `open` apabila anak sedang aktif; ini mencegah submenu tersembunyi menjadi kontrol mati.
+
+### A14-3 — Komponen form/action Guru berbaris stabil (4 November 2026)
+
+Lapisan CSS scoped pada emerald-glass.css menggunakan .a-guru-* untuk filter Peta ATP, impor, KKM, generator/unggah Word, Detail TP satu Materi, serta modal BAB/TP; tidak mengubah Admin/Siswa/Pimpinan. Grid field+tombol sejajar di desktop, responsif 3→2→1 untuk KKM, tombol minimal 44px, file input Dark/Light, dan Resume–HOTS berdampingan setelah baris waktu. Tidak menambahkan warna baru atau framework. Lakukan QA browser XAMPP Dark/Light, viewport 390/820/desktop dan keyboard sebelum FIX UI.
