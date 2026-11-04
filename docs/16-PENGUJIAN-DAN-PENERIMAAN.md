@@ -12,7 +12,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-002 | Gagal login 5 kali | Kunci 5 menit; tidak bocor akun mana yang valid |
 | E2E-003 | Staf Admin+Guru mengganti peran | Session ID baru; izin hanya role aktif |
 | E2E-004 | Satu Admin aktif | Administrasi normal dan koreksi biodata berfungsi |
-| E2E-005 | Admin+Guru menyetujui usulan akademik miliknya | Ditolak, tanpa nilai/konten berubah; pesan informatif |
+| E2E-005 | Akun staf Admin+Guru melakukan koreksi nilai saat role aktif Guru G1 | Koreksi langsung sah dengan audit tanpa approval; saat role Admin tidak boleh memutasi skor Guru dan G1 luar penugasan ditolak |
 | E2E-006 | Guru mengakses Gen–Mapel lain via URL ID sekalipun mapel sama | Ditolak server, tanpa bocor konten/siswa |
 | E2E-007 | Guru Gen–Mapel diganti | Guru baru hanya berwenang pada pasangan itu; Gen lain tetap, riwayat penilai lama utuh |
 | E2E-008 | Semester Gen dan override siswa | Semester sebelum mulai Dilewati, tidak menghilangkan progres |
