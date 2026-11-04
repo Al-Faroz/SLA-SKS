@@ -17,10 +17,10 @@ $peranAktif = $peranAktif ?? '';
     <meta name="color-scheme" content="dark light">
     <title><?= esc($judul ?? 'Panel') ?> · SLA-SKS</title>
     <?php
-        $ikonFavicon = FCPATH . 'public/assets/img/branding/favicon-mtsn4-jombang.png';
+        $ikonFavicon = FCPATH . 'public/assets/img/branding/logo-mtsn4-jombang.webp';
         $versiIkon = is_file($ikonFavicon) ? (string) filemtime($ikonFavicon) : '1';
     ?>
-    <link rel="icon" type="image/png" href="<?= esc(base_url('public/assets/img/branding/favicon-mtsn4-jombang.png') . '?v=' . $versiIkon, 'attr') ?>">
+    <link rel="icon" type="image/webp" href="<?= esc(base_url('public/assets/img/branding/logo-mtsn4-jombang.webp') . '?v=' . $versiIkon, 'attr') ?>">
     <?php
         // Browser harus mengambil CSS/JS baru setelah git pull.
         // FCPATH mengarah ke root proyek (index.php berada pada root SLA-SKS).
