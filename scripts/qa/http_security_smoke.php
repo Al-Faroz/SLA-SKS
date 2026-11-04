@@ -31,7 +31,7 @@ $parts=parse_url($base);
 $host=strtolower((string)($parts['host']??''));
 if (!is_array($parts) || !in_array($parts['scheme']??'', ['http','https'],true)
     || !in_array($host,['localhost','127.0.0.1','::1'],true)
-    || isset($parts['user'],$parts['pass'])
+    || isset($parts['user']) || isset($parts['pass'])
     || isset($parts['query']) || isset($parts['fragment'])) {
     fwrite(STDERR,"GALAT: hanya URL localhost HTTP(S) tanpa user/password/query.\n");
     exit(2);
