@@ -235,6 +235,18 @@ final class KoreksiNilaiDatabaseTest extends TestCase
         self::assertSame(1,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
     }
 
+    public function testPermohonanUsangMasihBisaDitolakTanpaMengubahSkor(): void
+    {
+        $id=$this->ajukan();
+        $this->db->table('resume_materi')->where('id',10)->update(['nilai'=>75]);
+        $hasil=$this->svc('admin',30)->putuskan($id,'ditolak',
+            'Snapshot sudah berubah dan permohonan harus ditutup tanpa penerapan.');
+        self::assertSame('ditolak',$hasil['status']);
+        self::assertSame(75,(int)$this->db->table('resume_materi')->get()->getRow('nilai'));
+        self::assertSame(74.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
+        self::assertSame(2,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
+    }
+
     public function testPenggantianGuruG1MenahanPersetujuan(): void
     {
         $id=$this->ajukan();
