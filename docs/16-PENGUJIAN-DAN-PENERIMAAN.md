@@ -751,3 +751,11 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 - Regresi fungsional: ATP 6 semester, input BAB/TP, Word preview→konfirmasi, KKM & snapshot TP Siap, penilaian awal→koreksi langsung G1→nilai TP→sertifikat personal on-demand; CSRF dan batas hak tidak berubah.
 - CI: perbaiki koneksi klien MariaDB QA CP V4-0007 pada loopback tanpa TLS; jalankan lint, PHPUnit, SQL 10.4/10.11 dan laporkan status sebenarnya. Tidak mengubah konfigurasi MySQL XAMPP atau hosting.
 - Uji statis/CI tidak membuktikan visual. Setelah pull, pemilik menguji Dark/Light di desktop dan HP; screenshot baru menjadi gerbang FIX tampilan.
+
+### Regresi A14-4 — Tampilan daftar FAQ dan Pengumuman (4 November 2026)
+
+- Admin Kelola Pengumuman: tabel 5 kolom melebar, header-data sejajar, judul panjang membungkus secara aman, tanggal UTC dan kedua tombol tidak berhimpitan.
+- Admin Kelola FAQ: tabel 6 kolom melebar, Urutan dan Versi tidak menyatu, pertanyaan panjang tetap terbaca, Sunting/Arsipkan tidak bergeser.
+- Guru Kelola Pengumuman memakai view tabel yang sama; uji tombol Tambah, Sunting, Arsipkan dan hanya melihat data miliknya. Penugasan Gen untuk pembaca Siswa tidak berubah.
+- Desktop 1366/1100px, tablet 820px, HP 390/360px, Light/Dark, sidebar terbuka/tutup: <=980px setiap data memiliki label kartu, tidak ada scrollbar horizontal di seluruh halaman. Keyboard dan konfirmasi pengarsipan bekerja.
+- Test otomatis `InformasiTabelUiTest` memeriksa class resmi, kelengkapan label, rute/CSRF, proporsi CSS dan breakpoints; jalankan bersama `InformasiGlobalDatabaseTest` (hak akses/CRUD) dan pengujian MariaDB A13-5. Test statis **bukan** bukti lulus visual XAMPP.
