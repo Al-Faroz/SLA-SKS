@@ -678,3 +678,5 @@ CI: PHP lint, PHPUnit SQLite anonim `KontakResmiMadrasahServiceTest.php`, regres
 | A13-410 | Regresi login 5x, CSRF, profil, akun, reset dan G1 | Lockout tetap, akses role dan data pribadi aman, tidak ada mutasi DB selain aksi sah |
 
 Workflow `QA A13-4 Informasi dan Revisi Sandi` menggunakan tes kebijakan role, validasi struktur UI, lint, serta regresi Bantuan/Kontak/akun. CI bukan uji browser XAMPP atau bukti sandi default otomatis berasal dari data lama: sandi awal sebelumnya tidak dapat didekripsi, sehingga Admin memasukkannya saat reset.
+
+ Regresi tambahan A13-407: klik/Enter grup dalam sidebar ringkas harus memperluas sidebar dan membuat anak dapat dipilih, termasuk saat grup sebelumnya aktif; JS diperiksa dengan `node --check`.
