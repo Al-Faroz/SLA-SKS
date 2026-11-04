@@ -200,7 +200,7 @@
 
 **Pertanyaan:** Bagaimana Pengumuman digunakan?
 
-**Jawaban:** Admin dan Guru dapat menerbitkan Pengumuman global. Semua akun aktif login membaca Pengumuman berstatus Terbit; draf dan arsip tidak ditampilkan. Guru hanya boleh mengelola Pengumuman yang dibuatnya sendiri, sedangkan Admin mengelola seluruhnya.
+**Jawaban:** Admin menerbitkan Pengumuman global yang terlihat semua akun aktif. Pengumuman buatan Guru hanya ditampilkan kepada Siswa pada Gen yang saat ini diampunya, bukan Pimpinan, Guru lain, atau Siswa Gen lain. Guru mengelola Pengumuman sendiri, Admin boleh mengelola semuanya. Draf dan arsip tidak ditampilkan pada halaman baca.
 
 **Urutan:** 25 · **Status awal:** Draf
 
