@@ -37,3 +37,8 @@ Tahap berikutnya: Notifikasi internal untuk peristiwa sah menurut Master 12/14/1
 ## Status implementasi A13-3 (3 November 2026)
 
 Tahap `Hubungi Admin` menggunakan lima pengaturan resmi yang sudah tersedia, tanpa SQL baru dan tanpa akses ke kontak pribadi Pengelola. Modul ini **tidak** membangun sistem tiket, pesan, email otomatis atau notifikasi. Seluruh peran aktif login dapat melihat kontak, dan tautan eksternal hanya dibentuk dari nilai yang valid. Implementasi branch bertumpuk A13-2 memerlukan review, CI serta uji XAMPP sebelum FIX. Gerbang notifikasi internal tetap sama: **jangan membuat patch skema berikutnya sebelum menerima dump baru XAMPP setelah V4-0012 berhasil diimpor**.
+
+
+## Revisi final A13-4 — 4 November 2026
+
+Pemilik mengubah kebijakan reset dan sandi awal: akun pemegang **Admin** saja yang mendapat reset acak dan wajib ganti; Guru/Pimpinan/Siswa direset ke **sandi default manual pada form Admin**, bukan acak, serta hanya dianjurkan ganti sandi pada Profil. Aplikasi lama tidak menyimpan plaintext sandi awal sehingga tidak mungkin memulihkan sandi yang sebelumnya diketik; solusi ini tidak menebak sandi universal. Semua sesi lama dicabut dan audit tidak menyimpan sandi. Kelima menu informasi dikelompokkan tanpa mengubah hak akses. Draf 28 FAQ ada sebagai dokumen salin, belum diterbitkan dan bukan SQL. Perubahan di branch A13-4 di atas A13-3; uji XAMPP diperlukan sebelum FIX. Notifikasi internal SQL masih menunggu dump terbaru pasca V4-0012.
