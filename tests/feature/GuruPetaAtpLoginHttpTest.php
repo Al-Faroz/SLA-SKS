@@ -114,9 +114,12 @@ final class GuruPetaAtpLoginHttpTest extends CIUnitTestCase
         $hasil->assertRedirectTo('masuk');
     }
 
-    public function testGuruWajibGantiSandiDialihkan(): void
+    public function testGuruTanpaPeranAdminDenganSandiAwalBolehMengaksesPeta(): void
     {
+        // Kebijakan final 04-11-2026: Guru tanpa peran Admin mendapat
+        // anjuran ganti sandi, bukan gerbang wajib seperti kebijakan lama.
         $hasil = $this->withSession($this->sesi(4))->get('guru/peta-atp');
-        $hasil->assertRedirectTo('ganti-sandi');
+        $hasil->assertOK();
+        self::assertStringContainsString('Belum ada penugasan Guru', $hasil->getBody());
     }
 }

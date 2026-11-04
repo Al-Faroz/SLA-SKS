@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page a-tp-satu-materi">
+<div class="a-page a-tp-satu-materi a-guru-detail-tp">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>

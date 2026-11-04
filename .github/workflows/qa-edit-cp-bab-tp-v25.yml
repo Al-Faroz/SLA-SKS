@@ -92,10 +92,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Pasang klien MariaDB
         run: sudo apt-get update -qq && sudo apt-get install -y -qq mariadb-client
+      # Service MariaDB pada runner bersifat QA lokal dan tidak membuka TLS.
+      # Klien runner baru kadang mewajibkan TLS: nonaktifkan SSL hanya untuk
+      # koneksi TCP loopback di job ini, bukan untuk koneksi produksi.
       - name: Siapkan data CP historis sintetis
         run: |
-          mariadb -h 127.0.0.1 -u root -ptesting -e "CREATE DATABASE sla_cp_qa CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
-          mariadb -h 127.0.0.1 -u root -ptesting sla_cp_qa <<'SQL'
+          mariadb --skip-ssl -h 127.0.0.1 -u root -ptesting -e "CREATE DATABASE sla_cp_qa CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
+          mariadb --skip-ssl -h 127.0.0.1 -u root -ptesting sla_cp_qa <<'SQL'
           CREATE TABLE schema_version (
             versi VARCHAR(40) PRIMARY KEY,
             diterapkan_pada TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -114,7 +117,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DB="mariadb -h 127.0.0.1 -u root -ptesting sla_cp_qa"
+          DB="mariadb --skip-ssl -h 127.0.0.1 -u root -ptesting sla_cp_qa"
           $DB < database/sql/updates/V4-0007_CP_LIMA_ISIAN.sql
           $DB < database/sql/updates/V4-0007_CP_LIMA_ISIAN.sql
           $DB -e "INSERT INTO ref_cp_versi (id) VALUES (2)"
