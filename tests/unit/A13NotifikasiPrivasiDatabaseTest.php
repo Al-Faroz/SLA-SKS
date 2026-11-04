@@ -143,6 +143,8 @@ final class A13NotifikasiPrivasiDatabaseTest extends TestCase
         try{$this->notif(20,'guru')->tujuanBerizin($id);self::fail('Penugasan berubah');}
         catch(\DomainException $e){self::assertNotSame('',$e->getMessage());}
         self::assertFalse($this->notif(20,'guru')->daftar()['baris'][0]['boleh_buka']);
+        $this->notif(20,'guru')->tandaiDibaca($id);
+        self::assertSame(0,$this->notif(20,'guru')->belumDibaca());
     }
 
     public function testPrivasiDrafDanTerbitImmutableDenganHistori(): void
