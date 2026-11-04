@@ -288,27 +288,41 @@ final class KoreksiNilaiService
             if ($k['status']!=='diajukan') {
                 throw new DomainException('Permohonan sudah diputus dan tidak dapat diulang.');
             }
-            $this->db->query('SELECT id FROM progres_tp WHERE id=?'.$lock,
-                [(int)$k['progres_tp_id']]);
-            $r=$this->sumber((string)$k['jenis'],(int)$k['sumber_id']);
-            if ((int)$r['progres_tp_id']!==(int)$k['progres_tp_id']
-                || (int)$r['versi_konten_tp_id']!==(int)$k['versi_konten_tp_id']) {
-                throw new DomainException('Snapshot atau progres siswa berubah; keputusan ditahan.');
-            }
-            $g=$this->db->table('pengguna u')->select('u.id')
-                ->join('pengguna_peran pr','pr.pengguna_id=u.id')
-                ->where('u.id',(int)$k['guru_id'])->where('u.status','aktif')
-                ->where('pr.peran','guru')->get(1)->getRowArray();
-            if (!$g || (int)$r['guru_g1']!==(int)$k['guru_id']) {
-                throw new DomainException('Guru pengusul tidak lagi aktif pada Gen–Mapel terkait.');
-            }
-            $d=$this->pratinjauSumber($r,(string)$k['jenis'],(int)$k['nilai_usulan']);
-            if ((int)$k['nilai_awal']!==$d['nilai_sumber_lama']
-                || (int)$k['nilai_usulan']!==$d['nilai_sumber_usulan']
-                || (string)$k['status_nilai_awal']!==$d['status_nilai_lama']
-                || !self::angkaSama($k['nilai_tp_awal'],$d['nilai_tp_lama'])
-                || !self::angkaSama($k['nilai_tp_usulan'],$d['nilai_tp_usulan'])) {
-                throw new DomainException('Snapshot penilaian berubah; pengajuan harus dibuat ulang.');
+            // Penolakan adalah tindakan penutupan administratif yang aman,
+            // sekalipun skor atau penugasan telah berubah. Hanya SETUJUI
+            // yang memerlukan snapshot sumber terbaru dan mutasi nilai.
+            $d=[
+                'nilai_sumber_lama'=>(int)$k['nilai_awal'],
+                'nilai_sumber_usulan'=>(int)$k['nilai_usulan'],
+                'nilai_tp_lama'=>$k['nilai_tp_awal']===null
+                    ?null:(float)$k['nilai_tp_awal'],
+                'nilai_tp_usulan'=>$k['nilai_tp_usulan']===null
+                    ?null:(float)$k['nilai_tp_usulan'],
+            ];
+            $r=null;
+            if ($keputusan==='disetujui') {
+                $this->db->query('SELECT id FROM progres_tp WHERE id=?'.$lock,
+                    [(int)$k['progres_tp_id']]);
+                $r=$this->sumber((string)$k['jenis'],(int)$k['sumber_id']);
+                if ((int)$r['progres_tp_id']!==(int)$k['progres_tp_id']
+                    || (int)$r['versi_konten_tp_id']!==(int)$k['versi_konten_tp_id']) {
+                    throw new DomainException('Snapshot atau progres siswa berubah; keputusan ditahan.');
+                }
+                $g=$this->db->table('pengguna u')->select('u.id')
+                    ->join('pengguna_peran pr','pr.pengguna_id=u.id')
+                    ->where('u.id',(int)$k['guru_id'])->where('u.status','aktif')
+                    ->where('pr.peran','guru')->get(1)->getRowArray();
+                if (!$g || (int)$r['guru_g1']!==(int)$k['guru_id']) {
+                    throw new DomainException('Guru pengusul tidak lagi aktif pada Gen–Mapel terkait.');
+                }
+                $d=$this->pratinjauSumber($r,(string)$k['jenis'],(int)$k['nilai_usulan']);
+                if ((int)$k['nilai_awal']!==$d['nilai_sumber_lama']
+                    || (int)$k['nilai_usulan']!==$d['nilai_sumber_usulan']
+                    || (string)$k['status_nilai_awal']!==$d['status_nilai_lama']
+                    || !self::angkaSama($k['nilai_tp_awal'],$d['nilai_tp_lama'])
+                    || !self::angkaSama($k['nilai_tp_usulan'],$d['nilai_tp_usulan'])) {
+                    throw new DomainException('Snapshot penilaian berubah; pengajuan harus dibuat ulang.');
+                }
             }
             $now=gmdate('Y-m-d H:i:s');
             $perluSertifikat=false;
