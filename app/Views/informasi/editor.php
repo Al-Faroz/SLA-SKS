@@ -6,6 +6,9 @@
     $kunciJudul = $jenis === 'faq' ? 'pertanyaan' : 'judul';
     $kunciIsi = $jenis === 'faq' ? 'jawaban' : 'isi';
     $status = old('status', $baris['status'] ?? 'draf');
+    // Buat: POST /tambah. Sunting: POST /{id}/sunting.
+    // Jangan kirim form baru ke URL daftar (hanya GET), akan 404.
+    $action = $prefix . ($baru ? '/tambah' : '/' . (int) $baris['id'] . '/sunting');
 ?>
 <div class="a-page a-informasi">
 <nav class="a-breadcrumb" aria-label="Breadcrumb">
@@ -34,7 +37,7 @@
 <section class="a-card a-page__editor a-page__editor--luas a-informasi__editor">
     <h2>Isi <?= esc($nama) ?></h2>
     <form class="a-form" method="post" data-dirty-form
-          action="<?= esc(site_url($prefix.($baru?'':'/'.(int)$baris['id'].'/sunting')),'attr') ?>">
+          action="<?= esc(site_url($action),'attr') ?>">
         <?= csrf_field() ?>
         <?php if (!$baru): ?><input type="hidden" name="versi" value="<?= (int)$baris['versi'] ?>"><?php endif ?>
         <div class="a-field">
