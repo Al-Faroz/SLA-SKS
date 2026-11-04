@@ -158,10 +158,16 @@ final class KoreksiNilaiLangsungService
                 || (int)$r['versi_konten_tp_id']!==(int)$tugas['versi_konten_tp_id']) {
                 throw new DomainException('Snapshot nilai sumber telah berubah.');
             }
-            // Periksa penugasan G1 setelah lock; pergantian pengampu harus
-            // terlihat sebelum mutasi dan tidak boleh melewati batas Gen.
-            if ((int)$r['guru_g1']!==$guruId) {
-                throw new DomainException('Guru pengampu sudah berubah.');
+            // Kunci juga penugasan G1 untuk menutup race dengan pengalihan
+            // Guru pada saat koreksi, seperti pada penilaian awal.
+            $g1=$this->db->query(
+                'SELECT guru_id FROM penugasan_guru_gen'
+                .' WHERE angkatan_id=? AND mapel_id=?'.$lock,
+                [(int)$r['angkatan_id'],(int)$r['mapel_id']]
+            )->getRowArray();
+            if (!$g1 || (int)$g1['guru_id']!==$guruId
+                || (int)$r['guru_g1']!==$guruId) {
+                throw new DomainException('Penugasan Guru G1 telah berubah. Muat ulang halaman.');
             }
             if ((int)$r['nilai_sumber']!==$nilaiAwalForm
                 || (int)$r['nilai_sumber']!==(int)$tugas['nilai']) {
