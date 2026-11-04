@@ -28,12 +28,12 @@ Options -Indexes
 	RewriteEngine On
 
 	# Never expose internal source/runtime directories from the Web root.
-	# Public application assets remain available through assets/, uploads/,
-	# public/, robots.txt, and the normal CodeIgniter front controller.
+	# Only public/assets/, public/favicon.ico and public/robots.txt
+	# are served statically; all other paths use the CI4 front controller.
 	# Deny source, operational tools, private data and archived copies.
 	# These rules apply even with the front controller kept in PROJECT ROOT.
 	RewriteRule ^(?:\.git|\.github|\.svn)(?:/|$) - [F,L,NC]
-	RewriteRule ^(?:app|vendor|writable|tests|database|docs|scripts|tools|builds|system|postman|\.postman)(?:/|$) - [F,L,NC]
+	RewriteRule ^(?:app|vendor|writable|tests|database|docs|scripts|tools|builds|uploads|system|postman|\.postman)(?:/|$) - [F,L,NC]
 	RewriteRule ^_step[^/]*_backup(?:/|$) - [F,L,NC]
 	RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L,NC]
 	RewriteRule \.(?:sql|sqlite3?|db|bak|backup|old|orig|swp|tmp|log|ini|conf)(?:/|$) - [F,L,NC]
