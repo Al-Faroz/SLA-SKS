@@ -446,3 +446,8 @@ Katalog target Kebijakan Privasi: halaman publik yang sudah ada `/kebijakan-priv
 ### A13-6/A13-7 — UI sesudah dump (18) dan V4-0013
 
 Menggantikan catatan pra-audit sebelumnya. **Notifikasi** kini menu tersendiri pada empat peran, termasuk tombol header berbadge unread. Daftar penerima menampilkan keadaan kosong, status baca, paginasi, serta tautan ke kegiatan yang diperiksa haknya saat dibuka; sumber yang tak berizin dapat tetap ditandai dibaca melalui POST+CSRF. Tidak tampil pop-up pada layar ujian. Admin mengelola **Kebijakan Privasi** lewat menu pengaturan sendiri: daftar versi, editor naskah, status Draf/Terbit, konfirmasi, dan audit. Grup **Informasi & Bantuan** tetap mempertahankan lima menu yang disepakati pada A13-4. Halaman publik tidak menampilkan naskah sebelum Admin menerbitkan versi yang berlaku. Dark/Light, HP, dan keyboard harus diuji manual di XAMPP.
+
+
+### A14-2 — Koreksi Nilai Siswa (4 November 2026)
+
+Untuk Guru: `Pengajuan Koreksi Nilai` pada navigasi, tautan **Ajukan Koreksi Nilai** dari detail Resume/HOTS yang sudah dinilai, pratinjau skor sumber/TP, alasan akademik wajib, daftar permohonan sendiri dan riwayat. Nilai tidak dapat disunting langsung dari form penilaian awal. Untuk Admin: `Persetujuan Koreksi Nilai`, daftar permohonan, detail skor sebelum/usulan, alasan Guru, catatan keputusan, **Setujui & Terapkan** atau **Tolak Permohonan**, audit dan penanda revisi sertifikat. Halaman harus memiliki kondisi kosong, penolakan hak, pesan sukses/gagal, input 0–100 (nol sah), persyaratan alasan dan responsif Emerald Glass. Tidak menambahkan tombol/opsi untuk koreksi nilai mesin ujian yang belum diimplementasikan.
