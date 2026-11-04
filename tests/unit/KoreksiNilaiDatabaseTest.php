@@ -300,4 +300,102 @@ final class KoreksiNilaiDatabaseTest extends TestCase
         }
         self::assertSame(0,$this->db->table('permohonan_koreksi_nilai')->countAllResults());
     }
+
+    /** Revisi final: Guru G1 mengoreksi tanpa pengajuan/persetujuan. */
+    private function langsung(string $role='guru',int $id=20): \App\Services\KoreksiNilaiLangsungService
+    {
+        return new \App\Services\KoreksiNilaiLangsungService($this->db,static fn():array=>[
+            'id'=>$id,'peran_aktif'=>$role,'status'=>'aktif','wajib_ganti_sandi'=>0,
+        ]);
+    }
+
+    public function testKoreksiLangsungResumeMengubahAgregatDanMenyimpanHistoriTanpaAdmin(): void
+    {
+        $hasil=$this->langsung()->proses('resume',10,90);
+        self::assertTrue($hasil['berubah']);
+        self::assertSame(1,$hasil['versi']);
+        self::assertSame(80.0,$hasil['nilai_tp_baru']);
+        $res=$this->db->table('resume_materi')->where('id',10)->get()->getRowArray();
+        self::assertSame(90,(int)$res['nilai']);
+        self::assertSame(21,(int)$res['dinilai_oleh']); // riwayat penilai pertama tidak tertimpa
+        self::assertSame(80.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
+        $audit=$this->db->table('permohonan_koreksi_nilai')->get()->getRowArray();
+        self::assertSame('disetujui',$audit['status']);
+        self::assertNull($audit['admin_id']);
+        self::assertSame(60,(int)$audit['nilai_awal']);
+        self::assertSame(90,(int)$audit['nilai_usulan']);
+        self::assertSame('guru',$this->db->table('riwayat_koreksi_nilai')
+            ->get()->getRow('peran_aktif'));
+        self::assertSame(1,$this->db->table('notifikasi')
+            ->where('jenis','koreksi_nilai_diterapkan')->countAllResults());
+        $ulang=$this->langsung()->proses('resume',10,90);
+        self::assertFalse($ulang['berubah']);
+        self::assertSame(1,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
+    }
+
+    public function testGuruG1BolehKoreksiBerulangNomorVersiBertambah(): void
+    {
+        $this->langsung()->proses('hots',12,0);
+        $hasil=$this->langsung()->proses('hots',12,50);
+        self::assertSame(2,$hasil['versi']);
+        self::assertSame(70.0,$hasil['nilai_tp_baru']);
+        self::assertSame(2,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
+        self::assertSame(50,(int)$this->db->table('jawaban_hots_materi')
+            ->where('id',12)->get()->getRow('nilai'));
+        self::assertSame(2,$this->db->table('notifikasi')
+            ->where('jenis','koreksi_nilai_diterapkan')->countAllResults());
+    }
+
+    public function testGuruLuarGenDanRoleAdminTidakBisaMemproses(): void
+    {
+        foreach ([['guru',21],['admin',30],['siswa',11]] as [$role,$uid]) {
+            try {
+                $this->langsung($role,$uid)->proses('resume',10,95);
+                self::fail('Peran lain atau Guru luar Gen tidak boleh mengoreksi.');
+            }catch(\DomainException $e){
+                self::assertNotSame('',$e->getMessage());
+            }
+        }
+        self::assertSame(60,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('nilai'));
+    }
+
+    public function testGuruG1PenggantiBolehKoreksiTanpaMengubahPenilaiHistoris(): void
+    {
+        $this->db->table('penugasan_guru_gen')->where('id',1)->update(['guru_id'=>21]);
+        $hasil=$this->langsung('guru',21)->proses('resume',10,95);
+        self::assertTrue($hasil['berubah']);
+        self::assertSame(21,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('dinilai_oleh'));
+        self::assertSame(95,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('nilai'));
+    }
+
+    public function testKoreksiKomponenSebelumTpTuntasTidakMengisiNilaiFinalFiktif(): void
+    {
+        $this->db->table('progres_tp')->where('id',8)->update(['status'=>'belajar']);
+        $this->db->table('nilai_tp')->where('id',9)->delete();
+        $hasil=$this->langsung()->proses('resume',10,80);
+        self::assertSame(1,$hasil['versi']);
+        self::assertNull($hasil['nilai_tp_baru']);
+        self::assertSame(80,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('nilai'));
+        self::assertSame(0,$this->db->table('nilai_tp')->countAllResults());
+        self::assertSame('belajar',$this->db->table('progres_tp')->get()->getRow('status'));
+    }
+
+    public function testKoreksiLangsungSkorTidakSahDanSnapshotPalsuDitolak(): void
+    {
+        foreach ([-1,101] as $nilai) {
+            try {
+                $this->langsung()->proses('resume',10,$nilai);
+                self::fail('Nilai di luar 0–100 harus ditolak.');
+            }catch(\DomainException $e){self::assertNotSame('',$e->getMessage());}
+        }
+        $this->db->table('versi_konten_tp')->where('id',4)
+            ->update(['snapshot_json'=>'{"materi":[]}']);
+        $this->expectException(\DomainException::class);
+        $this->langsung()->proses('resume',10,80);
+    }
+
 }
