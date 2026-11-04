@@ -172,3 +172,10 @@ Pemeriksaan dapat dijalankan tanpa identitas/login melalui `php scripts/qa/http_
 Patch SQL V4-0014 telah diimpor oleh pemilik dan **tidak diimpor ulang**; tabelnya dipertahankan sebagai audit versi tanpa permohonan/approval Admin. Koreksi nilai dilakukan hanya oleh **Guru G1 aktif** untuk Gen–Mapel yang bersangkutan, dengan verifikasi ulang snapshot/score di bawah row lock `progres_tp`; update skor sumber dan nilai TP, audit versi, `log_aktivitas` dan notifikasi siswa berada di satu transaksi. Penilai awal, jawaban, KKM, TP, bank soal dan percobaan tidak diubah. Guru lain, Admin, Siswa, Pimpinan tidak boleh memutasikan skor melalui endpoint.
 
 Sertifikat pribadi hanya diterbitkan saat siswa membuka daftar miliknya sendiri; sumber paket harus aktif dan sesuai Gen serta `penugasan_paket`, hak cek kelayakan siswa tidak boleh membuka daftar siswa lain, aset/template tetap Admin-only. Server membandingkan snapshot konten; PDF/nomor/QR baru dan pointer aktif diubah atomik, versi lama tetap immutable/Digantikan dengan QR verifikasi publik yang terbatas. Status belum layak tidak menghasilkan PDF. Error untuk satu paket tidak membocorkan NISN dan tidak menghentikan pembacaan paket lain. Admin hanya mengelola identitas/aset dan membaca audit.
+
+
+### A15 — Pengamanan naskah privasi dan gambar publik (4 November 2026)
+
+KebijakanPrivasiContohService hanya mengembalikan contoh teks untuk isian awal editor Admin. Tidak mengubah KebijakanPrivasiService::publikAktif, tidak menulis baris SQL, tidak mengganti status 503 ketika belum ada dokumen sah, dan tidak mengabaikan pengesahan madrasah. Admin tetap memasukkan versi/tanggal, Simpan Draf dengan audit, memastikan persetujuan kelembagaan, lalu Terbitkan. Checkbox adalah konfirmasi Admin, bukan bukti sah otomatis. Naskah versi terbit di-escape saat ditampilkan.
+
+Banner dan logo berasal dari gambar yang disampaikan pemilik untuk publikasi, diekspor menjadi WebP lokal di public/assets/img/branding. Tidak perlu endpoint upload baru, kredensial, koneksi eksternal maupun perubahan izin berkas privat.
