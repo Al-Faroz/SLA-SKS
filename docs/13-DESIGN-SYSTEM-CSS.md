@@ -560,3 +560,7 @@ Grup menu `Informasi & Bantuan` memakai komponen `.a-side__group` dan `.a-side__
 ### A14-3 — Komponen form/action Guru berbaris stabil (4 November 2026)
 
 Lapisan CSS scoped pada emerald-glass.css menggunakan .a-guru-* untuk filter Peta ATP, impor, KKM, generator/unggah Word, Detail TP satu Materi, serta modal BAB/TP; tidak mengubah Admin/Siswa/Pimpinan. Grid field+tombol sejajar di desktop, responsif 3→2→1 untuk KKM, tombol minimal 44px, file input Dark/Light, dan Resume–HOTS berdampingan setelah baris waktu. Tidak menambahkan warna baru atau framework. Lakukan QA browser XAMPP Dark/Light, viewport 390/820/desktop dan keyboard sebelum FIX UI.
+
+### Koreksi A14-4 — Satu komponen tabel untuk Informasi (4 November 2026)
+
+Daftar `informasi/kelola.php` menggunakan `a-tbl a-tbl--cards a-informasi__tabel` dengan varian `--faq` dan `--pengumuman`; jangan mengembalikan `a-tabel`. Struktur HTML: `th scope="row"` pada judul/pertanyaan, `data-label` pada setiap sel, dan grup `a-informasi__row-actions` untuk tombol Sunting serta form Arsipkan. Desktop memakai `table-layout:fixed`, proporsi 5/6 kolom dan `min-width` internal untuk gulir hanya dalam kontainer bila dibutuhkan. Pada <=980px memanfaatkan pola kartu `a-tbl--cards` existing, dengan `table-layout:auto` dan tanpa lebar minimum. Seluruh warna, zebra, batas, hover, label dan mode Light/Dark mengikuti token Emerald Glass. Perubahan bersifat scoped, bukan menimpa tabel lain.
