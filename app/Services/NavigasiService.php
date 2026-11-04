@@ -61,6 +61,9 @@ final class NavigasiService
             $menu[] = ['label' => 'Monitoring Akademik', 'path' => 'pimpinan/laporan',
                 'aktif' => $aktif === 'laporan'];
         }
+        // A13-6: notifikasi per akun dan peran aktif.
+        $menu[] = ['label' => 'Notifikasi', 'path' => 'notifikasi', 'aktif' => $aktif === 'notifikasi'];
+
         // A13-4: satu grup informasi untuk menjaga sidebar ringkas, tetap role-scoped.
         $informasi = [
             ['label' => 'Pengumuman', 'path' => 'pengumuman',
@@ -71,6 +74,8 @@ final class NavigasiService
                 'path' => $peran . '/pengumuman', 'aktif' => $aktif === 'pengumuman_kelola'];
         }
         if ($peran === 'admin') {
+            $informasi[] = ['label' => 'Kebijakan Privasi', 'path' => 'admin/kebijakan-privasi',
+                'aktif' => $aktif === 'privasi'];
             $informasi[] = ['label' => 'Kelola FAQ',
                 'path' => 'admin/faq', 'aktif' => $aktif === 'faq_kelola'];
         }
@@ -82,7 +87,7 @@ final class NavigasiService
             'label' => 'Informasi & Bantuan',
             'ikon' => 'book-open',
             'aktif' => in_array($aktif,
-                ['pengumuman', 'pengumuman_kelola', 'faq_kelola', 'bantuan', 'hubungi_admin'], true),
+                ['pengumuman', 'pengumuman_kelola', 'faq_kelola', 'privasi', 'bantuan', 'hubungi_admin'], true),
             'submenu' => $informasi,
         ];
         $menu[] = ['label' => 'Profil & peran', 'path' => 'profil', 'aktif' => $aktif === 'profil'];
