@@ -50,6 +50,7 @@ final class NavigasiService
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
                 'privasi' => ['Kebijakan Privasi', 'admin/kebijakan-privasi'],
                 'sertifikat' => ['Sertifikat', 'admin/sertifikat'],
+                'koreksi_nilai' => ['Persetujuan Koreksi Nilai', 'admin/koreksi-nilai'],
                 'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'pra_semester' => ['Jadwal Pra-Semester', 'admin/pra-semester'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],
