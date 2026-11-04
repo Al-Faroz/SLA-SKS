@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Services\KoreksiNilaiService;
 use CodeIgniter\Database\BaseConnection;
 use PHPUnit\Framework\TestCase;
 
 /**
- * A14-2: SQLite sintetis dari DDL relevan dump (19), TANPA data siswa asli.
+ * A14-4: fixture sintetis untuk koreksi langsung oleh Guru G1 dan audit historis V4-0014.
  * Tidak menulis nilai/riwayat ke database localhost.
  */
 final class KoreksiNilaiDatabaseTest extends TestCase
@@ -133,175 +132,7 @@ final class KoreksiNilaiDatabaseTest extends TestCase
         parent::tearDown();
     }
 
-    private function svc(string $role,int $id): KoreksiNilaiService
-    {
-        return new KoreksiNilaiService($this->db,static fn():array=>[
-            'id'=>$id,'peran_aktif'=>$role,'status'=>'aktif','wajib_ganti_sandi'=>0,
-        ]);
-    }
-
-    private function ajukan(int $baru=90,string $jenis='resume',int $sumber=10): int
-    {
-        return $this->svc('guru',20)->ajukan($jenis,$sumber,$baru,
-            'Koreksi berdasarkan pemeriksaan jawaban final siswa.');
-    }
-
-    public function testAlurSetujuMengubahNilaiAtomikDanMenjagaPenilaiAwal(): void
-    {
-        $id=$this->ajukan();
-        self::assertGreaterThan(0,$id);
-        self::assertSame($id,$this->ajukan()); // retry idempoten
-        self::assertSame(1,$this->db->table('permohonan_koreksi_nilai')->countAllResults());
-        self::assertSame(60,(int)$this->db->table('resume_materi')->get()->getRow('nilai'));
-        self::assertSame(74.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
-        self::assertSame('diajukan',$this->svc('admin',30)->permohonan($id)['status']);
-        $hasil=$this->svc('admin',30)->putuskan($id,'disetujui',
-            'Bukti pada jawaban final mendukung perubahan nilai tersebut.');
-        self::assertSame('disetujui',$hasil['status']);
-        self::assertFalse($hasil['perlu_tinjau_sertifikat']);
-        $resume=$this->db->table('resume_materi')->get()->getRowArray();
-        self::assertSame(90,(int)$resume['nilai']);
-        self::assertSame(21,(int)$resume['dinilai_oleh']); // penilai awal tidak ditimpa
-        self::assertSame('Penilaian awal',$resume['umpan_balik']);
-        self::assertSame(80.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
-        self::assertSame(90.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_resume'));
-        self::assertCount(2,$this->svc('guru',20)->riwayatPermohonan($id));
-        self::assertSame(3,$this->db->table('notifikasi')->countAllResults());
-        self::assertSame('final',$this->db->table('nilai_tp')->get()->getRow('status_nilai'));
-        $this->expectException(DomainException::class);
-        $this->svc('admin',30)->putuskan($id,'disetujui',
-            'Coba keputusan ganda dilarang oleh transaksi.');
-    }
-
-    public function testTolakTidakMengubahNilaiDanBolehBuatVersiPengajuanBerikutnya(): void
-    {
-        $id=$this->ajukan();
-        $hasil=$this->svc('admin',30)->putuskan($id,'ditolak',
-            'Alasan tidak cocok dengan hasil pemeriksaan sumber.');
-        self::assertSame('ditolak',$hasil['status']);
-        self::assertSame(60,(int)$this->db->table('resume_materi')->get()->getRow('nilai'));
-        self::assertSame(74.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
-        $id2=$this->ajukan(95);
-        self::assertNotSame($id,$id2);
-        self::assertSame(2,(int)$this->svc('guru',20)->permohonan($id2)['versi_koreksi']);
-    }
-
-    public function testAdminSatuAkunDenganGuruTidakBolehSetujui(): void
-    {
-        $id=$this->ajukan();
-        $this->db->table('pengguna_peran')->insert(['pengguna_id'=>20,'peran'=>'admin']);
-        try {
-            $this->svc('admin',20)->putuskan($id,'disetujui',
-                'Akun dual role tidak boleh menyetujui nilai sendiri.');
-            self::fail('Akun yang sama harus ditolak');
-        }catch(DomainException $e){
-            self::assertStringContainsString('akun sendiri',$e->getMessage());
-        }
-        self::assertSame('diajukan',$this->svc('admin',30)->permohonan($id)['status']);
-        self::assertSame(60,(int)$this->db->table('resume_materi')->get()->getRow('nilai'));
-    }
-
-    public function testGuruGenLainTidakDapatMelihatAtauMengajukan(): void
-    {
-        try {
-            $this->svc('guru',21)->ajukan('resume',10,90,
-                'Mencoba mengubah nilai dari Gen bukan penugasan.');
-            self::fail('Guru lain harus ditolak');
-        }catch(DomainException $e){
-            self::assertNotSame('',$e->getMessage());
-        }
-        $id=$this->ajukan();
-        try {
-            $this->svc('guru',21)->permohonan($id);
-            self::fail('Permohonan guru lain tidak boleh terbaca');
-        }catch(DomainException $e){
-            self::assertNotSame('',$e->getMessage());
-        }
-    }
-
-    public function testSnapshotBerubahMembatalkanKeputusanTanpaMutasiLain(): void
-    {
-        $id=$this->ajukan();
-        $this->db->table('resume_materi')->where('id',10)->update(['nilai'=>75]);
-        try{
-            $this->svc('admin',30)->putuskan($id,'disetujui',
-                'Snapshot lama tidak cocok dengan skor yang berlaku.');
-            self::fail('Nilai berubah harus ditolak');
-        }catch(DomainException $e){
-            self::assertNotSame('',$e->getMessage());
-        }
-        self::assertSame('diajukan',$this->svc('admin',30)->permohonan($id)['status']);
-        self::assertSame(74.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
-        self::assertSame(1,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
-    }
-
-    public function testPermohonanUsangMasihBisaDitolakTanpaMengubahSkor(): void
-    {
-        $id=$this->ajukan();
-        $this->db->table('resume_materi')->where('id',10)->update(['nilai'=>75]);
-        $hasil=$this->svc('admin',30)->putuskan($id,'ditolak',
-            'Snapshot sudah berubah dan permohonan harus ditutup tanpa penerapan.');
-        self::assertSame('ditolak',$hasil['status']);
-        self::assertSame(75,(int)$this->db->table('resume_materi')->get()->getRow('nilai'));
-        self::assertSame(74.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
-        self::assertSame(2,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
-    }
-
-    public function testPenggantianGuruG1MenahanPersetujuan(): void
-    {
-        $id=$this->ajukan();
-        $this->db->table('penugasan_guru_gen')->where('id',1)->update(['guru_id'=>21]);
-        try{
-            $this->svc('admin',30)->putuskan($id,'disetujui',
-                'Guru pengusul sudah bukan G1 saat peninjauan.');
-            self::fail('Guru berubah harus ditolak');
-        }catch(DomainException $e){
-            self::assertNotSame('',$e->getMessage());
-        }
-        self::assertSame(60,(int)$this->db->table('resume_materi')->get()->getRow('nilai'));
-    }
-
-    public function testSertifikatAktifMemerlukanTinjauBukanDitimpa(): void
-    {
-        $this->db->table('sertifikat_aktif')->insert([
-            'siswa_id'=>1,'paket_semester_id'=>5,'sertifikat_id'=>501,
-        ]);
-        $id=$this->ajukan();
-        $hasil=$this->svc('admin',30)->putuskan($id,'disetujui',
-            'Koreksi disetujui dan perlu pemeriksaan revisi dokumen.');
-        self::assertTrue($hasil['perlu_tinjau_sertifikat']);
-        self::assertSame(501,(int)$this->db->table('sertifikat_aktif')->get()->getRow('sertifikat_id'));
-        self::assertSame(1,(int)$this->svc('admin',30)->permohonan($id)['perlu_tinjau_sertifikat']);
-    }
-
-    public function testHotsJugaDapatDikoreksiDenganNilaiNolSah(): void
-    {
-        $this->db->table('jawaban_hots_materi')->where('id',12)->update(['nilai'=>0]);
-        $this->db->table('nilai_tp')->where('id',9)->update([
-            'nilai_hots'=>0,'nilai_tp'=>60,
-        ]); // 60*.2 + 0*.2 + 80*.6 = 60
-        $id=$this->ajukan(50,'hots',12);
-        $this->svc('admin',30)->putuskan($id,'disetujui',
-            'Koreksi tugas HOTS sah berdasarkan hasil telaah.');
-        self::assertSame(50,(int)$this->db->table('jawaban_hots_materi')->get()->getRow('nilai'));
-        self::assertSame(70.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
-    }
-
-    public function testAlasanPendekDanNilaiTidakBerubahDitolak(): void
-    {
-        foreach ([['resume',10,60,'Nilai sama tidak boleh diajukan.'],
-            ['resume',10,80,'Pendek']] as [$jenis,$id,$nilai,$alasan]) {
-            try {
-                $this->svc('guru',20)->ajukan($jenis,$id,$nilai,$alasan);
-                self::fail('Permohonan tanpa perubahan/alasan sah tidak diterima');
-            }catch(DomainException $e){
-                self::assertNotSame('',$e->getMessage());
-            }
-        }
-        self::assertSame(0,$this->db->table('permohonan_koreksi_nilai')->countAllResults());
-    }
-
-    /** Revisi final: Guru G1 mengoreksi tanpa pengajuan/persetujuan. */
+    /** Guru G1 mengoreksi langsung; audit versi tanpa Admin. */
     private function langsung(string $role='guru',int $id=20): \App\Services\KoreksiNilaiLangsungService
     {
         return new \App\Services\KoreksiNilaiLangsungService($this->db,static fn():array=>[
