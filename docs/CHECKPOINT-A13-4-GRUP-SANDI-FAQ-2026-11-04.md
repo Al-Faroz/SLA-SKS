@@ -27,3 +27,5 @@ Tanggal 4 November 2026. Branch `feature/a13-4-grup-informasi-revisi-sandi-faq-2
 
 ## Pekerjaan tertunda
 Notifikasi internal per penerima dan badge unread tetap memerlukan **dump baru pasca V4-0012**; A13-4 bukan SQL notifikasi. Kebijakan Privasi publik tetap menunggu teks resmi disahkan madrasah.
+
+ Tambahan QA navigasi: `theme-init.js` memperluas sidebar ringkas saat grup dibuka melalui klik/keyboard, sehingga submenu Rekap Nilai dan Informasi tetap dapat diakses. Workflow menjalankan `node --check`; tetap uji visual browser.
