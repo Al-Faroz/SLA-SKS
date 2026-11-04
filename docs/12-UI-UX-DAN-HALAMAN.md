@@ -453,3 +453,15 @@ Menggantikan catatan pra-audit sebelumnya. **Notifikasi** kini menu tersendiri p
 Guru G1 membuka detail penilaian Resume/HOTS yang telah dinilai → **Koreksi Nilai** → satu input skor 0–100 (nilai 0 sah) → **Proses**. Tampil hasil dan kembali ke detail skor; **tanpa pengajuan, alasan wajib atau keputusan Admin**. Sistem menangani penghitungan TP dan riwayat. Tidak membuka koreksi nilai mesin ujian yang tidak diminta.
 
 Siswa membuka **Sertifikat Saya**: sistem otomatis memeriksa paket miliknya, kelayakan TP Final dan identitas/TTD; menerbitkan awal atau membandingkan snapshot dan memperbarui versi **saat diakses**. Daftar memuat versi Berlaku/Digantikan beserta tautan unduhan privat. Jika belum layak, tampil keadaan kosong/informasi; bila gagal render, tampil pesan mudah dipahami dan halaman tetap terbuka. Admin **tidak** mempunyai tombol Terbitkan/Revisi sertifikat per siswa; masih mempunyai pengelolaan aset, identitas, pemeriksaan dan unduh audit.
+
+
+### A14-3 — Penataan UI Guru hasil audit 12 screenshot XAMPP (4 November 2026)
+
+Perbaikan **hanya tata letak** pada Guru → Peta ATP, Kelola ATP Excel, Semester/BAB/TP, Rincian TP, Bank Soal Diagnostik/Sumatif, dan review Word. Dari screenshot pengguna: input/tombol beberapa form tidak sejajar, input jumlah Word terlalu lebar, KKM terpisah, field Resume/HOTS tidak dalam satu baris, serta pilihan paket impor kurang rapi.
+
+- Filter Gen–Mapel Peta ATP/Impor: grid input + tombol yang sejajar; kartu filter Peta ATP tidak lagi memakai setengah lebar halaman secara arbitrer. Kartu semester 1–6, warna dan kelompok 1–3 / 4–6 tidak berubah.
+- KKM: input dan tombol sejajar; aksi responsif pada tablet/HP. Satu KKM untuk Diagnostik/Sumatif, aturan simpan dan pin snapshot tidak berubah.
+- Word: input jumlah soal dan Unduh Word sejajar; berkas DOCX dan Periksa Word sejajar. Native file input dengan bingkai/kontras Dark/Light; pratinjau, konfirmasi, arsip dan kunci soal tetap.
+- Satu Materi TP: judul + jenis media, URL/file sesuai jenis, waktu minimal pada baris tersendiri, kemudian petunjuk Resume dan HOTS berdampingan desktop/bertumpuk HP. Tidak mengubah POST, CSRF, atau aturan isian/penguncian TP terpakai.
+- BAB/TP: tinggi tombol, gap toolbar/baris aksi, pemisah footer dialog. Modal tetap native, akses keyboard dan URL tetap; tidak ada fitur pindah TP.
+- Tema Emerald Glass Dark/Light serta CTA Indigo–Violet dipertahankan. Viewport 360/390/768/1100px, sidebar ringkas/luas, fokus keyboard, validasi dan tabel perlu diuji browser XAMPP. CSS di-scope a-guru-*, tidak mengubah Admin/Siswa/Pimpinan.
