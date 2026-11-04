@@ -1,3 +1,5 @@
+> **PENTING — KEPUTUSAN FINAL PEMILIK 4 NOVEMBER 2026 MENGGANTI ALUR A14-2 LAMA DI BAWAH.** PR #131 (branch `feature/a14-2-koreksi-langsung-sertifikat-otomatis-20261104`) menggantikan approval Admin dengan **Guru G1 → Koreksi Nilai → Ubah skor → Proses**, tanpa alasan wajib dan tanpa tugas Admin. Sertifikat menjadi dokumentasi hasil belajar pribadi: **terbit awal otomatis saat layak dan diperbarui otomatis saat siswa mengakses**; versi PDF/QR/nomor lama tetap Digantikan. V4-0013 dan V4-0014 **sudah diimpor XAMPP** oleh pemilik pada 16:02:43/16:02:59 WIB, **jangan impor ulang**. Bagian tentang persetujuan Admin, revisi sertifikat manual, dan langkah impor di bawah adalah **catatan historis, bukan instruksi operasional terbaru**.
+
 # Checkpoint A14-2 — Koreksi Nilai Siswa Setelah Audit Dump (19)
 
 Tanggal 4 November 2026. Branch \`feature/a14-2-audit-dampak-koreksi-nilai-20261104\`, PR **#130** (Draft di atas A14-1 #129, belum digabung main).
