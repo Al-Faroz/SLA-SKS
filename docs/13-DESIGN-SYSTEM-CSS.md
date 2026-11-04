@@ -564,3 +564,8 @@ Lapisan CSS scoped pada emerald-glass.css menggunakan .a-guru-* untuk filter Pet
 ### Koreksi A14-4 — Satu komponen tabel untuk Informasi (4 November 2026)
 
 Daftar `informasi/kelola.php` menggunakan `a-tbl a-tbl--cards a-informasi__tabel` dengan varian `--faq` dan `--pengumuman`; jangan mengembalikan `a-tabel`. Struktur HTML: `th scope="row"` pada judul/pertanyaan, `data-label` pada setiap sel, dan grup `a-informasi__row-actions` untuk tombol Sunting serta form Arsipkan. Desktop memakai `table-layout:fixed`, proporsi 5/6 kolom dan `min-width` internal untuk gulir hanya dalam kontainer bila dibutuhkan. Pada <=980px memanfaatkan pola kartu `a-tbl--cards` existing, dengan `table-layout:auto` dan tanpa lebar minimum. Seluruh warna, zebra, batas, hover, label dan mode Light/Dark mengikuti token Emerald Glass. Perubahan bersifat scoped, bukan menimpa tabel lain.
+
+
+### A15 — Branding MTsN 4 Jombang pada halaman login (4 November 2026)
+
+Banner lokal WebP berasio 2048:763 menggantikan **gambar di dalam kotak ilustrasi**, tidak mengubah background seluruh halaman. Elemen responsif width min(100%,520px), radius 16px, object-fit cover dan tetap terlihat pada layar HP. Logo MTsN 4 Jombang yang diberikan pemilik dipakai pada a-identitas__mark--logo (publik/sidebar) dan a-proto-login-icon--madrasah (kartu login), serta favicon WebP yang sama. CTA login minimal 44px, tema Emerald Glass Dark/Light tetap; tanpa framework atau sumber gambar luar. Jangan mengubah gambar sertifikat, TTD ataupun data akademik untuk branding ini.
