@@ -25,8 +25,7 @@ final class NavigasiService
             $menu[] = ['label' => 'Peta ATP', 'path' => 'guru/peta-atp', 'aktif' => $aktif === 'peta_tp'];
             $menu[] = ['label' => 'Antrean Penilaian', 'path' => 'guru/penilaian',
                 'aktif' => $aktif === 'penilaian'];
-            $menu[] = ['label' => 'Pengajuan Koreksi Nilai', 'path' => 'guru/koreksi-nilai',
-                'aktif' => $aktif === 'koreksi_nilai'];
+
             $menu[] = ['label' => 'Pra-Semester', 'path' => 'guru/pra-semester',
                 'aktif' => $aktif === 'pra_semester'];
             $menu[] = ['label' => 'Permintaan Akses Ulang', 'path' => 'guru/akses-ulang',
@@ -52,7 +51,7 @@ final class NavigasiService
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
                 'privasi' => ['Kebijakan Privasi', 'admin/kebijakan-privasi'],
                 'sertifikat' => ['Sertifikat', 'admin/sertifikat'],
-                'koreksi_nilai' => ['Persetujuan Koreksi Nilai', 'admin/koreksi-nilai'],
+
                 'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'pra_semester' => ['Jadwal Pra-Semester', 'admin/pra-semester'],
                 'foto_profil' => ['Persetujuan Foto', 'admin/foto-profil'],
