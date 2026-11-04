@@ -1,6 +1,10 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<?php $nama = $jenis === 'faq' ? 'FAQ resmi' : 'Pengumuman'; ?>
+<?php
+$nama = $jenis === 'faq' ? 'FAQ resmi' : 'Pengumuman';
+$kolomJudul = $jenis === 'faq' ? 'Pertanyaan' : 'Judul pengumuman';
+$kelasTabel = $jenis === 'faq' ? 'a-informasi__tabel--faq' : 'a-informasi__tabel--pengumuman';
+?>
 <div class="a-page a-informasi">
 <nav class="a-breadcrumb" aria-label="Breadcrumb">
     <a href="<?= esc(site_url($peran),'attr') ?>">Beranda <?= esc($peranAktif) ?></a>
@@ -27,9 +31,9 @@
         <div class="a-informasi__kosong" role="status">Belum ada data. Gunakan tombol Tambah untuk membuat <?= esc($nama) ?> pertama.</div>
     <?php else: ?>
         <div class="a-tabel-gulir" tabindex="0" aria-label="Tabel kelola informasi">
-            <table class="a-tabel">
+            <table class="a-tbl a-tbl--cards a-informasi__tabel <?= esc($kelasTabel, 'attr') ?>">
                 <thead><tr>
-                    <th scope="col">Judul / pertanyaan</th><th scope="col">Status</th>
+                    <th scope="col"><?= esc($kolomJudul) ?></th><th scope="col">Status</th>
                     <?php if ($jenis === 'faq'): ?><th scope="col">Urutan</th><?php endif ?>
                     <th scope="col">Versi</th><th scope="col">Diperbarui (UTC)</th>
                     <th scope="col">Aksi</th>
@@ -37,13 +41,14 @@
                 <tbody>
                 <?php foreach ($daftar['data'] as $item): ?>
                     <tr>
-                        <td><?= esc($jenis === 'faq' ? $item['pertanyaan'] : $item['judul']) ?></td>
-                        <td><span class="a-badge"><?= esc(ucfirst((string)$item['status'])) ?></span></td>
-                        <?php if ($jenis === 'faq'): ?><td><?= (int)$item['urutan'] ?></td><?php endif ?>
-                        <td><?= (int)$item['versi'] ?></td>
-                        <td><?= esc($item['diubah_pada']) ?></td>
-                        <td>
+                        <th scope="row" data-label="<?= esc($kolomJudul, 'attr') ?>"><?= esc($jenis === 'faq' ? $item['pertanyaan'] : $item['judul']) ?></th>
+                        <td data-label="Status"><span class="a-badge"><?= esc(ucfirst((string)$item['status'])) ?></span></td>
+                        <?php if ($jenis === 'faq'): ?><td data-label="Urutan"><?= (int)$item['urutan'] ?></td><?php endif ?>
+                        <td data-label="Versi"><?= (int)$item['versi'] ?></td>
+                        <td data-label="Diperbarui (UTC)"><time datetime="<?= esc(str_replace(' ', 'T', (string)$item['diubah_pada']).'Z', 'attr') ?>"><?= esc($item['diubah_pada']) ?></time></td>
+                        <td data-label="Aksi">
                             <?php if ($item['status'] !== 'arsip'): ?>
+                                <div class="a-informasi__row-actions">
                                 <a class="a-btn a-btn--sekunder" href="<?= esc(site_url($prefix.'/'.(int)$item['id'].'/sunting'),'attr') ?>">Sunting</a>
                                 <form method="post" class="a-informasi__arsip"
                                       action="<?= esc(site_url($prefix.'/'.(int)$item['id'].'/arsip'),'attr') ?>"
@@ -52,6 +57,7 @@
                                     <input type="hidden" name="versi" value="<?= (int)$item['versi'] ?>">
                                     <button type="submit" class="a-btn a-btn--bahaya">Arsipkan</button>
                                 </form>
+                                </div>
                             <?php else: ?>
                                 <span class="a-help">Arsip dipertahankan</span>
                             <?php endif ?>
