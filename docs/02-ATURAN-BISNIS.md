@@ -57,7 +57,7 @@
 | Penilaian | belum_dinilai/dinilai/koreksi_diajukan/koreksi_diterapkan | Riwayat menyimpan perubahan |
 | Sertifikat | menyiapkan_revisi/berlaku/digantikan | Tidak ada `dicabut` |
 | CP/template | draf/aktif/diarsipkan | Versi aktif tunggal sesuai jenis referensi |
-| Pengumuman | draf/terbit/arsip | Global untuk pengguna yang login |
+| Pengumuman | draf/terbit/arsip | Buatan Admin global; buatan Guru hanya siswa pada Gen pengampu |
 
 ## 7. Prinsip pembacaan dokumen
 Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya karena contoh sebelumnya pernah menyebutnya. Persyaratan verifikasi harus **cukup aman, sederhana, dan sesuai keputusan akhir**. Rincian operasional hosting dan data pengaturan sekolah diisi melalui UI saat pemasangan.
@@ -83,4 +83,4 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 
 ### A13-2 — Siklus Pengumuman dan FAQ (3 November 2026)
 
-Pengumuman global dan FAQ resmi mengikuti status **Draf → Terbit → Arsip**. Draf hanya dilihat pengelola yang sah, Terbit terlihat **semua akun aktif login** tanpa segmentasi per Gen/peran, Arsip tidak terlihat pembaca dan tidak dapat diubah/diterbitkan ulang. Pengumuman terbit boleh diperbaiki dengan riwayat versi, tetapi tidak diturunkan ke Draf; hentikan publikasi melalui Arsip. Admin boleh mengelola seluruh Pengumuman serta semua FAQ; Guru boleh menulis dan memperbaiki **Pengumuman yang dibuatnya sendiri**; Siswa/Pimpinan hanya membaca. Tidak menghapus record ataupun mengirim email/WhatsApp. Audit setiap tindakan berhasil mencatat aktor, role, sebelum/sesudah dan timestamp UTC.
+Pengumuman dan FAQ resmi mengikuti status **Draf → Terbit → Arsip**. Draf hanya dilihat pengelola yang sah. Pengumuman **dibuat sebagai Admin** yang Terbit terlihat semua akun aktif login; Pengumuman **dibuat sebagai Guru** yang Terbit hanya terlihat oleh Siswa pada Gen yang diampu Guru pembuat. Guru lain, Pimpinan dan Siswa Gen lain tidak melihat Pengumuman Guru. FAQ Terbit tetap dapat dibaca semua akun aktif login. Arsip tidak terlihat pembaca dan tidak dapat diubah/diterbitkan ulang. Pengumuman terbit boleh diperbaiki dengan riwayat versi, tetapi tidak diturunkan ke Draf; hentikan publikasi melalui Arsip. Admin boleh mengelola seluruh Pengumuman serta semua FAQ; Guru boleh menulis dan memperbaiki **Pengumuman yang dibuatnya sendiri**; Siswa/Pimpinan hanya membaca. Tidak menghapus record ataupun mengirim email/WhatsApp. Audit setiap tindakan berhasil mencatat aktor, role, sebelum/sesudah dan timestamp UTC.
