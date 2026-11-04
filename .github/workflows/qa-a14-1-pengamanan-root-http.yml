@@ -59,8 +59,8 @@ jobs:
           cat > /tmp/sla-sks-a14.conf <<EOF
           <VirtualHost *:80>
               ServerName 127.0.0.1
-              DocumentRoot "$GITHUB_WORKSPACE"
-              <Directory "$GITHUB_WORKSPACE">
+              DocumentRoot "/var/www/sla-sks"
+              <Directory "/var/www/sla-sks">
                   Options FollowSymLinks
                   AllowOverride All
                   Require all granted
@@ -72,6 +72,11 @@ jobs:
           printf '%s\n' 'CI_ENVIRONMENT = production' \
              'app.baseURL = "http://127.0.0.1/"' \
              'app.indexPage = ""' > .env
+          # Apache www-data tidak dapat melintasi /home/runner/work.
+          # Gunakan vhost seperti XAMPP di lokasi web yang dapat dibaca.
+          sudo mkdir -p /var/www/sla-sks
+          sudo cp -a "$GITHUB_WORKSPACE/." /var/www/sla-sks/
+          sudo chown -R www-data:www-data /var/www/sla-sks/writable
           sudo apache2ctl configtest
           sudo service apache2 restart
       - name: Audit akses URL anonim (GET baca-saja)
