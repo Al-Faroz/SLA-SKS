@@ -133,3 +133,11 @@ Pembaca hanya memperoleh status `terbit`, tidak melihat draft/arsip. Satu akun s
 ### A13-3 — Hubungi Admin memakai kontak resmi (3 November 2026)
 
 Seluruh peran **aktif dan login** (Admin, Guru, Siswa, Pimpinan) boleh membuka `GET /hubungi-admin`. Sumber hanya kunci `nama_madrasah`, `alamat_madrasah`, `telepon`, `email`, dan `website` dari tabel `pengaturan` yang diisi Admin pada Identitas Madrasah. Tidak membaca `profil_pengelola`, nomor pribadi Admin/Guru, NIP, NISN atau detail autentikasi. Role aktif diperiksa kembali di Service; tidak ada formulir/tiket/chat/pesan otomatis.
+
+
+### A13-4 — Aturan sandi menurut kepemilikan role (4 November 2026)
+
+- Akun dengan **peran Admin** (termasuk Admin+Guru, Admin+Pimpinan) tetap wajib mengganti sandi pertama/reset sebelum beroperasi, apa pun peran aktif yang dipilih. Resetnya hanya menggunakan CSPRNG acak.
+- Guru/Pimpinan/Siswa **boleh langsung masuk** meskipun memakai sandi awal/reset, namun dianjurkan mengganti sandi di halaman Profil. Reset non-Admin oleh Admin memakai sandi default yang diketik/diulang saat konfirmasi, bukan nilai universal yang ditanam di kode.
+- `AuthService::penggunaSaatIni()` mengekspos kebijakan efektif `wajib_ganti_sandi` untuk Admin dan `sandi_direkomendasikan` untuk non-Admin tanpa mengubah kolom skema. Semua penolakan akses oleh Controller/Service memakai hasil autentikasi yang telah terverifikasi.
+- Navigasi `Informasi & Bantuan` menyatukan Pengumuman, Kelola Pengumuman (Admin/Guru), Kelola FAQ (Admin), Bantuan dan Hubungi Admin. Pengelompokan menu tidak menaikkan hak akses: Guru tetap hanya boleh mengelola Pengumuman buatannya, bukan Pengumuman rekan maupun FAQ.
