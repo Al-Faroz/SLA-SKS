@@ -12,7 +12,9 @@
         <h1>Kelola <?= esc($nama) ?></h1>
         <p class="a-proto-muted"><?= $jenis === 'faq'
             ? 'Admin mengatur pertanyaan resmi untuk Pusat Bantuan. Draf tidak terlihat pengguna.'
-            : 'Admin dapat mengelola seluruh pengumuman; Guru hanya pengumuman yang dibuatnya. Publikasi berlaku global bagi semua akun login.' ?></p>
+            : ($peran === 'guru'
+                ? 'Pengumuman Anda hanya muncul bagi Siswa di Gen yang saat ini Anda ampu. Guru lain dan Pimpinan tidak membacanya. Admin tetap dapat mengelola seluruh pengumuman.'
+                : 'Pengumuman yang diterbitkan sebagai Admin berlaku global. Pengumuman yang dibuat Guru hanya dibaca Siswa pada Gen yang diampu Guru tersebut; Admin dapat mengelola semuanya.') ?></p>
     </div>
     <a class="a-btn a-btn--utama" href="<?= esc(site_url($prefix.'/tambah'),'attr') ?>">Tambah <?= esc($nama) ?></a>
 </header>
