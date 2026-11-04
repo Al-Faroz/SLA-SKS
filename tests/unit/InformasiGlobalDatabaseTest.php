@@ -381,6 +381,34 @@ final class InformasiGlobalDatabaseTest extends TestCase
         $routes=file_get_contents($base.'app/Config/Routes.php');
         self::assertIsString($editor);
         self::assertStringContainsString('csrf_field()',$editor);
+        // Regresi 404 XAMPP: form BARU wajib POST /tambah, bukan GET daftar.
+        // Satu editor dipakai oleh FAQ Admin, Pengumuman Admin dan Guru.
+        self::assertStringContainsString(
+            "\$action = \$prefix . (\$baru ? '/tambah'", $editor
+        );
+        self::assertStringContainsString("site_url(\$action)", $editor);
+        self::assertStringNotContainsString(
+            "site_url(\$prefix.(\$baru?'':'/'", $editor
+        );
+        foreach ([
+            "admin/faq/tambah" => "Informasi::adminSimpanFaq",
+            "admin/pengumuman/tambah" => "Informasi::adminSimpanPengumuman",
+            "guru/pengumuman/tambah" => "Informasi::guruSimpanPengumuman",
+        ] as $path => $handler) {
+            self::assertStringContainsString(
+                "\$routes->post('".$path."', '".$handler."'", $routes
+            );
+        }
+        // Edit dan arsip punya POST eksplisit, bukan auto-route.
+        foreach (['admin/faq','admin/pengumuman','guru/pengumuman'] as $path) {
+            self::assertStringContainsString(
+                "\$routes->post('".$path."/(:num)/sunting'", $routes
+            );
+            self::assertStringContainsString(
+                "\$routes->post('".$path."/(:num)/arsip'", $routes
+            );
+        }
+
         self::assertStringContainsString("esc(old(\$kunciIsi",$editor);
         self::assertStringContainsString('name="versi"',$editor);
         self::assertStringContainsString('csrf_field()',$list);
