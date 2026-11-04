@@ -60,22 +60,18 @@ final class NotifikasiService
             return;
         }
         $kunci=$isi['kunci_idempoten'];
-        if ($db->table('notifikasi')->where('kunci_idempoten',$kunci)->countAllResults()>0) return;
-        try {
-            $db->table('notifikasi')->insert([
-                'penerima_id'=>$penerimaId,'peran_penerima'=>$peran,
-                'jenis'=>$jenis,'sumber_id'=>$sumberId,'versi_sumber'=>$versi,
-                'judul'=>$isi['judul'],'pesan'=>$isi['pesan'],'tujuan'=>$tujuan,
-                'kunci_idempoten'=>$kunci,'dibuat_pada'=>gmdate('Y-m-d H:i:s'),
-            ]);
-        } catch (Throwable $e) {
-            // Hanya tabrakan kunci identik yang idempoten. Kesalahan
-            // DB lain harus mengakibatkan rollback transaksi akademik.
-            if ($db->table('notifikasi')->where('kunci_idempoten',$kunci)
-                ->countAllResults()===0) {
-                throw $e;
-            }
-        }
+        // Unique key di database menjamin idempoten juga saat dua request
+        // bersamaan. Hindari error duplikat yang merusak transaksi sumber.
+        $kolom=['penerima_id','peran_penerima','jenis','sumber_id',
+            'versi_sumber','judul','pesan','tujuan','kunci_idempoten','dibuat_pada'];
+        $bind=[$penerimaId,$peran,$jenis,$sumberId,$versi,
+            $isi['judul'],$isi['pesan'],$tujuan,$kunci,gmdate('Y-m-d H:i:s')];
+        $sql='INSERT INTO notifikasi ('.implode(',',$kolom).') VALUES ('
+            .implode(',',array_fill(0,count($kolom),'?')).')';
+        $sql.=$db->DBDriver==='SQLite3'
+            ? ' ON CONFLICT(kunci_idempoten) DO NOTHING'
+            : ' ON DUPLICATE KEY UPDATE id=id';
+        $db->query($sql,$bind);
     }
 
     /** @return array<string,mixed> */
@@ -143,10 +139,10 @@ final class NotifikasiService
     {
         $a=$this->pengguna();
         if ($id<1) throw new DomainException('Notifikasi tidak valid.');
-        $r=$this->milik($id,$a);
-        if (!$this->berhakSumber($a,$r)) {
-            throw new DomainException('Akses ke sumber notifikasi sudah tidak berlaku.');
-        }
+        // Penerima tetap boleh membersihkan notifikasi lama jika akses
+        // sumber berubah (misalnya Guru ditugaskan ke Gen lain).
+        // Yang memerlukan revalidasi sumber adalah Buka kegiatan.
+        $this->milik($id,$a);
         $this->dasar($a)->where('id',$id)->where('dibaca_pada',null)
             ->update(['dibaca_pada'=>gmdate('Y-m-d H:i:s')]);
     }
