@@ -680,3 +680,20 @@ CI: PHP lint, PHPUnit SQLite anonim `KontakResmiMadrasahServiceTest.php`, regres
 Workflow `QA A13-4 Informasi dan Revisi Sandi` menggunakan tes kebijakan role, validasi struktur UI, lint, serta regresi Bantuan/Kontak/akun. CI bukan uji browser XAMPP atau bukti sandi default otomatis berasal dari data lama: sandi awal sebelumnya tidak dapat didekripsi, sehingga Admin memasukkannya saat reset.
 
  Regresi tambahan A13-407: klik/Enter grup dalam sidebar ringkas harus memperluas sidebar dan membuat anak dapat dipilih, termasuk saat grup sebelumnya aktif; JS diperiksa dengan `node --check`.
+
+
+### A13-5 — Uji isolasi Pengumuman Guru pada Gen (4 November 2026)
+| ID | Skenario | Kriteria PASS |
+|---|---|---|
+| A13-501 | Admin menerbitkan Pengumuman | Semua peran aktif termasuk Pimpinan, Guru dan semua Siswa boleh membacanya |
+| A13-502 | Guru Gen A menerbitkan Pengumuman | Hanya Siswa anggota Gen A melihat; Guru lain, Pimpinan, Siswa Gen B tidak melihat |
+| A13-503 | Guru mengampu lebih dari satu Gen / dua Mapel pada Gen sama | Siswa kedua Gen bisa membaca, duplikasi Mapel tidak menggandakan daftar/jumlah |
+| A13-504 | Penugasan Guru–Gen dicabut/ditambah | Daftar baca langsung mengikuti penugasan saat ini, tanpa menghapus pengumuman |
+| A13-505 | Akun Admin+Guru menerbitkan saat peran Guru atau Admin | Peran saat pembuatan yang tercatat di audit pertama menentukan cakupan, bukan daftar role akun |
+| A13-506 | Admin menyunting Pengumuman yang dibuat Guru | Tetap untuk Siswa Gen Guru pembuat, tidak berubah menjadi global |
+| A13-507 | Guru nonaktif, peran Guru dicabut, siswa tanpa Gen, atau audit pembuatan hilang | Tidak ada kebocoran Pengumuman Guru ke penerima yang tidak memenuhi relasi |
+| A13-508 | Paginasi dan jumlah | COUNT dan LIMIT hanya untuk pengumuman sesuai hak, tidak mengungkap item tersembunyi |
+| A13-509 | Draf, Arsip, Kelola Guru/Admin, FAQ | Semua hak dan status lama tetap; FAQ Terbit masih global |
+| A13-510 | Browser localhost empat role, Mode Dokumentasi, Dark/Light/HP | Isi, pesan kosong, navigasi dan tautan tetap berfungsi |
+
+Workflow `QA A13-5 Pengumuman Guru per Gen` memeriksa SQL Service dengan fixture SQLite dan MariaDB 11.4 sintetis. Pengujian tersebut **bukan verifikasi dump/data XAMPP**, sehingga tugas belum FIX sampai pemilik mengecek Gen dan akun nyata di localhost. A13-5 tidak mempunyai patch SQL.
