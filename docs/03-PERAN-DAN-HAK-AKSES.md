@@ -26,7 +26,7 @@ Satu akun staf boleh memiliki dua role saja: Admin+Guru, Admin+Pimpinan, Guru+Pi
 | Menyetujui koreksi akademik | **Ya**, bukan usulan sendiri | Tidak | Tidak | Tidak |
 | Memberi izin akses ulang Diagnostik/Sumatif; melihat pembatalan Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
 | Menyetel logo aplikasi/favikon, TTD PNG dan template | **Ya** | Tidak | Tidak | Baca |
-| Mengelola pengumuman global | **Ya** | **Ya** | Baca | Baca |
+| Mengelola Pengumuman | Semua; publikasi Admin global | Hanya miliknya; publikasi untuk siswa Gen yang diampu | Baca Admin dan Guru pengampu Gen-nya | Baca Admin saja |
 | Mengelola FAQ dan teks Kebijakan Privasi sekolah | **Ya** | Tidak | FAQ baca / privasi publik | FAQ baca / privasi publik |
 | Mengunduh sertifikat siswa | Seluruhnya | Gen–Mapelnya | Miliknya | Seluruhnya (baca) |
 | Melihat log audit sensitif | **Ya** | Audit relevan miliknya | Tidak | Ringkasan baca sesuai kebijakan |
@@ -121,8 +121,8 @@ Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master
 
 | Aksi | Admin | Guru | Siswa | Pimpinan |
 |---|---|---|---|---|
-| Membaca Pengumuman berstatus Terbit | Ya | Ya | Ya | Ya |
-| Membuat Pengumuman global | Ya | Ya | Tidak | Tidak |
+| Membaca Pengumuman berstatus Terbit | Buatan Admin | Buatan Admin | Buatan Admin + Guru yang mengampu Gen sendiri | Buatan Admin |
+| Membuat Pengumuman | Global | Untuk Siswa Gen yang diampu | Tidak | Tidak |
 | Menyunting/mengarsip Pengumuman | Seluruhnya | **Miliknya sendiri** | Tidak | Tidak |
 | Membaca FAQ resmi berstatus Terbit pada Bantuan | Ya | Ya | Ya | Ya |
 | Membuat/menyunting/mengarsip FAQ resmi | Ya | Tidak | Tidak | Tidak |
