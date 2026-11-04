@@ -697,3 +697,26 @@ Workflow `QA A13-4 Informasi dan Revisi Sandi` menggunakan tes kebijakan role, v
 | A13-510 | Browser localhost empat role, Mode Dokumentasi, Dark/Light/HP | Isi, pesan kosong, navigasi dan tautan tetap berfungsi |
 
 Workflow `QA A13-5 Pengumuman Guru per Gen` memeriksa SQL Service dengan fixture SQLite dan MariaDB 11.4 sintetis. Pengujian tersebut **bukan verifikasi dump/data XAMPP**, sehingga tugas belum FIX sampai pemilik mengecek Gen dan akun nyata di localhost. A13-5 tidak mempunyai patch SQL.
+
+
+### A13-6/A13-7 — rencana QA dan pekerjaan yang sudah bisa diuji (4 November 2026)
+
+| ID | Skenario | Status/kriteria |
+|---|---|---|
+| A13-601 | Katalog peristiwa sah dan peran penerima | Tes unit murni, PASS apabila jenis/role invalid ditolak |
+| A13-602 | Dua kali event sama, penerima sama | Kunci idempoten sama (hanya kontrak); DB unique dan transaksi **belum diuji** |
+| A13-603 | Penerima berbeda, versi sumber berbeda | Kunci berbeda tanpa mencantumkan data sensitif |
+| A13-604 | Peristiwa selesai tetapi penugasan berganti | **Belum**, harus cek penerima sah dari database saat transaksi |
+| A13-605 | Daftar, badge dan tandai dibaca penerima sendiri | **Belum**, butuh dump untuk tabel/indeks dan adapter |
+| A13-606 | Guru/Siswa membuka item milik orang lain lewat URL | **Belum**, harus ditolak Service pada tahap adapter |
+| A13-607 | Repeated submit, transaksi gagal, concurrency | **Belum**, harus dibuktikan idempoten pada MySQL/MariaDB |
+| A13-701 | Versi, tanggal, isi teks resmi | Tes validator murni dapat dijalankan tanpa SQL |
+| A13-702 | Tanggal mustahil, versi invalid, konten kosong/terlalu panjang | Tes validator menolak |
+| A13-703 | Konfirmasi pengesahan tidak diberikan | Validator menolak, tetapi **belum ada sistem persetujuan resmi** |
+| A13-704 | Tanpa kebijakan terbit | `/kebijakan-privasi` tetap mengembalikan 503 dan tidak mengarang teks |
+| A13-705 | Admin menerbitkan naskah sah berversi | **Belum**, perlu skema/riwayat dan naskah resmi |
+| A13-706 | Pengguna anonim membuka versi terbit; draf tidak bocor | **Belum**, integrasi UI/DB |
+| A13-707 | Publikasi kedua tidak menghapus versi sebelumnya | **Belum**, audit historis setelah dump |
+| A13-708 | UI desktop/HP, Dark/Light, CSRF, input gagal | **Belum**, harus diuji XAMPP setelah implementasi |
+
+Tes tahap ini di `tests/unit/A13KontrakNotifikasiPrivasiTest.php`. Workflow yang menyertai branch akan menjalankan `php -l`, PHPUnit, serta regresi Pengumuman/Kontak. **PASS validator bukan PASS modul Notifikasi dan Kebijakan Privasi.**
