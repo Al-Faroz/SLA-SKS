@@ -4,6 +4,9 @@
 <nav class="a-breadcrumb" aria-label="Breadcrumb"><a href="<?= esc(site_url('admin/' . $jenis), 'attr') ?>"><?= esc(ucfirst($jenis)) ?></a><span aria-hidden="true">/</span><span aria-current="page">Reset sandi</span></nav>
 <section class="a-card a-baca-panel a-akun-reset" aria-labelledby="judul-reset">
     <h1 id="judul-reset">Konfirmasi reset sandi</h1>
+    <?php if ($galat = session()->getFlashdata('galat')): ?>
+        <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>
+    <?php endif ?>
     <p>Reset hanya berlaku untuk akun yang dipilih. Semua sesi lama dibatalkan dan aktivitas reset dicatat tanpa menyimpan kata sandi.</p>
     <dl class="a-rincian">
         <dt>Nama pengguna</dt><dd><?= esc($target['nama']) ?></dd>
