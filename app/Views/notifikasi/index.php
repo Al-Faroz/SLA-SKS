@@ -32,7 +32,7 @@
                         <?php else: ?>
                             <span class="a-help">Akses kegiatan sudah berubah atau tidak tersedia.</span>
                         <?php endif ?>
-                        <?php if ($item['dibaca_pada']===null && $item['boleh_buka']): ?>
+                        <?php if ($item['dibaca_pada']===null): ?>
                             <form method="post" action="<?= esc(site_url('notifikasi/'.(int)$item['id'].'/dibaca'),'attr') ?>">
                                 <?= csrf_field() ?>
                                 <button type="submit" class="a-btn a-btn--utama">Tandai dibaca</button>
