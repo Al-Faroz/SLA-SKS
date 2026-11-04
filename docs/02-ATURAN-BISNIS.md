@@ -44,8 +44,8 @@
 
 ## 5. Keputusan final tentang sertifikat
 - Daftar nilai sertifikat berisi seluruh TP: Esensial tanpa nilai, NonEsensial dengan nilai; **tidak ada rata-rata nilai akhir semester**.
-- Syarat apakah Pra-Semester wajib selesai sebelum sertifikat terbit masih **menunggu keputusan**, tidak boleh ditetapkan otomatis.
-- Sertifikat A4 landscape, template background global berversi, TTD PNG wajib, NISN hanya PDF privat, QR publik aman. Koreksi cetakan berubah menghasilkan sertifikat pengganti nomor/QR baru, lama Digantikan; cetakan sama cukup audit. Tidak ada pencabutan/hapus.
+- Pra-Semester **bukan** syarat terbit sertifikat dan nilainya tidak dicetak. Sertifikat personal otomatis terbit saat siswa mengakses menu Sertifikat setelah semua TP wajib Tuntas/Final dan identitas/TTD siap.
+- Sertifikat A4 landscape, template background global berversi, TTD PNG wajib, NISN hanya PDF privat, QR publik aman. Perubahan nilai cetak membuat sertifikat diperbarui **otomatis saat siswa mengakses**: nomor/QR/PDF baru, lama Digantikan; konten cetak sama cukup audit. Tidak memerlukan Admin. Tidak ada pencabutan/hapus.
 
 ## 6. Status standar
 | Domain | Nilai status | Makna |
@@ -54,7 +54,7 @@
 | TP | draf/siap | Draf bisa diedit; Siap juga bisa diedit selama belum pernah digunakan siswa. Status Siap tidak sama dengan terkunci |
 | Progres TP | belum_mulai/diagnostik/belajar/sumatif/perlu_bantuan/tuntas | Proses siswa; transisi harus sesuai prasyarat |
 | Ujian | berjalan/jeda_fullscreen/jeda_koneksi/selesai_sah; mandiri: akses_ulang_diperlukan; Pra-Semester: dibatalkan_menunggu_guru | Skor hanya pada selesai_sah; enum DB lama masih memerlukan update SQL additive setelah audit dump terbaru |
-| Penilaian | belum_dinilai/dinilai/koreksi_diajukan/koreksi_diterapkan | Riwayat menyimpan perubahan |
+| Penilaian | belum_dinilai/dinilai/dikoreksi | Riwayat menyimpan perubahan |
 | Sertifikat | menyiapkan_revisi/berlaku/digantikan | Tidak ada `dicabut` |
 | CP/template | draf/aktif/diarsipkan | Versi aktif tunggal sesuai jenis referensi |
 | Pengumuman | draf/terbit/arsip | Buatan Admin global; buatan Guru hanya siswa pada Gen pengampu |
@@ -84,3 +84,7 @@ Jangan memperkenalkan menu, tabel, role, atau syarat persetujuan baru hanya kare
 ### A13-2 — Siklus Pengumuman dan FAQ (3 November 2026)
 
 Pengumuman dan FAQ resmi mengikuti status **Draf → Terbit → Arsip**. Draf hanya dilihat pengelola yang sah. Pengumuman **dibuat sebagai Admin** yang Terbit terlihat semua akun aktif login; Pengumuman **dibuat sebagai Guru** yang Terbit hanya terlihat oleh Siswa pada Gen yang diampu Guru pembuat. Guru lain, Pimpinan dan Siswa Gen lain tidak melihat Pengumuman Guru. FAQ Terbit tetap dapat dibaca semua akun aktif login. Arsip tidak terlihat pembaca dan tidak dapat diubah/diterbitkan ulang. Pengumuman terbit boleh diperbaiki dengan riwayat versi, tetapi tidak diturunkan ke Draf; hentikan publikasi melalui Arsip. Admin boleh mengelola seluruh Pengumuman serta semua FAQ; Guru boleh menulis dan memperbaiki **Pengumuman yang dibuatnya sendiri**; Siswa/Pimpinan hanya membaca. Tidak menghapus record ataupun mengirim email/WhatsApp. Audit setiap tindakan berhasil mencatat aktor, role, sebelum/sesudah dan timestamp UTC.
+
+
+## Keputusan final 4 November 2026 — Koreksi langsung dan sertifikat pribadi otomatis
+Guru pengampu G1 aktif untuk Gen–Mapel siswa dapat memperbaiki **nilai Resume/HOTS yang telah dinilai** lewat **Koreksi Nilai → ubah skor → Proses**, tanpa alasan wajib dan tanpa persetujuan Admin. Sistem menjaga transaksi, penilai historis, nilai awal/baru, audit versi, dan notifikasi siswa. Tidak mengubah soal/kunci/TP terpakai. Sertifikat hanyalah dokumentasi belajar pribadi, bukan dokumen resmi: terbit otomatis ketika siswa layak saat membuka menu Sertifikat, dan diperbarui otomatis bila ada perubahan cetak pada akses berikutnya. PDF/QR/nomor lama tetap sebagai versi Digantikan. Tidak ada penerbitan/revisi manual per siswa oleh Admin. Pra-Semester tidak masuk nilai cetak maupun syarat.
