@@ -1,13 +1,11 @@
-name: QA A14-2 Koreksi Nilai Resmi
+name: QA A14-2 Koreksi Nilai Langsung G1
 
 on:
   pull_request:
     paths:
-      - 'app/Services/KoreksiNilaiService.php'
-      - 'app/Services/KoreksiNilaiDampakService.php'
+      - 'app/Services/KoreksiNilaiLangsungService.php'
       - 'app/Services/NotifikasiService.php'
       - 'app/Controllers/GuruKoreksiNilai.php'
-      - 'app/Controllers/AdminKoreksiNilai.php'
       - 'app/Config/Routes.php'
       - 'app/Services/NavigasiService.php'
       - 'app/Views/koreksi_nilai/**'
@@ -35,18 +33,15 @@ jobs:
       - run: composer install --no-interaction --prefer-dist --no-progress
       - name: Syntax PHP
         run: |
-          for f in app/Services/KoreksiNilaiService.php app/Services/KoreksiNilaiDampakService.php \
+          for f in app/Services/KoreksiNilaiLangsungService.php \
                    app/Services/NotifikasiService.php app/Controllers/GuruKoreksiNilai.php \
-                   app/Controllers/AdminKoreksiNilai.php app/Config/Routes.php \
-                   app/Services/NavigasiService.php app/Views/koreksi_nilai/daftar.php \
-                   app/Views/koreksi_nilai/form_guru.php app/Views/koreksi_nilai/detail.php \
-                   app/Views/guru/nilai_kegiatan.php tests/unit/KoreksiNilaiDampakTest.php \
+                   app/Config/Routes.php app/Services/NavigasiService.php \
+                   app/Views/koreksi_nilai/form_guru.php app/Views/guru/nilai_kegiatan.php \
                    tests/unit/KoreksiNilaiDatabaseTest.php; do
             php -l "$f"
           done
       - name: PHPUnit A14-2 dan regresi A13/A11
         run: |
-          vendor/bin/phpunit --no-coverage tests/unit/KoreksiNilaiDampakTest.php
           vendor/bin/phpunit --no-coverage tests/unit/KoreksiNilaiDatabaseTest.php
           vendor/bin/phpunit --no-coverage tests/unit/PenilaianGuruDatabaseTest.php
           vendor/bin/phpunit --no-coverage tests/unit/NilaiTpLangsungBelajarTest.php
