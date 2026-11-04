@@ -37,9 +37,36 @@ final class InformasiGlobalDatabaseTest extends TestCase
             'CREATE TABLE log_aktivitas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT, pengguna_id INTEGER,
                 peran_aktif TEXT, peristiwa TEXT NOT NULL, catatan TEXT, waktu TEXT NOT NULL)',
+            'CREATE TABLE pengguna (id INTEGER PRIMARY KEY, status TEXT NOT NULL)',
+            'CREATE TABLE pengguna_peran (pengguna_id INTEGER NOT NULL, peran TEXT NOT NULL)',
+            'CREATE TABLE siswa (id INTEGER PRIMARY KEY, pengguna_id INTEGER NOT NULL, angkatan_id INTEGER)',
+            'CREATE TABLE penugasan_guru_gen (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, guru_id INTEGER NOT NULL,
+                angkatan_id INTEGER NOT NULL, mapel_id INTEGER NOT NULL)',
         ] as $sql) {
             $this->db->query($sql);
         }
+        // Hanya ID sintetis; tidak memuat data sekolah/akun nyata.
+        foreach ([201, 202, 203] as $id) {
+            $this->db->table('pengguna')->insert(['id' => $id, 'status' => 'aktif']);
+            $this->db->table('pengguna_peran')
+                ->insert(['pengguna_id' => $id, 'peran' => 'guru']);
+        }
+        $this->db->table('pengguna_peran')->insert([
+            'pengguna_id' => 203, 'peran' => 'admin',
+        ]);
+        foreach ([
+            [300, 10], [301, 20], [302, null], [303, 30], [304, 10],
+        ] as [$id, $gen]) {
+            $this->db->table('siswa')->insert([
+                'id' => $id - 200, 'pengguna_id' => $id, 'angkatan_id' => $gen,
+            ]);
+        }
+        $this->db->table('penugasan_guru_gen')->insertBatch([
+            ['guru_id' => 201, 'angkatan_id' => 10, 'mapel_id' => 1],
+            ['guru_id' => 202, 'angkatan_id' => 20, 'mapel_id' => 2],
+            ['guru_id' => 203, 'angkatan_id' => 10, 'mapel_id' => 3],
+        ]);
     }
 
     protected function tearDown(): void
@@ -89,16 +116,119 @@ final class InformasiGlobalDatabaseTest extends TestCase
         self::assertSame('buat',$this->db->table('riwayat_informasi')->get()->getRowArray()['aksi']);
     }
 
-    public function testTerbitBerlakuGlobalSemuaPeranTanpaSegmentasi(): void
+    public function testTerbitAdminGlobalSedangkanGuruHanyaSiswaPadaGenDiampu(): void
+    {
+        $admin=$this->svc('admin',101)->simpan('pengumuman',self::isi('terbit'));
+        $guru=$this->svc('guru',201)->simpan('pengumuman',[
+            'judul'=>'Info untuk Gen 10','isi'=>'Khusus siswa Guru 201.','status'=>'terbit',
+        ]);
+        foreach (['admin','guru','pimpinan'] as $role) {
+            $data=$this->svc($role, $role === 'guru' ? 202 : 101)
+                ->daftar('pengumuman');
+            self::assertSame(1,$data['jumlah']);
+            self::assertSame($admin,(int)$data['data'][0]['id']);
+        }
+        foreach ([300,304] as $siswa) {
+            $data=$this->svc('siswa',$siswa)->daftar('pengumuman');
+            self::assertSame(2,$data['jumlah']);
+            self::assertEqualsCanonicalizing([$admin,$guru],
+                array_map('intval',array_column($data['data'],'id')));
+        }
+        foreach ([301,302,303] as $siswa) {
+            $data=$this->svc('siswa',$siswa)->daftar('pengumuman');
+            self::assertSame(1,$data['jumlah']);
+            self::assertSame($admin,(int)$data['data'][0]['id']);
+        }
+        // Guru pembuat melihat Pengumuman sendiri di menu Kelola, bukan
+        // di daftar baca global; Admin tetap boleh mengelola semuanya.
+        self::assertSame(1,$this->svc('guru',201)->daftar('pengumuman',true)['jumlah']);
+        self::assertSame(2,$this->svc('admin')->daftar('pengumuman',true)['jumlah']);
+        self::assertSame('terbit',$this->db->table('riwayat_informasi')
+            ->where('objek_id',$guru)->get()->getRowArray()['aksi']);
+    }
+
+    public function testPerubahanPenugasanGenMenyaringPengumumanGuruSaatDibaca(): void
     {
         $id=$this->svc('guru',201)->simpan('pengumuman',self::isi('terbit'));
+        self::assertSame(0,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        $this->db->table('penugasan_guru_gen')->insert([
+            'guru_id'=>201,'angkatan_id'=>20,'mapel_id'=>5,
+        ]);
+        self::assertSame(1,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        // Dua mapel pada Gen sama tidak boleh menggandakan hasil COUNT/daftar.
+        $this->db->table('penugasan_guru_gen')->insert([
+            'guru_id'=>201,'angkatan_id'=>20,'mapel_id'=>6,
+        ]);
+        self::assertSame(1,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        $this->db->table('penugasan_guru_gen')
+            ->where('guru_id',201)->where('angkatan_id',10)->delete();
+        self::assertSame(0,$this->svc('siswa',300)->daftar('pengumuman')['jumlah']);
+        self::assertSame(1,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        self::assertSame('terbit',$this->db->table('pengumuman')->where('id',$id)
+            ->get()->getRowArray()['status']);
+    }
+
+    public function testAsalPeranTidakBerubahSetelahAdminMenyuntingGuruAtauAkunRangkap(): void
+    {
+        $id=$this->svc('guru',203)->simpan('pengumuman',self::isi('terbit'));
+        $this->svc('admin',101)->simpan('pengumuman',[
+            'judul'=>'Disunting Admin','isi'=>'Isi baru','status'=>'terbit','versi'=>'1',
+        ],$id);
+        self::assertSame(1,$this->svc('siswa',300)->daftar('pengumuman')['jumlah']);
+        self::assertSame(0,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        self::assertSame(0,$this->svc('pimpinan')->daftar('pengumuman')['jumlah']);
+        self::assertSame(0,$this->svc('admin')->daftar('pengumuman')['jumlah']);
+
+        // Pengguna 203 memiliki Admin+Guru; saat membuat sebagai Admin,
+        // Pengumuman berikutnya global, bukan salah dianggap milik Guru.
+        $global=$this->svc('admin',203)->simpan('pengumuman',[
+            'judul'=>'Resmi Global','isi'=>'Pengumuman Madrasah','status'=>'terbit',
+        ]);
+        self::assertSame(1,$this->svc('pimpinan')->daftar('pengumuman')['jumlah']);
+        self::assertSame($global,(int)$this->svc('pimpinan')
+            ->daftar('pengumuman')['data'][0]['id']);
+        self::assertSame(1,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        self::assertSame(2,$this->svc('siswa',300)->daftar('pengumuman')['jumlah']);
+    }
+
+    public function testDaftarDanHitunganPaginasiMenggunakanHakPenerimaSama(): void
+    {
+        $this->svc('admin')->simpan('pengumuman',[
+            'judul'=>'Global A','isi'=>'A','status'=>'terbit',
+        ]);
+        $this->svc('guru',201)->simpan('pengumuman',[
+            'judul'=>'Gen 10','isi'=>'B','status'=>'terbit',
+        ]);
+        $this->svc('guru',202)->simpan('pengumuman',[
+            'judul'=>'Gen 20','isi'=>'C','status'=>'terbit',
+        ]);
+        $this->svc('admin')->simpan('pengumuman',[
+            'judul'=>'Global B','isi'=>'D','status'=>'terbit',
+        ]);
+        $satu=$this->svc('siswa',300)->daftar('pengumuman',false,1,2);
+        $dua=$this->svc('siswa',300)->daftar('pengumuman',false,2,2);
+        self::assertSame(3,$satu['jumlah']);
+        self::assertSame(2,$satu['total_halaman']);
+        self::assertCount(2,$satu['data']);
+        self::assertCount(1,$dua['data']);
+        self::assertNotContains('Gen 20',
+            array_merge(array_column($satu['data'],'judul'),array_column($dua['data'],'judul')));
+        self::assertSame(3,$this->svc('siswa',301)->daftar('pengumuman')['jumlah']);
+        self::assertSame(2,$this->svc('pimpinan')->daftar('pengumuman')['jumlah']);
+        self::assertSame(2,$this->svc('guru',201)->daftar('pengumuman')['jumlah']);
+    }
+
+    public function testRiwayatPembuatanYangHilangAtauTidakSahDisembunyikan(): void
+    {
+        $id=$this->svc('guru',201)->simpan('pengumuman',self::isi('terbit'));
+        $this->db->table('riwayat_informasi')
+            ->where('jenis','pengumuman')->where('objek_id',$id)->delete();
         foreach (['admin','guru','siswa','pimpinan'] as $role) {
-            $data=$this->svc($role)->daftar('pengumuman');
-            self::assertSame(1,$data['jumlah']);
-            self::assertSame($id,(int)$data['data'][0]['id']);
-            self::assertNotNull($data['data'][0]['diterbitkan_pada']);
+            self::assertSame(0,$this->svc($role,$role==='siswa'?300:101)
+                ->daftar('pengumuman')['jumlah']);
         }
-        self::assertSame('terbit',$this->db->table('riwayat_informasi')->get()->getRowArray()['aksi']);
+        // Panel Kelola tetap memuat row historis; bukan menghapus isinya.
+        self::assertSame(1,$this->svc('guru',201)->daftar('pengumuman',true)['jumlah']);
     }
 
     public function testGuruTidakMengeditMilikAdminAtauGuruLain(): void
