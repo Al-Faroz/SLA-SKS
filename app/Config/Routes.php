@@ -9,6 +9,12 @@ $routes->get('/', 'Publik::beranda');
 $routes->get('masuk', 'Akun::masuk');
 $routes->post('masuk', 'Akun::prosesMasuk');
 $routes->get('kebijakan-privasi', 'Publik::kebijakanPrivasi');
+$routes->get('admin/kebijakan-privasi', 'AdminKebijakanPrivasi::index', ['filter'=>'auth:admin']);
+$routes->get('admin/kebijakan-privasi/baru', 'AdminKebijakanPrivasi::editor', ['filter'=>'auth:admin']);
+$routes->post('admin/kebijakan-privasi/baru', 'AdminKebijakanPrivasi::simpan', ['filter'=>'auth:admin']);
+$routes->get('admin/kebijakan-privasi/(:num)', 'AdminKebijakanPrivasi::editor/$1', ['filter'=>'auth:admin']);
+$routes->post('admin/kebijakan-privasi/(:num)', 'AdminKebijakanPrivasi::simpan/$1', ['filter'=>'auth:admin']);
+$routes->post('admin/kebijakan-privasi/(:num)/terbit', 'AdminKebijakanPrivasi::terbit/$1', ['filter'=>'auth:admin']);
 $routes->get('verifikasi/(:segment)', 'VerifikasiSertifikat::index/$1');
 
 // Semua mutasi memerlukan CSRF (Filter global) dan session.
@@ -22,6 +28,10 @@ $routes->get('bantuan', 'Bantuan::index', ['filter' => 'auth']);
 $routes->get('hubungi-admin', 'HubungiAdmin::index', ['filter' => 'auth']);
 
 $routes->get('pengumuman', 'Informasi::pengumuman', ['filter' => 'auth']);
+// Notifikasi hanya akun/peran aktif; GET tidak menulis status baca.
+$routes->get('notifikasi', 'Notifikasi::index', ['filter'=>'auth']);
+$routes->get('notifikasi/(:num)/buka', 'Notifikasi::buka/$1', ['filter'=>'auth']);
+$routes->post('notifikasi/(:num)/dibaca', 'Notifikasi::tandai/$1', ['filter'=>'auth']);
 // A13-2: semua login hanya baca global. Admin/Guru menulis, hanya Admin kelola FAQ.
 // Controller juga memeriksa role dan kepemilikan pada Service; POST memakai CSRF global.
 $routes->get('admin/pengumuman', 'Informasi::adminPengumuman', ['filter' => 'auth:admin']);

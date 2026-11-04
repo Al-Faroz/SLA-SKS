@@ -130,3 +130,10 @@ Penanda `schema_version` = `V4-0012-PENGUMUMAN-FAQ`. Tidak menghapus/mengubah da
 ### Gerbang DB A13-6/A13-7 — 4 November 2026
 
 Pembuatan tabel/indeks/versi baru untuk Notifikasi internal dan Kebijakan Privasi berversi **ditunda** sampai dump XAMPP terbaru yang dibuat **setelah V4-0012-PENGUMUMAN-FAQ** benar-benar tersedia. Audit wajib: header timestamp/DB server, `schema_version`, DDL/indeks/FK tabel pengguna, siswa, penugasan, progres TP, ujian/keputusan, penilaian, sertifikat, `pengaturan`, log aktivitas, pengumuman dan FAQ serta ringkasan agregat aman. Jangan menyalin dump privat ke repository. Rancangan SQL additive, nomor versi berikutnya, pengujian impor dan petunjuk rollback hanya ditentukan setelah audit. **Tidak ada SQL baru pada branch persiapan ini.**
+
+
+### Implementasi A13-6/A13-7 — dump (18) dan patch V4-0013 (4 November 2026)
+
+Audit dump privat `sla_sks_v4 (18).sql` (04-11-2026 03.59; MariaDB 10.4.32, 71 tabel) telah memverifikasi `V4-0012-PENGUMUMAN-FAQ` aktif, tabel pengguna, peran, siswa Gen, penugasan G1, progres, penilaian, akses ulang, sertifikat, pengaturan, audit, pengumuman serta FAQ. Tidak ada tabel Notifikasi/Privasi sebelum patch. Paragraf “Gerbang DB” di atas adalah **catatan historis sebelum dump ini diserahkan**, bukan penghalang lagi.
+
+Berkas baru **`database/sql/updates/V4-0013_NOTIFIKASI_PRIVASI.sql`** hanya menambahkan `notifikasi` (FK penerima, peran, jenis, sumber, versi, judul, pesan generik, rute internal, unique kunci idempoten, status dibaca), `kebijakan_privasi` (label versi unik, tanggal berlaku, isi teks, checksum, Draf/Terbit, revisi, pelaku/waktu), `riwayat_kebijakan_privasi` (aksi dan checksum sebelum/sesudah, FK admin/versi), serta marker `V4-0013-NOTIFIKASI-PRIVASI`. Tanpa migration/seeder, data siswa asli, reset, SQL destruktif atau perubahan patch V4-0012. Prosedur impor dan verifikasi aman ada di `database/sql/README.md`.

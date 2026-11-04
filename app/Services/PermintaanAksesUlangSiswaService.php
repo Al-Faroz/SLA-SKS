@@ -138,6 +138,17 @@ final class PermintaanAksesUlangSiswaService
                     'terjadi_pada' => gmdate('Y-m-d H:i:s'),
                 ]);
             }
+            if (!$sudah) {
+                $pengampu=$this->db->table('progres_tp pr')
+                    ->select('g.guru_id')->join('paket_semester p','p.id=pr.paket_semester_id')
+                    ->join('penugasan_guru_gen g',
+                        'g.angkatan_id=p.angkatan_id AND g.mapel_id=p.mapel_id')
+                    ->where('pr.id',(int)$progres['id'])->get(1)->getRowArray();
+                if ($pengampu && (int)($pengampu['guru_id']??0)>0) {
+                    NotifikasiService::catat($this->db,'permintaan_akses_ulang',
+                        (int)$pengampu['guru_id'],(int)$attempt['id']);
+                }
+            }
             if (!$this->db->transStatus()) {
                 throw new RuntimeException('Permintaan akses ulang gagal disimpan.');
             }

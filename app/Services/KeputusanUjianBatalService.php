@@ -210,6 +210,12 @@ final class KeputusanUjianBatalService
                         ->where('id',$id)->update(['digunakan_pada'=>$waktu]);
                 }
             }
+            $penerima=$this->db->table('progres_tp pr')
+                ->select('s.pengguna_id')->join('siswa s','s.id=pr.siswa_id')
+                ->where('pr.id',(int)$p['id'])->get(1)->getRowArray();
+            if (!$penerima) throw new RuntimeException('Penerima izin akses ulang tidak ditemukan.');
+            NotifikasiService::catat($this->db,'izin_akses_ulang',
+                (int)$penerima['pengguna_id'],$id);
             if (!$this->db->transStatus()) throw new RuntimeException('Keputusan gagal disimpan.');
             $this->db->transCommit();
         } catch (Throwable $e) {

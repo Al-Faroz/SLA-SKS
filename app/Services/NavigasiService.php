@@ -48,6 +48,7 @@ final class NavigasiService
                 'mapel' => ['Mapel & Guru', 'admin/mapel-guru'],
                 'cp' => ['Referensi Kurikulum & CP', 'admin/kurikulum-cp'],
                 'identitas' => ['Identitas Madrasah', 'admin/identitas'],
+                'privasi' => ['Kebijakan Privasi', 'admin/kebijakan-privasi'],
                 'sertifikat' => ['Sertifikat', 'admin/sertifikat'],
                 'kkm' => ['Pengaturan KKM', 'admin/kkm'],
                 'pra_semester' => ['Jadwal Pra-Semester', 'admin/pra-semester'],
@@ -61,6 +62,9 @@ final class NavigasiService
             $menu[] = ['label' => 'Monitoring Akademik', 'path' => 'pimpinan/laporan',
                 'aktif' => $aktif === 'laporan'];
         }
+        // A13-6: notifikasi per akun dan peran aktif.
+        $menu[] = ['label' => 'Notifikasi', 'path' => 'notifikasi', 'aktif' => $aktif === 'notifikasi'];
+
         // A13-4: satu grup informasi untuk menjaga sidebar ringkas, tetap role-scoped.
         $informasi = [
             ['label' => 'Pengumuman', 'path' => 'pengumuman',

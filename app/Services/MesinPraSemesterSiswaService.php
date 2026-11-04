@@ -237,6 +237,10 @@ final class MesinPraSemesterSiswaService
 
     private function simpan(int $id, array $s, int $now): void
     {
+        $batal=$s['status']==='dibatalkan_menunggu_guru'
+            ? $this->db->table('percobaan_ujian')
+                ->select('status,siswa_id,jenis')->where('id',$id)->get(1)->getRowArray()
+            : null;
         $this->db->table('percobaan_ujian')->where('id',$id)->update([
             'status'=>$s['status'],'sisa_detik'=>(int)$s['sisa_detik'],
             'waktu_aktif_terakhir'=>self::iso($s['waktu_aktif_terakhir']),
@@ -249,6 +253,15 @@ final class MesinPraSemesterSiswaService
             'waktu_selesai'=>self::iso($s['waktu_selesai']),
             'diubah_pada'=>self::iso($now),
         ]);
+        if ($batal && $batal['status']!=='dibatalkan_menunggu_guru'
+            && $batal['jenis']==='pra_semester') {
+            $penerima=$this->db->table('siswa')->select('pengguna_id')
+                ->where('id',(int)$batal['siswa_id'])->get(1)->getRowArray();
+            if ($penerima) {
+                NotifikasiService::catat($this->db,'pra_semester_dibatalkan',
+                    (int)$penerima['pengguna_id'],$id);
+            }
+        }
     }
 
     private function riwayat(int $id, ?string $sebelum, string $sesudah, string $pesan, int $now): void

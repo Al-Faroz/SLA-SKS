@@ -325,6 +325,13 @@ final class PenilaianGuruService
             // penilaian Guru langsung memperbarui nilai_tp secara atomik.
             // Jika komponen lain belum dinilai, tetap status sementara.
             NilaiTpService::sinkronkan($this->db, (int) $objek['progres_tp_id']);
+            $siswa=$this->db->table('progres_tp pr')
+                ->select('s.pengguna_id')->join('siswa s','s.id=pr.siswa_id')
+                ->where('pr.id',(int)$objek['progres_tp_id'])->get(1)->getRowArray();
+            if (!$siswa) throw new RuntimeException('Penerima penilaian tidak ditemukan.');
+            NotifikasiService::catat($this->db,
+                $jenis==='resume'?'nilai_resume_final':'nilai_hots_final',
+                (int)$siswa['pengguna_id'],$id);
             if (!$this->db->transStatus()) {
                 throw new RuntimeException('Nilai gagal disimpan.');
             }

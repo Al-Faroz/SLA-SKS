@@ -404,3 +404,37 @@ Berkas aset/PDF historis berada pada `writable/private/sertifikat/aset/` dan `wr
 **Jika impor gagal:** DDL MySQL/MariaDB melakukan *implicit commit*, sehingga membuat satu tabel tidak otomatis di-rollback saat pernyataan berikutnya gagal. **Jangan langsung impor ulang atau DROP hasil impor parsial.** Catat pesan gagal, `SHOW TABLES`, `schema_version`, lalu lakukan inspeksi berdasarkan backup. Patch versi ini tidak boleh dijalankan dua kali.
 
 **Batas:** `notifikasi` internal per penerima, kebijakan privasi resmi publik, dan Hubungi Admin sebagai kontak sekolah belum dibangun pada A13-2. Perubahan SQL berikutnya kembali mewajibkan dump XAMPP **terbaru sesudah patch V4-0012** sesuai AGENTS.md.
+
+
+## V4-0013 — Notifikasi Internal dan Kebijakan Privasi A13-6/A13-7 (4 November 2026)
+
+**Acuan terbaru:** dump privat `sla_sks_v4 (18).sql` bertanggal **04 Nov 2026 03.59**, MariaDB **10.4.32**, database **`sla_sks_v4`**. Terdapat 71 tabel; `schema_version` memuat **`V4-0012-PENGUMUMAN-FAQ`** dan belum memuat V4-0013. Tabel `pengguna`, `pengguna_peran`, `siswa`, `penugasan_guru_gen`, `pengaturan`, `log_aktivitas`, `pengumuman`, `faq`, `riwayat_informasi`, sertifikat, penilaian, dan ujian telah diperiksa struktur/indeks/FK-nya. Dump privat **jangan di-push ke GitHub**.
+
+1. **Backup** database `sla_sks_v4` dan seluruh folder `writable/` ke lokasi aman. `git pull` saja tidak menambah tabel.
+2. Di phpMyAdmin pilih database **`sla_sks_v4`** dan jalankan SQL **baca saja**:
+   ```sql
+   SELECT versi, diterapkan_pada FROM schema_version
+   WHERE versi IN ('V4-0012-PENGUMUMAN-FAQ','V4-0013-NOTIFIKASI-PRIVASI');
+   SHOW TABLES LIKE 'notifikasi';
+   SHOW TABLES LIKE 'kebijakan_privasi';
+   SHOW TABLES LIKE 'riwayat_kebijakan_privasi';
+   ```
+   **Harus** ada versi V4-0012, **belum** ada V4-0013, dan **belum** ada ketiga tabel baru. Jika berbeda, **hentikan** dan lakukan audit; jangan impor ulang.
+3. Tab **Import** → pilih **hanya `database/sql/updates/V4-0013_NOTIFIKASI_PRIVASI.sql`**, lalu impor **sekali** pada database yang sama. Tanpa Migration/Seeder, tanpa mengimpor dump lama.
+4. Verifikasi **baca saja**:
+   ```sql
+   SELECT versi, diterapkan_pada FROM schema_version
+   WHERE versi='V4-0013-NOTIFIKASI-PRIVASI';
+   SHOW CREATE TABLE notifikasi;
+   SHOW CREATE TABLE kebijakan_privasi;
+   SHOW CREATE TABLE riwayat_kebijakan_privasi;
+   SELECT COUNT(*) AS jumlah_notifikasi FROM notifikasi;
+   SELECT COUNT(*) AS jumlah_kebijakan FROM kebijakan_privasi;
+   SELECT COUNT(*) AS jumlah_riwayat FROM riwayat_kebijakan_privasi;
+   ```
+   Tiga tabel awalnya **kosong**. Jangan isi data siswa atau naskah privasi palsu melalui SQL.
+5. Tarik branch A13-6/7, masuk sebagai Siswa/Guru/Admin/Pimpinan. Menu Notifikasi dan badge header menampilkan masing-masing pengguna/peran; uji penilaian Resume/HOTS, permintaan/izin akses ulang, publikasi TP NonEsensial, penerbitan sertifikat **hanya pada data simulasi**, lalu cek item dan tombol **Tandai dibaca**. Perubahan status transaksi harus menghasilkan tepat satu notifikasi untuk peristiwa yang sama. Guru Gen lain dan akun lain tidak boleh melihat item.
+6. Admin → **Kebijakan Privasi**: buat Draf, sunting, periksa; **jangan menerbitkan sebelum teks resmi disahkan madrasah**. Setelah naskah resmi ada, pilih versi dan tanggal berlaku, konfirmasi lalu terbitkan. Halaman `/kebijakan-privasi` dapat dibuka tanpa login; sebelum ada naskah terbit yang berlaku akan menjawab 503 “Belum diterbitkan”.
+7. Uji ganti peran dan penugasan, login anonim, CSRF, input HTML sebagai teks, Dark/Light dan HP.
+
+**Sifat patch:** tiga `CREATE TABLE` additive + satu penanda `schema_version`; tidak ada `DROP`, `DELETE`, `UPDATE` tabel lama, perubahan .env atau tabel akademik. Jika gagal setelah satu atau dua DDL, MariaDB sudah melakukan implicit commit. **Jangan mengimpor ulang atau DROP tabel parsial**: catat galat dan hasil `SHOW TABLES`, lalu pulihkan dengan metode aman dari backup setelah pemeriksaan. PR masih Draft sampai QA XAMPP PASS.

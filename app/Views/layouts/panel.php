@@ -77,6 +77,7 @@ $peranAktif = $peranAktif ?? '';
                         str_contains($jalurIkon, 'peta-atp'), str_contains($jalurIkon, 'kurikulum'), str_contains($jalurIkon, 'cp') => 'book-open',
                         str_contains($jalurIkon, 'penilaian'), str_contains($jalurIkon, 'ujian') => 'clipboard-check',
                         str_contains($jalurIkon, 'pengelola'), str_contains($jalurIkon, 'siswa') => 'users',
+                        str_contains($jalurIkon, 'notifikasi') => 'bell',
                         str_contains($jalurIkon, 'profil') => 'user-round',
                         str_contains($jalurIkon, 'laporan') => 'chart-no-axes-combined',
                         str_contains($jalurIkon, 'bantuan'), str_contains($jalurIkon, 'hubungi-admin'), str_contains($jalurIkon, 'pengumuman'), str_contains($jalurIkon, '/faq') => 'book-open',
@@ -102,6 +103,19 @@ $peranAktif = $peranAktif ?? '';
                 <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#menu"></use></svg> Menu
             </button>
             <div class="a-header__pengguna">
+                <?php
+                $jumlahNotifikasi=0;
+                try {
+                    $jumlahNotifikasi=(new \App\Services\NotifikasiService())->belumDibaca();
+                } catch (\Throwable $e) {
+                    // Sebelum V4-0013 tersedia jumlah tetap 0, jangan bocorkan error.
+                }
+                ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('notifikasi'),'attr') ?>"
+                   aria-label="Notifikasi <?= (int)$jumlahNotifikasi ?> belum dibaca">
+                    <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#bell"></use></svg>
+                    <span>Notifikasi<?= $jumlahNotifikasi>0?' ('.($jumlahNotifikasi>99?'99+':(int)$jumlahNotifikasi).')':'' ?></span>
+                </a>
                 <button type="button" class="a-btn a-btn--sekunder a-btn--dokumentasi"
                         data-documentation-toggle aria-label="Aktifkan Mode Dokumentasi untuk screenshot panjang"
                         aria-pressed="false" title="Mode Dokumentasi: tata halaman khusus screenshot full-page">
