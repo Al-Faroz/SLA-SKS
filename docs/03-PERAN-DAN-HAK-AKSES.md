@@ -4,7 +4,7 @@
 | Role | Area utama |
 |---|---|
 | **Admin** | Pengelola/Siswa, impor/ekspor, reset sandi, Gen–Mapel–Guru, CP, profil sekolah, branding/template, biodata, penyuntingan CP langsung, pengumuman, FAQ, laporan, pemeliharaan |
-| **Guru** | TP/paket milik Gen–Mapel yang diampu G1, impor, media, soal, penilaian, keputusan ujian, monitoring, pengumuman global |
+| **Guru** | TP/paket milik Gen–Mapel yang diampu G1, impor, media, soal, penilaian, keputusan ujian, monitoring, pengumuman untuk siswa Gen pengampu |
 | **Siswa** | Belajar dan ujian miliknya, nilai, pengumuman, FAQ, notifikasi, sertifikat sendiri |
 | **Pimpinan** | Dasbor, monitoring dan laporan secara **baca saja**; pratinjau siswa tanpa perubahan data |
 
@@ -26,7 +26,7 @@ Satu akun staf boleh memiliki dua role saja: Admin+Guru, Admin+Pimpinan, Guru+Pi
 | Menyetujui koreksi akademik | **Ya**, bukan usulan sendiri | Tidak | Tidak | Tidak |
 | Memberi izin akses ulang Diagnostik/Sumatif; melihat pembatalan Pra-Semester | Tidak | **Ya, Gen–Mapelnya** | Tidak | Baca |
 | Menyetel logo aplikasi/favikon, TTD PNG dan template | **Ya** | Tidak | Tidak | Baca |
-| Mengelola pengumuman global | **Ya** | **Ya** | Baca | Baca |
+| Mengelola Pengumuman | Semua; publikasi Admin global | Hanya miliknya; publikasi untuk siswa Gen yang diampu | Baca Admin dan Guru pengampu Gen-nya | Baca Admin saja |
 | Mengelola FAQ dan teks Kebijakan Privasi sekolah | **Ya** | Tidak | FAQ baca / privasi publik | FAQ baca / privasi publik |
 | Mengunduh sertifikat siswa | Seluruhnya | Gen–Mapelnya | Miliknya | Seluruhnya (baca) |
 | Melihat log audit sensitif | **Ya** | Audit relevan miliknya | Tidak | Ringkasan baca sesuai kebijakan |
@@ -115,14 +115,14 @@ Beranda `/siswa` memakai filter `auth:siswa` dan pemeriksaan ulang role/status d
 
 `GET /bantuan` berlaku hanya untuk akun sudah login dengan status aktif; akun non-Admin boleh mengakses dengan sandi awal sambil memperoleh anjuran penggantian. Akun pemegang peran Admin tetap mengikuti kewajiban ganti sandi awal. AuthFilter `auth` dan `Bantuan::index` mengecek sesi/peran aktif; panduan `PanduanBantuanService::untukPeran()` hanya mengembalikan pertanyaan dan tautan GET yang sesuai **peran aktif** (bukan gabungan role staf). Guru tidak memperoleh panduan tautan Admin, Siswa tidak melihat tautan Guru/Admin, dan Pimpinan hanya menuju monitoring baca-saja atau Profil. Semua target tetap menerapkan otorisasi normal server ketika diklik. Halaman Bantuan tidak menerima ID siswa/Gen sebagai query, tidak melakukan mutasi, dan memakai `Cache-Control: private, no-store`.
 
-Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master**, bukan sistem FAQ yang dapat diubah Admin. Pengumuman global, FAQ resmi terkelola, notifikasi internal dan kontak resmi Hubungi Admin tetap terpisah hingga struktur/sumbernya diverifikasi lewat dump SQL XAMPP terbaru. Tidak ada perubahan izin pada tiga layanan tersebut.
+Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master**, bukan sistem FAQ yang dapat diubah Admin. Pengumuman, FAQ resmi terkelola, notifikasi internal dan kontak resmi Hubungi Admin memiliki hak akses tersendiri; rincian terbaru A13-5 di bawah berlaku untuk Pengumuman Guru. Notifikasi internal masih memerlukan tahap terpisah.
 
-### A13-2 — Pengumuman global dan FAQ resmi (3 November 2026)
+### A13-2/A13-5 — Pengumuman Admin global, Guru per Gen dan FAQ resmi
 
 | Aksi | Admin | Guru | Siswa | Pimpinan |
 |---|---|---|---|---|
-| Membaca Pengumuman berstatus Terbit | Ya | Ya | Ya | Ya |
-| Membuat Pengumuman global | Ya | Ya | Tidak | Tidak |
+| Membaca Pengumuman berstatus Terbit | Buatan Admin | Buatan Admin | Buatan Admin + Guru yang mengampu Gen sendiri | Buatan Admin |
+| Membuat Pengumuman | Global | Untuk Siswa Gen yang diampu | Tidak | Tidak |
 | Menyunting/mengarsip Pengumuman | Seluruhnya | **Miliknya sendiri** | Tidak | Tidak |
 | Membaca FAQ resmi berstatus Terbit pada Bantuan | Ya | Ya | Ya | Ya |
 | Membuat/menyunting/mengarsip FAQ resmi | Ya | Tidak | Tidak | Tidak |

@@ -132,7 +132,7 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 
 ### A13-2 — Audit, transaksi dan isolasi Pengumuman/FAQ (3 November 2026)
 
-- Semua akun login aktif yang memenuhi kebijakan sandi per peran (non-Admin boleh memakai sandi awal; pemegang Admin tetap wajib mengganti) dapat membaca Pengumuman dan FAQ berstatus `terbit`, tanpa segmentasi Gen atau role. Draf dan Arsip tidak boleh keluar dari Service pembaca.
+- Semua akun login aktif yang memenuhi kebijakan sandi per peran (non-Admin boleh memakai sandi awal; pemegang Admin tetap wajib mengganti) dapat membaca FAQ Terbit dan Pengumuman Admin Terbit. Khusus Siswa, Pengumuman Guru Terbit dibatasi pada Gen yang diampu Guru pembuat. Draf dan Arsip tidak boleh keluar dari Service pembaca.
 - Admin mengelola semua Pengumuman dan FAQ; Guru hanya Pengumuman yang dibuatnya sendiri; Pimpinan/Siswa hanya baca. Filter role di Routes dan otorisasi ulang pada `InformasiGlobalService`; staf dua peran tidak menggabungkan hak.
 - Setiap POST memakai CSRF global, panjang judul/isi, status, urutan divalidasi di server. Teks disimpan plain dan di-`esc()` dalam semua View.
 - Penyuntingan/pengarsipan memakai row lock MySQL/MariaDB `FOR UPDATE`, `versi` untuk menolak permintaan tab lama, dan transaksi yang menyimpan perubahan bersama `riwayat_informasi` serta `log_aktivitas`. Arsip terminal, tidak DELETE.
@@ -143,3 +143,7 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 ### A13-3 — Privasi kontak resmi (3 November 2026)
 
 `GET /hubungi-admin` dilindungi filter login dan verifikasi ulang role di `KontakResmiMadrasahService`. Query `pengaturan` hanya memilih kunci kontak sekolah resmi; informasi pribadi `profil_pengelola` dan data akademik tidak dimuat. Semua nilai HTML di-escape, termasuk atribut URL; tautan eksternal hanya HTTP(S) sah, email valid dan telepon yang dinormalisasi. Nilai legacy invalid hanya teks. No-store, tanpa mutasi, tiket, audit event palsu, data siswa maupun notifikasi otomatis.
+
+
+### A13-5 — Anti-kebocoran Pengumuman lintas Gen (4 November 2026)
+Pengumuman yang dibuat di peran Admin tampil global; yang dibuat di peran Guru hanya tampil kepada **Siswa** pada Gen yang saat ini ditugaskan kepada Guru tersebut. Catatan awal `riwayat_informasi` menentukan asal peran (termasuk akun rangkap Admin/Guru), bukan hak yang dimiliki saat membaca atau `diubah_oleh` sesudah Admin menyunting. Pengumuman tanpa catatan asal yang konsisten tidak ditampilkan ke pembaca. Query `EXISTS` memeriksa siswa terdaftar Gen, penugasan Guru–Gen, akun Guru aktif dan role Guru. Tidak ada pengambilan data dari parameter URL; status Draf/Arsip tidak ditampilkan; hitungan dan paginasi memakai filter server yang identik. Admin tetap boleh mengelola semua, Guru hanya miliknya. Bila penugasan Guru berubah, cakupan siswa berubah pada pembacaan berikutnya (riwayat lama tetap disimpan). Tidak menambah notifikasi otomatis atau tabel penerima.

@@ -72,7 +72,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | G15 | Laporan | Pilih laporan mapelnya dan PDF/Excel |
 | G16 | Edit TP Siap belum digunakan | Guru G1 langsung membuka editor TP/Materi/soal saat belum ada siswa yang menggunakan TP; bila telah digunakan, tampilkan status terkunci |
 | G17 | Koreksi nilai/kunci ujian | Usulan nilai guru sebelumnya, peninjauan soal/kunci dan dampak akademik |
-| G18 | Pengumuman | Buat/ubah/arsip pengumuman global secara sederhana |
+| G18 | Pengumuman | Buat/ubah/arsip Pengumuman untuk siswa Gen pengampu |
 
 ## 5. Katalog layar Admin
 | ID | Layar | Isi dan tombol utama |
@@ -117,7 +117,7 @@ UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol uta
 | U02S | Profil siswa | Siswa melihat biodata dan Gen sendiri, dapat ganti sandi; koreksi identitas resmi oleh Admin |
 
 | U03 | Notifikasi | Daftar per penerima; unread badge, mark read, tautan berizin |
-| U04 | Pengumuman | Daftar global aktif untuk akun login, tanpa segmentasi role/Gen |
+| U04 | Pengumuman | Terbit Admin global; Terbit Guru hanya Siswa Gen pengampu |
 | U05 | Bantuan/FAQ | Pertanyaan sesuai menu, **harus login**; Hubungi Admin berupa kontak resmi |
 | U06 | Pencarian dan filter | Paginasi, indikator jumlah, kosong/hasil tidak ada, reset filter |
 | P04 | Kebijakan Privasi publik | Teks kebijakan resmi sekolah, versi dan kontak sekolah; tanpa login |
@@ -416,7 +416,7 @@ Pusat Bantuan ini **belum** merupakan FAQ resmi terkelola Admin, Pengumuman glob
 
 ### A13-2 — Pengumuman global dan FAQ resmi pada Bantuan (3 November 2026)
 
-Menu **Pengumuman** tampil untuk Admin, Guru, Siswa, Pimpinan; Admin dan Guru mendapat **Kelola Pengumuman**, Admin tambahan **Kelola FAQ**. `/pengumuman` memuat daftar global hanya status `terbit`, kartu teks, tanggal penerbitan, pagination server-side, dan kondisi kosong. Kelola Pengumuman Guru hanya berisi konten miliknya, sedangkan Admin dapat mengelola semua. Editor Tambah/Sunting memakai judul/isi atau pertanyaan/jawaban, urutan FAQ, status Draf/Terbit dan CSRF; HTML pengguna ditampilkan sebagai teks biasa, bukan markup. Arsip memiliki konfirmasi, tetap dicatat, tidak dihapus.
+Menu **Pengumuman** tampil untuk Admin, Guru, Siswa, Pimpinan; Admin dan Guru mendapat **Kelola Pengumuman**, Admin tambahan **Kelola FAQ**. `/pengumuman` memuat hanya status `terbit` sesuai penerima: Admin global, Guru hanya Siswa Gen yang diampu. Kartu, tanggal terbit, pagination server-side dan kondisi kosong menghitung hanya yang boleh dibaca. Kelola Pengumuman Guru hanya berisi konten miliknya, sedangkan Admin dapat mengelola semua. Editor Tambah/Sunting memakai judul/isi atau pertanyaan/jawaban, urutan FAQ, status Draf/Terbit dan CSRF; HTML pengguna ditampilkan sebagai teks biasa, bukan markup. Arsip memiliki konfirmasi, tetap dicatat, tidak dihapus.
 
 Di `/bantuan`, **Panduan Penggunaan A13-1** tetap sesuai peran, ditambah **Pertanyaan Resmi** dari FAQ Admin berstatus `terbit`, urut dan dipaginasi dengan `details/summary` keyboard-accessible. Belum ada FAQ/pengumuman: tampil pesan kosong, bukan data contoh. Dark/Light, Mode Dokumentasi, tabel scroll dan HP 360/390px perlu diperiksa. Notifikasi penerima, kontak Hubungi Admin dan Kebijakan Privasi publik tidak termasuk A13-2.
 

@@ -121,3 +121,7 @@ Patch `database/sql/updates/V4-0012_PENGUMUMAN_FAQ.sql` menambahkan secara addit
 - `riwayat_informasi`: jenis `pengumuman/faq`, objek ID, aksi `buat/sunting/terbit/arsip`, FK aktor, peran aktif, snapshot JSON sebelum/sesudah, timestamp UTC. Tidak memakai FK polimorfik terhadap tabel sasaran; Service memeriksa objek dan transaksi.
 
 Penanda `schema_version` = `V4-0012-PENGUMUMAN-FAQ`. Tidak menghapus/mengubah data existing, dan tidak membuat akun/contoh siswa. Karena DDL bersifat implicit commit, **backup dulu, impor sekali**, jika gagal jangan ulang tanpa audit. Langkah rinci ada di `database/sql/README.md`. Tidak memakai Migration/Seeder. Modul Notifikasi internal penerima belum termasuk patch ini.
+
+
+### A13-5 — Filter baca Pengumuman Guru melalui relasi yang sudah ada (4 November 2026)
+**Tidak mengubah DDL atau data**: cakupan pembaca menggunakan `pengumuman.dibuat_oleh` dan audit awal `riwayat_informasi` untuk mengenali peran penulis saat pembuatan, lalu mencocokkan `siswa.pengguna_id`, `siswa.angkatan_id`, `penugasan_guru_gen.guru_id` dan `penugasan_guru_gen.angkatan_id`. Pemberitahuan Guru mengikuti Gen yang diampu saat pembacaan, tidak snapshot saat terbit. Hak baca akun terautentikasi dihitung server-side tanpa mempercayai Gen dari query string. Indeks/kolom existing digunakan, tanpa patch SQL baru atau impor ulang V4-0012.

@@ -7,10 +7,10 @@
 </nav>
 <header class="a-page__heading a-proto-heading">
     <div>
-        <p class="a-proto-eyebrow">Informasi · Seluruh Pengguna</p>
+        <p class="a-proto-eyebrow">Informasi · Sesuai Hak Akses</p>
         <h1>Pengumuman</h1>
-        <p class="a-proto-muted">Informasi resmi yang telah diterbitkan Admin atau Guru.
-            Seluruh akun login membaca daftar yang sama tanpa pembatasan Gen atau peran.</p>
+        <p class="a-proto-muted">Pengumuman Admin berlaku bagi semua akun aktif.
+            Pengumuman Guru hanya ditampilkan kepada Siswa pada Gen yang saat ini diampunya.</p>
     </div>
     <?php if (in_array($peran,['admin','guru'],true)): ?>
         <a class="a-btn a-btn--sekunder"
@@ -20,10 +20,10 @@
 <?php if (!$daftar['data']): ?>
     <section class="a-card a-informasi__kosong" role="status">
         <h2>Belum ada pengumuman</h2>
-        <p class="a-help">Pengumuman yang diterbitkan oleh Admin atau Guru akan tampil di sini.</p>
+        <p class="a-help">Belum ada pengumuman Terbit yang ditujukan kepada akun atau Gen Anda.</p>
     </section>
 <?php else: ?>
-    <p class="a-help" role="status"><?= (int) $daftar['jumlah'] ?> pengumuman diterbitkan.</p>
+    <p class="a-help" role="status"><?= (int) $daftar['jumlah'] ?> pengumuman sesuai akses Anda.</p>
     <div class="a-informasi__kartu">
         <?php foreach ($daftar['data'] as $item): ?>
             <article class="a-card a-informasi__item">
