@@ -218,6 +218,26 @@ final class InformasiGlobalDatabaseTest extends TestCase
         self::assertSame(2,$this->svc('guru',201)->daftar('pengumuman')['jumlah']);
     }
 
+    public function testGuruNonaktifAtauPerannyaDicabutTidakLagiMenyasarSiswa(): void
+    {
+        $guru=$this->svc('guru',201)->simpan('pengumuman',self::isi('terbit'));
+        $admin=$this->svc('admin')->simpan('pengumuman',[
+            'judul'=>'Informasi Admin','isi'=>'Tetap global','status'=>'terbit',
+        ]);
+        self::assertSame(2,$this->svc('siswa',300)->daftar('pengumuman')['jumlah']);
+        $this->db->table('pengguna')->where('id',201)->update(['status'=>'nonaktif']);
+        self::assertSame(1,$this->svc('siswa',300)->daftar('pengumuman')['jumlah']);
+        $this->db->table('pengguna')->where('id',201)->update(['status'=>'aktif']);
+        $this->db->table('pengguna_peran')->where('pengguna_id',201)
+            ->where('peran','guru')->delete();
+        $hasil=$this->svc('siswa',300)->daftar('pengumuman');
+        self::assertSame(1,$hasil['jumlah']);
+        self::assertSame($admin,(int)$hasil['data'][0]['id']);
+        self::assertSame(2,$this->db->table('pengumuman')->countAllResults());
+        self::assertSame('terbit',$this->db->table('pengumuman')->where('id',$guru)
+            ->get()->getRowArray()['status']);
+    }
+
     public function testRiwayatPembuatanYangHilangAtauTidakSahDisembunyikan(): void
     {
         $id=$this->svc('guru',201)->simpan('pengumuman',self::isi('terbit'));
