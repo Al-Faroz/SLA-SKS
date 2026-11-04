@@ -720,3 +720,7 @@ Workflow `QA A13-5 Pengumuman Guru per Gen` memeriksa SQL Service dengan fixture
 | A13-708 | UI desktop/HP, Dark/Light, CSRF, input gagal | **Belum**, harus diuji XAMPP setelah implementasi |
 
 Tes tahap ini di `tests/unit/A13KontrakNotifikasiPrivasiTest.php`. Workflow yang menyertai branch akan menjalankan `php -l`, PHPUnit, serta regresi Pengumuman/Kontak. **PASS validator bukan PASS modul Notifikasi dan Kebijakan Privasi.**
+
+### A13-6/A13-7 — verifikasi implementasi V4-0013
+
+Setelah audit dump (18), `tests/unit/A13NotifikasiPrivasiDatabaseTest.php` menguji otorisasi, pemisahan peran, idempoten, perubahan penugasan Guru, mark read, Draf/Terbit, histori versi dan batas tanggal berlaku. `tests/integration/SqlA13NotifikasiPrivasiSchemaCheck.php` mengimpor patch SQL asli V4-0013 pada MariaDB sintetis, memeriksa FK, kunci unik, dan marker versi. Workflow QA menguji lint, kontrak, SQLite, dan regresi layanan akademik. Uji E2E XAMPP masih wajib untuk penilaian Resume/HOTS, permintaan/izin akses ulang, TP Siap, sertifikat, pembatalan Pra-Semester, login semua peran, unggah naskah resmi, tampilan HP/Dark/Light, CSRF, retry. Pemicu koreksi nilai belum dapat dinyatakan selesai karena Service koreksi nilai sesuai v2.5 belum ada.
