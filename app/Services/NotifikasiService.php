@@ -29,8 +29,8 @@ final class NotifikasiService
         'koreksi_nilai_diterapkan' => ['siswa', 'siswa/laporan'],
         'sertifikat_awal_terbit' => ['siswa', 'siswa/sertifikat'],
         'sertifikat_pengganti_terbit' => ['siswa', 'siswa/sertifikat'],
-        'permohonan_koreksi_nilai' => ['admin', 'admin'],
-        'keputusan_koreksi_nilai' => ['guru', 'guru/penilaian'],
+        'permohonan_koreksi_nilai' => ['admin', 'admin/koreksi-nilai'],
+        'keputusan_koreksi_nilai' => ['guru', 'guru/koreksi-nilai'],
     ];
 
     public function __construct(?BaseConnection $db = null, ?callable $akun = null)
@@ -208,8 +208,29 @@ final class NotifikasiService
                 ->where('pu.id',$sid)->where('s.pengguna_id',$uid)
                 ->where('pu.jenis','pra_semester')->countAllResults()>0;
         }
-        // Belum ada alur koreksi nilai siswa yang diimplementasikan.
-        // Jangan menawarkan tautan untuk peristiwa tersebut tanpa Service sah.
+        if (in_array($jenis,[
+            'permohonan_koreksi_nilai','keputusan_koreksi_nilai',
+            'koreksi_nilai_diterapkan'],true)) {
+            if (!$this->db->tableExists('permohonan_koreksi_nilai')) return false;
+            $q=$this->db->table('permohonan_koreksi_nilai k')->where('k.id',$sid);
+            if ($jenis==='permohonan_koreksi_nilai'
+                && $a['peran_aktif']==='admin') {
+                return $q->countAllResults()>0;
+            }
+            if ($jenis==='keputusan_koreksi_nilai'
+                && $a['peran_aktif']==='guru') {
+                return $q->where('k.guru_id',$uid)
+                    ->where('k.status !=','diajukan')->countAllResults()>0;
+            }
+            if ($jenis==='koreksi_nilai_diterapkan'
+                && $a['peran_aktif']==='siswa') {
+                return $q->join('progres_tp pr','pr.id=k.progres_tp_id')
+                    ->join('siswa s','s.id=pr.siswa_id')
+                    ->where('s.pengguna_id',$uid)->where('k.status','disetujui')
+                    ->countAllResults()>0;
+            }
+            return false;
+        }
         return false;
     }
 }
