@@ -435,3 +435,10 @@ Guru/Pimpinan/Siswa mendapat anjuran keamanan sekali pada respons login menuju D
 FAQ resmi tetap dikelola Admin dari database; 28 draf jawaban pengguna tersedia sebagai bahan salin/tinjau di `docs/DRAF-FAQ-RESMI-SLA-SKS-2026-11-04.md`, **tidak otomatis diterbitkan**.
 
  Group pada sidebar yang sedang diminimalkan **harus memperluas sidebar terlebih dahulu** ketika dipilih (klik/Enter), agar submenunya benar-benar dapat diakses. Tombol ringkas tetap menyimpan preferensi pengguna.
+
+
+### A13-6/A13-7 — kesiapan UI sebelum SQL dan pengesahan (4 November 2026)
+
+Katalog target Notifikasi Internal: tombol header dengan badge jumlah belum dibaca penerima sendiri, daftar waktu terbaru dengan keadaan kosong dan paginasi, tautan peristiwa sah (hak diperiksa ulang), satu tombol **Tandai dibaca** per item dengan CSRF dan respons sukses/gagal. Tidak ada push/email/WhatsApp, tombol tutup ujian, atau pop-up mengganggu layar ujian. **Belum ditampilkan** pada sidebar/header saat fase pra-audit; tidak boleh ada kontrol palsu.
+
+Katalog target Kebijakan Privasi: halaman publik yang sudah ada `/kebijakan-privasi` akan menampilkan versi, tanggal berlaku, teks resmi sekolah (escaped plaintext dengan baris baru) dan kontak resmi, hanya setelah Admin menerbitkan dokumen yang disahkan. UI Admin yang dibutuhkan: daftar versi dan status, editor naskah, pratinjau, konfirmasi pernyataan pengesahan, publikasi, riwayat publikasi dan penolakan draf kosong. **Belum ada** form publikasi sampai struktur dan naskah resmi tersedia; saat ini 503 `Belum diterbitkan` adalah kondisi kosong yang benar. Jangan membuat isi kebijakan untuk mengisi halaman.
