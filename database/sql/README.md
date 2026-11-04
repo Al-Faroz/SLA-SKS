@@ -438,3 +438,48 @@ Berkas aset/PDF historis berada pada `writable/private/sertifikat/aset/` dan `wr
 7. Uji ganti peran dan penugasan, login anonim, CSRF, input HTML sebagai teks, Dark/Light dan HP.
 
 **Sifat patch:** tiga `CREATE TABLE` additive + satu penanda `schema_version`; tidak ada `DROP`, `DELETE`, `UPDATE` tabel lama, perubahan .env atau tabel akademik. Jika gagal setelah satu atau dua DDL, MariaDB sudah melakukan implicit commit. **Jangan mengimpor ulang atau DROP tabel parsial**: catat galat dan hasil `SHOW TABLES`, lalu pulihkan dengan metode aman dari backup setelah pemeriksaan. PR masih Draft sampai QA XAMPP PASS.
+
+## V4-0014 — Koreksi Nilai Siswa A14-2 (4 November 2026)
+
+**Acuan audit:** dump SQL XAMPP privat \`sla_sks_v4 (19).sql\`, phpMyAdmin 5.2.1, waktu **04 Nov 2026 09.28**, MariaDB **10.4.32**, database \`sla_sks_v4\`. Dump memuat **71 tabel** dengan marker sampai **\`V4-0012-PENGUMUMAN-FAQ\`**. V4-0013 **BELUM** tercatat dan tabel \`notifikasi\`/\`kebijakan_privasi\` tidak ada dalam dump. Tidak ada tabel koreksi nilai siswa.
+
+**Jangan menganggap A13-6/A13-7 sudah terpasang dalam database hanya karena kode/QA HTTP-nya FIX.** Modul Koreksi Nilai membutuhkan V4-0013 untuk notifikasi dan V4-0014 untuk transaksi permohonan.
+
+### Urutan impor aman
+
+1. **Backup** seluruh DB \`sla_sks_v4\` beserta \`writable/\` (termasuk PDF historis sertifikat) dan simpan di luar GitHub.
+2. Pilih database \`sla_sks_v4\` di phpMyAdmin lalu jalankan **baca saja**:
+
+   \`\`\`sql
+   SELECT versi,diterapkan_pada FROM schema_version
+   WHERE versi IN (
+      'V4-0012-PENGUMUMAN-FAQ',
+      'V4-0013-NOTIFIKASI-PRIVASI',
+      'V4-0014-KOREKSI-NILAI-SISWA'
+   );
+   SHOW TABLES LIKE 'notifikasi';
+   SHOW TABLES LIKE 'kebijakan_privasi';
+   SHOW TABLES LIKE 'riwayat_kebijakan_privasi';
+   SHOW TABLES LIKE 'permohonan_koreksi_nilai';
+   SHOW TABLES LIKE 'riwayat_koreksi_nilai';
+   \`\`\`
+
+   Jika marker dan tabel saling tidak konsisten atau sebagian sudah ada, **STOP**, jangan impor ulang maupun menghapus tabel.
+3. Bila **V4-0013 belum ada dan ketiga tabelnya belum ada**, impor **\`V4-0013_NOTIFIKASI_PRIVASI.sql\` satu kali**, verifikasi tabel + marker V4-0013. Jika marker V4-0013 sudah ada beserta ketiga tabelnya, **jangan impor ulang**.
+4. Jika marker V4-0014 belum ada dan kedua tabel koreksi belum ada, impor **hanya \`V4-0014_KOREKSI_NILAI_SISWA.sql\` satu kali**. Penerapan V4-0014 sebelum V4-0013 **tidak diizinkan**.
+5. Verifikasi **baca saja**:
+
+   \`\`\`sql
+   SELECT versi,diterapkan_pada FROM schema_version
+   WHERE versi IN ('V4-0013-NOTIFIKASI-PRIVASI','V4-0014-KOREKSI-NILAI-SISWA');
+   SHOW CREATE TABLE permohonan_koreksi_nilai;
+   SHOW CREATE TABLE riwayat_koreksi_nilai;
+   SELECT COUNT(*) AS permohonan FROM permohonan_koreksi_nilai;
+   SELECT COUNT(*) AS riwayat FROM riwayat_koreksi_nilai;
+   \`\`\`
+
+   Kedua tabel koreksi awalnya kosong; tabel nilai dan sertifikat lama **tidak boleh direset**.
+6. Uji dengan data **simulasi** yang sudah ada atau yang disiapkan secara terpisah dan aman: Guru G1 membuka tugas Resume/HOTS yang telah dinilai untuk TP Tuntas → Ajukan Koreksi (nilai 0–100 dan alasan 10–500 karakter) → Admin **akun berbeda** melihat permohonan → setujui/tolak → Guru dan Siswa melihat notifikasi serta rekap nilai hasil koreksi. Cek perbedaan nilai TP dan status sertifikat sebelum/sesudah, tidak mengubah nilai nyata sembarangan.
+7. Uji penolakan: Guru Gen lain, akun sama Admin+Guru, pengajuan ganda, perubahan penugasan, nilai sumber berubah di sela keputusan, dan nilai mesin Sumatif/Diagnostik/Pra-Semester tidak punya tombol koreksi dalam modul ini. Periksa form, status kosong/galat/sukses, Dark/Light dan HP.
+
+**Sifat SQL:** dua CREATE TABLE additive + satu INSERT marker; **tanpa** DROP/DELETE/TRUNCATE/UPDATE data lama, tanpa Migration/Seeder, tanpa mengubah \`.env\`. DDL MariaDB melakukan *implicit commit*. Bila ada galat di tengah impor, **jangan jalankan ulang patch**, catat pesan dan kondisi tabel/marker untuk rekonsiliasi aman dari backup. PR #130 masih Draft sampai QA XAMPP.
