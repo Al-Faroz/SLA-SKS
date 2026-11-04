@@ -8,7 +8,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 ## 2. Skenario end-to-end wajib
 | ID | Skenario | Hasil wajib |
 |---|---|---|
-| E2E-001 | Login pertama siswa/guru | Sandi awal wajib diganti; tidak bisa membuka fitur lain |
+| E2E-001 | Login pertama Siswa/Guru/Pimpinan dan Admin | Non-Admin boleh masuk tanpa ganti sandi disertai anjuran; pemegang peran Admin tetap diwajibkan ganti sandi |
 | E2E-002 | Gagal login 5 kali | Kunci 5 menit; tidak bocor akun mana yang valid |
 | E2E-003 | Staf Admin+Guru mengganti peran | Session ID baru; izin hanya role aktif |
 | E2E-004 | Satu Admin aktif | Administrasi normal dan koreksi biodata berfungsi |
@@ -94,7 +94,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-080 | Impor Pengelola XLSX valid, duplikat, dan file salah | Pratinjau/galat per baris; transaksi idempoten; satu akun staf multirole tidak digandakan |
 | E2E-081 | Impor Siswa XLSX valid dan NISN duplikat | NISN unik 10 digit, Gen valid, baris salah ditolak; tidak menghapus siswa lain |
 | E2E-082 | Export Pengelola dan Siswa sesuai filter | XLSX tepat data berizin; tanpa sandi/hash/token dan formula injection |
-| E2E-083 | Reset sandi satu Pengelola atau Siswa | Sandi acak tampil sekali, sesi lama batal, wajib ganti sandi, target lain tetap |
+| E2E-083 | Reset sandi satu Pengelola atau Siswa | Pemegang Admin mendapat sandi acak tampil sekali serta wajib ganti; non-Admin memakai sandi default input Admin, hanya anjuran ganti; sesi lama batal dan target lain utuh |
 | E2E-084 | Staf mengubah profil sendiri | Foto/kontak pribadi tersimpan; upaya mengubah nama resmi/NIP/role via POST ditolak |
 | E2E-085 | Siswa melihat profil Guru Gen-nya | Nama/foto disetujui/mapel terlihat; NIP, nomor pribadi dan profil Guru Gen lain tidak dapat dibaca |
 | E2E-086 | UI prototipe dashboard dan login v2.4 | Pemilik menyetujui sebelum rollout; font, ukuran, gap, layout padat/responsif di 360/390/768/1100px dan fokus/kontras lolos |
@@ -616,7 +616,7 @@ Regresi statis PHP menegaskan struktur form/CSRF/elemen CSS, sedangkan screensho
 |---|---|---|
 | A13-101 | Admin, Guru, Siswa, Pimpinan aktif login membuka `/bantuan` | Panduan sesuai role aktif, navigasi dan tombol kembali ke beranda sendiri |
 | A13-102 | Pengunjung belum login | AuthFilter mengarahkan login; tidak menampilkan panduan tanpa autentikasi |
-| A13-103 | Sandi sementara belum diganti, akun tidak aktif, peran tidak dikenal | Ditolak/diarahkan oleh pemeriksaan otorisasi sebelum render |
+| A13-103 | Sandi awal belum diganti, akun nonaktif, peran tidak dikenal | Akun non-Admin tetap masuk; pemegang Admin wajib ganti; nonaktif dan peran invalid ditolak |
 | A13-104 | Siswa membuka Bantuan | Tidak ada tautan `admin/` atau `guru/`; hanya `siswa/` dan Profil |
 | A13-105 | Staf multi-peran sedang Guru/Pimpinan | Tidak mendapat tautan peran lain sampai ganti peran melalui Profil |
 | A13-106 | Pimpinan membuka panduan | Hanya Monitoring baca-saja dan Profil, tidak ada tombol menulis nilai/jadwal |
@@ -641,7 +641,7 @@ Workflow `QA A13-1 Pusat Bantuan Peran` menjalankan PHP lint dan `tests/unit/Pan
 | A13-208 | Guru/Siswa/Pimpinan mencoba kelola FAQ | Ditolak filter dan Service; hanya Admin dapat mengelola |
 | A13-209 | FAQ Admin Draf/Terbit/Arsip dan urutan | Hanya Terbit muncul pada `/bantuan`, urut dan berpaginasi |
 | A13-210 | Input kosong, panjang berlebihan, status/urutan invalid, HTML | Ditolak server; konten HTML ditampilkan sebagai teks |
-| A13-211 | Akun tidak login/nonaktif/sandi sementara/role salah | Akses ditolak, tidak ada data draf yang bocor |
+| A13-211 | Akun tidak login/nonaktif/peran salah, sandi awal belum diganti | Akses tetap ditolak bagi tamu/invalid; non-Admin boleh membaca konten Terbit; pemegang Admin wajib ganti sandi, draf tetap privat |
 | A13-212 | Dark/Light, 360/390/768/1100px, keyboard | Tabel scroll, panel terbaca, FAQ bisa dibuka via keyboard, pesan kosong benar |
 
 Workflow `QA A13-2 Pengumuman dan FAQ` menjalankan PHP lint, PHPUnit `InformasiGlobalDatabaseTest.php` dengan SQLite anonim, regresi A13-1 `PanduanBantuanServiceTest.php`, serta **impor SQL asli V4-0012 pada MariaDB ephemeral** lewat `SqlA13InformasiSchemaCheck.php`. Pada run awal `41662610185` semuanya PASS: **12 tes/92 assertions**, **9 tes/219 assertions**, SQL MariaDB PASS. Ini bukan uji XAMPP; backup + impor SQL dan browser QA lokal tetap wajib. Notifikasi per penerima, badge unread, Hubungi Admin dan Kebijakan Privasi publik belum ditangani.
@@ -652,7 +652,7 @@ Workflow `QA A13-2 Pengumuman dan FAQ` menjalankan PHP lint, PHPUnit `InformasiG
 | ID | Skenario | Kriteria PASS |
 |---|---|---|
 | A13-301 | Admin/Guru/Siswa/Pimpinan membuka `/hubungi-admin` | Hanya lima kolom kontak sekolah resmi dari `pengaturan`; tidak memuat data pribadi staf |
-| A13-302 | Belum login, akun nonaktif, sandi awal atau role invalid | Ditolak sebelum membaca kontak |
+| A13-302 | Belum login, akun nonaktif, pemegang Admin belum ganti sandi, atau role invalid | Ditolak; non-Admin dengan sandi awal tetap dapat melihat kontak resmi |
 | A13-303 | Email, telepon, situs valid | Tautan mailto/tel/HTTP(S) terbentuk dan di-escape |
 | A13-304 | Nilai lama skema JavaScript, email/telepon invalid | Hanya teks di-escape, tidak membuat tautan yang berbahaya |
 | A13-305 | Informasi kontak kosong | State kosong jelas, tidak mengarang nomor/alamat |
