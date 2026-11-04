@@ -171,7 +171,8 @@ final class AdminPengguna extends BaseController
             $hasil = $this->service()->resetSandi($jenis, $id,
                 is_string($inputDefault) ? $inputDefault : null);
         } catch (DomainException $e) {
-            return redirect()->to(site_url('admin/' . $jenis))->with('galat', $e->getMessage());
+            return redirect()->to(site_url('admin/' . $jenis . '/' . $id . '/reset-sandi'))
+                ->with('galat', $e->getMessage());
         }
 
         $this->response->setHeader('Cache-Control', 'no-store, private');
