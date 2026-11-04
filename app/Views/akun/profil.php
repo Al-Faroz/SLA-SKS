@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Akun · Profil</p>
             <h1>Profil saya</h1>
-            <p class="a-proto-muted">Identitas resmi dikelola Admin. Sandi dapat diubah melalui menu yang tersedia.</p>
+            <p class="a-proto-muted">Identitas resmi dikelola Admin. <?= $peranAktifKode === 'admin' ? 'Penggantian sandi Admin tetap mengikuti kebijakan keamanan.' : 'Anda bisa mengganti sandi langsung dari Profil ini.' ?></p>
         </div>
     </header>
     <?php if ($galat = session()->getFlashdata('galat')): ?>
@@ -67,7 +67,9 @@
                 <?php endif ?>
             </dl>
             <p class="a-help">Perbaikan nama resmi, NISN, username dan peran hanya dapat dilakukan Admin melalui menu Pengelola/Siswa.</p>
-            <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('ganti-sandi'), 'attr') ?>">Ganti sandi</a>
+            <?php if ($peranAktifKode === 'admin'): ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('ganti-sandi'), 'attr') ?>">Ganti sandi Admin</a>
+            <?php endif ?>
         </section>
 
         <?php if (! $siswa): ?>
@@ -115,6 +117,33 @@
                 </div>
             <?php endif ?>
         </section>
+    <?php endif ?>
+
+    <?php if ($peranAktifKode !== 'admin'): ?>
+    <section class="a-card a-profil__sandi a-jarak-atas" aria-labelledby="judul-ganti-sandi-profil">
+        <h2 id="judul-ganti-sandi-profil">Ganti sandi akun</h2>
+        <?php if ($sandiDisarankan): ?>
+            <div class="a-alert a-alert--info" role="status">Anda masih menggunakan sandi awal/default. Demi keamanan, disarankan membuat sandi pribadi, tetapi Anda tetap bisa menggunakan aplikasi tanpa mengubahnya.</div>
+        <?php else: ?>
+            <p class="a-help">Penggantian sandi bersifat pilihan. Gunakan formulir ini jika ingin menggantinya.</p>
+        <?php endif ?>
+        <form method="post" action="<?= esc(site_url('ganti-sandi'), 'attr') ?>" class="a-form">
+            <?= csrf_field() ?>
+            <div class="a-field">
+                <label class="a-label" for="profil-sandi-lama">Sandi saat ini</label>
+                <input id="profil-sandi-lama" name="sandi_lama" type="password" autocomplete="current-password" required>
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="profil-sandi-baru">Sandi baru (8–200 karakter)</label>
+                <input id="profil-sandi-baru" name="sandi_baru" type="password" minlength="8" maxlength="200" autocomplete="new-password" required>
+            </div>
+            <div class="a-field">
+                <label class="a-label" for="profil-sandi-konfirmasi">Ulangi sandi baru</label>
+                <input id="profil-sandi-konfirmasi" name="sandi_konfirmasi" type="password" minlength="8" maxlength="200" autocomplete="new-password" required>
+            </div>
+            <button class="a-btn a-btn--utama" type="submit">Simpan sandi baru</button>
+        </form>
+    </section>
     <?php endif ?>
 
     <?php if (count($daftarPeran) > 1): ?>
