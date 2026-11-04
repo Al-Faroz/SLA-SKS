@@ -122,7 +122,7 @@ final class A13KontrakNotifikasiPrivasiTest extends TestCase
         $view = file_get_contents($root . 'app/Views/publik/kebijakan_privasi.php');
         self::assertIsString($routes);
         self::assertStringContainsString("'kebijakan-privasi', 'Publik::kebijakanPrivasi'", $routes);
-        self::assertStringContainsString('setStatusCode(503)', $publik);
+        self::assertStringContainsString('setStatusCode($kebijakan===null?503:200)', $publik);
         self::assertStringContainsString('Belum diterbitkan', $view);
         self::assertStringNotContainsString('INSERT INTO notifikasi', $publik);
         self::assertStringNotContainsString('pernah_disahkan = true', $view);
