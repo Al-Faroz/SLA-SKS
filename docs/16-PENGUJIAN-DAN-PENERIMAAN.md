@@ -759,3 +759,12 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 - Guru Kelola Pengumuman memakai view tabel yang sama; uji tombol Tambah, Sunting, Arsipkan dan hanya melihat data miliknya. Penugasan Gen untuk pembaca Siswa tidak berubah.
 - Desktop 1366/1100px, tablet 820px, HP 390/360px, Light/Dark, sidebar terbuka/tutup: <=980px setiap data memiliki label kartu, tidak ada scrollbar horizontal di seluruh halaman. Keyboard dan konfirmasi pengarsipan bekerja.
 - Test otomatis `InformasiTabelUiTest` memeriksa class resmi, kelengkapan label, rute/CSRF, proporsi CSS dan breakpoints; jalankan bersama `InformasiGlobalDatabaseTest` (hak akses/CRUD) dan pengujian MariaDB A13-5. Test statis **bukan** bukti lulus visual XAMPP.
+
+
+### A15 — Penerimaan halaman login dan privasi (4 November 2026)
+
+- Desktop: teks hero baru, banner MTsN 4 Jombang **di dalam kotak antara paragraf dan caption**, kartu kanan formal. Login POST/CSRF/autofill/lockout dan pesan kesalahan tetap bekerja.
+- HP 360/390/820px dan desktop: banner tidak hilang, tidak stretch; logo publik/panel/favicon sesuai LogoFlat dari pemilik; Dark/Light, keyboard dan zoom 125% tanpa overflow.
+- Admin Kebijakan Privasi Baru: naskah contoh otomatis mengisi textarea tetapi tidak tersimpan sebelum klik Simpan Draf. Versi/tanggal perlu diperiksa. Tindakan Terbitkan hanya setelah pengesahan madrasah; publik tetap 503 sampai ada versi sah dengan tanggal berlaku yang tercapai.
+- Setelah terbit, halaman publik memperlihatkan naskah escaped, versi, tanggal WIB serta kontak resmi. Naskah draf tidak bocor ke publik. Riwayat dan hak akses tetap.
+- Uji otomatis A15LoginPrivasiBrandingTest, A13KontrakNotifikasiPrivasiTest, A13NotifikasiPrivasiDatabaseTest dan PHP lint wajib PASS; pengujian CI tidak menggantikan uji visual XAMPP.
