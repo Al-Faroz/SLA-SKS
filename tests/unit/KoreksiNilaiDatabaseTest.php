@@ -311,7 +311,7 @@ final class KoreksiNilaiDatabaseTest extends TestCase
 
     public function testKoreksiLangsungResumeMengubahAgregatDanMenyimpanHistoriTanpaAdmin(): void
     {
-        $hasil=$this->langsung()->proses('resume',10,90);
+        $hasil=$this->langsung()->proses('resume',10,90,60);
         self::assertTrue($hasil['berubah']);
         self::assertSame(1,$hasil['versi']);
         self::assertSame(80.0,$hasil['nilai_tp_baru']);
@@ -328,15 +328,15 @@ final class KoreksiNilaiDatabaseTest extends TestCase
             ->get()->getRow('peran_aktif'));
         self::assertSame(1,$this->db->table('notifikasi')
             ->where('jenis','koreksi_nilai_diterapkan')->countAllResults());
-        $ulang=$this->langsung()->proses('resume',10,90);
+        $ulang=$this->langsung()->proses('resume',10,90,90);
         self::assertFalse($ulang['berubah']);
         self::assertSame(1,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
     }
 
     public function testGuruG1BolehKoreksiBerulangNomorVersiBertambah(): void
     {
-        $this->langsung()->proses('hots',12,0);
-        $hasil=$this->langsung()->proses('hots',12,50);
+        $this->langsung()->proses('hots',12,0,70);
+        $hasil=$this->langsung()->proses('hots',12,50,0);
         self::assertSame(2,$hasil['versi']);
         self::assertSame(70.0,$hasil['nilai_tp_baru']);
         self::assertSame(2,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
@@ -350,7 +350,7 @@ final class KoreksiNilaiDatabaseTest extends TestCase
     {
         foreach ([['guru',21],['admin',30],['siswa',11]] as [$role,$uid]) {
             try {
-                $this->langsung($role,$uid)->proses('resume',10,95);
+                $this->langsung($role,$uid)->proses('resume',10,95,60);
                 self::fail('Peran lain atau Guru luar Gen tidak boleh mengoreksi.');
             }catch(\DomainException $e){
                 self::assertNotSame('',$e->getMessage());
@@ -363,7 +363,7 @@ final class KoreksiNilaiDatabaseTest extends TestCase
     public function testGuruG1PenggantiBolehKoreksiTanpaMengubahPenilaiHistoris(): void
     {
         $this->db->table('penugasan_guru_gen')->where('id',1)->update(['guru_id'=>21]);
-        $hasil=$this->langsung('guru',21)->proses('resume',10,95);
+        $hasil=$this->langsung('guru',21)->proses('resume',10,95,60);
         self::assertTrue($hasil['berubah']);
         self::assertSame(21,(int)$this->db->table('resume_materi')
             ->where('id',10)->get()->getRow('dinilai_oleh'));
@@ -375,7 +375,7 @@ final class KoreksiNilaiDatabaseTest extends TestCase
     {
         $this->db->table('progres_tp')->where('id',8)->update(['status'=>'belajar']);
         $this->db->table('nilai_tp')->where('id',9)->delete();
-        $hasil=$this->langsung()->proses('resume',10,80);
+        $hasil=$this->langsung()->proses('resume',10,80,60);
         self::assertSame(1,$hasil['versi']);
         self::assertNull($hasil['nilai_tp_baru']);
         self::assertSame(80,(int)$this->db->table('resume_materi')
@@ -388,14 +388,52 @@ final class KoreksiNilaiDatabaseTest extends TestCase
     {
         foreach ([-1,101] as $nilai) {
             try {
-                $this->langsung()->proses('resume',10,$nilai);
+                $this->langsung()->proses('resume',10,$nilai,60);
                 self::fail('Nilai di luar 0–100 harus ditolak.');
             }catch(\DomainException $e){self::assertNotSame('',$e->getMessage());}
         }
         $this->db->table('versi_konten_tp')->where('id',4)
             ->update(['snapshot_json'=>'{"materi":[]}']);
         $this->expectException(\DomainException::class);
-        $this->langsung()->proses('resume',10,80);
+        $this->langsung()->proses('resume',10,80,60);
+    }
+
+    public function testTabKoreksiLamaTidakDapatMenimpaSkorTerbaru(): void
+    {
+        $this->langsung()->proses('resume',10,80,60);
+        try {
+            // Tab kedua masih memegang nilai awal 60, padahal sudah 80.
+            $this->langsung()->proses('resume',10,95,60);
+            self::fail('Tab lama tidak boleh menimpa nilai dari tab pertama.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('Buka ulang Koreksi Nilai',$e->getMessage());
+        }
+        self::assertSame(80,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('nilai'));
+        self::assertSame(1,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
+        self::assertSame(78.0,(float)$this->db->table('nilai_tp')->get()->getRow('nilai_tp'));
+    }
+
+    public function testNilaiAwalYangDipalsukanDitolakMeskiNilaiBaruValid(): void
+    {
+        $this->expectException(\DomainException::class);
+        $this->langsung()->proses('resume',10,90,50);
+    }
+
+    public function testPengalihanGuruG1SebelumKoreksiHarusDitolak(): void
+    {
+        // Guru pernah membuka nilai, tetapi sebelum Proses, pengampu Gen pindah.
+        $this->db->table('penugasan_guru_gen')->where('id',1)
+            ->update(['guru_id'=>21]);
+        try {
+            $this->langsung('guru',20)->proses('resume',10,90,60);
+            self::fail('Hak G1 yang sudah dialihkan tidak boleh melakukan koreksi.');
+        } catch (\DomainException $e) {
+            self::assertNotSame('',$e->getMessage());
+        }
+        self::assertSame(60,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('nilai'));
+        self::assertSame(0,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
     }
 
 }

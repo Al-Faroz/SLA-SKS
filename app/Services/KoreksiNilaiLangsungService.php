@@ -119,22 +119,32 @@ final class KoreksiNilaiLangsungService
         return $hasil;
     }
 
-    public function pratinjau(string $jenis,int $id,int $nilaiBaru): array
+    public function pratinjau(string $jenis,int $id,?int $nilaiBaru=null): array
     {
         $guruId=$this->guru();
         // PenilaianGuruService memverifikasi checksum snapshot, hak G1,
         // versi materi, status jawaban dan menampilkan penilai awal.
         $tugas=(new PenilaianGuruService($this->db,$this->akun))->lihat($jenis,$id);
         $r=$this->sumber($jenis,$id,$guruId);
-        return ['tugas'=>$tugas,'dampak'=>self::dampak($r,$jenis,$nilaiBaru)];
+        if ($tugas['nilai']===null) {
+            throw new DomainException('Nilai awal belum disimpan Guru.');
+        }
+        return ['tugas'=>$tugas,
+            'dampak'=>self::dampak($r,$jenis,$nilaiBaru??(int)$tugas['nilai'])];
     }
 
     /** @return array{versi:int,berubah:bool,nilai_tp_baru:?float} */
-    public function proses(string $jenis,int $id,int $nilaiBaru): array
+    public function proses(string $jenis,int $id,int $nilaiBaru,int $nilaiAwalForm): array
     {
         $guruId=$this->guru();
         PenilaianGuruService::skor($nilaiBaru);
+        PenilaianGuruService::skor($nilaiAwalForm);
         $tugas=(new PenilaianGuruService($this->db,$this->akun))->lihat($jenis,$id);
+        // Melindungi formulir/tab lama: skor yang dilihat Guru saat membuka
+        // formulir wajib tetap sama ketika tombol Proses digunakan.
+        if ($tugas['nilai']===null || (int)$tugas['nilai']!==$nilaiAwalForm) {
+            throw new DomainException('Nilai sudah berubah di tempat lain. Buka ulang Koreksi Nilai.');
+        }
         $this->db->transBegin();
         try {
             $lock=$this->db->DBDriver==='SQLite3'?'':' FOR UPDATE';
@@ -148,13 +158,20 @@ final class KoreksiNilaiLangsungService
                 || (int)$r['versi_konten_tp_id']!==(int)$tugas['versi_konten_tp_id']) {
                 throw new DomainException('Snapshot nilai sumber telah berubah.');
             }
-            // Periksa penugasan G1 setelah lock; pergantian pengampu harus
-            // terlihat sebelum mutasi dan tidak boleh melewati batas Gen.
-            if ((int)$r['guru_g1']!==$guruId) {
-                throw new DomainException('Guru pengampu sudah berubah.');
+            // Kunci juga penugasan G1 untuk menutup race dengan pengalihan
+            // Guru pada saat koreksi, seperti pada penilaian awal.
+            $g1=$this->db->query(
+                'SELECT guru_id FROM penugasan_guru_gen'
+                .' WHERE angkatan_id=? AND mapel_id=?'.$lock,
+                [(int)$r['angkatan_id'],(int)$r['mapel_id']]
+            )->getRowArray();
+            if (!$g1 || (int)$g1['guru_id']!==$guruId
+                || (int)$r['guru_g1']!==$guruId) {
+                throw new DomainException('Penugasan Guru G1 telah berubah. Muat ulang halaman.');
             }
-            if ((int)$r['nilai_sumber']!==(int)$tugas['nilai']) {
-                throw new DomainException('Skor telah berubah di sesi lain; muat ulang.');
+            if ((int)$r['nilai_sumber']!==$nilaiAwalForm
+                || (int)$r['nilai_sumber']!==(int)$tugas['nilai']) {
+                throw new DomainException('Nilai sudah berubah di tempat lain. Buka ulang Koreksi Nilai.');
             }
             $d=self::dampak($r,$jenis,$nilaiBaru);
             if ($d['nilai_awal']===$d['nilai_baru']) {

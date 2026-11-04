@@ -21,9 +21,8 @@ final class GuruKoreksiNilai extends BaseController
     {
         try {
             $svc=new KoreksiNilaiLangsungService();
-            // NILAI LAMA berasal dari snapshot final yang diverifikasi Service.
-            $p=$svc->pratinjau($jenis,$id,
-                $this->pilihNilai($svc,$jenis,$id));
+            // Nilai awal diambil sekali dari sumber yang diverifikasi Service.
+            $p=$svc->pratinjau($jenis,$id);
             $akun=(new AuthService())->penggunaSaatIni();
             return view('koreksi_nilai/form_guru',[
                 'judul'=>'Koreksi Nilai',
@@ -48,25 +47,18 @@ final class GuruKoreksiNilai extends BaseController
         }
     }
 
-    private function pilihNilai(KoreksiNilaiLangsungService $svc,string $jenis,int $id): int
-    {
-        // GET hanya membaca nilai lama; tidak mengubah atau menulis data.
-        $r=(new \App\Services\PenilaianGuruService())->lihat($jenis,$id);
-        if ($r['nilai']===null) {
-            throw new DomainException('Nilai awal belum disimpan Guru.');
-        }
-        return (int)$r['nilai'];
-    }
-
     public function proses(string $jenis,int $id): RedirectResponse
     {
         $url=site_url('guru/penilaian/'.$jenis.'/'.$id);
         $n=$this->request->getPost('nilai');
-        if(!is_string($n)||preg_match('/^(?:100|[1-9]?[0-9])$/D',$n)!==1){
-            return redirect()->to($url)->with('nilai_galat','Nilai koreksi wajib bilangan bulat 0–100.');
+        $nilaiAwal=$this->request->getPost('nilai_awal');
+        if(!is_string($n)||preg_match('/^(?:100|[1-9]?[0-9])$/D',$n)!==1
+            ||!is_string($nilaiAwal)
+            ||preg_match('/^(?:100|[1-9]?[0-9])$/D',$nilaiAwal)!==1){
+            return redirect()->to($url)->with('nilai_galat','Nilai koreksi atau skor awal tidak sah. Buka ulang formulir.');
         }
         try{
-            $hasil=(new KoreksiNilaiLangsungService())->proses($jenis,$id,(int)$n);
+            $hasil=(new KoreksiNilaiLangsungService())->proses($jenis,$id,(int)$n,(int)$nilaiAwal);
             return redirect()->to($url)->with('nilai_sukses',
                 $hasil['berubah']
                     ?'Koreksi nilai berhasil diproses. Riwayat tersimpan dan nilai TP telah diperbarui jika tersedia.'

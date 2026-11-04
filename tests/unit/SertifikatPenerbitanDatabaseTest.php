@@ -284,4 +284,24 @@ final class SertifikatPenerbitanDatabaseTest extends TestCase
         $this->svc()->sinkronkanSaya();
     }
 
+    public function testKelayakanPerSiswaLangsungDanHakPemilik(): void
+    {
+        $milik=new \App\Services\KelayakanSertifikatService(
+            $this->db,self::actor(101,'siswa'));
+        $hasil=$milik->periksaSiswa(1,11);
+        self::assertSame(1,(int)$hasil['siswa_id']);
+        self::assertTrue($hasil['layak_akademik']);
+        try {
+            $milik->periksaSiswa(2,11);
+            self::fail('Siswa lain tidak boleh melakukan pemeriksaan sertifikat.');
+        } catch (\DomainException $e) {
+            self::assertStringContainsString('pribadi sendiri',$e->getMessage());
+        }
+        $admin=new \App\Services\KelayakanSertifikatService(
+            $this->db,self::actor());
+        $lain=$admin->periksaSiswa(2,11);
+        self::assertSame(2,(int)$lain['siswa_id']);
+        self::assertFalse($lain['layak_akademik']);
+    }
+
 }
