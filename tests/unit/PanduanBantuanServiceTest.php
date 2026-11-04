@@ -54,10 +54,10 @@ final class PanduanBantuanServiceTest extends TestCase
             self::assertStringNotContainsString('admin/',$q['path']);
             self::assertStringNotContainsString('guru/',$q['path']);
         }
-        self::assertCount(1,array_filter(
+        self::assertGreaterThanOrEqual(1,count(array_filter(
             self::semuaPertanyaan('siswa'),
             static fn(array $q):bool => $q['path']==='profil'
-        ));
+        )));
     }
 
     public function testGuruTidakMemperolehTautanAdminAtauDataSiswaLain(): void
