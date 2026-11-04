@@ -44,9 +44,9 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET | `/guru/{id}/profil` | Siswa hanya profil profesional Guru yang ditugaskan pada Gen-nya; tanpa data kontak pribadi |
 | GET,POST | `/admin/mapel-guru/.../gen/{angkatan_id}` | Penugasan/riwayat satu Guru aktif per Gen–Mapel, validasi role Guru |
 
-| GET,POST | `/admin/kurikulum-cp/...`, `/admin/koreksi-nilai/...` | Admin sunting CP langsung kapan saja; persetujuan hanya untuk koreksi nilai yang memang memerlukannya |
+| GET,POST | `/admin/kurikulum-cp/...` | Admin menyunting CP langsung kapan saja; **tidak ada** endpoint persetujuan koreksi nilai |
 | GET,POST | `/admin/pengaturan/identitas`, `/admin/pengaturan/aset` | Branding dengan upload tervalidasi |
-| GET,POST | `/admin/sertifikat/template/...`, `/admin/sertifikat/{id}/revisi-identitas` | Versi background, pratinjau, revisi |
+| GET,POST | `/admin/sertifikat/aset/...` | Admin mengelola template/TTD dan pratinjau; PDF pribadi diterbitkan otomatis saat diakses siswa |
 | GET,POST | `/pengumuman`, `/guru/pengumuman/...`, `/admin/pengumuman/...` | Sesuai penerima; Admin global, Guru siswa Gen pengampu |
 | GET | `/bantuan`, `/notifikasi` | Login-only; penerima masing-masing |
 | POST | `/notifikasi/{id}/dibaca` | Penerima sendiri |
@@ -64,7 +64,7 @@ Validasi MIME hasil inspeksi, ekstensi, ukuran, dimensi, decoder, PDF aktif, dan
 ## 5. Transaksi penting
 - `TP draf → Siap`: checklist final, kunci versi dan catat audit dalam transaksi.
 - **Edit TP Siap belum digunakan siswa**: G1/CSRF, lock/periksa ulang progres + aktivitas + percobaan dalam transaksi, validasi kesiapan, simpan konten/media/soal, perbarui snapshot/pointer aktif secara konsisten sebelum memberi akses siswa. **Jika telah digunakan minimal satu siswa: tolak**. Tidak memerlukan persetujuan Admin, kategori, atau jalur draf koreksi terpisah.
-- `Penilaian/koreksi`: hitung agregat, update nilai dan audit idempoten; bila sertifikat perlu revisi, siapkan PDF sebelumnya dan commit perpindahan secara terkoordinasi.
+- `Penilaian/koreksi`: Guru G1 memperbaiki skor langsung, menghitung agregat dan audit dalam transaksi; tidak membuat PDF saat koreksi. Saat siswa mengakses Sertifikat, Service membandingkan snapshot cetak dan memperbarui versi bila perlu.
 - `Koreksi NISN`: periksa keunikan, ubah biodata dan username dalam transaksi tanpa membuat siswa baru.
 - `Impor Excel ATP`: satu peta Gen–Mapel, pratinjau dan konfirmasi transaksional dengan idempoten UUID/checksum; hanya INSERT ke semester yang benar-benar kosong, **tidak memperbarui semester terisi**, terlepas dari status TP.
 - `Ujian`: transisi status setelah pemeriksaan jam server, row lock/optimistic concurrency, nol skor untuk batal.
@@ -139,15 +139,15 @@ Semua endpoint adalah **kontrak rancangan**, bukan klaim API telah terpasang. `.
 
 | Metode | Endpoint | Peran |
 |---|---|---|
-| GET | `/admin/sertifikat` | Admin: kelayakan, penerbitan/unduh/revisi satu siswa |
+| GET | `/admin/sertifikat` | Admin: pemeriksaan kelayakan dan riwayat; **tanpa** penerbitan/revisi manual |
 | GET,POST | `/admin/sertifikat/aset`, `/admin/sertifikat/aset/{jenis}` | Admin: daftar/unggah PNG/JPG privat |
 | GET | `/admin/sertifikat/aset/{id}/gambar` | Admin: preview gambar berizin |
 | GET | `/admin/sertifikat/template/pratinjau/{id}` | Admin: PDF dummy A4 landscape, `id=0` fallback |
 | POST | `/admin/sertifikat/aset/{id}/aktifkan` | Admin: pointer template/TTD, preview BG wajib |
-| POST | `/admin/sertifikat/{paketId}/siswa/{siswaId}/terbit` | Admin: cek ulang TP Final, idempoten |
-| POST | `/admin/sertifikat/{paketId}/siswa/{siswaId}/revisi` | Admin: alasan, konten berubah, versi/QR baru |
+| GET | `/siswa/sertifikat` | Siswa pemilik: otomatis terbitkan/revisi paket layak, idempoten |
+| GET | `/siswa/sertifikat/{id}/unduh` | Siswa: PDF historis/aktif miliknya sendiri |
 | GET | `/admin/sertifikat/{id}/unduh` | Admin: PDF privat berizin |
-| GET | `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Siswa: hanya PDF milik sendiri |
+| GET | `/siswa/sertifikat`, `/siswa/sertifikat/{id}/unduh` | Siswa: sinkronisasi pada akses menu dan unduh PDF miliknya |
 | GET | `/verifikasi/{kode}` | Publik: token acak + throttle, whitelist informasi |
 
 Service: `SertifikatAsetService`, `SertifikatPdfService`, `SertifikatPenerbitanService`, `KelayakanSertifikatService`. Pembuatan PDF dilakukan di luar transaksi DB; sebelum commit dikunci `siswa` dan diperiksa ulang kelayakan dan checksum konten. Transaction rollback hanya membersihkan PDF **baru**, versi lama tetap aman. PHP Dompdf menggunakan data-URI tanpa remote request/embedded PHP; QR endroid tidak memuat PII. Tidak mengubah root `index.php`/`.htaccess`.
@@ -218,10 +218,8 @@ Bagian kontrak pra-dump di atas adalah histori. A13-6 kini memiliki `NotifikasiS
 A13-7 memakai `KebijakanPrivasiService` untuk Draf, sunting, Terbit, checksum dan histori berversi. Hanya Admin dapat mengelola pada `/admin/kebijakan-privasi` dan tindakan POST ber-CSRF. Halaman publik `/kebijakan-privasi` menampilkan hanya versi Terbit yang sudah berlaku WIB, dengan isi teks yang di-escape; tanpa versi sah hasilnya 503. Pengembang tidak memasukkan naskah resmi sekolah. Koreksi nilai siswa belum menjadi pemicu notifikasi karena Service koreksi sah belum tersedia.
 
 
-### A14-2 — Service Layer dan rute koreksi nilai resmi (4 November 2026)
+### Keputusan final A14-2 — Koreksi langsung dan sertifikat otomatis (4 November 2026)
 
-`KoreksiNilaiDampakService::pratinjau()` menghitung dampak tanpa mutasi dengan `NilaiTpService::hitung` dan validasi snapshot angka. `KoreksiNilaiService` memakai satu transaksi/row lock untuk pengajuan dan keputusan, role aktif Guru G1/Admin berbeda, membatasi sumber ke jawaban final Resume/HOTS yang sudah dinilai, progres Tuntas, snapshot terpin, Sumatif dan nilai TP tersedia. Menghindari duplikasi melalui unique SQL, membandingkan skor/versi saat keputusan (optimistic concurrency + locking), mempertahankan penilai asli, serta menulis audit sebelum/sesudah. Notifikasi dikirim dalam transaksi melalui NotifikasiService untuk Admin, Guru pengusul, dan Siswa bila nilai berubah.
+`KoreksiNilaiLangsungService::proses()` menegakkan role Guru G1 aktif dan snapshot yang terpin, row lock `progres_tp`, pemeriksaan skor/komponen, perhitungan ulang nilai TP via `NilaiTpService::hitung()`, lalu menulis skor sumber, agregat, audit versi V4-0014, log dan notifikasi siswa **atomik**. Guru dapat mengoreksi skor Resume/HOTS yang telah dinilai walaupun TP belum Final; jika nilai TP belum tersedia, hanya skor sumber dan audit yang berubah. Penilai awal tetap tersimpan. **Tidak ada pengajuan/persetujuan Admin.** Rute aktif hanya `GET/POST /guru/koreksi-nilai/{resume|hots}/{id}` dengan filter `auth:guru` dan CSRF POST.
 
-Rute: `GET /guru/koreksi-nilai` daftar Guru, `GET|POST /guru/koreksi-nilai/{jenis}/{sumberId}` pratinjau/pengajuan Guru, `GET /guru/koreksi-nilai/permohonan/{id}` riwayat sendiri; `GET /admin/koreksi-nilai` antrean Admin, `GET /admin/koreksi-nilai/{id}` rincian, dan `POST /admin/koreksi-nilai/{id}/keputusan` Setujui/Tolak. Seluruh POST memakai CSRF global; Service **wajib mengulang** hak G1, snapshot dan status di bawah transaksi. Tidak ada API umum untuk penggantian nilai tanpa persetujuan.
-
-`NotifikasiService` melakukan pemeriksaan ulang sumber, penerima dan peran ketika dibuka. Rute pengumuman, nilai TP dan sertifikat lama tetap terpisah. Koreksi Sumatif/Diagnostik/Pra-Semester memerlukan implementasi selanjutnya berdasarkan audit attempt sah.
+`SertifikatPenerbitanService::sinkronkanSaya()` dipanggil saat `GET /siswa/sertifikat` dan hanya untuk profil siswa login, paket Gen aktif/ditugaskan dan semester valid. `KelayakanSertifikatService` memverifikasi data akademik melalui pemeriksaan internal sama untuk Admin/Siswa pemilik; aset TTD/template hanya dapat diunggah/diaktifkan Admin. Ketika layak, jika tidak ada sertifikat, buat awal; jika hash snapshot konten berubah, buat **satu** versi pengganti dengan PDF/nomor/QR baru dan status lama Digantikan. Jika hash sama, kembalikan versi aktif (idempoten). Seluruh perubahan PDF tersimpan privat dan transaksional; tidak ada pemrosesan Admin maupun SQL baru. Status Pra-Semester tidak diperiksa.
