@@ -163,6 +163,11 @@ final class AdminPengguna extends BaseController
         try {
             $target = $this->service()->target($jenis, $id);
             $inputDefault = $this->request->getPost('sandi_default');
+            if (! in_array('admin', $target['daftar_peran'], true)
+                && (! is_string($inputDefault)
+                    || $inputDefault !== $this->request->getPost('sandi_default_konfirmasi'))) {
+                throw new DomainException('Konfirmasi sandi default tidak sama.');
+            }
             $hasil = $this->service()->resetSandi($jenis, $id,
                 is_string($inputDefault) ? $inputDefault : null);
         } catch (DomainException $e) {
