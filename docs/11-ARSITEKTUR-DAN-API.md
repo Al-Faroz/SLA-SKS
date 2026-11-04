@@ -194,3 +194,10 @@ Rute GET daftar kelola baca saja; simpan dan arsip memakai POST + CSRF global. A
 ### A13-3 — Read model kontak resmi (3 November 2026)
 
 `GET /hubungi-admin` menggunakan `HubungiAdmin::index` dan `KontakResmiMadrasahService::ambil()`, filter `auth` dan pemeriksaan ulang akun aktif, peran serta sandi awal. Service membaca **lima kunci whitelist** tabel `pengaturan`, lalu membangun tautan `tel:`, `mailto:` dan HTTPS/HTTP hanya untuk nilai yang lolos validasi. Nilai lama tidak valid tampil sebagai teks yang di-escape tanpa tautan. Halaman mempunyai status kontak kosong, HTTP `private, no-store`, tidak mengubah database dan tidak mengirim pesan. Tidak ada SQL, migrasi, notifikasi, worker atau koneksi ke profil pribadi.
+
+
+### A13-4 — Kebijakan sandi efektif tanpa SQL (4 November 2026)
+
+`AuthService::kebijakanSandi(daftarPeran, flagAsli)` menghitung apakah sandi wajib atau hanya dianjurkan diganti. Hasil `penggunaSaatIni()` menampilkan nilai efektif agar filter, Controller dan Service lama konsisten: akun non-Admin tidak digerbang oleh `wajib_ganti_sandi=1` historis, sedangkan pemegang Admin (termasuk role rangkap) tetap wajib. Tidak ada pembaruan otomatis password/flag di database saat login; rekomendasi bertahan sampai pengguna berhasil mengganti sandi. Semua sesi tetap bergantung pada `versi_sesi` dan role aktif.
+
+`PenggunaAdminService::resetSandi()` membedakan dua mode secara server-side setelah SELECT FOR UPDATE dan validasi role. Mode `acak` untuk akun pemegang Admin (tampil sekali), mode `default` untuk Guru/Pimpinan/Siswa yang mensyaratkan input manual sandi default dan konfirmasi di Controller. Hanya hash yang disimpan; versi sesi naik, gagal login direset, audit dibuat tanpa sandi, dan output mode default tidak pernah mengembalikan plaintext. Form `ganti-sandi` Guru/Pimpinan/Siswa dipindah ke `GET /profil`; POST aman tetap memakai endpoint yang ada dan CSRF. Tidak ada `.env`, konfigurasi domain, tabel, migrasi maupun seeder baru.
