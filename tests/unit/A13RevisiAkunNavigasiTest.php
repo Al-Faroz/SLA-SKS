@@ -49,9 +49,9 @@ final class A13RevisiAkunNavigasiTest extends TestCase
 
         $service = self::sumber('app/Services/PenggunaAdminService.php');
         self::assertStringContainsString('password_hash($baru, PASSWORD_DEFAULT)', $service);
-        self::assertStringContainsString("'versi_sesi' => (int) $target['versi_sesi'] + 1", $service);
+        self::assertStringContainsString("'versi_sesi' => (int) \$target['versi_sesi'] + 1", $service);
         self::assertStringContainsString("sandiDefault === null || strlen", $service);
-        self::assertStringContainsString("['mode' => $isAdmin ? 'acak' : 'default'", $service);
+        self::assertStringContainsString("['mode' => \$isAdmin ? 'acak' : 'default'", $service);
         self::assertStringNotContainsString('INSERT INTO pengguna', $service);
     }
 
@@ -91,7 +91,7 @@ final class A13RevisiAkunNavigasiTest extends TestCase
         self::assertTrue($group[0]['aktif']);
         $panel = self::sumber('app/Views/layouts/panel.php');
         self::assertStringContainsString('a-side__group', $panel);
-        self::assertStringContainsString("$tautan['ikon']", $panel);
+        self::assertStringContainsString("\$tautan['ikon']", $panel);
     }
 
     public function testResetDanProfilTerlindungiCSRFDanTidakMengulangSandiDefault(): void
