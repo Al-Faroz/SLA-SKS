@@ -424,3 +424,12 @@ Di `/bantuan`, **Panduan Penggunaan A13-1** tetap sesuai peran, ditambah **Perta
 ### A13-3 — U05 Hubungi Admin: kontak resmi madrasah (3 November 2026)
 
 Menu **Hubungi Admin** tampil untuk keempat peran aktif dan dari halaman `/bantuan`; halaman `/hubungi-admin` menampilkan nama, alamat, telepon, email dan situs **resmi** dari Identitas Madrasah Admin, masing-masing hanya jika tersedia. Email, telepon dan situs diberi tautan hanya apabila format valid; tidak menyediakan formulir pengaduan/tiket atau klaim pesan telah terkirim. Kontak pribadi staf tidak pernah muncul. Keadaan kosong menjelaskan agar Admin memperbarui Identitas Madrasah. Kartu menggunakan Emerald Glass Dark/Light dan susunan 2 kolom desktop/1 kolom HP; tautan bisa difokus dengan keyboard. Kebijakan Privasi berversi publik dan notifikasi per penerima tetap tahap berbeda.
+
+
+### A13-4 — Satu grup Informasi & Bantuan, Profil sandi dan FAQ (4 November 2026)
+
+Di keempat sidebar, lima pilihan disatukan dalam grup `details/summary` **Informasi & Bantuan**, dengan urutan Pengumuman → Kelola Pengumuman (Admin/Guru) → Kelola FAQ (Admin) → Bantuan → Hubungi Admin. Siswa/Pimpinan hanya melihat tiga item baca. Grup terbuka ketika salah satu halaman aktif, dapat dibuka keyboard dan tidak menggandakan tautan di tingkat utama. Group Rekap Nilai Guru tetap terpisah. Komponen sidebar yang ada dipakai ulang, termasuk Mode Dokumentasi.
+
+Guru/Pimpinan/Siswa mendapat anjuran keamanan sekali pada respons login menuju Dashboard dan pengingat pada Profil sampai sandi berhasil diganti; tidak ada paksaan ke halaman Ganti Sandi. Form sandi berada **langsung pada Profil**, mengikuti CSRF, konfirmasi dua isian, error/sukses dan penggantian sesi. Admin tetap memakai alur Ganti Sandi khusus dengan kewajiban awal. Layar Reset Sandi Admin memisahkan mode acak Admin versus sandi default manual non-Admin, memvalidasi dua isian dan tidak memperlihatkan sandi default lagi di halaman hasil.
+
+FAQ resmi tetap dikelola Admin dari database; 28 draf jawaban pengguna tersedia sebagai bahan salin/tinjau di `docs/DRAF-FAQ-RESMI-SLA-SKS-2026-11-04.md`, **tidak otomatis diterbitkan**.
