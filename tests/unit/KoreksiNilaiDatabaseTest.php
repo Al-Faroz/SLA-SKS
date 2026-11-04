@@ -420,4 +420,20 @@ final class KoreksiNilaiDatabaseTest extends TestCase
         $this->langsung()->proses('resume',10,90,50);
     }
 
+    public function testPengalihanGuruG1SebelumKoreksiHarusDitolak(): void
+    {
+        // Guru pernah membuka nilai, tetapi sebelum Proses, pengampu Gen pindah.
+        $this->db->table('penugasan_guru_gen')->where('id',1)
+            ->update(['guru_id'=>21]);
+        try {
+            $this->langsung('guru',20)->proses('resume',10,90,60);
+            self::fail('Hak G1 yang sudah dialihkan tidak boleh melakukan koreksi.');
+        } catch (\DomainException $e) {
+            self::assertNotSame('',$e->getMessage());
+        }
+        self::assertSame(60,(int)$this->db->table('resume_materi')
+            ->where('id',10)->get()->getRow('nilai'));
+        self::assertSame(0,$this->db->table('riwayat_koreksi_nilai')->countAllResults());
+    }
+
 }
