@@ -91,3 +91,8 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 
 - [Draf 28 FAQ resmi SLA-SKS](DRAF-FAQ-RESMI-SLA-SKS-2026-11-04.md) — salin ke Kelola FAQ sebagai Draf, Admin tinjau lalu terbitkan; tidak ada seeder atau publikasi otomatis.
 - A13-4 menyatukan lima menu Informasi & Bantuan dan memperbarui kebijakan reset kata sandi sebagaimana keputusan 4 November 2026 di Master 02, 03, 11, 12, 13, 14 dan 16.
+
+
+## A13-6/A13-7 — Persiapan tanpa mutasi DB
+
+- [Checkpoint kontrak Notifikasi dan Kebijakan Privasi](CHECKPOINT-A13-6-A13-7-PRA-DB-2026-11-04.md) — batas yang telah diuji, kebutuhan dump pasca V4-0012 serta naskah sekolah disahkan. Ini dokumen implementasi, **bukan Master ke-17**.
