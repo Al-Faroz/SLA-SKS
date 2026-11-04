@@ -89,7 +89,7 @@ $batasServer = min(
     </p>
     <p class="a-error" id="materi-file-error" data-materi-file-error aria-live="polite"></p>
 </div>
-<div class="a-field">
+<div class="a-field a-materi-waktu">
     <label class="a-label" for="materi-waktu">Minimal waktu belajar (menit) <span aria-hidden="true">*</span></label>
     <input class="a-input" id="materi-waktu" name="min_waktu_menit" type="number"
         min="0" max="1092.25" step="0.01" required
@@ -97,12 +97,12 @@ $batasServer = min(
         <?= $galatKolom === 'min_waktu_menit' ? 'aria-invalid="true"' : '' ?>>
     <p class="a-help">Masukkan waktu dalam menit; contoh 1.5. Nilai disimpan sebagai detik.</p>
 </div>
-<div class="a-field">
+<div class="a-field a-materi-resume">
     <label class="a-label" for="materi-resume">Petunjuk Resume <?= $wajibKegiatan ? '<span aria-hidden="true">*</span>' : '(opsional Esensial)' ?></label>
     <textarea class="a-input" id="materi-resume" name="petunjuk_resume" rows="4"
         maxlength="20000" <?= $wajibKegiatan ? 'required' : '' ?> <?= $galatKolom === 'petunjuk_resume' ? 'aria-invalid="true"' : '' ?>><?= esc((string) ($nilai['petunjuk_resume'] ?? '')) ?></textarea>
 </div>
-<div class="a-field">
+<div class="a-field a-materi-hots">
     <label class="a-label" for="materi-hots">Petunjuk tugas HOTS <?= $wajibKegiatan ? '<span aria-hidden="true">*</span>' : '(opsional Esensial)' ?></label>
     <textarea class="a-input" id="materi-hots" name="petunjuk_hots" rows="4"
         maxlength="20000" <?= $wajibKegiatan ? 'required' : '' ?> <?= $galatKolom === 'petunjuk_hots' ? 'aria-invalid="true"' : '' ?>><?= esc((string) ($nilai['petunjuk_hots'] ?? '')) ?></textarea>
