@@ -73,3 +73,8 @@ Penyuntingan CP oleh Admin dan isian BAB oleh Guru bukan tindakan menerbitkan/me
 - Untuk jumlah TP lebih banyak, gunakan footer dalam alur halaman normal, bukan footer absolut yang dapat menumpuk tabel. Jika Dompdf masih membentuk halaman ekstra pada mode pendek, renderer mengulang menggunakan mode alur normal. Semua TP tidak boleh disembunyikan untuk memaksakan satu halaman.
 - Pratinjau template bawaan kini menggunakan **dua BAB/empat TP sintetis**, tidak menggunakan data siswa atau TTD nyata. Perubahan ini **hanya berlaku pada PDF yang dirender setelah kode diperbarui**; PDF yang sudah diterbitkan tidak boleh dihapus/ditimpa dan tidak otomatis menghasilkan nomor/QR baru.
 - Koreksi estetika/layout tidak mengubah nilai TP, syarat kelayakan, versi/QR lama, aturan revisi, ataupun pemisahan Pra-Semester. Tetap tidak ada Nilai Akhir Semester.
+
+
+### Dampak Koreksi Nilai A14-2 (4 November 2026)
+
+Koreksi resmi Guru/Admin terhadap komponen nilai Resume/HOTS dapat mengubah nilai TP yang tercantum pada sertifikat. Penerapan koreksi **tidak otomatis memperbarui PDF historis**. Bila pasangan siswa–paket mempunyai `sertifikat_aktif` dan nilai TP berubah, permohonan koreksi mendapat penanda **Perlu Tinjau Sertifikat**; Admin wajib menilai apakah revisi sertifikat diperlukan, lalu memakai alur revisi versi yang sudah ada pada Master 09. Nomor, token QR, dan berkas lama tetap ada sebagai histori; tidak ada pencabutan. Hasil Pra-Semester tetap tidak memengaruhi sertifikat.
