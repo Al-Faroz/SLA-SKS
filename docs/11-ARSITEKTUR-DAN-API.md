@@ -47,7 +47,7 @@ Setiap metode mutasi menegakkan invariant dan melempar exception bisnis berkode 
 | GET,POST | `/admin/kurikulum-cp/...`, `/admin/koreksi-nilai/...` | Admin sunting CP langsung kapan saja; persetujuan hanya untuk koreksi nilai yang memang memerlukannya |
 | GET,POST | `/admin/pengaturan/identitas`, `/admin/pengaturan/aset` | Branding dengan upload tervalidasi |
 | GET,POST | `/admin/sertifikat/template/...`, `/admin/sertifikat/{id}/revisi-identitas` | Versi background, pratinjau, revisi |
-| GET,POST | `/pengumuman`, `/guru/pengumuman/...`, `/admin/pengumuman/...` | Semua login membaca; Admin/Guru menulis global |
+| GET,POST | `/pengumuman`, `/guru/pengumuman/...`, `/admin/pengumuman/...` | Sesuai penerima; Admin global, Guru siswa Gen pengampu |
 | GET | `/bantuan`, `/notifikasi` | Login-only; penerima masing-masing |
 | POST | `/notifikasi/{id}/dibaca` | Penerima sendiri |
 | GET | `/pimpinan/...`, `/pratinjau/...` | Baca saja; pratinjau tidak menyimpan data |
@@ -178,11 +178,11 @@ Model `FaqService` terkelola, `PengumumanService`, `NotifikasiService`, `Hubungi
 
 Database dari dump XAMPP 03-11-2026 16.02 (MariaDB 10.4.32) dinyatakan belum memiliki `pengumuman`, `faq`, `riwayat_informasi`. SQL additive `V4-0012_PENGUMUMAN_FAQ.sql` membuat ketiganya dengan FK pengguna; `schema_version` menandai `V4-0012-PENGUMUMAN-FAQ`.
 
-`InformasiGlobalService` mengelola daftar, baca, tambah, ubah dan arsip. Akses baca dan tulis selalu diperiksa ulang lewat `AuthService` dan role aktif. `daftar('pengumuman'|'faq',false)` hanya mengembalikan `status=terbit`; daftar kelola Guru dibatasi `dibuat_oleh`; Admin dapat mengelola semua. Update memakai row lock MySQL `FOR UPDATE`, nomor `versi` untuk menghindari stale POST, transaksi database dan audit `riwayat_informasi` serta `log_aktivitas` dalam transaksi yang sama. Tidak memakai cron, worker, email/WhatsApp, event notifikasi atau penyaringan Gen/role.
+`InformasiGlobalService` mengelola daftar, baca, tambah, ubah dan arsip. Akses baca dan tulis selalu diperiksa ulang lewat `AuthService` dan role aktif. `daftar('pengumuman'|'faq',false)` mengembalikan `status=terbit`; Pengumuman Admin tampil global, Pengumuman Guru hanya untuk siswa Gen pengampu saat dibaca. Asal peran pembuat berasal dari catatan pertama `riwayat_informasi`, tidak dari role akun sekarang atau penulis perubahan terakhir. `siswa.pengguna_id` → `siswa.angkatan_id` → `penugasan_guru_gen.angkatan_id` dengan `penugasan_guru_gen.guru_id=pengumuman.dibuat_oleh` dan Guru harus aktif serta memiliki role Guru. COUNT dan LIMIT sama-sama difilter di Service. Daftar kelola Guru dibatasi `dibuat_oleh`; Admin dapat mengelola semua. Update memakai row lock MySQL `FOR UPDATE`, nomor `versi` untuk menghindari stale POST, transaksi database dan audit `riwayat_informasi` serta `log_aktivitas` dalam transaksi yang sama. Tidak memakai cron, worker, email/WhatsApp, event notifikasi atau penyaringan Gen/role.
 
 | Method | Rute | Akses |
 |---|---|---|
-| GET | `/pengumuman` | Seluruh login, hanya Terbit |
+| GET | `/pengumuman` | Terbit sesuai hak: Admin global, Guru untuk Siswa Gen pengampu |
 | GET | `/bantuan` | Seluruh login, panduan A13-1 + FAQ resmi Terbit |
 | GET/POST | `/admin/pengumuman`, `/admin/pengumuman/tambah`, `/admin/pengumuman/{id}/sunting`, POST `.../{id}/arsip` | Admin |
 | GET/POST | `/guru/pengumuman`, `/guru/pengumuman/tambah`, `/guru/pengumuman/{id}/sunting`, POST `.../{id}/arsip` | Guru, hanya Pengumuman miliknya |
