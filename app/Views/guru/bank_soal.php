@@ -175,7 +175,7 @@
             <p class="a-help">Unggahan diperiksa dan disimpan sementara secara privat. Bank soal baru berubah setelah Anda memeriksa seluruh soal dan menekan Konfirmasi Simpan.</p>
             <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenis => $namaJenis): ?>
                 <?php if ($jenis !== $jenis_dipilih) continue; ?>
-                <form method="post" enctype="multipart/form-data" class="a-form a-jarak-atas" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/word/' . $jenis . '/pratinjau'), 'attr') ?>">
+                <form method="post" enctype="multipart/form-data" class="a-form a-jarak-atas a-guru-bank-soal__upload-form" action="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal/word/' . $jenis . '/pratinjau'), 'attr') ?>">
                     <?= csrf_field() ?>
                     <div class="a-field">
                         <label class="a-label" for="unggah-word-<?= esc($jenis, 'attr') ?>">Word <?= esc($namaJenis) ?> (.docx)</label>
