@@ -77,6 +77,7 @@ $peranAktif = $peranAktif ?? '';
                         str_contains($jalurIkon, 'peta-atp'), str_contains($jalurIkon, 'kurikulum'), str_contains($jalurIkon, 'cp') => 'book-open',
                         str_contains($jalurIkon, 'penilaian'), str_contains($jalurIkon, 'ujian') => 'clipboard-check',
                         str_contains($jalurIkon, 'pengelola'), str_contains($jalurIkon, 'siswa') => 'users',
+                        str_contains($jalurIkon, 'notifikasi') => 'bell',
                         str_contains($jalurIkon, 'profil') => 'user-round',
                         str_contains($jalurIkon, 'laporan') => 'chart-no-axes-combined',
                         str_contains($jalurIkon, 'bantuan'), str_contains($jalurIkon, 'hubungi-admin'), str_contains($jalurIkon, 'pengumuman'), str_contains($jalurIkon, '/faq') => 'book-open',
