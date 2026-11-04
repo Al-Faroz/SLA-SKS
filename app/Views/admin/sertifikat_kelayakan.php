@@ -10,7 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Sertifikat Akademik</p>
             <h1>Pemeriksaan Kelayakan Sertifikat</h1>
-            <p class="a-proto-muted">Periksa ketuntasan TP dan nilai Final sebelum penerbitan.
+            <p class="a-proto-muted">Pantau ketuntasan TP dan nilai Final; penerbitan dan pembaruan berlangsung otomatis saat siswa mengakses Sertifikat.
                 Pra-Semester bukan syarat dan nilainya tidak dicantumkan dalam sertifikat.</p>
         </div>
     </header>
@@ -49,7 +49,7 @@
             Penerbitan memerlukan semua TP NonEsensial selesai dan Nilai TP Final,
             identitas madrasah lengkap serta TTD PNG aktif.
             Pra-Semester tidak menjadi syarat dan nilainya tidak dicetak.
-            Perubahan isi cetak harus melalui revisi satu per satu; versi lama tetap arsip.
+            Perubahan isi cetak akan menghasilkan versi pengganti saat siswa mengakses Sertifikat; versi lama tetap arsip.
         </div>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="pilih-paket-sertifikat">
@@ -96,7 +96,7 @@
                                 <th scope="col">Nilai TP Final</th>
                                 <th scope="col">Kelayakan Akademik</th>
                                 <th scope="col">Keterangan</th>
-                                <th scope="col">Sertifikat / Aksi</th>
+                                <th scope="col">Status Sertifikat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -139,39 +139,10 @@
                                                 site_url('admin/sertifikat/'.(int)$terbit['id'].'/unduh'),'attr') ?>">
                                                 Unduh PDF
                                             </a>
-                                            <?php if ($baris['layak_akademik'] && $identitas['lengkap']
-                                                && isset($asetAktif['ttd'])): ?>
-                                                <details class="a-sertifikat__alasan">
-                                                    <summary>Revisi sertifikat</summary>
-                                                    <form method="post" class="a-form"
-                                                        action="<?= esc(site_url('admin/sertifikat/'
-                                                            .(int)$rekap['paket']['id'].'/siswa/'
-                                                            .(int)$baris['siswa_id'].'/revisi'),'attr') ?>">
-                                                        <?= csrf_field() ?>
-                                                        <div class="a-field">
-                                                            <label class="a-label" for="alasan-revisi-<?= (int)$baris['siswa_id'] ?>">
-                                                                Alasan revisi (5–225 karakter)
-                                                            </label>
-                                                            <input class="a-input" type="text" name="alasan"
-                                                                id="alasan-revisi-<?= (int)$baris['siswa_id'] ?>"
-                                                                minlength="5" maxlength="225" required>
-                                                        </div>
-                                                        <button class="a-btn a-btn--utama" type="submit">
-                                                            Terbitkan Revisi
-                                                        </button>
-                                                    </form>
-                                                </details>
-                                            <?php endif ?>
+                                            <p class="a-help">Pembaruan versi otomatis pada akses berikutnya oleh siswa.</p>
                                         <?php elseif ($baris['layak_akademik'] && $identitas['lengkap']
                                             && isset($asetAktif['ttd'])): ?>
-                                            <form method="post" action="<?= esc(site_url(
-                                                'admin/sertifikat/'.(int)$rekap['paket']['id']
-                                                .'/siswa/'.(int)$baris['siswa_id'].'/terbit'),'attr') ?>">
-                                                <?= csrf_field() ?>
-                                                <button class="a-btn a-btn--utama" type="submit">
-                                                    Terbitkan Sertifikat
-                                                </button>
-                                            </form>
+                                            <span class="a-help">Siap diterbitkan otomatis ketika siswa membuka Sertifikat.</span>
                                         <?php else: ?>
                                             <span class="a-help">Menunggu seluruh syarat.</span>
                                         <?php endif ?>
