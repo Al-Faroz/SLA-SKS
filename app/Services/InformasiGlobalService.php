@@ -10,11 +10,11 @@ use RuntimeException;
 use Throwable;
 
 /**
- * A13-2: Pengumuman global dan FAQ resmi login-only.
- *
- * Admin mengelola keduanya. Guru membuat/mengubah/mengarsip Pengumuman sendiri.
- * Semua akun login aktif membaca hanya konten berstatus terbit.
- * Tidak ada segmentasi Gen/role, pengiriman pesan atau penghapusan histori.
+ * A13-5: Pengumuman Admin global; Pengumuman Guru khusus siswa pada Gen
+ * yang benar-benar diampu. FAQ resmi tetap global untuk pengguna login.
+ * Klasifikasi asal memakai riwayat aksi pembuatan (bukan role akun
+ * sekarang atau diubah_oleh) agar aman untuk akun Admin+Guru dan edit Admin.
+ * Tidak membuat data target/snapshot baru atau menghapus histori.
  */
 final class InformasiGlobalService
 {
@@ -62,6 +62,47 @@ final class InformasiGlobalService
         return $akun;
     }
 
+    /**
+     * Filter SQL baca-saja. Riwayat pertama ialah asal Pengumuman yang tidak
+     * berubah ketika Admin mengedit pengumuman Guru; peran pembuat pada
+     * tabel pengguna_peran tidak cukup karena akun boleh merangkap Admin+Guru.
+     *
+     * Jika asal tidak tercatat lengkap, fail-closed: jangan tayangkan.
+     * @param array<string,mixed> $akun
+     */
+    private static function lingkupPengumuman(array $akun): string
+    {
+        $pertama = "(SELECT MIN(ri0.id) FROM riwayat_informasi ri0
+            WHERE ri0.jenis = 'pengumuman' AND ri0.objek_id = p.id)";
+        $asal = static fn (string $peran): string =>
+            "EXISTS (SELECT 1 FROM riwayat_informasi ri
+                WHERE ri.jenis = 'pengumuman'
+                  AND ri.objek_id = p.id
+                  AND ri.id = " . $pertama . "
+                  AND ri.pengguna_id = p.dibuat_oleh
+                  AND ri.aksi IN ('buat','terbit')
+                  AND ri.peran_aktif = '" . $peran . "')";
+        $admin = $asal('admin');
+
+        // Pengumuman Guru tidak tampil untuk Admin, Guru lain, Pimpinan
+        // maupun guru penulis di beranda baca. Penulis tetap melihatnya
+        // melalui Kelola Pengumuman sesuai hak miliknya.
+        if ($akun['peran_aktif'] !== 'siswa') {
+            return $admin;
+        }
+
+        $siswaId = (int) $akun['id']; // integer dari sesi terverifikasi
+        $penugasan = "EXISTS (SELECT 1 FROM siswa s
+            INNER JOIN penugasan_guru_gen pg ON pg.angkatan_id = s.angkatan_id
+                AND pg.guru_id = p.dibuat_oleh
+            INNER JOIN pengguna g ON g.id = pg.guru_id AND g.status = 'aktif'
+            INNER JOIN pengguna_peran gp ON gp.pengguna_id = g.id AND gp.peran = 'guru'
+            WHERE s.pengguna_id = " . $siswaId . "
+              AND s.angkatan_id IS NOT NULL)";
+
+        return '(' . $admin . ' OR (' . $asal('guru') . ' AND ' . $penugasan . '))';
+    }
+
     /** @return array{data:list<array<string,mixed>>,jumlah:int,halaman:int,total_halaman:int,per_halaman:int} */
     public function daftar(string $jenis, bool $kelola = false, int $halaman = 1, int $perHalaman = 12): array
     {
@@ -69,18 +110,25 @@ final class InformasiGlobalService
         $akun = $kelola ? $this->pengelola($jenis) : $this->akun();
         $perHalaman = max(1, min(50, $perHalaman));
         $halaman = max(1, $halaman);
-        $query = $this->db->table($jenis);
+        // Alias hanya untuk pembacaan terbit Pengumuman; jalur kelola dan
+        // FAQ tidak berubah. Filter dan hitungan halaman memakai SQL sama.
+        $query = $this->db->table($jenis === 'pengumuman' && ! $kelola
+            ? 'pengumuman p' : $jenis);
         if ($kelola) {
             if ($akun['peran_aktif'] === 'guru') {
                 $query->where('dibuat_oleh', (int) $akun['id']);
             }
             $query->orderBy('diubah_pada', 'DESC')->orderBy('id', 'DESC');
         } else {
-            $query->where('status', 'terbit');
             if ($jenis === 'faq') {
-                $query->orderBy('urutan', 'ASC')->orderBy('id', 'ASC');
+                $query->where('status', 'terbit')
+                    ->orderBy('urutan', 'ASC')->orderBy('id', 'ASC');
             } else {
-                $query->orderBy('diterbitkan_pada', 'DESC')->orderBy('id', 'DESC');
+                // Server-side scope, bukan penyaringan setelah LIMIT/COUNT.
+                // Tidak menerima Gen/role dari URL atau POST.
+                $query->where('p.status', 'terbit')
+                    ->where(self::lingkupPengumuman($akun), null, false)
+                    ->orderBy('p.diterbitkan_pada', 'DESC')->orderBy('p.id', 'DESC');
             }
         }
         $jumlah = $query->countAllResults(false);
