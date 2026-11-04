@@ -80,9 +80,9 @@
                     </fieldset>
                 <?php endif ?>
                 <div class="a-field">
-                    <label class="a-label" for="akun-sandi">Sandi awal sementara</label>
+                    <label class="a-label" for="akun-sandi">Sandi awal akun</label>
                     <input id="akun-sandi" name="sandi" type="password" autocomplete="new-password" minlength="8" maxlength="200" required>
-                    <span class="a-help">Minimal 8 karakter. Pengguna wajib menggantinya saat login pertama.</span>
+                    <span class="a-help">Minimal 8 karakter. Admin wajib mengganti saat login pertama; Guru, Pimpinan dan Siswa disarankan menggantinya melalui Profil.</span>
                 </div>
                 <button class="a-btn a-btn--utama" type="submit" <?= $siswa && $gen === [] ? 'disabled' : '' ?>>Buat akun <?= esc($judulDaftar) ?></button>
             </form>
@@ -151,7 +151,10 @@
                         <tbody>
                             <?php foreach ($pengguna as $akun): ?>
                             <tr>
-                                <th scope="row" data-label="Nama"><strong><?= esc($akun['nama']) ?></strong><small class="a-admin-akun__subtitle"><?= (int) $akun['wajib_ganti_sandi'] ? 'Wajib ganti sandi' : 'Sandi aktif' ?></small></th>
+                                <th scope="row" data-label="Nama"><strong><?= esc($akun['nama']) ?></strong><small class="a-admin-akun__subtitle"><?= (int) $akun['wajib_ganti_sandi']
+                                ? ((!$siswa && in_array('admin', $akun['daftar_peran'] ?? [], true))
+                                    ? 'Admin wajib ganti sandi' : 'Disarankan ganti sandi')
+                                : 'Sandi telah diperbarui' ?></small></th>
                                 <td data-label="<?= $siswa ? 'NISN' : 'Username' ?>"><?= esc($akun['username']) ?></td>
                                 <td data-label="<?= $siswa ? 'Gen' : 'Peran' ?>">
                                     <?php if ($siswa): ?>
