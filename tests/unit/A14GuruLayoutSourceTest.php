@@ -84,4 +84,17 @@ final class A14GuruLayoutSourceTest extends TestCase
         self::assertStringContainsString('mariadb --skip-ssl -h 127.0.0.1',$workflow);
         self::assertStringNotContainsString('mariadb -h 127.0.0.1 -u root',$workflow);
     }
+
+    public function testAlurApprovalKoreksiLamaTidakMempunyaiRouteAktif(): void
+    {
+        $routes=self::sumber('app/Config/Routes.php');
+        $menu=self::sumber('app/Services/NavigasiService.php');
+        $routing=self::sumber('app/Config/Routing.php');
+        self::assertStringContainsString('GuruKoreksiNilai::proses',$routes);
+        self::assertStringNotContainsString('AdminKoreksiNilai::',$routes);
+        self::assertStringNotContainsString('GuruKoreksiNilai::ajukan',$routes);
+        self::assertStringNotContainsString('Persetujuan Koreksi Nilai',$menu);
+        self::assertStringContainsString('public bool $autoRoute = false;',$routing);
+    }
+
 }
