@@ -96,3 +96,6 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 ## A13-6/A13-7 — Persiapan tanpa mutasi DB
 
 - [Checkpoint kontrak Notifikasi dan Kebijakan Privasi](CHECKPOINT-A13-6-A13-7-PRA-DB-2026-11-04.md) — batas yang telah diuji, kebutuhan dump pasca V4-0012 serta naskah sekolah disahkan. Ini dokumen implementasi, **bukan Master ke-17**.
+
+
+- **[Checkpoint A14-1 — Pengamanan ROOT dan QA HTTP anonim (4 November 2026)](CHECKPOINT-A14-1-HTTP-ROOT-2026-11-04.md)**. Perketatan `.htaccess` untuk skrip CLI, berkas sensitif dan executable assets; pemeriksaan HTTP anonim baca-saja via CLI XAMPP; tidak mengubah database, URL, atau struktur ROOT. PR #129 masih Draft sampai uji Apache dan XAMPP.
