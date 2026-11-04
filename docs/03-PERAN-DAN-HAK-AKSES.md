@@ -115,9 +115,9 @@ Beranda `/siswa` memakai filter `auth:siswa` dan pemeriksaan ulang role/status d
 
 `GET /bantuan` berlaku hanya untuk akun sudah login dengan status aktif; akun non-Admin boleh mengakses dengan sandi awal sambil memperoleh anjuran penggantian. Akun pemegang peran Admin tetap mengikuti kewajiban ganti sandi awal. AuthFilter `auth` dan `Bantuan::index` mengecek sesi/peran aktif; panduan `PanduanBantuanService::untukPeran()` hanya mengembalikan pertanyaan dan tautan GET yang sesuai **peran aktif** (bukan gabungan role staf). Guru tidak memperoleh panduan tautan Admin, Siswa tidak melihat tautan Guru/Admin, dan Pimpinan hanya menuju monitoring baca-saja atau Profil. Semua target tetap menerapkan otorisasi normal server ketika diklik. Halaman Bantuan tidak menerima ID siswa/Gen sebagai query, tidak melakukan mutasi, dan memakai `Cache-Control: private, no-store`.
 
-Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master**, bukan sistem FAQ yang dapat diubah Admin. Pengumuman global, FAQ resmi terkelola, notifikasi internal dan kontak resmi Hubungi Admin tetap terpisah hingga struktur/sumbernya diverifikasi lewat dump SQL XAMPP terbaru. Tidak ada perubahan izin pada tiga layanan tersebut.
+Halaman ini adalah **panduan operasional tetap yang diverifikasi terhadap Master**, bukan sistem FAQ yang dapat diubah Admin. Pengumuman, FAQ resmi terkelola, notifikasi internal dan kontak resmi Hubungi Admin memiliki hak akses tersendiri; rincian terbaru A13-5 di bawah berlaku untuk Pengumuman Guru. Notifikasi internal masih memerlukan tahap terpisah.
 
-### A13-2 — Pengumuman global dan FAQ resmi (3 November 2026)
+### A13-2/A13-5 — Pengumuman Admin global, Guru per Gen dan FAQ resmi
 
 | Aksi | Admin | Guru | Siswa | Pimpinan |
 |---|---|---|---|---|
