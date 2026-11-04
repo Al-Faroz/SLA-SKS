@@ -319,6 +319,12 @@ final class SertifikatPenerbitanService
                     .($revisi?'; pengganti ID '.$terkini['id']:''),
                 'waktu'=>$now,
             ]);
+            $penerima=$this->db->table('siswa')->select('pengguna_id')
+                ->where('id',$sid)->get(1)->getRowArray();
+            if (!$penerima) throw new RuntimeException('Penerima sertifikat tidak ditemukan.');
+            NotifikasiService::catat($this->db,
+                $revisi?'sertifikat_pengganti_terbit':'sertifikat_awal_terbit',
+                (int)$penerima['pengguna_id'],$id,(int)$r['versi']);
             if ($id<1 || $this->db->transStatus()===false) {
                 throw new RuntimeException('Transaksi sertifikat tidak berhasil.');
             }
