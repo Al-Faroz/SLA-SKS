@@ -549,3 +549,8 @@ Kelas `a-informasi`, `a-informasi__kartu`, `__item`, `__isi`, `__kosong`, `__pag
 ### A13-3 — Kartu kontak resmi Hubungi Admin (3 November 2026)
 
 `.a-hubungi-admin__daftar` menata `dl` semantik menjadi dua kolom desktop dan satu kolom untuk lebar ≤820px. Setiap `.a-hubungi-admin__butir` menggunakan `--eg-line`, `--eg-pane-soft`, fokus `--eg-focus` dan teks panjang membungkus; `.a-informasi__aksi` yang sudah tersedia digunakan untuk tombol menuju Kontak dan Profil di Bantuan. Tidak ada framework, ikon tambahan, JS, atau CSS global yang mengubah formulir ujian.
+
+
+### A13-4 — Responsif Profil sandi dan grup menu (4 November 2026)
+
+Grup menu `Informasi & Bantuan` memakai komponen `.a-side__group` dan `.a-side__submenu` yang sudah digunakan Rekap Nilai, dengan ikon lokal `book-open` serta status aktif ketika anak dipilih. Menambahkan fokus keyboard pada `summary`/submenu. Form `.a-profil__sandi` dua kolom pada desktop dan satu kolom ≤620px, tombol aksi jelas, tanpa mengubah layout ujian atau import. Pesan pengingat `.a-sandi-pengingat` fleksibel dan tidak menutupi header. Panel reset sandi masih memakai komponen/kontras Dark/Light yang sudah ada. Evaluasi visual manual desktop/HP dan Mode Dokumentasi wajib.
