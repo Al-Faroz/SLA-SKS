@@ -144,6 +144,14 @@ $routes->get('guru/rekap-nilai', 'GuruRekapNilai::index', ['filter' => 'auth:gur
 $routes->get('guru/rekap-nilai/pra-semester', 'GuruRekapPraSemester::index', ['filter' => 'auth:guru']);
 $routes->get('guru/rekap-nilai/pra-semester/unduh', 'GuruEksporPraSemester::unduh', ['filter' => 'auth:guru']);
 $routes->get('guru/rekap-nilai/unduh', 'GuruEksporNilai::unduh', ['filter' => 'auth:guru']);
+// A14-2: permohonan koreksi nilai Resume/HOTS terpisah dari koreksi konten TP.
+$routes->get('guru/koreksi-nilai', 'GuruKoreksiNilai::index', ['filter'=>'auth:guru']);
+$routes->get('guru/koreksi-nilai/permohonan/(:num)', 'GuruKoreksiNilai::detail/$1', ['filter'=>'auth:guru']);
+$routes->get('guru/koreksi-nilai/(:segment)/(:num)', 'GuruKoreksiNilai::form/$1/$2', ['filter'=>'auth:guru']);
+$routes->post('guru/koreksi-nilai/(:segment)/(:num)', 'GuruKoreksiNilai::ajukan/$1/$2', ['filter'=>'auth:guru']);
+$routes->get('admin/koreksi-nilai', 'AdminKoreksiNilai::index', ['filter'=>'auth:admin']);
+$routes->get('admin/koreksi-nilai/(:num)', 'AdminKoreksiNilai::detail/$1', ['filter'=>'auth:admin']);
+$routes->post('admin/koreksi-nilai/(:num)/keputusan', 'AdminKoreksiNilai::putuskan/$1', ['filter'=>'auth:admin']);
 $routes->get('guru/penilaian', 'GuruPenilaian::antrean', ['filter' => 'auth:guru']);
 $routes->get('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::lihat/$1/$2', ['filter' => 'auth:guru']);
 $routes->post('guru/penilaian/(:segment)/(:num)', 'GuruPenilaian::simpan/$1/$2', ['filter' => 'auth:guru']);
