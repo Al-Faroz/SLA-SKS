@@ -1,0 +1,50 @@
+name: QA A15 Branding Login dan Privasi
+
+on:
+  pull_request:
+    paths:
+      - 'app/Views/akun/masuk.php'
+      - 'app/Views/layouts/publik.php'
+      - 'app/Views/layouts/panel.php'
+      - 'app/Views/admin/kebijakan_privasi_editor.php'
+      - 'app/Services/KebijakanPrivasiContohService.php'
+      - 'public/assets/css/emerald-glass.css'
+      - 'public/assets/img/branding/**'
+      - 'tests/unit/A15LoginPrivasiBrandingTest.php'
+      - '.github/workflows/qa-a15-branding-privasi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  branding-privacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: fileinfo, gd, mbstring, intl, sqlite3, pdo_sqlite, dom, xml, zip
+          coverage: none
+      - name: Siapkan direktori writable sintetis
+        run: mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+      - name: Dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP layout, privasi dan unit
+        run: |
+          for f in \
+            app/Views/akun/masuk.php \
+            app/Views/layouts/publik.php \
+            app/Views/layouts/panel.php \
+            app/Views/admin/kebijakan_privasi_editor.php \
+            app/Services/KebijakanPrivasiContohService.php \
+            tests/unit/A15LoginPrivasiBrandingTest.php; do
+            php -l "$f"
+          done
+      - name: Regresi A15 aset, login, privasi dan responsive
+        run: vendor/bin/phpunit --no-coverage tests/unit/A15LoginPrivasiBrandingTest.php
+      - name: Regresi kontrak pengesahan naskah dan hak privasi
+        run: vendor/bin/phpunit --no-coverage tests/unit/A13KontrakNotifikasiPrivasiTest.php
+      - name: Regresi database anonim draf/terbit
+        run: vendor/bin/phpunit --no-coverage tests/unit/A13NotifikasiPrivasiDatabaseTest.php

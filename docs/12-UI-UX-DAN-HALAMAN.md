@@ -469,3 +469,12 @@ Perbaikan **hanya tata letak** pada Guru → Peta ATP, Kelola ATP Excel, Semeste
 ### Koreksi A14-4 — Tabel Kelola Pengumuman dan FAQ (4 November 2026)
 
 Tabel **Admin → Kelola Pengumuman**, **Admin → Kelola FAQ** dan **Guru → Kelola Pengumuman** wajib menggunakan komponen tabel baku `a-tbl a-tbl--cards` (bukan `a-tabel` yang tidak memiliki aturan desain). Tabel mengisi lebar kontainer dan memiliki proporsi kolom terpisah: Pengumuman 5 kolom (Judul, Status, Versi, Diperbarui UTC, Aksi) dan FAQ 6 kolom (Pertanyaan, Status, Urutan, Versi, Diperbarui UTC, Aksi). Sunting dan Arsipkan berdekatan, tidak menempel pada kolom tanggal/versi. Pada <=980px baris menjadi kartu terlabel per sel, dengan label, tombol, dan isi tetap terbaca di HP. Tombol Tambah, POST Arsipkan/CSRF, paginasi, draf/terbit/arsip, serta hak Guru per Gen **tidak diubah**. Dark/Light memakai token Emerald Glass resmi. Validasi browser pada XAMPP tetap diperlukan.
+
+
+### A15 — Identitas login dan naskah contoh privasi (4 November 2026)
+
+Keputusan pemilik: kotak ilustrasi semu di bawah teks pembuka login diganti dengan **banner backlogin MTsN 4 Jombang yang disediakan pemilik**, tepat di antara lead dan caption (bukan background halaman). Teks hero menjadi "Pembelajaran terarah, capaian terukur." dan menjelaskan materi, asesmen, penilaian serta progres belajar selama enam semester. Caption mencerminkan portal akademik empat peran. Kartu kanan menggunakan copy profesional dan logo sekolah.
+
+Logo sumber LogoFlat.png digunakan sebagai WebP lokal pada header publik, sidebar panel, kartu login dan favicon. Banner ringan, aspect ratio asli dan tetap terlihat di HP; Dark/Light mengikuti Emerald Glass.
+
+Naskah **contoh umum** untuk Kebijakan Privasi terisi hanya pada editor Admin untuk **draf baru**, bukan otomatis diterbitkan: Admin memeriksa praktik aktual, mengisi versi dan tanggal berlaku, memperoleh pengesahan lembaga, lalu menyimpan Draf dan menerbitkan. Halaman publik tetap hanya membaca versi Terbit yang berlaku WIB. Database dan mekanisme audit tidak diubah.

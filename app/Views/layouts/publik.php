@@ -6,6 +6,11 @@
     <meta name="color-scheme" content="dark light">
     <title><?= esc($judul ?? 'SLA-SKS') ?> · SLA-SKS</title>
     <?php
+        $ikonFavicon = FCPATH . 'public/assets/img/branding/logo-mtsn4-jombang.webp';
+        $versiIkon = is_file($ikonFavicon) ? (string) filemtime($ikonFavicon) : '1';
+    ?>
+    <link rel="icon" type="image/webp" href="<?= esc(base_url('public/assets/img/branding/logo-mtsn4-jombang.webp') . '?v=' . $versiIkon, 'attr') ?>">
+    <?php
         $temaCssFile = FCPATH . 'public/assets/css/emerald-glass.css';
         $temaJsFile = FCPATH . 'public/assets/js/theme-init.js';
         $cssVersi = is_file(FCPATH . 'public/assets/css/app.css') ? (string) filemtime(FCPATH . 'public/assets/css/app.css') : '1';
@@ -22,7 +27,9 @@
 <div class="a-shell-publik">
     <header class="a-kepala-publik">
         <a class="a-identitas" href="<?= esc(site_url('masuk'), 'attr') ?>" aria-label="SLA-SKS, halaman awal">
-            <span class="a-identitas__mark" aria-hidden="true">S</span>
+            <span class="a-identitas__mark a-identitas__mark--logo" aria-hidden="true">
+                <img src="<?= esc(base_url('public/assets/img/branding/logo-mtsn4-jombang.webp'), 'attr') ?>" alt="" width="128" height="127">
+            </span>
             <span class="a-identitas__teks"><strong>SLA-SKS</strong><small>Sistem Layanan Akademik</small></span>
         </a>
         <nav class="a-navigasi-publik" aria-label="Navigasi publik">
