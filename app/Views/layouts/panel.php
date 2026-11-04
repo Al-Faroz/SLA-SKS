@@ -102,6 +102,19 @@ $peranAktif = $peranAktif ?? '';
                 <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#menu"></use></svg> Menu
             </button>
             <div class="a-header__pengguna">
+                <?php
+                $jumlahNotifikasi=0;
+                try {
+                    $jumlahNotifikasi=(new \App\Services\NotifikasiService())->belumDibaca();
+                } catch (\Throwable $e) {
+                    // Sebelum V4-0013 tersedia jumlah tetap 0, jangan bocorkan error.
+                }
+                ?>
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('notifikasi'),'attr') ?>"
+                   aria-label="Notifikasi <?= (int)$jumlahNotifikasi ?> belum dibaca">
+                    <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#bell"></use></svg>
+                    <span>Notifikasi<?= $jumlahNotifikasi>0?' ('.($jumlahNotifikasi>99?'99+':(int)$jumlahNotifikasi).')':'' ?></span>
+                </a>
                 <button type="button" class="a-btn a-btn--sekunder a-btn--dokumentasi"
                         data-documentation-toggle aria-label="Aktifkan Mode Dokumentasi untuk screenshot panjang"
                         aria-pressed="false" title="Mode Dokumentasi: tata halaman khusus screenshot full-page">
