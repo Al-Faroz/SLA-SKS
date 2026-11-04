@@ -26,3 +26,12 @@ php scripts/qa/http_security_smoke.php http://localhost/sla-sks/
 Script hanya HTTP GET anonim. **Jangan** menguji akses langsung `/scripts/perbarui_template_atp_v25_3.php` melalui browser, karena pada server yang belum dilindungi itu berpotensi menjalankan skrip pemutakhiran. Gunakan hasil smoke yang aman dan verifikasi login/tema/aset di Chrome.
 
 Hasil yang diharapkan: 0 FAIL, halaman `/masuk` dan CSS/JS/logo tetap 200, file internal 403/404. Jika `app.css` gagal 200, hentikan penandaan FIX dan kirim hasilnya untuk diperbaiki. Jika aturan Apache tidak aktif pada hosting nanti, jangan memaksa deploy; konfigurasi host harus ditinjau terpisah.
+
+
+## Hasil QA otomatis final pada PR #129
+
+- GitHub Actions `QA A14-1 Pengamanan ROOT dan HTTP Anonim`: **PASS kedua job**.
+- HTTP Apache 2.4 dengan mod_rewrite, PHP 8.3, document root simulasi dan sesi FileHandler CI sintetis: **41 pemeriksaan PASS, 0 FAIL**; aset publik 200, file privat 403, halaman anonim tidak membuka data peran.
+- PHP lint: **4 berkas PASS**.
+- PHPUnit `A14RootHttpProtectionTest`: **5 tes/53 assertion PASS**; regresi `K1AksesAnonimTest`: **1 tes/7 assertion PASS**; `AuthFilterPeranAktifTest`: **2 tes/8 assertion PASS**.
+- `session.driver` diubah **hanya dalam .env sintetis runner CI** untuk pengujian HTTP tanpa database; bukan perubahan konfigurasi aplikasi/localhost. XAMPP belum diuji pemilik; **belum dinyatakan FIX di localhost**.
