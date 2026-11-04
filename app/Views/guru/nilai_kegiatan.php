@@ -59,6 +59,12 @@
                 Perubahan nilai memerlukan jalur koreksi akademik.</div>
             <p class="a-help">Umpan balik:</p>
             <div class="a-penilaian-isi"><?= nl2br(esc((string) ($tugas['umpan_balik'] ?? ''))) ?></div>
+            <div class="a-penilaian-aksi">
+                <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/koreksi-nilai/'
+                    . $tugas['jenis'] . '/' . (int)$tugas['id']),'attr') ?>">Ajukan Koreksi Nilai</a>
+            </div>
+            <p class="a-help">Perubahan tidak dilakukan dari penilaian awal.
+                Guru mengajukan alasan akademik dan Admin yang berbeda memutuskan.</p>
         <?php else: ?>
             <p class="a-help">Skor wajib berupa bilangan bulat 0–100.
                 Umpan balik boleh kosong, maksimal 1.000 karakter.
