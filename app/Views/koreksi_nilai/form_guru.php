@@ -31,6 +31,7 @@
         <?php endif ?>
         <form class="a-form" method="post" action="<?= esc(site_url($url),'attr') ?>">
             <?= csrf_field() ?>
+            <input type="hidden" name="nilai_awal" value="<?= (int)$tugas['nilai'] ?>">
             <div class="a-field">
                 <label class="a-label" for="nilai-koreksi">Nilai koreksi (0–100)</label>
                 <input class="a-input" type="number" id="nilai-koreksi" name="nilai"
