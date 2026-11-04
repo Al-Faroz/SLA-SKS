@@ -132,7 +132,7 @@ Bank soal/kunci Pra-Semester hanya untuk Guru G1 dan server ujian; tidak pernah 
 
 ### A13-2 — Audit, transaksi dan isolasi Pengumuman/FAQ (3 November 2026)
 
-- Semua akun login aktif yang memenuhi kebijakan sandi per peran (non-Admin boleh memakai sandi awal; pemegang Admin tetap wajib mengganti) dapat membaca Pengumuman dan FAQ berstatus `terbit`, tanpa segmentasi Gen atau role. Draf dan Arsip tidak boleh keluar dari Service pembaca.
+- Semua akun login aktif yang memenuhi kebijakan sandi per peran (non-Admin boleh memakai sandi awal; pemegang Admin tetap wajib mengganti) dapat membaca FAQ Terbit dan Pengumuman Admin Terbit. Khusus Siswa, Pengumuman Guru Terbit dibatasi pada Gen yang diampu Guru pembuat. Draf dan Arsip tidak boleh keluar dari Service pembaca.
 - Admin mengelola semua Pengumuman dan FAQ; Guru hanya Pengumuman yang dibuatnya sendiri; Pimpinan/Siswa hanya baca. Filter role di Routes dan otorisasi ulang pada `InformasiGlobalService`; staf dua peran tidak menggabungkan hak.
 - Setiap POST memakai CSRF global, panjang judul/isi, status, urutan divalidasi di server. Teks disimpan plain dan di-`esc()` dalam semua View.
 - Penyuntingan/pengarsipan memakai row lock MySQL/MariaDB `FOR UPDATE`, `versi` untuk menolak permintaan tab lama, dan transaksi yang menyimpan perubahan bersama `riwayat_informasi` serta `log_aktivitas`. Arsip terminal, tidak DELETE.
