@@ -68,9 +68,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Pasang MariaDB client
         run: sudo apt-get update -qq && sudo apt-get install -y -qq mariadb-client
+      # QA service MariaDB tidak menyediakan TLS; nonaktifkan SSL khusus
+      # untuk klien pada TCP loopback runner, bukan untuk hosting/produksi.
       - name: Fixture anonim dan patch V4-0008
         run: |
-          mariadb -h 127.0.0.1 -u root -plocalqa sla_a5_qa <<'SQL'
+          mariadb --skip-ssl -h 127.0.0.1 -u root -plocalqa sla_a5_qa <<'SQL'
           CREATE TABLE pengguna (id BIGINT UNSIGNED PRIMARY KEY) ENGINE=InnoDB;
           CREATE TABLE percobaan_ujian (id BIGINT UNSIGNED PRIMARY KEY) ENGINE=InnoDB;
           CREATE TABLE schema_version (versi VARCHAR(40) PRIMARY KEY, diterapkan_pada TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB;
@@ -78,12 +80,12 @@ jobs:
           INSERT INTO percobaan_ujian (id) VALUES (101);
           SQL
           sed '/^USE sla_sks_v4;$/d' database/sql/updates/V4-0008_KEPUTUSAN_UJIAN_BATAL.sql > /tmp/a5-update.sql
-          mariadb -h 127.0.0.1 -u root -plocalqa sla_a5_qa < /tmp/a5-update.sql
-          mariadb -h 127.0.0.1 -u root -plocalqa sla_a5_qa -e "
+          mariadb --skip-ssl -h 127.0.0.1 -u root -plocalqa sla_a5_qa < /tmp/a5-update.sql
+          mariadb --skip-ssl -h 127.0.0.1 -u root -plocalqa sla_a5_qa -e "
             INSERT INTO keputusan_ujian_batal (percobaan_ujian_id,keputusan,guru_id,alasan,diputus_pada)
             VALUES (101,'ulang_diagnostik',4,'Uji anonim',UTC_TIMESTAMP());
             INSERT INTO riwayat_keputusan_ujian_batal
             (keputusan_ujian_batal_id,guru_id,keputusan_baru,alasan,terjadi_pada)
             VALUES (1,4,'ulang_diagnostik','Uji anonim',UTC_TIMESTAMP());"
-          test "$(mariadb -h 127.0.0.1 -u root -plocalqa -N sla_a5_qa -e "SELECT COUNT(*) FROM keputusan_ujian_batal")" = "1"
-          test "$(mariadb -h 127.0.0.1 -u root -plocalqa -N sla_a5_qa -e "SELECT COUNT(*) FROM schema_version WHERE versi='V4-0008-KEPUTUSAN-UJIAN-BATAL'")" = "1"
+          test "$(mariadb --skip-ssl -h 127.0.0.1 -u root -plocalqa -N sla_a5_qa -e "SELECT COUNT(*) FROM keputusan_ujian_batal")" = "1"
+          test "$(mariadb --skip-ssl -h 127.0.0.1 -u root -plocalqa -N sla_a5_qa -e "SELECT COUNT(*) FROM schema_version WHERE versi='V4-0008-KEPUTUSAN-UJIAN-BATAL'")" = "1"
