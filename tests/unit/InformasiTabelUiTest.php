@@ -38,8 +38,8 @@ final class InformasiTabelUiTest extends TestCase
         $view = self::sumber('app/Views/informasi/kelola.php');
         self::assertStringContainsString('a-informasi__row-actions', $view);
         self::assertStringContainsString("site_url(\$prefix.'/tambah')", $view);
-        self::assertStringContainsString("'/.(int)\$item['id'].'/sunting'", $view);
-        self::assertStringContainsString("'/.(int)\$item['id'].'/arsip'", $view);
+        self::assertStringContainsString("'/'.(int)\$item['id'].'/sunting'", $view);
+        self::assertStringContainsString("'/'.(int)\$item['id'].'/arsip'", $view);
         self::assertStringContainsString('csrf_field()', $view);
         self::assertStringContainsString('name="versi"', $view);
         self::assertStringContainsString("confirm('Arsipkan informasi ini?", $view);
