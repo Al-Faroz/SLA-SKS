@@ -3109,3 +3109,34 @@ a.a-pager__tombol:focus-visible { outline: 3px solid #168458; outline-offset: 2p
     .a-bantuan__pengenalan .a-informasi__aksi {width:100%;}
     .a-bantuan__pengenalan .a-informasi__aksi .a-btn {flex:1 1 auto;}
 }
+
+
+/* A13-4 — Grup Informasi & Bantuan serta sandi di Profil. */
+.a-profil__sandi {margin-top:18px;}
+.a-profil__sandi h2 {margin:0 0 12px;font-size:1.14rem;}
+.a-profil__sandi .a-form {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:end;
+    gap:14px 18px;
+    max-width:940px;
+}
+.a-profil__sandi .a-form > .a-field {min-width:0;}
+.a-profil__sandi .a-form > button {justify-self:start;grid-column:1/-1;}
+.a-sandi-pengingat {
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;flex-wrap:wrap;margin-bottom:16px;
+}
+.a-sandi-pengingat .a-btn {flex-shrink:0;}
+.a-akun-reset__aksi > .a-field {width:100%;max-width:460px;}
+.a-akun-reset__aksi > .a-help {max-width:650px;}
+.a-side__group-trigger:focus-visible,
+.a-side__subtautan:focus-visible {
+    outline:2px solid var(--eg-focus,#44c6a1);
+    outline-offset:-2px;
+}
+@media(max-width:620px) {
+    .a-profil__sandi .a-form {grid-template-columns:minmax(0,1fr);}
+    .a-profil__sandi .a-form > button {justify-self:stretch;}
+    .a-sandi-pengingat .a-btn {width:100%;}
+}
