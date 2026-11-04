@@ -742,3 +742,12 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 - Setelah koreksi skor TP yang tercetak, beberapa koreksi sebelum akses tidak menghasilkan banyak PDF; **akses berikutnya** menghasilkan satu PDF/nomor/QR pengganti dan menandai versi sebelumnya Digantikan. Akses PDF historis berizin; QR historis tetap dapat diverifikasi dengan status Digantikan.
 - Perubahan nilai Pra-Semester tidak mengubah sertifikat. Tidak ada SQL baru: V4-0014 yang sudah diimpor dimanfaatkan untuk audit koreksi langsung tanpa menghapus data versi/permohonan lama.
 - QA PHPUnit sintetis, lint, pemeriksaan akses/privasi, MySQL/MariaDB, serta pengujian browser XAMPP dan PDF tetap wajib sebelum FIX.
+
+### A14-3 — QA stabilisasi dan audit 12 screenshot Guru (4 November 2026)
+
+- Peta ATP/Impor: dropdown Gen–Mapel dan tombol pada garis dasar yang sama di desktop; HP 390px turun satu kolom, semester 1–6 tidak berubah.
+- Bank Soal: input/tombol KKM sejajar; 3 kolom desktop, 2 tablet, 1 HP; tetap satu KKM untuk Diagnostik/Sumatif. Word jumlah/unduh dan file/periksa satu baris saat ruang cukup, bertumpuk di HP.
+- Detail TP: URL/file, menit, petunjuk Resume/HOTS rapi; Resume/HOTS satu baris desktop, vertikal di HP. Modal BAB/TP, footer dan tabel TP tetap bisa dioperasikan keyboard.
+- Regresi fungsional: ATP 6 semester, input BAB/TP, Word preview→konfirmasi, KKM & snapshot TP Siap, penilaian awal→koreksi langsung G1→nilai TP→sertifikat personal on-demand; CSRF dan batas hak tidak berubah.
+- CI: perbaiki koneksi klien MariaDB QA CP V4-0007 pada loopback tanpa TLS; jalankan lint, PHPUnit, SQL 10.4/10.11 dan laporkan status sebenarnya. Tidak mengubah konfigurasi MySQL XAMPP atau hosting.
+- Uji statis/CI tidak membuktikan visual. Setelah pull, pemilik menguji Dark/Light di desktop dan HP; screenshot baru menjadi gerbang FIX tampilan.
