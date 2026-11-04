@@ -65,7 +65,7 @@ Untuk daftar detail berikut, ID `E2E-...` adalah identitas pengujian final paket
 | E2E-055 | QR lama dipindai | Status digantikan, tautan versi baru; data historis jelas |
 | E2E-056 | QR publik dipindai | **Tidak ada NISN**, padahal PDF privat mencetaknya |
 | E2E-057 | Percobaan mencari tombol cabut/hapus | Tidak ada endpoint sah, penghapusan siswa/sertifikat ditolak |
-| E2E-058 | Admin/Guru menerbitkan pengumuman | Muncul global bagi akun login; tidak ada target Gen/role khusus |
+| E2E-058 | Admin/Guru menerbitkan Pengumuman | Admin global; Guru hanya Siswa Gen pengampu, tidak bocor ke Guru lain/Pimpinan/Siswa Gen lain |
 | E2E-059 | Pengguna anonim membuka FAQ | Memerlukan login |
 | E2E-060 | Penilaian selesai | Notifikasi internal penerima terbit sekali setelah commit |
 | E2E-061 | Mengakses notifikasi milik pengguna lain | Ditolak |
@@ -633,9 +633,9 @@ Workflow `QA A13-1 Pusat Bantuan Peran` menjalankan PHP lint dan `tests/unit/Pan
 |---|---|---|
 | A13-201 | Impor patch V4-0012 pada database v4 setelah backup | Tabel Pengumuman/FAQ/Riwayat, FK dan penanda versi ada, data lama utuh |
 | A13-202 | Admin/Guru menyimpan Pengumuman Draf | Hanya tampak di kelola berizin, tidak bocor pada daftar publik |
-| A13-203 | Pengumuman Terbit | Admin/Guru/Siswa/Pimpinan membaca konten yang sama tanpa target Gen/role |
+| A13-203 | Pengumuman Terbit | Admin global; Guru hanya siswa Gen pengampu, bukan Guru lain/Pimpinan/siswa Gen berbeda |
 | A13-204 | Guru menebak ID Pengumuman Guru lain/Admin | Editor, simpan dan arsip ditolak Service; audit/konten utuh |
-| A13-205 | Admin menyunting Pengumuman Guru | Perubahan versi dan audit aktor benar, tetap global |
+| A13-205 | Admin menyunting Pengumuman Guru | Versi dan audit aktor benar, cakupan tetap mengikuti peran pembuat asli dan Gen pengampu |
 | A13-206 | Mengirim formulir dari tab yang tertinggal versinya | Ditolak tanpa menimpa versi baru |
 | A13-207 | Mengarsipkan Pengumuman/FAQ | Tidak tampil di publik; record dan riwayat tetap ada |
 | A13-208 | Guru/Siswa/Pimpinan mencoba kelola FAQ | Ditolak filter dan Service; hanya Admin dapat mengelola |
