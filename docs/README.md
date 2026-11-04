@@ -85,3 +85,9 @@ Dokumen pendukung bukan Master ke-17: [progres](PROGRES-SEBELUM-POLA-BARU-2026-1
 - **[Checkpoint A13-1 — Pusat Bantuan per peran (3 November 2026)](CHECKPOINT-A13-1-PUSAT-BANTUAN-2026-11-03.md)**. Panduan operasional login-only untuk keempat peran, tautan GET berizin, FAQ pertanyaan berdasarkan Master. **Belum** FAQ terkelola Admin, Pengumuman, Notifikasi, Hubungi Admin; memerlukan dump SQL terbaru. Tanpa SQL baru; QA PHPUnit dan uji XAMPP.
 
 - **[Checkpoint A13-2 — Pengumuman Global dan FAQ Terkelola (3 November 2026)](CHECKPOINT-A13-2-PENGUMUMAN-FAQ-2026-11-03.md)**. Dump privat XAMPP 03-11-2026 16.02 telah diaudit; tabel Pengumuman, FAQ dan riwayat sebelumnya belum ada. Patch baru `database/sql/updates/V4-0012_PENGUMUMAN_FAQ.sql` (impor sekali setelah backup); Admin mengelola keduanya, Guru pengumumannya sendiri, seluruh login membaca konten Terbit. FAQ terbit tampil pada Bantuan A13-1. Tidak ada data privat di GitHub. Notifikasi internal per penerima belum termasuk A13-2.
+
+
+## Konten bantuan (pelengkap, bukan Master ke-17)
+
+- [Draf 28 FAQ resmi SLA-SKS](DRAF-FAQ-RESMI-SLA-SKS-2026-11-04.md) — salin ke Kelola FAQ sebagai Draf, Admin tinjau lalu terbitkan; tidak ada seeder atau publikasi otomatis.
+- A13-4 menyatukan lima menu Informasi & Bantuan dan memperbarui kebijakan reset kata sandi sebagaimana keputusan 4 November 2026 di Master 02, 03, 11, 12, 13, 14 dan 16.
