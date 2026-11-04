@@ -140,21 +140,42 @@ final class SertifikatPenerbitanService
             ->get()->getRowArray();
     }
 
+    /** Baca internal aset setelah role dan kepemilikan siswa diverifikasi.
+     * Aksi upload/aktifkan tetap eksklusif Admin pada SertifikatAsetService.
+     */
+    private function asetAktif(): array
+    {
+        $rows=$this->db->table('sertifikat_aset_aktif aa')
+            ->select('aa.jenis,a.id,a.nama_acak,a.mime,a.sha256,a.lebar,a.tinggi')
+            ->join('sertifikat_aset a','a.id=aa.aset_id AND a.jenis=aa.jenis')
+            ->get()->getResultArray();
+        $out=[];
+        foreach($rows as $row)$out[$row['jenis']]=$row;
+        return $out;
+    }
+
+    private function asetAmbil(int $id,string $jenis): array
+    {
+        $r=$this->db->table('sertifikat_aset')
+            ->where('id',$id)->where('jenis',$jenis)->get(1)->getRowArray();
+        if (!$r)throw new DomainException('Aset sertifikat tidak ditemukan.');
+        return $r;
+    }
+
     /** @return array{background:?array,ttd:array} */
     private function aset(?array $lama,bool $revisi): array
     {
-        $svc=new SertifikatAsetService($this->db,$this->akun);
-        $aktif=$svc->aktif();
+        $aktif=$this->asetAktif();
         if (!isset($aktif['ttd'])) {
             throw new DomainException('Unggah dan aktifkan tanda tangan PNG terlebih dahulu.');
         }
-        $ttd=$svc->ambil((int)$aktif['ttd']['id'],'ttd');
+        $ttd=$this->asetAmbil((int)$aktif['ttd']['id'],'ttd');
         SertifikatAsetService::path($ttd);
         $background=null;
         if ($revisi && $lama!==null && $lama['background_aset_id']!==null) {
-            $background=$svc->ambil((int)$lama['background_aset_id'],'background');
+            $background=$this->asetAmbil((int)$lama['background_aset_id'],'background');
         } elseif (!$revisi && isset($aktif['background'])) {
-            $background=$svc->ambil((int)$aktif['background']['id'],'background');
+            $background=$this->asetAmbil((int)$aktif['background']['id'],'background');
         }
         // Revisi template fallback lama tetap fallback, meski template baru aktif.
         SertifikatAsetService::path($ttd);
@@ -162,7 +183,7 @@ final class SertifikatPenerbitanService
         return ['background'=>$background,'ttd'=>$ttd];
     }
 
-    private function persiapkan(int $sid,int $pid,bool $revisi,string $alasan): array
+    private function persiapkan(int $sid,int $pid,bool $revisi,string $alasan,bool $otomatis=false): array
     {
         $svc=new KelayakanSertifikatService($this->db,$this->akun);
         $cek=$svc->periksaSiswa($sid,$pid);
@@ -182,7 +203,7 @@ final class SertifikatPenerbitanService
         $hash=hash('sha256',$json);
         if ($lama!==null) {
             if (hash_equals((string)$lama['konten_sha256'],$hash)) {
-                if ($revisi) throw new DomainException('Isi cetak belum berubah. Tidak perlu revisi.');
+                if ($revisi && !$otomatis) throw new DomainException('Isi cetak belum berubah. Tidak perlu revisi.');
                 return ['sudah_ada'=>$lama];
             }
             if (!$revisi) {
@@ -239,11 +260,21 @@ final class SertifikatPenerbitanService
         return $this->simpan($siswaId,$paketId,true,trim($alasan));
     }
 
-    private function simpan(int $sid,int $pid,bool $revisi,string $alasan): array
+    private function simpan(int $sid,int $pid,bool $revisi,string $alasan,bool $otomatis=false): array
     {
-        $admin=$this->admin();
+        $a=$this->role();
         if ($sid<1 || $pid<1) throw new DomainException('Siswa/paket tidak valid.');
-        $r=$this->persiapkan($sid,$pid,$revisi,$alasan);
+        if ($a['peran_aktif']==='siswa') {
+            if (!$otomatis) throw new DomainException('Siswa tidak dapat menerbitkan secara manual.');
+            $pemilik=$this->db->table('siswa')->where('id',$sid)
+                ->where('pengguna_id',(int)$a['id'])->countAllResults();
+            if ($pemilik!==1) throw new DomainException('Sertifikat hanya untuk siswa pemilik.');
+        } elseif ($a['peran_aktif']!=='admin' || $otomatis) {
+            throw new DomainException('Aktor penerbitan tidak sah.');
+        }
+        $pelaku=(int)$a['id'];
+        $peran=(string)$a['peran_aktif'];
+        $r=$this->persiapkan($sid,$pid,$revisi,$alasan,$otomatis);
         if ($r['sudah_ada']!==null) return $r['sudah_ada'];
         $this->db->transBegin();
         try {
@@ -256,7 +287,7 @@ final class SertifikatPenerbitanService
                 || ($terkini['konten_sha256']??null)!==($r['lama']['konten_sha256']??null)) {
                 // Permintaan identik dari tab ganda tetap idempoten;
                 // tidak menerbitkan versi baru, tidak menyimpan PDF duplikat.
-                if (!$revisi && $terkini!==null
+                if ((!$revisi || $otomatis) && $terkini!==null
                     && hash_equals((string)$terkini['konten_sha256'],$r['konten_sha256'])) {
                     $this->db->transRollback();
                     @unlink($r['path']);
@@ -264,7 +295,7 @@ final class SertifikatPenerbitanService
                 }
                 throw new DomainException('Versi sertifikat berubah. Muat ulang halaman.');
             }
-            $asetAktif=(new SertifikatAsetService($this->db,$this->akun))->aktif();
+            $asetAktif=$this->asetAktif();
             if ((int)($asetAktif['ttd']['id']??0)!==$r['ttd_id']
                 || (!$revisi && ($asetAktif['background']['id']??null)!==$r['background_id'])) {
                 throw new DomainException('Template atau TTD aktif berubah; ulangi penerbitan.');
@@ -296,7 +327,7 @@ final class SertifikatPenerbitanService
                 'pdf_nama_acak'=>$r['nama'],
                 'pdf_sha256'=>$r['pdf_sha256'],
                 'alasan_revisi'=>$r['alasan'],
-                'diterbitkan_oleh'=>$admin,'diterbitkan_pada'=>$now,
+                'diterbitkan_oleh'=>$pelaku,'diterbitkan_pada'=>$now,
             ]);
             $id=(int)$this->db->insertID();
             if ($terkini!==null) {
@@ -313,8 +344,10 @@ final class SertifikatPenerbitanService
                 ]);
             }
             $this->db->table('log_aktivitas')->insert([
-                'pengguna_id'=>$admin,'peran_aktif'=>'admin',
-                'peristiwa'=>$revisi?'sertifikat_direvisi':'sertifikat_diterbitkan',
+                'pengguna_id'=>$pelaku,'peran_aktif'=>$peran,
+                'peristiwa'=>$otomatis
+                    ?($revisi?'sertifikat_otomatis_direvisi':'sertifikat_otomatis_diterbitkan')
+                    :($revisi?'sertifikat_direvisi':'sertifikat_diterbitkan'),
                 'catatan'=>'Sertifikat ID '.$id.'; paket '.$pid.'; versi '.$r['versi']
                     .($revisi?'; pengganti ID '.$terkini['id']:''),
                 'waktu'=>$now,
@@ -350,6 +383,63 @@ final class SertifikatPenerbitanService
         $map=[];
         foreach ($rows as $r) $map[(int)$r['siswa_id']]=$r;
         return $map;
+    }
+
+    /**
+     * Terbitkan atau revisi sertifikat pribadi saat halaman dibuka.
+     * Hanya paket aktif/ditugaskan milik Gen siswa; tidak memerlukan
+     * tombol/konfirmasi Admin. Setiap paket diverifikasi akademik ulang.
+     *
+     * @return array{diperbarui:int,belum_layak:int,galat:int}
+     */
+    public function sinkronkanSaya(): array
+    {
+        $a=$this->role();
+        if ($a['peran_aktif']!=='siswa') {
+            throw new DomainException('Penerbitan otomatis hanya bagi pemilik siswa.');
+        }
+        $s=$this->db->table('siswa s')
+            ->select('s.id,s.angkatan_id,s.semester_mulai,'
+                .'g.semester_mulai AS gen_semester_mulai')
+            ->join('ref_angkatan g','g.id=s.angkatan_id')
+            ->where('s.pengguna_id',(int)$a['id'])->get(1)->getRowArray();
+        if (!$s) throw new DomainException('Akun belum memiliki profil siswa.');
+        $sid=(int)$s['id'];
+        $mulai=(int)($s['semester_mulai']??$s['gen_semester_mulai']);
+        $paket=$this->db->table('paket_semester p')
+            ->distinct()->select('p.id,p.semester')
+            ->join('penugasan_paket pp','pp.paket_id=p.id'
+                .' AND pp.angkatan_id=p.angkatan_id'
+                .' AND pp.mapel_id=p.mapel_id'
+                .' AND pp.semester=p.semester'
+                .' AND pp.tahun_ajaran_id=p.tahun_ajaran_id')
+            ->where('p.angkatan_id',(int)$s['angkatan_id'])
+            ->where('p.status','aktif')
+            ->where('p.semester >=',$mulai)
+            ->orderBy('p.semester','ASC')->orderBy('p.id','ASC')
+            ->get()->getResultArray();
+        $hasil=['diperbarui'=>0,'belum_layak'=>0,'galat'=>0];
+        foreach ($paket as $p) {
+            try {
+                $pid=(int)$p['id'];
+                $lama=$this->aktif($sid,$pid);
+                $hasilTerbit=$this->simpan($sid,$pid,$lama!==null,
+                    'Pembaruan otomatis isi sertifikat personal',true);
+                if ($lama===null || (int)$lama['id']!==(int)$hasilTerbit['id']) {
+                    $hasil['diperbarui']++;
+                }
+            } catch (DomainException $e) {
+                // Paket belum tuntas/identitas/TTD belum siap: halaman lain
+                // tetap tersedia; tidak menciptakan sertifikat palsu.
+                $hasil['belum_layak']++;
+            } catch (Throwable $e) {
+                $hasil['galat']++;
+                log_message('error','Sertifikat otomatis paket #{id}: {error}',[
+                    'id'=>(int)$p['id'],'error'=>$e->getMessage(),
+                ]);
+            }
+        }
+        return $hasil;
     }
 
     public function daftarSaya(): array
