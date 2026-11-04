@@ -14,9 +14,9 @@ Struktur utama: **Mapel → 1 CP operasional → Semester → BAB → TP**. Enam
 - **Akun/otorisasi:** login tertutup; menu Admin terpisah **Pengelola** (Admin/Guru/Pimpinan) dan **Siswa**, keduanya tetap memakai akun autentikasi yang sama. Impor/ekspor XLSX, reset sandi per akun, ganti sandi pertama kali, peran staf, nonaktif akun, pembatasan login.
 - **Administrasi:** Gen, semester mulai, penugasan Guru G1 per Gen–Mapel, tahun ajaran, kurikulum dan CP, branding sekolah, logo, ikon aplikasi, PNG tanda tangan, template sertifikat.
 - **Konten LMS:** paket, TP, CP, Excel peta ATP enam semester dan Word bank soal Diagnostik/Sumatif per TP, berkas PDF/audio/gambar, video YouTube, daftar kesiapan TP, penyuntingan CP/BAB/TP sesuai hak akses dan status penggunaan siswa.
-- **Siswa:** pembaca materi, diagnostik, resume, HOTS, sumatif, hasil, nilai, progres, lencana, sertifikat, pengumuman global, notifikasi dalam aplikasi, FAQ setelah login.
+- **Siswa:** pembaca materi, diagnostik, resume, HOTS, sumatif, hasil, nilai, progres, lencana, sertifikat, pengumuman Admin global dan Pengumuman Guru bagi siswa Gen pengampu, notifikasi dalam aplikasi, FAQ setelah login.
 - **Informasi dan privasi:** halaman Kebijakan Privasi aplikasi berisi ketentuan resmi yang disahkan sekolah, dapat dibaca tanpa login; kontak sekolah tampil pada menu Hubungi Admin (tanpa sistem tiket).
-- **Guru:** penulisan paket/TP khusus Gen–Mapel yang diampu, penilaian 0–100, pemeriksaan kecurangan/perlu bantuan, izin ujian ulang, monitoring, laporan, pengumuman global.
+- **Guru:** penulisan paket/TP khusus Gen–Mapel yang diampu, penilaian 0–100, pemeriksaan kecurangan/perlu bantuan, izin ujian ulang, monitoring, laporan, pengumuman bagi siswa Gen yang diampu.
 - **Admin/Pimpinan:** Admin mengelola sumber daya dan persetujuan akademik tertentu, Pimpinan hanya membaca; laporan PDF/Excel dan dasbor peran.
 - **Sertifikat:** A4 landscape, background JPG/PNG berversi, identitas siswa termasuk NISN pada PDF, QR publik tanpa NISN, penerbitan awal dan pengganti tanpa menghapus sejarah.
 
