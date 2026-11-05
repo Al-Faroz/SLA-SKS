@@ -191,7 +191,7 @@
         </section>
     <?php endif ?>
 
-    <section class="a-card a-jarak-atas a-tp-penutup" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
+    <section class="a-card a-jarak-atas a-tp-penutup <?= $tp['status'] === 'siap' ? 'a-tp-penutup--siap' : 'a-tp-penutup--draf' ?>" id="kesiapan-tp" aria-labelledby="judul-kesiapan-tp">
         <h2 id="judul-kesiapan-tp"><?= $tp['status'] === 'siap' ? 'TP sudah Siap' : 'Langkah akhir · Pemeriksaan kesiapan' ?></h2>
         <p class="a-help"><?php if ($tp['status'] === 'siap'): ?>
             TP telah diterbitkan. Snapshot konten tersimpan; akses sunting ditentukan

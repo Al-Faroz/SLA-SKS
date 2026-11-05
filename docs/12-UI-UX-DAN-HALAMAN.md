@@ -44,6 +44,18 @@ Tahap ini melanjutkan **fondasi shell yang telah ditinjau pemilik melalui screen
 
 **Penerimaan Tahap 2:** uji Admin Dashboard, Guru Dashboard/Peta ATP/Bank Soal/Antrean Penilaian, Siswa Dashboard/Materi, Pimpinan Dashboard, Dark+Light, desktop/sidebar collapsed, 820/390/360px, validasi form, tabel panjang, klik yang aktif, serta screenshot full-page tanpa Mode Dokumentasi. Belum dinyatakan FIX sampai diverifikasi pemilik.
 
+## 0C. Tahap 3 — Audit Konsistensi Visual per Halaman, Batch 1 (5 November 2026)
+
+**Cakupan:** Guru Rekap Nilai TP, Guru Kelola TP, Admin Pengelola/Siswa. Tahap ini hanya presentasi; tidak mengubah sumber angka, status siswa, ekspor, aksi penilaian, validasi, route, CSRF, akses peran, atau algoritme pemenuhan TP.
+
+1. **Rekap Nilai TP:** empat kartu mengikuti KPI Vibrant Glass: Siswa Gen Blue Emerald, Final Emerald, Sementara Amber Olive, Belum Ada Rose Plum. Status tetap berupa teks dan angka dari server. Tidak mengubah arti Selesai TP versus Nilai Final, atau nilai 0 versus Belum Ada; ekspor XLSX tetap dapat dilakukan meski baru satu nilai. Grid responsif serta scroll horizontal tabel 10 kolom dipertahankan; jarak/ukuran teks pada identitas siswa, BAB/TP dan petunjuk scroll diperhalus.
+2. **Kelola TP Guru:** identitas lima bidang tetap ringkas; Step Progress menunjukkan hasil Service. Header Data TP, Satu Materi, Diagnostik/Sumatif dan Pemeriksaan Kesiapan memperoleh aksen terarah. Panel kesiapan memiliki pembeda Siap/Draf berdasarkan nilai status server, bukan hitungan baru. Form/editor media tetap di halaman, bukan modal; field, POST/CSRF dan upload tetap.
+3. **Admin Pengelola dan Siswa:** form Tambah tetap penuh di atas daftar. Filter, panel template/impor/ekspor Excel dan tabel dipisahkan lewat spacing, border dan label teratur. Tabel responsif tetap memiliki aksi per baris; tidak mengubah pagination, penempatan Gen atau sandi.
+4. **Dipertahankan:** sidebar desktop normal-flow, tombol Kembali ke Atas, Dark/Light, primary Indigo–Violet, enam kartu semester Peta ATP, dan komponen/fokus keyboard Tahap 2.
+5. **Galeri:** empat KPI contoh tanpa angka atau data akun/siswa nyata. CSS scoped ditambahkan ke emerald-glass.css; konsolidasi total stylesheet ditunda agar regresi terbatas.
+
+**QA sebelum FIX:** Rekap TP filter, XLSX, tabel panjang, keadaan kosong; Kelola TP Draf/Siap/terkunci, media/soal, fokus/validasi; Admin Pengelola/Siswa tambah, filter, impor/ekspor, paginasi, aksi per baris. Dark/Light; sidebar expanded/collapsed; 1440/1100/820/390/360px dan screenshot full-page. Pemeriksaan statis bukan pengganti XAMPP.
+
 ## 1. Prinsip wajib
 UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol utama tunggal per layar, status dan alasan terkunci, pesan galat memberi solusi, *loading/success/empty/error/permission-denied*, konfirmasi untuk aksi permanen, *breadcrumbs* pada halaman dalam, dan tidak ada tombol yang tidak punya endpoint. Desain mobile-first untuk siswa, desktop-first untuk editor kompleks Guru/Admin, responsif sampai 360 px. Siswa diberi pengalaman pembelajaran yang menarik, ruang ujian tenang; tidak ada papan peringkat/streak/poin. Empat dashboard tidak berarti empat sistem CSS berbeda.
 

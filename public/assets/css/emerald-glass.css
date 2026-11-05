@@ -2822,3 +2822,302 @@ html[data-theme] .a-galeri-vg-kpi__item > small {
 @media (prefers-reduced-motion:reduce) {
   html[data-theme] .a-app--prototipe .a-page .a-btn { transition:none; }
 }
+
+
+/* ============================================================
+   VIBRANT GLASS PAGE AUDIT — TAHAP 3 (5 November 2026)
+   Batch 1: Rekap Nilai TP, Kelola TP Guru, Pengelola/Siswa Admin.
+   Hanya presentasi. Pertahankan perilaku UI, status, dan alur POST.
+   ============================================================ */
+
+/* REKAP NILAI TP — kartu ringkasan sesuai keluarga KPI Tahap 2.
+   Warna dekoratif tidak mengubah arti Final / Sementara / Belum Ada. */
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item {
+  --v3-rekap-bg:var(--vg-kpi-3-bg);
+  --v3-rekap-line:var(--vg-kpi-3-line);
+  --v3-rekap-accent:var(--vg-kpi-3-accent);
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  min-height:125px;
+  padding:18px 20px;
+  gap:9px;
+  background:var(--v3-rekap-bg);
+  border:1px solid var(--v3-rekap-line);
+  border-radius:15px;
+  box-shadow:var(--vg-kpi-shadow);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item::before {
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  border-radius:15px 0 0 15px;
+  background:var(--v3-rekap-accent);
+  pointer-events:none;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item--final {
+  --v3-rekap-bg:var(--vg-kpi-1-bg);
+  --v3-rekap-line:var(--vg-kpi-1-line);
+  --v3-rekap-accent:var(--vg-kpi-1-accent);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item--sementara {
+  --v3-rekap-bg:var(--vg-kpi-5-bg);
+  --v3-rekap-line:var(--vg-kpi-5-line);
+  --v3-rekap-accent:var(--vg-kpi-5-accent);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item--belum {
+  --v3-rekap-bg:var(--vg-kpi-6-bg);
+  --v3-rekap-line:var(--vg-kpi-6-line);
+  --v3-rekap-accent:var(--vg-kpi-6-accent);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik dt,
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik dd,
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item--final dd,
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik__item--sementara dd {
+  color:var(--vg-kpi-ink);
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik dt {
+  opacity:.87;
+  font-size:13px;
+  font-weight:700;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-metrik dd {
+  margin-top:auto;
+  font-size:clamp(1.7rem,2.5vw,2.15rem);
+  letter-spacing:-.02em;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-scroll-hint {
+  display:inline-flex;
+  max-width:100%;
+  padding:7px 11px;
+  border:1px solid var(--vg-table-line);
+  border-radius:8px;
+  background:var(--eg-pane-soft);
+  color:var(--e-muted);
+  line-height:1.5;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-table :is(th,td) {
+  line-height:1.55;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-table__siswa,
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-table__tp {
+  font-size:13px;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-table__meta,
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-rekap-table__nama-tp {
+  font-size:12px;
+  line-height:1.5;
+}
+html[data-theme] .a-app--prototipe .a-rekap-page--tp .a-penilaian-aksi {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* KELOLA TP — identitas dan Step Progress tetap satu alur;
+   pemisah judul membantu membaca form panjang tanpa tab/modal baru. */
+html[data-theme] .a-app--prototipe .a-guru-detail-tp
+  :is(#rumusan-tp,#materi-tp,#bank-soal-tautan,#kesiapan-tp) > h2 {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin-bottom:14px;
+  letter-spacing:-.018em;
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp
+  :is(#rumusan-tp,#materi-tp,#bank-soal-tautan,#kesiapan-tp) > h2::before {
+  content:"";
+  flex:0 0 4px;
+  align-self:stretch;
+  min-height:23px;
+  border-radius:999px;
+  background:var(--e-primary);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #materi-tp > h2::before {
+  background:var(--vg-kpi-2-accent);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #bank-soal-tautan > h2::before {
+  background:var(--vg-kpi-3-accent);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #kesiapan-tp > h2::before {
+  background:var(--vg-kpi-4-accent);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #rumusan-tp > .a-form {
+  display:grid;
+  gap:14px;
+  max-width:1000px;
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #rumusan-tp > .a-form > .a-field {
+  margin:0;
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #rumusan-tp textarea {
+  min-height:105px;
+  line-height:1.65;
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #rumusan-tp > .a-form > .a-btn {
+  justify-self:start;
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp .a-tp-materi-ringkas {
+  padding-bottom:13px;
+  margin-bottom:18px;
+  border-bottom:1px solid var(--vg-panel-line);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp .a-materi-form-fields {
+  padding-top:14px;
+  border-top:1px solid var(--vg-panel-line);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp .a-tp-langkah__item.is-selesai {
+  border-top:3px solid var(--eg-step-done-border);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp .a-tp-langkah__item.is-belum {
+  border-top:3px dashed var(--eg-step-pending-border);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #kesiapan-tp {
+  border-left:4px solid var(--vg-kpi-5-line);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #kesiapan-tp.a-tp-penutup--siap {
+  border-left-color:var(--vg-kpi-1-line);
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #kesiapan-tp .a-tp-penutup__aksi {
+  align-items:stretch;
+  gap:10px;
+}
+html[data-theme] .a-app--prototipe .a-guru-detail-tp #kesiapan-tp .a-tp-penutup__aksi :is(a.a-btn,button.a-btn) {
+  min-height:44px;
+}
+@media (max-width:620px) {
+  html[data-theme] .a-app--prototipe .a-guru-detail-tp #rumusan-tp > .a-form > .a-btn {
+    justify-self:stretch;
+    width:100%;
+  }
+}
+
+/* PENGELOLA / SISWA ADMIN — struktur form di atas tabel sudah final.
+   Perjelas pengelompokan tanpa modal, sticky, atau mengubah aksi server. */
+html[data-theme] .a-app--prototipe .a-admin-akun
+  :is(.a-admin-akun__form > h2,.a-admin-akun__daftar .a-proto-section-head h2) {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  letter-spacing:-.015em;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun
+  :is(.a-admin-akun__form > h2,.a-admin-akun__daftar .a-proto-section-head h2)::before {
+  content:"";
+  width:4px;
+  min-height:19px;
+  align-self:stretch;
+  flex:0 0 4px;
+  border-radius:999px;
+  background:var(--e-primary);
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__filter {
+  padding:14px 15px;
+  margin:16px 0;
+  border-radius:12px;
+  background:var(--eg-pane-soft);
+  border:1px solid var(--vg-panel-line);
+  gap:12px;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__filter > .a-field {
+  min-width:0;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__form .a-fieldset {
+  border-color:var(--vg-panel-line);
+  border-radius:12px;
+  padding:13px 14px;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__form .a-fieldset > legend {
+  font-weight:750;
+  padding-inline:7px;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__xlsx {
+  padding:15px 16px;
+  gap:14px 16px;
+  border-color:var(--vg-panel-line);
+  box-shadow:var(--vg-table-shadow);
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__xlsx strong {
+  font-size:14px;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__daftar .a-tabel-gulir {
+  overflow-x:auto;
+  max-width:100%;
+  border-radius:12px;
+  border-color:var(--vg-table-line);
+}
+@media (min-width:981px) {
+  html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__tabel tbody :is(th,td) {
+    font-size:13px;
+    line-height:1.55;
+    padding:12px 13px;
+    vertical-align:middle;
+  }
+  html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__tabel td > strong {
+    font-size:13px;
+  }
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__subtitle {
+  font-size:12px;
+  line-height:1.45;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__aksi {
+  gap:8px;
+}
+html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__aksi .a-btn {
+  min-height:40px;
+  font-size:12px;
+  line-height:1.4;
+}
+@media (max-width:767px) {
+  html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__filter {
+    padding:12px;
+  }
+  html[data-theme] .a-app--prototipe .a-admin-akun .a-admin-akun__xlsx-aksi {
+    width:100%;
+  }
+}
+
+
+/* Galeri statis untuk audit per halaman; bukan data riil. */
+html[data-theme] .a-galeri-v3 { grid-column:1/-1; }
+html[data-theme] .a-galeri-v3__metrics {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  padding:0;
+  margin:16px 0;
+}
+html[data-theme] .a-galeri-v3__metrics > div {
+  --vg-preview-bg:var(--vg-kpi-3-bg);
+  --vg-preview-line:var(--vg-kpi-3-line);
+  min-width:0;
+  padding:17px 18px;
+  border-radius:14px;
+  background:var(--vg-preview-bg);
+  border:1px solid var(--vg-preview-line);
+  color:var(--vg-kpi-ink);
+  box-shadow:var(--vg-kpi-shadow);
+}
+html[data-theme] .a-galeri-v3__metrics > div:nth-child(2) {
+  --vg-preview-bg:var(--vg-kpi-1-bg);
+  --vg-preview-line:var(--vg-kpi-1-line);
+}
+html[data-theme] .a-galeri-v3__metrics > div:nth-child(3) {
+  --vg-preview-bg:var(--vg-kpi-5-bg);
+  --vg-preview-line:var(--vg-kpi-5-line);
+}
+html[data-theme] .a-galeri-v3__metrics > div:nth-child(4) {
+  --vg-preview-bg:var(--vg-kpi-6-bg);
+  --vg-preview-line:var(--vg-kpi-6-line);
+}
+html[data-theme] .a-galeri-v3__metrics dt { margin:0 0 9px; font-size:13px; font-weight:700; }
+html[data-theme] .a-galeri-v3__metrics dd { margin:0; font-size:30px; font-weight:800; }
+@media (max-width:820px) {
+  html[data-theme] .a-galeri-v3__metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:420px) {
+  html[data-theme] .a-galeri-v3__metrics { grid-template-columns:minmax(0,1fr); }
+}
