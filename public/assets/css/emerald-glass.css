@@ -2514,3 +2514,309 @@ html[data-theme] .a-app--prototipe .a-back-to-top:focus-visible {
 @media (prefers-reduced-motion:reduce) {
   html[data-theme] .a-app--prototipe .a-back-to-top { transition:none; }
 }
+
+
+/* ================================================================
+   VIBRANT GLASS COMPONENT SYSTEM — TAHAP 2 (5 November 2026)
+   Komponen lintas peran, token Dark/Light dan gaya KPI berurutan.
+   Tidak menimpa enam kartu semester, materi, editor, atau layar ujian.
+   ================================================================ */
+html[data-theme="dark"] {
+  --vg-panel-line:rgba(151,215,191,.23);
+  --vg-panel-shadow:0 12px 30px rgba(0,8,11,.18),inset 0 1px 0 rgba(255,255,255,.07);
+  --vg-kpi-ink:#F3FAF8;
+  --vg-kpi-shadow:0 11px 26px rgba(0,9,12,.17),inset 0 1px 0 rgba(255,255,255,.12);
+  --vg-control-bg:#0C2B2C;
+  --vg-control-line:#52796D;
+  --vg-control-hover:#769B8B;
+  --vg-secondary-bg:#123538;
+  --vg-secondary-hover:#1C4747;
+  --vg-secondary-line:#48766F;
+  --vg-table-line:rgba(141,202,178,.25);
+  --vg-table-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  --vg-danger-bg:#45292F;
+}
+html[data-theme="light"] {
+  --vg-panel-line:#C6DCD4;
+  --vg-panel-shadow:0 10px 30px rgba(17,75,61,.085),inset 0 1px 0 #FFFFFF;
+  --vg-kpi-ink:#173B33;
+  --vg-kpi-shadow:0 8px 22px rgba(32,82,75,.085),inset 0 1px 0 rgba(255,255,255,.82);
+  --vg-control-bg:#FFFFFF;
+  --vg-control-line:#819F91;
+  --vg-control-hover:#347A67;
+  --vg-secondary-bg:#F0F8F4;
+  --vg-secondary-hover:#E3F2EB;
+  --vg-secondary-line:#BED7CB;
+  --vg-table-line:#D4E5DC;
+  --vg-table-shadow:0 2px 10px rgba(21,65,53,.035);
+  --vg-danger-bg:#FDEEF0;
+}
+
+/* Aksen KPI sama untuk empat peran; angka tetap dari service dan server. */
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) {
+  min-width:0;
+  min-height:138px;
+  position:relative;
+  isolation:isolate;
+  padding:19px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  color:var(--vg-kpi-ink);
+  background:var(--vg-kpi-bg);
+  border:1px solid var(--vg-kpi-line);
+  border-radius:16px;
+  box-shadow:var(--vg-kpi-shadow);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) > :is(span,p) {
+  color:var(--vg-kpi-ink);
+  opacity:.93;
+  font-size:13px;
+  font-weight:650;
+  line-height:1.45;
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) > strong {
+  color:var(--vg-kpi-ink);
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.025em;
+  line-height:1.15;
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) > small {
+  color:var(--vg-kpi-muted);
+  opacity:1;
+  font-size:12px;
+  line-height:1.5;
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) > a {
+  color:var(--vg-kpi-ink);
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+  font-size:13px;
+  font-weight:700;
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) > a:hover { text-decoration-thickness:2px; }
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric) .a-proto-metric__symbol {
+  color:var(--vg-kpi-accent);
+  background:rgba(255,255,255,.12);
+  border-color:var(--vg-kpi-line);
+}
+html[data-theme="light"] .a-app--prototipe .a-proto-metric__symbol {
+  background:rgba(255,255,255,.48);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric):nth-child(6n + 1),
+html[data-theme] .a-galeri-vg-kpi__item:nth-child(6n + 1) {
+  --vg-kpi-bg:var(--vg-kpi-1-bg);
+  --vg-kpi-line:var(--vg-kpi-1-line);
+  --vg-kpi-accent:var(--vg-kpi-1-accent);
+  --vg-kpi-muted:var(--vg-kpi-1-muted);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric):nth-child(6n + 2),
+html[data-theme] .a-galeri-vg-kpi__item:nth-child(6n + 2) {
+  --vg-kpi-bg:var(--vg-kpi-2-bg);
+  --vg-kpi-line:var(--vg-kpi-2-line);
+  --vg-kpi-accent:var(--vg-kpi-2-accent);
+  --vg-kpi-muted:var(--vg-kpi-2-muted);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric):nth-child(6n + 3),
+html[data-theme] .a-galeri-vg-kpi__item:nth-child(6n + 3) {
+  --vg-kpi-bg:var(--vg-kpi-3-bg);
+  --vg-kpi-line:var(--vg-kpi-3-line);
+  --vg-kpi-accent:var(--vg-kpi-3-accent);
+  --vg-kpi-muted:var(--vg-kpi-3-muted);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric):nth-child(6n + 4),
+html[data-theme] .a-galeri-vg-kpi__item:nth-child(6n + 4) {
+  --vg-kpi-bg:var(--vg-kpi-4-bg);
+  --vg-kpi-line:var(--vg-kpi-4-line);
+  --vg-kpi-accent:var(--vg-kpi-4-accent);
+  --vg-kpi-muted:var(--vg-kpi-4-muted);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric):nth-child(6n + 5),
+html[data-theme] .a-galeri-vg-kpi__item:nth-child(6n + 5) {
+  --vg-kpi-bg:var(--vg-kpi-5-bg);
+  --vg-kpi-line:var(--vg-kpi-5-line);
+  --vg-kpi-accent:var(--vg-kpi-5-accent);
+  --vg-kpi-muted:var(--vg-kpi-5-muted);
+}
+html[data-theme] .a-app--prototipe :is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric):nth-child(6n + 6),
+html[data-theme] .a-galeri-vg-kpi__item:nth-child(6n + 6) {
+  --vg-kpi-bg:var(--vg-kpi-6-bg);
+  --vg-kpi-line:var(--vg-kpi-6-line);
+  --vg-kpi-accent:var(--vg-kpi-6-accent);
+  --vg-kpi-muted:var(--vg-kpi-6-muted);
+}
+html[data-theme="dark"] {
+  --vg-kpi-1-bg:linear-gradient(135deg,#174C3D,#103A34);
+  --vg-kpi-1-line:#326956;
+  --vg-kpi-1-accent:#8DEBD0;
+  --vg-kpi-1-muted:#CBE6DB;
+  --vg-kpi-2-bg:linear-gradient(135deg,#153D4E,#10343D);
+  --vg-kpi-2-line:#2E6377;
+  --vg-kpi-2-accent:#9DDEED;
+  --vg-kpi-2-muted:#C9E0E9;
+  --vg-kpi-3-bg:linear-gradient(135deg,#253B63,#1A2D4D);
+  --vg-kpi-3-line:#486494;
+  --vg-kpi-3-accent:#B9D8FF;
+  --vg-kpi-3-muted:#CDDEEF;
+  --vg-kpi-4-bg:linear-gradient(135deg,#423059,#2E2846);
+  --vg-kpi-4-line:#725489;
+  --vg-kpi-4-accent:#E3CBF6;
+  --vg-kpi-4-muted:#E8DBF2;
+  --vg-kpi-5-bg:linear-gradient(135deg,#4A3D27,#383021);
+  --vg-kpi-5-line:#826E42;
+  --vg-kpi-5-accent:#FFE3A5;
+  --vg-kpi-5-muted:#E9DCC2;
+  --vg-kpi-6-bg:linear-gradient(135deg,#4A3040,#392A36);
+  --vg-kpi-6-line:#88546B;
+  --vg-kpi-6-accent:#FFC9DA;
+  --vg-kpi-6-muted:#F0D5DF;
+}
+html[data-theme="light"] {
+  --vg-kpi-1-bg:linear-gradient(135deg,#E8F8F0,#D8EFE4);
+  --vg-kpi-1-line:#B7DDC8;
+  --vg-kpi-1-accent:#246A50;
+  --vg-kpi-1-muted:#506D60;
+  --vg-kpi-2-bg:linear-gradient(135deg,#E6F7F9,#D6EDF1);
+  --vg-kpi-2-line:#ADD5DF;
+  --vg-kpi-2-accent:#216978;
+  --vg-kpi-2-muted:#4E6F77;
+  --vg-kpi-3-bg:linear-gradient(135deg,#EAF1FE,#D9E6FA);
+  --vg-kpi-3-line:#BFD0EA;
+  --vg-kpi-3-accent:#2B5183;
+  --vg-kpi-3-muted:#536781;
+  --vg-kpi-4-bg:linear-gradient(135deg,#F2EDFC,#E4DBF7);
+  --vg-kpi-4-line:#D3C5EE;
+  --vg-kpi-4-accent:#65478A;
+  --vg-kpi-4-muted:#6D627F;
+  --vg-kpi-5-bg:linear-gradient(135deg,#FFF5E5,#F8E9C9);
+  --vg-kpi-5-line:#E6D3AA;
+  --vg-kpi-5-accent:#795A29;
+  --vg-kpi-5-muted:#776A4E;
+  --vg-kpi-6-bg:linear-gradient(135deg,#FCEEF3,#F5DFE9);
+  --vg-kpi-6-line:#E9C5D5;
+  --vg-kpi-6-accent:#8F4965;
+  --vg-kpi-6-muted:#7B6670;
+}
+
+/* Panel kerja: warna tenang, depth ringan, tanpa mengubah layout/konten. */
+html[data-theme] .a-app--prototipe .a-page > .a-card:not(.a-siswa-media) {
+  border-color:var(--vg-panel-line);
+  box-shadow:var(--vg-panel-shadow);
+}
+html[data-theme] .a-app--prototipe .a-page > .a-card h2 {
+  letter-spacing:-.015em;
+  line-height:1.3;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field { gap:6px; }
+html[data-theme] .a-app--prototipe .a-page .a-field .a-label {
+  font-size:13px;
+  font-weight:700;
+  line-height:1.45;
+}
+/* Hanya field kerja: media/pdf, checkbox, radio, hidden, dan editor kaya dikecualikan. */
+html[data-theme] .a-app--prototipe .a-page .a-field
+  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"])) {
+  min-height:44px;
+  max-width:100%;
+  border-radius:10px;
+  background:var(--vg-control-bg);
+  color:var(--e-text);
+  border-color:var(--vg-control-line);
+}
+html[data-theme] .a-app--prototipe .a-page .a-field
+  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"])):hover:not(:disabled) {
+  border-color:var(--vg-control-hover);
+}
+html[data-theme] .a-app--prototipe .a-page .a-field
+  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"])):focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:2px;
+  border-color:var(--vg-control-hover);
+}
+/* Keadaan invalid tetap menggunakan warna bahaya dari tema. */
+html[data-theme] .a-app--prototipe .a-page .a-field [aria-invalid="true"] {
+  border-color:var(--e-danger);
+}
+
+/* Secondary mudah dibedakan dari background panel, primary tetap Indigo-Violet. */
+html[data-theme] .a-app--prototipe .a-page .a-btn--sekunder {
+  background:var(--vg-secondary-bg);
+  border-color:var(--vg-secondary-line);
+  color:var(--e-text);
+}
+html[data-theme] .a-app--prototipe .a-page .a-btn--sekunder:hover:not(:disabled) {
+  background:var(--vg-secondary-hover);
+  border-color:var(--vg-control-hover);
+}
+html[data-theme] .a-app--prototipe .a-page .a-btn--bahaya {
+  background:var(--vg-danger-bg);
+  color:var(--e-danger);
+  border-color:var(--e-danger);
+}
+html[data-theme] .a-app--prototipe .a-page :is(.a-btn,a-pager__tombol):focus-visible {
+  outline:3px solid var(--eg-focus);
+  outline-offset:2px;
+}
+
+/* Tabel kerja tetap solid, zebra dan status diserahkan token semantik lama. */
+html[data-theme] .a-app--prototipe .a-page .a-tabel-gulir {
+  border-color:var(--vg-table-line);
+  border-radius:12px;
+  box-shadow:var(--vg-table-shadow);
+}
+html[data-theme] .a-app--prototipe .a-page .a-tbl thead th {
+  font-weight:750;
+  letter-spacing:.008em;
+  border-color:var(--vg-table-line);
+}
+@media (min-width:981px) {
+  html[data-theme] .a-app--prototipe .a-page .a-tbl :is(th,td) {
+    padding:12px 14px;
+    vertical-align:middle;
+  }
+}
+html[data-theme] .a-app--prototipe .a-page .a-tbl tbody tr:focus-within :is(th,td) {
+  outline-color:var(--eg-focus);
+}
+html[data-theme] .a-app--prototipe .a-page .a-empty {
+  border-color:var(--vg-panel-line);
+  background:var(--eg-pane-soft);
+}
+
+/* Galeri statis memakai token KPI yang sama tanpa membuat data seolah real. */
+html[data-theme] .a-galeri-vg-kpi__grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+html[data-theme] .a-galeri-vg-kpi__item {
+  background:var(--vg-kpi-bg);
+  border:1px solid var(--vg-kpi-line);
+  border-radius:14px;
+  padding:17px;
+  color:var(--vg-kpi-ink);
+  min-width:0;
+  min-height:84px;
+  display:grid;
+  align-content:center;
+  gap:5px;
+}
+html[data-theme] .a-galeri-vg-kpi__item > strong {
+  font-size:15px;
+  color:var(--vg-kpi-ink);
+}
+html[data-theme] .a-galeri-vg-kpi__item > small {
+  font-size:12px;
+  color:var(--vg-kpi-muted);
+}
+@media (max-width:700px) {
+  html[data-theme] .a-galeri-vg-kpi__grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:420px) {
+  html[data-theme] .a-galeri-vg-kpi__grid { grid-template-columns:minmax(0,1fr); }
+}
+@media (prefers-reduced-motion:reduce) {
+  html[data-theme] .a-app--prototipe .a-page .a-btn { transition:none; }
+}
