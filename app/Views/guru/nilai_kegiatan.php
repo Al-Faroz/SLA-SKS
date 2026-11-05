@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page a-penilaian-page">
+<div class="a-page a-penilaian-page a-penilaian-page--detail">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
@@ -50,7 +50,7 @@
             </div>
         <?php endif ?>
     </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="nilai-kegiatan">
+    <section class="a-card a-jarak-atas a-penilaian-skor-card" aria-labelledby="nilai-kegiatan">
         <h2 id="nilai-kegiatan">Nilai Guru</h2>
         <?php if ($tugas['nilai'] !== null): ?>
             <div class="a-alert" role="status">Nilai sudah tersimpan: <strong><?= (int) $tugas['nilai'] ?>/100</strong>.
