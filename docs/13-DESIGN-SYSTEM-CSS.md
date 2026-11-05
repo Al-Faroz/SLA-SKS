@@ -7,6 +7,20 @@
 
 Nama: **Emerald Glass Academic UI**. Default DARK, LIGHT opsional, CSS kustom + JS native, empat peran satu shell. Master 12 mengatur perilaku; bagian ini supersede palet default terang pada bagian historis berikutnya. Tidak boleh mengubah hierarki Mapel–CP–Semester–BAB–TP.
 
+### Pembaruan visual shell final — 5 November 2026 (menggantikan hanya bagian yang konflik)
+
+**Vibrant Glass · Navy–Emerald Hybrid / Tabler-inspired** adalah desain terpilih. Ini memperbarui aturan background/sidebar/header dari Emerald Glass 27 Oktober, tanpa mengubah kontrak akademik atau semantik komponen lain.
+
+- Dark: --e-bg deep forest navy (gradient #040E14 → #07181D → #09251D), sidebar gradient gelap rgba(7,26,31,.97) → rgba(5,30,26,.97), header rgba(7,25,30,.94), glows emerald/cyan/violet beropacity rendah; emerald menjadi identitas utama.
+- Light: off-white kehijauan sebagai kanvas, sidebar mint #EDF7F2 → #DDEDE5 dengan teks #183F34, header putih hampir solid. Latar menu aktif tetap hijau lembut, teks gelap. Dark sidebar berteks putih/hijau sangat muda.
+- Semua warna shell dan menu dipetakan melalui token --eg-*; tombol primary tetap gradient Indigo–Violet dan enam kartu semester tidak berubah. Kode antarmuka tetap memakai a- serta CSS kustom + JS native.
+- **Grid dan screenshot:** .a-app--prototipe memisahkan sidebar 240/72px dari .a-main memakai minmax(0,1fr). Pada desktop sidebar position:static, height:auto, overflow:visible, tanpa sub-scroll/sticky/fixed. Header juga tidak sticky; shell header/sidebar tidak memakai blur compositor agar full-page lebih stabil. Glow dekoratif kecil tetap boleh pada panel terpilih. HP tetap drawer fixed.
+- **Kembali ke Atas**: data-back-to-top berada di panel bersama, tombol baru terlihat bila scroll desktop mencapai 440px; click memakai scroll smooth atau auto untuk prefers-reduced-motion. Tidak muncul di HP, permukaan print, atau halaman publik/ujian.
+- **Mode Dokumentasi dicabut:** hapus tombol header, JS sessionStorage toggle, data attribute serta selector CSS mode tersebut. Riwayat spesifikasi di bagian bawah dokumen disimpan untuk audit, tetapi tidak berlaku pada desain baru.
+- Galeri docs/assets/galeri-komponen.html harus memperlihatkan prinsip shell dan menghapus instruksi Mode Dokumentasi. Semua fungsi/form/CSRF/otorisasi tetap milik sistem yang sudah berjalan; tidak membuat widget atau backend palsu.
+
+**QA penerimaan wajib (belum otomatis PASS):** XAMPP Chrome 360/390/768/820/1100/1440, Dark/Light, collapsed/expanded, long content, menu drawer/Tab/Escape, kondisi kosong dan validasi, screenshot native full-page dan ekstensi pengguna; pastikan tidak ada layout overlap, body horizontal scroll ataupun hilang menu. Bila hasil screenshot ekstensi masih berbeda, analisis penyebab spesifik sebelum mengubah struktur layout.
+
 ### Token tema
 - Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
 - Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.
