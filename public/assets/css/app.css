@@ -295,7 +295,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 /* Dashboard Admin — semua angka live dari DashboardAdminService. */
 .a-app--prototipe { grid-template-columns: 236px minmax(0, 1fr); background: #eaf0f5; }
-.a-app--prototipe .a-side { background: #fff; color: #334454; border-right: 1px solid #e4eaf0; padding: 22px 12px; position: sticky; top: 0; height: 100vh; min-height: 0; overflow-y: auto; }
+.a-app--prototipe .a-side { background: #fff; color: #334454; border-right: 1px solid #e4eaf0; padding: 22px 12px; position: static; align-self: stretch; height: auto; min-height: 100vh; overflow: visible; }
 .a-app--prototipe .a-side__atas { padding: 2px 12px 25px; border-bottom: 1px solid #edf1f3; margin-bottom: 22px; color: #152b2a; }
 .a-app--prototipe .a-side__atas strong { font-size: 17px; letter-spacing: -.045em; }
 .a-app--prototipe .a-side__atas .a-identitas__mark { background: #146b4a; color: #fff; border-radius: 10px; height: 39px; width: 39px; font-size: 20px; }
