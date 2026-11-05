@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page a-penilaian-page">
+<div class="a-page a-penilaian-page a-penilaian-page--antrean">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru'), 'attr') ?>">Beranda Guru</a>
         <span aria-hidden="true">/</span>
@@ -20,7 +20,7 @@
     <?php if (session()->getFlashdata('nilai_sukses')): ?>
         <div class="a-alert" role="status"><?= esc(session()->getFlashdata('nilai_sukses')) ?></div>
     <?php endif ?>
-    <section class="a-card" aria-labelledby="filter-penilaian">
+    <section class="a-card a-penilaian-filter-card" aria-labelledby="filter-penilaian">
         <h2 id="filter-penilaian">Filter penugasan Guru</h2>
         <?php if ($penugasan === []): ?>
             <div class="a-alert" role="status">Belum ada penugasan Gen–Mapel aktif.
@@ -92,14 +92,14 @@
             </script>
         <?php endif ?>
     </section>
-    <section class="a-card a-jarak-atas" aria-labelledby="antrean-pengumpulan">
+    <section class="a-card a-jarak-atas a-penilaian-list-card" aria-labelledby="antrean-pengumpulan">
         <h2 id="antrean-pengumpulan"><?= $status_penilaian==='sudah'?'Nilai yang dapat dikoreksi':'Jawaban final belum dinilai' ?></h2>
         <p class="a-help"><?= (int) $antrean['total'] ?> <?= $status_penilaian==='sudah'?'tugas sudah dinilai':'tugas menunggu penilaian' ?>.
             Halaman <?= (int) $antrean['halaman'] ?> dari <?= (int) $antrean['jumlah_halaman'] ?>.</p>
         <?php if ($antrean['baris'] === []): ?>
             <div class="a-alert" role="status"><?= $status_penilaian==='sudah'?'Belum ada nilai Resume/HOTS yang dapat dikoreksi.':'Belum ada Resume/HOTS yang perlu dinilai.' ?></div>
         <?php else: ?>
-            <div class="a-tabel-gulir">
+            <div class="a-tabel-gulir a-penilaian-scroll" role="region" aria-label="Tabel antrean Resume dan HOTS dapat digulir secara horizontal" tabindex="0">
                 <table class="a-tbl a-penilaian-tabel">
                     <thead><tr>
                         <th scope="col">Dikirim (UTC)</th>
@@ -120,7 +120,7 @@
                                 </td>
                                 <td><span class="a-badge"><?= esc(strtoupper($r['jenis'])) ?></span>
                                 </td>
-                                <td>
+                                <td class="a-penilaian-tabel__aksi">
                                     <?php if ($status_penilaian==='sudah'): ?>
                                         <strong class="a-help">Skor <?= (int)$r['nilai'] ?>/100</strong>
                                         <a class="a-btn a-btn--sekunder"
