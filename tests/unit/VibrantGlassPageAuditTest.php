@@ -80,7 +80,7 @@ final class VibrantGlassPageAuditTest extends TestCase
         self::assertStringContainsString('a-admin-akun__form', $view);
         self::assertStringContainsString('a-admin-akun__daftar', $view);
         self::assertStringContainsString('a-admin-akun__xlsx', $view);
-        self::assertStringContainsString('a-admin-akun__pagination', $view);
+        self::assertStringContainsString("view('components/pager'", $view);
         self::assertStringContainsString('csrf_field()', $view);
         self::assertStringContainsString('name="cari"', $view);
         self::assertStringContainsString('name="status"', $view);
