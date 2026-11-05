@@ -21,6 +21,18 @@ Nama: **Emerald Glass Academic UI**. Default DARK, LIGHT opsional, CSS kustom + 
 
 **QA penerimaan wajib (belum otomatis PASS):** XAMPP Chrome 360/390/768/820/1100/1440, Dark/Light, collapsed/expanded, long content, menu drawer/Tab/Escape, kondisi kosong dan validasi, screenshot native full-page dan ekstensi pengguna; pastikan tidak ada layout overlap, body horizontal scroll ataupun hilang menu. Bila hasil screenshot ekstensi masih berbeda, analisis penyebab spesifik sebelum mengubah struktur layout.
 
+### Tahap 2 — Token komponen Vibrant Glass lintas peran (5 November 2026)
+
+`public/assets/css/emerald-glass.css` menyimpan blok bertanda **VIBRANT GLASS COMPONENT SYSTEM — TAHAP 2** sebagai lapisan komponen selama transisi; tetap satu stylesheet tema bersama, bukan stylesheet terpisah per peran. Konsolidasi total `app.css` dan lapisan tema dilakukan setelah QA visual.
+
+- `--vg-kpi-1..6-{bg,line,accent,muted}`: enam tint untuk KPI berdasarkan urutan kartu dengan **masing-masing 2 set Dark/Light**. Dark memakai permukaan forest/navy–teal–blue–violet–amber–rose pekat dan teks #F3FAF8; Light memakai pastel emerald/teal/blue/violet/amber/rose dengan teks #173B33. Kontras teks pendamping pada warna solid endpoint gradasi diuji secara matematis ≥4,5:1; verifikasi render browser tetap wajib.
+- `--vg-panel-line/shadow`, `--vg-control-bg/line/hover`, `--vg-secondary-bg/hover/line`, `--vg-table-line/shadow`, `--vg-danger-bg` mengikat panel, field, tombol, dan tabel. Primary tetap `--eg-cta-*`. Status yang telah diterbitkan oleh service tetap memiliki teks/status; warna KPI tidak menentukan status akademik.
+- Sekumpulan selector `:is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric)` dibatasi pada `.a-app--prototipe` agar tidak memengaruhi login/publik atau ujian. Kartu Semester `.a-atp-kartu` tetap memakai enam gradient resminya.
+- Form menggunakan `.a-page .a-field` dan mengecualikan `input[type=file/hidden/checkbox/radio/submit/button/reset]`. Form invalid dan fokus keyboard tetap terlihat. Tabel dalam `.a-page .a-tabel-gulir` memakai border dan shadow kecil; padding desktop hanya mulai 981px agar tabel-kartu mobile tetap aman.
+- Komponen galeri `.a-galeri-vg-kpi__grid` menunjukkan enam contoh warna noninteraktif pada Dark/Light.
+
+Tidak ada perubahan SQL, controller, rute, penilaian, unduhan, editor WYSIWYG, PDF, ujian fullscreen, atau data pengguna. QA XAMPP dan screenshot panjang tetap prasyarat FIX.
+
 ### Token tema
 - Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
 - Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.
