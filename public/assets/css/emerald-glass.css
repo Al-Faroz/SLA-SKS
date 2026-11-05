@@ -2717,7 +2717,7 @@ html[data-theme] .a-app--prototipe .a-page .a-field .a-label {
 }
 /* Hanya field kerja: media/pdf, checkbox, radio, hidden, dan editor kaya dikecualikan. */
 html[data-theme] .a-app--prototipe .a-page .a-field
-  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"])) {
+  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"])) {
   min-height:44px;
   max-width:100%;
   border-radius:10px;
@@ -2726,11 +2726,11 @@ html[data-theme] .a-app--prototipe .a-page .a-field
   border-color:var(--vg-control-line);
 }
 html[data-theme] .a-app--prototipe .a-page .a-field
-  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"])):hover:not(:disabled) {
+  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"])):hover:not(:disabled) {
   border-color:var(--vg-control-hover);
 }
 html[data-theme] .a-app--prototipe .a-page .a-field
-  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"])):focus-visible {
+  :is(select,textarea,input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"])):focus-visible {
   outline:3px solid var(--eg-focus);
   outline-offset:2px;
   border-color:var(--vg-control-hover);
@@ -2755,7 +2755,7 @@ html[data-theme] .a-app--prototipe .a-page .a-btn--bahaya {
   color:var(--e-danger);
   border-color:var(--e-danger);
 }
-html[data-theme] .a-app--prototipe .a-page :is(.a-btn,a-pager__tombol):focus-visible {
+html[data-theme] .a-app--prototipe .a-page :is(.a-btn,.a-pager__tombol):focus-visible {
   outline:3px solid var(--eg-focus);
   outline-offset:2px;
 }
@@ -2786,6 +2786,8 @@ html[data-theme] .a-app--prototipe .a-page .a-empty {
 }
 
 /* Galeri statis memakai token KPI yang sama tanpa membuat data seolah real. */
+html[data-theme] .a-galeri-vg-kpi { grid-column:1/-1; }
+
 html[data-theme] .a-galeri-vg-kpi__grid {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
