@@ -25,7 +25,7 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
 ?>
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page a-page__editor--luas">
+<div class="a-page a-page__editor--luas a-guru-soal-form">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Peta ATP</a>
         <span>/</span><a href="<?= esc(site_url('guru/tp/' . (int) $tp['id']), 'attr') ?>">Rincian TP</a>
