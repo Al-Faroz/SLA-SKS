@@ -33,6 +33,18 @@ Nama: **Emerald Glass Academic UI**. Default DARK, LIGHT opsional, CSS kustom + 
 
 Tidak ada perubahan SQL, controller, rute, penilaian, unduhan, editor WYSIWYG, PDF, ujian fullscreen, atau data pengguna. QA XAMPP dan screenshot panjang tetap prasyarat FIX.
 
+### Tahap 3 — Audit visual terarah per halaman, Batch 1 (5 November 2026)
+
+Blok CSS **VIBRANT GLASS PAGE AUDIT — TAHAP 3** ditempatkan setelah lapisan komponen Tahap 2 di public/assets/css/emerald-glass.css. Override aplikasi dibatasi pada tiga scope: .a-rekap-page--tp, .a-guru-detail-tp dan .a-admin-akun; galeri memakai .a-galeri-v3. Tidak ada stylesheet per role atau modul.
+
+- Empat KPI Rekap memakai token --vg-kpi-3 (Siswa), --vg-kpi-1 (Final), --vg-kpi-5 (Sementara), --vg-kpi-6 (Belum Ada). Warna dekoratif tidak menggantikan semantik Final/Sementara/Belum Ada. Semua memakai --vg-kpi-ink untuk teks Dark/Light.
+- Tabel Rekap mempertahankan minimum width dan scroll sendiri, tipografi sedikit lebih besar untuk siswa/TP, serta petunjuk scroll jelas. Screenshot full-page menilai pemisahan sidebar-konten, bukan memaksakan semua kolom tabel lebar terlihat serentak.
+- Kelola TP memakai aksen judul via pseudo-element, pemisah form Materi, serta border status Siap/Draf pada panel kesiapan. View menambah kelas a-tp-penutup--siap hanya saat status TP dari server siap; tidak ada perhitungan status akademik baru.
+- Admin Akun memakai panel filter dengan border/spacing, fieldset semantik peran staf, panel XLSX serta tabel lebih terbaca. Jangan mengubah elemen form atau perilaku a-tbl--cards pada mobile.
+- Responsif: tidak menambah sticky/fixed pada shell/tabel; target tombol minimal 40–44px; focus outline/aria/CSRF tetap; padding sel tabel Pengelola dibatasi pada lebar >=981px. Galeri 4 KPI menjadi 2/1 kolom pada <=820/420px.
+
+Visual QA XAMPP dan screenshot full-page tetap wajib sebelum Batch 1 dinyatakan FIX. Ini tidak mengubah proses akademik atau database.
+
 ### Token tema
 - Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
 - Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.
