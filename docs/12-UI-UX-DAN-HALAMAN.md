@@ -18,6 +18,19 @@
 
 Rincian palet, token dan komponen berada di Master Document 13. Ketentuan lama di bawah tetap berlaku sepanjang tidak bertentangan dengan v2.5 dan kontrak UI ini.
 
+## 0A. Keputusan implementasi UI final — Vibrant Glass / Tabler-inspired (5 November 2026)
+
+Keputusan pemilik **menggantikan hanya ketentuan visual/layout Emerald Glass 27 Oktober 2026 yang bertentangan**. Alur, hak akses, rute, data, status akademik, struktur 4 peran dan enam gradient semester **tidak berubah**. Tabler UI adalah **referensi prinsip tata letak**, bukan dependensi atau kode template yang dipasang.
+
+- **Identitas:** Vibrant Glass dengan palet *deep forest navy* sangat gelap sebagai background, permukaan navy–emerald, aksen emerald sebagai identitas MTsN 4 Jombang, dan variasi cyan/violet untuk kartu. Primary tetap Indigo–Violet. Dark default; Light menggunakan sidebar **mint/off-white** dengan teks hijau gelap dan header putih; keduanya konsisten dengan tema.
+- **Desktop:** CSS Grid dua kolom, sidebar expanded sekitar 240px / collapsed sekitar 72px. Sidebar berada **dalam alur dokumen normal** (bukan sticky/fixed), sehingga halaman panjang tidak masuk ke area navigasi saat tangkapan full-page. Sidebar ikut tergulir; pada desktop tampil tombol **Kembali ke Atas** setelah pengguna menggulir untuk mempermudah akses menu. Tidak perlu Mode Dokumentasi.
+- **Mobile ≤767px:** sidebar menjadi drawer fixed hanya ketika dibuka, dengan backdrop, fokus terjaga, Escape, dan scroll lock. Tombol Kembali ke Atas khusus desktop disembunyikan pada HP.
+- **Komposisi:** glassmorphism terbatas pada shell/hero/ringkasan; tabel, form, editor, materi dan ujian tetap semi-solid/solid dan terbaca. Kartu tidak ditumpuk berlebihan, tombol status semantik, fokus keyboard/kontras Dark/Light wajib.
+- **Screenshot:** gunakan tampilan aplikasi normal, tanpa mode penangkapan khusus. Pemeriksaan manual wajib pada halaman panjang, Chrome Capture Full Size dan alat screenshot pengguna, sidebar dua keadaan, Dark/Light, serta responsif 360/390/768/820/1100/desktop. **Penghapusan solusi sementara bukan klaim otomatis semua ekstensi screenshot pasti berhasil.**
+- **Migrasi bertahap:** tahap fondasi shell/tema/tombol dipisah dari pekerjaan konsolidasi komponen dan seluruh halaman. Belum mengubah index.php, .htaccess, .env, SQL, rute, autentikasi, maupun proses belajar. Tahap UI hanya disebut FIX setelah pengujian XAMPP oleh pemilik.
+
+**Catatan riwayat:** petunjuk Mode Dokumentasi dalam catatan bertanggal 2–4 November di bawah adalah **riwayat solusi sementara yang sudah dicabut**, bukan persyaratan UI aktif. Tombol, data-documentation, sessionStorage key terkait, dan CSS khususnya dihapus pada tahap ini.
+
 ## 1. Prinsip wajib
 UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol utama tunggal per layar, status dan alasan terkunci, pesan galat memberi solusi, *loading/success/empty/error/permission-denied*, konfirmasi untuk aksi permanen, *breadcrumbs* pada halaman dalam, dan tidak ada tombol yang tidak punya endpoint. Desain mobile-first untuk siswa, desktop-first untuk editor kompleks Guru/Admin, responsif sampai 360 px. Siswa diberi pengalaman pembelajaran yang menarik, ruang ujian tenang; tidak ada papan peringkat/streak/poin. Empat dashboard tidak berarti empat sistem CSS berbeda.
 

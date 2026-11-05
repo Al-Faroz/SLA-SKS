@@ -3,8 +3,8 @@
    Tidak mengubah rute, akses, service, aturan akademik, atau database. */
 html[data-theme="dark"] {
   color-scheme:dark;
-  --e-bg:linear-gradient(145deg,#031A13 0%,#052C20 52%,#004225 100%);
-  --e-side:linear-gradient(175deg,#041C17,#0B3427); --e-header:rgba(11,41,31,.96);
+  --e-bg:linear-gradient(145deg,#040E14 0%,#07181D 48%,#09251D 100%);
+  --e-side:linear-gradient(175deg,#061B1F,#08271F); --e-header:rgba(6,21,26,.95);
   --e-surface:#102E25; --e-surface-2:#163C30; --e-input:#0D2921;
   --e-text:#F0F8F3; --e-muted:#B3CFC0; --e-border:#426556;
   --e-primary:#50DEAC; --e-danger:#FF888D; --e-warning:#FFD166;
@@ -22,7 +22,7 @@ html[data-theme="dark"] {
 html[data-theme="light"] {
   color-scheme:light;
   --e-bg:linear-gradient(145deg,#F3F8F5,#E6F4EA 65%,#EDF9F3);
-  --e-side:linear-gradient(165deg,#0D4437,#126B50); --e-header:rgba(255,255,255,.96);
+  --e-side:linear-gradient(165deg,#EDF7F2,#DDEDE5); --e-header:rgba(252,255,253,.96);
   --e-surface:#FFFFFF; --e-surface-2:#F4FAF6; --e-input:#FFFFFF;
   --e-text:#19382D; --e-muted:#526E61; --e-border:#CCDDD3;
   --e-primary:#126B50; --e-danger:#A52B3A; --e-warning:#805400;
@@ -55,28 +55,28 @@ html[data-theme] .a-app--prototipe.a-app--is-collapsed {
   grid-template-columns:var(--a-sidebar-ringkas) minmax(0,1fr);
 }
 html[data-theme] .a-app--prototipe .a-side {
-  background:var(--e-side);color:#EAF8F0;border-right:1px solid rgba(255,255,255,.13);
+  background:var(--e-side);color:var(--eg-side-text);border-right:1px solid var(--eg-side-border);
   padding:18px 12px;box-shadow:2px 0 20px rgba(0,0,0,.08);
 }
 html[data-theme] .a-app--prototipe .a-side__atas {
-  color:#F2FFF7;border-bottom-color:rgba(255,255,255,.17);display:flex;
+  color:var(--eg-side-text);border-bottom-color:var(--eg-side-border);display:flex;
 }
 html[data-theme] .a-app--prototipe .a-side__atas .a-identitas__mark {
   background:#20A97A;color:#031A13;
 }
 html[data-theme] .a-app--prototipe .a-side__tautan {
-  display:flex;gap:12px;align-items:center;color:#EAF8F0;
+  display:flex;gap:12px;align-items:center;color:var(--eg-side-text);
   border-radius:10px;padding:10px 12px;min-height:46px;
 }
 html[data-theme] .a-app--prototipe .a-side__tautan::before { content:none;display:none; }
-html[data-theme] .a-app--prototipe .a-side__tautan:hover { color:#FFFFFF;background:rgba(123,231,172,.16); }
+html[data-theme] .a-app--prototipe .a-side__tautan:hover { color:var(--eg-side-active-text);background:var(--eg-side-hover); }
 html[data-theme] .a-app--prototipe .a-side__tautan.is-aktif {
-  background:rgba(80,222,172,.20);color:#FFFFFF;border:1px solid rgba(107,244,182,.23);
+  background:var(--eg-side-active);color:var(--eg-side-active-text);border:1px solid var(--eg-side-border);
 }
 .a-icon { width:19px;height:19px;display:inline-block;flex:none;stroke:currentColor;fill:none;vertical-align:middle; }
 html[data-theme] .a-btn.a-side__collapse {
   margin-inline-start:auto;padding:7px;min-width:38px;min-height:38px;
-  background:rgba(255,255,255,.12);color:#FFFFFF;border-color:rgba(255,255,255,.25);
+  background:var(--eg-toggle-bg);color:var(--eg-side-text);border-color:var(--eg-side-border);
 }
 .a-icon--collapsed { display:none; }
 html[data-theme] .a-app--is-collapsed .a-side { padding:15px 8px; }
@@ -263,15 +263,18 @@ html[data-theme] .a-app--prototipe .a-btn--utama:hover:not(:disabled) {
    ============================================================= */
 html[data-theme="dark"] {
   --eg-wallpaper:
-    radial-gradient(ellipse 850px 680px at 17% 19%,rgba(16,185,129,.20),transparent 70%),
-    radial-gradient(ellipse 660px 530px at 86% 10%,rgba(20,184,166,.14),transparent 72%),
-    radial-gradient(ellipse 710px 660px at 79% 81%,rgba(112,86,170,.11),transparent 74%),
+    radial-gradient(ellipse 850px 680px at 17% 19%,rgba(16,185,129,.12),transparent 70%),
+    radial-gradient(ellipse 660px 530px at 86% 10%,rgba(20,184,166,.08),transparent 72%),
+    radial-gradient(ellipse 710px 660px at 79% 81%,rgba(112,86,170,.055),transparent 74%),
     var(--e-bg);
   --eg-pane:rgba(10,43,34,.74);
   --eg-pane-strong:rgba(8,35,28,.87);
   --eg-pane-soft:rgba(11,50,40,.58);
-  --eg-navbar:rgba(8,37,29,.81);
-  --eg-sidebar:linear-gradient(167deg,rgba(10,53,41,.88),rgba(4,27,21,.91));
+  --eg-navbar:rgba(7,25,30,.94);
+  --eg-sidebar:linear-gradient(165deg,rgba(7,26,31,.97),rgba(5,30,26,.97));
+  --eg-side-text:#EAF8F0; --eg-side-border:rgba(201,255,230,.15);
+  --eg-side-hover:rgba(80,222,172,.13); --eg-side-active:rgba(80,222,172,.19);
+  --eg-side-active-text:#FFFFFF; --eg-toggle-bg:rgba(255,255,255,.11);
   --eg-line:rgba(191,251,223,.20);
   --eg-line-soft:rgba(191,251,223,.12);
   --eg-sheen:rgba(255,255,255,.07);
@@ -292,8 +295,11 @@ html[data-theme="light"] {
   --eg-pane:rgba(255,255,255,.76);
   --eg-pane-strong:rgba(255,255,255,.89);
   --eg-pane-soft:rgba(248,255,251,.67);
-  --eg-navbar:rgba(255,255,255,.76);
-  --eg-sidebar:linear-gradient(165deg,rgba(9,66,49,.94),rgba(14,93,67,.94));
+  --eg-navbar:rgba(252,255,253,.96);
+  --eg-sidebar:linear-gradient(165deg,#EDF7F2,#DDEDE5);
+  --eg-side-text:#183F34; --eg-side-border:rgba(12,81,59,.18);
+  --eg-side-hover:rgba(23,119,85,.11); --eg-side-active:rgba(31,144,100,.17);
+  --eg-side-active-text:#104D37; --eg-toggle-bg:rgba(12,81,59,.09);
   --eg-line:rgba(19,93,62,.17);
   --eg-line-soft:rgba(19,93,62,.10);
   --eg-sheen:rgba(255,255,255,.42);
@@ -312,18 +318,19 @@ html[data-theme] .a-app--prototipe {
 }
 html[data-theme] .a-app--prototipe .a-side {
   background:var(--eg-sidebar);
-  border-right:1px solid rgba(201,255,230,.16);
+  border-right:1px solid var(--eg-side-border);
   box-shadow:12px 0 32px rgba(0,12,8,.10);
-  backdrop-filter:blur(12px) saturate(115%);
-  -webkit-backdrop-filter:blur(12px) saturate(115%);
+  /* Sidebar tidak memakai blur agar capture halaman panjang lebih stabil. */
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
 html[data-theme] .a-app--prototipe .a-header,
 html[data-theme] .a-publik--prototipe .a-kepala-publik,
 html[data-theme] .a-publik--prototipe .a-kaki-publik {
   background:var(--eg-navbar);
   border-color:var(--eg-line-soft);
-  backdrop-filter:blur(12px) saturate(120%);
-  -webkit-backdrop-filter:blur(12px) saturate(120%);
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
   box-shadow:inset 0 1px 0 var(--eg-sheen);
 }
 /* Permukaan kaca yang hanya membingkai pekerjaan, bukan seluruh editor. */
@@ -1674,165 +1681,6 @@ html[data-theme] .a-app--prototipe .a-review-word-page .a-word-review-item .a-tb
 }
 
 
-/* =============================================================
-   MODE DOKUMENTASI — screenshot full-page Chrome.
-   Sidebar sticky 100vh + overflow-y internal dan backdrop blur
-   menciptakan lapisan komposit yang sering keliru dijahit oleh
-   ekstensi capture. Perubahan hanya saat tombol Dokumentasi aktif.
-   Tidak mempengaruhi UI harian, media pembelajaran, atau ujian.
-   ============================================================= */
-html[data-theme="dark"][data-documentation="on"] {
-  --eg-document-wall:#062C21;
-  --eg-document-side:#09281F;
-  --eg-document-panel:#10372B;
-}
-html[data-theme="light"][data-documentation="on"] {
-  --eg-document-wall:#EFF7F1;
-  /* Teks menu/brand tetap terang seperti sidebar normal.
-     Pakai bidang emerald gelap agar navigasi tidak lenyap pada Light. */
-  --eg-document-side:linear-gradient(115deg,#0D4437,#126B50);
-  --eg-document-panel:#FFFFFF;
-}
-html[data-theme][data-documentation="on"] {
-  scroll-behavior:auto;
-}
-html[data-theme][data-documentation="on"] body {
-  overflow:visible;
-}
-/* Penting: mode capture tidak boleh memakai dua kolom grid.
-   Chrome extension menempelkan potongan setelah viewport ke kolom sidebar
-   ketika melakukan stitched scrolling pada grid berisi sticky sidebar. */
-html[data-theme][data-documentation="on"] .a-app--prototipe,
-html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed {
-  display:block !important;
-  width:100%;
-  min-width:0;
-  grid-template-columns:none !important;
-  background:var(--eg-document-wall);
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-main,
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-main__konten,
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-page {
-  overflow:visible;
-  min-width:0;
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-header {
-  position:static;
-  background:var(--eg-document-panel);
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-  box-shadow:none;
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe :is(
-  .a-side,.a-header,.a-card,.a-proto-panel,.a-atp-kelompok,.a-siswa-kartu
-) {
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card,
-html[data-theme][data-documentation="on"] .a-app--prototipe :is(.a-proto-panel,.a-atp-kelompok) {
-  background:var(--eg-document-panel);
-  box-shadow:none;
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-page > .a-card::before,
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-atp-kelompok::before {
-  content:none;
-  display:none;
-}
-/* Toolbar debug CI4 yang fixed bukan bagian dari tutorial. */
-html[data-documentation="on"] :is(#debugbar,#debugbarToggle,#debugbar-toolbar) {
-  display:none !important;
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi {
-  border-color:var(--e-primary);
-  color:var(--e-text);
-  background:var(--e-soft-hover);
-  font-weight:750;
-}
-html[data-theme][data-documentation="on"] .a-app--prototipe .a-btn--dokumentasi:focus-visible {
-  outline:3px solid var(--eg-focus);
-  outline-offset:3px;
-}
-/* Sidebar dipindahkan ke baris navigasi di atas konten. Aliran
-   dokumen tetap DOM normal tanpa position fixed/sticky atau sub-scroll. */
-@media (min-width:768px) {
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side {
-    position:static !important;
-    inset:auto;
-    width:100% !important;
-    height:auto !important;
-    min-height:0 !important;
-    max-height:none;
-    overflow:visible !important;
-    transform:none !important;
-    transition:none;
-    visibility:visible;
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:12px 24px;
-    padding:12px clamp(14px,3vw,32px);
-    background:var(--eg-document-side);
-    border-right:0;
-    border-bottom:1px solid var(--eg-line);
-    box-shadow:none;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__atas,
-  html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed .a-side__atas {
-    display:flex;
-    flex-direction:row;
-    flex:0 0 auto;
-    align-items:center;
-    gap:10px;
-    margin:0;
-    padding:0;
-    border:0;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__brand,
-  html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed .a-side__brand {
-    display:inline;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__menu {
-    display:flex;
-    flex:1 1 420px;
-    align-items:center;
-    justify-content:flex-end;
-    flex-wrap:wrap;
-    gap:6px;
-    min-width:0;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__tautan {
-    display:inline-flex;
-    align-items:center;
-    width:auto;
-    min-height:38px;
-    padding:8px 11px;
-    gap:7px;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__teks,
-  html[data-theme][data-documentation="on"] .a-app--prototipe.a-app--is-collapsed .a-side__teks {
-    display:inline;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__collapse {
-    display:none;
-  }
-}
-@media (max-width:767px) {
-  /* HP tetap memakai drawer yang tertutup ketika screenshot diambil. */
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side:not(.is-open) {
-    max-height:100dvh;
-  }
-}
-@media (max-width:900px) {
-  html[data-theme] .a-app--prototipe .a-btn--dokumentasi {
-    width:42px;
-    min-width:42px;
-    padding:8px;
-  }
-  html[data-theme] .a-app--prototipe .a-btn--dokumentasi [data-documentation-label] {
-    display:none;
-  }
-}
 @media print {
   /* Print/PDF memakai aliran yang sama; kontrol interaktif tidak dicetak. */
   html[data-theme] .a-app--prototipe {
@@ -2160,28 +2008,23 @@ html[data-theme="light"] .a-app--prototipe .a-rekap-page .a-rekap-status.a-rekap
   background:#FFF1D5;
   border-color:#C9A66C;
 }
-/* Petunjuk & jawaban harus jelas beda WARNA sekalipun
-   Mode Dokumentasi menonaktifkan kaca pada semua kartu. */
-html[data-theme="dark"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk,
-html[data-theme="dark"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk {
+/* Petunjuk dan jawaban siswa selalu dibedakan oleh warna dan border. */
+html[data-theme="dark"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk {
   background:linear-gradient(130deg,#104C3B,#11392F);
   border-color:rgba(83,222,177,.56);
   box-shadow:inset 4px 0 0 #43D6A1,0 8px 24px rgba(0,0,0,.09);
 }
-html[data-theme="dark"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa,
-html[data-theme="dark"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa {
+html[data-theme="dark"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa {
   background:linear-gradient(130deg,#2A315C,#1B3951);
   border-color:rgba(169,159,241,.51);
   box-shadow:inset 4px 0 0 #AB9BFF,0 8px 24px rgba(0,0,0,.09);
 }
-html[data-theme="light"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk,
-html[data-theme="light"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk {
+html[data-theme="light"] .a-app--prototipe .a-page > .a-card.a-penilaian-petunjuk {
   background:linear-gradient(140deg,#E4F6EC,#E6F1F7);
   border-color:#86C9AF;
   box-shadow:inset 4px 0 0 #208B65;
 }
-html[data-theme="light"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa,
-html[data-theme="light"][data-documentation="on"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa {
+html[data-theme="light"] .a-app--prototipe .a-page > .a-card.a-card--jawaban-siswa {
   background:linear-gradient(140deg,#EDE9FA,#E8F1FA);
   border-color:#B5ACDF;
   box-shadow:inset 4px 0 0 #7061AE;
@@ -2201,65 +2044,6 @@ html[data-theme] .a-app--prototipe .a-penilaian-page .a-penilaian-bagian__headin
 }
 html[data-theme] .a-app--prototipe .a-rekap-page .a-rekap-table :is(th[scope="row"],td) {
   vertical-align:middle;
-}
-
-/* Dokumentasi full-page mengubah sidebar menjadi menu horizontal.
-   Submenu tidak boleh memperpanjang/menumpuk bar navigasi. */
-@media (min-width:768px) {
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group {
-    position:relative;
-    flex:0 0 auto;
-    min-width:0;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group-trigger {
-    display:inline-flex;
-    width:auto;
-    gap:7px;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu {
-    display:grid;
-    position:absolute;
-    z-index:45;
-    top:calc(100% + 6px);
-    right:0;
-    left:auto;
-    min-width:200px;
-    padding:7px;
-    gap:4px;
-    background:#103D30;
-    border:1px solid rgba(126,231,188,.38);
-    border-radius:12px;
-    box-shadow:0 16px 30px rgba(0,0,0,.25);
-    visibility:hidden;
-    opacity:0;
-    pointer-events:none;
-    transform:translateY(-4px);
-    transition:opacity .15s ease,transform .15s ease;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group[open]:hover .a-side__submenu,
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__group[open]:focus-within .a-side__submenu {
-    visibility:visible;
-    opacity:1;
-    pointer-events:auto;
-    transform:none;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu .a-side__subtautan {
-    display:flex;
-    width:100%;
-    min-height:38px;
-    color:#EAF8F0;
-    justify-content:flex-start;
-    padding:8px 10px;
-  }
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu .a-side__teks {
-    display:inline;
-    white-space:nowrap;
-  }
-}
-@media (prefers-reduced-motion:reduce) {
-  html[data-theme][data-documentation="on"] .a-app--prototipe .a-side__submenu {
-    transition:none;
-  }
 }
 
 /* A10-1 — laporan akademik tetap mengikuti Emerald Glass Dark/Light. */
@@ -2674,4 +2458,59 @@ html[data-theme] .a-publik--prototipe .a-proto-login-help {
   html[data-theme] .a-publik--prototipe .a-proto-login-card {
     padding:24px 20px;
   }
+}
+
+
+/* Vibrant Glass Shell (5 November 2026): navigasi desktop ikut alur dokumen.
+   Grid memisahkan sidebar dan main; capture full-page tidak perlu mode khusus. */
+@media (min-width:768px) {
+  html[data-theme] .a-app--prototipe .a-side {
+    position:static;
+    inset:auto;
+    align-self:stretch;
+    height:auto;
+    min-height:100vh;
+    max-height:none;
+    overflow:visible;
+    transform:none;
+  }
+  html[data-theme] .a-app--prototipe .a-main { min-width:0; max-width:100%; }
+}
+html[data-theme] .a-app--prototipe .a-back-to-top {
+  position:fixed;
+  right:clamp(18px,2.3vw,34px);
+  bottom:clamp(22px,2.3vw,34px);
+  z-index:26;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  padding:10px 16px;
+  min-height:46px;
+  color:#FFF;
+  background:var(--eg-cta-gradient);
+  border:1px solid var(--eg-cta-border);
+  border-radius:14px;
+  box-shadow:0 12px 25px rgba(0,0,0,.27);
+  font-weight:700;
+  cursor:pointer;
+}
+html[data-theme] .a-app--prototipe .a-back-to-top[hidden] { display:none; }
+html[data-theme] .a-app--prototipe .a-back-to-top:hover:not(:disabled) {
+  background:var(--eg-cta-hover);
+  color:#FFF;
+  transform:translateY(-2px);
+}
+html[data-theme] .a-app--prototipe .a-back-to-top:focus-visible {
+  outline:3px solid var(--e-primary);
+  outline-offset:3px;
+}
+@media (max-width:767px) {
+  html[data-theme] .a-app--prototipe .a-back-to-top { display:none; }
+}
+@media print {
+  html[data-theme] .a-app--prototipe .a-back-to-top { display:none !important; }
+}
+@media (prefers-reduced-motion:reduce) {
+  html[data-theme] .a-app--prototipe .a-back-to-top { transition:none; }
 }

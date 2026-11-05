@@ -1,3 +1,22 @@
+/* Shell Vibrant Glass: tombol kembali ke atas hanya untuk desktop.
+   Tidak mengubah scroll halaman atau memerlukan Mode Dokumentasi. */
+(() => {
+    'use strict';
+    const button = document.querySelector('[data-back-to-top]');
+    if (!button) return;
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const sync = () => {
+        button.hidden = !desktop.matches || window.scrollY < 440;
+    };
+    button.addEventListener('click', () => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+    window.addEventListener('scroll', sync, { passive: true });
+    desktop.addEventListener('change', sync);
+    sync();
+})();
+
 /* Navigasi panel HP: drawer fokus-terjaga, Escape, backdrop & scroll lock.
    Tidak memodifikasi rute/peran/menu yang disiapkan server. */
 (() => {
