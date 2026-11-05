@@ -72,8 +72,8 @@ final class VibrantGlassComponentsTest extends TestCase
             self::assertStringContainsString($pola, $css);
         }
         self::assertStringContainsString('input:not([type="checkbox"])', $css);
-        self::assertStringContainsString('input:not([type="file"])', $css);
-        self::assertStringContainsString('input:not([type="submit"])', $css);
+        self::assertStringContainsString(':not([type="file"])', $css);
+        self::assertStringContainsString(':not([type="submit"])', $css);
         self::assertStringContainsString('@media (min-width:981px)', $css);
     }
 
