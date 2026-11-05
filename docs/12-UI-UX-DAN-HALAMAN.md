@@ -31,6 +31,19 @@ Keputusan pemilik **menggantikan hanya ketentuan visual/layout Emerald Glass 27 
 
 **Catatan riwayat:** petunjuk Mode Dokumentasi dalam catatan bertanggal 2–4 November di bawah adalah **riwayat solusi sementara yang sudah dicabut**, bukan persyaratan UI aktif. Tombol, data-documentation, sessionStorage key terkait, dan CSS khususnya dihapus pada tahap ini.
 
+## 0B. Tahap 2 — Standarisasi Komponen Vibrant Glass (5 November 2026)
+
+Tahap ini melanjutkan **fondasi shell yang telah ditinjau pemilik melalui screenshot XAMPP Dark dan Light**. Perubahan hanya presentasi; tidak mengganti label, nilai, data/filter yang berasal dari server, perilaku form, CSRF, URL, atau aturan pembelajaran.
+
+1. **KPI empat peran:** kelas `a-proto-metric` (Admin), `a-dashboard-admin__metric`, `a-dashboard-guru__metric`, `a-dashboard-siswa__metric`, dan `a-dashboard-pimpinan__metric` memakai pola dekoratif enam aksen yang selaras: Emerald, Teal, Blue Emerald, Violet, Amber Olive, dan Rose Plum. Urutannya berdasarkan posisi kartu, bukan status; angka/progres harus tetap mencerminkan data server. Dark memakai tint lebih dalam, Light memakai pastel dengan teks gelap. **Enam kartu semester Peta ATP yang sudah FIX tidak berubah.**
+2. **Panel dan ruang kerja:** border dan depth konsisten tanpa membuat semua kartu berwarna. Form, tabel, bank soal, editor, materi, hasil ujian dan pengaturan tetap memakai permukaan lebih solid agar nyaman dibaca.
+3. **Kontrol:** label, input/select/textarea, focus ring, invalid state, tombol primary Indigo–Violet, secondary yang terlihat pada latar Light/Dark, danger, tabel, header, border serta empty state memakai token. Tidak mengubah field `hidden`, `file`, checkbox/radio, tombol submit, atau komponen editor menjadi input bergaya yang salah.
+4. **Responsif:** tabel lebar tetap digulir dalam kontainer dan tabel kartu mobile tetap mengikuti aturan historis; breakpoint 981px membatasi perubahan kepadatan sel desktop. Tidak menambah horizontal scroll pada body, tidak merusak sidebar tahap 1.
+5. **Galeri:** enam KPI contoh di `docs/assets/galeri-komponen.html` memakai token yang sama. Hanya contoh statis, bukan angka atau status aktual.
+6. **Regresi:** tes lama Mode Dokumentasi diselaraskan dengan keputusan pencabutannya, tes statis komponen baru tersedia. Pemeriksaan statis bukan pengganti QA visual XAMPP.
+
+**Penerimaan Tahap 2:** uji Admin Dashboard, Guru Dashboard/Peta ATP/Bank Soal/Antrean Penilaian, Siswa Dashboard/Materi, Pimpinan Dashboard, Dark+Light, desktop/sidebar collapsed, 820/390/360px, validasi form, tabel panjang, klik yang aktif, serta screenshot full-page tanpa Mode Dokumentasi. Belum dinyatakan FIX sampai diverifikasi pemilik.
+
 ## 1. Prinsip wajib
 UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol utama tunggal per layar, status dan alasan terkunci, pesan galat memberi solusi, *loading/success/empty/error/permission-denied*, konfirmasi untuk aksi permanen, *breadcrumbs* pada halaman dalam, dan tidak ada tombol yang tidak punya endpoint. Desain mobile-first untuk siswa, desktop-first untuk editor kompleks Guru/Admin, responsif sampai 360 px. Siswa diberi pengalaman pembelajaran yang menarik, ruang ujian tenang; tidak ada papan peringkat/streak/poin. Empat dashboard tidak berarti empat sistem CSS berbeda.
 
