@@ -528,3 +528,7 @@ Keputusan pemilik: kotak ilustrasi semu di bawah teks pembuka login diganti deng
 Logo sumber LogoFlat.png digunakan sebagai WebP lokal pada header publik, sidebar panel, kartu login dan favicon. Banner ringan, aspect ratio asli dan tetap terlihat di HP; Dark/Light mengikuti Emerald Glass.
 
 Naskah **contoh umum** untuk Kebijakan Privasi terisi hanya pada editor Admin untuk **draf baru**, bukan otomatis diterbitkan: Admin memeriksa praktik aktual, mengisi versi dan tanggal berlaku, memperoleh pengesahan lembaga, lalu menyimpan Draf dan menerbitkan. Halaman publik tetap hanya membaca versi Terbit yang berlaku WIB. Database dan mekanisme audit tidak diubah.
+
+## Addendum UI Tahap 3 Batch 3 — 6 November 2026
+
+Penyelarasan visual **Pra-Semester Admin/Guru**, detail jadwal remedial/susulan, **Sertifikat Admin/Siswa**, **Monitoring Pimpinan** dan **Informasi & Bantuan** memakai token Vibrant Glass Navy–Emerald Dark/Light. Berkas UI yang sudah mempunyai `a-pra-*`, `a-sertifikat__*`, `a-laporan__*`, `a-informasi__*` dipertahankan; perubahan hanya styling scoped, semantik tabel `scope="row"`, nama tombol Unduh PDF spesifik, dan region gulir yang dapat difokus. Filter, URL GET/POST, CSRF, bank, jadwal, nilai, status sertifikat, dan izin tetap berasal dari Service. Mode Dokumentasi **tetap dicabut** pada Tahap 1, sehingga referensi historis dalam dokumen ini tidak boleh diaktifkan ulang. QA XAMPP dan regresi E2E mengikuti `docs/QA-T3-BATCH3-INTEGRASI-20261106.md`. Branch Batch 3 tetap Draft hingga pengujian pemilik.
