@@ -146,7 +146,6 @@ $peranAktif = $peranAktif ?? '';
         </main>
         <button type="button" class="a-btn a-back-to-top" data-back-to-top hidden aria-label="Kembali ke atas halaman" title="Kembali ke atas halaman">
             <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#arrow-up"></use></svg>
-            <span>Kembali ke Atas</span>
         </button>
     </div>
 </div>
