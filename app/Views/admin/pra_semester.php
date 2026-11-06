@@ -114,7 +114,7 @@
                                 if ($params !== '') $tujuan .= '?' . $params; ?>
                             <tr <?= $pilih !== null && (int)$pilih['paket_id'] === (int)$row['paket_id']
                                 ? 'class="a-pra-table__selected"' : '' ?>>
-                                <td><strong><?= esc((string)$row['nama_gen']) ?></strong></td>
+                                <th scope="row"><strong><?= esc((string)$row['nama_gen']) ?></strong></th>
                                 <td><?= esc((string)$row['nama_mapel']) ?></td>
                                 <td class="a-pra-col-center"><?= (int)$row['semester'] ?></td>
                                 <td><span class="a-badge <?= $style ?>"><?= esc($label) ?></span></td>

@@ -1,0 +1,43 @@
+name: "QA UI Batch 3 dan Regresi Unit v2.5"
+
+on:
+  pull_request:
+    paths:
+      - 'app/Views/admin/pra_semester.php'
+      - 'app/Views/guru/pra_semester.php'
+      - 'app/Views/admin/pra_semester_detail.php'
+      - 'app/Views/siswa/sertifikat.php'
+      - 'app/Views/informasi/kelola.php'
+      - 'app/Views/pimpinan/laporan.php'
+      - 'public/assets/css/emerald-glass.css'
+      - 'tests/unit/VibrantGlassBatch3AuditTest.php'
+      - 'docs/QA-T3-BATCH3-INTEGRASI-20261106.md'
+      - '.github/workflows/qa-ui-batch3-integrasi.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ui-dan-integrasi-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, sqlite3, pdo_sqlite, dom, xml, zip
+          coverage: none
+      - name: Persiapkan writable dan dependency
+        run: |
+          mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+          composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint seluruh PHP yang berubah
+        run: |
+          for file in             app/Views/admin/pra_semester.php             app/Views/guru/pra_semester.php             app/Views/admin/pra_semester_detail.php             app/Views/siswa/sertifikat.php             app/Views/informasi/kelola.php             tests/unit/VibrantGlassBatch3AuditTest.php; do
+            php -l "$file"
+          done
+      - name: Uji kontrak UI Batch 3
+        run: vendor/bin/phpunit --no-coverage tests/unit/VibrantGlassBatch3AuditTest.php
+      - name: Regresi unit lintas modul v2.5
+        run: vendor/bin/phpunit --no-coverage tests/unit

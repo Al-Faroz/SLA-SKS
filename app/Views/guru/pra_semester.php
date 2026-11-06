@@ -75,7 +75,7 @@
                                 if ($filterGen !== null) $tujuan .= '?gen=' . $filterGen; ?>
                             <tr <?= $konteks !== null && (int)$konteks['paket']['id'] === (int)$p['id']
                                 ? 'class="a-pra-table__selected"' : '' ?>>
-                                <td><strong><?= esc((string)$p['nama_gen']) ?></strong></td>
+                                <th scope="row"><strong><?= esc((string)$p['nama_gen']) ?></strong></th>
                                 <td><?= esc((string)$p['nama_mapel']) ?></td>
                                 <td class="a-pra-col-center"><?= (int)$p['semester'] ?></td>
                                 <td><span class="a-badge <?= $p['status'] === 'aktif'

@@ -30,7 +30,8 @@ $kelasTabel = $jenis === 'faq' ? 'a-informasi__tabel--faq' : 'a-informasi__tabel
     <?php if (!$daftar['data']): ?>
         <div class="a-informasi__kosong" role="status">Belum ada data. Gunakan tombol Tambah untuk membuat <?= esc($nama) ?> pertama.</div>
     <?php else: ?>
-        <div class="a-tabel-gulir" tabindex="0" aria-label="Tabel kelola informasi">
+        <div class="a-tabel-gulir" tabindex="0" role="region"
+            aria-label="Tabel kelola informasi dapat digulir">
             <table class="a-tbl a-tbl--cards a-informasi__tabel <?= esc($kelasTabel, 'attr') ?>">
                 <thead><tr>
                     <th scope="col"><?= esc($kolomJudul) ?></th><th scope="col">Status</th>

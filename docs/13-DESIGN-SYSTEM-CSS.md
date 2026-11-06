@@ -620,3 +620,7 @@ Daftar `informasi/kelola.php` menggunakan `a-tbl a-tbl--cards a-informasi__tabel
 ### A15 — Branding MTsN 4 Jombang pada halaman login (4 November 2026)
 
 Banner lokal WebP berasio 2048:763 menggantikan **gambar di dalam kotak ilustrasi**, tidak mengubah background seluruh halaman. Elemen responsif width min(100%,520px), radius 16px, object-fit cover dan tetap terlihat pada layar HP. Logo MTsN 4 Jombang yang diberikan pemilik dipakai pada a-identitas__mark--logo (publik/sidebar) dan a-proto-login-icon--madrasah (kartu login), serta favicon WebP yang sama. CTA login minimal 44px, tema Emerald Glass Dark/Light tetap; tanpa framework atau sumber gambar luar. Jangan mengubah gambar sertifikat, TTD ataupun data akademik untuk branding ini.
+
+## Addendum CSS Tahap 3 Batch 3 — 6 November 2026
+
+Tambahan di akhir `public/assets/css/emerald-glass.css` dibatasi pada kontainer panel `.a-app--prototipe` dan selector halaman `.a-pra-daftar`, `.a-pra-sesi-form`, `.a-sertifikat`, `.a-laporan`, serta `.a-informasi`. Gunakan `--vg-panel-line`, `--eg-pane-soft`, `--eg-state-positive`, `--eg-focus`, dan warna KPI yang sudah disetujui; **tanpa** framework, `!important`, posisi fixed baru, atau JS khusus. Filter Pra-Semester Admin menjadi 2 kolom di ≤980px dan 1 kolom di ≤620px; tombol tetap dapat dijangkau. Fokus keyboard pada region tabel gulir diberi ring; status dipastikan disertai label teks. Tombol Kembali ke Atas tetap lingkaran 48px dan panah tanpa teks visual. Kondisi Dark/Light dan ukuran 360/390/820/1100/1440px wajib diperiksa di XAMPP sebelum dinyatakan FIX.

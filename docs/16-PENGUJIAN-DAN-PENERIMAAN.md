@@ -785,3 +785,9 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 - Admin Kebijakan Privasi Baru: naskah contoh otomatis mengisi textarea tetapi tidak tersimpan sebelum klik Simpan Draf. Versi/tanggal perlu diperiksa. Tindakan Terbitkan hanya setelah pengesahan madrasah; publik tetap 503 sampai ada versi sah dengan tanggal berlaku yang tercapai.
 - Setelah terbit, halaman publik memperlihatkan naskah escaped, versi, tanggal WIB serta kontak resmi. Naskah draf tidak bocor ke publik. Riwayat dan hak akses tetap.
 - Uji otomatis A15LoginPrivasiBrandingTest, A13KontrakNotifikasiPrivasiTest, A13NotifikasiPrivasiDatabaseTest dan PHP lint wajib PASS; pengujian CI tidak menggantikan uji visual XAMPP.
+
+## Addendum QA Tahap 3 Batch 3 dan regresi integrasi — 6 November 2026
+
+- PR stabilisasi sesudah Batch 2 mengoreksi tiga *test expectation* CSS historis (A9/A14/A15) agar tidak menolak keputusan mencabut Mode Dokumentasi dan menerapkan tombol Kembali ke Atas fixed. Workflow QA Pra-Semester bernama dengan tanda kutip agar YAML dapat dieksekusi. Perubahan ini **tidak** boleh menghapus asersi fungsi/otorisasi yang masih berlaku.
+- Batch 3 menambahkan `VibrantGlassBatch3AuditTest.php` untuk kontrak filter Pra-Semester, CSS scoped, region gulir, semantik tabel, sertifikat, monitoring Pimpinan, Informasi, dan rute yang tetap ada. Workflow `qa-ui-batch3-integrasi.yml` menjalankan lint PHP, tes Batch 3 dan `tests/unit` lengkap. **CI bukan pengganti QA browser/DB XAMPP.**
+- Bukti penerimaan manual dicatat dalam `docs/QA-T3-BATCH3-INTEGRASI-20261106.md` berdasarkan role, kasus sukses/gagal, viewport, Dark/Light, dan ID E2E lintas fitur. Jangan mengklaim PASS untuk tes yang hanya ditulis tetapi belum dijalankan.
