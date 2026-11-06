@@ -791,3 +791,12 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 - PR stabilisasi sesudah Batch 2 mengoreksi tiga *test expectation* CSS historis (A9/A14/A15) agar tidak menolak keputusan mencabut Mode Dokumentasi dan menerapkan tombol Kembali ke Atas fixed. Workflow QA Pra-Semester bernama dengan tanda kutip agar YAML dapat dieksekusi. Perubahan ini **tidak** boleh menghapus asersi fungsi/otorisasi yang masih berlaku.
 - Batch 3 menambahkan `VibrantGlassBatch3AuditTest.php` untuk kontrak filter Pra-Semester, CSS scoped, region gulir, semantik tabel, sertifikat, monitoring Pimpinan, Informasi, dan rute yang tetap ada. Workflow `qa-ui-batch3-integrasi.yml` menjalankan lint PHP, tes Batch 3 dan `tests/unit` lengkap. **CI bukan pengganti QA browser/DB XAMPP.**
 - Bukti penerimaan manual dicatat dalam `docs/QA-T3-BATCH3-INTEGRASI-20261106.md` berdasarkan role, kasus sukses/gagal, viewport, Dark/Light, dan ID E2E lintas fitur. Jangan mengklaim PASS untuk tes yang hanya ditulis tetapi belum dijalankan.
+
+
+## Addendum penerimaan integrasi dan persiapan konsolidasi — 6 November 2026
+
+Hasil **smoke test UI lima kelompok** dinyatakan normal oleh pemilik setelah pull dan uji XAMPP. Bukti ini hanya mencakup pemeriksaan visual/navigasi singkat, **bukan** penutupan semua E2E. Pada branch Batch 3, **28 workflow CI PASS**, termasuk 715 tes unit; angka tersebut hanya berlaku untuk commit yang teruji.
+
+Gerbang finalisasi menambahkan `FinalisasiKontrakIntegrasiTest.php`: audit semua definisi rute terhadap filter peran, Controller/method, jalur akademik, CSRF global dan auto-routing. CI baru menjalankan uji riil Service pada database SQLite sintetis lalu suite unit penuh. Semua ini **tidak** membuktikan perilaku browser XAMPP atau MariaDB hosting.
+
+Matriks bukti dan skenario E2E yang masih memerlukan pemeriksaan tersedia di `docs/FINALISASI-KESIAPAN-RILIS-V25-20261106.md`. Sebelum menyatakan rilis siap, harus ada pemeriksaan otorisasi Gen, jalur Diagnostik–Sumatif, gangguan fullscreen/koneksi, Pra-Semester dan susulan, koreksi nilai/sertifikat, HTTP ROOT, serta backup/restore. Hasil PASS/FAIL/BLOCKED dicatat secara faktual; pengujian di shared hosting tetap belum ada. **Tidak boleh mengubah SQL atau data lokal tanpa dump terbaru.**
