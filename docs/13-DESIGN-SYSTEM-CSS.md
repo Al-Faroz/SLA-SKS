@@ -45,6 +45,19 @@ Blok CSS **VIBRANT GLASS PAGE AUDIT — TAHAP 3** ditempatkan setelah lapisan ko
 
 Visual QA XAMPP dan screenshot full-page tetap wajib sebelum Batch 1 dinyatakan FIX. Ini tidak mengubah proses akademik atau database.
 
+### Tahap 3 — BATCH 2: token Bank Soal & Penilaian Guru (5 November 2026)
+
+Blok di akhir `public/assets/css/emerald-glass.css` bertanda **VIBRANT GLASS PAGE AUDIT — BATCH 2**. Scoped pada `.a-guru-bank-soal`, `.a-penilaian-page--antrean`, `.a-penilaian-page--detail`, `.a-guru-soal-form`, `.a-guru-review-word`. Tidak mengubah editor WYSIWYG, HTML soal, kalkulator nilai, atau stylesheet shell.
+
+- **Ketersediaan soal:** dua kartu memakai `--vg-kpi-2/3-*` dan teks `--vg-kpi-ink` Dark/Light. Badge `.a-bank-soal__status.is-cukup` dibedakan dari `.is-kurang` memakai token status, tetapi makna tetap teks yang dikirim view. Tab jenis bank link server, akses `aria-current` tidak menjadi tombol palsu; KKM dan form Word mendapat border/spacing yang konsisten.
+- **Tabel bank:** pertanyaan dan tombol per soal lebih terbaca. `.a-bank-soal__scroll` merupakan region horizontal dengan `tabindex=0` dan label; pada <=980px tabel `a-tbl--cards` tetap menjadi kartu, hint scroll disembunyikan.
+- **Filter Penilaian:** lima filter di grid desktop, turun dua kolom pada <=1180px dan satu pada <=680px. Aksi/tautan serta pagination tetap menggunakan URL lama, tabel tetap scroll internal pada viewport kecil, dengan label area yang dapat difokuskan.
+- **Rincian skor:** `a-penilaian-petunjuk` dan `a-card--jawaban-siswa` tetap dua latar berbeda dari Master 13; `.a-penilaian-isi` dibuat lebih nyaman dibaca, form skor diberi garis/bingkai tanpa mengubah nama field, CSRF, tombol lanjut atau validasi server.
+- **Editor/Review Word:** `.a-guru-soal-form` hanya membenahi radio pilihan A–E, fokus, pembatas dan pratinjau; tidak membuat style berwarna di dalam SunEditor saat menyunting konten. `.a-guru-review-word` hanya memperjelas header review `details` dan keadaan dibuka. Pilihan benar, gambar, tabel dan rumus tetap dirender seperti sebelumnya.
+- **Kinerja dan responsif:** semua CSS hanya memakai token global dan pseudo-element ringan; tidak ada komponen fixed/sticky tambahan di area kerja. Form dan editor tetap solid, tanpa framework baru.
+
+Uji XAMPP nyata pada Dark/Light serta desktop/tablet/HP sebelum menyatakan Batch 2 FIX. Pemeriksaan statis tidak cukup untuk membuktikan tombol dan penilaian benar-benar berjalan.
+
 ### Token tema
 - Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
 - Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.

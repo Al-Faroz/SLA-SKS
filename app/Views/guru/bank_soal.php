@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/panel') ?>
 <?= $this->section('konten') ?>
-<div class="a-page a-guru-bank-soal">
+<div class="a-page a-guru-bank-soal a-guru-bank-soal--vibrant">
     <nav class="a-breadcrumb" aria-label="Breadcrumb">
         <a href="<?= esc(site_url('guru/peta-atp'), 'attr') ?>">Peta ATP</a>
         <span aria-hidden="true">/</span>
@@ -111,7 +111,8 @@
             <?php if (empty($daftar_soal)): ?>
                 <p class="a-help a-jarak-atas">Belum ada soal. Tambahkan langsung melalui aplikasi atau impor Word.</p>
             <?php else: ?>
-                <div class="a-tabel-gulir a-jarak-atas"><table class="a-tbl a-tbl--cards a-tbl--bank">
+                <p class="a-help a-bank-soal__scroll-hint">Geser tabel soal ke samping untuk melihat seluruh tindakan jika layar sempit.</p>
+                <div class="a-tabel-gulir a-jarak-atas a-bank-soal__scroll" tabindex="0" role="region" aria-label="Daftar soal <?= esc(ucfirst($jenis_dipilih), 'attr') ?> dapat digulir secara horizontal"><table class="a-tbl a-tbl--cards a-tbl--bank">
                     <thead><tr><th scope="col">Urutan</th><th scope="col">Pertanyaan</th><th scope="col">Status</th>
                         <th scope="col">Asal</th><th scope="col">Tindakan</th></tr></thead>
                     <tbody>

@@ -1,5 +1,22 @@
 # 16 — Pengujian dan Kriteria Penerimaan
 
+## Addendum QA UI — Vibrant Glass Tahap 3 Batch 2 (5 November 2026)
+
+Keputusan terbaru: screenshot full-page dilakukan pada shell normal dengan sidebar desktop **tanpa sticky/fixed**; tidak memakai tombol atau `data-documentation`. Butir uji historis di bawah yang masih meminta Mode Dokumentasi dianggap digantikan oleh ketentuan ini, bukan persyaratan penerimaan.
+
+**Matriks QA Batch 2:**
+
+| ID | Area | Pemeriksaan wajib |
+|---|---|---|
+| VG3B2-01 | Bank Soal | Tab Diagnostik/Sumatif dan jumlah/status nyata, kurang/cukup, halaman kosong, KKM bersama, soal aktif/nonaktif, paginasi 15 soal |
+| VG3B2-02 | Bank manual & Word | Tambah/sunting/pratinjau soal tanpa simpan, PG A–E, gambar/tabel/Arab/Equation; template Word, unggah, review nomor soal, konfirmasi eksplisit dan histori aman |
+| VG3B2-03 | Antrean Penilaian | Lima filter GET, status Belum/Sudah, link Nilai dan Koreksi, pagination mempertahankan filter; akses G1 tetap diverifikasi server |
+| VG3B2-04 | Rincian penilaian | Petunjuk snapshot dan jawaban final terpisah, skor sah 0–100, pesan validasi, Simpan & berikutnya, koreksi langsung dan riwayat audit |
+| VG3B2-05 | Visual & responsif | Dark/Light, collapsed/expanded, Chrome 1440/1100/820/390/360px, keyboard focus, tabel tidak mendorong body melebar, screenshot panjang tanpa Mode Dokumentasi |
+| VG3B2-06 | Regresi | Aksi upload/POST, CSRF, tab URL, nilai final dan akses peran tetap; tidak ada migrasi/DDL maupun perubahan data |
+
+Status awal semua skenario: **belum diuji XAMPP**. Jangan ditandai PASS hanya karena tes statis/PR dibuat.
+
 ## 1. Strategi
 Tiap fitur harus lolos: **uji aturan bisnis di Service, uji integrasi DB, uji endpoint & hak akses, uji browser desktop/HP, uji keamanan URL**, serta verifikasi perilaku sukses dan gagal. PHPUnit untuk kode server; browser testing dapat memakai Playwright bila fasilitas lokal tersedia. **Jangan mewajibkan test runner Node/daemon pada shared hosting**, pengujian dijalankan sebelum deploy.
 
