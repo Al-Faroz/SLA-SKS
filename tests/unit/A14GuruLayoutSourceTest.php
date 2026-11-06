@@ -72,10 +72,18 @@ final class A14GuruLayoutSourceTest extends TestCase
             '@media(max-width:900px)','@media(max-width:640px)'] as $s){
             self::assertStringContainsString($s,$css);
         }
-        $a143=substr($css,strpos($css,'A14-3 / Guru'));
+        // Periksa hanya blok A14-3; tombol kembali ke atas di shell baru
+        // memang harus fixed, namun sidebar dan halaman Guru tidak demikian.
+        $start=strpos($css,'A14-3 / Guru');
+        $end=strpos($css,'/* A15 — identitas MTsN', $start === false ? 0 : $start);
+        self::assertNotFalse($start);
+        self::assertNotFalse($end);
+        $a143=substr($css,$start,$end-$start);
         self::assertStringNotContainsString('!important',$a143);
         self::assertStringNotContainsString('position:fixed',$a143);
         self::assertStringNotContainsString('background:#fff',$a143);
+        self::assertStringContainsString('html[data-theme] .a-app--prototipe .a-side {', $css);
+        self::assertStringContainsString('position:static;', $css);
     }
 
     public function testQaMariaDbMenghindariTlsWajibHanyaPadaRunnerLoopback(): void

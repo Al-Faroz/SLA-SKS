@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Galeri Komponen SLA-SKS · Emerald Glass v2.5</title>
+    <title>Galeri Komponen SLA-SKS · Vibrant Glass v2.5</title>
     <script src="../../public/assets/js/theme-init.js"></script>
     <script defer src="../../public/assets/js/app.js"></script>
     <link rel="stylesheet" href="../../public/assets/css/app.css">
@@ -12,11 +12,36 @@
 <body>
 <main class="a-main__konten">
     <header>
-        <p class="a-kicker">Dokumentasi desain · Emerald Glass UI v2.5</p>
+        <p class="a-kicker">Dokumentasi desain · Vibrant Glass UI v2.5</p>
         <h1>Galeri Komponen SLA-SKS</h1>
         <p class="a-help">Contoh visual statis, bukan layar aplikasi. Galeri memuat <code>app.css</code> dan <code>emerald-glass.css</code>; pemeriksaan layout panel sebenarnya tetap dilakukan di XAMPP. Tombol contoh tidak disajikan sebagai aksi aplikasi.</p>
     </header>
     <div class="a-galeri-grid">
+        <section class="a-card a-galeri-vg-kpi" aria-labelledby="galeri-vg-judul">
+            <h2 id="galeri-vg-judul">Enam kartu KPI — Vibrant Glass</h2>
+            <p class="a-help">Contoh palet komponen lintas peran. Tidak berisi angka aplikasi nyata. Di Dark Mode warna lebih pekat; pada Light Mode warnanya pastel dengan teks kontras.</p>
+            <div class="a-galeri-vg-kpi__grid">
+                <article class="a-galeri-vg-kpi__item"><strong>01 · Emerald</strong><small>Ringkasan &amp; pembelajaran</small></article>
+                <article class="a-galeri-vg-kpi__item"><strong>02 · Teal</strong><small>Aktivitas &amp; informasi</small></article>
+                <article class="a-galeri-vg-kpi__item"><strong>03 · Blue Emerald</strong><small>Capaian &amp; monitoring</small></article>
+                <article class="a-galeri-vg-kpi__item"><strong>04 · Violet</strong><small>Penilaian &amp; evaluasi</small></article>
+                <article class="a-galeri-vg-kpi__item"><strong>05 · Amber Olive</strong><small>Perlu perhatian</small></article>
+                <article class="a-galeri-vg-kpi__item"><strong>06 · Rose Plum</strong><small>Informasi pendamping</small></article>
+            </div>
+            <p class="a-help">Warna hanya penekanan dekoratif; status akademik selalu disertai teks. Enam gradient kartu Semester resmi tidak berubah.</p>
+        </section>
+        <section class="a-card a-galeri-v3" aria-labelledby="galeri-audit-rekap">
+            <h2 id="galeri-audit-rekap">Audit halaman · Rekap Nilai TP, Kelola TP, dan Akun Admin</h2>
+            <p class="a-help">Empat metrik Rekap Nilai menggunakan warna dekoratif dari KPI bersama; jenis informasi tetap ditulis. Tanda pisah adalah contoh, bukan nilai siswa atau pengukuran aplikasi.</p>
+            <dl class="a-galeri-v3__metrics" aria-label="Contoh empat metrik">
+                <div><dt>Siswa dalam Gen</dt><dd>—</dd></div>
+                <div><dt>Nilai Final</dt><dd>—</dd></div>
+                <div><dt>Nilai Sementara</dt><dd>—</dd></div>
+                <div><dt>Belum Ada Nilai</dt><dd>—</dd></div>
+            </dl>
+            <p class="a-help">Kelola TP: setiap section memiliki aksen judul, status Siap/Draf pada panel kesiapan, dan Step Progress tetap berasal dari Service. Akun Admin: tambah akun di atas tabel, filter dan ekspor dipisahkan secara visual.</p>
+            <p class="a-help">Contoh hanya untuk tinjauan warna. Aksi sebenarnya dan screenshot full-page tetap diuji pada halaman aplikasi di XAMPP.</p>
+        </section>
         <section class="a-card">
             <h2>Tombol dan label</h2>
             <p><span class="a-btn a-btn--utama">Tombol utama</span> <span class="a-btn a-btn--sekunder">Sekunder</span> <span class="a-btn a-btn--bahaya">Bahaya</span></p>
@@ -24,10 +49,12 @@
             <p><span class="a-badge a-badge--siap">Siap</span> <span class="a-badge a-badge--tunggu">Menunggu</span> <span class="a-badge a-badge--bahaya">Ditolak</span></p>
         </section>
         <section class="a-card">
-            <h2>Mode Dokumentasi — screenshot halaman panjang</h2>
-            <p class="a-help">Pada panel Admin/Guru/Siswa/Pimpinan tersedia tombol kamera <strong>Dokumentasi</strong> di header. Saat aktif, menu samping berubah dari sticky menjadi statis, scroll khusus sidebar dan efek blur kaca dinonaktifkan sementara. Mode tetap aktif ketika berpindah halaman dalam tab yang sama, lalu tekan <strong>Selesai</strong> untuk kembali ke tampilan biasa.</p>
-            <p><span class="a-btn a-btn--sekunder">Dokumentasi (contoh)</span> <span class="a-btn a-btn--utama">Selesai (contoh aktif)</span></p>
-            <p class="a-help">Komponen di galeri ini hanya contoh visual; tombol sebenarnya berada di header aplikasi. Screenshot full-page tetap dilakukan melalui ekstensi/browser.</p>
+            <h2>Vibrant Glass — shell desktop dan mobile</h2>
+            <p class="a-help">Kontrak visual: background deep forest navy, sidebar Dark pekat / Light mint, header serasi, dan konten dalam kolom Grid terpisah. Sidebar desktop tidak sticky sehingga halaman panjang ditangkap dalam tampilan normal.</p>
+            <p><span class="a-badge a-badge--siap">Desktop 240px / 72px</span> <span class="a-badge">HP: drawer</span></p>
+            <p class="a-help">Saat halaman desktop digulir jauh, tombol <strong>Kembali ke Atas</strong> tersedia agar navigasi dapat diakses kembali. Di bawah hanya contoh tampilan tombol, bukan aksi aktif.</p>
+            <p><span class="a-btn a-btn--utama">↑ Kembali ke Atas (contoh)</span></p>
+            <p class="a-help">Tidak ada Mode Dokumentasi. Screenshot full-page langsung diperiksa di XAMPP dengan alat yang digunakan.</p>
         </section>
         <section class="a-card">
             <h2>Kartu dan progres</h2>

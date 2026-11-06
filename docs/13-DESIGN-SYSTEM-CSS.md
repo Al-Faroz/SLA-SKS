@@ -7,6 +7,57 @@
 
 Nama: **Emerald Glass Academic UI**. Default DARK, LIGHT opsional, CSS kustom + JS native, empat peran satu shell. Master 12 mengatur perilaku; bagian ini supersede palet default terang pada bagian historis berikutnya. Tidak boleh mengubah hierarki Mapel–CP–Semester–BAB–TP.
 
+### Pembaruan visual shell final — 5 November 2026 (menggantikan hanya bagian yang konflik)
+
+**Vibrant Glass · Navy–Emerald Hybrid / Tabler-inspired** adalah desain terpilih. Ini memperbarui aturan background/sidebar/header dari Emerald Glass 27 Oktober, tanpa mengubah kontrak akademik atau semantik komponen lain.
+
+- Dark: --e-bg deep forest navy (gradient #040E14 → #07181D → #09251D), sidebar gradient gelap rgba(7,26,31,.97) → rgba(5,30,26,.97), header rgba(7,25,30,.94), glows emerald/cyan/violet beropacity rendah; emerald menjadi identitas utama.
+- Light: off-white kehijauan sebagai kanvas, sidebar mint #EDF7F2 → #DDEDE5 dengan teks #183F34, header putih hampir solid. Latar menu aktif tetap hijau lembut, teks gelap. Dark sidebar berteks putih/hijau sangat muda.
+- Semua warna shell dan menu dipetakan melalui token --eg-*; tombol primary tetap gradient Indigo–Violet dan enam kartu semester tidak berubah. Kode antarmuka tetap memakai a- serta CSS kustom + JS native.
+- **Grid dan screenshot:** .a-app--prototipe memisahkan sidebar 240/72px dari .a-main memakai minmax(0,1fr). Pada desktop sidebar position:static, height:auto, overflow:visible, tanpa sub-scroll/sticky/fixed. Header juga tidak sticky; shell header/sidebar tidak memakai blur compositor agar full-page lebih stabil. Glow dekoratif kecil tetap boleh pada panel terpilih. HP tetap drawer fixed.
+- **Kembali ke Atas**: data-back-to-top berada di panel bersama, tombol baru terlihat bila scroll desktop mencapai 440px; click memakai scroll smooth atau auto untuk prefers-reduced-motion. Tidak muncul di HP, permukaan print, atau halaman publik/ujian.
+- **Mode Dokumentasi dicabut:** hapus tombol header, JS sessionStorage toggle, data attribute serta selector CSS mode tersebut. Riwayat spesifikasi di bagian bawah dokumen disimpan untuk audit, tetapi tidak berlaku pada desain baru.
+- Galeri docs/assets/galeri-komponen.html harus memperlihatkan prinsip shell dan menghapus instruksi Mode Dokumentasi. Semua fungsi/form/CSRF/otorisasi tetap milik sistem yang sudah berjalan; tidak membuat widget atau backend palsu.
+
+**QA penerimaan wajib (belum otomatis PASS):** XAMPP Chrome 360/390/768/820/1100/1440, Dark/Light, collapsed/expanded, long content, menu drawer/Tab/Escape, kondisi kosong dan validasi, screenshot native full-page dan ekstensi pengguna; pastikan tidak ada layout overlap, body horizontal scroll ataupun hilang menu. Bila hasil screenshot ekstensi masih berbeda, analisis penyebab spesifik sebelum mengubah struktur layout.
+
+### Tahap 2 — Token komponen Vibrant Glass lintas peran (5 November 2026)
+
+`public/assets/css/emerald-glass.css` menyimpan blok bertanda **VIBRANT GLASS COMPONENT SYSTEM — TAHAP 2** sebagai lapisan komponen selama transisi; tetap satu stylesheet tema bersama, bukan stylesheet terpisah per peran. Konsolidasi total `app.css` dan lapisan tema dilakukan setelah QA visual.
+
+- `--vg-kpi-1..6-{bg,line,accent,muted}`: enam tint untuk KPI berdasarkan urutan kartu dengan **masing-masing 2 set Dark/Light**. Dark memakai permukaan forest/navy–teal–blue–violet–amber–rose pekat dan teks #F3FAF8; Light memakai pastel emerald/teal/blue/violet/amber/rose dengan teks #173B33. Kontras teks pendamping pada warna solid endpoint gradasi diuji secara matematis ≥4,5:1; verifikasi render browser tetap wajib.
+- `--vg-panel-line/shadow`, `--vg-control-bg/line/hover`, `--vg-secondary-bg/hover/line`, `--vg-table-line/shadow`, `--vg-danger-bg` mengikat panel, field, tombol, dan tabel. Primary tetap `--eg-cta-*`. Status yang telah diterbitkan oleh service tetap memiliki teks/status; warna KPI tidak menentukan status akademik.
+- Sekumpulan selector `:is(.a-proto-metric,.a-dashboard-admin__metric,.a-dashboard-guru__metric,.a-dashboard-pimpinan__metric,.a-dashboard-siswa__metric)` dibatasi pada `.a-app--prototipe` agar tidak memengaruhi login/publik atau ujian. Kartu Semester `.a-atp-kartu` tetap memakai enam gradient resminya.
+- Form menggunakan `.a-page .a-field` dan mengecualikan `input[type=file/hidden/checkbox/radio/submit/button/reset]`. Form invalid dan fokus keyboard tetap terlihat. Tabel dalam `.a-page .a-tabel-gulir` memakai border dan shadow kecil; padding desktop hanya mulai 981px agar tabel-kartu mobile tetap aman.
+- Komponen galeri `.a-galeri-vg-kpi__grid` menunjukkan enam contoh warna noninteraktif pada Dark/Light.
+
+Tidak ada perubahan SQL, controller, rute, penilaian, unduhan, editor WYSIWYG, PDF, ujian fullscreen, atau data pengguna. QA XAMPP dan screenshot panjang tetap prasyarat FIX.
+
+### Tahap 3 — Audit visual terarah per halaman, Batch 1 (5 November 2026)
+
+Blok CSS **VIBRANT GLASS PAGE AUDIT — TAHAP 3** ditempatkan setelah lapisan komponen Tahap 2 di public/assets/css/emerald-glass.css. Override aplikasi dibatasi pada tiga scope: .a-rekap-page--tp, .a-guru-detail-tp dan .a-admin-akun; galeri memakai .a-galeri-v3. Tidak ada stylesheet per role atau modul.
+
+- Empat KPI Rekap memakai token --vg-kpi-3 (Siswa), --vg-kpi-1 (Final), --vg-kpi-5 (Sementara), --vg-kpi-6 (Belum Ada). Warna dekoratif tidak menggantikan semantik Final/Sementara/Belum Ada. Semua memakai --vg-kpi-ink untuk teks Dark/Light.
+- Tabel Rekap mempertahankan minimum width dan scroll sendiri, tipografi sedikit lebih besar untuk siswa/TP, serta petunjuk scroll jelas. Screenshot full-page menilai pemisahan sidebar-konten, bukan memaksakan semua kolom tabel lebar terlihat serentak.
+- Kelola TP memakai aksen judul via pseudo-element, pemisah form Materi, serta border status Siap/Draf pada panel kesiapan. View menambah kelas a-tp-penutup--siap hanya saat status TP dari server siap; tidak ada perhitungan status akademik baru.
+- Admin Akun memakai panel filter dengan border/spacing, fieldset semantik peran staf, panel XLSX serta tabel lebih terbaca. Jangan mengubah elemen form atau perilaku a-tbl--cards pada mobile.
+- Responsif: tidak menambah sticky/fixed pada shell/tabel; target tombol minimal 40–44px; focus outline/aria/CSRF tetap; padding sel tabel Pengelola dibatasi pada lebar >=981px. Galeri 4 KPI menjadi 2/1 kolom pada <=820/420px.
+
+Visual QA XAMPP dan screenshot full-page tetap wajib sebelum Batch 1 dinyatakan FIX. Ini tidak mengubah proses akademik atau database.
+
+### Tahap 3 — BATCH 2: token Bank Soal & Penilaian Guru (5 November 2026)
+
+Blok di akhir `public/assets/css/emerald-glass.css` bertanda **VIBRANT GLASS PAGE AUDIT — BATCH 2**. Scoped pada `.a-guru-bank-soal`, `.a-penilaian-page--antrean`, `.a-penilaian-page--detail`, `.a-guru-soal-form`, `.a-guru-review-word`. Tidak mengubah editor WYSIWYG, HTML soal, kalkulator nilai, atau stylesheet shell.
+
+- **Ketersediaan soal:** dua kartu memakai `--vg-kpi-2/3-*` dan teks `--vg-kpi-ink` Dark/Light. Badge `.a-bank-soal__status.is-cukup` dibedakan dari `.is-kurang` memakai token status, tetapi makna tetap teks yang dikirim view. Tab jenis bank link server, akses `aria-current` tidak menjadi tombol palsu; KKM dan form Word mendapat border/spacing yang konsisten.
+- **Tabel bank:** pertanyaan dan tombol per soal lebih terbaca. `.a-bank-soal__scroll` merupakan region horizontal dengan `tabindex=0` dan label; pada <=980px tabel `a-tbl--cards` tetap menjadi kartu, hint scroll disembunyikan.
+- **Filter Penilaian:** lima filter di grid desktop, turun dua kolom pada <=1180px dan satu pada <=680px. Aksi/tautan serta pagination tetap menggunakan URL lama, tabel tetap scroll internal pada viewport kecil, dengan label area yang dapat difokuskan.
+- **Rincian skor:** `a-penilaian-petunjuk` dan `a-card--jawaban-siswa` tetap dua latar berbeda dari Master 13; `.a-penilaian-isi` dibuat lebih nyaman dibaca, form skor diberi garis/bingkai tanpa mengubah nama field, CSRF, tombol lanjut atau validasi server.
+- **Editor/Review Word:** `.a-guru-soal-form` hanya membenahi radio pilihan A–E, fokus, pembatas dan pratinjau; tidak membuat style berwarna di dalam SunEditor saat menyunting konten. `.a-guru-review-word` hanya memperjelas header review `details` dan keadaan dibuka. Pilihan benar, gambar, tabel dan rumus tetap dirender seperti sebelumnya.
+- **Kinerja dan responsif:** semua CSS hanya memakai token global dan pseudo-element ringan; tidak ada komponen fixed/sticky tambahan di area kerja. Form dan editor tetap solid, tanpa framework baru.
+
+Uji XAMPP nyata pada Dark/Light serta desktop/tablet/HP sebelum menyatakan Batch 2 FIX. Pemeriksaan statis tidak cukup untuk membuktikan tombol dan penilaian benar-benar berjalan.
+
 ### Token tema
 - Dark: wallpaper linear-gradient(145deg, #031A13, #052C20 52%, #004225); text #F0F8F3, muted #B3CFC0, mint #50DEAC, coral #FF777C, amber #FFD166, blue #80BBFF, violet #D1A7FF.
 - Light: background off-white kehijauan #F3F8F5, teks gelap #19382D, garis #CCDDD3; aksen dibuat lebih gelap agar terbaca.
@@ -569,3 +620,7 @@ Daftar `informasi/kelola.php` menggunakan `a-tbl a-tbl--cards a-informasi__tabel
 ### A15 — Branding MTsN 4 Jombang pada halaman login (4 November 2026)
 
 Banner lokal WebP berasio 2048:763 menggantikan **gambar di dalam kotak ilustrasi**, tidak mengubah background seluruh halaman. Elemen responsif width min(100%,520px), radius 16px, object-fit cover dan tetap terlihat pada layar HP. Logo MTsN 4 Jombang yang diberikan pemilik dipakai pada a-identitas__mark--logo (publik/sidebar) dan a-proto-login-icon--madrasah (kartu login), serta favicon WebP yang sama. CTA login minimal 44px, tema Emerald Glass Dark/Light tetap; tanpa framework atau sumber gambar luar. Jangan mengubah gambar sertifikat, TTD ataupun data akademik untuk branding ini.
+
+## Addendum CSS Tahap 3 Batch 3 — 6 November 2026
+
+Tambahan di akhir `public/assets/css/emerald-glass.css` dibatasi pada kontainer panel `.a-app--prototipe` dan selector halaman `.a-pra-daftar`, `.a-pra-sesi-form`, `.a-sertifikat`, `.a-laporan`, serta `.a-informasi`. Gunakan `--vg-panel-line`, `--eg-pane-soft`, `--eg-state-positive`, `--eg-focus`, dan warna KPI yang sudah disetujui; **tanpa** framework, `!important`, posisi fixed baru, atau JS khusus. Filter Pra-Semester Admin menjadi 2 kolom di ≤980px dan 1 kolom di ≤620px; tombol tetap dapat dijangkau. Fokus keyboard pada region tabel gulir diberi ring; status dipastikan disertai label teks. Tombol Kembali ke Atas tetap lingkaran 48px dan panah tanpa teks visual. Kondisi Dark/Light dan ukuran 360/390/820/1100/1440px wajib diperiksa di XAMPP sebelum dinyatakan FIX.

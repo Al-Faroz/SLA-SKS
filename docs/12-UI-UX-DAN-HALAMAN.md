@@ -18,6 +18,56 @@
 
 Rincian palet, token dan komponen berada di Master Document 13. Ketentuan lama di bawah tetap berlaku sepanjang tidak bertentangan dengan v2.5 dan kontrak UI ini.
 
+## 0A. Keputusan implementasi UI final — Vibrant Glass / Tabler-inspired (5 November 2026)
+
+Keputusan pemilik **menggantikan hanya ketentuan visual/layout Emerald Glass 27 Oktober 2026 yang bertentangan**. Alur, hak akses, rute, data, status akademik, struktur 4 peran dan enam gradient semester **tidak berubah**. Tabler UI adalah **referensi prinsip tata letak**, bukan dependensi atau kode template yang dipasang.
+
+- **Identitas:** Vibrant Glass dengan palet *deep forest navy* sangat gelap sebagai background, permukaan navy–emerald, aksen emerald sebagai identitas MTsN 4 Jombang, dan variasi cyan/violet untuk kartu. Primary tetap Indigo–Violet. Dark default; Light menggunakan sidebar **mint/off-white** dengan teks hijau gelap dan header putih; keduanya konsisten dengan tema.
+- **Desktop:** CSS Grid dua kolom, sidebar expanded sekitar 240px / collapsed sekitar 72px. Sidebar berada **dalam alur dokumen normal** (bukan sticky/fixed), sehingga halaman panjang tidak masuk ke area navigasi saat tangkapan full-page. Sidebar ikut tergulir; pada desktop tampil tombol **Kembali ke Atas** setelah pengguna menggulir untuk mempermudah akses menu. Tidak perlu Mode Dokumentasi.
+- **Mobile ≤767px:** sidebar menjadi drawer fixed hanya ketika dibuka, dengan backdrop, fokus terjaga, Escape, dan scroll lock. Tombol Kembali ke Atas khusus desktop disembunyikan pada HP.
+- **Komposisi:** glassmorphism terbatas pada shell/hero/ringkasan; tabel, form, editor, materi dan ujian tetap semi-solid/solid dan terbaca. Kartu tidak ditumpuk berlebihan, tombol status semantik, fokus keyboard/kontras Dark/Light wajib.
+- **Screenshot:** gunakan tampilan aplikasi normal, tanpa mode penangkapan khusus. Pemeriksaan manual wajib pada halaman panjang, Chrome Capture Full Size dan alat screenshot pengguna, sidebar dua keadaan, Dark/Light, serta responsif 360/390/768/820/1100/desktop. **Penghapusan solusi sementara bukan klaim otomatis semua ekstensi screenshot pasti berhasil.**
+- **Migrasi bertahap:** tahap fondasi shell/tema/tombol dipisah dari pekerjaan konsolidasi komponen dan seluruh halaman. Belum mengubah index.php, .htaccess, .env, SQL, rute, autentikasi, maupun proses belajar. Tahap UI hanya disebut FIX setelah pengujian XAMPP oleh pemilik.
+
+**Catatan riwayat:** petunjuk Mode Dokumentasi dalam catatan bertanggal 2–4 November di bawah adalah **riwayat solusi sementara yang sudah dicabut**, bukan persyaratan UI aktif. Tombol, data-documentation, sessionStorage key terkait, dan CSS khususnya dihapus pada tahap ini.
+
+## 0B. Tahap 2 — Standarisasi Komponen Vibrant Glass (5 November 2026)
+
+Tahap ini melanjutkan **fondasi shell yang telah ditinjau pemilik melalui screenshot XAMPP Dark dan Light**. Perubahan hanya presentasi; tidak mengganti label, nilai, data/filter yang berasal dari server, perilaku form, CSRF, URL, atau aturan pembelajaran.
+
+1. **KPI empat peran:** kelas `a-proto-metric` (Admin), `a-dashboard-admin__metric`, `a-dashboard-guru__metric`, `a-dashboard-siswa__metric`, dan `a-dashboard-pimpinan__metric` memakai pola dekoratif enam aksen yang selaras: Emerald, Teal, Blue Emerald, Violet, Amber Olive, dan Rose Plum. Urutannya berdasarkan posisi kartu, bukan status; angka/progres harus tetap mencerminkan data server. Dark memakai tint lebih dalam, Light memakai pastel dengan teks gelap. **Enam kartu semester Peta ATP yang sudah FIX tidak berubah.**
+2. **Panel dan ruang kerja:** border dan depth konsisten tanpa membuat semua kartu berwarna. Form, tabel, bank soal, editor, materi, hasil ujian dan pengaturan tetap memakai permukaan lebih solid agar nyaman dibaca.
+3. **Kontrol:** label, input/select/textarea, focus ring, invalid state, tombol primary Indigo–Violet, secondary yang terlihat pada latar Light/Dark, danger, tabel, header, border serta empty state memakai token. Tidak mengubah field `hidden`, `file`, checkbox/radio, tombol submit, atau komponen editor menjadi input bergaya yang salah.
+4. **Responsif:** tabel lebar tetap digulir dalam kontainer dan tabel kartu mobile tetap mengikuti aturan historis; breakpoint 981px membatasi perubahan kepadatan sel desktop. Tidak menambah horizontal scroll pada body, tidak merusak sidebar tahap 1.
+5. **Galeri:** enam KPI contoh di `docs/assets/galeri-komponen.html` memakai token yang sama. Hanya contoh statis, bukan angka atau status aktual.
+6. **Regresi:** tes lama Mode Dokumentasi diselaraskan dengan keputusan pencabutannya, tes statis komponen baru tersedia. Pemeriksaan statis bukan pengganti QA visual XAMPP.
+
+**Penerimaan Tahap 2:** uji Admin Dashboard, Guru Dashboard/Peta ATP/Bank Soal/Antrean Penilaian, Siswa Dashboard/Materi, Pimpinan Dashboard, Dark+Light, desktop/sidebar collapsed, 820/390/360px, validasi form, tabel panjang, klik yang aktif, serta screenshot full-page tanpa Mode Dokumentasi. Belum dinyatakan FIX sampai diverifikasi pemilik.
+
+## 0C. Tahap 3 — Audit Konsistensi Visual per Halaman, Batch 1 (5 November 2026)
+
+**Cakupan:** Guru Rekap Nilai TP, Guru Kelola TP, Admin Pengelola/Siswa. Tahap ini hanya presentasi; tidak mengubah sumber angka, status siswa, ekspor, aksi penilaian, validasi, route, CSRF, akses peran, atau algoritme pemenuhan TP.
+
+1. **Rekap Nilai TP:** empat kartu mengikuti KPI Vibrant Glass: Siswa Gen Blue Emerald, Final Emerald, Sementara Amber Olive, Belum Ada Rose Plum. Status tetap berupa teks dan angka dari server. Tidak mengubah arti Selesai TP versus Nilai Final, atau nilai 0 versus Belum Ada; ekspor XLSX tetap dapat dilakukan meski baru satu nilai. Grid responsif serta scroll horizontal tabel 10 kolom dipertahankan; jarak/ukuran teks pada identitas siswa, BAB/TP dan petunjuk scroll diperhalus.
+2. **Kelola TP Guru:** identitas lima bidang tetap ringkas; Step Progress menunjukkan hasil Service. Header Data TP, Satu Materi, Diagnostik/Sumatif dan Pemeriksaan Kesiapan memperoleh aksen terarah. Panel kesiapan memiliki pembeda Siap/Draf berdasarkan nilai status server, bukan hitungan baru. Form/editor media tetap di halaman, bukan modal; field, POST/CSRF dan upload tetap.
+3. **Admin Pengelola dan Siswa:** form Tambah tetap penuh di atas daftar. Filter, panel template/impor/ekspor Excel dan tabel dipisahkan lewat spacing, border dan label teratur. Tabel responsif tetap memiliki aksi per baris; tidak mengubah pagination, penempatan Gen atau sandi.
+4. **Dipertahankan:** sidebar desktop normal-flow, tombol Kembali ke Atas, Dark/Light, primary Indigo–Violet, enam kartu semester Peta ATP, dan komponen/fokus keyboard Tahap 2.
+5. **Galeri:** empat KPI contoh tanpa angka atau data akun/siswa nyata. CSS scoped ditambahkan ke emerald-glass.css; konsolidasi total stylesheet ditunda agar regresi terbatas.
+
+**QA sebelum FIX:** Rekap TP filter, XLSX, tabel panjang, keadaan kosong; Kelola TP Draf/Siap/terkunci, media/soal, fokus/validasi; Admin Pengelola/Siswa tambah, filter, impor/ekspor, paginasi, aksi per baris. Dark/Light; sidebar expanded/collapsed; 1440/1100/820/390/360px dan screenshot full-page. Pemeriksaan statis bukan pengganti XAMPP.
+
+## 0D. Tahap 3 — Batch 2: Bank Soal dan Antrean Penilaian Guru (5 November 2026)
+
+Cakupan implementasi: Bank Soal Diagnostik/Sumatif TP NonEsensial, daftar Antrean Penilaian Resume/HOTS, rincian penilaian, editor soal manual dan halaman review Word. **Ini audit presentasi saja**; aturan akademik, stok dan validitas bank, KKM, penugasan G1, transaksi nilai, izin koreksi, snapshot, impor/konfirmasi dan rute tetap berdasarkan Service/Controller yang sudah ada.
+
+1. **Bank Soal:** ringkasan dua jenis tampil di atas, kedua kartu mempunyai aksen lembut dan **status jumlah soal tetap tekstual**; kecukupan jumlah bukan kesiapan final soal. Tab Diagnostik/Sumatif tetap link server per `jenis`, dengan tab aktif jelas; daftar soal, paginasi, form KKM tunggal dan Word hanya menampilkan jenis yang dipilih. Editor lima opsi A–E, tombol Pratinjau vs Simpan, gambar/Equation/tabel dalam SunEditor tetap berfungsi; status aktif dan tindakan per baris tidak diubah.
+2. **KKM dan Word:** KKM tetap satu nilai untuk Diagnostik/Sumatif, nilai default Admin/khusus Guru serta efek status Siap/Draf mengikuti server. Unduh template Word, unggah staging privat, review per nomor dan konfirmasi tetap **proses terpisah**. Bingkai input, tabel, status, tombol dan panel review diseragamkan Dark/Light tanpa memodifikasi sanitasi HTML, kunci, media atau WYSIWYG.
+3. **Antrean Penilaian Guru:** filter Gen–Mapel, Semester, BAB, Jenis Tugas, Status Belum/Sudah ditata 5 kolom adaptif (2 pada tablet, 1 pada HP), tetapi request `GET`, pergantian filter dan pagination mengikuti server. Daftar menampilkan aksi **Nilai jawaban** bagi belum dinilai dan **Koreksi Nilai** bagi sudah dinilai; akses Guru G1/koreksi langsung dan audit tidak diubah.
+4. **Rincian Resume/HOTS:** Petunjuk snapshot Materi dan Jawaban final siswa tetap dua kartu berbeda dengan permukaan kontras. Area skor 0–100, umpan balik, simpan/berikutnya serta tautan koreksi langsung tetap sesuai izin dan data server. Nilai 0 valid; tidak menghitung atau menerbitkan nilai final secara otomatis dari perubahan visual.
+5. **Batasan:** tidak mengubah SQL, controller, service, routes, file upload, renderer Word, keselamatan data dan hak akses. Shell tetap desktop non-sticky dengan screenshot full-page biasa; tidak memunculkan kembali Mode Dokumentasi.
+
+**QA sebelum FIX:** uji Bank Soal Diagnostik/Sumatif, jumlah kurang/cukup, Draf/Siap, KKM Admin/Guru, daftar kosong/paginasi, tambah/pratinjau/simpan soal, Word unduh–unggah–review–konfirmasi; Antrean filter 5 dimensi, belum/sudah, nilainya, koreksi langsung, scroll tabel, detail 2 panel, validasi nilai dan aksi. Uji Dark/Light, sidebar 240/72, 1440/1100/820/390/360px, tab/keyboard/fokus, full-page screenshot dan fungsi di XAMPP. Semua perubahan UI ini memerlukan verifikasi manual sebelum FIX.
+
 ## 1. Prinsip wajib
 UI menggunakan **bahasa Indonesia** yang konsisten: kata kerja jelas, tombol utama tunggal per layar, status dan alasan terkunci, pesan galat memberi solusi, *loading/success/empty/error/permission-denied*, konfirmasi untuk aksi permanen, *breadcrumbs* pada halaman dalam, dan tidak ada tombol yang tidak punya endpoint. Desain mobile-first untuk siswa, desktop-first untuk editor kompleks Guru/Admin, responsif sampai 360 px. Siswa diberi pengalaman pembelajaran yang menarik, ruang ujian tenang; tidak ada papan peringkat/streak/poin. Empat dashboard tidak berarti empat sistem CSS berbeda.
 
@@ -478,3 +528,7 @@ Keputusan pemilik: kotak ilustrasi semu di bawah teks pembuka login diganti deng
 Logo sumber LogoFlat.png digunakan sebagai WebP lokal pada header publik, sidebar panel, kartu login dan favicon. Banner ringan, aspect ratio asli dan tetap terlihat di HP; Dark/Light mengikuti Emerald Glass.
 
 Naskah **contoh umum** untuk Kebijakan Privasi terisi hanya pada editor Admin untuk **draf baru**, bukan otomatis diterbitkan: Admin memeriksa praktik aktual, mengisi versi dan tanggal berlaku, memperoleh pengesahan lembaga, lalu menyimpan Draf dan menerbitkan. Halaman publik tetap hanya membaca versi Terbit yang berlaku WIB. Database dan mekanisme audit tidak diubah.
+
+## Addendum UI Tahap 3 Batch 3 — 6 November 2026
+
+Penyelarasan visual **Pra-Semester Admin/Guru**, detail jadwal remedial/susulan, **Sertifikat Admin/Siswa**, **Monitoring Pimpinan** dan **Informasi & Bantuan** memakai token Vibrant Glass Navy–Emerald Dark/Light. Berkas UI yang sudah mempunyai `a-pra-*`, `a-sertifikat__*`, `a-laporan__*`, `a-informasi__*` dipertahankan; perubahan hanya styling scoped, semantik tabel `scope="row"`, nama tombol Unduh PDF spesifik, dan region gulir yang dapat difokus. Filter, URL GET/POST, CSRF, bank, jadwal, nilai, status sertifikat, dan izin tetap berasal dari Service. Mode Dokumentasi **tetap dicabut** pada Tahap 1, sehingga referensi historis dalam dokumen ini tidak boleh diaktifkan ulang. QA XAMPP dan regresi E2E mengikuti `docs/QA-T3-BATCH3-INTEGRASI-20261106.md`. Branch Batch 3 tetap Draft hingga pengujian pemilik.

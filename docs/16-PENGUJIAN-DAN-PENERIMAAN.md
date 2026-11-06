@@ -1,5 +1,22 @@
 # 16 — Pengujian dan Kriteria Penerimaan
 
+## Addendum QA UI — Vibrant Glass Tahap 3 Batch 2 (5 November 2026)
+
+Keputusan terbaru: screenshot full-page dilakukan pada shell normal dengan sidebar desktop **tanpa sticky/fixed**; tidak memakai tombol atau `data-documentation`. Butir uji historis di bawah yang masih meminta Mode Dokumentasi dianggap digantikan oleh ketentuan ini, bukan persyaratan penerimaan.
+
+**Matriks QA Batch 2:**
+
+| ID | Area | Pemeriksaan wajib |
+|---|---|---|
+| VG3B2-01 | Bank Soal | Tab Diagnostik/Sumatif dan jumlah/status nyata, kurang/cukup, halaman kosong, KKM bersama, soal aktif/nonaktif, paginasi 15 soal |
+| VG3B2-02 | Bank manual & Word | Tambah/sunting/pratinjau soal tanpa simpan, PG A–E, gambar/tabel/Arab/Equation; template Word, unggah, review nomor soal, konfirmasi eksplisit dan histori aman |
+| VG3B2-03 | Antrean Penilaian | Lima filter GET, status Belum/Sudah, link Nilai dan Koreksi, pagination mempertahankan filter; akses G1 tetap diverifikasi server |
+| VG3B2-04 | Rincian penilaian | Petunjuk snapshot dan jawaban final terpisah, skor sah 0–100, pesan validasi, Simpan & berikutnya, koreksi langsung dan riwayat audit |
+| VG3B2-05 | Visual & responsif | Dark/Light, collapsed/expanded, Chrome 1440/1100/820/390/360px, keyboard focus, tabel tidak mendorong body melebar, screenshot panjang tanpa Mode Dokumentasi |
+| VG3B2-06 | Regresi | Aksi upload/POST, CSRF, tab URL, nilai final dan akses peran tetap; tidak ada migrasi/DDL maupun perubahan data |
+
+Status awal semua skenario: **belum diuji XAMPP**. Jangan ditandai PASS hanya karena tes statis/PR dibuat.
+
 ## 1. Strategi
 Tiap fitur harus lolos: **uji aturan bisnis di Service, uji integrasi DB, uji endpoint & hak akses, uji browser desktop/HP, uji keamanan URL**, serta verifikasi perilaku sukses dan gagal. PHPUnit untuk kode server; browser testing dapat memakai Playwright bila fasilitas lokal tersedia. **Jangan mewajibkan test runner Node/daemon pada shared hosting**, pengujian dijalankan sebelum deploy.
 
@@ -768,3 +785,18 @@ Acuan E2E-059, E2E-064, E2E-065 dan E2E-071. Skenario minimum: (1) HTML login da
 - Admin Kebijakan Privasi Baru: naskah contoh otomatis mengisi textarea tetapi tidak tersimpan sebelum klik Simpan Draf. Versi/tanggal perlu diperiksa. Tindakan Terbitkan hanya setelah pengesahan madrasah; publik tetap 503 sampai ada versi sah dengan tanggal berlaku yang tercapai.
 - Setelah terbit, halaman publik memperlihatkan naskah escaped, versi, tanggal WIB serta kontak resmi. Naskah draf tidak bocor ke publik. Riwayat dan hak akses tetap.
 - Uji otomatis A15LoginPrivasiBrandingTest, A13KontrakNotifikasiPrivasiTest, A13NotifikasiPrivasiDatabaseTest dan PHP lint wajib PASS; pengujian CI tidak menggantikan uji visual XAMPP.
+
+## Addendum QA Tahap 3 Batch 3 dan regresi integrasi — 6 November 2026
+
+- PR stabilisasi sesudah Batch 2 mengoreksi tiga *test expectation* CSS historis (A9/A14/A15) agar tidak menolak keputusan mencabut Mode Dokumentasi dan menerapkan tombol Kembali ke Atas fixed. Workflow QA Pra-Semester bernama dengan tanda kutip agar YAML dapat dieksekusi. Perubahan ini **tidak** boleh menghapus asersi fungsi/otorisasi yang masih berlaku.
+- Batch 3 menambahkan `VibrantGlassBatch3AuditTest.php` untuk kontrak filter Pra-Semester, CSS scoped, region gulir, semantik tabel, sertifikat, monitoring Pimpinan, Informasi, dan rute yang tetap ada. Workflow `qa-ui-batch3-integrasi.yml` menjalankan lint PHP, tes Batch 3 dan `tests/unit` lengkap. **CI bukan pengganti QA browser/DB XAMPP.**
+- Bukti penerimaan manual dicatat dalam `docs/QA-T3-BATCH3-INTEGRASI-20261106.md` berdasarkan role, kasus sukses/gagal, viewport, Dark/Light, dan ID E2E lintas fitur. Jangan mengklaim PASS untuk tes yang hanya ditulis tetapi belum dijalankan.
+
+
+## Addendum penerimaan integrasi dan persiapan konsolidasi — 6 November 2026
+
+Hasil **smoke test UI lima kelompok** dinyatakan normal oleh pemilik setelah pull dan uji XAMPP. Bukti ini hanya mencakup pemeriksaan visual/navigasi singkat, **bukan** penutupan semua E2E. Pada branch Batch 3, **28 workflow CI PASS**, termasuk 715 tes unit; angka tersebut hanya berlaku untuk commit yang teruji.
+
+Gerbang finalisasi menambahkan `FinalisasiKontrakIntegrasiTest.php`: audit semua definisi rute terhadap filter peran, Controller/method, jalur akademik, CSRF global dan auto-routing. CI baru menjalankan uji riil Service pada database SQLite sintetis lalu suite unit penuh. Semua ini **tidak** membuktikan perilaku browser XAMPP atau MariaDB hosting.
+
+Matriks bukti dan skenario E2E yang masih memerlukan pemeriksaan tersedia di `docs/FINALISASI-KESIAPAN-RILIS-V25-20261106.md`. Sebelum menyatakan rilis siap, harus ada pemeriksaan otorisasi Gen, jalur Diagnostik–Sumatif, gangguan fullscreen/koneksi, Pra-Semester dan susulan, koreksi nilai/sertifikat, HTTP ROOT, serta backup/restore. Hasil PASS/FAIL/BLOCKED dicatat secara faktual; pengujian di shared hosting tetap belum ada. **Tidak boleh mengubah SQL atau data lokal tanpa dump terbaru.**
