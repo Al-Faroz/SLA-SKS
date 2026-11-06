@@ -2,7 +2,7 @@
 
 MTs Fase D · LMS CodeIgniter 4 · Admin, Guru, Siswa, Pimpinan · 6 semester.
 
-> **Status:** Master v2.5 dan SQL v4 sedang disiapkan pada branch review. **Kode adaptasi v2.5 tersedia di branch pengembangan, tetapi belum dinyatakan lolos pengujian XAMPP/merge `main`**. Tidak boleh menyatakan fitur siap sampai implementasi dan tes manual selesai.
+> **Status 6 November 2026:** Implementasi inti v2.5 telah dikonsolidasikan ke `main` melalui PR #134, disusul branding A15 melalui PR #136. Redesign UI #137–#142 telah dikembangkan dan lima kelompok halaman telah lulus **smoke test visual/navigasi XAMPP menurut laporan pemilik**; CI branch Batch 3 mencapai **28/28 workflow PASS**. **Pengujian end-to-end akademik/keamanan, backup/restore, dan kesiapan hosting belum dinyatakan selesai**. Branch finalisasi tetap untuk review sebelum merge.
 
 ## Alur produk terbaru
 **Mapel (1 CP operasional) → Semester → BAB → TP**. ATP Guru dibuat melalui aplikasi atau impor template Excel manual (.xlsx) yang sudah disiapkan; tanpa macro, tombol pembentukan otomatis, atau pemasangan VBA. Generator/validator di aplikasi akan diselaraskan pada tahap implementasi. Kode TP `KODEMAPEL.KELAS.NO_BAB.NO_TP_DALAM_BAB` (misalnya `BIND.8.1.1`). Nomor BAB berlanjut semester 1–2, 3–4, 5–6. Nama BAB/TP maksimal 50 karakter, deskripsi maksimal 225.
@@ -24,4 +24,11 @@ Progres semester hanya TP NonEsensial. **Pra-Semester** setelah seluruh TP NonEs
 
 
 ## Keputusan final 4 November 2026 — Penilaian dan sertifikat pribadi
-Guru pengampu **G1 Gen–Mapel** mengoreksi skor Resume/HOTS yang telah dinilai melalui **Koreksi Nilai → ubah skor → Proses** secara langsung tanpa pengajuan/approval Admin. Semua perubahan menjaga jejak audit versi dan nilai TP dihitung ulang otomatis bila tersedia. **Sertifikat pribadi siswa** otomatis diterbitkan pada akses menu ketika layak dan otomatis diperbarui pada akses berikutnya bila snapshot cetak berubah. Nomor, QR dan PDF versi lama tetap diarsipkan sebagai Digantikan. Admin hanya mengelola template/TTD/identitas, bukan menerbitkan satu per satu. PR implementasi #131 masih Draft sampai pengujian XAMPP; **V4-0013/V4-0014 sudah diimpor dan tidak boleh diimpor ulang**.
+Guru pengampu **G1 Gen–Mapel** mengoreksi skor Resume/HOTS yang telah dinilai melalui **Koreksi Nilai → ubah skor → Proses** secara langsung tanpa pengajuan/approval Admin. Semua perubahan menjaga jejak audit versi dan nilai TP dihitung ulang otomatis bila tersedia. **Sertifikat pribadi siswa** otomatis diterbitkan pada akses menu ketika layak dan otomatis diperbarui pada akses berikutnya bila snapshot cetak berubah. Nomor, QR dan PDF versi lama tetap diarsipkan sebagai Digantikan. Admin hanya mengelola template/TTD/identitas, bukan menerbitkan satu per satu. Implementasi perubahan ini telah dikonsolidasikan ke `main` melalui PR #134 (meskipun PR historis #131 tetap Draft); **V4-0013/V4-0014 sudah diimpor dan tidak boleh diimpor ulang**.
+
+
+## Checkpoint finalisasi — 6 November 2026
+- Smoke test UI Batch 2–3: lima kelompok halaman diperiksa pemilik di XAMPP, tidak ada masalah yang dilaporkan. Ini **bukan** pengujian alur akademik penuh.
+- Gerbang otomatis tambahan mencakup konsistensi rute/handler, filter peran dan CSRF, serta regresi Service memakai fixture sintetis. Hasil CI setiap commit harus dibaca dari GitHub Actions.
+- [Matriks bukti dan syarat finalisasi](docs/FINALISASI-KESIAPAN-RILIS-V25-20261106.md) membedakan PASS otomatis/visual dari E2E, keamanan HTTP, backup/restore, dan hosting yang masih memerlukan verifikasi.
+- Tidak ada perubahan database, SQL, `.env`, `index.php`, atau `.htaccess` pada checkpoint finalisasi.
