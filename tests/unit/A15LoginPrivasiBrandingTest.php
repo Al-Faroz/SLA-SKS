@@ -118,7 +118,13 @@ final class A15LoginPrivasiBrandingTest extends TestCase
         ] as $selector){
             self::assertStringContainsString($selector,$css);
         }
-        $section=substr($css,strpos($css,'/* A15 — identitas MTsN'));
+        // Batasi kontrak ke blok A15: aturan shell/tombol dan batch UI sesudahnya
+        // boleh punya kebutuhan CSS berbeda tanpa mengubah branding login.
+        $start=strpos($css,'/* A15 — identitas MTsN');
+        $end=strpos($css,'/* Vibrant Glass Shell', $start === false ? 0 : $start);
+        self::assertNotFalse($start);
+        self::assertNotFalse($end);
+        $section=substr($css,$start,$end-$start);
         self::assertStringNotContainsString('https://',$section);
         self::assertStringNotContainsString('!important',$section);
     }

@@ -1,4 +1,4 @@
-name: QA A8 Pra-Semester: bank, jadwal, ujian utama
+name: "QA A8 Pra-Semester: bank, jadwal, ujian utama"
 
 on:
   pull_request:
