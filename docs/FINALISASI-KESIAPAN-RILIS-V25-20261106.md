@@ -4,7 +4,7 @@
 ## 1. Dasar bukti dan batas kesimpulan
 - [x] **Smoke test UI Batch 2–3**: pemilik menyampaikan **lima kelompok halaman telah diperiksa dan tidak ditemukan masalah** pada XAMPP (6 November 2026). Ini penerimaan visual/navigasi singkat, bukan bukti seluruh POST, keamanan ujian, penguncian TP, atau penerbitan sertifikat ujung-ke-ujung.
 - [x] **CI PR #142** commit `b8afa7004c8ad540463b68d4cc48ee09c58a8178`: **28/28 workflow GitHub Actions PASS**. Workflow Batch 3: 6 tes baru / 70 assertions; suite penuh 715 tes / 8.295 assertions.
-- [ ] **CI gerbang finalisasi** pada branch release: hasil harus dicatat setelah workflow berjalan; jangan menyalin PASS commit lama sebagai hasil commit baru.
+- [x] **CI gerbang finalisasi** pada commit `83cd1da6c72045894014d2e16d16a03ac710cbf0`: **43/43 workflow PASS**, termasuk kontrak rute (5 tes / 1.969 assertions) dan suite penuh **720 tes / 10.264 assertions**. Hasil khusus untuk commit yang diuji; perubahan commit berikutnya wajib diuji ulang.
 - [ ] **E2E akademik di XAMPP** memakai data simulasi, termasuk kegagalan, otorisasi lintas Gen, ujian mandiri, Pra-Semester, koreksi dan sertifikat.
 - [ ] **Uji HTTP ROOT** langsung pada Apache XAMPP dengan alat baca-saja, dan audit izin URL sesuai Master 14.
 - [ ] **Backup → restore pada DB uji**; shared hosting/MariaDB target **belum diuji langsung**.
@@ -19,7 +19,7 @@ Rangkaian UI:
 
 Branch calon finalisasi: `release/v25-regresi-integrasi-konsolidasi-20261106`, dibangun di atas branch Batch 3. Semua PR tetap Draft sampai ditinjau. **Jangan menggabungkan PR bertingkat dan PR konsolidasi sekaligus** (menghindari duplikasi commit); pilih satu jalur integrasi yang disetujui.
 
-**Penting:** pada audit 6 Nov, perbandingan branch Batch 3 ke `main` menghasilkan **ahead 52 / behind 1**. Perbedaan riwayat akibat A15 harus diperiksa dalam PR konsolidasi, bukan diatasi dengan force-push/rebase otomatis atau merge tanpa review. Evaluasi *mergeability*, diff dan status CI pada PR menuju `main` sebelum mengambil keputusan.
+**Penting:** pada audit 6 Nov, perbandingan branch Batch 3 ke `main` menghasilkan **ahead 52 / behind 1**. PR konsolidasi **#143** kemudian diverifikasi GitHub sebagai **mergeable=true**, tetapi tetap **Draft**. Diff PR #143 memuat 35 berkas (UI/CSS/JS, dokumen, tes, workflow) dan **tidak memuat SQL, `.env`, `index.php` atau `.htaccess`**. Perbedaan riwayat A15 tidak boleh dijadikan alasan untuk force-push/merge tanpa review; evaluasi status CI pada setiap commit baru.
 
 ## 3. Regresi otomatis finalisasi
 Berkas `tests/unit/FinalisasiKontrakIntegrasiTest.php` memeriksa:
