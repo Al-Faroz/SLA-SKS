@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 // Test integrasi sintetis. TIDAK mengakses DB XAMPP atau data pengguna.
 // Dijalankan di GitHub Actions dengan MariaDB ephemeral.
-require dirname(__DIR__, 2) . '/app/Services/AdminHostingSqlService.php';
-
 use App\Services\AdminHostingSqlService;
+
+require dirname(__DIR__, 2) . '/app/Services/AdminHostingSqlService.php';
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
