@@ -29,11 +29,15 @@ sla-sks/
 
 `index.php` ROOT harus menggunakan jalur yang benar menuju `app/Config/Paths.php` (karena berpindah dari `public/`); sesuaikan rute aset `/assets/...`. Gunakan contoh aturan deny di `14-KEAMANAN-DAN-AUDIT.md`, tetapi **uji HTTP nyata**; jangan hanya percaya file `.htaccess` berada di folder.
 
+### Checkpoint calon produksi v5 / GEN2025 — 8 November 2026
+
+Untuk deployment **baru** dari klon bersih `sla_sks_v5`, ikuti [checkpoint hosting v5 dan Admin privat](CHECKPOINT-HOSTING-V5-ADMIN-DAN-OPERASIONAL-20261108.md). Hasil ringkasan pemeriksaan setelah pembersihan: 15 CP, 17 G1 GEN2025, 17 siswa semester 5, FAQ 1 terbit +27 draf, BAB/TP/ujian/sertifikat 0. Ini **belum** berarti backup-restore, PHP/MariaDB hosting atau security HTTP target sudah diuji. Database `sla_sks_v4` beserta `.env` XAMPP tetap tidak berubah. SQL privat v5 tidak masuk GitHub.
+
 ## 3. Instalasi awal tanpa migration/seeder
 1. Siapkan hosting dan database MariaDB kosong, domain HTTPS dan PHP extension.
 2. Upload aplikasi (kecuali data dev/test yang tidak diperlukan di produksi), `vendor/` hasil Composer; hak file/folder seminimal mungkin. `writable/` dapat ditulis PHP, directory listing mati.
-3. Import **`database/sql/install/sla_sks_v2_4_full.sql`** melalui phpMyAdmin atau CLI setelah dump benar-benar dibuat/dites developer. Dump berisi skema dan pengaturan default non-pribadi, **tidak** menyisipkan password Admin umum sebagai teks biasa.
-4. Buat akun Admin awal melalui tahap inisialisasi aman **sekali pakai** (atau data hash unik hasil setup), lalu nonaktifkan endpoint/script setup. Password pertama harus diganti.
+3. **Untuk hosting SLA-SKS v2.5 GEN2025**, impor hanya snapshot **privat v5 yang sudah dibersihkan dan dicadangkan** ke database hosting kosong melalui phpMyAdmin. **Jangan mengimpor ulang dump lama v2.4, v4, atau patch berulang**. Basis data hosting dapat bernama dengan prefix akun; periksa hasil marker V5 dan jumlah CP/Guru/Siswa sebelum membuka akses. Snapshot privat/dump identitas siswa tidak masuk GitHub.
+4. Setelah snapshot v5 siap di hosting, buat Admin **baru** melalui SQL privat dari `php spark sla:admin-hosting-sql` **yang dijalankan di XAMPP lokal tanpa mengubah database lokal**, lalu impor berkas hasilnya ke phpMyAdmin hosting; sandi acak dicetak sekali dan wajib diganti saat login. **Jangan** menjalankan `sla:admin-awal` karena pengguna Guru/Siswa sudah ada, atau membuka endpoint setup web. Buat Pimpinan kemudian melalui Admin/Pengelola.
 5. Salin `.env.example` menjadi `.env` secara privat; isi koneksi DB, `app.baseURL`, HTTPS, session/CSRF, zona Asia/Jakarta. Jangan push `.env`.
 6. Login Admin dan lengkapi **seluruh data madrasah wajib** (nama, alamat, NPSN, NSM, telepon, email, kota, kepala madrasah dan NIP); situs web boleh kosong. Upload logo, ikon dan **PNG tanda tangan wajib untuk sertifikat**; latar sertifikat optional karena ada template bawaan.
 7. Atur Gen, siswa, Guru, mapel, satu Guru **per pasangan Gen–Mapel**, kurikulum dan referensi CP. Guru menyusun ATP enam semester melalui Excel lalu melengkapi konten Materi/HOTS langsung di aplikasi serta mengimpor Word Diagnostik/Sumatif per TP.
