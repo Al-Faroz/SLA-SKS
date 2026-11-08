@@ -14,20 +14,28 @@ sla-sks/
 ├── index.php              # front controller ROOT
 ├── .htaccess              # rewrite + deny ROOT
 ├── .env                   # privat, tidak masuk Git
-├── .env.example           # templat tanpa rahasia
+├── env                    # contoh konfigurasi repo (tanpa rahasia)
 ├── composer.json
 ├── composer.lock
 ├── spark
-├── app/
+├── app/                   # termasuk Resources/templates/ privat untuk runtime
 ├── public/assets/        # file statis yang boleh publik
 ├── vendor/
 ├── writable/             # berkas siswa dan hasil PDF privat
 ├── database/sql/         # berkas install/update; harus tidak terbaca publik
-├── docs/
-└── tests/
+├── docs/                  # referensi pengembangan, bukan runtime hosting
+└── tests/                 # pengujian pengembangan, bukan runtime hosting
 ```
 
 `index.php` ROOT harus menggunakan jalur yang benar menuju `app/Config/Paths.php` (karena berpindah dari `public/`); sesuaikan rute aset `/assets/...`. Gunakan contoh aturan deny di `14-KEAMANAN-DAN-AUDIT.md`, tetapi **uji HTTP nyata**; jangan hanya percaya file `.htaccess` berada di folder.
+
+### Pemisahan dokumen pengembangan dan runtime hosting (8 November 2026)
+
+**Sumber kebenaran tetap 16 Master Document di `docs/`.** File contoh XLSX/DOCX di `docs/` adalah referensi pembuatan fitur dan pengujian pengembangan, **bukan lokasi yang wajib ada pada runtime hosting**. Salinan operasional template ATP V25-3 (identik dengan contoh resmi) berada di `app/Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx`; `AtpUnduhanService` membacanya dari `APPPATH`. Generator Word membangun DOCX melalui kode, tidak mengambil file contoh Word dari `docs/`.
+
+Untuk pemasangan baru di shared hosting, **berkas ZIP aplikasi** memuat: `app/` (termasuk `app/Resources/templates/`), `public/`, `vendor/` hasil instalasi Composer yang cocok, `writable/` dalam keadaan bersih tanpa data development, `index.php`, `.htaccess`, `composer.json`, `composer.lock`, dan `spark` bila CLI diperlukan. File konfigurasi `.env` khusus hosting dibuat **setelah ekstraksi**; `env` dalam repo hanyalah contoh dan tidak wajib masuk ZIP. Jangan mengunggah `.git/`, `.github/`, `builds/`, `database/` berisi SQL/backup, `docs/`, `scripts/`, `tests/`, `tools/`, dump privat, atau `writable/` development. Snapshot database v5 privat diimpor terpisah lewat phpMyAdmin; SQL sumber dan cadangan tidak disimpan dalam document root.
+
+`index.php` dan `.htaccess` tetap pada ROOT sebagaimana arsitektur final. Keputusan ini **tidak** mengubah URL, pengaturan .env XAMPP, database, format ATP, atau ketentuan akademik. Setelah ekstraksi, verifikasi file operasional ada dan akses HTTP anonim ke direktori privat tetap 403/404 sebelum go-live.
 
 ### Checkpoint calon produksi v5 / GEN2025 — 8 November 2026
 
