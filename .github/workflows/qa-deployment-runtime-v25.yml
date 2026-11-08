@@ -7,6 +7,7 @@ on:
       - 'app/Services/AtpUnduhanService.php'
       - 'tests/unit/AtpUnduhanServiceTest.php'
       - 'tests/unit/AtpManualTemplateTest.php'
+      - 'tests/unit/DeploymentBoundaryTest.php'
       - 'docs/15-INSTALASI-DAN-OPERASIONAL.md'
       - '.github/workflows/qa-deployment-runtime-v25.yml'
   workflow_dispatch:
@@ -31,10 +32,12 @@ jobs:
         run: |
           php -l app/Services/AtpUnduhanService.php
           php -l tests/unit/AtpUnduhanServiceTest.php
+          php -l tests/unit/DeploymentBoundaryTest.php
       - name: Validasi salinan runtime dan kontrak Excel
         run: |
           vendor/bin/phpunit --no-coverage tests/unit/AtpUnduhanServiceTest.php
           vendor/bin/phpunit --no-coverage tests/unit/AtpManualTemplateTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/DeploymentBoundaryTest.php
       - name: Simulasi runtime tanpa folder docs
         run: |
           mv docs docs.referensi-nonruntime
