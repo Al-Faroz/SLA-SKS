@@ -49,6 +49,8 @@ jobs:
           $path = "app/" . $ref->getValue();
           if (!is_file($path)) { exit(2); }
           $buku = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
+          \App\Services\AtpTemplateLayoutService::terapkan($buku);
+          \App\Services\AtpOtomatisTpService::terapkan($buku);
           \App\Services\AtpUnduhanService::periksaTemplateV25Tiga($buku);
           $buku->disconnectWorksheets();
           echo "PASS runtime ATP tanpa docs\n";
