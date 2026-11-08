@@ -95,7 +95,17 @@ final class A15LoginPrivasiBrandingTest extends TestCase
             'versi'=>'A15-2026.11','tanggal_berlaku'=>'2026-11-04',
             'teks'=>$teks,
         ]);
-        self::assertSame($teks,$valid['teks']);
+        // Git di Windows dapat melakukan checkout CRLF; Service secara sengaja
+        // menormalkan naskah menjadi LF sebelum disimpan dan dihitung checksum.
+        $teksNormal=trim(str_replace(["\r\n", "\r"], "\n", $teks));
+        self::assertSame($teksNormal,$valid['teks']);
+        self::assertSame(hash('sha256',$teksNormal),$valid['checksum_sha256']);
+        $versiCrLf=KebijakanPrivasiValidasiService::validasiNaskah([
+            'versi'=>'A15-2026.11','tanggal_berlaku'=>'2026-11-04',
+            'teks'=>str_replace("\n", "\r\n", $teksNormal),
+        ]);
+        self::assertSame($valid['teks'],$versiCrLf['teks']);
+        self::assertSame($valid['checksum_sha256'],$versiCrLf['checksum_sha256']);
         $editor=self::source('app/Views/admin/kebijakan_privasi_editor.php');
         self::assertStringContainsString('KebijakanPrivasiContohService::naskah()', $editor);
         self::assertStringContainsString('Draf contoh — belum menjadi Kebijakan Privasi resmi.', $editor);
