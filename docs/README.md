@@ -26,6 +26,7 @@
 - `docs/TEMPLATE_SOAL_SLA-SKS.docx` — struktur Word Soal Global yang diselaraskan ke **SLA-SKS-WORD-V1**, satu tipe PG lima opsi A–E. Generator per TP/jenis ujian mengikuti ukuran bank aktual; **berkas `docs/` berisi contoh, sedangkan unduhan Guru harus menghasilkan semua slot pertanyaan/opsi/kunci kosong sesuai jumlah bank yang diatur di aplikasi**.
 - `docs/assets/galeri-komponen.html` — galeri visual CSS yang diperbarui bersama perubahan kode UI.
 - [Keputusan produk](PENDING-DECISIONS.md) dan [SQL](../database/sql/README.md) bersifat pelengkap, bukan Master ke-17.
+- **[Checkpoint hosting v5 / GEN2025 dan bootstrap Admin privat](CHECKPOINT-HOSTING-V5-ADMIN-DAN-OPERASIONAL-20261108.md)** — posisi kerja terbaru setelah pembersihan v5, perintah Admin produksi offline tanpa SSH, gerbang kompatibilitas server serta SOP backup/restore. **Belum deploy; `sla_sks_v4` tidak diubah.**
 - **[Keputusan final validasi PDF Materi](KEPUTUSAN-VALIDASI-PDF-MATERI.md)** — pembatasan 15 MB/40 halaman untuk storage hosting, bug PDF yang sudah FIX di XAMPP, batas parser tersisa dan tes regresi wajib. Baca sebelum perubahan kode media; catatan implementasi ini **bukan Master ke-17**.
 
 ## Keputusan fundamental final — 2 November 2026 (wajib didahulukan)
