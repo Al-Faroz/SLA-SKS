@@ -6,6 +6,7 @@ on:
       - 'app/Commands/BuatAdminHostingSql.php'
       - 'app/Services/AdminHostingSqlService.php'
       - 'tests/unit/AdminHostingSqlServiceTest.php'
+      - 'tests/integration/HostingAdminSqlMariaDbCheck.php'
       - '.github/workflows/qa-hosting-bootstrap-v5.yml'
   workflow_dispatch:
 
@@ -16,12 +17,27 @@ jobs:
   bootstrap-admin:
     name: Validasi PHP 8.2 dan SQL privat (tanpa akun nyata)
     runs-on: ubuntu-24.04
+    services:
+      db:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: qa_root_sintetis
+          MARIADB_DATABASE: qa_admin_v5
+          MARIADB_USER: qa_user
+          MARIADB_PASSWORD: qa_pass_sintetis
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, intl, gd, fileinfo, sqlite3, pdo_sqlite, dom, xml, zip
+          extensions: mbstring, intl, gd, fileinfo, sqlite3, pdo_sqlite, dom, xml, zip, mysqli
           coverage: none
       - name: Pasang dependensi
         run: |
@@ -32,8 +48,16 @@ jobs:
           php -l app/Commands/BuatAdminHostingSql.php
           php -l app/Services/AdminHostingSqlService.php
           php -l tests/unit/AdminHostingSqlServiceTest.php
+          php -l tests/integration/HostingAdminSqlMariaDbCheck.php
       - name: Test generator dan larangan plaintext
         run: vendor/bin/phpunit --no-coverage tests/unit/AdminHostingSqlServiceTest.php
+      - name: Eksekusi SQL pada MariaDB sintetis dan pastikan replay ditolak
+        env:
+          QA_DB_HOST: 127.0.0.1
+          QA_DB_USER: qa_user
+          QA_DB_PASSWORD: qa_pass_sintetis
+          QA_DB_NAME: qa_admin_v5
+        run: php tests/integration/HostingAdminSqlMariaDbCheck.php
       - name: Pastikan tidak membuat SQL privasi di repository
         run: |
           test ! -f writable/private/setup/admin_produksi.sql
