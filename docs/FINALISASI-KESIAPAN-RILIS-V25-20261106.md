@@ -4,9 +4,10 @@
 ## 1. Dasar bukti dan batas kesimpulan
 - [x] **Smoke test UI Batch 2–3**: pemilik menyampaikan **lima kelompok halaman telah diperiksa dan tidak ditemukan masalah** pada XAMPP (6 November 2026). Ini penerimaan visual/navigasi singkat, bukan bukti seluruh POST, keamanan ujian, penguncian TP, atau penerbitan sertifikat ujung-ke-ujung.
 - [x] **CI PR #142** commit `b8afa7004c8ad540463b68d4cc48ee09c58a8178`: **28/28 workflow GitHub Actions PASS**. Workflow Batch 3: 6 tes baru / 70 assertions; suite penuh 715 tes / 8.295 assertions.
-- [x] **CI gerbang finalisasi** pada commit `83cd1da6c72045894014d2e16d16a03ac710cbf0`: **43/43 workflow PASS**, termasuk kontrak rute (5 tes / 1.969 assertions) dan suite penuh **720 tes / 10.264 assertions**. Hasil khusus untuk commit yang diuji; perubahan commit berikutnya wajib diuji ulang.
+- [x] **CI gerbang finalisasi** pada commit `83cd1da6c72045894014d2e16d16a03ac710cbf0`: **43/43 workflow PASS**, termasuk kontrak rute (5 tes / 1.969 assertions) dan suite penuh **720 tes / 10.264 assertions**. Commit perbaikan portabilitas Windows `c7c548a96e40a912d4d21e05a995bd3ebf42525e` selanjutnya mendapatkan **45/45 workflow PASS**; suite penuh CI Linux **720 tes / 10.267 assertions**. Hasil khusus per commit; perubahan berikutnya wajib diuji ulang.
+- [x] **Regresi unit XAMPP Windows** (8 November 2026): PHP 8.2.12, PHPUnit 10.5.66, `OK (720 tests, 10268 assertions)` setelah mengaktifkan ekstensi `sqlite3` dan menormalkan dua fixture lintas OS; tanpa perubahan MySQL.
 - [ ] **E2E akademik di XAMPP** memakai data simulasi, termasuk kegagalan, otorisasi lintas Gen, ujian mandiri, Pra-Semester, koreksi dan sertifikat.
-- [ ] **Uji HTTP ROOT** langsung pada Apache XAMPP dengan alat baca-saja, dan audit izin URL sesuai Master 14.
+- [x] **Uji HTTP ROOT anonim** langsung pada Apache XAMPP (8 November 2026): `php scripts/qa/http_security_smoke.php http://localhost/sla-sks/` menghasilkan **41 PASS, 0 FAIL**; publik HTTP 200, berkas privat HTTP 403, halaman terlindungi HTTP 302. Ini audit sampel URL anonim, bukan bukti otorisasi lintas peran secara menyeluruh.
 - [ ] **Backup → restore pada DB uji**; shared hosting/MariaDB target **belum diuji langsung**.
 - [ ] **Pengesahan dan penerbitan Kebijakan Privasi** oleh madrasah (bukan tindakan developer).
 - [ ] **Audit skema dan data XAMPP terbaru**: hanya setelah pemilik mengunggah dump privat terbaru; jangan kirim dump, hash sandi, NISN, atau data siswa ke GitHub.
