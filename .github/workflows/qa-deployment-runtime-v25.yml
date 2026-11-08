@@ -1,0 +1,43 @@
+name: "QA Deployment v2.5: template runtime terpisah dari docs"
+
+on:
+  pull_request:
+    paths:
+      - 'app/Resources/templates/**'
+      - 'app/Services/AtpUnduhanService.php'
+      - 'tests/unit/AtpUnduhanServiceTest.php'
+      - 'tests/unit/AtpManualTemplateTest.php'
+      - 'docs/15-INSTALASI-DAN-OPERASIONAL.md'
+      - '.github/workflows/qa-deployment-runtime-v25.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-boundary:
+    name: PHP 8.2 dan ATP tanpa ketergantungan docs runtime
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, fileinfo, dom, xml, zip, mysqli
+          coverage: none
+      - name: Pasang dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP
+        run: |
+          php -l app/Services/AtpUnduhanService.php
+          php -l tests/unit/AtpUnduhanServiceTest.php
+      - name: Validasi salinan runtime dan kontrak Excel
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/AtpUnduhanServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/AtpManualTemplateTest.php
+      - name: Simulasi paket tanpa docs
+        run: |
+          mkdir -p /tmp/sla-sks-check/runtime
+          cp -a app /tmp/sla-sks-check/runtime/
+          test -f /tmp/sla-sks-check/runtime/app/Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx
+          test ! -d /tmp/sla-sks-check/runtime/docs
