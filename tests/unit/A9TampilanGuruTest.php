@@ -5,7 +5,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 
 /**
- * Regresi markup/CSS A9-2 dari QA screenshot mode Dokumentasi.
+ * Regresi markup/CSS A9-2 setelah Mode Dokumentasi dicabut pada UI Tahap 1.
  * Baca sumber lokal saja; tidak menggunakan DB ataupun data siswa.
  */
 final class A9TampilanGuruTest extends TestCase
@@ -59,7 +59,7 @@ final class A9TampilanGuruTest extends TestCase
         self::assertStringContainsString("esc((string) \$tugas['isi'])", $view);
     }
 
-    public function testCssMemilikiScrollHorizontalDanDropdownDokumentasi(): void
+    public function testCssMemilikiScrollHorizontalDanShellTanpaModeDokumentasi(): void
     {
         $css = self::berkas('public/assets/css/app.css');
         $glass = self::berkas('public/assets/css/emerald-glass.css');
@@ -73,10 +73,12 @@ final class A9TampilanGuruTest extends TestCase
         self::assertStringContainsString(
             '.a-penilaian-page .a-penilaian-form-grid', $css
         );
-        self::assertStringContainsString(
-            '[data-documentation="on"] .a-app--prototipe .a-side__submenu', $glass
-        );
-        self::assertStringContainsString('visibility:hidden;', $glass);
+        // Mode Dokumentasi telah dicabut; screenshot full-page memakai
+        // sidebar normal-flow dan tombol kembali ke atas tersendiri.
+        self::assertStringNotContainsString('[data-documentation=', $glass);
+        self::assertStringNotContainsString('data-documentation=', $panel);
+        self::assertStringContainsString('a-back-to-top', $glass);
+        self::assertStringContainsString('data-back-to-top', $panel);
         self::assertStringContainsString('a-side__group', $panel);
         self::assertStringContainsString('aria-current="page"', $panel);
     }

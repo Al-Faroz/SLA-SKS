@@ -48,7 +48,8 @@
                                 ? 'a-sertifikat__badge--layak' : 'a-sertifikat__badge--tahan' ?>">
                                 <?= $s['status']==='berlaku'?'Berlaku':'Digantikan' ?></span></td>
                             <td><a class="a-btn a-btn--sekunder" href="<?= esc(site_url(
-                                'siswa/sertifikat/'.(int)$s['id'].'/unduh'),'attr') ?>">
+                                'siswa/sertifikat/'.(int)$s['id'].'/unduh'),'attr') ?>"
+                                aria-label="Unduh PDF sertifikat <?= esc((string)$s['nomor'],'attr') ?>">
                                 Unduh PDF</a></td>
                         </tr>
                     <?php endforeach ?>

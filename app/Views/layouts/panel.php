@@ -123,12 +123,6 @@ $peranAktif = $peranAktif ?? '';
                     <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'),'attr') ?>#bell"></use></svg>
                     <span>Notifikasi<?= $jumlahNotifikasi>0?' ('.($jumlahNotifikasi>99?'99+':(int)$jumlahNotifikasi).')':'' ?></span>
                 </a>
-                <button type="button" class="a-btn a-btn--sekunder a-btn--dokumentasi"
-                        data-documentation-toggle aria-label="Aktifkan Mode Dokumentasi untuk screenshot panjang"
-                        aria-pressed="false" title="Mode Dokumentasi: tata halaman khusus screenshot full-page">
-                    <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#camera"></use></svg>
-                    <span data-documentation-label>Dokumentasi</span>
-                </button>
                 <button type="button" class="a-btn a-btn--tema" data-theme-toggle aria-label="Aktifkan tema terang" title="Aktifkan tema terang" aria-pressed="false">
                     <svg class="a-icon a-tema__ikon--dark" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#sun"></use></svg>
                     <svg class="a-icon a-tema__ikon--light" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#moon"></use></svg>
@@ -150,6 +144,9 @@ $peranAktif = $peranAktif ?? '';
             <?php endif ?>
             <?= $this->renderSection('konten') ?>
         </main>
+        <button type="button" class="a-btn a-back-to-top" data-back-to-top hidden aria-label="Kembali ke atas halaman" title="Kembali ke atas halaman">
+            <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#arrow-up"></use></svg>
+        </button>
     </div>
 </div>
 </body>

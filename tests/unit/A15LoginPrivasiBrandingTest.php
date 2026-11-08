@@ -95,7 +95,17 @@ final class A15LoginPrivasiBrandingTest extends TestCase
             'versi'=>'A15-2026.11','tanggal_berlaku'=>'2026-11-04',
             'teks'=>$teks,
         ]);
-        self::assertSame($teks,$valid['teks']);
+        // Git di Windows dapat melakukan checkout CRLF; Service secara sengaja
+        // menormalkan naskah menjadi LF sebelum disimpan dan dihitung checksum.
+        $teksNormal=trim(str_replace(["\r\n", "\r"], "\n", $teks));
+        self::assertSame($teksNormal,$valid['teks']);
+        self::assertSame(hash('sha256',$teksNormal),$valid['checksum_sha256']);
+        $versiCrLf=KebijakanPrivasiValidasiService::validasiNaskah([
+            'versi'=>'A15-2026.11','tanggal_berlaku'=>'2026-11-04',
+            'teks'=>str_replace("\n", "\r\n", $teksNormal),
+        ]);
+        self::assertSame($valid['teks'],$versiCrLf['teks']);
+        self::assertSame($valid['checksum_sha256'],$versiCrLf['checksum_sha256']);
         $editor=self::source('app/Views/admin/kebijakan_privasi_editor.php');
         self::assertStringContainsString('KebijakanPrivasiContohService::naskah()', $editor);
         self::assertStringContainsString('Draf contoh — belum menjadi Kebijakan Privasi resmi.', $editor);
@@ -118,7 +128,13 @@ final class A15LoginPrivasiBrandingTest extends TestCase
         ] as $selector){
             self::assertStringContainsString($selector,$css);
         }
-        $section=substr($css,strpos($css,'/* A15 — identitas MTsN'));
+        // Batasi kontrak ke blok A15: aturan shell/tombol dan batch UI sesudahnya
+        // boleh punya kebutuhan CSS berbeda tanpa mengubah branding login.
+        $start=strpos($css,'/* A15 — identitas MTsN');
+        $end=strpos($css,'/* Vibrant Glass Shell', $start === false ? 0 : $start);
+        self::assertNotFalse($start);
+        self::assertNotFalse($end);
+        $section=substr($css,$start,$end-$start);
         self::assertStringNotContainsString('https://',$section);
         self::assertStringNotContainsString('!important',$section);
     }

@@ -104,9 +104,11 @@ final class MateriSiswaDatabaseTest extends TestCase
                 'versi_paket_yang_ditugaskan'=>1,'status'=>'tuntas','dimulai_pada'=>'2026-10-24 00:00:00'],
         ]);
         $nama = str_repeat('a',48) . '.pdf';
-        $this->folder = sys_get_temp_dir() . '/sla_s08a_' . bin2hex(random_bytes(8));
+        $this->folder = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sla_s08a_' . bin2hex(random_bytes(8));
         if (!mkdir($this->folder, 0700, true)) throw new RuntimeException('Folder uji sementara tidak tersedia.');
-        $this->file = $this->folder . '/' . $nama;
+        // Sama dengan MateriSiswaService::media(): path platform-native.
+        // Menghindari perbedaan '\\' (Windows) dan '/' (Linux) pada assertSame.
+        $this->file = $this->folder . DIRECTORY_SEPARATOR . $nama;
         file_put_contents($this->file, "%PDF-1.4\n% uji sintetis\n");
         $this->db->table('berkas')->insert([
             'id'=>9,'tp_id'=>1,'nama_acak'=>$nama,'mime'=>'application/pdf',

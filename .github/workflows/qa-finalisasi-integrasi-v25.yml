@@ -1,0 +1,55 @@
+name: "QA Finalisasi v2.5: integrasi akademik dan akses"
+
+on:
+  pull_request:
+    paths:
+      - 'tests/unit/FinalisasiKontrakIntegrasiTest.php'
+      - '.github/workflows/qa-finalisasi-integrasi-v25.yml'
+      - 'docs/FINALISASI-KESIAPAN-RILIS-V25-20261106.md'
+      - 'app/Config/Routes.php'
+      - 'app/Config/Filters.php'
+      - 'app/Config/Routing.php'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integrasi-akademik:
+    name: Regresi lintas modul dan gerbang rute
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, fileinfo, sqlite3, pdo_sqlite, dom, xml, zip
+          coverage: none
+      - name: Pasang dependensi tanpa mengakses database XAMPP
+        run: |
+          mkdir -p writable/private/sertifikat/aset writable/private/sertifikat/pdf \
+            writable/cache writable/logs writable/session writable/uploads writable/debugbar
+          composer install --no-interaction --prefer-dist --no-progress
+      - name: PHP lint Controller, Service, Config, test finalisasi
+        run: |
+          find app/Controllers app/Services app/Config -type f -name '*.php' -print0 |
+            xargs -0 -n 1 php -l >/dev/null
+          php -l tests/unit/FinalisasiKontrakIntegrasiTest.php
+      - name: Kontrak keamanan rute dan otorisasi
+        run: vendor/bin/phpunit --no-coverage tests/unit/FinalisasiKontrakIntegrasiTest.php
+      - name: Regresi alur utama pada fixture sintetis (tanpa DB lokal)
+        run: |
+          for file in \
+            KelayakanSumatifSiswaTest \
+            SumatifRemedialNilaiV25Test \
+            AturanWaktuUjianServiceTest \
+            PraSemesterRemedialSusulanTest \
+            KoreksiNilaiDatabaseTest \
+            SertifikatPenerbitanDatabaseTest \
+            A13NotifikasiPrivasiDatabaseTest \
+            A14RootHttpProtectionTest \
+            AuthFilterPeranAktifTest; do
+            vendor/bin/phpunit --no-coverage "tests/unit/$file.php"
+          done
+      - name: Semua regresi unit
+        run: vendor/bin/phpunit --no-coverage tests/unit
