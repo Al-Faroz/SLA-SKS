@@ -19,7 +19,7 @@ use RuntimeException;
 final class AtpUnduhanService
 {
     public const VERSI = AtpOtomatisTpService::VERSI;
-    private const TEMPLATE = 'docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
+    private const TEMPLATE = 'Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
 
     private BaseConnection $db;
 
@@ -93,9 +93,9 @@ final class AtpUnduhanService
             throw new DomainException('CP operasional belum memiliki elemen aktif atau jumlah elemennya perlu ditinjau Admin.');
         }
 
-        $path = ROOTPATH . self::TEMPLATE;
+        $path = APPPATH . self::TEMPLATE;
         if (! is_file($path)) {
-            throw new RuntimeException('Berkas template ATP resmi tidak ditemukan di docs/.');
+            throw new RuntimeException('Berkas template ATP operasional tidak ditemukan.');
         }
 
         $buku = IOFactory::load($path);

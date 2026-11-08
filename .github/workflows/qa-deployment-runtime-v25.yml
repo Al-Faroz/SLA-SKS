@@ -1,0 +1,57 @@
+name: "QA Deployment v2.5: template runtime terpisah dari docs"
+
+on:
+  pull_request:
+    paths:
+      - 'app/Resources/templates/**'
+      - 'app/Services/AtpUnduhanService.php'
+      - 'tests/unit/AtpUnduhanServiceTest.php'
+      - 'tests/unit/AtpManualTemplateTest.php'
+      - 'tests/unit/DeploymentBoundaryTest.php'
+      - 'docs/15-INSTALASI-DAN-OPERASIONAL.md'
+      - '.github/workflows/qa-deployment-runtime-v25.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-boundary:
+    name: PHP 8.2 dan ATP tanpa ketergantungan docs runtime
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, fileinfo, dom, xml, zip, mysqli
+          coverage: none
+      - name: Pasang dependensi
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Lint PHP
+        run: |
+          php -l app/Services/AtpUnduhanService.php
+          php -l tests/unit/AtpUnduhanServiceTest.php
+          php -l tests/unit/DeploymentBoundaryTest.php
+      - name: Validasi salinan runtime dan kontrak Excel
+        run: |
+          vendor/bin/phpunit --no-coverage tests/unit/AtpUnduhanServiceTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/AtpManualTemplateTest.php
+          vendor/bin/phpunit --no-coverage tests/unit/DeploymentBoundaryTest.php
+      - name: Simulasi runtime tanpa folder docs
+        run: |
+          mv docs docs.referensi-nonruntime
+          test ! -d docs
+          php -r '
+          require "vendor/autoload.php";
+          $ref = (new ReflectionClass(\App\Services\AtpUnduhanService::class))->getReflectionConstant("TEMPLATE");
+          if ($ref === false) { exit(1); }
+          $path = "app/" . $ref->getValue();
+          if (!is_file($path)) { exit(2); }
+          $buku = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
+          \App\Services\AtpTemplateLayoutService::terapkan($buku);
+          \App\Services\AtpOtomatisTpService::terapkan($buku);
+          \App\Services\AtpUnduhanService::periksaTemplateV25Tiga($buku);
+          $buku->disconnectWorksheets();
+          echo "PASS runtime ATP tanpa docs\n";
+          '

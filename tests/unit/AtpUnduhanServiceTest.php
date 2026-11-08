@@ -12,7 +12,27 @@ final class AtpUnduhanServiceTest extends TestCase
     private function buku(): \PhpOffice\PhpSpreadsheet\Spreadsheet
     {
         return IOFactory::load(dirname(__DIR__, 2)
-            . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx');
+            . '/app/Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx');
+    }
+
+    /** File contoh di docs/ tetap referensi; runtime wajib mandiri dari docs/. */
+    public function testTemplateOperasionalPrivatIdentikDenganReferensi(): void
+    {
+        $root = dirname(__DIR__, 2);
+        $runtime = $root . '/app/Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
+        $referensi = $root . '/docs/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx';
+
+        self::assertFileExists($runtime);
+        self::assertFileExists($referensi);
+        self::assertSame(hash_file('sha256', $referensi), hash_file('sha256', $runtime),
+            'Template operasional harus identik dengan referensi V25-3.');
+        $path = (new ReflectionClass(AtpUnduhanService::class))
+            ->getReflectionConstant('TEMPLATE');
+        self::assertNotFalse($path);
+        self::assertSame('Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx',
+            $path->getValue());
+        self::assertSame('app/Resources/templates/TEMPLATE_ATP_SLA_SKS_v2_5_MANUAL_TANPA_MACRO.xlsx',
+            substr($runtime, strlen($root) + 1));
     }
 
     /** @return array<string,string|int> */
