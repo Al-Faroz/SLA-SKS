@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - 'app/Views/**'
+      - 'tests/unit/A15LoginPrivasiBrandingTest.php'
+      - 'tests/unit/AdminUiAuditTest.php'
       - 'public/assets/css/app.css'
       - 'public/assets/css/emerald-glass.css'
       - 'docs/12-UI-UX-DAN-HALAMAN.md'
