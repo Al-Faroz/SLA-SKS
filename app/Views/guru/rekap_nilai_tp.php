@@ -17,9 +17,7 @@ $statusNilai = static fn (array $baris): string =>
         <div>
             <p class="a-proto-eyebrow">Guru · Rekap Pembelajaran</p>
             <h1>Rekap Nilai Tujuan Pembelajaran</h1>
-            <p class="a-proto-muted">Seluruh siswa dalam Gen–Mapel yang Anda ampu.
-                Status selesai TP berbeda dari status nilai sementara/final;
-                nilai yang belum tersedia bukan nol.</p>
+            <p class="a-proto-muted">Status TP dan nilai terpisah. Nilai kosong bukan nol.</p>
         </div>
     </header>
 
@@ -107,7 +105,7 @@ $statusNilai = static fn (array $baris): string =>
             <h2 id="ringkasan-rekap">Ringkasan Semester <?= (int) $semester ?></h2>
             <p class="a-help"><strong><?= esc((string) $dipilih['nama_gen']) ?></strong> ·
                 <?= esc((string) $dipilih['nama_mapel']) ?>.
-                </p>
+                Hasil berdasarkan data yang telah tersimpan di server, tanpa menghitung ulang nilai historis.</p>
             <dl class="a-rekap-metrik" aria-label="Ringkasan nilai semester">
                 <div class="a-rekap-metrik__item">
                     <dt>Siswa dalam Gen</dt><dd><?= (int) $rekap['jumlah_siswa'] ?></dd>
@@ -167,7 +165,7 @@ $statusNilai = static fn (array $baris): string =>
                     Pilih jenis TP atau BAB lain, atau pastikan data telah tersedia.
                 </div>
             <?php else: ?>
-                <p class="a-rekap-scroll-hint">Geser tabel untuk melihat kolom lain.</p>
+                <p class="a-rekap-scroll-hint">Geser tabel ke samping untuk melihat seluruh komponen nilai.</p>
                 <div class="a-tabel-gulir a-rekap-scroll" tabindex="0" role="region"
                     aria-label="Tabel nilai TP dapat digulir secara horizontal">
                     <table class="a-tbl a-rekap-table a-rekap-table--tp">

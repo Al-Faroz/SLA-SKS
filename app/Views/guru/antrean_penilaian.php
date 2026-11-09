@@ -10,8 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Guru · Penilaian per Gen–Mapel</p>
             <h1>Penilaian Resume &amp; HOTS</h1>
-            <p class="a-proto-muted">Pilih Belum Dinilai untuk memberi skor atau Sudah Dinilai untuk memperbaiki
-                skor secara langsung melalui tombol Koreksi Nilai.</p>
+            <p class="a-proto-muted">Belum Dinilai: beri skor. Sudah Dinilai: koreksi skor.</p>
         </div>
     </header>
     <?php if (session()->getFlashdata('nilai_galat')): ?>

@@ -20,8 +20,7 @@ $urlFilter = static fn (int $page): string =>
         <div>
             <p class="a-proto-eyebrow">Guru · Rekap Ujian Terjadwal</p>
             <h1>Rekap Nilai Pra-Semester</h1>
-            <p class="a-proto-muted">Nilai ujian tersendiri per siswa dan semester, tidak dicampur dengan Nilai TP.
-                Skor ujian normal dan remedial diambil hanya dari percobaan selesai sah.</p>
+            <p class="a-proto-muted">Nilai Pra-Semester terpisah dari Nilai TP.</p>
         </div>
     </header>
     <?php if ($pesan=session()->getFlashdata('rekap_galat')): ?>
@@ -87,7 +86,7 @@ $urlFilter = static fn (int $page): string =>
             <?php if ($rekap['baris'] === []): ?>
                 <div class="a-alert" role="status">Tidak ada siswa pada Gen ini.</div>
             <?php else: ?>
-                <p class="a-rekap-scroll-hint">Geser tabel untuk kolom lainnya.</p>
+                <p class="a-rekap-scroll-hint">Geser tabel ke samping untuk melihat seluruh kolom nilai.</p>
                 <div class="a-tabel-gulir a-rekap-scroll" tabindex="0" role="region"
                     aria-label="Tabel nilai Pra-Semester dapat digulir horizontal">
                     <table class="a-tbl a-rekap-table a-rekap-table--pra">

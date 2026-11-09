@@ -128,8 +128,7 @@
                 <button class="a-btn a-btn--utama" type="submit">Konfirmasi &amp; Jadikan TP Siap</button>
             </form>
         <?php else: ?>
-            <p class="a-help">Tindakan menjadikan TP Siap belum tersedia sampai semua
-                pemeriksaan di atas terpenuhi. Ini mencegah penerbitan konten yang belum lengkap.</p>
+            <p class="a-help">TP dapat disiapkan setelah seluruh syarat terpenuhi.</p>
         <?php endif ?>
     </section>
     <?php endif ?>

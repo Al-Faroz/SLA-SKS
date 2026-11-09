@@ -10,8 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Sertifikat Akademik</p>
             <h1>Pemeriksaan Kelayakan Sertifikat</h1>
-            <p class="a-proto-muted">Pantau ketuntasan TP dan nilai Final; penerbitan dan pembaruan berlangsung otomatis saat siswa mengakses Sertifikat.
-                Pra-Semester bukan syarat dan nilainya tidak dicantumkan dalam sertifikat.</p>
+            <p class="a-proto-muted">Sertifikat terbit otomatis saat layak. Pra-Semester bukan syarat.</p>
         </div>
     </header>
     <?php if ($sukses = session()->getFlashdata('sukses_sertifikat')): ?>
@@ -139,7 +138,8 @@
                                                 site_url('admin/sertifikat/'.(int)$terbit['id'].'/unduh'),'attr') ?>">
                                                 Unduh PDF
                                             </a>
-                                            <?php elseif ($baris['layak_akademik'] && $identitas['lengkap']
+                                            <p class="a-help">Pembaruan versi otomatis pada akses berikutnya oleh siswa.</p>
+                                        <?php elseif ($baris['layak_akademik'] && $identitas['lengkap']
                                             && isset($asetAktif['ttd'])): ?>
                                             <span class="a-help">Siap diterbitkan otomatis ketika siswa membuka Sertifikat.</span>
                                         <?php else: ?>

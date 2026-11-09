@@ -9,8 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Penjadwalan Per Mapel</p>
             <h1>Jadwal Pra-Semester</h1>
-            <p class="a-proto-muted">Tetapkan jendela boleh mulai ujian dan durasi pengerjaan per Gen–Mapel–Semester.
-                Durasi setiap siswa dimulai ketika siswa masuk ujian, bukan saat jendela dibuka.</p>
+            <p class="a-proto-muted">Atur jadwal mulai dan durasi per Gen–Mapel–Semester.</p>
         </div>
     </header>
     <?php if ($pesan = session()->getFlashdata('sukses')): ?>
@@ -26,8 +25,7 @@
             <div>
                 <p class="a-pra-kicker">PENGELOLAAN JADWAL</p>
                 <h2 id="pra-daftar-judul">Daftar Pra-Semester</h2>
-                <p class="a-help">Pilih kombinasi filter untuk mempersempit daftar paket.
-                    Status mengacu pada kesiapan/jadwal ujian, bukan status TP.</p>
+                
             </div>
             <span class="a-pra-total" aria-live="polite">
                 <?= count($daftar) ?> paket ditemukan
@@ -90,7 +88,7 @@
         <?php if ($daftar === []): ?>
             <div class="a-empty a-pra-empty" role="status">
                 <strong>Tidak ada paket sesuai filter.</strong>
-                <p></p>
+                <p>Ganti pilihan Gen, Mapel, Semester, atau Status, lalu terapkan ulang.</p>
             </div>
         <?php else: ?>
             <div class="a-tabel-gulir a-pra-table-wrap" tabindex="0"
