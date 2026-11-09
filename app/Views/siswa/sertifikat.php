@@ -9,9 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Siswa · Sertifikat Pembelajaran</p>
             <h1>Sertifikat Saya</h1>
-            <p class="a-proto-muted">Sertifikat personal terbit otomatis setelah seluruh nilai TP siap.
-                Jika nilai berubah, versi terbaru dibuat otomatis saat halaman ini dibuka.
-                Versi lama tetap tersedia sebagai arsip.</p>
+            <p class="a-proto-muted">Sertifikat diperbarui otomatis sesuai nilai TP terbaru.</p>
         </div>
     </header>
     <?php if (($otomatis['diperbarui']??0)>0): ?>

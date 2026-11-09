@@ -6,7 +6,7 @@
         <div>
             <p class="a-proto-eyebrow">Informasi · Pribadi</p>
             <h1>Notifikasi Saya</h1>
-            <p class="a-proto-muted">Hanya notifikasi untuk akun dan peran yang sedang aktif. Tautan ke kegiatan diperiksa kembali ketika dibuka.</p>
+            <p class="a-proto-muted">Notifikasi akun dan peran aktif.</p>
         </div>
     </header>
     <?php if ($pesan=session()->getFlashdata('sukses')): ?><div class="a-alert" role="status"><?= esc($pesan) ?></div><?php endif ?>
@@ -15,7 +15,7 @@
         <h2 id="daftar-notifikasi">Daftar Notifikasi</h2>
         <p class="a-help"><?= (int)$daftar['jumlah'] ?> notifikasi; <?= (int)$daftar['belum_dibaca'] ?> belum dibaca.</p>
         <?php if (!$daftar['baris']): ?>
-            <div class="a-empty" role="status"><strong>Belum ada notifikasi untuk Anda.</strong><p>Notifikasi muncul setelah kegiatan akademik yang sah diselesaikan.</p></div>
+            <div class="a-empty" role="status"><strong>Belum ada notifikasi untuk Anda.</strong></div>
         <?php else: ?>
             <div class="a-informasi__daftar">
             <?php foreach ($daftar['baris'] as $item): ?>

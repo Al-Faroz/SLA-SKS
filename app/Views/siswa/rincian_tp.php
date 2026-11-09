@@ -72,9 +72,7 @@
                 <div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div>
             <?php endif ?>
             <?php if ($progres === null): ?>
-                <p class="a-help">TP ini belum diaktifkan untuk akun Anda. Aktivasi menyimpan
-                    satu progres TP dan mengikat versi konten yang akan digunakan kelak.
-                    Tidak ada jawaban, nilai, atau percobaan ujian yang dibuat.</p>
+                <p class="a-help">Mulai TP untuk mengaktifkan pembelajaran.</p>
                 <form action="<?= esc(site_url('siswa/tp/' . (int) $tp['id'] . '/mulai'), 'attr') ?>"
                     method="post"
                     onsubmit="return confirm('Aktifkan TP dan kunci versi konten untuk akun ini? Aktivasi tidak memulai ujian.');">
@@ -135,12 +133,9 @@
                 kedua jalur</strong>; Diagnostik tidak langsung menuntaskan TP.
             </p>
             <?php if ($progres !== null && $progres['status'] === 'sumatif'): ?>
-                <p class="a-alert" role="status">Diagnostik telah memenuhi KKM.
-                    Materi, Resume dan HOTS boleh dilewati. Anda tetap wajib
-                    mengikuti Sumatif sebelum TP selesai.</p>
+                <p class="a-alert" role="status">Diagnostik lulus. Lanjutkan ke Sumatif.</p>
             <?php elseif ($progres !== null && $progres['status'] === 'belajar'): ?>
-                <p class="a-alert" role="status">Diagnostik belum memenuhi KKM.
-                    Selesaikan Materi, Resume final dan HOTS final sebelum Sumatif.</p>
+                <p class="a-alert" role="status">Selesaikan Materi, Resume, HOTS, lalu Sumatif.</p>
             <?php endif ?>
             <?php if ($kesiapanSumatif !== null): ?>
                 <section class="a-jarak-atas" aria-labelledby="syarat-sumatif">

@@ -624,3 +624,10 @@ Banner lokal WebP berasio 2048:763 menggantikan **gambar di dalam kotak ilustras
 ## Addendum CSS Tahap 3 Batch 3 — 6 November 2026
 
 Tambahan di akhir `public/assets/css/emerald-glass.css` dibatasi pada kontainer panel `.a-app--prototipe` dan selector halaman `.a-pra-daftar`, `.a-pra-sesi-form`, `.a-sertifikat`, `.a-laporan`, serta `.a-informasi`. Gunakan `--vg-panel-line`, `--eg-pane-soft`, `--eg-state-positive`, `--eg-focus`, dan warna KPI yang sudah disetujui; **tanpa** framework, `!important`, posisi fixed baru, atau JS khusus. Filter Pra-Semester Admin menjadi 2 kolom di ≤980px dan 1 kolom di ≤620px; tombol tetap dapat dijangkau. Fokus keyboard pada region tabel gulir diberi ring; status dipastikan disertai label teks. Tombol Kembali ke Atas tetap lingkaran 48px dan panah tanpa teks visual. Kondisi Dark/Light dan ukuran 360/390/820/1100/1440px wajib diperiksa di XAMPP sebelum dinyatakan FIX.
+
+
+## Clean Look — audit komponen dan footer (9 November 2026)
+
+- Warna deep forest navy–emerald, Dark/Light, tombol utama indigo–violet, dekorasi serta enam kartu semester tidak diubah. Tambahan CSS hanya mengatur layout login, footer, konsistensi input dan textarea, lebar tabel bergulir, fokus keyboard, disabled/error state, dan pagination.
+- Footer memakai identitas teks **@LemahTeles | 2026** baik di layout publik maupun panel. Posisi footer mengikuti alur dokumen agar tidak menutupi tabel panjang atau sidebar.
+- Kontrak komponen berlaku untuk semua peran tanpa menimpa editor media, tipe upload, input tersembunyi, checkbox/radio, atau layar ujian mandiri. Audit QA visual tetap meliputi Dark/Light, desktop/HP, tabel lebar, form validasi, tindakan nyata dan layar gagal/kosong.

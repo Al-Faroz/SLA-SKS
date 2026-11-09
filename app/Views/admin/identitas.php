@@ -6,7 +6,7 @@
     <div>
         <p class="a-proto-eyebrow">Admin · Pengaturan</p>
         <h1>Identitas Madrasah</h1>
-        <p class="a-proto-muted">Lengkapi informasi resmi madrasah untuk administrasi dan sertifikat. Setiap perubahan menyimpan riwayat; tidak ada data contoh yang digunakan sebagai identitas resmi.</p>
+        <p class="a-proto-muted">Lengkapi identitas resmi madrasah.</p>
     </div>
 </header>
 <?php if ($pesan = session()->getFlashdata('galat')): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div><?php endif ?>
@@ -37,7 +37,7 @@
     <?php endif ?>
 </div>
 <?php endforeach ?>
-<p class="a-help" data-dirty-status role="status">Ubah data yang diperlukan, lalu simpan perubahan.</p>
+<p class="a-help" data-dirty-status role="status"></p>
 <button class="a-btn a-btn--utama" type="submit" data-dirty-submit>Simpan identitas</button>
 </form>
 </section>

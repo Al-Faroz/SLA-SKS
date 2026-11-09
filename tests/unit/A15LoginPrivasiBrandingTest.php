@@ -24,18 +24,17 @@ final class A15LoginPrivasiBrandingTest extends TestCase
         return $s;
     }
 
-    public function testLoginMenggunakanCopySlaSksDanBannerAsli(): void
+    public function testLoginCleanLookMempertahankanBrandingDanFormAman(): void
     {
         $s=self::source('app/Views/akun/masuk.php');
-        self::assertStringContainsString('Pembelajaran terarah,', $s);
-        self::assertStringContainsString('capaian terukur.', $s);
-        self::assertStringContainsString('asesmen bertahap', $s);
-        self::assertStringContainsString('enam semester', $s);
+        self::assertStringContainsString('a-clean-login__card', $s);
+        self::assertStringContainsString('SLA-SKS', $s);
         self::assertStringContainsString('MTsN 4 Jombang', $s);
-        self::assertStringContainsString('login-banner-mtsn4-jombang.webp', $s);
-        self::assertStringContainsString('alt="Identitas MTsN 4 Jombang', $s);
-        self::assertStringNotContainsString('a-proto-orbit--one', $s);
-        self::assertStringNotContainsString('Belajar dengan arah yang', $s);
+        self::assertStringContainsString('logo-mtsn4-jombang.webp', $s);
+        self::assertStringNotContainsString('a-proto-login-hero', $s);
+        self::assertStringNotContainsString('login-banner-mtsn4-jombang.webp', $s);
+        self::assertStringContainsString('data-theme-toggle', $s);
+        self::assertStringContainsString('Kebijakan Privasi', $s);
         self::assertStringContainsString('name="username"', $s);
         self::assertStringContainsString('name="sandi"', $s);
         self::assertStringContainsString('csrf_field()', $s);
@@ -53,7 +52,7 @@ final class A15LoginPrivasiBrandingTest extends TestCase
             self::assertStringNotContainsString('aria-hidden="true">S</span>', $s);
         }
         $s=self::source('app/Views/akun/masuk.php');
-        self::assertStringContainsString('a-proto-login-icon--madrasah', $s);
+        self::assertStringContainsString('a-clean-login__brand', $s);
     }
 
     public function testAssetAsliTersimpanDiPublicDanDapatDikenaliDecoder(): void

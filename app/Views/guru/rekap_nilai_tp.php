@@ -17,9 +17,7 @@ $statusNilai = static fn (array $baris): string =>
         <div>
             <p class="a-proto-eyebrow">Guru · Rekap Pembelajaran</p>
             <h1>Rekap Nilai Tujuan Pembelajaran</h1>
-            <p class="a-proto-muted">Seluruh siswa dalam Gen–Mapel yang Anda ampu.
-                Status selesai TP berbeda dari status nilai sementara/final;
-                nilai yang belum tersedia bukan nol.</p>
+            <p class="a-proto-muted">Status TP dan nilai terpisah. Nilai kosong bukan nol.</p>
         </div>
     </header>
 

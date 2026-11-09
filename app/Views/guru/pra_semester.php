@@ -9,9 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Guru · Gen–Mapel–Semester</p>
             <h1>Bank Soal Pra-Semester</h1>
-            <p class="a-proto-muted">Bank soal tersendiri untuk seluruh BAB pada satu semester.
-                Minimal 30 soal aktif yang sah dan setiap BAB terwakili.
-                Jadwal dan durasi ditetapkan Admin.</p>
+            <p class="a-proto-muted">Minimal 30 soal sah mencakup seluruh BAB. Jadwal oleh Admin.</p>
         </div>
     </header>
     <?php if ($pesan = session()->getFlashdata('sukses')): ?>

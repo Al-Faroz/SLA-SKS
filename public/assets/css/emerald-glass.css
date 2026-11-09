@@ -3684,3 +3684,136 @@ html[data-theme] .a-app--prototipe :is(
     justify-content:flex-start;
   }
 }
+
+/* CLEAN LOOK TAHAP 1 — HANYA SUSUNAN LOGIN, WARNA TETAP TOKEN TEMA */
+html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-kepala-publik { display:none; }
+html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-konten-publik {
+    display:flex; align-items:center; justify-content:center;
+    width:100%; max-width:none; padding:24px 16px; flex:1;
+}
+html[data-theme] .a-clean-login {
+    display:flex; align-items:center; justify-content:center;
+    width:100%; min-height:0;
+}
+html[data-theme] .a-publik--prototipe .a-clean-login__card {
+    width:100%; max-width:400px; padding:36px 30px 26px; justify-self:center;
+    background:var(--e-surface); color:var(--e-text);
+    border:1px solid var(--e-border); border-radius:20px; gap:0;
+    box-shadow:0 16px 48px rgba(0,0,0,.13);
+}
+html[data-theme] .a-clean-login__brand {
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center; margin-bottom:26px; gap:4px;
+}
+html[data-theme] .a-clean-login__brand img {
+    width:92px; height:auto; max-height:92px; object-fit:contain; margin:0 0 10px;
+}
+html[data-theme] .a-clean-login__brand h1 {
+    color:var(--e-text); font-size:30px; line-height:1.2;
+    letter-spacing:-.03em; margin:0; font-weight:800;
+}
+html[data-theme] .a-clean-login__brand p {
+    color:var(--e-muted); font-size:13px; margin:0;
+}
+html[data-theme] .a-clean-login__form { display:grid; gap:14px; }
+html[data-theme] .a-clean-login__form .a-field { display:grid; gap:6px; }
+html[data-theme] .a-clean-login__form .a-btn { width:100%; justify-content:center; margin-top:8px; }
+html[data-theme] .a-clean-login__foot {
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:8px; margin-top:20px;
+    padding-top:16px; border-top:1px solid var(--e-border);
+    color:var(--e-muted); font-size:11px;
+}
+html[data-theme] .a-clean-login__foot a { color:var(--e-primary); font-weight:600; }
+@media (max-width:480px) {
+    html[data-theme] .a-publik--prototipe .a-clean-login__card { padding:30px 20px 24px; }
+    html[data-theme] .a-clean-login__foot { justify-content:center; text-align:center; }
+}
+
+/* Login Clean Look: input, keyboard focus, dan pemilih tema tetap dapat digunakan. */
+html[data-theme] .a-publik--prototipe .a-clean-login__card { position:relative; }
+html[data-theme] .a-clean-login__tema {
+    position:absolute; top:12px; right:12px;
+    min-width:36px; min-height:36px; width:36px; height:36px;
+    padding:7px; display:inline-flex; align-items:center; justify-content:center;
+}
+html[data-theme] .a-clean-login__form input {
+    display:block; width:100%; box-sizing:border-box; min-height:46px;
+    padding:11px 13px; color:var(--e-text); background:var(--e-input);
+    border:1px solid var(--e-border); border-radius:10px;
+}
+html[data-theme] .a-clean-login__form input::placeholder { color:var(--e-muted); opacity:.8; }
+html[data-theme] .a-clean-login__form input:focus-visible {
+    outline:2px solid var(--e-primary); outline-offset:2px;
+}
+
+/* CLEAN LOOK — AUDIT KOMPONEN TERPADU, 9 NOVEMBER 2026
+   Hanya konsistensi dimensi, keterbacaan dan fokus. Palet tema tetap. */
+html[data-theme] .a-app--prototipe .a-main {
+    display:flex; flex-direction:column; min-height:100vh;
+}
+html[data-theme] .a-app--prototipe .a-main__konten {
+    flex:1 0 auto; min-width:0; width:100%;
+}
+html[data-theme] .a-app--prototipe .a-main__footer {
+    display:flex; align-items:center; justify-content:center;
+    padding:14px 22px; margin-top:auto; min-height:44px;
+    font-size:12px; line-height:1.4; color:var(--e-muted);
+    border-top:1px solid var(--e-border); background:var(--e-header);
+}
+html[data-theme] .a-publik--prototipe .a-kaki-publik {
+    display:flex; align-items:center; justify-content:center;
+    gap:8px; min-height:44px; padding:10px 16px;
+    font-size:12px; color:var(--e-muted); background:var(--e-header);
+    border-top:1px solid var(--e-border);
+}
+html[data-theme] .a-publik--prototipe .a-kaki-publik span { color:inherit; }
+html[data-theme] .a-app--prototipe .a-page .a-field {
+    min-width:0;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="button"]),
+    select, textarea
+) {
+    box-sizing:border-box; max-width:100%; min-height:42px;
+    border-radius:10px; border:1px solid var(--vg-control-line,var(--e-border));
+    color:var(--e-text); background:var(--vg-control-bg,var(--e-input));
+}
+html[data-theme] .a-app--prototipe .a-page .a-field textarea {
+    width:100%; min-height:110px; resize:vertical;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(input,select,textarea):focus-visible,
+html[data-theme] .a-app--prototipe .a-page :is(.a-btn,.a-pager__tombol):focus-visible {
+    outline:2px solid var(--e-primary); outline-offset:2px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(input,select,textarea):disabled {
+    opacity:.7; cursor:not-allowed;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(input,select,textarea)[aria-invalid="true"] {
+    border-color:var(--e-danger);
+}
+html[data-theme] .a-app--prototipe .a-page .a-tabel-gulir {
+    max-width:100%; overflow-x:auto; overscroll-behavior-x:contain;
+}
+html[data-theme] .a-app--prototipe .a-page .a-tbl :is(th,td) {
+    vertical-align:middle;
+}
+html[data-theme] .a-app--prototipe .a-page .a-pager__aksi {
+    display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-pager__tombol {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-height:40px; min-width:40px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-pager__tombol.is-nonaktif {
+    cursor:default;
+}
+@media(max-width:767px) {
+    html[data-theme] .a-app--prototipe .a-main__footer { padding:12px 16px; }
+    html[data-theme] .a-app--prototipe .a-page .a-pager__aksi { justify-content:center; }
+}
+
+/* QA visual tabel monitoring pimpinan: label tombol aksi tetap satu baris. */
+html[data-theme] .a-dashboard-pimpinan__table td:last-child .a-btn {
+    white-space:nowrap; width:max-content; max-width:none;
+}

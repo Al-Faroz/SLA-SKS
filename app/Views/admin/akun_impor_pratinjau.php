@@ -87,7 +87,7 @@
             <a class="a-btn a-btn--sekunder" href="<?= esc($base . '/impor', 'attr') ?>">Kembali / Unggah ulang</a>
             <a class="a-btn a-btn--sekunder" href="<?= esc($base, 'attr') ?>">Daftar akun</a>
         </div>
-        <p class="a-help">Sandi awal tidak ditampilkan dalam pratinjau. Untuk akun yang sudah ada, sandi dan status aktif/nonaktif tidak berubah.</p>
+        <p class="a-help">Sandi tidak ditampilkan. Akun lama tidak direset.</p>
     </section>
 </div>
 <?= $this->endSection() ?>

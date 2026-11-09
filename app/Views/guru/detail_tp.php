@@ -67,8 +67,7 @@
                         <option value="non_esensial" <?= ($tp['jenis_tp'] ?? '') === 'non_esensial' ? 'selected' : '' ?>>NonEsensial</option>
                     </select>
                 </div>
-                <p class="a-help">Indikator ketercapaian tidak lagi menjadi kolom wajib terpisah.
-                    Informasi lama yang telah tersimpan tetap dipertahankan.</p>
+                
                 <button class="a-btn a-btn--utama" type="submit">Simpan data TP</button>
             </form>
         <?php else: ?>
@@ -106,8 +105,7 @@
                 }
                 ?>
                 <h3>Lengkapi satu Materi ini</h3>
-                <p class="a-help">Sunting Materi yang sudah dibuat dari ATP. Tidak perlu menambah Materi
-                    kedua. Isi media dan waktu minimal; Resume/HOTS hanya diwajibkan untuk NonEsensial.</p>
+                <p class="a-help">Satu Materi per TP.</p>
                 <?php if (is_string($pesanSuntingGalat) && $pesanSuntingGalat !== ''): ?>
                     <div class="a-alert a-alert--bahaya" role="alert">
                         <strong>Materi belum disimpan:</strong> <?= esc($pesanSuntingGalat) ?>

@@ -10,8 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Sertifikat Akademik</p>
             <h1>Pemeriksaan Kelayakan Sertifikat</h1>
-            <p class="a-proto-muted">Pantau ketuntasan TP dan nilai Final; penerbitan dan pembaruan berlangsung otomatis saat siswa mengakses Sertifikat.
-                Pra-Semester bukan syarat dan nilainya tidak dicantumkan dalam sertifikat.</p>
+            <p class="a-proto-muted">Sertifikat terbit otomatis saat layak. Pra-Semester bukan syarat.</p>
         </div>
     </header>
     <?php if ($sukses = session()->getFlashdata('sukses_sertifikat')): ?>

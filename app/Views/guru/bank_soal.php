@@ -17,7 +17,7 @@
     </header>
     <section class="a-card a-bank-soal__ringkasan" aria-labelledby="bank-soal-status">
         <h2 id="bank-soal-status">Ketersediaan Bank Soal</h2>
-        <p class="a-help">Ringkasan untuk kedua jenis ujian pada TP ini. Jumlah soal aktif diperiksa terpisah dari kelengkapan isi, kunci, dan media.</p>
+        <p class="a-help">Jumlah soal aktif Diagnostik dan Sumatif.</p>
         <div class="a-bank-soal__ringkasan-grid">
             <?php foreach ($ringkasan_bank as $jenis => $data): ?>
                 <article class="a-bank-soal__ringkasan-item">
@@ -40,7 +40,7 @@
 
     <section class="a-card a-bank-soal__workspace a-jarak-atas" aria-labelledby="judul-kelola-bank">
         <h2 id="judul-kelola-bank">Bank Soal</h2>
-        <p class="a-help">Pilih tab jenis ujian untuk mengelola soal. Semua daftar, formulir dan riwayat di bawah mengikuti tab yang sedang aktif.</p>
+        <p class="a-help"></p>
         <nav class="a-bank-soal__tabs" aria-label="Jenis bank soal">
             <?php foreach (['diagnostik' => 'Diagnostik', 'sumatif' => 'Sumatif'] as $jenisTab => $namaTab): ?>
                 <a href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/bank-soal?jenis=' . $jenisTab), 'attr') ?>"

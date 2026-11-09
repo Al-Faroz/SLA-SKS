@@ -93,7 +93,7 @@
                     <button class="a-btn a-btn--sekunder" type="submit" name="lanjut" value="berikutnya"
                         data-nilai-lanjut>Simpan &amp; berikutnya</button>
                 </div>
-                <p class="a-help" data-nilai-status role="status">Belum dikirim. Pastikan skor dan komentar sudah benar.</p>
+                <p class="a-help" data-nilai-status role="status">Belum disimpan.</p>
             </form>
         <?php endif ?>
         <p class="a-help">Penilaian awal ini belum menerbitkan nilai TP final atau sertifikat.

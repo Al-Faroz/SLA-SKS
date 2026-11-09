@@ -14,7 +14,7 @@
             </div>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/kurikulum-cp/' . (int) $cp['id']), 'attr') ?>">Lihat riwayat CP</a>
         </div>
-        <p class="a-help">Ubah lima isian di bawah. Perubahan disimpan langsung, dan versi CP sebelumnya tetap tercatat.</p>
+        <p class="a-help">Perubahan disimpan langsung; versi sebelumnya tetap tercatat.</p>
         <?php if ($galat = session()->getFlashdata('galat')): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>
         <?php endif ?>

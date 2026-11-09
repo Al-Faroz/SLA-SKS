@@ -9,8 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Pimpinan · Monitoring Baca-Saja</p>
             <h1>Monitoring Akademik Siswa</h1>
-            <p class="a-proto-muted">Progres TP NonEsensial berdasarkan aktivitas sah.
-                Semua informasi hanya untuk pemantauan, tanpa perubahan nilai atau jadwal.</p>
+            <p class="a-proto-muted">Monitoring akademik (baca-saja).</p>
         </div>
     </header>
     <?php if ($pesan=session()->getFlashdata('galat_laporan')): ?>

@@ -84,7 +84,7 @@ final class AdminUiAuditTest extends TestCase
         $view=self::sumber('app/Views/admin/akun_daftar.php');
         $css=self::sumber('public/assets/css/app.css');
         self::assertStringContainsString('name="peran[]"',$view);
-        self::assertStringContainsString('Maksimal dua peran',$view);
+        self::assertStringContainsString('Staf dapat memiliki maksimal dua peran.',$view);
         self::assertStringContainsString(
             '.a-admin-akun .a-admin-akun__form .a-fieldset {',$css);
         self::assertStringContainsString(

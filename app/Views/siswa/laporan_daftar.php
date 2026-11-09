@@ -8,10 +8,9 @@
     </nav>
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Siswa · Hasil Pembelajaran</p>
+            
             <h1>Laporan Akademik Saya</h1>
-            <p class="a-proto-muted">Lihat perkembangan TP, nilai yang sudah sah,
-                serta hasil Pra-Semester pada bagian tersendiri.</p>
+            
         </div>
     </header>
     <section class="a-card a-jarak-atas" aria-labelledby="pilih-laporan">
@@ -25,7 +24,7 @@
                     <article class="a-laporan__pilihan">
                         <span class="a-badge">Semester <?= (int)$item['semester'] ?></span>
                         <h3><?= esc($item['mapel']) ?></h3>
-                        <p class="a-help">Progres dan nilai TP, serta checkpoint Pra-Semester.</p>
+                        
                         <a class="a-btn a-btn--utama"
                             href="<?= esc(site_url('siswa/laporan/'.(int)$item['paket_id']),'attr') ?>">
                             Buka Laporan

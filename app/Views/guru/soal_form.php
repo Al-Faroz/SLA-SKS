@@ -35,7 +35,7 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
     <header class="a-page__heading"><div>
         <p class="a-proto-eyebrow">Guru · <?= esc($jenisLabel) ?> · TP <?= esc($tp['kode_tp']) ?></p>
         <h1><?= $soal ? 'Sunting Soal' : 'Tambah Soal Baru' ?></h1>
-        <p class="a-proto-muted">Soal dapat ditulis langsung di aplikasi; format tetap pilihan ganda A–E dengan satu jawaban benar.</p>
+        <p class="a-proto-muted">Soal pilihan ganda A–E, satu jawaban benar.</p>
     </div></header>
     <section class="a-card">
         <?php if ($pesan = session()->getFlashdata('soal_galat')): ?>
@@ -70,7 +70,6 @@ $tujuan = $soal === null ? $uri . '/soal/' . $jenis : $uri . '/soal/' . $jenis .
                 </div>
             </div>
             <p class="a-help a-soal-gambar-info">Untuk gambar: klik tombol <strong>Gambar</strong> di toolbar pertanyaan atau opsi yang sedang Anda sunting, pilih file PNG/JPEG (maksimal 2 MB). Tidak perlu langkah unggah terpisah.</p>
-            <p class="a-help" id="status-gambar-soal" role="status" aria-live="polite"></p>
             <div class="a-soal-aksi">
                 <button class="a-btn a-btn--sekunder" type="button" id="pratinjau-soal">Pratinjau Soal</button>
                 <button class="a-btn a-btn--utama" type="submit">Simpan Soal</button>

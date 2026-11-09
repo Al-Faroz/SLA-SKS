@@ -14,12 +14,8 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
 <div class="a-page a-dashboard-guru">
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Guru · Ringkasan Tugas Akademik</p>
             <h1>Dashboard Guru</h1>
-            <p class="a-proto-muted">Pantau kesiapan TP, antrean penilaian, dan
-                kegiatan siswa pada Gen–Mapel yang Anda ampu.
-                Seluruh indikator berdasarkan data server dan tidak mengubah nilai.</p>
-        </div>
+            </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc($urlPeta,'attr') ?>">Buka Peta ATP</a>
     </header>
 
@@ -73,7 +69,7 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Paket Semester</span>
                     <strong><?= (int)$kpi['paket'] ?></strong>
-                    <small>Paket aktif pada filter</small>
+                    
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>TP Siap</span>
@@ -83,23 +79,22 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                 <article class="a-card a-dashboard-guru__metric">
                     <span>TP Draf</span>
                     <strong><?= (int)$kpi['tp_draf'] ?></strong>
-                    <small>Masih dalam penyusunan Guru</small>
+                    
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Materi perlu diperiksa</span>
                     <strong><?= (int)$kpi['tp_tanpa_materi'] ?></strong>
-                    <small>TP tanpa tepat satu Materi aktif, termasuk Esensial</small>
+                    
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Antrean Resume/HOTS</span>
                     <strong><?= (int)($kpi['antrean_resume']+$kpi['antrean_hots']) ?></strong>
-                    <small><?= (int)$kpi['antrean_resume'] ?> Resume ·
-                        <?= (int)$kpi['antrean_hots'] ?> HOTS final belum dinilai</small>
+                    <small><?= (int)$kpi['antrean_resume'] ?> Resume · <?= (int)$kpi['antrean_hots'] ?> HOTS</small>
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Siswa perlu bantuan</span>
                     <strong><?= (int)$kpi['perlu_bantuan'] ?></strong>
-                    <small>Jumlah unik per paket dengan progres perlu bantuan</small>
+                    
                 </article>
             </div>
         </section>
@@ -121,16 +116,12 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                     Pra-Semester
                 </a>
             </div>
-            <p class="a-help">Ujian Diagnostik/Sumatif sedang berjalan:
-                <strong><?= (int)$kpi['ujian_berjalan'] ?></strong> percobaan pada paket terpilih.
-                Ujian Pra-Semester dan nilainya dikelola terpisah.</p>
+            <p class="a-help">Ujian berjalan: <strong><?= (int)$kpi['ujian_berjalan'] ?></strong></p>
         </section>
 
         <section class="a-card a-jarak-atas" aria-labelledby="guru-dash-persemester">
             <h2 id="guru-dash-persemester">Ringkasan per Semester</h2>
-            <p class="a-help">Indikator Materi dihitung dari kelengkapan jumlah Materi aktif;
-                pemeriksaan lengkap kesiapan TP tetap dilakukan pada Kelola TP.
-                Status angka 0 berarti tidak ada data yang memenuhi indikator terkait.</p>
+            
             <?php if ($dashboard['baris']===[]): ?>
                 <div class="a-alert" role="status">Belum ada paket Semester aktif untuk
                     Gen–Mapel dan filter yang dipilih. Periksa Peta ATP.</div>
