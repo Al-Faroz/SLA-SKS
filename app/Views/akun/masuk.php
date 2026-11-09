@@ -2,6 +2,11 @@
 <?= $this->section('konten') ?>
 <div class="a-clean-login">
     <section class="a-card a-akses a-clean-login__card" aria-labelledby="judul-masuk">
+        <button type="button" class="a-btn a-btn--tema a-clean-login__tema"
+                data-theme-toggle aria-label="Aktifkan tema terang" title="Ganti tema" aria-pressed="false">
+            <svg class="a-icon a-tema__ikon--dark" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#sun"></use></svg>
+            <svg class="a-icon a-tema__ikon--light" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#moon"></use></svg>
+        </button>
         <div class="a-clean-login__brand">
             <img src="<?= esc(base_url('public/assets/img/branding/logo-mtsn4-jombang.webp'), 'attr') ?>"
                  alt="Logo MTsN 4 Jombang" width="96" height="95">
