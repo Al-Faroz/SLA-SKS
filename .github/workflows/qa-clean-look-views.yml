@@ -1,0 +1,56 @@
+name: "QA Clean Look - seluruh View dan komponen"
+
+on:
+  pull_request:
+    paths:
+      - 'app/Views/**'
+      - 'public/assets/css/app.css'
+      - 'public/assets/css/emerald-glass.css'
+      - 'docs/12-UI-UX-DAN-HALAMAN.md'
+      - 'docs/13-DESIGN-SYSTEM-CSS.md'
+      - '.github/workflows/qa-clean-look-views.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-look:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, intl, gd, fileinfo, sqlite3, pdo_sqlite, dom, xml, zip
+          coverage: none
+      - name: PHP lint semua View (termasuk tidak diubah)
+        run: |
+          set -euo pipefail
+          find app/Views -type f -name '*.php' -print0 | xargs -0 -n 1 php -l > /tmp/sla-sks-view-lint.txt
+          cat /tmp/sla-sks-view-lint.txt | tail -n 5
+          echo "View diperiksa: $(grep -c 'No syntax errors' /tmp/sla-sks-view-lint.txt)"
+      - name: Periksa struktur footer dan form login
+        run: |
+          php -r '
+            $panel = file_get_contents("app/Views/layouts/panel.php");
+            $publik = file_get_contents("app/Views/layouts/publik.php");
+            $login = file_get_contents("app/Views/akun/masuk.php");
+            $css = file_get_contents("public/assets/css/emerald-glass.css");
+            foreach ([$panel, $publik] as $layout) {
+              if (strpos($layout, "@LemahTeles | 2026") === false) { throw new RuntimeException("Footer tidak lengkap"); }
+            }
+            foreach (["csrf_field()", "name=\"username\"", "name=\"sandi\"", "type=\"submit\"", "data-theme-toggle"] as $required) {
+              if (strpos($login, $required) === false) { throw new RuntimeException("Form login kurang: " . $required); }
+            }
+            if (strpos($css, "a-clean-login__card") === false || strpos($css, "a-pager__tombol") === false) {
+              throw new RuntimeException("CSS komponen Clean Look tidak ditemukan");
+            }
+            echo "Kontrak footer, login, CSS: PASS\n";
+          '
+      - name: Persiapkan dependency untuk regresi unit
+        run: |
+          mkdir -p writable/private writable/cache writable/logs writable/session writable/uploads writable/debugbar
+          composer install --no-interaction --prefer-dist --no-progress
+      - name: Regresi seluruh unit
+        run: vendor/bin/phpunit --no-coverage tests/unit
