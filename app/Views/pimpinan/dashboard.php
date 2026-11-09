@@ -20,11 +20,8 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
 <div class="a-page a-dashboard-pimpinan">
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Pimpinan · Monitoring Akademik Baca-Saja</p>
             <h1>Dashboard Akademik</h1>
-            <p class="a-proto-muted">Ringkasan Gen–Mapel–Semester dari kegiatan siswa yang sah.
-                Angka bersumber dari data tersimpan dan tidak mengubah progres atau nilai.</p>
-        </div>
+            </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('pimpinan/laporan'),'attr') ?>">
             Buka Monitoring Individual
         </a>
@@ -96,7 +93,7 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>Paket aktif</span>
                 <strong><?= (int)$ring['paket'] ?></strong>
-                <small>Gen–Mapel–Semester yang ditugaskan</small>
+                
             </article>
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>TP selesai sah</span>

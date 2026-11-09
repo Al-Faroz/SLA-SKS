@@ -14,12 +14,8 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
 <div class="a-page a-dashboard-guru">
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Guru · Ringkasan Tugas Akademik</p>
             <h1>Dashboard Guru</h1>
-            <p class="a-proto-muted">Pantau kesiapan TP, antrean penilaian, dan
-                kegiatan siswa pada Gen–Mapel yang Anda ampu.
-                Seluruh indikator berdasarkan data server dan tidak mengubah nilai.</p>
-        </div>
+            </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc($urlPeta,'attr') ?>">Buka Peta ATP</a>
     </header>
 
@@ -73,7 +69,7 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Paket Semester</span>
                     <strong><?= (int)$kpi['paket'] ?></strong>
-                    <small>Paket aktif pada filter</small>
+                    
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>TP Siap</span>
@@ -83,7 +79,7 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                 <article class="a-card a-dashboard-guru__metric">
                     <span>TP Draf</span>
                     <strong><?= (int)$kpi['tp_draf'] ?></strong>
-                    <small>Masih dalam penyusunan Guru</small>
+                    
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Materi perlu diperiksa</span>

@@ -7,11 +7,8 @@ $lanjut=$ring['lanjut'];
 <div class="a-page a-dashboard-siswa">
     <header class="a-page__heading a-proto-heading">
         <div>
-            <p class="a-proto-eyebrow">Siswa · Pembelajaran Mandiri</p>
             <h1>Dashboard Pembelajaran Saya</h1>
-            <p class="a-proto-muted">Pantau TP yang sudah diselesaikan,
-                temukan kegiatan berikutnya, dan lihat nilai yang telah Final.</p>
-        </div>
+            </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('siswa/pembelajaran'),'attr') ?>">
             Daftar Mata Pelajaran
         </a>
@@ -55,12 +52,12 @@ $lanjut=$ring['lanjut'];
             <article class="a-card a-dashboard-siswa__metric">
                 <span>Mata Pelajaran</span>
                 <strong><?= (int)$ring['mapel'] ?></strong>
-                <small>Ditugaskan pada Gen Anda</small>
+                
             </article>
             <article class="a-card a-dashboard-siswa__metric">
                 <span>Semester dapat diakses</span>
                 <strong><?= (int)$ring['paket_terbuka'] ?></strong>
-                <small>Sudah melewati gerbang semester sebelumnya</small>
+                
             </article>
             <article class="a-card a-dashboard-siswa__metric">
                 <span>Nilai TP Final</span>

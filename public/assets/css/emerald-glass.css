@@ -3684,3 +3684,49 @@ html[data-theme] .a-app--prototipe :is(
     justify-content:flex-start;
   }
 }
+
+/* CLEAN LOOK TAHAP 1 — HANYA SUSUNAN LOGIN, WARNA TETAP TOKEN TEMA */
+html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-kepala-publik,
+html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-kaki-publik { display:none; }
+html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-konten-publik {
+    display:flex; align-items:center; justify-content:center;
+    width:100%; max-width:none; padding:24px 16px; flex:1;
+}
+html[data-theme] .a-clean-login {
+    display:flex; align-items:center; justify-content:center;
+    width:100%; min-height:calc(100dvh - 48px);
+}
+html[data-theme] .a-publik--prototipe .a-clean-login__card {
+    width:100%; max-width:400px; padding:36px 30px 26px; justify-self:center;
+    background:var(--e-surface); color:var(--e-text);
+    border:1px solid var(--e-border); border-radius:20px; gap:0;
+    box-shadow:0 16px 48px rgba(0,0,0,.13);
+}
+html[data-theme] .a-clean-login__brand {
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center; margin-bottom:26px; gap:4px;
+}
+html[data-theme] .a-clean-login__brand img {
+    width:92px; height:auto; max-height:92px; object-fit:contain; margin:0 0 10px;
+}
+html[data-theme] .a-clean-login__brand h1 {
+    color:var(--e-text); font-size:30px; line-height:1.2;
+    letter-spacing:-.03em; margin:0; font-weight:800;
+}
+html[data-theme] .a-clean-login__brand p {
+    color:var(--e-muted); font-size:13px; margin:0;
+}
+html[data-theme] .a-clean-login__form { display:grid; gap:14px; }
+html[data-theme] .a-clean-login__form .a-field { display:grid; gap:6px; }
+html[data-theme] .a-clean-login__form .a-btn { width:100%; justify-content:center; margin-top:8px; }
+html[data-theme] .a-clean-login__foot {
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:8px; margin-top:20px;
+    padding-top:16px; border-top:1px solid var(--e-border);
+    color:var(--e-muted); font-size:11px;
+}
+html[data-theme] .a-clean-login__foot a { color:var(--e-primary); font-weight:600; }
+@media (max-width:480px) {
+    html[data-theme] .a-publik--prototipe .a-clean-login__card { padding:30px 20px 24px; }
+    html[data-theme] .a-clean-login__foot { justify-content:center; text-align:center; }
+}

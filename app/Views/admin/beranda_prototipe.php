@@ -3,10 +3,8 @@
 <div class="a-proto-dashboard a-page">
     <header class="a-proto-heading a-page__heading">
         <div>
-            <p class="a-proto-eyebrow">Ruang kerja / Administrasi</p>
             <h1>Dashboard Admin</h1>
-            <p class="a-proto-muted">Selamat datang, <strong><?= esc($namaPengguna) ?></strong>. Berikut ringkasan referensi, kegiatan akademik, dan pekerjaan administrasi yang terpantau.</p>
-        </div>
+            </div>
         <a class="a-btn a-btn--utama" href="<?= esc(site_url('admin/referensi'), 'attr') ?>">Kelola Gen <span aria-hidden="true">↗</span></a>
     </header>
 
@@ -18,7 +16,7 @@
         <div class="a-proto-section-head">
             <div>
                 <h2 id="judul-ringkasan">Ringkasan akademik</h2>
-                <p>Data langsung dari referensi dan penugasan K2.</p>
+                
             </div>
             <span class="a-proto-context">Gen × Mapel</span>
         </div>
@@ -55,8 +53,7 @@
         <div class="a-proto-section-head">
             <div>
                 <h2 id="admin-ringkasan-operasional">Ringkasan Operasional</h2>
-                <p>Jumlah dari data tersimpan, bukan angka contoh.
-                    TP Siap/Draf adalah status konten Guru, bukan nilai siswa.</p>
+                
             </div>
         </div>
         <div class="a-dashboard-admin__metrics">
@@ -163,7 +160,7 @@
             <div class="a-proto-section-head">
                 <div>
                     <h2 id="judul-akses-cepat">Akses cepat</h2>
-                    <p>Kelola data yang telah tersedia dalam aplikasi.</p>
+                    
                 </div>
             </div>
             <div class="a-proto-shortcuts">
