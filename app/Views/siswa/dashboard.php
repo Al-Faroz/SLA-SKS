@@ -163,9 +163,7 @@ $lanjut=$ring['lanjut'];
             </div>
             <div>
                 <h3>Sertifikat Saya</h3>
-                <p class="a-help">Sertifikat diterbitkan setelah syarat
-                    akademik TP terpenuhi; nilai Pra-Semester
-                    bukan syarat penerbitan dan tidak dicetak.</p>
+                
                 <a class="a-btn a-btn--sekunder"
                     href="<?= esc(site_url('siswa/sertifikat'),'attr') ?>">
                     Lihat Sertifikat

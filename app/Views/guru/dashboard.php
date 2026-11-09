@@ -116,16 +116,12 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                     Pra-Semester
                 </a>
             </div>
-            <p class="a-help">Ujian Diagnostik/Sumatif sedang berjalan:
-                <strong><?= (int)$kpi['ujian_berjalan'] ?></strong> percobaan pada paket terpilih.
-                Ujian Pra-Semester dan nilainya dikelola terpisah.</p>
+            <p class="a-help">Ujian berjalan: <strong><?= (int)$kpi['ujian_berjalan'] ?></strong></p>
         </section>
 
         <section class="a-card a-jarak-atas" aria-labelledby="guru-dash-persemester">
             <h2 id="guru-dash-persemester">Ringkasan per Semester</h2>
-            <p class="a-help">Indikator Materi dihitung dari kelengkapan jumlah Materi aktif;
-                pemeriksaan lengkap kesiapan TP tetap dilakukan pada Kelola TP.
-                Status angka 0 berarti tidak ada data yang memenuhi indikator terkait.</p>
+            
             <?php if ($dashboard['baris']===[]): ?>
                 <div class="a-alert" role="status">Belum ada paket Semester aktif untuk
                     Gen–Mapel dan filter yang dipilih. Periksa Peta ATP.</div>

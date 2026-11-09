@@ -149,10 +149,7 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
 
     <section class="a-card a-jarak-atas" aria-labelledby="judul-paket-monitor">
         <h2 id="judul-paket-monitor">Ringkasan per Gen–Mapel–Semester</h2>
-        <p class="a-help">Nilai Pra-Semester berdiri sendiri sebagai checkpoint,
-            tidak dihitung dalam progres TP maupun sertifikat.
-            Halaman <?= (int)$dashboard['halaman'] ?> dari
-            <?= (int)$dashboard['jumlah_halaman'] ?>.</p>
+        <p class="a-help">Halaman <?= (int)$dashboard['halaman'] ?> / <?= (int)$dashboard['jumlah_halaman'] ?></p>
         <?php if ($dashboard['baris'] === []): ?>
             <div class="a-alert" role="status">Tidak ada paket aktif untuk
                 kombinasi filter yang dipilih.</div>

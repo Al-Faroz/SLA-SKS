@@ -3812,3 +3812,8 @@ html[data-theme] .a-app--prototipe .a-page .a-pager__tombol.is-nonaktif {
     html[data-theme] .a-app--prototipe .a-main__footer { padding:12px 16px; }
     html[data-theme] .a-app--prototipe .a-page .a-pager__aksi { justify-content:center; }
 }
+
+/* QA visual tabel monitoring pimpinan: label tombol aksi tetap satu baris. */
+html[data-theme] .a-dashboard-pimpinan__table td:last-child .a-btn {
+    white-space:nowrap; width:max-content; max-width:none;
+}
