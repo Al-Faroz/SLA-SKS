@@ -87,7 +87,7 @@ $urlFilter = static fn (int $page): string =>
             <?php if ($rekap['baris'] === []): ?>
                 <div class="a-alert" role="status">Tidak ada siswa pada Gen ini.</div>
             <?php else: ?>
-                <p class="a-rekap-scroll-hint">Geser tabel ke samping untuk melihat seluruh kolom nilai.</p>
+                <p class="a-rekap-scroll-hint">Geser tabel untuk kolom lainnya.</p>
                 <div class="a-tabel-gulir a-rekap-scroll" tabindex="0" role="region"
                     aria-label="Tabel nilai Pra-Semester dapat digulir horizontal">
                     <table class="a-tbl a-rekap-table a-rekap-table--pra">

@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Guru · Peta Pembelajaran</p>
             <h1>Peta ATP enam semester</h1>
-            <p class="a-proto-muted">Pilih semester untuk menyusun BAB dan TP. Ringkasan selalu mengikuti Gen–Mapel yang sedang diampu.</p>
+            <p class="a-proto-muted">Pilih semester untuk mengelola BAB dan TP.</p>
         </div>
     </header>
 

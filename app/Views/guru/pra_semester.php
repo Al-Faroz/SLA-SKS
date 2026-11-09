@@ -25,7 +25,7 @@
             <div>
                 <p class="a-pra-kicker">BANK SOAL PER PAKET</p>
                 <h2 id="pra-paket-guru">Pilih Gen dan Semester</h2>
-                <p class="a-help">Hanya paket dari penugasan Guru Gen–Mapel Anda yang ditampilkan.</p>
+                <p class="a-help"></p>
             </div>
             <span class="a-pra-total" aria-live="polite">
                 <?= count($paketGuru) ?> paket ditemukan

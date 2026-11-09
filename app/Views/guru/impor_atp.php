@@ -32,7 +32,7 @@
     <?php if ($pilihan === []): ?>
         <section class="a-card"><div class="a-empty" role="status">
             <h2>Belum ada penugasan Gen–Mapel</h2>
-            <p>Hubungi Admin sebelum mengunduh atau mengimpor ATP.</p>
+            <p>Hubungi Admin untuk melengkapi penugasan Gen–Mapel.</p>
         </div></section>
     <?php else: ?>
         <section class="a-card" aria-labelledby="pilih-konteks">

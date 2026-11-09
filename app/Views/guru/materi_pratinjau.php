@@ -33,7 +33,7 @@
                 default => 'Media pembelajaran',
             }) ?>
         </h2>
-        <p class="a-help">Pratinjau hanya untuk Guru yang ditugaskan pada Gen–Mapel ini. Halaman ini tidak mengubah progres siswa.</p>
+        <p class="a-help">Pratinjau Materi Guru.</p>
         <div class="a-pratinjau-info" aria-label="Informasi media">
             <span class="a-pratinjau-info__item">Jenis: <strong><?= esc(strtoupper((string) $materi['jenis'])) ?></strong></span>
             <span class="a-pratinjau-info__item">Urutan: <strong><?= (int) $materi['urutan'] ?></strong></span>

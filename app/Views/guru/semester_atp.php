@@ -54,7 +54,7 @@
                 <p class="a-atp-pesan-terkunci">Penambahan BAB saat ini terkunci oleh aturan nomor antarsemester.
                     Periksa urutan BAB semester ganjil/genap pada kelas yang sama.</p>
             <?php elseif (! ($semester['pola_bab'] ?? false)): ?>
-                <p class="a-atp-pesan-terkunci">Database v4 R2 diperlukan untuk penyusunan BAB dan TP.</p>
+                <p class="a-atp-pesan-terkunci">Struktur BAB/TP belum tersedia. Hubungi Admin.</p>
             <?php endif ?>
         </div>
         <div class="a-atp-detail__toolbar-actions">

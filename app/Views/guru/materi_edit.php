@@ -66,7 +66,7 @@ if ($materi['berkas_id'] !== null) {
         <section class="a-card a-jarak-atas" aria-label="Media tersimpan">
             <h2>Media tersimpan</h2>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('guru/tp/' . (int) $tp['id'] . '/materi/' . (int) $materi['id'] . '/pratinjau'), 'attr') ?>">Buka pratinjau Materi</a>
-            <p class="a-help">Gunakan kolom Upload file di atas untuk mengganti media pada Materi draf.</p>
+            <p class="a-help"></p>
         </section>
     <?php endif ?>
 </div>
