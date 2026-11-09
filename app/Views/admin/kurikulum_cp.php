@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Referensi Akademik</p>
             <h1>Referensi Kurikulum &amp; CP</h1>
-            <p class="a-proto-muted">Admin dapat menambah dan menyunting CP langsung melalui lima isian. Riwayat akademik dipertahankan.</p>
+            <p class="a-proto-muted">Kelola CP resmi madrasah.</p>
         </div>
     </header>
     <?php if ($galat = session()->getFlashdata('galat')): ?>
@@ -34,7 +34,7 @@
         <div class="a-cp__section-heading">
             <div>
                 <h2 id="judul-cp-daftar">Daftar CP dan sunting langsung</h2>
-                <p class="a-help">Temukan CP berdasarkan mapel atau kode, lalu sunting tanpa melalui pengajuan.</p>
+                <p class="a-help"></p>
             </div>
             <a class="a-btn a-btn--utama" href="#cp-tambah">+ Tambah CP</a>
         </div>
@@ -118,7 +118,7 @@
     </section>
     <section class="a-card" id="cp-tambah" aria-labelledby="judul-cp-baru">
         <h2 id="judul-cp-baru">Tambah CP Fase D</h2>
-        <p class="a-help">Pilih kurikulum, mata pelajaran, kode CP, elemen, dan rumusan resmi. Fase D otomatis.</p>
+        <p class="a-help"></p>
         <?php if ($kurikulum === [] || $mapel === []): ?>
             <div class="a-alert a-alert--info" role="status">Tambahkan kurikulum serta mapel pada menu terkait terlebih dahulu.</div>
         <?php else: ?>

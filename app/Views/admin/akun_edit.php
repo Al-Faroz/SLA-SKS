@@ -8,7 +8,7 @@
 </nav>
 <section class="a-card a-akun-edit" aria-labelledby="judul-edit-akun">
     <h1 id="judul-edit-akun">Ubah identitas <?= $siswa ? 'Siswa' : 'Pengelola' ?></h1>
-    <p class="a-help">Ubah hanya data resmi yang diperlukan. Setiap perubahan tercatat dengan identitas Admin dan data sebelum/sesudah.</p>
+    <p class="a-help">Perubahan identitas dicatat.</p>
 
     <?php if ($galat = session()->getFlashdata('galat')): ?>
         <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>

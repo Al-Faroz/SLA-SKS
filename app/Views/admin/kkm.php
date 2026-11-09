@@ -9,7 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Admin · Pengaturan Ujian</p>
             <h1>KKM Default</h1>
-            <p class="a-proto-muted">Nilai batas yang dipakai TP NonEsensial jika Guru belum menetapkan KKM khusus.</p>
+            <p class="a-proto-muted">KKM default TP NonEsensial.</p>
         </div>
     </header>
     <section class="a-card a-kkm-admin" aria-labelledby="judul-kkm-admin">

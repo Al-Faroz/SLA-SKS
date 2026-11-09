@@ -21,7 +21,7 @@
     <section class="a-card a-profil__tinjau" aria-labelledby="judul-tinjau">
         <h2 id="judul-tinjau">Foto yang menunggu persetujuan</h2>
         <?php if ($daftarFoto === []): ?>
-            <div class="a-empty" role="status"><strong>Tidak ada foto menunggu.</strong><p>Unggahan foto staf baru akan ditampilkan di sini.</p></div>
+            <div class="a-empty" role="status"><strong>Tidak ada foto menunggu.</strong><p>Belum ada foto menunggu persetujuan.</p></div>
         <?php else: ?>
             <div class="a-profil__guru-grid">
                 <?php foreach ($daftarFoto as $foto): ?>

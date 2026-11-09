@@ -90,7 +90,7 @@
         <?php if ($daftar === []): ?>
             <div class="a-empty a-pra-empty" role="status">
                 <strong>Tidak ada paket sesuai filter.</strong>
-                <p>Ganti pilihan Gen, Mapel, Semester, atau Status, lalu terapkan ulang.</p>
+                <p></p>
             </div>
         <?php else: ?>
             <div class="a-tabel-gulir a-pra-table-wrap" tabindex="0"

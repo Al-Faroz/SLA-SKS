@@ -6,7 +6,7 @@
     <div>
         <p class="a-proto-eyebrow">Admin · Referensi Akademik</p>
         <h1>Gen &amp; Tahun Ajaran</h1>
-        <p class="a-proto-muted">Kelola data Gen dan tahun ajaran. Semester sebelum titik mulai Gen dianggap Dilewati; data referensi yang sudah digunakan tetap dipertahankan.</p>
+        <p class="a-proto-muted">Kelola Gen dan tahun ajaran. Semester sebelumnya berstatus Dilewati.</p>
     </div>
 </header>
 <?php if ($pesan = session()->getFlashdata('galat')): ?><div class="a-alert a-alert--bahaya" role="alert"><?= esc($pesan) ?></div><?php endif ?>

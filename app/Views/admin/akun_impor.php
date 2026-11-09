@@ -9,7 +9,7 @@
     <section class="a-card a-impor-akun" aria-labelledby="judul-impor">
         <p class="a-proto-eyebrow">Administrasi · <?= esc(ucfirst($jenis)) ?></p>
         <h1 id="judul-impor">Impor akun melalui Excel</h1>
-        <p class="a-help">Unduh template terbaru, isi data akun, lalu unggah untuk pratinjau. Tidak ada akun yang berubah sampai Anda melakukan konfirmasi.</p>
+        <p class="a-help">Unduh template → Isi Excel → Unggah → Konfirmasi.</p>
 
         <?php if ($galat = session()->getFlashdata('galat')): ?>
             <div class="a-alert a-alert--bahaya" role="alert"><?= esc($galat) ?></div>

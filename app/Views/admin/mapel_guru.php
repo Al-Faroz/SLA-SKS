@@ -9,7 +9,7 @@
     <div>
         <p class="a-proto-eyebrow">Admin · Data Akademik</p>
         <h1>Mata Pelajaran &amp; Guru per Gen</h1>
-        <p class="a-proto-muted">Satu Guru aktif setiap pasangan Gen–Mapel; penetapan Guru pada satu Gen tidak mengubah penugasan Gen lain.</p>
+        <p class="a-proto-muted">Satu Guru aktif per Gen–Mapel.</p>
     </div>
 </header>
 <?php if ($pesan = session()->getFlashdata('galat')): ?>

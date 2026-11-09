@@ -76,7 +76,7 @@
                         <?php foreach (['admin' => 'Admin', 'guru' => 'Guru', 'pimpinan' => 'Pimpinan'] as $kode => $label): ?>
                             <label><input type="checkbox" name="peran[]" value="<?= esc($kode, 'attr') ?>"> <?= esc($label) ?></label>
                         <?php endforeach ?>
-                        <p class="a-help">Maksimal dua peran. Admin+Guru, Admin+Pimpinan, atau Guru+Pimpinan.</p>
+                        <p class="a-help">Staf dapat memiliki maksimal dua peran.</p>
                     </fieldset>
                 <?php endif ?>
                 <div class="a-field">
@@ -206,6 +206,6 @@
             <?php endif ?>
         </section>
     </div>
-    <p class="a-help">Impor XLSX tersedia dengan validasi, pratinjau, konfirmasi transaksi, dan audit. Perubahan Gen siswa yang sudah ditempatkan tetap memerlukan pemeriksaan progres pada modul berikutnya.</p>
+    <p class="a-help">Impor Excel melalui pratinjau dan konfirmasi. Perubahan Gen siswa yang sudah ditempatkan tetap memerlukan pemeriksaan progres pada modul berikutnya.</p>
 </div>
 <?= $this->endSection() ?>
