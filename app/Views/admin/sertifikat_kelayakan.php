@@ -139,8 +139,7 @@
                                                 site_url('admin/sertifikat/'.(int)$terbit['id'].'/unduh'),'attr') ?>">
                                                 Unduh PDF
                                             </a>
-                                            <p class="a-help">Pembaruan versi otomatis pada akses berikutnya oleh siswa.</p>
-                                        <?php elseif ($baris['layak_akademik'] && $identitas['lengkap']
+                                            <?php elseif ($baris['layak_akademik'] && $identitas['lengkap']
                                             && isset($asetAktif['ttd'])): ?>
                                             <span class="a-help">Siap diterbitkan otomatis ketika siswa membuka Sertifikat.</span>
                                         <?php else: ?>
