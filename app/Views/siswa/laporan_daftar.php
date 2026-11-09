@@ -10,8 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Siswa · Hasil Pembelajaran</p>
             <h1>Laporan Akademik Saya</h1>
-            <p class="a-proto-muted">Lihat perkembangan TP, nilai yang sudah sah,
-                serta hasil Pra-Semester pada bagian tersendiri.</p>
+            <p class="a-proto-muted">Lihat progres dan nilai pembelajaran.</p>
         </div>
     </header>
     <section class="a-card a-jarak-atas" aria-labelledby="pilih-laporan">

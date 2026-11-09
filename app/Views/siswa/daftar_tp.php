@@ -12,8 +12,7 @@
         <div>
             <p class="a-proto-eyebrow">Siswa · <?= esc((string) $paket['kode_mapel']) ?> · Gen <?= esc((string) $siswa['gen_kode']) ?></p>
             <h1>Semester <?= (int) $paket['semester'] ?> — <?= esc((string) $paket['nama_mapel']) ?></h1>
-            <p class="a-proto-muted">TP dibuka sesuai urutan ATP. TP berikutnya menunggu
-                penyelesaian TP sebelumnya; TP Draf menunggu Guru menyiapkannya.</p>
+            <p class="a-proto-muted">TP dibuka berurutan sesuai ATP.</p>
         </div>
     </header>
     <section class="a-card">
@@ -61,9 +60,7 @@
                 <?php endforeach ?>
             </div>
         <?php endif ?>
-        <p class="a-help a-jarak-atas">Daftar ini menunjukkan urutan TP. Buka Rincian TP
-            untuk menjalankan Diagnostik, melihat hasil, atau membaca Materi yang sudah diizinkan.
-            Materi berikutnya tetap menunggu persyaratan pembelajaran sebelumnya.</p>
+        <p class="a-help a-jarak-atas">Buka Rincian TP untuk melanjutkan belajar.</p>
     </section>
     <section class="a-card a-jarak-atas" aria-labelledby="pra-siswa">
         <?php

@@ -14,8 +14,7 @@ $adaKontak = $kontak['alamat'] !== '' || $kontak['telepon'] !== ''
         <div>
             <p class="a-proto-eyebrow">Bantuan · Kontak Resmi</p>
             <h1>Hubungi Admin</h1>
-            <p class="a-proto-muted">Gunakan informasi resmi madrasah berikut untuk menghubungi pengelola.
-                Halaman ini tidak menyediakan tiket, percakapan langsung, atau pengiriman pesan otomatis.</p>
+            <p class="a-proto-muted">Kontak resmi madrasah.</p>
         </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('bantuan'), 'attr') ?>">Kembali ke Bantuan</a>
     </header>
@@ -62,8 +61,6 @@ $adaKontak = $kontak['alamat'] !== '' || $kontak['telepon'] !== ''
                 <?php endif ?>
             </dl>
         <?php endif ?>
-        <p class="a-help a-jarak-atas">Sumber informasi: menu Identitas Madrasah yang dikelola Admin.
-            Nomor telepon dan email pribadi Guru/Admin tidak ditampilkan.</p>
-    </section>
+        </section>
 </div>
 <?= $this->endSection() ?>

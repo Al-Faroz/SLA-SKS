@@ -5,7 +5,7 @@
     <div>
         <p class="a-proto-eyebrow">Beranda · <?= esc($peranAktif) ?></p>
         <h1>Selamat datang, <?= esc($namaPengguna) ?></h1>
-        <p class="a-proto-muted">Ruang kerja akun Anda untuk mengakses layanan akademik sesuai peran aktif.</p>
+        <p class="a-proto-muted">Pilih layanan sesuai peran aktif.</p>
     </div>
 </header>
 <?php if ($pesan = session()->getFlashdata('galat')): ?>

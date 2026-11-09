@@ -9,8 +9,7 @@
     <div>
         <p class="a-proto-eyebrow">Informasi · Sesuai Hak Akses</p>
         <h1>Pengumuman</h1>
-        <p class="a-proto-muted">Pengumuman Admin berlaku bagi semua akun aktif.
-            Pengumuman Guru hanya ditampilkan kepada Siswa pada Gen yang saat ini diampunya.</p>
+        <p class="a-proto-muted">Pengumuman untuk akun Anda.</p>
     </div>
     <?php if (in_array($peran,['admin','guru'],true)): ?>
         <a class="a-btn a-btn--sekunder"

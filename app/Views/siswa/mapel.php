@@ -9,8 +9,7 @@
         <div>
             <p class="a-proto-eyebrow">Siswa · Gen <?= esc((string) $siswa['gen_kode']) ?></p>
             <h1>Mata Pelajaran</h1>
-            <p class="a-proto-muted">Pilih mata pelajaran yang ditugaskan untuk Gen Anda.
-                Pembelajaran mengikuti enam semester sesuai semester mulai Anda.</p>
+            <p class="a-proto-muted">Pilih mata pelajaran.</p>
         </div>
     </header>
     <section class="a-card">

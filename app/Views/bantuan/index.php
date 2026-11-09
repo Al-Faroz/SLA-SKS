@@ -15,8 +15,7 @@
         <div>
             <p class="a-proto-eyebrow"><?= esc($panduan['nama_peran']) ?> · Panduan Penggunaan</p>
             <h1>Pusat Bantuan</h1>
-            <p class="a-proto-muted">Petunjuk penggunaan SLA-SKS sesuai peran aktif dan alur akademik yang berlaku.
-                Pertanyaan di bawah ini mengarah ke halaman yang sudah tersedia.</p>
+            <p class="a-proto-muted">Panduan sesuai peran aktif.</p>
         </div>
         <a class="a-btn a-btn--sekunder" href="<?= esc(site_url($peran),'attr') ?>">Kembali ke Beranda</a>
     </header>
@@ -24,9 +23,7 @@
     <section class="a-card a-bantuan__pengenalan a-jarak-atas" aria-label="Cara menggunakan panduan">
         <div>
             <h2>Panduan untuk <?= esc($panduan['nama_peran']) ?></h2>
-            <p class="a-help">Pilih pertanyaan untuk melihat jawabannya, kemudian buka menu yang ditautkan.
-                Hak akses tetap diperiksa oleh server. Halaman ini berisi panduan penggunaan,
-                bukan pengumuman atau notifikasi dari sekolah.</p>
+            <p class="a-help">Pilih pertanyaan untuk melihat jawabannya.</p>
         </div>
         <div class="a-informasi__aksi">
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('hubungi-admin'),'attr') ?>">Hubungi Admin</a>

@@ -10,8 +10,7 @@
         <div>
             <p class="a-proto-eyebrow">Siswa · <?= esc((string) $mapel['kode_mapel']) ?></p>
             <h1><?= esc((string) $mapel['nama_mapel']) ?></h1>
-            <p class="a-proto-muted">Pilih semester sesuai urutan pembelajaran Gen Anda.
-                Semester sebelum semester mulai dilewati tanpa nilai.</p>
+            <p class="a-proto-muted">Pilih semester untuk melanjutkan belajar.</p>
         </div>
     </header>
     <section class="a-card">
