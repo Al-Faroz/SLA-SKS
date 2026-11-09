@@ -13,11 +13,9 @@
     </nav>
     <header class="a-proto-heading a-page__heading">
         <div>
-            <p class="a-proto-eyebrow">Administrasi / Akun</p>
+            
             <h1><?= esc($judulDaftar) ?></h1>
-            <p class="a-proto-muted"><?= $siswa
-                ? 'Akun siswa, NISN dan penempatan Gen.'
-                : 'Akun Admin, Guru dan Pimpinan dalam satu daftar.' ?></p>
+            
         </div>
         <span class="a-admin-akun__jumlah"><?= (int) $total ?> akun sesuai filter</span>
     </header>
@@ -32,9 +30,7 @@
     <div class="a-admin-akun__grid">
         <section class="a-card a-admin-akun__form" aria-labelledby="judul-tambah">
             <h2 id="judul-tambah">Tambah <?= esc($judulDaftar) ?></h2>
-            <p class="a-help"><?= $siswa
-                ? 'Siswa wajib memiliki NISN 10 angka dan penempatan Gen sebelum bisa belajar.'
-                : 'Staf dapat memiliki satu atau dua peran sesuai kombinasi yang diizinkan.' ?></p>
+            
             <form class="a-form" method="post" action="<?= esc($lokasi, 'attr') ?>">
                 <?= csrf_field() ?>
                 <div class="a-field">
@@ -82,7 +78,7 @@
                 <div class="a-field">
                     <label class="a-label" for="akun-sandi">Sandi awal akun</label>
                     <input id="akun-sandi" name="sandi" type="password" autocomplete="new-password" minlength="8" maxlength="200" required>
-                    <span class="a-help">Minimal 8 karakter. Admin wajib mengganti saat login pertama; Guru, Pimpinan dan Siswa disarankan menggantinya melalui Profil.</span>
+                    <span class="a-help">Minimal 8 karakter.</span>
                 </div>
                 <button class="a-btn a-btn--utama" type="submit" <?= $siswa && $gen === [] ? 'disabled' : '' ?>>Buat akun <?= esc($judulDaftar) ?></button>
             </form>
@@ -92,7 +88,7 @@
             <div class="a-proto-section-head">
                 <div>
                     <h2 id="judul-daftar">Daftar <?= esc($judulDaftar) ?></h2>
-                    <p>Gunakan filter untuk mencari akun terdaftar.</p>
+                    
                 </div>
             </div>
             <form class="a-filter a-admin-akun__filter" method="get" action="<?= esc($lokasi, 'attr') ?>">
@@ -128,7 +124,7 @@
             <div class="a-admin-akun__xlsx">
                 <div>
                     <strong>File Excel (.xlsx)</strong>
-                    <span class="a-help">Ekspor sesuai filter yang diterapkan, tanpa sandi dan hash.</span>
+                    
                 </div>
                 <div class="a-admin-akun__xlsx-aksi">
                     <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/' . $jenis . '/template'), 'attr') ?>">Unduh template</a>
@@ -206,6 +202,6 @@
             <?php endif ?>
         </section>
     </div>
-    <p class="a-help">Impor Excel melalui pratinjau dan konfirmasi. Perubahan Gen siswa yang sudah ditempatkan tetap memerlukan pemeriksaan progres pada modul berikutnya.</p>
+    
 </div>
 <?= $this->endSection() ?>

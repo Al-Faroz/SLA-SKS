@@ -84,18 +84,17 @@ $urlPeta=site_url('guru/peta-atp').'?'.http_build_query(['pilihan'=>$nomor]);
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Materi perlu diperiksa</span>
                     <strong><?= (int)$kpi['tp_tanpa_materi'] ?></strong>
-                    <small>TP tanpa tepat satu Materi aktif, termasuk Esensial</small>
+                    
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Antrean Resume/HOTS</span>
                     <strong><?= (int)($kpi['antrean_resume']+$kpi['antrean_hots']) ?></strong>
-                    <small><?= (int)$kpi['antrean_resume'] ?> Resume ·
-                        <?= (int)$kpi['antrean_hots'] ?> HOTS final belum dinilai</small>
+                    <small><?= (int)$kpi['antrean_resume'] ?> Resume · <?= (int)$kpi['antrean_hots'] ?> HOTS</small>
                 </article>
                 <article class="a-card a-dashboard-guru__metric">
                     <span>Siswa perlu bantuan</span>
                     <strong><?= (int)$kpi['perlu_bantuan'] ?></strong>
-                    <small>Jumlah unik per paket dengan progres perlu bantuan</small>
+                    
                 </article>
             </div>
         </section>

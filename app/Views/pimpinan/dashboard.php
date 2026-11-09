@@ -88,7 +88,7 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>Siswa terdaftar</span>
                 <strong><?= (int)$ring['siswa'] ?></strong>
-                <small>Unik pada Gen yang tercakup filter, termasuk semester dilewati</small>
+                
             </article>
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>Paket aktif</span>
@@ -98,17 +98,17 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>TP selesai sah</span>
                 <strong><?= (int)$ring['tuntas_sah'] ?> / <?= (int)$ring['pasangan_wajib'] ?></strong>
-                <small>Pasangan siswa×TP NonEsensial dengan Sumatif selesai sah</small>
+                
             </article>
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>Nilai TP Final</span>
                 <strong><?= (int)$ring['nilai_final'] ?></strong>
-                <small>Pasangan tuntas sah dengan nilai Final, termasuk skor 0</small>
+                
             </article>
             <article class="a-card a-dashboard-pimpinan__metric">
                 <span>Sertifikat berlaku</span>
                 <strong><?= (int)$ring['sertifikat_berlaku'] ?></strong>
-                <small>Versi aktif; arsip digantikan tidak dihitung</small>
+                
             </article>
         </div>
     </section>
@@ -124,15 +124,10 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
                     aria-label="Persentase TP selesai sah pada seluruh paket yang difilter"></progress>
                 <strong><?= esc(number_format((float)$ring['persen'],1,',','.')) ?>%</strong>
             </div>
-            <p class="a-help"><?= (int)$ring['tuntas_sah'] ?> dari
-                <?= (int)$ring['pasangan_wajib'] ?> pasangan siswa×TP NonEsensial.
-                Angka ini bukan rata-rata nilai maupun Nilai Akhir Semester.</p>
+            
         <?php endif ?>
         <?php if ($ring['paket_kosong']>0): ?>
-            <p class="a-dashboard-pimpinan__note">
-                <?= (int)$ring['paket_kosong'] ?> paket aktif belum memiliki
-                TP NonEsensial; paket tersebut tidak dianggap 100% selesai.
-            </p>
+            <p class="a-dashboard-pimpinan__note"><?= (int)$ring['paket_kosong'] ?> paket tanpa TP wajib.</p>
         <?php endif ?>
     </section>
 
@@ -142,16 +137,14 @@ $urlHalaman=static fn (int $n): string => site_url('pimpinan').'?'.http_build_qu
             <div>
                 <strong><?= (int)$ring['guru_ditugaskan'] ?> /
                     <?= (int)$ring['pasangan_gen_mapel'] ?></strong>
-                <span>Pasangan Gen–Mapel memiliki Guru yang ditugaskan</span>
+                <span>Gen–Mapel memiliki Guru</span>
             </div>
             <div>
                 <strong><?= (int)$ring['antrean_penilaian'] ?></strong>
-                <span>Jawaban final Resume/HOTS yang belum dinilai Guru</span>
+                <span>Resume/HOTS belum dinilai</span>
             </div>
         </div>
-        <p class="a-help">Angka antrean berasal dari jawaban final yang belum berskor,
-            bukan semua draf siswa. Pimpinan hanya memantau; penilaian dilakukan
-            Guru melalui menu Antrean Penilaian.</p>
+        
     </section>
 
     <section class="a-card a-jarak-atas" aria-labelledby="judul-paket-monitor">

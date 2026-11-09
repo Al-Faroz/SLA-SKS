@@ -40,8 +40,7 @@ $lanjut=$ring['lanjut'];
             <?php if ($ring['persen']===null): ?>
                 <small>Belum ada target TP NonEsensial yang terbuka</small>
             <?php else: ?>
-                <small><?= esc(number_format((float)$ring['persen'],1,',','.')) ?>%
-                    dari TP NonEsensial pada paket terbuka</small>
+                <small><?= esc(number_format((float)$ring['persen'],1,',','.')) ?>%</small>
             <?php endif ?>
         </div>
     </section>
@@ -62,26 +61,24 @@ $lanjut=$ring['lanjut'];
             <article class="a-card a-dashboard-siswa__metric">
                 <span>Nilai TP Final</span>
                 <strong><?= (int)$ring['nilai_final'] ?></strong>
-                <small>Termasuk skor 0; nilai yang belum ada tidak dihitung</small>
+                
             </article>
             <article class="a-card a-dashboard-siswa__metric">
                 <span>TP perlu bantuan</span>
                 <strong><?= (int)$ring['perlu_bantuan'] ?></strong>
-                <small>Buka rincian TP untuk melihat kebutuhan akses ulang</small>
+                
             </article>
             <article class="a-card a-dashboard-siswa__metric">
                 <span>Sertifikat berlaku</span>
                 <strong><?= (int)$ring['sertifikat_berlaku'] ?></strong>
-                <small>Versi aktif yang dapat diunduh melalui menu Sertifikat</small>
+                
             </article>
         </div>
     </section>
 
     <section class="a-card a-jarak-atas" aria-labelledby="siswa-progres-judul">
         <h2 id="siswa-progres-judul">Progres per Mata Pelajaran dan Semester</h2>
-        <p class="a-help">Progres dihitung hanya dari TP NonEsensial yang tuntas dan
-            mempunyai Sumatif selesai sah. TP Esensial tidak bernilai,
-            dan Pra-Semester tidak masuk ke perhitungan ini.</p>
+        
         <?php if ($ring['paket']===[]): ?>
             <div class="a-alert" role="status">
                 Belum ada semester yang dapat dibuka. Periksa daftar pembelajaran
@@ -114,8 +111,7 @@ $lanjut=$ring['lanjut'];
                             <span>TP selesai sah</span>
                         </p>
                         <?php if ($paket['tp_wajib']===0): ?>
-                            <p class="a-help">Belum ada target TP wajib.
-                                Progres belum dapat dihitung.</p>
+                            <p class="a-help">Belum ada TP wajib.</p>
                         <?php elseif ($paket['tp_wajib']<=12): ?>
                             <div class="a-dashboard-siswa__segments"
                                 role="img" aria-label="<?= esc((string)$paket['tp_tuntas']
@@ -159,9 +155,7 @@ $lanjut=$ring['lanjut'];
         <div class="a-dashboard-siswa__links">
             <div>
                 <h3>Laporan Akademik Saya</h3>
-                <p class="a-help">Lihat nilai Final atau Sementara per TP.
-                    Hasil Pra-Semester ditampilkan pada bagian terpisah
-                    sebagai checkpoint sebelum Ujian Semester.</p>
+                
                 <a class="a-btn a-btn--sekunder"
                     href="<?= esc(site_url('siswa/laporan'),'attr') ?>">
                     Buka Laporan Akademik

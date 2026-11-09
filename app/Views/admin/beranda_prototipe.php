@@ -60,7 +60,7 @@
             <article class="a-dashboard-admin__metric">
                 <span>Akun aktif</span>
                 <strong><?= (int)$ringkasan['akun_aktif'] ?></strong>
-                <small>Semua peran dengan status akun aktif</small>
+                
             </article>
             <article class="a-dashboard-admin__metric">
                 <span>Siswa terdaftar</span>
@@ -70,12 +70,12 @@
             <article class="a-dashboard-admin__metric">
                 <span>TP Siap</span>
                 <strong><?= (int)$ringkasan['tp_siap'] ?></strong>
-                <small>Konten siap tersimpan, dikelola Guru G1</small>
+                
             </article>
             <article class="a-dashboard-admin__metric">
                 <span>TP Draf</span>
                 <strong><?= (int)$ringkasan['tp_draf'] ?></strong>
-                <small>Masih disiapkan Guru, tidak otomatis gagal</small>
+                
             </article>
             <article class="a-dashboard-admin__metric">
                 <span>Foto menunggu persetujuan</span>
@@ -93,8 +93,7 @@
     <div class="a-dashboard-admin__health a-jarak-atas">
         <section class="a-card a-dashboard-admin__section" aria-labelledby="admin-perhatian">
             <h2 id="admin-perhatian">Perhatian Admin</h2>
-            <p class="a-help">Hanya kondisi yang dapat diperiksa dari data.
-                Penugasan Guru dan persetujuan foto tetap diproses melalui halaman resminya.</p>
+            
             <?php if ($ringkasan['perhatian'] === []): ?>
                 <div class="a-alert" role="status">
                     Tidak ada penugasan kosong, foto menunggu, atau kendala TTD
@@ -139,17 +138,17 @@
                             <?= esc(number_format((float)$ringkasan['disk_sisa_byte'] / 1073741824,2,',','.')) ?> GB
                         <?php endif ?>
                     </strong>
-                    <small>Angka kapasitas, bukan pemeriksaan ambang aman hosting</small>
+                    
                 </div>
                 <div>
                     <span>Status cron</span>
                     <strong>Belum diperiksa otomatis</strong>
-                    <small>Jadwal tugas server tidak dinilai dari kunjungan halaman</small>
+                    
                 </div>
                 <div>
                     <span>Status backup</span>
                     <strong>Belum diverifikasi</strong>
-                    <small>Pastikan backup database dan writable/ secara terpisah</small>
+                    
                 </div>
             </div>
         </section>
@@ -166,42 +165,42 @@
             <div class="a-proto-shortcuts">
                 <a href="<?= esc(site_url('admin/pengelola'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8.5" cy="8" r="2.5"/><path d="M3 19v-2.2A4.8 4.8 0 0 1 7.8 12h1.4a4.8 4.8 0 0 1 4.8 4.8V19M16 5a3 3 0 0 1 0 6M17 13a4 4 0 0 1 4 4v2"/></svg></span>
-                    <span><strong>Pengelola</strong><small>Akun staf dan reset sandi</small></span>
+                    <span><strong>Pengelola</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/referensi'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span>
-                    <span><strong>Gen &amp; Tahun Ajaran</strong><small>Data induk pembelajaran</small></span>
+                    <span><strong>Gen &amp; Tahun Ajaran</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19v-1.5a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V19"/><circle cx="8.5" cy="7" r="3"/><path d="m16 10 2.3 2.3L22 8.5"/></svg></span>
-                    <span><strong>Mapel &amp; Guru per Gen</strong><small>Penugasan pengampu</small></span>
+                    <span><strong>Mapel &amp; Guru per Gen</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/kurikulum-cp'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4zM8 9h8M8 13h6M8 17h4"/></svg></span>
-                    <span><strong>Kurikulum &amp; CP</strong><small>Tambah, cari, dan sunting CP</small></span>
+                    <span><strong>Kurikulum &amp; CP</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/siswa'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 8h4M19 6v4"/></svg></span>
-                    <span><strong>Data Siswa</strong><small>Akun dan penempatan Gen</small></span>
+                    <span><strong>Data Siswa</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/kkm'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM8 12l3 3 5-6"/></svg></span>
-                    <span><strong>KKM Default</strong><small>Ambang ketuntasan akademik</small></span>
+                    <span><strong>KKM Default</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/identitas'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-6 9 6v12H3ZM9 21v-8h6v8M7 10h.01M17 10h.01"/></svg></span>
-                    <span><strong>Identitas Madrasah</strong><small>Informasi resmi sekolah</small></span>
+                    <span><strong>Identitas Madrasah</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
                 <a href="<?= esc(site_url('admin/foto-profil'), 'attr') ?>">
                     <span class="a-proto-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m5 18 5-5 4 3 2-2 3 4"/></svg></span>
-                    <span><strong>Persetujuan Foto</strong><small>Tinjau foto profil pengelola</small></span>
+                    <span><strong>Persetujuan Foto</strong></span>
                     <span class="a-proto-shortcut-arrow" aria-hidden="true">↗</span>
                 </a>
             </div>
@@ -211,15 +210,15 @@
             <span class="a-proto-pill">Fondasi akademik</span>
             <h2 id="judul-tahap">Kesiapan pengelolaan</h2>
             <?php if ($ringkasan['gen'] === 0 || $ringkasan['mapel'] === 0): ?>
-                <p>Data Gen atau mata pelajaran masih kosong. Lengkapi referensi sebelum menetapkan pengampu.</p>
+                <p>Lengkapi Gen dan Mapel.</p>
             <?php elseif ($ringkasan['belum_ditugaskan'] > 0): ?>
-                <p>Sebagian kombinasi potensial Gen–Mapel belum ditetapkan Guru. Tetapkan pengampu pada kombinasi yang memang digunakan dalam pembelajaran.</p>
+                <p>Ada Gen–Mapel tanpa pengampu.</p>
             <?php else: ?>
-                <p>Semua kombinasi Gen–Mapel yang terhitung dalam ringkasan sudah memiliki Guru pengampu.</p>
+                <p>Pengampu lengkap.</p>
             <?php endif ?>
             <div class="a-proto-note">
                 <span class="a-proto-note__mark" aria-hidden="true">i</span>
-                <p>Ringkasan berisi data referensi dan penugasan. Kelengkapan TP dan hasil pembelajaran diperiksa pada halaman modul masing-masing.</p>
+                <p></p>
             </div>
             <a class="a-btn a-btn--sekunder" href="<?= esc(site_url('admin/mapel-guru'), 'attr') ?>">Periksa penugasan</a>
         </aside>
