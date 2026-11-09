@@ -144,6 +144,9 @@ $peranAktif = $peranAktif ?? '';
             <?php endif ?>
             <?= $this->renderSection('konten') ?>
         </main>
+        <footer class="a-main__footer" role="contentinfo">
+            <span>@LemahTeles | 2026</span>
+        </footer>
         <button type="button" class="a-btn a-back-to-top" data-back-to-top hidden aria-label="Kembali ke atas halaman" title="Kembali ke atas halaman">
             <svg class="a-icon" aria-hidden="true"><use href="<?= esc(base_url('public/assets/icons/lucide-sla.svg'), 'attr') ?>#arrow-up"></use></svg>
         </button>

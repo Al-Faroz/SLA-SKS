@@ -45,8 +45,7 @@
         <?= $this->renderSection('konten') ?>
     </main>
     <footer class="a-kaki-publik">
-        <span>SLA-SKS · Pembelajaran mandiri MTs Fase D</span>
-        <span>Akses pengguna dikelola madrasah.</span>
+        <span>@LemahTeles | 2026</span>
     </footer>
 </div>
 </body>

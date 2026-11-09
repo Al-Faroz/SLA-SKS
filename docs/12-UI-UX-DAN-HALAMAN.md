@@ -532,3 +532,11 @@ Naskah **contoh umum** untuk Kebijakan Privasi terisi hanya pada editor Admin un
 ## Addendum UI Tahap 3 Batch 3 — 6 November 2026
 
 Penyelarasan visual **Pra-Semester Admin/Guru**, detail jadwal remedial/susulan, **Sertifikat Admin/Siswa**, **Monitoring Pimpinan** dan **Informasi & Bantuan** memakai token Vibrant Glass Navy–Emerald Dark/Light. Berkas UI yang sudah mempunyai `a-pra-*`, `a-sertifikat__*`, `a-laporan__*`, `a-informasi__*` dipertahankan; perubahan hanya styling scoped, semantik tabel `scope="row"`, nama tombol Unduh PDF spesifik, dan region gulir yang dapat difokus. Filter, URL GET/POST, CSRF, bank, jadwal, nilai, status sertifikat, dan izin tetap berasal dari Service. Mode Dokumentasi **tetap dicabut** pada Tahap 1, sehingga referensi historis dalam dokumen ini tidak boleh diaktifkan ulang. QA XAMPP dan regresi E2E mengikuti `docs/QA-T3-BATCH3-INTEGRASI-20261106.md`. Branch Batch 3 tetap Draft hingga pengujian pemilik.
+
+
+## Clean Look — penyederhanaan teks dan konsistensi komponen (9 November 2026)
+
+- Bukan penggantian palet, tema, gradasi, atau keputusan Vibrant Glass sebelumnya. Dashboard dan halaman kerja mengurangi narasi pengantar berulang. Status akademik, pesan kesalahan, konsekuensi impor, instruksi ujian, serta alasan penguncian tetap terlihat sesuai kebutuhan.
+- Login disajikan sebagai satu kartu terpusat, menampilkan logo resmi, identitas SLA-SKS, form, pilihan tema, pesan autentikasi, bantuan ringkas dan tautan privasi. Warna mengikuti token yang ada.
+- Semua panel empat peran memakai label form dan status yang ringkas. Tabel tetap dapat digulir pada layar kecil; input, textarea, fokus keyboard, tombol dan pagination dipastikan konsisten dengan token Dark/Light. Tidak mengubah nama input, validasi, aksi, endpoint, perhitungan, maupun hak akses.
+- Footer publik dan panel pengguna: teks tepat **@LemahTeles | 2026**. Footer tampil pada login dan panel tanpa menutupi isi layar. Screenshot dan regresi tampilan di browser XAMPP/hosting staging wajib sebelum perubahan dianggap FIX.

@@ -3686,15 +3686,14 @@ html[data-theme] .a-app--prototipe :is(
 }
 
 /* CLEAN LOOK TAHAP 1 — HANYA SUSUNAN LOGIN, WARNA TETAP TOKEN TEMA */
-html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-kepala-publik,
-html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-kaki-publik { display:none; }
+html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-kepala-publik { display:none; }
 html[data-theme] body.a-publik--prototipe:has(.a-clean-login) .a-konten-publik {
     display:flex; align-items:center; justify-content:center;
     width:100%; max-width:none; padding:24px 16px; flex:1;
 }
 html[data-theme] .a-clean-login {
     display:flex; align-items:center; justify-content:center;
-    width:100%; min-height:calc(100dvh - 48px);
+    width:100%; min-height:0;
 }
 html[data-theme] .a-publik--prototipe .a-clean-login__card {
     width:100%; max-width:400px; padding:36px 30px 26px; justify-self:center;
@@ -3746,4 +3745,70 @@ html[data-theme] .a-clean-login__form input {
 html[data-theme] .a-clean-login__form input::placeholder { color:var(--e-muted); opacity:.8; }
 html[data-theme] .a-clean-login__form input:focus-visible {
     outline:2px solid var(--e-primary); outline-offset:2px;
+}
+
+/* CLEAN LOOK — AUDIT KOMPONEN TERPADU, 9 NOVEMBER 2026
+   Hanya konsistensi dimensi, keterbacaan dan fokus. Palet tema tetap. */
+html[data-theme] .a-app--prototipe .a-main {
+    display:flex; flex-direction:column; min-height:100vh;
+}
+html[data-theme] .a-app--prototipe .a-main__konten {
+    flex:1 0 auto; min-width:0; width:100%;
+}
+html[data-theme] .a-app--prototipe .a-main__footer {
+    display:flex; align-items:center; justify-content:center;
+    padding:14px 22px; margin-top:auto; min-height:44px;
+    font-size:12px; line-height:1.4; color:var(--e-muted);
+    border-top:1px solid var(--e-border); background:var(--e-header);
+}
+html[data-theme] .a-publik--prototipe .a-kaki-publik {
+    display:flex; align-items:center; justify-content:center;
+    gap:8px; min-height:44px; padding:10px 16px;
+    font-size:12px; color:var(--e-muted); background:var(--e-header);
+    border-top:1px solid var(--e-border);
+}
+html[data-theme] .a-publik--prototipe .a-kaki-publik span { color:inherit; }
+html[data-theme] .a-app--prototipe .a-page .a-field {
+    min-width:0;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="submit"]):not([type="button"]),
+    select, textarea
+) {
+    box-sizing:border-box; max-width:100%; min-height:42px;
+    border-radius:10px; border:1px solid var(--vg-control-line,var(--e-border));
+    color:var(--e-text); background:var(--vg-control-bg,var(--e-input));
+}
+html[data-theme] .a-app--prototipe .a-page .a-field textarea {
+    width:100%; min-height:110px; resize:vertical;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(input,select,textarea):focus-visible,
+html[data-theme] .a-app--prototipe .a-page :is(.a-btn,.a-pager__tombol):focus-visible {
+    outline:2px solid var(--e-primary); outline-offset:2px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(input,select,textarea):disabled {
+    opacity:.7; cursor:not-allowed;
+}
+html[data-theme] .a-app--prototipe .a-page .a-field :is(input,select,textarea)[aria-invalid="true"] {
+    border-color:var(--e-danger);
+}
+html[data-theme] .a-app--prototipe .a-page .a-tabel-gulir {
+    max-width:100%; overflow-x:auto; overscroll-behavior-x:contain;
+}
+html[data-theme] .a-app--prototipe .a-page .a-tbl :is(th,td) {
+    vertical-align:middle;
+}
+html[data-theme] .a-app--prototipe .a-page .a-pager__aksi {
+    display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-pager__tombol {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-height:40px; min-width:40px;
+}
+html[data-theme] .a-app--prototipe .a-page .a-pager__tombol.is-nonaktif {
+    cursor:default;
+}
+@media(max-width:767px) {
+    html[data-theme] .a-app--prototipe .a-main__footer { padding:12px 16px; }
+    html[data-theme] .a-app--prototipe .a-page .a-pager__aksi { justify-content:center; }
 }
